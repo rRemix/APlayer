@@ -115,7 +115,7 @@ public class Global {
             @Override
             public void run() {
                 //当前模式是随机播放 或者即将设置为随机播放 都要更新mRandomList
-                boolean shuffle = intent.getBooleanExtra("shuffle",false) | SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP) == Constants.PLAY_SHUFFLE;
+                boolean shuffle = intent.getBooleanExtra("shuffle",false) | SPUtil.getValue(context,SPUtil.SETTING_KEY.NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP) == Constants.PLAY_SHUFFLE;
                 if(newQueueIdList == null || newQueueIdList.size() == 0){
                     return;
                 }

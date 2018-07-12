@@ -138,8 +138,8 @@ public class TimerDialog extends BaseDialogActivity {
         ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
 
         //读取保存的配置
-        boolean hasDefault = SPUtil.getValue(this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
-        final int time = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.TIMER_DURATION,-1);
+        boolean hasDefault = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
+        final int time = SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.TIMER_DURATION,-1);
 
         //默认选项
         if(hasDefault && time > 0){
@@ -155,16 +155,16 @@ public class TimerDialog extends BaseDialogActivity {
             if (isChecked) {
                 if (mSaveTime > 0) {
                     ToastUtil.show(TimerDialog.this,R.string.set_success);
-                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, true);
-                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.TIMER_DURATION, mSaveTime);
+                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, true);
+                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.TIMER_DURATION, mSaveTime);
                 } else {
                     ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
                     mSwitch.setChecked(false);
                 }
             } else {
                 ToastUtil.show(TimerDialog.this,R.string.cancel_success);
-                SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
-                SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
+                SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
+                SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
                 mSaveTime = -1;
             }
         });

@@ -154,7 +154,7 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
     }
 
     protected void updateRemoteViews(RemoteViews remoteViews,Song song){
-//        int skin = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
+//        int skin = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
 //        mSkin = skin == SKIN_TRANSPARENT ? AppWidgetSkin.TRANSPARENT : AppWidgetSkin.WHITE_1F;
 //        updateBackground(remoteViews);
         updateTitle(remoteViews,song);

@@ -164,12 +164,12 @@ public class FloatLrcView extends RelativeLayout {
     }
 
     private void setUpView() {
-        mText1.setTextColor(ThemeStore.getThemeColorInt(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_COLOR,ThemeStore.getThemeColor())));
+        mText1.setTextColor(ThemeStore.getThemeColorInt(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_COLOR,ThemeStore.getThemeColor())));
         mText1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
         mText2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
-        mIsLock = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_LOCK,false);
+        mIsLock = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_LOCK,false);
 
-        mTextSizeType = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_SIZE,MEDIUM);
+        mTextSizeType = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_SIZE,MEDIUM);
         setPlayIcon(MusicService.isPlay());
 
         getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -280,7 +280,7 @@ public class FloatLrcView extends RelativeLayout {
         switch (view.getId()) {
             //关闭桌面歌词
             case R.id.widget_close:
-                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW,false);
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW,false);
                 Intent closeIntent = new Intent(MusicService.ACTION_CMD);
                 closeIntent.putExtra("FloatLrc",false);
                 closeIntent.putExtra("Control", Command.TOGGLE_FLOAT_LRC);
@@ -336,7 +336,7 @@ public class FloatLrcView extends RelativeLayout {
                 if(needRefresh){
                     mText1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
                     mText2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
-                    SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_SIZE,mTextSizeType);
+                    SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_SIZE,mTextSizeType);
                     //操作后重置消息的时间
                     resetHide();
                 }
@@ -346,7 +346,7 @@ public class FloatLrcView extends RelativeLayout {
 
     public void saveLock(boolean lock, boolean toast){
         mIsLock = lock;
-        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_LOCK, mIsLock);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_LOCK, mIsLock);
         if(toast){
             ToastUtil.show(mContext, !mIsLock ? R.string.float_unlock : R.string.float_lock);
         }

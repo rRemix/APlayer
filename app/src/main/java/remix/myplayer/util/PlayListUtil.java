@@ -288,7 +288,7 @@ public class PlayListUtil {
         ArrayList<PlayList> playList = new ArrayList<>();
         Cursor cursor = null;
         try {
-            String sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER, SortOrder.PlayListSortOrder.PLAYLIST_DATE);
+            String sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER, SortOrder.PlayListSortOrder.PLAYLIST_DATE);
             LogUtil.d("QueryPlayList","SortOrder: " + sortOrder);
             cursor = DBManager.getInstance().openDataBase().rawQuery("select * from play_list where name != '" + Constants.PLAY_QUEUE + "' order by " + sortOrder,null);
 //            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,null,PlayLists.PlayListColumns.NAME + "!= ?",
@@ -418,7 +418,7 @@ public class PlayListUtil {
 
         StringBuilder selection = new StringBuilder(127);
         selection.append(MediaStore.Audio.Media._ID + " in (");
-        StringBuilder sortOrder = new StringBuilder(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,SortOrder.PlayListSongSortOrder.SONG_A_Z));
+        StringBuilder sortOrder = new StringBuilder(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,SortOrder.PlayListSongSortOrder.SONG_A_Z));
 //        //自定义排序 sqlite不支持find_in_set
 //        if(sortOrder.toString().equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)){
 //            sortOrder.delete(0,sortOrder.length());
@@ -497,7 +497,7 @@ public class PlayListUtil {
      * @return
      */
     public static String getDeleteID(){
-        Set<String> deleteId = SPUtil.getStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
+        Set<String> deleteId = SPUtil.getStringSet(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
         if(deleteId == null || deleteId.size() == 0)
             return "";
         StringBuilder stringBuilder = new StringBuilder();

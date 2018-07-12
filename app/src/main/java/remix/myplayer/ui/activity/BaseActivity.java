@@ -125,7 +125,7 @@ public class BaseActivity extends AppCompatActivity {
      */
     protected void setNavigationBarColor(){
         //导航栏变色
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION,false)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION,false)) {
             getWindow().setNavigationBarColor(ThemeStore.getAccentColor());
         }
     }

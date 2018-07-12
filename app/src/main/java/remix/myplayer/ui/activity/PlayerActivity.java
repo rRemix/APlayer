@@ -950,7 +950,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 else
                     mPager.setIntercept(false);
                 //歌词界面常亮
-                if(position == 2 && SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,false)){
+                if(position == 2 && SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,false)){
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 }
             }
@@ -1050,7 +1050,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         Theme.TintDrawable(mTopHide,R.drawable.icon_player_back,tintColor);
         Theme.TintDrawable(mTopMore,R.drawable.icon_player_more,tintColor);
         //播放模式与播放队列
-        int playMode = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP);
+        int playMode = SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP);
         Theme.TintDrawable(mPlayModel,playMode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                 playMode == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                         R.drawable.play_btn_loop_one,tintColor);
@@ -1157,16 +1157,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @Override
     public void onFileSelection(@NonNull FileChooserDialog dialog, @NonNull File file) {
 //        //如果之前忽略过该歌曲的歌词，取消忽略
-//        Set<String> ignoreLrcId = new HashSet<>(SPUtil.getStringSet(this,SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID"));
+//        Set<String> ignoreLrcId = new HashSet<>(SPUtil.getStringSet(this,SPUtil.SETTING_KEY.NAME,"IgnoreLrcID"));
 //        if(ignoreLrcId.size() > 0){
 //            for (String id : ignoreLrcId){
 //                if((mInfo.getID() + "").equals(id)){
 //                    ignoreLrcId.remove(mInfo.getID() + "");
-//                    SPUtil.putStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID",ignoreLrcId);
+//                    SPUtil.putStringSet(mContext,SPUtil.SETTING_KEY.NAME,"IgnoreLrcID",ignoreLrcId);
 //                }
 //            }
 //        }
-        SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_MANUAL);
+        SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_MANUAL);
         mLyricFragment.updateLrc(file.getAbsolutePath());
         sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
     }
@@ -1216,8 +1216,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mLyricFragment.updateLrc(newSong,true);
             Fresco.getImagePipeline().clearCaches();
             final UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(mInfo);
-            SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,request.getLastFMKey());
-            SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseCacheKey());
+            SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.NAME,request.getLastFMKey());
+            SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.NAME,request.getNeteaseCacheKey());
             mInfo = newSong;
             requestCover(false);
         }

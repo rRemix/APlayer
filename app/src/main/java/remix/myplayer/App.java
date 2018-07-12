@@ -14,7 +14,6 @@ import com.umeng.analytics.MobclickAgent;
 import com.umeng.commonsdk.UMConfigure;
 
 import cn.bmob.v3.Bmob;
-import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
@@ -73,9 +72,9 @@ public class App extends MultiDexApplication{
             new DynamicShortcutManager(this).setUpShortcut();
 
         //兼容性
-        if(SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"CoverTemp",true)){
-            SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"CoverTemp",false);
-            SPUtil.deleteFile(this,SPUtil.COVER_KEY.COVER_NAME);
+        if(SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME,"CoverTemp",true)){
+            SPUtil.putValue(this,SPUtil.SETTING_KEY.NAME,"CoverTemp",false);
+            SPUtil.deleteFile(this,SPUtil.COVER_KEY.NAME);
         }
 
     }
@@ -116,10 +115,7 @@ public class App extends MultiDexApplication{
 
     private void loadThirdParty() {
         //bomb
-        Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
-        if(!IS_GOOGLEPLAY){
-            BmobUpdateAgent.setUpdateOnlyWifi(false);
-            BmobUpdateAgent.update(this);
-        }
+        if(!IS_GOOGLEPLAY)
+            Bmob.initialize(this, BuildConfig.BMOB_KEY);
     }
 }

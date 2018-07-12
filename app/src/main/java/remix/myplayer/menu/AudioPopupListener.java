@@ -63,7 +63,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
         MobclickAgent.onEvent(mActivity,item.getItemId() == R.id.menu_edit ? "SongEdit" : "SongDetail" );
         switch (item.getItemId()){
             case R.id.menu_lyric:
-                final boolean alreadyIgnore = SPUtil.getValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
+                final boolean alreadyIgnore = SPUtil.getValue(mActivity,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
                 final LyricFragment lyricFragment = ((PlayerActivity)mActivity).getLyricFragment();
                 new MaterialDialog.Builder(mActivity)
                         .items(getString(R.string.netease), getString(R.string.kugou), getString(R.string.select_lrc), getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc))
@@ -73,7 +73,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                             switch (position){
                                 case 0: //网易 酷狗
                                 case 1:
-                                    SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
+                                    SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
                                     lyricFragment.updateLrc(mInfo,true);
                                     sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                     break;
@@ -94,11 +94,11 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                             .onPositive((dialog1, which) -> {
                                                 if(!alreadyIgnore){//忽略
                                                     if (mInfo != null) {
-                                                        SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_IGNORE);
+                                                        SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_IGNORE);
                                                         lyricFragment.updateLrc(mInfo);
                                                     }
                                                 } else {//取消忽略
-                                                    SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT);
+                                                    SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT);
                                                     lyricFragment.updateLrc(mInfo);
                                                 }
                                             })

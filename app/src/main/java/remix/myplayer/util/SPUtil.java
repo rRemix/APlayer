@@ -70,96 +70,99 @@ public class SPUtil {
         editor.clear().apply();
     }
 
-    public static class LYRIC_KEY{
-        public static final String LYRIC_NAME = "Lyric";
-        public static final int LYRIC_DEFAULT = 0;
-        public static final int LYRIC_IGNORE = 1;
-        public static final int LYRIC_NETEASE = 2;
-        public static final int LYRIC_KUGOU = 3;
-        public static final int LYRIC_MANUAL = 4;
+    public interface UPDATE_KEY{
+        String NAME = "Update";
     }
 
-    public static class COVER_KEY{
-        public static final String COVER_NAME = "Cover";
+    public interface LYRIC_KEY{
+        String NAME = "Lyric";
+        int LYRIC_DEFAULT = 0;
+        int LYRIC_IGNORE = 1;
+        int LYRIC_NETEASE = 2;
+        int LYRIC_KUGOU = 3;
+        int LYRIC_MANUAL = 4;
     }
 
+    public interface COVER_KEY{
+        String NAME = "Cover";
+    }
 
-    public static class SETTING_KEY {
-        public static final String SETTING_NAME = "Setting";
+    public interface SETTING_KEY {
+        String NAME = "Setting";
         //桌面歌词是否可移动
-        public static final String FLOAT_LYRIC_LOCK = "float_lyric_lock";
+        String FLOAT_LYRIC_LOCK = "float_lyric_lock";
         //桌面歌词字体大小
-        public static final String FLOAT_TEXT_SIZE = "float_text_size";
+        String FLOAT_TEXT_SIZE = "float_text_size";
         //桌面歌词y坐标
-        public static final String FLOAT_Y = "float_y";
+        String FLOAT_Y = "float_y";
         //桌面歌词的字体颜色
-        public static final String FLOAT_TEXT_COLOR = "float_text_color";
+        String FLOAT_TEXT_COLOR = "float_text_color";
         //是否开启屏幕常亮
-        public static final String SCREEN_ALWAYS_ON = "key_screen_always_on";
+        String SCREEN_ALWAYS_ON = "key_screen_always_on";
         //通知栏是否启用经典样式
-        public static final String NOTIFY_STYLE_CLASSIC = "notify_classic";
+        String NOTIFY_STYLE_CLASSIC = "notify_classic";
         //是否自动下载专辑封面
-        public static final String AUTO_DOWNLOAD_ALBUM_COVER = "auto_download_album_cover";
+        String AUTO_DOWNLOAD_ALBUM_COVER = "auto_download_album_cover";
         //是否自动下载艺术家封面
-        public static final String AUTO_DOWNLOAD_ARTIST_COVER = "auto_download_artist_cover";
+        String AUTO_DOWNLOAD_ARTIST_COVER = "auto_download_artist_cover";
         //曲库配置
-        public static final String LIBRARY_CATEGORY = "library_category";
+        String LIBRARY_CATEGORY = "library_category";
         //锁屏设置
-        public static final String LOCKSCREEN = "lockScreen";
+        String LOCKSCREEN = "lockScreen";
         //导航浪变色
-        public static final String COLOR_NAVIGATION = "color_Navigation";
+        String COLOR_NAVIGATION = "color_Navigation";
         //摇一摇
-        public static final String SHAKE = "shake";
+        String SHAKE = "shake";
         //优先搜索在线歌词
-        public static final String ONLINE_LYRIC_FIRST = "online_lyric_first";
+        String ONLINE_LYRIC_FIRST = "online_lyric_first";
         //是否开启桌面歌词
-        public static final String FLOAT_LYRIC_SHOW = "float_lyric_show";
+        String FLOAT_LYRIC_SHOW = "float_lyric_show";
         //沉浸式状态栏
-        public static final String IMMERSIVE_MODE = "immersive_mode";
+        String IMMERSIVE_MODE = "immersive_mode";
         //过滤大小
-        public static final String SCAN_SIZE = "scan_size";
+        String SCAN_SIZE = "scan_size";
         //歌曲排序顺序
-        public static final String SONG_SORT_ORDER = "song_sort_order";
+        String SONG_SORT_ORDER = "song_sort_order";
         //专辑排序顺序
-        public static final String ALBUM_SORT_ORDER = "album_sort_order";
+        String ALBUM_SORT_ORDER = "album_sort_order";
         //艺术家排序顺序
-        public static final String ARTIST_SORT_ORDER = "artist_sort_order";
+        String ARTIST_SORT_ORDER = "artist_sort_order";
         //播放列表排序顺序
-        public static final String PLAYLIST_SORT_ORDER = "playlist_sort_order";
+        String PLAYLIST_SORT_ORDER = "playlist_sort_order";
         //文件夹内歌曲排序顺序
-        public static final String CHILD_FOLDER_SONG_SORT_ORDER = "child_folder_song_sort_order";
+        String CHILD_FOLDER_SONG_SORT_ORDER = "child_folder_song_sort_order";
         //艺术家内歌曲排序顺序
-        public static final String CHILD_ARTIST_SONG_SORT_ORDER = "child_artist_sort_order";
+        String CHILD_ARTIST_SONG_SORT_ORDER = "child_artist_sort_order";
         //专辑内歌曲排序顺序
-        public static final String CHILD_ALBUM_SONG_SORT_ORDER = "child_album_song_sort_order";
+        String CHILD_ALBUM_SONG_SORT_ORDER = "child_album_song_sort_order";
         //播放列表内歌曲排序顺序
-        public static final String CHILD_PLAYLIST_SONG_SORT_ORDER = "child_playlist_song_sort_order";
+        String CHILD_PLAYLIST_SONG_SORT_ORDER = "child_playlist_song_sort_order";
         //移除歌曲
-        public static final String BLACKLIST_SONG = "black_list_song";
+        String BLACKLIST_SONG = "black_list_song";
         //本地歌词搜索路径
-        public static final String LOCAL_LYRIC_SEARCH_DIR = "local_lyric_search_dir";
+        String LOCAL_LYRIC_SEARCH_DIR = "local_lyric_search_dir";
         //退出时播放时间
-        public static final String LAST_PLAY_PROGRESS = "last_play_progress";
+        String LAST_PLAY_PROGRESS = "last_play_progress";
         //退出时播放的歌曲
-        public static final String LAST_SONG_ID = "last_song_id";
+        String LAST_SONG_ID = "last_song_id";
         //退出时下一首歌曲
-        public static final String NEXT_SONG_ID = "next_song_id";
+        String NEXT_SONG_ID = "next_song_id";
         //播放模式
-        public static final String PLAY_MODEL = "play_model";
+        String PLAY_MODEL = "play_model";
         //经典通知栏背景是否是系统背景色
-        public static final String NOTIFY_SYSTEM_COLOR = "notify_system_color";
+        String NOTIFY_SYSTEM_COLOR = "notify_system_color";
         //断点播放
-        public static final String PLAY_AT_BREAKPOINT = "play_at_breakpoint";
+        String PLAY_AT_BREAKPOINT = "play_at_breakpoint";
         //是否忽略内嵌封面
-        public static final String IGNORE_MEDIA_STORE = "ignore_media_store";
+        String IGNORE_MEDIA_STORE = "ignore_media_store";
         //桌面部件样式
-        public static final String APP_WIDGET_SKIN = "app_widget_transparent";
+        String APP_WIDGET_SKIN = "app_widget_transparent";
         //是否默认开启定时器
-        public static final String TIMER_DEFAULT = "timer_default";
+        String TIMER_DEFAULT = "timer_default";
         //定时器时长
-        public static final String TIMER_DURATION = "timer_duration";
+        String TIMER_DURATION = "timer_duration";
         //封面下载源
-        public static final String ALBUM_COVER_DOWNLOAD_SOURCE = "album_cover_download_source";
+        String ALBUM_COVER_DOWNLOAD_SOURCE = "album_cover_download_source";
     }
 
 }

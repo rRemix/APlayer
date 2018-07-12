@@ -75,7 +75,7 @@ public class EQActivity extends ToolbarActivity {
                         return;
                     }
                     //是否启用音效设置
-                    mEnable = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"EnableEQ",false) & Global.getHeadsetOn();
+                    mEnable = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,"EnableEQ",false) & Global.getHeadsetOn();
 
                     //EQ
                     mEqualizer = new Equalizer(0, AudioSessionId);
@@ -86,7 +86,7 @@ public class EQActivity extends ToolbarActivity {
 
                     //得到之前存储的每个频率的db值
                     for(short i = 0 ; i < mBandNumber; i++){
-                        short temp = (short)(SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"Band" + i,0));
+                        short temp = (short)(SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,"Band" + i,0));
                         mBandFrequencys.add(temp);
                         if (mEnable){
                             mEqualizer.setBandLevel(i,temp);
@@ -212,7 +212,7 @@ public class EQActivity extends ToolbarActivity {
 
     public void updateEnable(boolean enable) {
         mEnable = enable;
-        SPUtil.putValue(EQActivity.this,SPUtil.SETTING_KEY.SETTING_NAME,"EnableEQ",enable);
+        SPUtil.putValue(EQActivity.this,SPUtil.SETTING_KEY.NAME,"EnableEQ",enable);
 
         if(mSwitch != null) {
             mSwitch.setChecked(enable);
@@ -253,7 +253,7 @@ public class EQActivity extends ToolbarActivity {
                         //设置db值
                         mEqualizer.setBandLevel((short)i,temp);
                         //db值存储到sp
-                        SPUtil.putValue(EQActivity.this,SPUtil.SETTING_KEY.SETTING_NAME,"Band" + i,temp );
+                        SPUtil.putValue(EQActivity.this,SPUtil.SETTING_KEY.NAME,"Band" + i,temp );
                         break;
                     }
                 }
@@ -291,7 +291,7 @@ public class EQActivity extends ToolbarActivity {
             //设置db值
             mEqualizer.setBandLevel(i,(short) 0);
             //db值存储到sp
-            SPUtil.putValue(EQActivity.this,SPUtil.SETTING_KEY.SETTING_NAME,"Band" + i,(short)0 );
+            SPUtil.putValue(EQActivity.this,SPUtil.SETTING_KEY.NAME,"Band" + i,(short)0 );
             //设置seekbar进度
             setSeekBarProgress(mEQSeekBars.get(i),0);
             //存储每个频率的db值到内存

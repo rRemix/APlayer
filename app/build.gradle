@@ -39,6 +39,7 @@ android {
 
         buildConfigField("String", "LASTFM_API_KEY", "\"${getProperty(getProperties('../local.properties'), 'LASTFM_API_KEY')}\"")
         buildConfigField("String", "GOOGLE_PLAY_LICENSE_KEY", "\"${getProperty(getProperties('../local.properties'), 'GOOGLE_PLAY_LICENSE_KEY')}\"")
+        buildConfigField("String", "BMOB_KEY", "\"${getProperty(getProperties('../local.properties'), 'BMOB_KEY')}\"")
     }
 
     signingConfigs {
@@ -144,7 +145,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
-//    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation "com.android.support:design:$supportLibVersion"
     implementation "com.android.support:palette-v7:$supportLibVersion"
@@ -164,22 +165,15 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
-    implementation 'androidx.core:core-ktx:0.3'
     implementation 'org.jetbrains.anko:anko-common:0.10.4'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     kapt  'com.jakewharton:butterknife-compiler:8.8.1'
 
-    implementation 'cn.bmob.android:bmob-sdk:3.6.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-//    implementation 'com.android.billingclient:billing:1.1'
+    implementation 'cn.bmob.android:bmob-sdk:3.6.4'
     implementation 'com.anjlab.android.iab.v3:library:1.0.44'
 //    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 //    implementation 'com.google.code.gson:gson:2.8.2'
-
-//    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
-//    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
-//    implementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'
 }
 
 def releaseTime() {

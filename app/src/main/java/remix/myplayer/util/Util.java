@@ -22,7 +22,9 @@ import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
@@ -439,7 +441,7 @@ public class Util {
     public static Intent createShareSongFileIntent(@NonNull final Song song, Context context) {
         try {
             Parcelable parcelable = FileProvider.getUriForFile(context,
-                    context.getPackageName() + "fileprovider",
+                    context.getPackageName() + ".fileprovider",
                     new File(song.getUrl()));
             return new Intent()
                     .setAction(Intent.ACTION_SEND)
@@ -459,7 +461,7 @@ public class Util {
     public static Intent createShareImageFileIntent(@NonNull final File file, Context context) {
         try {
             Parcelable parcelable = FileProvider.getUriForFile(context,
-                    context.getPackageName() + "fileprovider",
+                    context.getPackageName() + ".fileprovider",
                     file);
             return new Intent()
                     .setAction(Intent.ACTION_SEND)
@@ -474,4 +476,45 @@ public class Util {
         }
     }
 
+    public static void closeStream(Closeable closeable) {
+        if(closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void installApk(Context context,String path) {
+        if(path == null){
+            ToastUtil.show(mContext,"安装路径为空,请反馈给开发者");
+            return;
+        }
+        File installFile = new File(path);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri apkUri = FileProvider.getUriForFile( context, context.getApplicationContext().getPackageName() + ".fileprovider", installFile);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+            context.startActivity(intent);
+        }else{
+            intent.setDataAndType(Uri.fromFile(installFile), "application/vnd.android.package-archive");
+            context.startActivity(intent);
+        }
+
+        //        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        //        Intent install = new Intent(Intent.ACTION_VIEW);
+        //        Uri downloadFileUri = downloadManager.getUriForDownloadedFile(downloadApkId);
+        //        downloadManager.query()
+        //        if (downloadFileUri != null) {
+        //            Log.d("DownloadManager", downloadFileUri.toString());
+        //            install.setDataAndType(downloadFileUri, "application/vnd.android.package-archive");
+        //            install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        //            context.startActivity(install);
+        //        } else {
+        //            Log.e("DownloadManager", "download error");
+        //        }
+    }
 }

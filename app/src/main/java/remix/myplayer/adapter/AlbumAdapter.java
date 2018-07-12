@@ -57,7 +57,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
 
     public AlbumAdapter(Context context, int layoutId, MultiChoice multiChoice) {
         super(context,layoutId,multiChoice);
-        ListModel =  SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,"AlbumModel",Constants.GRID_MODEL);
+        ListModel =  SPUtil.getValue(context,SPUtil.SETTING_KEY.NAME,"AlbumModel",Constants.GRID_MODEL);
     }
 
     @Override
@@ -192,7 +192,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
 
     @Override
     public void saveMode() {
-        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"AlbumModel",ListModel);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,"AlbumModel",ListModel);
     }
 
     @Override

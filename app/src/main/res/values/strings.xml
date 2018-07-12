@@ -121,7 +121,7 @@
     <string name="delete">Remove</string>
     <string name="ring">Ringtone</string>
     <string name="join">Add</string>
-    <string name="update_error">Query failed</string>
+    <string name="update_query_error">Query error: %s</string>
     <string name="update_ignore">This version has been ignored for update</string>
     <string name="no_update">Current version is newest</string>
     <string name="search">Search</string>
@@ -234,8 +234,8 @@
     <string name="no_audio_file">No audio file</string>
     <string name="manual_scan_tip">Please make sure that the scan directory without .nomedia file(Hidden file)</string>
     <string name="playing_notification">Now playing notify</string>
-    <string name="playing_notification_description">正在播放通知提供了播放/暂停等便捷操作</string>
-    <string name="unlock_notification_description">解锁桌面歌词通知提供解锁桌面歌词功能</string>
+    <string name="playing_notification_description">Playing notification provide some operation such as play/pause</string>
+    <string name="unlock_notification_description">Unlock notification provide function to unlock desktop lyric</string>
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="play_pause">Play/Pause</string>
@@ -333,4 +333,13 @@
     <string name="export_success">Export success</string>
     <string name="cover_download_source">Cover download source</string>
     <string name="cover_download_source_tip">Default behavior is download from LastFM</string>
+    <string name="update_notification">Notification for update</string>
+    <string name="update_notification_description">Notification for update</string>
+    <string name="downloading">Downloading</string>
+    <string name="download_complete">Download complete</string>
+    <string name="download_complete_to_do">Download complete and click to install</string>
+    <string name="plz_give_install_permission">Please give permission to install unknown apps</string>
+    <string name="update">Update</string>
+    <string name="new_version_found">New version found</string>
+    <string name="ignore_this_version">Ignore this version</string>
 </resources>

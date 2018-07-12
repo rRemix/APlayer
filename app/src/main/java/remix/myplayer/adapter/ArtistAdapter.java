@@ -54,7 +54,7 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> implements FastScroller.SectionIndexer{
     public ArtistAdapter(Context context,int layoutId,MultiChoice multiChoice) {
         super(context,layoutId,multiChoice);
-        ListModel =  SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,"ArtistModel",Constants.GRID_MODEL);
+        ListModel =  SPUtil.getValue(context,SPUtil.SETTING_KEY.NAME,"ArtistModel",Constants.GRID_MODEL);
     }
 
     @Override
@@ -184,7 +184,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
     @Override
     public void saveMode() {
-        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ArtistModel",ListModel);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,"ArtistModel",ListModel);
     }
 
 //    @NonNull

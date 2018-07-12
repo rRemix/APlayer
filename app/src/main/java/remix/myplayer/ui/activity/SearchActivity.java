@@ -176,7 +176,7 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter>{
                         new String[]{"%" + mkey + "%","%" + mkey + "%","%" + mkey + "%"}, null);
 
                 if (cursor != null && cursor.getCount() > 0) {
-                    Set<String> blackList = SPUtil.getStringSet(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
+                    Set<String> blackList = SPUtil.getStringSet(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
                     while (cursor.moveToNext()){
                         if(!blackList.contains(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))))
                             songs.add(MediaStoreUtil.getMP3Info(cursor));

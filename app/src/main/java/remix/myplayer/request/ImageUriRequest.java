@@ -64,16 +64,16 @@ public abstract class ImageUriRequest<T> {
     public static final int URL_ARTIST = 100;
 
     //自动下载封面
-    public static String AUTO_DOWNLOAD_ALBUM = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,
+    public static String AUTO_DOWNLOAD_ALBUM = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,
             SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, App.getContext().getString(R.string.always));
     //忽略内嵌
-    public static boolean IGNORE_MEDIA_STORE = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,
+    public static boolean IGNORE_MEDIA_STORE = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,
             SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE,false);
 
     //封面下载源
     public static final int DOWNLOAD_NETEASE = 1;
     public static final int DOWNLOAD_LASTFM = 0;
-    public static int DOWNLOAD_SOURCE = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,
+    public static int DOWNLOAD_SOURCE = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,
             SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,DOWNLOAD_LASTFM);
 
     protected RequestConfig mConfig = DEFAULT_CONFIG;
@@ -201,7 +201,7 @@ public abstract class ImageUriRequest<T> {
         return Observable.concat(new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
-                String imageUrl = SPUtil.getValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getLastFMKey(),"");
+                String imageUrl = SPUtil.getValue(App.getContext(),SPUtil.COVER_KEY.NAME,request.getLastFMKey(),"");
                 if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
                     observer.onNext(imageUrl);
                 }
@@ -235,7 +235,7 @@ public abstract class ImageUriRequest<T> {
                 imageUrl = ImageUriUtil.getLargestArtistImageUrl(lastFmArtist.getArtist().getImage());
         }
         if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
-            SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getLastFMKey(),imageUrl);
+            SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.NAME,request.getLastFMKey(),imageUrl);
         }
         return imageUrl;
     }
@@ -245,7 +245,7 @@ public abstract class ImageUriRequest<T> {
         return Observable.concat(new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
-                String imageUrl = SPUtil.getValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseCacheKey(),"");
+                String imageUrl = SPUtil.getValue(App.getContext(),SPUtil.COVER_KEY.NAME,request.getNeteaseCacheKey(),"");
                 if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
                     observer.onNext(imageUrl);
                 }
@@ -276,7 +276,7 @@ public abstract class ImageUriRequest<T> {
             imageUrl = response.getResult().getArtists().get(0).getPicUrl();
         }
         if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
-            SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseCacheKey(),imageUrl);
+            SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.NAME,request.getNeteaseCacheKey(),imageUrl);
         }
         return imageUrl;
     }

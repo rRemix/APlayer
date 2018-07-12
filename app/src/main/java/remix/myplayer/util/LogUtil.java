@@ -32,6 +32,11 @@ public class LogUtil {
             Log.e(TAG, msg);
     }
 
+    public static void e(Throwable t) {
+        if (isDebug)
+            Log.e(TAG, t + "");
+    }
+
     public static void v(String msg) {
         if (isDebug)
             Log.v(TAG, msg);
@@ -51,6 +56,11 @@ public class LogUtil {
     public static void e(String tag, String msg) {
         if (isDebug)
             Log.e(tag, msg);
+    }
+
+    public static void e(String tag, Throwable throwable) {
+        if (isDebug)
+            Log.e(tag, throwable + "");
     }
 
     public static void v(String tag, String msg) {

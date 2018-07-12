@@ -81,12 +81,12 @@ public class SearchLrc {
      */
     @SuppressLint("CheckResult")
     public Observable<List<LrcRow>> getLyric(String manualPath, boolean clearCache){
-        int type = SPUtil.getValue(App.getContext(),SPUtil.LYRIC_KEY.LYRIC_NAME,mSong.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT);
+        int type = SPUtil.getValue(App.getContext(),SPUtil.LYRIC_KEY.NAME,mSong.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT);
         Observable<List<LrcRow>> networkObservable = getNetworkObservable(type);
         Observable<List<LrcRow>> localObservable = getLocalObservable(type);
 
         //根据在线和本地的优先级 确定最后一级
-        boolean onlineFirst = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,false);
+        boolean onlineFirst = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,false);
         Observable<List<LrcRow>> last = Observable.concat(onlineFirst ? networkObservable : localObservable ,onlineFirst ? localObservable : networkObservable).firstOrError().toObservable();
         return type == SPUtil.LYRIC_KEY.LYRIC_IGNORE ? Observable.error(new Throwable("Ignore")) :
                 Observable.concat(getCacheObservable(),getManualObservable(manualPath), getEmbeddedObservable(),last).firstOrError().toObservable()
@@ -294,7 +294,7 @@ public class SearchLrc {
      */
     private String getLocalLrcPath() {
         //查找本地目录
-        String searchPath =  SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR,"");
+        String searchPath =  SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR,"");
         if(mSong == null)
             return "";
         if(!TextUtils.isEmpty(searchPath)){
@@ -338,7 +338,7 @@ public class SearchLrc {
     private List<String> getAllLocalLrcPath() {
         List<String> results = new ArrayList<>();
         //查找本地目录
-        String searchPath = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "");
+        String searchPath = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "");
         if (mSong == null)
             return results;
         if (!TextUtils.isEmpty(searchPath)) {

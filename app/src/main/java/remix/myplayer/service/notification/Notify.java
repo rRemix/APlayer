@@ -90,7 +90,7 @@ public abstract class Notify {
     public void cancelPlayingNotify(){
         mService.stopForeground(true);
         mNotificationManager.cancel(PLAYING_NOTIFICATION_ID);
-//        mIsStop = true;
+        mIsStop = true;
 //        mNotifyMode = NOTIFY_MODE_NONE;
     }
 

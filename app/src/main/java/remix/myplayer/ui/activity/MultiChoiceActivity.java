@@ -125,8 +125,8 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
             //只有主界面显示分割线
             mMultiToolBar.findViewById(R.id.multi_divider).setVisibility(MultiChoiceActivity.this instanceof MainActivity ? View.VISIBLE : View.GONE);
             //第一次长按操作显示提示框
-            if(SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IsFirstMulti",true)){
-                SPUtil.putValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IsFirstMulti",false);
+            if(SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,"IsFirstMulti",true)){
+                SPUtil.putValue(App.getContext(),SPUtil.SETTING_KEY.NAME,"IsFirstMulti",false);
                 if(mTipPopupWindow == null){
                     mTipPopupWindow = new TipPopupwindow(this);
                     mTipPopupWindow.setOnDismissListener(() -> mTipPopupWindow = null);

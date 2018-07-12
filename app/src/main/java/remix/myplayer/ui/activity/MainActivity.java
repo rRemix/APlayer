@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -8,13 +9,17 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -52,6 +57,7 @@ import org.jaudiotagger.tag.images.ArtworkFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,6 +80,9 @@ import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.receiver.ExitReceiver;
+import remix.myplayer.misc.update.UpdateAgent;
+import remix.myplayer.misc.update.UpdateListener;
+import remix.myplayer.misc.update.UpdateService;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.SimpleUriRequest;
@@ -99,14 +108,17 @@ import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
+import static remix.myplayer.App.IS_GOOGLEPLAY;
 import static remix.myplayer.bean.Category.DEFAULT_LIBRARY;
 import static remix.myplayer.service.MusicService.ACTION_LOAD_FINISH;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
+import static remix.myplayer.util.Util.installApk;
 
 /**
  *
  */
 public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback {
+
     @BindView(R.id.tabs)
     TabLayout mTablayout;
     @BindView(R.id.ViewPager)
@@ -135,8 +147,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
     private MsgHandler mRefreshHandler;
     //设置界面
-    private final int REQUEST_SETTING = 1;
+    private static final int REQUEST_SETTING = 1;
+    //安装权限
+    private static final int REQUEST_INSTALL_PACKAGES = 2;
     private BroadcastReceiver mLoadReceiver;
+    private BroadcastReceiver mInstallReceiver;
 
     //当前选中的fragment
     private LibraryFragment mCurrentFragment;
@@ -163,6 +178,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     protected void onDestroy() {
         super.onDestroy();
         Util.unregisterReceiver(mContext,mLoadReceiver);
+        Util.unregisterReceiver(mContext,mInstallReceiver);
     }
 
     @Override
@@ -173,8 +189,10 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //receiver
-        mLoadReceiver = new LoadFinishReceiver();
+        mLoadReceiver = new LoadFinishReceiver(this);
         registerReceiver(mLoadReceiver,new IntentFilter(MusicService.ACTION_LOAD_FINISH));
+        mInstallReceiver = new DownloadReceiver(this);
+        registerReceiver(mInstallReceiver,new IntentFilter(DownloadReceiver.ACTION_DOWNLOAD_COMPLETE));
         //初始化控件
         setUpToolbar(mToolBar);
         setUpPager();
@@ -200,6 +218,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 //                .itemsColorAttr(R.attr.text_color_primary)
 //                .theme(ThemeStore.getMDDialogTheme())
 //                .show();
+        checkUpdate();
     }
 
     /**
@@ -208,7 +227,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private void setUpBottomBar() {
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        int lastId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_SONG_ID,-1);
+        int lastId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.LAST_SONG_ID,-1);
         Song item;
         if(lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
             mBottomBar.updateBottomStatus(item,  MusicService.isPlay());
@@ -306,11 +325,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
     //初始化ViewPager
     private void setUpPager() {
-        String categoryJson = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,"");
+        String categoryJson = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,"");
         List<Category> categories = TextUtils.isEmpty(categoryJson) ? new ArrayList<>() : new Gson().fromJson(categoryJson,new TypeToken<List<Category>>(){}.getType());
         if(categories.size() == 0){
             categories.addAll(DEFAULT_LIBRARY);
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,new Gson().toJson(DEFAULT_LIBRARY,new TypeToken<List<Category>>(){}.getType()));
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,new Gson().toJson(DEFAULT_LIBRARY,new TypeToken<List<Category>>(){}.getType()));
         }
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mPagerAdapter.setList(categories);
@@ -361,13 +380,13 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         String sortOrder = null;
 
         if(mCurrentFragment instanceof SongFragment){
-            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z);
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z);
         } else if(mCurrentFragment instanceof AlbumFragment){
-            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,SortOrder.AlbumSortOrder.ALBUM_A_Z);
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,SortOrder.AlbumSortOrder.ALBUM_A_Z);
         } else if(mCurrentFragment instanceof ArtistFragment){
-            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,SortOrder.ArtistSortOrder.ARTIST_A_Z);
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,SortOrder.ArtistSortOrder.ARTIST_A_Z);
         } else if(mCurrentFragment instanceof PlayListFragment){
-            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,SortOrder.PlayListSortOrder.PLAYLIST_DATE);
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,SortOrder.PlayListSortOrder.PLAYLIST_DATE);
         }
 
         if(TextUtils.isEmpty(sortOrder)){
@@ -386,13 +405,13 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     @Override
     protected void saveSortOrder(String sortOrder) {
         if(mCurrentFragment instanceof SongFragment){
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SONG_SORT_ORDER,sortOrder);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SONG_SORT_ORDER,sortOrder);
         } else if(mCurrentFragment instanceof AlbumFragment){
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,sortOrder);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,sortOrder);
         } else if(mCurrentFragment instanceof ArtistFragment){
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,sortOrder);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,sortOrder);
         } else if(mCurrentFragment instanceof PlayListFragment ){
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,sortOrder);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,sortOrder);
         }
         mCurrentFragment.onMediaStoreChanged();
     }
@@ -654,11 +673,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
     //更新界面
     @Override
-    public void UpdateUI(Song song, boolean isplay) {
+    public void UpdateUI(Song song, boolean isPlay) {
         if (!mIsRunning)
             return;
 
-        mBottomBar.updateBottomStatus(song, isplay);
+        mBottomBar.updateBottomStatus(song, isPlay);
 //        for(Fragment temp : getSupportFragmentManager().getFragments()) {
 //            if (temp instanceof SongFragment) {
 //                SongFragment songFragment = (SongFragment) temp;
@@ -667,7 +686,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 //                }
 //            }
 //        }
-        updateHeader(song,isplay);
+        updateHeader(song,isPlay);
     }
 
     /**
@@ -706,16 +725,25 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-    public class LoadFinishReceiver extends BroadcastReceiver {
+    public static class LoadFinishReceiver extends BroadcastReceiver {
+        private final WeakReference<MainActivity> mRef;
+        LoadFinishReceiver(MainActivity mainActivity){
+            mRef  = new WeakReference<>(mainActivity);
+        }
         @Override
         public void onReceive(Context context, Intent receive) {
             if(ACTION_LOAD_FINISH.equals(receive != null ? receive.getAction() : "")){
-                setUpBottomBar();
-                UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
+                if(mRef.get() != null){
+                    mRef.get().setUpBottomBar();
+                    mRef.get().UpdateUI(MusicService.getCurrentMP3(),MusicService.isPlay());
+                }
             }
         }
     }
 
+    /**
+     * 解析外部打开Intent
+     */
     private void parseIntent() {
         final Intent param = getIntent();
         if(param != null && param.getData() != null){
@@ -731,6 +759,80 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             list.add(id);
             Global.setPlayQueue(list,mContext,intent);
             setIntent(new Intent());
+        }
+    }
+
+    /**
+     * 检查更新
+     */
+    private static boolean mAlreadyCheck;
+    private void checkUpdate() {
+        if(!IS_GOOGLEPLAY && !mAlreadyCheck){
+            UpdateAgent.INSTANCE.setCancelIgnore(false);
+            UpdateAgent.INSTANCE.setListener(new UpdateListener(mContext));
+            mAlreadyCheck = true;
+            UpdateAgent.INSTANCE.check(this);
+        }
+    }
+
+    /**
+     * 判断安卓版本，请求安装权限或者直接安装
+     * @param context
+     * @param path
+     */
+    private void checkIsAndroidO(Context context,String path){
+        if(!TextUtils.isEmpty(path) && !path.equals(mInstallPath))
+            mInstallPath = path;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            boolean hasInstallPermission = context.getPackageManager().canRequestPackageInstalls();
+            if (hasInstallPermission) {
+                installApk(context,path);
+            } else {
+                //请求安装未知应用来源的权限
+                ToastUtil.show(mContext,R.string.plz_give_install_permission);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.REQUEST_INSTALL_PACKAGES}, REQUEST_INSTALL_PACKAGES);
+            }
+        } else {
+            installApk(context,path);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_INSTALL_PACKAGES:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    installApk(this,mInstallPath);
+                }
+                break;
+
+        }
+    }
+
+    private String mInstallPath;
+    public static class DownloadReceiver extends BroadcastReceiver {
+        public static final String ACTION_DOWNLOAD_COMPLETE = App.getContext().getPackageName() + ".ACTION.DOWNLOAD_COMPLETE";
+        public static final String ACTION_DOWNLOAD_NOTIFICATION_CLICK = App.getContext().getPackageName() + ".ACTION.DOWNLOAD_NOTIFICATION_CLICKED";
+
+        private final WeakReference<MainActivity> mRef;
+
+        public DownloadReceiver(MainActivity activity){
+            mRef = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent == null)
+                return;
+            final String action = intent.getAction();
+            if(TextUtils.isEmpty(action))
+                return;
+            if (action.equals(ACTION_DOWNLOAD_COMPLETE)) {
+                final String path = intent.getStringExtra(UpdateService.EXTRA_PATH);
+                if(mRef.get() != null)
+                    mRef.get().checkIsAndroidO(context,path);
+            }
         }
     }
 }

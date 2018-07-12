@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.hardware.sensor.accelerometer"/>
     <uses-permission android:name="com.android.vending.BILLING" />
 
@@ -192,13 +193,26 @@
         <!-- <action android:name="remix.music.NOTIFY" /> -->
         <!-- </intent-filter> -->
         <!-- </receiver> -->
-        <receiver android:name=".misc.receiver.ExitReceiver">
+        <receiver android:name=".misc.receiver.ExitReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="remix.music.EXIT" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.MusicService" />
+        <!--<receiver android:name=".ui.activity.MainActivity$DownloadReceiver"-->
+            <!--android:exported="false">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="${applicationId}.ACTION.DOWNLOAD_COMPLETE" />-->
+                <!--<action android:name="${applicationId}.ACTION.DOWNLOAD_NOTIFICATION_CLICKED" />-->
+                <!--<action android:name="DownloadComplete"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
+
+        <service android:name=".service.MusicService"
+            android:exported="false"/>
+        <service android:name=".misc.update.UpdateService"
+            android:exported="false"/>
 
         <provider
             android:name=".db.DBContentProvider"
@@ -260,7 +274,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}fileprovider"
+            android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

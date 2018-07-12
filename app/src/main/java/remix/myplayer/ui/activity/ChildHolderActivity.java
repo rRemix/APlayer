@@ -186,13 +186,13 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         if(mType == Constants.PLAYLIST){
-            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, SortOrder.PlayListSongSortOrder.SONG_A_Z);
+            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, SortOrder.PlayListSongSortOrder.SONG_A_Z);
         } else if(mType == Constants.ALBUM){
-            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
+            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
         } else if(mType == Constants.ARTIST){
-            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
+            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
         } else {
-            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
+            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
         }
         if(TextUtils.isEmpty(mSortOrder))
             return true;
@@ -224,13 +224,13 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
             }
         }
         if(mType == Constants.PLAYLIST){
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,sortOrder);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,sortOrder);
         } else if(mType == Constants.ALBUM){
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,sortOrder);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,sortOrder);
         } else if(mType == Constants.ARTIST){
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,sortOrder);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,sortOrder);
         } else {
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,sortOrder);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,sortOrder);
         }
         mSortOrder = sortOrder;
         if(update)
@@ -274,8 +274,8 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
             return;
         Fresco.getImagePipeline().clearCaches();
         final UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(newSong);
-        SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,request.getLastFMKey());
-        SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseCacheKey());
+        SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.NAME,request.getLastFMKey());
+        SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.NAME,request.getNeteaseCacheKey());
         if(mType == Constants.ARTIST || mType == Constants.ALBUM) {
             ID = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
             Title = mType == Constants.ARTIST ? newSong.getArtist() : newSong.getAlbum();

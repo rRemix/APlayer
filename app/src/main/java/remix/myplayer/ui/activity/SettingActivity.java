@@ -38,8 +38,6 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cn.bmob.v3.update.BmobUpdateAgent;
-import cn.bmob.v3.update.UpdateStatus;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
@@ -52,6 +50,8 @@ import remix.myplayer.misc.MediaScanner;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.update.UpdateAgent;
+import remix.myplayer.misc.update.UpdateListener;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.Command;
@@ -164,7 +164,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch, mBreakpointSwitch, mIgnoreMediastoreSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
-                view.setChecked(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, keyWord[index], false));
+                view.setChecked(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, keyWord[index], false));
                 //5.0以上才支持变色导航栏
                 if (view.getId() == R.id.setting_navaigation_switch) {
                     view.setEnabled(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
@@ -172,7 +172,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, keyWord[index], isChecked);
+                        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, keyWord[index], isChecked);
                         switch (buttonView.getId()) {
                             //变色导航栏
                             case R.id.setting_navaigation_switch:
@@ -188,7 +188,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //设置歌词搜索优先级
                             case R.id.setting_lrc_priority_switch:
-                                SPUtil.putValue(App.getContext(), SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST, isChecked);
+                                SPUtil.putValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST, isChecked);
                                 break;
                             //桌面歌词
                             case R.id.setting_lrc_float_switch:
@@ -245,8 +245,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         });
 
         //歌词搜索路径
-        if (!SPUtil.getValue(this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "").equals("")) {
-            mLrcPath.setText(getString(R.string.lrc_tip, SPUtil.getValue(this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")));
+        if (!SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "").equals("")) {
+            mLrcPath.setText(getString(R.string.lrc_tip, SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")));
         }
         //桌面歌词
         mFloatLrcTip.setText(mFloatLrcSwitch.isChecked() ? R.string.opened_float_lrc : R.string.closed_float_lrc);
@@ -263,14 +263,14 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 (view, index) -> Theme.TintDrawable(view, view.getBackground(), arrowColor));
 
         //封面
-        mOriginalAlbumChoice = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, mContext.getString(R.string.always));
+        mOriginalAlbumChoice = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, mContext.getString(R.string.always));
         mAlbumCoverText.setText(mOriginalAlbumChoice);
 
         //根据系统版本决定是否显示通知栏样式切换
         findView(R.id.setting_classic_notify_container).setVisibility(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? View.VISIBLE : View.GONE);
 
         //锁屏样式
-        int lockScreen = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN);
+        int lockScreen = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN);
         mLockScreenTip.setText(lockScreen == 0 ? R.string.aplayer_lockscreen_tip :
                 lockScreen == 1 ? R.string.system_lockscreen_tip : R.string.lockscreen_off_tip);
 
@@ -332,9 +332,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         switch (tag) {
             case "Lrc":
-                boolean success = SPUtil.putValue(this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, folder.getAbsolutePath());
+                boolean success = SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, folder.getAbsolutePath());
                 ToastUtil.show(this, success ? R.string.setting_success : R.string.setting_error, Toast.LENGTH_SHORT);
-                mLrcPath.setText(getString(R.string.lrc_tip, SPUtil.getValue(this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")));
+                mLrcPath.setText(getString(R.string.lrc_tip, SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")));
                 break;
             case "Scan":
                 new MediaScanner(mContext).scanFiles(folder, "audio/*");
@@ -418,7 +418,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .itemsColorAttr(R.attr.text_color_primary)
                         .backgroundColorAttr(R.attr.background_color_3)
                         .itemsCallbackSingleChoice(position, (dialog, itemView, which, text) -> {
-                            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.SCAN_SIZE, mScanSize[which]);
+                            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE, mScanSize[which]);
                             Constants.SCAN_SIZE = mScanSize[which];
                             getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
                             return true;
@@ -430,7 +430,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //曲库
             case R.id.setting_library_category_container:
-                String categoryJson = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, "");
+                String categoryJson = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, "");
 
                 List<Category> oldCategories = new Gson().fromJson(categoryJson, new TypeToken<List<Category>>() {
                 }.getType());
@@ -461,7 +461,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             if (!newCategories.equals(oldCategories)) {
                                 mNeedRefreshLibrary = true;
                                 getIntent().putExtra("Category", newCategories);
-                                SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, new Gson().toJson(newCategories, new TypeToken<List<Category>>() {
+                                SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, new Gson().toJson(newCategories, new TypeToken<List<Category>>() {
                                 }.getType()));
                             }
                             return true;
@@ -511,9 +511,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .positiveColorAttr(R.attr.text_color_primary)
                         .buttonRippleColorAttr(R.attr.ripple_color)
                         .items(new String[]{getString(R.string.aplayer_lockscreen), getString(R.string.system_lockscreen), getString(R.string.close)})
-                        .itemsCallbackSingleChoice(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN),
+                        .itemsCallbackSingleChoice(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN),
                                 (dialog, view, which, text) -> {
-                                    SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN, which);
+                                    SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, which);
                                     mLockScreenTip.setText(which == 0 ? R.string.aplayer_lockscreen_tip :
                                             which == 1 ? R.string.system_lockscreen_tip : R.string.lockscreen_off_tip);
                                     Intent intent = new Intent(MusicService.ACTION_CMD);
@@ -544,7 +544,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //通知栏底色
             case R.id.setting_notify_color_container:
-                if (!SPUtil.getValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, false)) {
+                if (!SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, false)) {
                     ToastUtil.show(mContext, R.string.notify_bg_color_warnning);
                     return;
                 }
@@ -556,9 +556,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .positiveColorAttr(R.attr.text_color_primary)
                         .buttonRippleColorAttr(R.attr.ripple_color)
                         .items(new String[]{getString(R.string.use_system_color), getString(R.string.use_black_color)})
-                        .itemsCallbackSingleChoice(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true) ? 0 : 1,
+                        .itemsCallbackSingleChoice(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true) ? 0 : 1,
                                 (dialog, view, which, text) -> {
-                                    SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, which == 0);
+                                    SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, which == 0);
                                     sendBroadcast(new Intent(MusicService.ACTION_CMD)
                                             .putExtra("Control", Command.TOGGLE_NOTIFY)
                                             .putExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, mNotifyStyleSwitch.isChecked()));
@@ -597,16 +597,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //检查更新
             case R.id.setting_update_container:
                 MobclickAgent.onEvent(this, "CheckUpdate");
-                BmobUpdateAgent.setUpdateListener((updateStatus, updateInfo) -> {
-                    if (updateStatus == UpdateStatus.No) {
-                        ToastUtil.show(mContext, getString(R.string.no_update));
-                    } else if (updateStatus == UpdateStatus.IGNORED) {
-                        ToastUtil.show(mContext, getString(R.string.update_ignore));
-                    } else if (updateStatus == UpdateStatus.TimeOut) {
-                        ToastUtil.show(mContext, R.string.update_error);
-                    }
-                });
-                BmobUpdateAgent.forceUpdate(this);
+                UpdateAgent.INSTANCE.setCancelIgnore(true);
+                UpdateAgent.INSTANCE.setListener(new UpdateListener(mContext));
+                UpdateAgent.INSTANCE.check(this);
                 break;
             //清除缓存
             case R.id.setting_clear_container:
@@ -621,7 +614,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 //清除配置文件、数据库等缓存
                                 Util.deleteFilesByDirectory(getCacheDir());
                                 Util.deleteFilesByDirectory(getExternalCacheDir());
-//                                SPUtil.deleteFile(mContext,SPUtil.SETTING_KEY.SETTING_NAME);
+//                                SPUtil.deleteFile(mContext,SPUtil.SETTING_KEY.NAME);
 //                                deleteDatabase(DBOpenHelper.DBNAME);
                                 //清除fresco缓存
                                 Fresco.getImagePipeline().clearCaches();
@@ -641,7 +634,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //专辑与艺术家封面自动下载
             case R.id.setting_album_cover_container:
-                final String choice = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, mContext.getString(R.string.always));
+                final String choice = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, mContext.getString(R.string.always));
                 new MaterialDialog.Builder(this)
                         .title(R.string.auto_download_album_cover)
                         .titleColorAttr(R.attr.text_color_primary)
@@ -656,7 +649,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     mNeedRefreshAdapter |= ((mContext.getString(R.string.wifi_only).contentEquals(text) | mContext.getString(R.string.always).contentEquals(text))
                                             & !mOriginalAlbumChoice.contentEquals(text));
                                     ImageUriRequest.AUTO_DOWNLOAD_ALBUM = text.toString();
-                                    SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME,
+                                    SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME,
                                             SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
                                             text.toString());
                                     return true;
@@ -668,7 +661,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //封面下载源
             case R.id.setting_cover_source_container:
-                final int oldChoice = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,DOWNLOAD_LASTFM);
+                final int oldChoice = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,DOWNLOAD_LASTFM);
                 new MaterialDialog.Builder(this)
                         .title(R.string.cover_download_source)
                         .titleColorAttr(R.attr.text_color_primary)
@@ -681,7 +674,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     if(oldChoice != which){
                                         mNeedRefreshAdapter = true;
                                         ImageUriRequest.DOWNLOAD_SOURCE = which;
-                                        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,which);
+                                        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,which);
                                     }
                                     return true;
                                 })
