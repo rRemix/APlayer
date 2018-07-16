@@ -1,4 +1,4 @@
-package remix.myplayer.bean;
+package remix.myplayer.bean.misc;
 
 import android.os.Parcel;
 import android.os.Parcelable;

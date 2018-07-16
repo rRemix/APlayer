@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 
 import com.facebook.common.util.ByteConstants;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 
@@ -44,21 +43,11 @@ public class ScanActivity extends ToolbarActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        MobclickAgent.onEvent(this,"Filter");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
         ButterKnife.bind(this);
         setUpToolbar(mToolBar,getString(R.string.back));
         initSeekbar();
-    }
-
-    public void onResume() {
-        MobclickAgent.onPageStart(ScanActivity.class.getSimpleName());
-        super.onResume();
-    }
-    public void onPause() {
-        MobclickAgent.onPageEnd(ScanActivity.class.getSimpleName());
-        super.onPause();
     }
 
     private void initSeekbar() {

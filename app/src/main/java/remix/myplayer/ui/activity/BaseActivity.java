@@ -9,8 +9,6 @@ import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.umeng.analytics.MobclickAgent;
-
 import remix.myplayer.BuildConfig;
 import remix.myplayer.R;
 import remix.myplayer.misc.manager.ActivityManager;
@@ -141,12 +139,10 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         startService(new Intent(this,MusicService.class));
-        MobclickAgent.onResume(this);
     }
     @Override
     protected void onPause() {
         super.onPause();
-        MobclickAgent.onPause(this);
     }
 
 }

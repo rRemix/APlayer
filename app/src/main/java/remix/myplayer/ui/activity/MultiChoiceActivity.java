@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import remix.myplayer.App;
@@ -79,7 +78,6 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
                                     .checkBoxPromptRes(R.string.delete_source, false, null)
                                     .onAny((dialog, which) -> {
                                         if(which == POSITIVE){
-                                            MobclickAgent.onEvent(mContext,"Delete");
                                             if(mMultiChoice != null)
                                                 mMultiChoice.OnDelete(dialog.isPromptCheckBoxChecked());
                                         }
@@ -91,12 +89,10 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
                                     .show();
                             break;
                         case R.id.multi_playqueue:
-                            MobclickAgent.onEvent(MultiChoiceActivity.this,"AddtoPlayingList");
                             if(mMultiChoice != null)
                                 mMultiChoice.OnAddToPlayQueue();
                             break;
                         case R.id.multi_playlist:
-                            MobclickAgent.onEvent(MultiChoiceActivity.this,"AddtoPlayList");
                             if(mMultiChoice != null)
                                 mMultiChoice.OnAddToPlayList();
                             break;

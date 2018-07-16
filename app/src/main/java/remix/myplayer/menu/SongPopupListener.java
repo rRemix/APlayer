@@ -8,13 +8,12 @@ import android.view.MenuItem;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.soundcloud.android.crop.Crop;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 import remix.myplayer.R;
-import remix.myplayer.bean.CustomThumb;
+import remix.myplayer.bean.misc.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
@@ -54,14 +53,12 @@ public class SongPopupListener
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_next:
-                MobclickAgent.onEvent(mActivity,"Share");
                 Intent intent = new Intent(MusicService.ACTION_CMD);
                 intent.putExtra("Control", Command.ADD_TO_NEXT_SONG);
                 intent.putExtra("song",mSong);
                 mActivity.sendBroadcast(intent);
                 break;
             case R.id.menu_add_to_playlist:
-                MobclickAgent.onEvent(mActivity,"AddtoPlayList");
                 Intent intentAdd = new Intent(mActivity,AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
                 ardAdd.putSerializable("list", new ArrayList<>(Collections.singletonList(mSong.getId())));
@@ -85,16 +82,13 @@ public class SongPopupListener
                 Crop.pickImage(mActivity, Crop.REQUEST_PICK);
                 break;
             case R.id.menu_ring:
-                MobclickAgent.onEvent(mActivity,"Ring");
                 MediaStoreUtil.setRing(mActivity,mSong.getId());
                 break;
             case R.id.menu_share:
-                MobclickAgent.onEvent(mActivity,"Share");
                 mActivity.startActivity(
                         Intent.createChooser(Util.createShareSongFileIntent(mSong, mActivity), null));
                 break;
             case R.id.menu_delete:
-                MobclickAgent.onEvent(mActivity,"Delete");
                 try {
                     String title = mActivity.getString(R.string.confirm_delete_from_playlist_or_library,mIsDeletePlayList ? mPlayListName : "曲库");
                     new MaterialDialog.Builder(mActivity)
@@ -105,7 +99,6 @@ public class SongPopupListener
                             .checkBoxPromptRes(R.string.delete_source, false, null)
                             .onAny((dialog, which) -> {
                                 if(which == POSITIVE){
-                                    MobclickAgent.onEvent(mActivity,"Delete");
                                     boolean deleteSuccess = !mIsDeletePlayList ?
                                             MediaStoreUtil.delete(mSong.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0 :
                                             PlayListUtil.deleteSong(mSong.getId(),mPlayListName);

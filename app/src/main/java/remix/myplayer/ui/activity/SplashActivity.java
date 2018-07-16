@@ -8,8 +8,6 @@ import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.umeng.analytics.MobclickAgent;
-
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
@@ -80,14 +78,4 @@ public class SplashActivity extends BaseActivity {
     protected void setStatusBar() {
         StatusBarUtil.setTransparent(this);
     }
-
-    public void onResume() {
-        MobclickAgent.onPageStart(SplashActivity.class.getSimpleName());
-        super.onResume();
-    }
-    public void onPause() {
-        MobclickAgent.onPageEnd(SplashActivity.class.getSimpleName());
-        super.onPause();
-    }
-
 }

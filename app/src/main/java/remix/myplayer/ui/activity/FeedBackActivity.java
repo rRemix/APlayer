@@ -14,13 +14,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.umeng.analytics.MobclickAgent;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.bean.bmob.Feedback;
+import remix.myplayer.bean.misc.Feedback;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
@@ -105,14 +103,5 @@ public class FeedBackActivity extends ToolbarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         ToastUtil.show(this,requestCode == Activity.RESULT_OK ? R.string.send_success : R.string.send_error);
         finish();
-    }
-
-    public void onResume() {
-        MobclickAgent.onPageStart(FeedBackActivity.class.getSimpleName());
-        super.onResume();
-    }
-    public void onPause() {
-        MobclickAgent.onPageEnd(FeedBackActivity.class.getSimpleName());
-        super.onPause();
     }
 }

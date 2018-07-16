@@ -8,7 +8,7 @@ import butterknife.BindView
 import com.facebook.drawee.view.SimpleDraweeView
 import remix.myplayer.R
 import remix.myplayer.adapter.holder.BaseViewHolder
-import remix.myplayer.bean.PurchaseBean
+import remix.myplayer.bean.misc.PurchaseBean
 
 class PurchaseAdapter (context: Context, layoutId: Int) : BaseAdapter<PurchaseBean,PurchaseAdapter.PurchaseHolder>(context,layoutId) {
     private val LOGOS_OTHERS = listOf(R.drawable.icon_cookie,R.drawable.icon_cake,R.drawable.icon_drink,

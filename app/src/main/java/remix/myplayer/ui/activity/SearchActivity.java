@@ -16,8 +16,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.umeng.analytics.MobclickAgent;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -62,7 +60,6 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter>{
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        MobclickAgent.onEvent(this,"Search");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
@@ -197,16 +194,6 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter>{
         boolean flag = mAdapter.getDatas() != null && mAdapter.getDatas().size() > 0;
         mSearchResRecyclerView.setVisibility(flag? View.VISIBLE : View.GONE);
         mSearchResBlank.setVisibility(flag? View.GONE :View.VISIBLE);
-    }
-
-    public void onResume() {
-        MobclickAgent.onPageStart(SearchActivity.class.getSimpleName());
-        super.onResume();
-    }
-
-    public void onPause() {
-        MobclickAgent.onPageEnd(SearchActivity.class.getSimpleName());
-        super.onPause();
     }
 
 }

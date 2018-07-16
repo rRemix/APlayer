@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 
@@ -46,7 +45,6 @@ public class ThemeDialog extends BaseDialogActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        MobclickAgent.onEvent(this,"ThemeColor");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_color_choose);
         ButterKnife.bind(this);

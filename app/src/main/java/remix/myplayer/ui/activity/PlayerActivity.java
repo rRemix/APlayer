@@ -48,7 +48,6 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
-import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -59,7 +58,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
-import remix.myplayer.bean.AnimationUrl;
+import remix.myplayer.bean.misc.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnTagEditListener;
@@ -524,7 +523,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 intent.putExtra("Control", Command.TOGGLE);
                 break;
         }
-        MobclickAgent.onEvent(this,v.getId() == R.id.playbar_play_container ? "Prev" : v.getId() == R.id.playbar_next ? "Next" : "Play");
         sendBroadcast(intent);
     }
 
@@ -537,7 +535,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         switch (v.getId()){
             //设置播放模式
             case R.id.playbar_model:
-                MobclickAgent.onEvent(this,"PlayModel");
                 int currentModel = MusicService.getPlayModel();
                 currentModel = (currentModel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentModel);
                 MusicService.getInstance().setPlayModel(currentModel);
@@ -555,7 +552,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 break;
             //打开正在播放列表
             case R.id.playbar_playinglist:
-                MobclickAgent.onEvent(this,"PlayingList");
                 Intent intent = new Intent(this,PlayQueueDialog.class);
                 startActivity(intent);
                 break;

@@ -121,8 +121,8 @@
     <string name="delete">移除</string>
     <string name="ring">铃声</string>
     <string name="join">加入</string>
-    <string name="update_query_error">查询失败: %s</string>
-    <string name="update_ignore">该版本已被忽略更新</string>
+    <string name="update_error">更新失败: %s</string>
+    <string name="update_ignore">该版本已忽略更新</string>
     <string name="no_update">当前已经是最新版本</string>
     <string name="search">搜索</string>
     <string name="timer_close">定时关闭</string>
@@ -342,4 +342,5 @@
     <string name="update">更新</string>
     <string name="new_version_found">发现新版本</string>
     <string name="ignore_this_version">忽略该版本</string>
+    <string name="empty_path_report_to_developer">安装路径为空,请反馈给开发者</string>
 </resources>

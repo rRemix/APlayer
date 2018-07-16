@@ -17,8 +17,6 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.umeng.analytics.MobclickAgent;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -85,7 +83,6 @@ public class TimerDialog extends BaseDialogActivity {
     @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        MobclickAgent.onEvent(this,"Timer");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_timer);
         ButterKnife.bind(this);

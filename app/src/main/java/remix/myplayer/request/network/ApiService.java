@@ -5,8 +5,11 @@ import android.support.annotation.Nullable;
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 import remix.myplayer.BuildConfig;
+import remix.myplayer.bean.github.Release;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
@@ -36,4 +39,8 @@ public interface ApiService {
 
     @GET(BASE_QUERY_PARAMETERS + "&method=artist.getinfo")
     Observable<ResponseBody> getArtistInfo(@Query("artist") String artistName, @Nullable @Query("lang") String language);
+
+    @GET("repos/{owner}/{repo}/releases/latest")
+    @Headers("Authorization: token " + BuildConfig.GITHUB_SECRET_KEY)
+    Observable<Release> getLatestRelease(@Path("owner") String owner, @Path("repo") String repo);
 }

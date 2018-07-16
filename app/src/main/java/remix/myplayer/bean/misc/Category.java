@@ -1,4 +1,4 @@
-package remix.myplayer.bean;
+package remix.myplayer.bean.misc;
 
 import java.io.Serializable;
 import java.util.Arrays;

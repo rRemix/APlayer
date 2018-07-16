@@ -8,8 +8,6 @@ import android.os.Environment;
 import android.os.Process;
 import android.util.Log;
 
-import com.umeng.analytics.MobclickAgent;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -82,7 +80,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         if (mDefaultCrashHandler != null) {
             mDefaultCrashHandler.uncaughtException(thread, ex);
         } else {
-            MobclickAgent.onKillProcess(mContext);
             Process.killProcess(Process.myPid());
         }
 
@@ -123,7 +120,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             pw.println();
             //导出异常的调用栈信息
             ex.printStackTrace(pw);
-            ToastUtil.show(mContext,"错误:" + ex.toString());
             pw.close();
         } catch (Exception e) {
             Log.e(TAG, "dump crash info failed");

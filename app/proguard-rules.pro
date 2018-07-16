@@ -142,14 +142,6 @@ public static final int *;
 -keep class * extends cn.bmob.v3.BmobObject {
     *;
 }
--keep class com.example.bmobexample.bean.BankCard{*;}
--keep class com.example.bmobexample.bean.GameScore{*;}
--keep class com.example.bmobexample.bean.MyUser{*;}
--keep class com.example.bmobexample.bean.Person{*;}
--keep class com.example.bmobexample.file.Movie{*;}
--keep class com.example.bmobexample.file.Song{*;}
--keep class com.example.bmobexample.relation.Post{*;}
--keep class com.example.bmobexample.relation.Comment{*;}
 
 # keep okhttp3、okio
 -dontwarn javax.annotation.**
@@ -157,10 +149,6 @@ public static final int *;
 -keep class okhttp3.** { *;}
 -keep interface okhttp3.** { *; }
 -dontwarn okio.**
-
-# keep rx
--dontwarn sun.misc.**
--keep class io.reactivex.**{*;}
 
 -dontwarn retrofit2.**
 -keep class retrofit2.** { *; }
@@ -207,3 +195,7 @@ public static final int *;
 
 #ijkplayer
 -keep class tv.danmaku.ijk.media.player.** { *; }
+
+#bugly
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}

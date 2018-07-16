@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
@@ -177,10 +177,6 @@
         <!-- 图片裁剪 -->
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
 
-        <!-- bombupdate -->
-        <activity
-            android:name="cn.bmob.v3.update.UpdateDialogActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!-- 线控 -->
         <receiver android:name=".misc.receiver.MediaButtonReceiver">
@@ -188,11 +184,7 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
-        <!-- <receiver android:name=".receiver.NotifyReceiver"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="remix.music.NOTIFY" /> -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
+
         <receiver android:name=".misc.receiver.ExitReceiver"
             android:exported="false">
             <intent-filter>
@@ -200,18 +192,9 @@
             </intent-filter>
         </receiver>
 
-        <!--<receiver android:name=".ui.activity.MainActivity$DownloadReceiver"-->
-            <!--android:exported="false">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="${applicationId}.ACTION.DOWNLOAD_COMPLETE" />-->
-                <!--<action android:name="${applicationId}.ACTION.DOWNLOAD_NOTIFICATION_CLICKED" />-->
-                <!--<action android:name="DownloadComplete"/>-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
-
         <service android:name=".service.MusicService"
             android:exported="false"/>
-        <service android:name=".misc.update.UpdateService"
+        <service android:name=".misc.update.DownloadService"
             android:exported="false"/>
 
         <provider

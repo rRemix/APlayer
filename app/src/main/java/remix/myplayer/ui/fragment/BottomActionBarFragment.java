@@ -26,7 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.App;
 import remix.myplayer.R;
-import remix.myplayer.bean.AnimationUrl;
+import remix.myplayer.bean.misc.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.menu.CtrlButtonListener;
 import remix.myplayer.request.LibraryUriRequest;

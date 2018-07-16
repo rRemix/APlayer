@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
-import com.umeng.analytics.MobclickAgent;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.App;
@@ -36,15 +34,6 @@ public class AboutActivity extends ToolbarActivity {
         }
 
         setUpToolbar(mToolBar, getString(R.string.about));
-    }
-
-    public void onResume() {
-        MobclickAgent.onPageStart(AboutActivity.class.getSimpleName());
-        super.onResume();
-    }
-    public void onPause() {
-        MobclickAgent.onPageEnd(AboutActivity.class.getSimpleName());
-        super.onPause();
     }
 
 }

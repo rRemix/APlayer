@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -328,7 +327,6 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
     @Override
     protected void onPause() {
-        MobclickAgent.onPageEnd(ChildHolderActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
@@ -337,7 +335,6 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
     @Override
     protected void onResume() {
-        MobclickAgent.onPageStart(ChildHolderActivity.class.getSimpleName());
         super.onResume();
         mIsRunning = true;
         updateList(true);

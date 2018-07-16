@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.umeng.analytics.MobclickAgent;
 
 import java.lang.ref.WeakReference;
 
@@ -58,12 +57,12 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * 实际为将手机解锁并对Activity进行处理，使其看起来像锁屏界面
  */
 
-public class LockScreenActivity extends BaseActivity implements UpdateHelper.Callback{
+public class LockScreenActivity extends BaseActivity implements UpdateHelper.Callback {
     private static final String TAG = "LockScreenActivity";
     private static final Bitmap DEFAULT_BITMAP = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_night);
-    private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),210);
-    private static final int BLUR_SIZE = DensityUtil.dip2px(App.getContext(),100);
-    private static final RequestConfig CONFIG = new RequestConfig.Builder(BLUR_SIZE,BLUR_SIZE).build();
+    private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 210);
+    private static final int BLUR_SIZE = DensityUtil.dip2px(App.getContext(), 100);
+    private static final RequestConfig CONFIG = new RequestConfig.Builder(BLUR_SIZE, BLUR_SIZE).build();
     //当前播放的歌曲信息
     private Song mInfo;
     //歌曲与艺术家
@@ -123,7 +122,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         setContentView(R.layout.activity_lockscreen);
         ButterKnife.bind(this);
 
-        if((mInfo = MusicService.getCurrentMP3()) == null)
+        if ((mInfo = MusicService.getCurrentMP3()) == null)
             return;
 
         DisplayMetrics metric = new DisplayMetrics();
@@ -147,7 +146,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         mView = getWindow().getDecorView();
         mView.setBackgroundColor(Color.TRANSPARENT);
 
-        findView(R.id.lockscreen_arrow_container).startAnimation(AnimationUtils.loadAnimation(this,R.anim.arrow_left_to_right));
+        findView(R.id.lockscreen_arrow_container).startAnimation(AnimationUtils.loadAnimation(this, R.anim.arrow_left_to_right));
 
     }
 
@@ -156,12 +155,13 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     private float mScrollX2;
     //一次移动的距离
     private float mDistance;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(mView == null)
+        if (mView == null)
             return true;
         int action = event.getAction();
-        switch (action){
+        switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mScrollX1 = event.getX();
                 break;
@@ -170,18 +170,18 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                 mDistance = mScrollX2 - mScrollX1;
                 mScrollX1 = mScrollX2;
                 //如果往右或者是往左没有超过最左边,移动View
-                if(mDistance > 0 || ((mView.getScrollX() + (-mDistance)) < 0)) {
+                if (mDistance > 0 || ((mView.getScrollX() + (-mDistance)) < 0)) {
                     mView.scrollBy((int) -mDistance, 0);
                 }
-                LogUtil.d(TAG,"distance:" + mDistance + "\r\n");
+                LogUtil.d(TAG, "distance:" + mDistance + "\r\n");
                 break;
             case MotionEvent.ACTION_UP:
                 //判断当前位置是否超过整个屏幕宽度的0.25
                 //超过则finish;没有则移动回初始状态
-                if(-mView.getScrollX() > mWidth * 0.25)
+                if (-mView.getScrollX() > mWidth * 0.25)
                     finish();
                 else
-                    mView.scrollTo(0,0);
+                    mView.scrollTo(0, 0);
                 mDistance = mScrollX1 = 0;
                 break;
         }
@@ -191,7 +191,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     @Override
     protected void onStart() {
         super.onStart();
-        overridePendingTransition(0,0);
+        overridePendingTransition(0, 0);
     }
 
     @Override
@@ -208,26 +208,23 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
 
     @Override
     protected void onResume() {
-        MobclickAgent.onPageStart(LockScreenActivity.class.getSimpleName());
         super.onResume();
         mIsRunning = true;
-        UpdateUI(mInfo,mIsPlay);
+        UpdateUI(mInfo, mIsPlay);
     }
 
     public void onPause() {
-        MobclickAgent.onPageEnd(LockScreenActivity.class.getSimpleName());
         super.onPause();
-        MobclickAgent.onPause(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(mDisposable != null)
+        if (mDisposable != null)
             mDisposable.dispose();
-        if(mRawBitMap != null && !mRawBitMap.isRecycled())
+        if (mRawBitMap != null && !mRawBitMap.isRecycled())
             mRawBitMap.recycle();
-        if(mNewBitMap != null && !mNewBitMap.isRecycled())
+        if (mNewBitMap != null && !mNewBitMap.isRecycled())
             mNewBitMap.recycle();
     }
 
@@ -235,41 +232,41 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     public void UpdateUI(Song Song, boolean isplay) {
         mInfo = Song;
         mIsPlay = isplay;
-        if(!mIsRunning){
+        if (!mIsRunning) {
 //            ToastUtil.show(mContext,R.string.error);
             return;
         }
-        if(mInfo == null){
+        if (mInfo == null) {
 //            ToastUtil.show(mContext,R.string.error);
             return;
         }
 
         //更新播放按钮
-        if(mPlayButton != null){
+        if (mPlayButton != null) {
             mPlayButton.setImageResource(MusicService.isPlay() ? R.drawable.lock_btn_pause : R.drawable.lock_btn_play);
         }
         //标题
-        if(mSong != null) {
+        if (mSong != null) {
             mSong.setText(mInfo.getTitle());
         }
         //艺术家
-        if(mArtist != null) {
+        if (mArtist != null) {
             mArtist.setText(mInfo.getArtist());
         }
         //封面
-        if(mSimpleImage != null) {
+        if (mSimpleImage != null) {
             new LibraryUriRequest(mSimpleImage,
                     getSearchRequestWithAlbumType(mInfo),
-                    new RequestConfig.Builder(IMAGE_SIZE,IMAGE_SIZE).build()).load();
+                    new RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load();
         }
         //下一首
-        if(mNextSong != null && MusicService.getNextMP3() != null)
-            mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
+        if (mNextSong != null && MusicService.getNextMP3() != null)
+            mNextSong.setText(getString(R.string.next_song, MusicService.getNextMP3().getTitle()));
 
-        if(mInfo == null)
+        if (mInfo == null)
             return;
 //        new ImageUriRequestImpl(this,mInfo).load();
-        new ImageUriRequest<Palette.Swatch>(CONFIG){
+        new ImageUriRequest<Palette.Swatch>(CONFIG) {
             @Override
             public void onError(String errMsg) {
 //                ToastUtil.show(mContext,errMsg);
@@ -285,13 +282,13 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                 mDisposable = getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(mInfo))
                         .compose(RxUtil.applySchedulerToIO())
                         .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
-                            if(bitmap == null){
-                                processBitmap(e,DEFAULT_BITMAP);
+                            if (bitmap == null) {
+                                processBitmap(e, DEFAULT_BITMAP);
                             } else {
-                                processBitmap(e,bitmap);
+                                processBitmap(e, bitmap);
                             }
                         }))
-                        .onErrorResumeNext(Observable.create(e -> processBitmap(e,DEFAULT_BITMAP)))
+                        .onErrorResumeNext(Observable.create(e -> processBitmap(e, DEFAULT_BITMAP)))
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
             }
@@ -299,7 +296,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     }
 
     private void setResult(Palette.Swatch result) {
-        if(result == null)
+        if (result == null)
             return;
         mSongColor = result.getBodyTextColor();
         mArtistColor = result.getTitleTextColor();
@@ -308,16 +305,16 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         mSong.setTextColor(mSongColor);
         mArtist.setTextColor(mArtistColor);
         mNextSong.setTextColor(mSongColor);
-        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,mSongColor,0,0,1));
+        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT, 0, 2, mSongColor, 0, 0, 1));
     }
 
-    private void processBitmap(ObservableEmitter<Palette.Swatch> e,Bitmap raw) {
-        if(isFinishing()){
+    private void processBitmap(ObservableEmitter<Palette.Swatch> e, Bitmap raw) {
+        if (isFinishing()) {
             e.onComplete();
             return;
         }
         mRawBitMap = MusicService.copy(raw);
-        if(mRawBitMap == null || mRawBitMap.isRecycled()){
+        if (mRawBitMap == null || mRawBitMap.isRecycled()) {
             e.onComplete();
             return;
         }
@@ -325,8 +322,8 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         mNewBitMap = stackBlurManager.processNatively(40);
         Palette palette = Palette.from(mRawBitMap).generate();
         Palette.Swatch swatch = palette.getMutedSwatch();//柔和 暗色
-        if(swatch == null)
-            swatch = new Palette.Swatch(Color.GRAY,100);
+        if (swatch == null)
+            swatch = new Palette.Swatch(Color.GRAY, 100);
         e.onNext(swatch);
         e.onComplete();
     }
@@ -334,7 +331,8 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     private static class ImageUriRequestImpl extends ImageUriRequest<Palette.Swatch> {
         private final WeakReference<LockScreenActivity> mRef;
         private final Song mSong;
-        ImageUriRequestImpl(LockScreenActivity activity,Song song){
+
+        ImageUriRequestImpl(LockScreenActivity activity, Song song) {
             mRef = new WeakReference<>(activity);
             mSong = song;
         }
@@ -346,7 +344,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
 
         @Override
         public void onSuccess(Palette.Swatch result) {
-            if(mRef.get() != null && !mRef.get().isFinishing())
+            if (mRef.get() != null && !mRef.get().isFinishing())
                 mRef.get().setResult(result);
         }
 
@@ -354,19 +352,19 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         @Override
         public void load() {
             final LockScreenActivity activity = mRef.get();
-            if(activity == null || activity.isFinishing())
+            if (activity == null || activity.isFinishing())
                 return;
             UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(mSong);
             getThumbBitmapObservable(request)
                     .compose(RxUtil.applySchedulerToIO())
                     .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
-                        if(bitmap == null){
-                            activity.processBitmap(e,DEFAULT_BITMAP);
+                        if (bitmap == null) {
+                            activity.processBitmap(e, DEFAULT_BITMAP);
                         } else {
-                            activity.processBitmap(e,bitmap);
+                            activity.processBitmap(e, bitmap);
                         }
                     }))
-                    .onErrorResumeNext(Observable.create(e -> activity.processBitmap(e,DEFAULT_BITMAP)))
+                    .onErrorResumeNext(Observable.create(e -> activity.processBitmap(e, DEFAULT_BITMAP)))
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
         }

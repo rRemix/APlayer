@@ -9,13 +9,12 @@ import android.view.MenuItem;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.soundcloud.android.crop.Crop;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import remix.myplayer.R;
-import remix.myplayer.bean.CustomThumb;
+import remix.myplayer.bean.misc.CustomThumb;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
@@ -89,7 +88,6 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                         .checkBoxPromptRes(R.string.delete_source, false, null)
                         .onAny((dialog, which) -> {
                             if(which == POSITIVE){
-                                MobclickAgent.onEvent(mContext,"Delete");
                                 if(mId == Global.MyLoveID && mType == Constants.PLAYLIST){
                                     ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delete));
                                     return;

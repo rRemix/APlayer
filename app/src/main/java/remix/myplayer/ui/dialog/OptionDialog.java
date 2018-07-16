@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -114,7 +113,6 @@ public class OptionDialog extends BaseDialogActivity {
         switch (v.getId()){
             //添加到播放列表
             case R.id.popup_add:
-                MobclickAgent.onEvent(this,"AddtoPlayList");
                 Intent intentAdd = new Intent(OptionDialog.this,AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
                 ardAdd.putInt("Id", mSong.getId());
@@ -124,7 +122,6 @@ public class OptionDialog extends BaseDialogActivity {
                 break;
             //设置铃声
             case R.id.popup_ring:
-                MobclickAgent.onEvent(this,"Ring");
                 MediaStoreUtil.setRing(this, mSong.getId());
                 finish();
                 break;
@@ -135,14 +132,12 @@ public class OptionDialog extends BaseDialogActivity {
 //                intent.putExtra("song",mSong);
 //                sendBroadcast(intent);
 //                finish();
-                MobclickAgent.onEvent(this,"Share");
                 startActivity(
                         Intent.createChooser(Util.createShareSongFileIntent(mSong, mContext), null));
                 finish();
                 break;
             //删除
             case R.id.popup_delete:
-                MobclickAgent.onEvent(this,"Delete");
                 try {
                     String title = getString(R.string.confirm_delete_from_playlist_or_library,mIsDeletePlayList ? mPlayListName : "曲库");
                     new MaterialDialog.Builder(OptionDialog.this)
@@ -153,7 +148,6 @@ public class OptionDialog extends BaseDialogActivity {
                             .checkBoxPromptRes(R.string.delete_source, false, null)
                             .onAny((dialog, which) -> {
                                 if(which == POSITIVE){
-                                    MobclickAgent.onEvent(mContext,"Delete");
                                     boolean deleteSuccess = !mIsDeletePlayList ?
                                             MediaStoreUtil.delete(mSong.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0 :
                                             PlayListUtil.deleteSong(mSong.getId(),mPlayListName);

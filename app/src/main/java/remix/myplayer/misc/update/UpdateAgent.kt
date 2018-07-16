@@ -1,104 +1,89 @@
 package remix.myplayer.misc.update
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Environment
 import android.text.TextUtils
-import cn.bmob.v3.BmobQuery
-import cn.bmob.v3.exception.BmobException
-import cn.bmob.v3.listener.BmobUpdateListener
-import cn.bmob.v3.listener.FindListener
-import cn.bmob.v3.update.AppVersion
-import cn.bmob.v3.update.UpdateResponse
-import cn.bmob.v3.update.UpdateStatus
-import com.afollestad.materialdialogs.MaterialDialog
 import remix.myplayer.App
 import remix.myplayer.R
-import remix.myplayer.misc.update.UpdateService.Companion.EXTRA_RESPONSE
-import remix.myplayer.theme.ThemeStore
+import remix.myplayer.bean.github.Release
+import remix.myplayer.request.network.HttpClient
+import remix.myplayer.request.network.RxUtil
 import remix.myplayer.util.LogUtil
 import remix.myplayer.util.SPUtil
+import remix.myplayer.util.Util
 
 object UpdateAgent {
     private const val TAG = "UpdateAgent"
 
-    var listener: BmobUpdateListener? = null
+    var listener: Listener? = null
 
-    var cancelIgnore = false
-
-    private val versionCode: Int
-        get() {
-            var versionCode = 0
-            try {
-                versionCode = App.getContext().packageManager.getPackageInfo(App.getContext().packageName, 0).versionCode
-            } catch (e: PackageManager.NameNotFoundException) {
-                LogUtil.e(TAG, e)
-            }
-
-            return versionCode
-        }
+    var forceCheck = false
 
     fun check(context: Context) {
-        if(listener == null)
+        if (listener == null)
             return
-        val bmobQuery = BmobQuery<AppVersion>()
-        bmobQuery.addWhereEqualTo("platform", "Android")
-        bmobQuery.addWhereGreaterThan("version_i", versionCode)
-        bmobQuery.order("-version_i")
-        bmobQuery.findObjects(object : FindListener<AppVersion>() {
-            override fun done(list: List<AppVersion>?, e: BmobException?) {
-                if (e != null) {
-                    listener?.onUpdateReturned(-1, UpdateResponse(e.errorCode, e.message))
-                    return
+        HttpClient.getGithubApiservice().getLatestRelease("rRemix", "APlayer")
+                .compose(RxUtil.applyScheduler())
+                .doFinally {
+                    listener = null
                 }
-                if (list == null || list.isEmpty()) {
-                    listener?.onUpdateReturned(UpdateStatus.No, UpdateResponse(UpdateStatus.No, context.getString(R.string.no_update)))
-                    //todo 删除以前下载的
-                    return
-                }
-                val updateResponse = UpdateResponse(list[0])
-                //是否忽略了该版本的更新
-                if(!cancelIgnore && SPUtil.getValue(context,SPUtil.UPDATE_KEY.NAME,updateResponse.version_i.toString(),false)){
-                    listener?.onUpdateReturned(UpdateStatus.IGNORED, UpdateResponse(UpdateStatus.IGNORED, "该版本已经忽略"))
-                    return
-                }
-                if (updateResponse.target_size <= 0L) {
-                    listener?.onUpdateReturned(UpdateStatus.EmptyField, UpdateResponse(UpdateStatus.EmptyField, "target_size为空或格式不对，请填写apk文件大小(long类型)。"))
-                    return
-                }
-                if (TextUtils.isEmpty(updateResponse.path)) {
-                    listener?.onUpdateReturned(UpdateStatus.EmptyField, UpdateResponse(UpdateStatus.EmptyField, "path/android_url需填写其中之一。"))
-                    return
-                }
-                listener?.onUpdateReturned(UpdateStatus.Yes, updateResponse)
-            }
-        })
+                .subscribe({
+                    val release = it
+                    if (release == null || release.assets == null || release.assets.size == 0) {
+                        listener?.onUpdateReturned(UpdateStatus.No, context.getString(R.string.no_update), null)
+                        return@subscribe
+                    }
+                    //比较版本号
+                    val versionCode = getOnlineVersionCode(release)
+                    if (versionCode <= getLocalVersionCode()) {
+                        listener?.onUpdateReturned(UpdateStatus.No, context.getString(R.string.no_update), null)
+                        //删除以前的安装包
+                        val downloadDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+                        if(downloadDir.exists() && downloadDir.listFiles() != null && downloadDir.listFiles().isNotEmpty()){
+                            Util.deleteFilesByDirectory(downloadDir)
+                        }
+                        return@subscribe
+                    }
+                    //是否忽略了该版本的更新
+                    if (!forceCheck && SPUtil.getValue(context, SPUtil.UPDATE_KEY.NAME, versionCode.toString(), false)) {
+                        listener?.onUpdateReturned(UpdateStatus.IGNORED, context.getString(R.string.update_ignore), release)
+                        return@subscribe
+                    }
+                    //路径不合法
+                    if (release.assets[0].size < 0) {
+                        listener?.onUpdateReturned(UpdateStatus.ErrorSizeFormat, "Size为空或格式不对", release)
+                        return@subscribe
+                    }
+                    //文件大小不合法
+                    if (TextUtils.isEmpty(release.assets[0].browser_download_url)) {
+                        listener?.onUpdateReturned(UpdateStatus.ErrorSizeFormat, "下载地址为空", release)
+                        return@subscribe
+                    }
+                    //更新
+                    listener?.onUpdateReturned(UpdateStatus.Yes, "Start Update", release)
+
+                }, {
+                    listener?.onUpdateError(it)
+                })
+
     }
 
-    fun showUpdateDialog(context: Context,updateResponse:UpdateResponse){
-        MaterialDialog.Builder(context)
-                .title(R.string.new_version_found)
-                .titleColorAttr(R.attr.text_color_primary)
-                .positiveText(R.string.update)
-                .positiveColorAttr(R.attr.text_color_primary)
-                .onPositive { _, _ ->
-                    context.startService(Intent(context, UpdateService::class.java)
-                            .putExtra(EXTRA_RESPONSE, updateResponse))
-                }
-                .negativeText(R.string.cancel)
-                .negativeColorAttr(R.attr.text_color_primary)
-                .onNegative { _, _ ->
-
-                }
-                .neutralText(R.string.ignore_this_version)
-                .neutralColorAttr(R.attr.text_color_primary)
-                .onNeutral { _, _ -> SPUtil.putValue(context, SPUtil.UPDATE_KEY.NAME, updateResponse.version_i.toString(), true) }
-                .content(updateResponse.updateLog)
-                .contentColorAttr(R.attr.text_color_primary)
-                .buttonRippleColorAttr(R.attr.ripple_color)
-                .backgroundColorAttr(R.attr.background_color_3)
-                .theme(ThemeStore.getMDDialogTheme())
-                .show()
+    private fun getLocalVersionCode(): Int {
+        var versionCode = 0
+        try {
+            versionCode = App.getContext().packageManager.getPackageInfo(App.getContext().packageName, 0).versionCode
+        } catch (e: PackageManager.NameNotFoundException) {
+            LogUtil.e(TAG, e)
+        }
+        return versionCode
     }
 
+    fun getOnlineVersionCode(release: Release): Int {
+        //Release-v1.3.5.2-80
+        val numberAndCode = release.name.split("-")
+        if (numberAndCode.size < 2)
+            return 0
+        return numberAndCode[2].toInt()
+    }
 }

@@ -22,7 +22,6 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -125,7 +124,6 @@ public class RecordShareActivity extends BaseActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        MobclickAgent.onEvent(this,"Share");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recordshare);
@@ -261,7 +259,6 @@ public class RecordShareActivity extends BaseActivity {
     }
 
     public void onResume() {
-        MobclickAgent.onPageStart(RecordShareActivity.class.getSimpleName());
         super.onResume();
         new RxPermissions(this)
                 .request(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -276,7 +273,6 @@ public class RecordShareActivity extends BaseActivity {
     }
 
     public void onPause() {
-        MobclickAgent.onPageEnd(RecentlyActivity.class.getSimpleName());
         super.onPause();
     }
 

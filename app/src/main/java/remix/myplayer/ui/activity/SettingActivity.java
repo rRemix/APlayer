@@ -28,7 +28,6 @@ import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
 import remix.myplayer.App;
 import remix.myplayer.R;
-import remix.myplayer.bean.Category;
+import remix.myplayer.bean.misc.Category;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
@@ -70,7 +69,7 @@ import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
 import static remix.myplayer.App.IS_GOOGLEPLAY;
-import static remix.myplayer.bean.Category.ALL_LIBRARY_STRING;
+import static remix.myplayer.bean.misc.Category.ALL_LIBRARY_STRING;
 import static remix.myplayer.helper.M3UHelperKt.exportPlayListToFile;
 import static remix.myplayer.helper.M3UHelperKt.importLocalPlayList;
 import static remix.myplayer.helper.M3UHelperKt.importM3UFile;
@@ -291,15 +290,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
     }
 
-    public void onResume() {
-        MobclickAgent.onPageStart(SettingActivity.class.getSimpleName());
-        super.onResume();
-    }
-
-    public void onPause() {
-        MobclickAgent.onPageEnd(SettingActivity.class.getSimpleName());
-        super.onPause();
-    }
 
     @Override
     public void onBackPressed() {
@@ -548,7 +538,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     ToastUtil.show(mContext, R.string.notify_bg_color_warnning);
                     return;
                 }
-                MobclickAgent.onEvent(this, "NotifyColor");
                 new MaterialDialog.Builder(this)
                         .title(R.string.notify_bg_color)
                         .titleColorAttr(R.attr.text_color_primary)
@@ -571,7 +560,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //音效设置
             case R.id.setting_eq_container:
-                MobclickAgent.onEvent(this, "EQ");
                 final int sessionId = MusicService.getMediaPlayer().getAudioSessionId();
                 if (sessionId == AudioEffect.ERROR_BAD_VALUE) {
                     Toast.makeText(mContext, getResources().getString(R.string.no_audio_ID), Toast.LENGTH_LONG).show();
@@ -596,8 +584,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //检查更新
             case R.id.setting_update_container:
-                MobclickAgent.onEvent(this, "CheckUpdate");
-                UpdateAgent.INSTANCE.setCancelIgnore(true);
+                UpdateAgent.INSTANCE.setForceCheck(true);
                 UpdateAgent.INSTANCE.setListener(new UpdateListener(mContext));
                 UpdateAgent.INSTANCE.check(this);
                 break;

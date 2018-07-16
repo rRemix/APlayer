@@ -31,7 +31,7 @@ import io.reactivex.schedulers.Schedulers
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.adapter.PurchaseAdapter
-import remix.myplayer.bean.PurchaseBean
+import remix.myplayer.bean.misc.PurchaseBean
 import remix.myplayer.interfaces.OnItemClickListener
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.request.network.RxUtil
@@ -65,9 +65,9 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
         mAdapter = PurchaseAdapter(mContext,R.layout.item_support)
 
         val beans = ArrayList<PurchaseBean>()
-        beans.add(PurchaseBean("wechat","icon_wechat_donate",getString(R.string.wechat),""))
-        beans.add(PurchaseBean("alipay","icon_alipay_donate",getString(R.string.alipay),""))
-        beans.add(PurchaseBean("paypal","icon_paypal_donate",getString(R.string.paypal),""))
+        beans.add(PurchaseBean("wechat", "icon_wechat_donate", getString(R.string.wechat), ""))
+        beans.add(PurchaseBean("alipay", "icon_alipay_donate", getString(R.string.alipay), ""))
+        beans.add(PurchaseBean("paypal", "icon_paypal_donate", getString(R.string.paypal), ""))
 
         mAdapter.setData(beans)
         mAdapter.setOnItemClickListener(object : OnItemClickListener{
@@ -192,7 +192,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
                     it.sortedWith(kotlin.Comparator{ o1, o2 ->
                         o1.priceValue.compareTo(o2.priceValue)
                     }).forEach {
-                        beans.add(PurchaseBean(it.productId,"",it.title,it.priceText))
+                        beans.add(PurchaseBean(it.productId, "", it.title, it.priceText))
                     }
                     beans
                 }

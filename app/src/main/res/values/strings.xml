@@ -121,7 +121,7 @@
     <string name="delete">Remove</string>
     <string name="ring">Ringtone</string>
     <string name="join">Add</string>
-    <string name="update_query_error">Query error: %s</string>
+    <string name="update_error">Update error: %s</string>
     <string name="update_ignore">This version has been ignored for update</string>
     <string name="no_update">Current version is newest</string>
     <string name="search">Search</string>
@@ -342,4 +342,5 @@
     <string name="update">Update</string>
     <string name="new_version_found">New version found</string>
     <string name="ignore_this_version">Ignore this version</string>
+    <string name="empty_path_report_to_developer">Path of apk is empty,please report issue to developer</string>
 </resources>

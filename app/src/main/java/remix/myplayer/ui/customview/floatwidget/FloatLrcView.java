@@ -31,7 +31,7 @@ import butterknife.OnClick;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.adapter.FloatColorAdapter;
-import remix.myplayer.bean.FloatLrcContent;
+import remix.myplayer.bean.misc.FloatLrcContent;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.service.Command;

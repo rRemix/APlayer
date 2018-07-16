@@ -13,7 +13,6 @@ import android.text.TextWatcher;
 import android.view.MenuItem;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,7 +59,6 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        MobclickAgent.onEvent(mActivity,item.getItemId() == R.id.menu_edit ? "SongEdit" : "SongDetail" );
         switch (item.getItemId()){
             case R.id.menu_lyric:
                 final boolean alreadyIgnore = SPUtil.getValue(mActivity,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
@@ -120,7 +118,6 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                 mActivity.startActivity(new Intent(mActivity, TimerDialog.class));
                 break;
             case R.id.menu_eq:
-                MobclickAgent.onEvent(mActivity,"EQ");
                 Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
                 audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
                 if(Util.isIntentAvailable(mActivity,audioEffectIntent)){
@@ -135,7 +132,6 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                         PlayListUtil.addSong(info) > 0 ? getString(R.string.add_song_playlist_success, 1,Constants.MYLOVE) : getString(R.string.add_song_playlist_error));
                 break;
             case R.id.menu_add_to_playlist:
-                MobclickAgent.onEvent(mActivity,"AddtoPlayList");
                 Intent intentAdd = new Intent(this,AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
                 ardAdd.putSerializable("list", new ArrayList<>(Collections.singletonList(mInfo.getId())));

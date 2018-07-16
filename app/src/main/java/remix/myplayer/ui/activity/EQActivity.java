@@ -14,8 +14,6 @@ import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.umeng.analytics.MobclickAgent;
-
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -116,15 +114,6 @@ public class EQActivity extends ToolbarActivity {
 
         }.start();
 
-    }
-
-    public void onResume() {
-        MobclickAgent.onPageStart(EQActivity.class.getSimpleName());
-        super.onResume();
-    }
-    public void onPause() {
-        MobclickAgent.onPageEnd(EQActivity.class.getSimpleName());
-        super.onPause();
     }
 
     @Override

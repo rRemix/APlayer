@@ -488,7 +488,7 @@ public class Util {
 
     public static void installApk(Context context,String path) {
         if(path == null){
-            ToastUtil.show(mContext,"安装路径为空,请反馈给开发者");
+            ToastUtil.show(mContext,context.getString(R.string.empty_path_report_to_developer));
             return;
         }
         File installFile = new File(path);
@@ -503,18 +503,5 @@ public class Util {
             intent.setDataAndType(Uri.fromFile(installFile), "application/vnd.android.package-archive");
             context.startActivity(intent);
         }
-
-        //        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        //        Intent install = new Intent(Intent.ACTION_VIEW);
-        //        Uri downloadFileUri = downloadManager.getUriForDownloadedFile(downloadApkId);
-        //        downloadManager.query()
-        //        if (downloadFileUri != null) {
-        //            Log.d("DownloadManager", downloadFileUri.toString());
-        //            install.setDataAndType(downloadFileUri, "application/vnd.android.package-archive");
-        //            install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //            context.startActivity(install);
-        //        } else {
-        //            Log.e("DownloadManager", "download error");
-        //        }
     }
 }

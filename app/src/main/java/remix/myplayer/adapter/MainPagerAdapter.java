@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import remix.myplayer.bean.Category;
+import remix.myplayer.bean.misc.Category;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.FolderFragment;

@@ -10,9 +10,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.Environment
 import android.support.v4.app.NotificationCompat
-import cn.bmob.v3.update.UpdateResponse
 import remix.myplayer.R
-import remix.myplayer.ui.activity.MainActivity
+import remix.myplayer.bean.github.Release
 import remix.myplayer.util.LogUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
@@ -26,8 +25,8 @@ import java.net.URL
  *
  * @param name Used to name the worker thread, important only for debugging.
  */
-class UpdateService : IntentService("UpdateService") {
-    private val mNotificationManager:NotificationManager by lazy {
+class DownloadService : IntentService("DownloadService") {
+    private val mNotificationManager: NotificationManager by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
@@ -54,38 +53,37 @@ class UpdateService : IntentService("UpdateService") {
         if (intent == null || !intent.hasExtra(EXTRA_RESPONSE)) {
             return
         }
-        val updateResponse = intent.getSerializableExtra(EXTRA_RESPONSE) as UpdateResponse
+        val release: Release = intent.getParcelableExtra(EXTRA_RESPONSE) as Release
         var inStream: InputStream? = null
         var outStream: FileOutputStream? = null
         try {
-            val downloadUrl = updateResponse.path
-            val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val downloadUrl = release.assets[0].browser_download_url
             val downloadDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
                     ?: throw RuntimeException("下载目录不存在")
             if (!downloadDir.exists() && !downloadDir.mkdirs()) {
                 throw RuntimeException("下载目录创建失败")
             }
-            val downloadFile = File(downloadDir, updateResponse.path_md5 + ".apk")
+            val downloadFile = File(downloadDir, release.name + ".apk")
             //已经下载完成
             if (downloadFile.exists()) {
-                val length = downloadFile.length()
-                if (downloadFile.length() == updateResponse.target_size) {
+                if (downloadFile.length() == release.assets[0].size) {
                     sendCompleteBroadcast(downloadFile.absolutePath)
                     return
                 } else {
                     //删除原来的文件并重新创建
-                    if (!downloadFile.delete() && !downloadFile.createNewFile()) {
-                        throw RuntimeException("无法重新创建文件")
+                    if (!downloadFile.delete()) {
+                        throw RuntimeException("Can't delete old file")
                     }
                 }
             }
+            postNotification(release.assets[0].size, 0)
             val url = URL(downloadUrl)
             val conn = url.openConnection()
             conn.connect()
             inStream = conn.getInputStream()
             val fileSize = conn.contentLength//根据响应获取文件大小
-            if (fileSize <= 0) throw RuntimeException("无法获知文件大小")
-            if (inStream == null) throw RuntimeException("无法获取输入流")
+            if (fileSize <= 0) throw RuntimeException("Can't get size of file")
+            if (inStream == null) throw RuntimeException("Can't get InputStream")
             outStream = FileOutputStream(downloadFile)
             val buf = ByteArray(1024)
             var downloadSize = 0L
@@ -97,13 +95,13 @@ class UpdateService : IntentService("UpdateService") {
                 }
                 outStream.write(buf, 0, numRead)
                 downloadSize += numRead
-                postNotification(updateResponse.target_size, downloadSize,downloadFile.absolutePath)
+                postNotification(release.assets[0].size, downloadSize)
                 //更新进度条
             } while (true)
             outStream.flush()
             sendCompleteBroadcast(downloadFile.absolutePath)
         } catch (ex: Exception) {
-            ToastUtil.show(this,"更新失败: " + ex.toString())
+            ToastUtil.show(this, R.string.update_error, ex.message)
         } finally {
             Util.closeStream(inStream)
             Util.closeStream(outStream)
@@ -111,29 +109,32 @@ class UpdateService : IntentService("UpdateService") {
         mNotificationManager.cancel(UPDATE_NOTIFICATION_ID)
     }
 
-    private fun sendCompleteBroadcast(path:String){
-        sendBroadcast(Intent(MainActivity.DownloadReceiver.ACTION_DOWNLOAD_COMPLETE)
-                .putExtra(EXTRA_PATH,path))
+    private fun sendCompleteBroadcast(path: String) {
+        sendBroadcast(Intent(ACTION_DOWNLOAD_COMPLETE)
+                .putExtra(EXTRA_PATH, path))
     }
 
-    private fun postNotification(targetSize: Long, downloadSize: Long,path: String) {
+    private fun postNotification(targetSize: Long, downloadSize: Long) {
         val builder = NotificationCompat.Builder(this, UPDATE_NOTIFICATION_CHANNEL_ID)
                 .setContentIntent(null)
                 .setContentTitle(getString(R.string.downloading))
 //                .setContentText(getString(if(isFinish) R.string.download_complete_to_do else R.string.please_wait))
-                .setProgress(targetSize.toInt(), downloadSize.toInt(),false)
+                .setProgress(targetSize.toInt(), downloadSize.toInt(), false)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setAutoCancel(false)
                 .setShowWhen(false)
                 .setOngoing(true)
+        if (targetSize == 0L) {
+            builder.setTicker(getString(R.string.downloading))
+        }
         mNotificationManager.notify(UPDATE_NOTIFICATION_ID, builder.build())
         LogUtil.d(TAG, "TargetSize: $targetSize DownloadSize: $downloadSize")
     }
 
-    private fun getContentIntent(isFinish:Boolean,path:String): PendingIntent? {
+    private fun getContentIntent(isFinish: Boolean, path: String): PendingIntent? {
         return null
 //        return if(isFinish){
-//            val intent = Intent(MainActivity.DownloadReceiver.ACTION_DOWNLOAD_COMPLETE)
+//            val intent = Intent(MainActivity.UpdateReceiver.ACTION_DOWNLOAD_COMPLETE)
 //                    .putExtra(EXTRA_PATH,path)
 //            PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 //        }else{
@@ -144,9 +145,10 @@ class UpdateService : IntentService("UpdateService") {
     }
 
     companion object {
-        const val EXTRA_RESPONSE = "update_response"
+        const val ACTION_DOWNLOAD_COMPLETE = "remix.myplayer.ACTION.DOWNLOAD_COMPLETE"
+        const val EXTRA_RESPONSE = "update_info"
         const val EXTRA_PATH = "file_path"
-        private const val TAG = "UpdateService"
+        private const val TAG = "DownloadService"
         private const val UPDATE_NOTIFICATION_CHANNEL_ID = "update_notification"
         private const val UPDATE_NOTIFICATION_ID = 10
     }

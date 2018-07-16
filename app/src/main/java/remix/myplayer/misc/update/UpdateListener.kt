@@ -2,50 +2,62 @@ package remix.myplayer.misc.update
 
 import android.content.Context
 import android.content.Intent
-import cn.bmob.v3.listener.BmobUpdateListener
-import cn.bmob.v3.update.UpdateResponse
-import cn.bmob.v3.update.UpdateStatus
 import com.afollestad.materialdialogs.MaterialDialog
 import remix.myplayer.R
-import remix.myplayer.misc.update.UpdateService.Companion.EXTRA_RESPONSE
+import remix.myplayer.bean.github.Release
+import remix.myplayer.misc.update.DownloadService.Companion.EXTRA_RESPONSE
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 
-class UpdateListener(val mContext:Context) : BmobUpdateListener {
-
-    override fun onUpdateReturned(updateStatus: Int, updateResponse: UpdateResponse?) {
-        if(updateResponse == null)
+class UpdateListener(val mContext: Context) : Listener {
+    override fun onUpdateReturned(code: Int, message: String, release: Release?) {
+        val showToast= UpdateAgent.forceCheck
+        if (release == null ){
+            if(showToast)
+                ToastUtil.show(mContext,message)
             return
-        when (updateStatus) {
+        }
+        when (code) {
             UpdateStatus.Yes -> MaterialDialog.Builder(mContext)
                     .title(R.string.new_version_found)
                     .titleColorAttr(R.attr.text_color_primary)
                     .positiveText(R.string.update)
                     .positiveColorAttr(R.attr.text_color_primary)
                     .onPositive { _, _ ->
-                        mContext.startService(Intent(mContext, UpdateService::class.java)
-                                .putExtra(EXTRA_RESPONSE, updateResponse))
+                        mContext.startService(Intent(mContext, DownloadService::class.java)
+                                .putExtra(EXTRA_RESPONSE, release))
                     }
                     .negativeText(R.string.cancel)
                     .negativeColorAttr(R.attr.text_color_primary)
                     .onNegative { _, _ ->
-
                     }
                     .neutralText(R.string.ignore_this_version)
                     .neutralColorAttr(R.attr.text_color_primary)
-                    .onNeutral { _, _ -> SPUtil.putValue(mContext, SPUtil.UPDATE_KEY.NAME, updateResponse.version_i.toString(), true) }
-                    .content(updateResponse.updateLog)
+                    .onNeutral { _, _ -> SPUtil.putValue(mContext, SPUtil.UPDATE_KEY.NAME, UpdateAgent.getOnlineVersionCode(release).toString(), true) }
+                    .content(release.body)
                     .contentColorAttr(R.attr.text_color_primary)
                     .buttonRippleColorAttr(R.attr.ripple_color)
                     .backgroundColorAttr(R.attr.background_color_3)
                     .theme(ThemeStore.getMDDialogTheme())
                     .show()
-            UpdateStatus.No -> ToastUtil.show(mContext, mContext.getString(R.string.no_update))
-            UpdateStatus.IGNORED -> {
-//                ToastUtil.show(mContext, mContext.getString(R.string.update_ignore))
+            UpdateStatus.No,UpdateStatus.ErrorSizeFormat -> {
+                if(showToast)
+                    ToastUtil.show(mContext, message)
             }
-            else -> ToastUtil.show(mContext, R.string.update_query_error, updateResponse.exception)
+            UpdateStatus.IGNORED -> {
+//                if(showToast)
+//                    ToastUtil.show(mContext, message)
+            }
+            else -> {
+                if(showToast)
+                    ToastUtil.show(mContext, message)
+            }
         }
     }
+
+    override fun onUpdateError(throwable: Throwable) {
+        ToastUtil.show(mContext, R.string.update_error, throwable)
+    }
+
 }

@@ -10,8 +10,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 
-import com.umeng.analytics.MobclickAgent;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +52,6 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        MobclickAgent.onEvent(this,"RecentlyAdd");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recently);
         ButterKnife.bind(this);
@@ -138,7 +135,6 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
 
     @Override
     protected void onResume() {
-        MobclickAgent.onPageStart(RecentlyActivity.class.getSimpleName());
         super.onResume();
         if(mMultiChoice.isShow()){
             mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
@@ -147,7 +143,6 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
 
     @Override
     protected void onPause() {
-        MobclickAgent.onPageEnd(RecentlyActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
             mHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
