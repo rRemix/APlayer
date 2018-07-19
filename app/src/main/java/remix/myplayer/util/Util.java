@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.media.MediaFormat;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -484,6 +485,11 @@ public class Util {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void closeCursor(Cursor cursor){
+        if(cursor != null && !cursor.isClosed())
+            cursor.close();
     }
 
     public static void installApk(Context context,String path) {

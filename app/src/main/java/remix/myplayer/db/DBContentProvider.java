@@ -135,8 +135,8 @@ public class DBContentProvider extends ContentProvider {
         int match = mUriMatcher.match(uri);
         int updateRow = 0;
         try {
-            updateRow = db.delete(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
-                    selection,selectionArgs);
+            updateRow = db.update(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
+                    values,selection,selectionArgs);
             App.getContext().getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
         } catch (Exception e){
             e.printStackTrace();

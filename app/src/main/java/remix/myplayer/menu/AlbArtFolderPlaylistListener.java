@@ -30,16 +30,16 @@ import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
 /**
  * Created by taeja on 16-1-25.
  */
-public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickListener {
+public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickListener{
     private Context mContext;
     //专辑id 艺术家id 歌曲id 文件夹position
     private int mId;
     //0:专辑 1:歌手 2:文件夹 3:播放列表
     private int mType;
-    //专辑名 艺术家名 文件夹position或者播放列表id
+    //专辑名 艺术家名 文件夹position或者播放列表名字
     private String mKey;
-    public AlbArtFolderPlaylistListener(Context Context, int id, int type, String key) {
-        this.mContext = Context;
+    public AlbArtFolderPlaylistListener(Context context, int id, int type, String key) {
+        this.mContext = context;
         this.mId = id;
         this.mType = type;
         this.mKey = key;
@@ -80,6 +80,10 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 break;
             //删除
             case R.id.menu_delete:
+                if(mId == Global.MyLoveID && mType == Constants.PLAYLIST){
+                    ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_edit));
+                    return true;
+                }
                 new MaterialDialog.Builder(mContext)
                         .content(mType == Constants.PLAYLIST ? R.string.confirm_delete_playlist : R.string.confirm_delete_from_library)
                         .buttonRippleColor(ThemeStore.getRippleColor())
@@ -88,10 +92,6 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                         .checkBoxPromptRes(R.string.delete_source, false, null)
                         .onAny((dialog, which) -> {
                             if(which == POSITIVE){
-                                if(mId == Global.MyLoveID && mType == Constants.PLAYLIST){
-                                    ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delete));
-                                    return;
-                                }
                                 if(mType != Constants.PLAYLIST){
                                     ToastUtil.show(mContext,MediaStoreUtil.delete(mId , mType,dialog.isPromptCheckBoxChecked()) > 0 ? R.string.delete_success : R.string.delete_error);
                                 } else {
@@ -111,22 +111,30 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 Intent thumbIntent = ((Activity)mContext).getIntent();
                 thumbIntent.putExtra("thumb",thumbBean);
                 ((Activity)mContext).setIntent(thumbIntent);
-//                try {
-//                    Intent pickIntent = new Intent("android.intent.action.GET_CONTENT").setType("image/*");
-//                    pickIntent.putExtra("test",1234);
-//                    pickIntent.setExtrasClassLoader(CustomThumb.class.getClassLoader());
-//                    pickIntent.putExtra("thumb",thumbBean);
-//
-//                    ((Activity)mContext).startActivityForResult(pickIntent, Crop.REQUEST_PICK);
-//                }catch (Exception e){
-//                    Toast.makeText(mContext, com.soundcloud.android.crop.R.string.crop__pick_error, Toast.LENGTH_SHORT).show();
-//                }
-
                 Crop.pickImage((Activity) mContext, Crop.REQUEST_PICK);
                 break;
+            case R.id.menu_playlist_rename://列表重命名
+                if(mId == Global.MyLoveID && mType == Constants.PLAYLIST){
+                    ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_edit));
+                    return true;
+                }
+                new MaterialDialog.Builder(mContext)
+                        .title(R.string.rename)
+                        .titleColorAttr(R.attr.text_color_primary)
+                        .input("", "", false, (dialog, input) -> ToastUtil.show(mContext,mContext.getString(PlayListUtil.rename(mId,input.toString()) ? R.string.save_success : R.string.save_error)))
+                        .buttonRippleColor(ThemeStore.getRippleColor())
+                        .positiveText(R.string.confirm)
+                        .negativeText(R.string.cancel)
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .negativeColorAttr(R.attr.text_color_primary)
+                        .contentColorAttr(R.attr.text_color_primary)
+                        .show();
+                break;
             default:
-                ToastUtil.show(mContext,"itemClick " + item.getTitle());
+                break;
         }
         return true;
     }
+
 }

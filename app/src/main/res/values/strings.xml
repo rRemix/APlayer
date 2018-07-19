@@ -101,7 +101,7 @@
     <string name="lrc_tip">%s</string>
     <string name="cache_size">%1$2.2f MB</string>
     <string name="confirm_clear_cache">Confirm to clear cache?</string>
-    <string name="mylove_cant_delete">My favorite cannot be deleted</string>
+    <string name="mylove_cant_edit">My favorite is not editable</string>
     <string name="error">Error</string>
     <string name="share_to">Share to</string>
     <string name="qq">QQ</string>
@@ -343,4 +343,5 @@
     <string name="new_version_found">New version found</string>
     <string name="ignore_this_version">Ignore this version</string>
     <string name="empty_path_report_to_developer">Path of apk is empty,please report issue to developer</string>
+    <string name="rename">Rename</string>
 </resources>

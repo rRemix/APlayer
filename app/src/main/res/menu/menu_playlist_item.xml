@@ -9,6 +9,8 @@
             android:id="@+id/menu_add_to_playlist"/>
         <item android:title="@string/set_playlist_cover"
             android:id="@+id/menu_album_thumb"/>
+        <item android:title="@string/rename"
+            android:id="@+id/menu_playlist_rename"/>
         <item android:title="@string/delete"
             android:id="@+id/menu_delete"/>
     </group>

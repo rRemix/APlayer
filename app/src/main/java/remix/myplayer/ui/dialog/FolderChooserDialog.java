@@ -3,9 +3,11 @@ package remix.myplayer.ui.dialog;
 /**
  * Created by Remix on 2016/11/2.
  */
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -211,6 +213,13 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
 
         public <ActivityType extends AppCompatActivity & FolderCallback> Builder(@NonNull ActivityType context) {
             mContext = context;
+            mChooseButton = R.string.choose_folder;
+            mCancelButton = android.R.string.cancel;
+            mInitialPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        }
+
+        public Builder(Context context) {
+            mContext = (AppCompatActivity) context;
             mChooseButton = R.string.choose_folder;
             mCancelButton = android.R.string.cancel;
             mInitialPath = Environment.getExternalStorageDirectory().getAbsolutePath();

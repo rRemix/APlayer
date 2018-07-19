@@ -568,4 +568,21 @@ public class PlayListUtil {
         }
         return map;
     }
+
+    /**
+     * 重命名播放列表
+     * @param playlistId
+     * @param playlistName
+     */
+    public static boolean rename(int playlistId, String playlistName) {
+        ContentValues values = new ContentValues();
+        values.put(PlayLists.PlayListColumns.NAME,playlistName);
+        try {
+            return mContext.getContentResolver().update(PlayLists.CONTENT_URI,
+                    values,PlayLists.PlayListColumns._ID + "=" + playlistId,null) > 0;
+        }catch (Exception e){
+            return false;
+        }
+
+    }
 }

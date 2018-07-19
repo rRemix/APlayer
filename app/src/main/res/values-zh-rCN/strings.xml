@@ -101,7 +101,7 @@
     <string name="lrc_tip">%s</string>
     <string name="cache_size">%1$2.2f MB</string>
     <string name="confirm_clear_cache">确认清除缓存?</string>
-    <string name="mylove_cant_delete">我的收藏列表不可删除</string>
+    <string name="mylove_cant_edit">我的收藏列表不可编辑</string>
     <string name="error">错误</string>
     <string name="share_to">分享到</string>
     <string name="qq">QQ</string>
@@ -343,4 +343,5 @@
     <string name="new_version_found">发现新版本</string>
     <string name="ignore_this_version">忽略该版本</string>
     <string name="empty_path_report_to_developer">安装路径为空,请反馈给开发者</string>
+    <string name="rename">重命名</string>
 </resources>
