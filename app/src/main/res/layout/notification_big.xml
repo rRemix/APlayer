@@ -34,7 +34,6 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/d5_szie"
                 android:layout_marginTop="@dimen/d4_size">
                 <ImageButton
                     android:id="@+id/notify_close"
@@ -62,7 +61,6 @@
                 android:id="@+id/notify_artist_album"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/d5_szie"
                 android:layout_marginRight="@dimen/d12_size"
                 android:layout_marginBottom="@dimen/d12_size"
                 android:lines="1"
@@ -75,7 +73,7 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:weightSum="3"
+                android:weightSum="4"
                 android:paddingTop="@dimen/d4_size"
                 android:paddingBottom="@dimen/d4_size">
                 <ImageButton
@@ -100,6 +98,13 @@
                     android:layout_height="match_parent"
                     android:background="?android:attr/selectableItemBackground"
                     android:src="@drawable/notify_next"/>
+                <ImageButton
+                    android:id="@+id/notify_lyric"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:src="@drawable/notify_lyric"/>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
