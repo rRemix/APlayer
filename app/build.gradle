@@ -33,8 +33,8 @@ android {
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
-            abiFilters 'armeabi-v7a'
-//            abiFilters 'armeabi-v7a', 'x86'
+//            abiFilters 'armeabi-v7a'
+            abiFilters 'armeabi-v7a', 'x86'
         }
         externalNativeBuild {
             cmake {
@@ -102,11 +102,11 @@ android {
 //        baidu{}
 //        anzhuomarket{}
 
-        chuizi{}
-        qihu360{}
-        xiaomi{}
+//        chuizi{}
+//        qihu360{}
+//        xiaomi{}
         kuan {}
-        google{}
+//        google{}
         productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }
