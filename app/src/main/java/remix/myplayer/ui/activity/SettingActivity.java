@@ -199,7 +199,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                                         intent.setData(Uri.parse("package:" + getPackageName()));
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(intent);
+                                        Util.startActivitySafely(mContext,intent);
                                     }
                                     ToastUtil.show(mContext, R.string.plz_give_float_permission);
                                     return;

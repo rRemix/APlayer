@@ -1,6 +1,5 @@
 package remix.myplayer.ui.fragment;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -15,6 +14,7 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.lyric.SearchLrc;
+import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -58,7 +58,7 @@ public class LyricFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if(mDisposable != null && !mDisposable.isDisposed()){
+        if(mDisposable != null){
             mDisposable.dispose();
         }
     }
@@ -76,7 +76,6 @@ public class LyricFragment extends BaseFragment {
         getLrc(lrcPath,true);
     }
 
-    @SuppressLint("CheckResult")
     private void getLrc(String manualPath, boolean clearCache) {
         if (mInfo == null) {
             mLrcView.setText(getStringSafely(R.string.no_lrc));
@@ -85,11 +84,8 @@ public class LyricFragment extends BaseFragment {
         if(mLrcView == null)
             return;
         final int id = mInfo.getId();
-        new SearchLrc(mInfo).getLyric(manualPath,clearCache)
-                .doOnSubscribe(disposable -> {
-                    mLrcView.setText(getStringSafely(R.string.searching));
-                    mDisposable = disposable;
-                })
+        mDisposable = new SearchLrc(mInfo).getLyric(manualPath,clearCache)
+                .doOnSubscribe(disposable -> mLrcView.setText(getStringSafely(R.string.searching)))
                 .subscribe(lrcRows -> {
                     if (id == mInfo.getId()) {
                         if (lrcRows == null || lrcRows.size() == 0) {
@@ -99,6 +95,7 @@ public class LyricFragment extends BaseFragment {
                         mLrcView.setLrcRows(lrcRows);
                     }
                 }, throwable -> {
+                    LogUtil.e(throwable);
                     if (id == mInfo.getId()) {
                         mLrcView.setLrcRows(null);
                         mLrcView.setText(getStringSafely(R.string.no_lrc));

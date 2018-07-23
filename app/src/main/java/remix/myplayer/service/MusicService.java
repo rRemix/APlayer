@@ -42,7 +42,11 @@ import java.util.TimerTask;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.R;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.appwidgets.BaseAppwidget;
@@ -189,7 +193,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /** 当前歌词*/
     private volatile List<LrcRow> mLrcRows = null;
     /** 已经生成过的随机数 用于随机播放模式*/
-    private ArrayList<Integer> mRandomList = new ArrayList<>();
+    private volatile List<Integer> mRandomList = new ArrayList<>();
     /** service是否停止运行*/
     private boolean mIsServiceStop = true;
     /** handlerThread*/
@@ -262,25 +266,22 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         setUp();
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public int onStartCommand(Intent commandIntent, int flags, int startId) {
         LogUtil.d("ServiceLifeCycle","onStartCommand");
         mIsServiceStop = false;
 
-        mPlaybackHandler.post(() -> {
+        Single.create((SingleOnSubscribe<String>) emitter -> {
             if(!mLoadFinished && (mHasPermission = Util.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}))) {
                 loadAsync();
             }
             String action = commandIntent != null ? commandIntent.getAction() : "";
             if(!TextUtils.isEmpty(action)){
-                handleStartCommandIntent(commandIntent, action);
+                emitter.onSuccess(action);
             }
-//            if(!TextUtils.isEmpty(action)){
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                    startForegroundService(new Intent(mContext,MusicService.class));
-//                }
-//            }
-        });
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        .subscribe(action -> handleStartCommandIntent(commandIntent, action));
 
 //        if(!mLoadFinished && (mHasPermission = Util.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}))) {
 //            loadSync();

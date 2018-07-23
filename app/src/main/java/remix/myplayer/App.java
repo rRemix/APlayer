@@ -12,6 +12,7 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.squareup.leakcanary.LeakCanary;
 import com.tencent.bugly.crashreport.CrashReport;
 
+import io.reactivex.plugins.RxJavaPlugins;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
@@ -24,7 +25,6 @@ import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
 
 /**
@@ -40,7 +40,6 @@ public class App extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        LogUtil.d("ServiceLifeCycle", "启动App");
         mContext = getApplicationContext();
 
         if (!BuildConfig.DEBUG)
@@ -48,26 +47,26 @@ public class App extends MultiDexApplication {
         initUtil();
         initTheme();
 
-        //根据渠道加载其他第三方库
-        loadThirdParty();
-
         //异常捕获
-        CrashHandler crashHandler = CrashHandler.getInstance();
-        crashHandler.init(this);
+        CrashHandler.getInstance().init(this);
+
         //检测内存泄漏
         if (!LeakCanary.isInAnalyzerProcess(this)) {
             LeakCanary.install(this);
         }
+
         //AppShortcut
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
             new DynamicShortcutManager(this).setUpShortcut();
 
-        //兼容性
-        if (SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, "CoverTemp", true)) {
-            SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, "CoverTemp", false);
-            SPUtil.deleteFile(this, SPUtil.COVER_KEY.NAME);
-        }
+        //加载其他第三方库
+        loadThirdParty();
 
+        //处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
+        RxJavaPlugins.setErrorHandler(throwable -> {
+            LogUtil.e(throwable);
+            CrashReport.postCatchedException(throwable);
+        });
     }
 
     private void initUtil() {

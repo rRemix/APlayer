@@ -241,6 +241,17 @@ public class Util {
     }
 
     /**
+     * 安全的启动activity
+     * @param context
+     * @param intent
+     */
+    public static void startActivitySafely(Context context,Intent intent){
+        if(isIntentAvailable(context,intent)){
+            context.startActivity(intent);
+        }
+    }
+
+    /**
      * 判断网路是否连接
      * @return
      */

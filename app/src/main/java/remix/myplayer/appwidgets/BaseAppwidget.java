@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.widget.RemoteViews;
 
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.appwidgets.medium.AppWidgetMedium;
 import remix.myplayer.appwidgets.small.AppWidgetSmall;
@@ -42,6 +43,7 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
 
     protected AppWidgetSkin mSkin;
     protected Bitmap mBitmap;
+    private static int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),72);
 
     protected PendingIntent buildPendingIntent(Context context,ComponentName componentName,int operation) {
         Intent intent = new Intent(MusicService.ACTION_APPWIDGET_OPERATE);
@@ -85,9 +87,7 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
             }
             pushUpdate(context,appWidgetIds,remoteViews);
         } else {
-            final int size = DensityUtil.dip2px(context,72);
-
-            new RemoteUriRequest(getSearchRequestWithAlbumType(song),new RequestConfig.Builder(size,size).build()){
+            new RemoteUriRequest(getSearchRequestWithAlbumType(song),new RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()){
                 @Override
                 public void onError(String errMsg) {
                     if(mBitmap != null && !mBitmap.isRecycled()){

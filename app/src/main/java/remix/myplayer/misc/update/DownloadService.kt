@@ -79,6 +79,8 @@ class DownloadService : IntentService("DownloadService") {
             postNotification(release.assets[0].size, 0)
             val url = URL(downloadUrl)
             val conn = url.openConnection()
+            conn.connectTimeout = TIME_OUT
+            conn.readTimeout = TIME_OUT
             conn.connect()
             inStream = conn.getInputStream()
             val fileSize = conn.contentLength//根据响应获取文件大小
@@ -151,5 +153,6 @@ class DownloadService : IntentService("DownloadService") {
         private const val TAG = "DownloadService"
         private const val UPDATE_NOTIFICATION_CHANNEL_ID = "update_notification"
         private const val UPDATE_NOTIFICATION_ID = 10
+        private const val TIME_OUT = 5000
     }
 }

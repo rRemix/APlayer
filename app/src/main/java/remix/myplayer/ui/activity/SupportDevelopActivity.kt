@@ -186,7 +186,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
     private fun loadSkuDetails() {
         if(mAdapter.datas.size >  3)
             return
-        mDisposable = Single.fromCallable({ mBillingProcessor!!.getPurchaseListingDetails(SKU_IDS) })
+        mDisposable = Single.fromCallable { mBillingProcessor?.getPurchaseListingDetails(SKU_IDS) }
                 .map {
                     val beans = ArrayList<PurchaseBean>()
                     it.sortedWith(kotlin.Comparator{ o1, o2 ->
@@ -242,12 +242,14 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
     }
 
     override fun onDestroy() {
+        super.onDestroy()
         mBillingProcessor?.release()
         mDisposable?.let {
             if(!it.isDisposed)
                 it.dispose()
         }
-        super.onDestroy()
+        if(mLoading.isShowing)
+            mLoading.dismiss()
     }
 
 

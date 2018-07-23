@@ -52,7 +52,7 @@ object UpdateAgent {
                     }
                     //路径不合法
                     if (release.assets[0].size < 0) {
-                        listener?.onUpdateReturned(UpdateStatus.ErrorSizeFormat, "Size为空或格式不对", release)
+                        listener?.onUpdateReturned(UpdateStatus.ErrorSizeFormat, "Size为空", release)
                         return@subscribe
                     }
                     //文件大小不合法

@@ -81,26 +81,28 @@ public class Global {
      * @param newQueueIdList
      * @return
      */
-    public synchronized static void setPlayQueue(final List<Integer> newQueueIdList) {
+    public static void setPlayQueue(final List<Integer> newQueueIdList) {
         new Thread(){
             @Override
             public void run() {
-                if(newQueueIdList == null || newQueueIdList.size() == 0){
-                    return;
-                }
-                if (newQueueIdList.equals(PlayQueue))
-                    return;
-                PlayQueue.clear();
-                PlayQueue.addAll(newQueueIdList);
-                int deleteRow = 0;
-                int addRow = 0;
-                try {
-                    deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
-                    addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
-                } catch (Exception e){
-                    LogUtil.d("Global",e.toString());
-                }
+                synchronized (this){
+                    if(newQueueIdList == null || newQueueIdList.size() == 0){
+                        return;
+                    }
+                    if (newQueueIdList.equals(PlayQueue))
+                        return;
+                    PlayQueue.clear();
+                    PlayQueue.addAll(newQueueIdList);
+                    int deleteRow = 0;
+                    int addRow = 0;
+                    try {
+                        deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
+                        addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
+                    } catch (Exception e){
+                        LogUtil.d("Global",e.toString());
+                    }
 
+                }
             }
         }.start();
     }
@@ -110,45 +112,44 @@ public class Global {
      * @param newQueueIdList
      * @return
      */
-    public synchronized static void setPlayQueue(final List<Integer> newQueueIdList, final Context context, final Intent intent) {
+    public static void setPlayQueue(final List<Integer> newQueueIdList, final Context context, final Intent intent) {
         new Thread(){
             @Override
             public void run() {
-                //当前模式是随机播放 或者即将设置为随机播放 都要更新mRandomList
-                boolean shuffle = intent.getBooleanExtra("shuffle",false) | SPUtil.getValue(context,SPUtil.SETTING_KEY.NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP) == Constants.PLAY_SHUFFLE;
-                if(newQueueIdList == null || newQueueIdList.size() == 0){
-                    return;
-                }
-                //设置的播放队列相等
-                boolean equals = newQueueIdList.equals(PlayQueue);
-                if(!equals){
-                    PlayQueue.clear();
-                    PlayQueue.addAll(newQueueIdList);
-                }
-                if(shuffle){
-                    MusicService.getInstance().setPlayModel(Constants.PLAY_SHUFFLE);
-                    MusicService.getInstance().updateNextSong();
-                }
-                context.sendBroadcast(intent);
+                synchronized (this){
+                    //当前模式是随机播放 或者即将设置为随机播放 都要更新mRandomList
+                    boolean shuffle = intent.getBooleanExtra("shuffle",false) | SPUtil.getValue(context,SPUtil.SETTING_KEY.NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP) == Constants.PLAY_SHUFFLE;
+                    if(newQueueIdList == null || newQueueIdList.size() == 0){
+                        return;
+                    }
+                    //设置的播放队列相等
+                    boolean equals = newQueueIdList.equals(PlayQueue);
+                    if(!equals){
+                        PlayQueue.clear();
+                        PlayQueue.addAll(newQueueIdList);
+                    }
+                    if(shuffle){
+                        MusicService.getInstance().setPlayModel(Constants.PLAY_SHUFFLE);
+                        MusicService.getInstance().updateNextSong();
+                    }
+                    context.sendBroadcast(intent);
 
-                if(equals){
-                    return;
+                    if(equals){
+                        return;
+                    }
+
+                    int deleteRow = 0;
+                    int addRow = 0;
+                    try {
+                        deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
+                        addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
+                    } catch (Exception e){
+                        LogUtil.d("Global",e.toString());
+                    }
                 }
 
-                int deleteRow = 0;
-                int addRow = 0;
-                try {
-                    deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
-                    addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
-                } catch (Exception e){
-                    LogUtil.d("Global",e.toString());
-                }
             }
         }.start();
-    }
-
-    public static synchronized List<Integer> getPlayQueue(){
-        return PlayQueue;
     }
 
     /**

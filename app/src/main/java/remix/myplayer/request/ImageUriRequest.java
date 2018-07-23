@@ -264,16 +264,18 @@ public abstract class ImageUriRequest<T> {
         if (request.getNeteaseType() == TYPE_NETEASE_SONG) {
             //搜索的是歌曲
             NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);
-            if(response.result.songs.get(0).score >= 60)
+            if(response != null && response.result.songs != null && response.result.songs.get(0).score >= 60)
                 imageUrl = response.result.songs.get(0).album.picUrl;
         } else if (request.getNeteaseType() == TYPE_NETEASE_ALBUM) {
             //搜索的是专辑
             NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
-            imageUrl = response.result.albums.get(0).picUrl;
+            if(response != null && response.result.albums != null)
+                imageUrl = response.result.albums.get(0).picUrl;
         } else if (request.getNeteaseType() == TYPE_NETEASE_ARTIST) {
             //搜索的是艺术家
             NArtistSearchResponse response = new Gson().fromJson(body.string(), NArtistSearchResponse.class);
-            imageUrl = response.getResult().getArtists().get(0).getPicUrl();
+            if(response != null && response.getResult().getArtists() != null)
+                imageUrl = response.getResult().getArtists().get(0).getPicUrl();
         }
         if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
             SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.NAME,request.getNeteaseCacheKey(),imageUrl);
