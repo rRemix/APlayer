@@ -128,7 +128,7 @@ public class Global {
                         PlayQueue.clear();
                         PlayQueue.addAll(newQueueIdList);
                     }
-                    if(shuffle){
+                    if(shuffle && MusicService.getInstance() != null ){
                         MusicService.getInstance().setPlayModel(Constants.PLAY_SHUFFLE);
                         MusicService.getInstance().updateNextSong();
                     }

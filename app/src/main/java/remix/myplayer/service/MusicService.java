@@ -1075,6 +1075,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 }
 
                 private void setMediaSessionData(Bitmap result) {
+                    result = copy(result);
                     builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,result);
                     mMediaSession.setMetadata(builder.build());
                 }

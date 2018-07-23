@@ -36,7 +36,7 @@
             android:layout_width="@dimen/app_widget_small_image_size"
             android:layout_height="@dimen/app_widget_small_image_size"
             android:scaleType="centerCrop"
-            android:src="@drawable/album_empty_bg_day"
+            android:src="@drawable/album_empty_bg_night"
             android:layout_marginLeft="@dimen/d8_size"
             android:layout_gravity="center_vertical"/>
 

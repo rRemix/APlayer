@@ -59,7 +59,7 @@ public class App extends MultiDexApplication {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
             new DynamicShortcutManager(this).setUpShortcut();
 
-        //加载其他第三方库
+        //加载第三方库
         loadThirdParty();
 
         //处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃

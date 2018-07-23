@@ -26,6 +26,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PlayListUtil;
 
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
@@ -40,6 +41,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 public abstract class BaseAppwidget extends AppWidgetProvider {
     public static final int SKIN_WHITE_1F = 1;//白色不带透明
     public static final int SKIN_TRANSPARENT = 2;//透明
+    private static final String TAG = "桌面部件";
 
     protected AppWidgetSkin mSkin;
     protected Bitmap mBitmap;
@@ -81,8 +83,10 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
         //设置封面
         if(!reloadCover){
             if(mBitmap != null && !mBitmap.isRecycled()) {
+                LogUtil.d(TAG,"复用Bitmap: " + mBitmap);
                 remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
             } else {
+                LogUtil.d(TAG,"Bitmap复用失败: " + mBitmap);
                 remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_night);
             }
             pushUpdate(context,appWidgetIds,remoteViews);
@@ -90,9 +94,10 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
             new RemoteUriRequest(getSearchRequestWithAlbumType(song),new RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()){
                 @Override
                 public void onError(String errMsg) {
-                    if(mBitmap != null && !mBitmap.isRecycled()){
-                        mBitmap.recycle();
-                    }
+                    LogUtil.d(TAG,"onError: " + errMsg + " --- 清空bitmap: " + mBitmap);
+//                    if(mBitmap != null && !mBitmap.isRecycled()){
+//                        mBitmap.recycle();
+//                    }
                     mBitmap = null;
                     remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
                     pushUpdate(context,appWidgetIds,remoteViews);
@@ -101,11 +106,14 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
                 @Override
                 public void onSuccess(Bitmap result) {
                     try {
-                        if(mBitmap != null && !mBitmap.isRecycled()){
-                            mBitmap.recycle();
+                        if(result != mBitmap && mBitmap != null && !mBitmap.isRecycled()){
+                            LogUtil.d(TAG,"onSuccess --- 回收Bitmap: " + mBitmap);
+//                            mBitmap.recycle();
                             mBitmap = null;
                         }
-                        mBitmap = MusicService.copy(result);
+//                        mBitmap = MusicService.copy(result);
+                        mBitmap = result;
+                        LogUtil.d(TAG,"onSuccess --- 获取Bitmap: " + mBitmap);
                         if(mBitmap != null) {
                             remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
                         } else {
@@ -113,7 +121,7 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
                         }
 
                     } catch (Exception e){
-                        e.printStackTrace();
+                        LogUtil.d(TAG,"onSuccess --- 发生异常: " + e);
                     } finally {
                         pushUpdate(context,appWidgetIds,remoteViews);
                     }
@@ -165,7 +173,7 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
         updateModel(remoteViews);
         updateNextAndPrev(remoteViews);
         updateProgress(remoteViews,song);
-        updateTimer(remoteViews);
+//        updateTimer(remoteViews);
     }
 
     private void updateTimer(RemoteViews remoteViews) {

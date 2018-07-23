@@ -19,7 +19,6 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 
-import static remix.myplayer.service.MusicService.copy;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
@@ -84,9 +83,9 @@ public class NotifyImpl extends Notify {
                 }
 
                 @Override
-                public void onSuccess(Bitmap bitmap) {
+                public void onSuccess(Bitmap result) {
                     try {
-                        Bitmap result = copy(bitmap);
+//                        Bitmap result = copy(bitmap);
                         if(result != null) {
                             mRemoteBigView.setImageViewBitmap(R.id.notify_image, result);
                             mRemoteView.setImageViewBitmap(R.id.notify_image,result);

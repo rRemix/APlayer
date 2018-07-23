@@ -16,7 +16,6 @@ import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.DensityUtil;
 
-import static remix.myplayer.service.MusicService.copy;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
@@ -44,8 +43,8 @@ public class NotifyImpl24 extends Notify{
             }
 
             @Override
-            public void onSuccess(Bitmap bitmap) {
-                Bitmap result = copy(bitmap);
+            public void onSuccess(Bitmap result) {
+//                Bitmap result = copy(bitmap);
                 if(result == null) {
                     result = BitmapFactory.decodeResource(mService.getResources(),R.drawable.album_empty_bg_night);
                 }

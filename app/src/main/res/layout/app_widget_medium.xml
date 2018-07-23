@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="84dp">
             <ImageView android:id="@+id/appwidget_image"
-                android:src="@drawable/album_empty_bg_day"
+                android:src="@drawable/album_empty_bg_night"
                 android:layout_width="@dimen/app_widget_medium_image_size"
                 android:layout_height="@dimen/app_widget_medium_image_size"
                 android:scaleType="centerCrop"

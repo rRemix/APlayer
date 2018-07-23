@@ -5,11 +5,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import remix.myplayer.bean.misc.Category;
 import remix.myplayer.ui.fragment.AlbumFragment;
@@ -26,7 +23,7 @@ import remix.myplayer.util.LogUtil;
 
 public class MainPagerAdapter extends FragmentStatePagerAdapter {
     private List<Category> mCateGory = new ArrayList<>();
-    private Map<Integer,WeakReference<Fragment>> mCacheMap = new HashMap<>();
+//    private Map<Integer,WeakReference<Fragment>> mCacheMap = new HashMap<>();
     public MainPagerAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -44,17 +41,17 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         Category category = mCateGory.get(position);
-        WeakReference<Fragment> reference = mCacheMap.get(category.getTag());
+//        WeakReference<Fragment> reference = mCacheMap.get(category.getTag());
 
-        if(reference != null && reference.get() != null){
-            LogUtil.d("ConfigViewPager","缓存命中: " + reference.get());
-            return reference.get();
-        }
+//        if(reference != null && reference.get() != null){
+//            LogUtil.d("ConfigViewPager","缓存命中: " + reference.get());
+//            return reference.get();
+//        }
         Fragment fragment = category.getTag() == Category.TAG_SONG ? new SongFragment() :
                 category.getTag() == Category.TAG_ALBUM ? new AlbumFragment() :
                 category.getTag() == Category.TAG_ARTIST ? new ArtistFragment() :
                 category.getTag() == Category.TAG_PLAYLIST ? new PlayListFragment() : new FolderFragment();
-        mCacheMap.put(category.getTag(),new WeakReference<>(fragment));
+//        mCacheMap.put(category.getTag(),new WeakReference<>(fragment));
         LogUtil.d("ConfigViewPager","重新创建: " + fragment);
         return fragment;
     }
