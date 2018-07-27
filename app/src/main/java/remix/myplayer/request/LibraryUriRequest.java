@@ -34,6 +34,7 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
     }
 
     public void onSuccess(String result) {
+        LogUtil.e("UriRequest","success: " + result);
         ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(result));
         if(mConfig.isResize()){
             imageRequestBuilder.setResizeOptions(ResizeOptions.forDimensions(mConfig.getWidth(),mConfig.getHeight()));

@@ -12,6 +12,7 @@ import android.os.Environment
 import android.support.v4.app.NotificationCompat
 import remix.myplayer.R
 import remix.myplayer.bean.github.Release
+import remix.myplayer.request.network.OkHttpHelper
 import remix.myplayer.util.LogUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
@@ -19,6 +20,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 /**
  * Creates an IntentService.  Invoked by your subclass's constructor.
@@ -77,7 +79,9 @@ class DownloadService : IntentService("DownloadService") {
                 }
             }
             postNotification(release.assets[0].size, 0)
+            HttpsURLConnection.setDefaultSSLSocketFactory(OkHttpHelper.getSSLSocketFactory())
             val url = URL(downloadUrl)
+
             val conn = url.openConnection()
             conn.connectTimeout = TIME_OUT
             conn.readTimeout = TIME_OUT

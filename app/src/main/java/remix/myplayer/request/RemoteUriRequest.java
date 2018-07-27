@@ -20,7 +20,7 @@ public abstract class RemoteUriRequest extends ImageUriRequest<Bitmap> {
     @Override
     public void load() {
         getThumbBitmapObservable(mRequest)
-                .compose(RxUtil.applyScheduler())
+                .compose(RxUtil.applySchedulerToIO())
                 .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
     }
 

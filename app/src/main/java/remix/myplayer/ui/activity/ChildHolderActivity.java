@@ -110,7 +110,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                 if(position < 0 || mInfoList == null || position >= mInfoList.size())
                     return;
                 int songId = mInfoList.get(position).getId();
-                if(!mMultiChoice.itemClick(mAdapter,position,songId,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
+                if(!mMultiChoice.itemClick(position,songId,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
                     if (mInfoList != null && mInfoList.size() == 0)
                         return;
                     ArrayList<Integer> idList = new ArrayList<>();
@@ -135,7 +135,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
             @Override
             public void onItemLongClick(View view, int position) {
-                mMultiChoice.itemLongClick(mAdapter,position,mInfoList.get(position).getId(), TAG,mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
+                mMultiChoice.itemLongClick(position,mInfoList.get(position).getId(), TAG,mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
             }
         });
 

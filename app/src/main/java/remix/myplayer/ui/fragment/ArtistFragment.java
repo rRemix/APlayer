@@ -61,7 +61,7 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
             public void onItemClick(View view, int position) {
                 int artistId = getArtistId(position);
                 if(getUserVisibleHint() && artistId > 0 &&
-                        !mMultiChoice.itemClick(mAdapter,position,artistId,TAG)){
+                        !mMultiChoice.itemClick(position,artistId,TAG)){
                     if (mAdapter.getDatas() != null) {
                         Artist artist =  mAdapter.getDatas().get(position);
                         int artistid = artist.getArtistID();
@@ -78,7 +78,7 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
             public void onItemLongClick(View view, int position) {
                 int artistId = getArtistId(position);
                 if(getUserVisibleHint() && artistId > 0)
-                    mMultiChoice.itemLongClick(mAdapter,position,artistId,TAG,Constants.ARTIST);
+                    mMultiChoice.itemLongClick(position,artistId,TAG,Constants.ARTIST);
             }
         });
     }

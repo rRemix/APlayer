@@ -61,7 +61,7 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdapter>{
             public void onItemClick(View view, int position) {
                 int albumId = getAlbumID(position);
                 if(getUserVisibleHint() && albumId > 0 &&
-                        !mMultiChoice.itemClick(mAdapter,position,albumId,TAG)){
+                        !mMultiChoice.itemClick(position,albumId,TAG)){
                     if(mAdapter.getDatas() != null){
                         Album album = mAdapter.getDatas().get(position);
                         int albumid = album.getAlbumID();
@@ -78,7 +78,7 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdapter>{
             public void onItemLongClick(View view, int position) {
                 int albumId = getAlbumID(position);
                 if(getUserVisibleHint() && albumId > 0){
-                    mMultiChoice.itemLongClick(mAdapter,position,albumId,TAG,Constants.ALBUM);
+                    mMultiChoice.itemLongClick(position,albumId,TAG,Constants.ALBUM);
                 }
             }
         });

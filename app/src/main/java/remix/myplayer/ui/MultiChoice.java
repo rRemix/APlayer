@@ -16,7 +16,7 @@ import java.util.Set;
 import remix.myplayer.R;
 import remix.myplayer.adapter.AlbumAdapter;
 import remix.myplayer.adapter.ArtistAdapter;
-import remix.myplayer.adapter.FolderAdapter;
+import remix.myplayer.adapter.ChildHolderAdapter;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.bean.mp3.PlayList;
@@ -84,6 +84,10 @@ public class MultiChoice implements OnMultiItemClickListener {
 
     public void setAdapter(RecyclerView.Adapter adapter){
         mAdapter = adapter;
+    }
+
+    public RecyclerView.Adapter getAdapter(){
+        return mAdapter;
     }
 
     public Set<Integer> getSelectPos(){
@@ -244,13 +248,12 @@ public class MultiChoice implements OnMultiItemClickListener {
     }
 
     /**
-     * @param adapter
      * @param position
      * @param arg
      * @param tag
      * @return
      */
-    public boolean itemClick(RecyclerView.Adapter adapter, int position, Object arg, String tag){
+    public boolean itemClick(int position, Object arg, String tag){
         if(mIsShow && TAG.equals(tag)){
             mIsShow = true;
 //            removeOrAddView(view);
@@ -266,12 +269,11 @@ public class MultiChoice implements OnMultiItemClickListener {
 
     /**
      *
-     * @param adapter
      * @param position
      * @param arg
      * @param newTag
      */
-    public void itemLongClick(RecyclerView.Adapter adapter, int position, Object arg, String newTag, int type){
+    public void itemLongClick(int position, Object arg, String newTag, int type){
         //当前没有处于多选状态
         if(!mIsShow && TAG.equals("")){
             Util.vibrate(mContext,150);
@@ -291,7 +293,7 @@ public class MultiChoice implements OnMultiItemClickListener {
 
     private boolean isLibraryAdapter(){
         return mAdapter instanceof SongAdapter || mAdapter instanceof AlbumAdapter || mAdapter instanceof ArtistAdapter
-                || mAdapter instanceof PlayListAdapter || mAdapter instanceof FolderAdapter;
+                || mAdapter instanceof PlayListAdapter || mAdapter instanceof ChildHolderAdapter;
     }
 
     public void updateOptionMenu(boolean multishow){

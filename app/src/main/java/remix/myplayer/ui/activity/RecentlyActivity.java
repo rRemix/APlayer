@@ -64,7 +64,7 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
             @Override
             public void onItemClick(View view, int position) {
                 int id = getSongId(position);
-                if(id > 0 && !mMultiChoice.itemClick(mAdapter,position,id,TAG)){
+                if(id > 0 && !mMultiChoice.itemClick(position,id,TAG)){
                     Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Command.PLAYSELECTEDSONG);
@@ -78,7 +78,7 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
             public void onItemLongClick(View view, int position) {
                 int id = getSongId(position);
                 if(id > 0)
-                    mMultiChoice.itemLongClick(mAdapter,position,id,TAG,Constants.SONG);
+                    mMultiChoice.itemLongClick(position,id,TAG,Constants.SONG);
             }
         });
 

@@ -1,17 +1,9 @@
 package remix.myplayer.request.network;
 
-import android.content.Context;
-import android.support.annotation.Nullable;
-
-import java.io.File;
-import java.util.concurrent.TimeUnit;
-
 import io.reactivex.Observable;
-import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import remix.myplayer.lyric.HttpHelper;
-import remix.myplayer.misc.cache.DiskCache;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -25,7 +17,7 @@ public class HttpClient implements HttpHelper {
     private static final String KUGOU_BASE_URL = "http://lyrics.kugou.com/";
     private static final String LASTFM_BASE_URL = "http://ws.audioscrobbler.com/2.0/";
     private static final String GITHUB_BASE_URL = "https://api.github.com/";
-    private static final long TIMEOUT = 5000;
+    private static final long TIMEOUT = 10000;
 
     private ApiService mNeteaseApi;
     private ApiService mKuGouApi;
@@ -55,139 +47,98 @@ public class HttpClient implements HttpHelper {
     private HttpClient(){
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
 
+        OkHttpClient okHttpClient = OkHttpHelper.getOkHttpClient();
         mNeteaseApi = retrofitBuilder
                 .baseUrl(NETEASE_BASE_URL)
-                .client(new OkHttpClient.Builder()
-                        .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .build())
+                .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(ApiService.class);
 
         mKuGouApi = retrofitBuilder
                 .baseUrl(KUGOU_BASE_URL)
-                .client(new OkHttpClient.Builder()
-                        .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .build())
+                .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(ApiService.class);
 
         mLastfmApi = retrofitBuilder
                 .baseUrl(LASTFM_BASE_URL)
-                .client(new OkHttpClient.Builder()
-                        .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .build())
+                .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(ApiService.class);
 
         mGithubApi = retrofitBuilder
                 .baseUrl(GITHUB_BASE_URL)
-                .client(new OkHttpClient.Builder()
-                        .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                        .build())
+                .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(ApiService.class);
     }
 
-    @Nullable
-    private Cache createDefaultCache(Context context) {
-        File cacheDir = DiskCache.getDiskCacheDir(context,"okhttp");
-        if (cacheDir.mkdirs() || cacheDir.isDirectory()) {
-            return new Cache(cacheDir, 1024 * 1024 * 10);
-        }
-        return null;
-    }
-
-//    private Interceptor TEMP = chain -> {
-//        Request request = chain.request();//获取请求
-//        if(!Util.isNetWorkConnected()){
-//            //没有网络的时候从缓存读取数据
-//            String key = Util.hashKeyForDisk(request.url().toString());
-//            InputStream cacheInput = DiskCache.getHttpDiskCache().get(key).getInputStream(0);
-//            byte[] cacheBytes = new byte[cacheInput.available()];
-//            cacheInput.close();
-//
-//            return new Response.Builder()
-//                    .removeHeader("Pragma")
-//                    .body(ResponseBody.create(MediaType.importM3UFile("text/plain;charset=UTF-8"), cacheBytes))
-//                    .request(request)
-//                    .protocol(Protocol.HTTP_1_1)
-//                    .code(200)
-//                    .build();
-//        }else{
-//            //将数据缓存
-//            Response originalResponse = chain.proceed(request);
-//            ResponseBody responseBody = originalResponse.body();
-//            byte[] responseBytes = responseBody.bytes();
-//            MediaType mediaType = responseBody.contentType();
-//
+//    private static OkHttpClient sOkHttpClient;
+//    private static SSLSocketFactory mSSLSocketFactory;
+//    public static SSLSocketFactory getSSLSocketFactory(){
+//        if(mSSLSocketFactory == null){
 //            try {
-//                String key = Util.hashKeyForDisk(request.url().toString());
-//                DiskLruCache.Editor editor = DiskCache.getHttpDiskCache().edit(key);
-//                if(editor != null){
-//                    OutputStream outputStream = editor.newOutputStream(0);
-//                    outputStream.write(responseBytes);
-//                    outputStream.flush();
-//                    outputStream.close();
-//                    editor.commit();
-//                }
-//            } catch (Exception e){
-//                e.printStackTrace();
-//            }
+//                // 自定义一个信任所有证书的TrustManager，添加SSLSocketFactory的时候要用到
+//                final X509TrustManager trustAllCert =
+//                        new X509TrustManager() {
+//                            @Override
+//                            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)  {
+//                            }
 //
-//            return originalResponse.newBuilder()
-//                    .removeHeader("Pragma")
-//                    .removeHeader("Cache-Control")
-//                    .request(request)
-//                    .header("Cache-Control", "public, max-age=" + 31536000)
-//                    .body(ResponseBody.create(mediaType, responseBytes))
-//                    .build();
+//                            @Override
+//                            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)  {
+//                            }
+//
+//                            @Override
+//                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+//                                return new java.security.cert.X509Certificate[]{};
+//                            }
+//                        };
+//                mSSLSocketFactory = new SSLSocketFactoryCompat(trustAllCert);
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
 //        }
-//    };
+//        return mSSLSocketFactory;
+//    }
+//
+//    public synchronized static OkHttpClient getOkHttpClient(){
+//        if (sOkHttpClient == null) {
+//            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+//            try {
+//                // 自定义一个信任所有证书的TrustManager，添加SSLSocketFactory的时候要用到
+//                final X509TrustManager trustAllCert =
+//                        new X509TrustManager() {
+//                            @Override
+//                            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)  {
+//                            }
+//
+//                            @Override
+//                            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)  {
+//                            }
+//
+//                            @Override
+//                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+//                                return new java.security.cert.X509Certificate[]{};
+//                            }
+//                        };
+//                builder.sslSocketFactory(getSSLSocketFactory(), trustAllCert);
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+//            builder.connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+//                    .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+//                    .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+//                    .cache(createDefaultCache(App.getContext()));
+//            sOkHttpClient = builder.build();
+//        }
+//        return sOkHttpClient;
+//    }
 
-//    private Interceptor REWRITE_RESPONSE_INTERCEPTOR = chain -> {
-//        Request request = chain.request();//获取请求
-//
-//        //将数据缓存
-//        Response originalResponse = chain.proceed(request);
-//        ResponseBody responseBody = originalResponse.body();
-//        byte[] responseBytes = responseBody.bytes();
-//        MediaType mediaType = responseBody.contentType();
-//
-//        try {
-//            String key = Util.hashKeyForDisk(request.url().toString());
-//            DiskLruCache.Editor editor = DiskCache.getHttpDiskCache().edit(key);
-//            if(editor != null){
-//                OutputStream outputStream = editor.newOutputStream(0);
-//                outputStream.write(responseBytes);
-//                outputStream.flush();
-//                outputStream.close();
-//                editor.commit();
-//            }
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        }
-//
-//        Response newResponse = originalResponse.newBuilder()
-//                .removeHeader("Pragma")
-//                .removeHeader("Cache-Control")
-//                .request(request)
-//                .header("Cache-Control", "public, max-age=" + 31536000)
-//                .body(ResponseBody.create(mediaType, responseBytes))
-//                .build();
-//        return newResponse;
-//    };
 
     @Override
     public Observable<ResponseBody> getNeteaseSearch(String key, int offset, int limit, int type) {
