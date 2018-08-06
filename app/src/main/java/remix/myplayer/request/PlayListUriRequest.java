@@ -9,7 +9,6 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import remix.myplayer.request.network.RxUtil;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PlayListUtil;
 
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
@@ -26,7 +25,6 @@ public class PlayListUriRequest extends LibraryUriRequest {
     @Override
     public void onError(String errMsg) {
         mImage.setImageURI(Uri.EMPTY);
-        LogUtil.d("Cover","Err: " + errMsg);
     }
 
     public Disposable loadImage(){

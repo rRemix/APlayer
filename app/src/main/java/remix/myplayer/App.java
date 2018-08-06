@@ -25,6 +25,7 @@ import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
 
 /**
@@ -67,6 +68,12 @@ public class App extends MultiDexApplication {
             LogUtil.e(throwable);
             CrashReport.postCatchedException(throwable);
         });
+
+        //兼容性
+        if(SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME,"CategoryReset",true)){
+            SPUtil.putValue(this,SPUtil.SETTING_KEY.NAME,"CategoryReset",false);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,"");
+        }
     }
 
     private void initUtil() {

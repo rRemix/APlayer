@@ -91,6 +91,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.BottomActionBarFragment;
+import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
@@ -98,6 +99,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
@@ -311,12 +313,10 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     //初始化ViewPager
     private void setUpPager() {
         String categoryJson = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, "");
-        List<Category> categories = TextUtils.isEmpty(categoryJson) ? new ArrayList<>() : new Gson().fromJson(categoryJson, new TypeToken<List<Category>>() {
-        }.getType());
+        List<Category> categories = TextUtils.isEmpty(categoryJson) ? new ArrayList<>() : new Gson().fromJson(categoryJson, new TypeToken<List<Category>>(){}.getType());
         if (categories.size() == 0) {
             categories.addAll(DEFAULT_LIBRARY);
-            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, new Gson().toJson(DEFAULT_LIBRARY, new TypeToken<List<Category>>() {
-            }.getType()));
+            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, new Gson().toJson(DEFAULT_LIBRARY, new TypeToken<List<Category>>() {}.getType()));
         }
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mPagerAdapter.setList(categories);
@@ -339,7 +339,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             public void onPageSelected(int position) {
                 showAddPlayListButton(mPagerAdapter.getList().get(position).getTitle().equals(getString(R.string.tab_playlist)));
                 mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getTag());
-                mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(position);
+                LogUtil.d("MenuParse","LayoutID: " + mMenuLayoutId);
+                mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(position);
+                 LogUtil.d("MenuParse","CurrentFragment: " + mCurrentFragment);
                 mMultiChoice.setAdapter(mCurrentFragment.getAdapter());
                 invalidateOptionsMenu();
             }
@@ -348,26 +350,24 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             public void onPageScrollStateChanged(int state) {
             }
         });
-        mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(0);
-        mCurrentFragment.setAdapterLifeCycle(adapter -> mMultiChoice.setAdapter(adapter));
-
+        mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(0);
     }
 
     private int mMenuLayoutId = R.menu.menu_main;
-
     public int parseMenuId(int tag) {
         return tag == Category.TAG_SONG ? R.menu.menu_main :
                 tag == Category.TAG_ALBUM ? R.menu.menu_album :
-                        tag == Category.TAG_ARTIST ? R.menu.menu_artist :
-                                tag == Category.TAG_PLAYLIST ? R.menu.menu_playlist :
-                                        tag == Category.TAG_FOLDER ? R.menu.menu_folder : R.menu.menu_main_simple;
+                tag == Category.TAG_ARTIST ? R.menu.menu_artist :
+                tag == Category.TAG_PLAYLIST ? R.menu.menu_playlist :
+                tag == Category.TAG_FOLDER ? R.menu.menu_folder : R.menu.menu_main_simple;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
+        if(mCurrentFragment instanceof FolderFragment)
+            return true;
         String sortOrder = null;
-
         if (mCurrentFragment instanceof SongFragment) {
             sortOrder = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z);
         } else if (mCurrentFragment instanceof AlbumFragment) {
@@ -560,12 +560,14 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                     mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                 } else if (data.getBooleanExtra("needRefreshLibrary", false)) { //刷新Library
                     List<Category> categories = (List<Category>) data.getSerializableExtra("Category");
+                    LogUtil.d("MainPagerAdapter","更新过后: " + categories);
                     if (categories != null && categories.size() > 0) {
-                        mViewPager.setOffscreenPageLimit(categories.size() - 1);
                         mPagerAdapter.setList(categories);
                         mPagerAdapter.notifyDataSetChanged();
+                        mViewPager.setOffscreenPageLimit(categories.size() - 1);
                         mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(mViewPager.getCurrentItem()).getTag());
-                        mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(mViewPager.getCurrentItem());
+                        mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(mViewPager.getCurrentItem());
+                        mMultiChoice.setAdapter(mCurrentFragment.getAdapter());
                         invalidateOptionsMenu();
                     }
                 }

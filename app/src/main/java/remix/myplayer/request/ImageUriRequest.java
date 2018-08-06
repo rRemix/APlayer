@@ -226,12 +226,10 @@ public abstract class ImageUriRequest<T> {
         String bodyString = body.string();
         if(request.getSearchType() == ImageUriRequest.URL_ALBUM){
             LastFmAlbum lastFmAlbum = new Gson().fromJson(bodyString, LastFmAlbum.class);
-            if(lastFmAlbum != null && lastFmAlbum.getAlbum() != null)
-                imageUrl = ImageUriUtil.getLargestAlbumImageUrl(lastFmAlbum.getAlbum().getImage());
+            imageUrl = ImageUriUtil.getLargestAlbumImageUrl(lastFmAlbum.getAlbum().getImage());
         }else if(request.getSearchType() == ImageUriRequest.URL_ARTIST){
             LastFmArtist lastFmArtist = new Gson().fromJson(bodyString, LastFmArtist.class);
-            if(lastFmArtist != null && lastFmArtist.getArtist() != null)
-                imageUrl = ImageUriUtil.getLargestArtistImageUrl(lastFmArtist.getArtist().getImage());
+            imageUrl = ImageUriUtil.getLargestArtistImageUrl(lastFmArtist.getArtist().getImage());
         }
         if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
             SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.NAME,request.getLastFMKey(),imageUrl);
@@ -263,18 +261,16 @@ public abstract class ImageUriRequest<T> {
         if (request.getNeteaseType() == TYPE_NETEASE_SONG) {
             //搜索的是歌曲
             NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);
-            if(response != null && response.result.songs != null && response.result.songs.get(0).score >= 60)
+            if(response.result.songs.get(0).score >= 60)
                 imageUrl = response.result.songs.get(0).album.picUrl;
         } else if (request.getNeteaseType() == TYPE_NETEASE_ALBUM) {
             //搜索的是专辑
             NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
-            if(response != null && response.result.albums != null)
-                imageUrl = response.result.albums.get(0).picUrl;
+            imageUrl = response.result.albums.get(0).picUrl;
         } else if (request.getNeteaseType() == TYPE_NETEASE_ARTIST) {
             //搜索的是艺术家
             NArtistSearchResponse response = new Gson().fromJson(body.string(), NArtistSearchResponse.class);
-            if(response != null && response.getResult().getArtists() != null)
-                imageUrl = response.getResult().getArtists().get(0).getPicUrl();
+            imageUrl = response.getResult().getArtists().get(0).getPicUrl();
         }
         if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
             SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.NAME,request.getNeteaseCacheKey(),imageUrl);
