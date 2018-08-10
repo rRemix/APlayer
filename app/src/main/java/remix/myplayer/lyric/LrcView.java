@@ -425,6 +425,8 @@ public class LrcView extends View implements ILrcView{
      * @return
      */
     private int getScrollYByRow(int row){
+        if(mLrcRows == null)
+            return 0;
         int scrollY = 0;
         for(int i = 0 ;i < mLrcRows.size() &&  i < row;i++){
             scrollY += mLrcRows.get(i).getTotalHeight() + mLinePadding;
@@ -437,6 +439,8 @@ public class LrcView extends View implements ILrcView{
      * @return
      */
     private int getRowByScrollY(){
+        if(mLrcRows == null)
+            return 0;
         int totalY = 0;
         int line;
 

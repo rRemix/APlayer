@@ -24,14 +24,15 @@
         android:layout_height="match_parent"
         android:id="@+id/appwidget_clickable"/>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_widget_big_height"
         android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/app_widget_big_image_size">
+            android:layout_height="0dp"
+            android:layout_weight="1">
             <ImageView android:id="@+id/appwidget_image"
                 android:src="@drawable/album_empty_bg_night"
                 android:layout_width="match_parent"
@@ -75,7 +76,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="@dimen/app_widget_big_control_height">
             <ImageButton android:id="@+id/appwidget_model"
                 android:background="@drawable/bg_common_borderless_ripple"
                 android:src="@drawable/widget_btn_loop_normal"

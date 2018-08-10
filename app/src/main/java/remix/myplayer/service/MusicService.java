@@ -76,7 +76,6 @@ import remix.myplayer.service.notification.Notify;
 import remix.myplayer.service.notification.NotifyImpl;
 import remix.myplayer.service.notification.NotifyImpl24;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.LockScreenActivity;
 import remix.myplayer.ui.customview.floatwidget.FloatLrcView;
 import remix.myplayer.ui.dialog.TimerDialog;
@@ -372,9 +371,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         //初始化音效设置
         Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
-        if(!Util.isIntentAvailable(this,i)){
-            EQActivity.Init();
+        if(Util.isIntentAvailable(this,i)){
+            openAudioEffectSession();
+        }else{
+//            EQActivity.Init();
         }
+
     }
 
     /**
@@ -577,7 +579,14 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
         if(!mAudioFocus)
             return;
-        mIsplay = true; //更新所有界面
+        mIsplay = true;
+        //eq可用
+        Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+        i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
+        if(Util.isIntentAvailable(this,i)){
+            openAudioEffectSession();
+        }
+        //更新所有界面
         update(Global.getOperation());
         mMediaPlayer.start();
         if(fadeIn)
@@ -1106,13 +1115,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 pause(true);
             }
             mIsInitialized = false;
-            openAudioEffectSession();
+//            openAudioEffectSession();
             mMediaPlayer.reset();
             if(mMediaPlayer instanceof IjkMediaPlayer)
                 ((IjkMediaPlayer)mMediaPlayer).setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
             mMediaPlayer.setDataSource(path);
             mMediaPlayer.prepareAsync();
-//            mIsplay = true;
             mIsInitialized = true;
         } catch (Exception e){
             mUpdateUIHandler.post(() -> ToastUtil.show(mContext,getString(R.string.play_failed) + e.toString()));
@@ -1632,7 +1640,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     return;
                 }
                 //当前应用在前台
-                if(Util.isAppOnForeground(mContext)){
+                if(Util.isAppOnForeground()){
                     if(isFloatLrcShowing())
                         mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
                 } else{
@@ -1955,7 +1963,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 createFloatLrcThreadIfNeed();
             } else {
                 //屏幕熄灭 关闭桌面歌词
-                if(mShowFloatLrc && isFloatLrcShowing()) {
+                if(mShowFloatLrc && isFloatLrcShowing() && mUpdateFloatLrcThread != null) {
                     mUpdateFloatLrcThread.quitImmediately();
                 }
             }

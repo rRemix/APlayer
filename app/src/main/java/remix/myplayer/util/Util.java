@@ -1,5 +1,6 @@
 package remix.myplayer.util;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -73,12 +74,11 @@ public class Util {
 
     /**
      * 判断app是否运行在前台
-     * @param context
      * @return
      */
-    public static boolean isAppOnForeground(Context context) {
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        String packageName = context.getPackageName();
+    public static boolean isAppOnForeground() {
+        ActivityManager activityManager = (ActivityManager) App.getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        String packageName = App.getContext().getPackageName();
 
         List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
         if (appProcesses == null)
@@ -413,6 +413,15 @@ public class Util {
         }
         return true;
     }
+
+    /**
+     * 是否有读写权限
+     */
+    private static final String[] PERMISSION_STORAGE = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    public static boolean hasStoragePermissions(){
+        return hasPermissions(PERMISSION_STORAGE);
+    }
+
 
     /**
      * 判断wifi是否打开

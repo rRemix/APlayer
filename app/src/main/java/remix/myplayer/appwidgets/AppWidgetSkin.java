@@ -151,7 +151,7 @@ public enum AppWidgetSkin {
     }
 
     public int getPlayPauseRes(){
-        return MusicService.isPlay() ? getPauseRes() : getPauseRes();
+        return MusicService.isPlay() ? getPauseRes() : getPlayRes();
     }
 
     public int getPlayRes() {

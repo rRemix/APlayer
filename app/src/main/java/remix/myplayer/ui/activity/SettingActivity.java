@@ -571,7 +571,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 if (Util.isIntentAvailable(this, audioEffectIntent)) {
                     startActivityForResult(audioEffectIntent, REQUEST_EQ);
                 } else {
-                    startActivity(new Intent(this, EQActivity.class));
+                    ToastUtil.show(mContext,R.string.no_equalizer);
+//                    startActivity(new Intent(this, EQActivity.class));
                 }
                 break;
             //意见与反馈
