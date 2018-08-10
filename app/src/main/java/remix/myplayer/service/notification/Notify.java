@@ -122,7 +122,7 @@ public abstract class Notify {
             if(operation != Command.TOGGLE_FLOAT_LRC){
                 return PendingIntent.getForegroundService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             }else{
-                PendingIntent.getBroadcast(context,operation,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.getService(context,operation,intent,PendingIntent.FLAG_UPDATE_CURRENT);
             }
         }
 

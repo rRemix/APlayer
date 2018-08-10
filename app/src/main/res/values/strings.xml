@@ -344,4 +344,5 @@
     <string name="ignore_this_version">Ignore this version</string>
     <string name="empty_path_report_to_developer">Path of apk is empty,please report issue to developer</string>
     <string name="rename">Rename</string>
+    <string name="no_equalizer">No equalizer found</string>
 </resources>

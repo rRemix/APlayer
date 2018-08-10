@@ -44,6 +44,8 @@ import remix.myplayer.helper.SortOrder;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.request.ImageUriRequest;
 
+import static remix.myplayer.util.Util.hasStoragePermissions;
+
 /**
  * Created by taeja on 16-2-17.
  */
@@ -1159,7 +1161,7 @@ public class MediaStoreUtil {
      * @return
      */
     public static int getSongIdByUrl(String url){
-        if(TextUtils.isEmpty(url))
+        if(TextUtils.isEmpty(url) || !hasStoragePermissions())
             return -1;
         Cursor cursor = null;
         try {
