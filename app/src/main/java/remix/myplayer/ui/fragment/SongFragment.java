@@ -15,14 +15,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import remix.myplayer.R;
-import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
+import remix.myplayer.ui.adapter.SongAdapter;
+import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;

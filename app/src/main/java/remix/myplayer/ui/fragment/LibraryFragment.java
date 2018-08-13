@@ -15,11 +15,11 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import java.util.List;
 
 import butterknife.ButterKnife;
-import remix.myplayer.adapter.BaseAdapter;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
+import remix.myplayer.ui.adapter.BaseAdapter;
 import remix.myplayer.util.Util;
 
 /**

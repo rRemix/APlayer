@@ -16,7 +16,7 @@
         android:src="@drawable/icon_player_more"
         android:background="@color/transparent"/>
 
-    <remix.myplayer.ui.customview.ColumnView
+    <remix.myplayer.ui.widget.ColumnView
         android:layout_toLeftOf="@id/song_item_button"
         android:visibility="gone"
         android:layout_centerVertical="true"

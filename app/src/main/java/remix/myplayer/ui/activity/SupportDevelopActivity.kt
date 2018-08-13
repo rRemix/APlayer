@@ -30,11 +30,11 @@ import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
-import remix.myplayer.adapter.PurchaseAdapter
 import remix.myplayer.bean.misc.PurchaseBean
 import remix.myplayer.interfaces.OnItemClickListener
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.request.network.RxUtil
+import remix.myplayer.ui.adapter.PurchaseAdapter
 import remix.myplayer.util.AlipayUtil
 import remix.myplayer.util.ToastUtil
 import java.io.File
@@ -62,7 +62,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
         ButterKnife.bind(this)
         setUpToolbar(mToolBar,getString(R.string.support_develop))
 
-        mAdapter = PurchaseAdapter(mContext,R.layout.item_support)
+        mAdapter = PurchaseAdapter(mContext, R.layout.item_support)
 
         val beans = ArrayList<PurchaseBean>()
         beans.add(PurchaseBean("wechat", "icon_wechat_donate", getString(R.string.wechat), ""))

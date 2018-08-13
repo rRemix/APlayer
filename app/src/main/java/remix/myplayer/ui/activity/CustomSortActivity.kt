@@ -13,11 +13,11 @@ import com.afollestad.materialdialogs.MaterialDialog
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import remix.myplayer.R
-import remix.myplayer.adapter.CustomSortAdapter
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.interfaces.OnItemClickListener
 import remix.myplayer.theme.ThemeStore
-import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView
+import remix.myplayer.ui.adapter.CustomSortAdapter
+import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
 import remix.myplayer.util.*
 import java.util.*
 
@@ -44,7 +44,7 @@ class CustomSortActivity : ToolbarActivity() {
 
         setUpToolbar(findViewById(R.id.toolbar),mPlayListName)
 
-        mAdapter = CustomSortAdapter(mContext,R.layout.item_custom_sort)
+        mAdapter = CustomSortAdapter(mContext, R.layout.item_custom_sort)
         mAdapter.setHasStableIds(true)
         mAdapter.setData(mInfoList)
         mAdapter.setOnItemClickListener(object : OnItemClickListener{

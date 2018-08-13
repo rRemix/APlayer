@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 
 import remix.myplayer.R;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.customview.StatusBarView;
+import remix.myplayer.ui.widget.StatusBarView;
 
 /**
  * Created by Remix on 2016/7/28.

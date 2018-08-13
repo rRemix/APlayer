@@ -41,7 +41,7 @@ import remix.myplayer.request.UriRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.blur.StackBlurManager;
-import remix.myplayer.ui.customview.VerticalScrollTextView;
+import remix.myplayer.ui.widget.VerticalScrollTextView;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.LogUtil;

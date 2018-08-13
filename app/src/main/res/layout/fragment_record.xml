@@ -12,7 +12,7 @@
         android:layout_centerHorizontal="true"
         android:id="@+id/record_container"
         android:background="@drawable/note_bg">
-        <remix.myplayer.ui.customview.PagerEditText
+        <remix.myplayer.ui.widget.PagerEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/edit_record"
@@ -27,7 +27,7 @@
             android:textCursorDrawable="@null"
             android:background="@null"/>
 
-        <remix.myplayer.ui.customview.PagerButton
+        <remix.myplayer.ui.widget.PagerButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"

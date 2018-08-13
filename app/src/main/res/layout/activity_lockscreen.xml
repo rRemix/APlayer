@@ -105,7 +105,7 @@
             android:layout_centerVertical="true"/>
     </RelativeLayout>
 
-    <remix.myplayer.ui.customview.VerticalScrollTextView
+    <remix.myplayer.ui.widget.VerticalScrollTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="@dimen/s16_size"

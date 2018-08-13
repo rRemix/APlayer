@@ -2,7 +2,6 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
     android:id="@+id/audio_holder_container"
     android:background="?attr/background_color_main">
@@ -54,7 +53,7 @@
                         android:layout_centerVertical="true"/>
                 </RelativeLayout>
                 <!-- 中间三个页面 -->
-                <remix.myplayer.ui.customview.AudioViewPager
+                <remix.myplayer.ui.widget.AudioViewPager
                     android:id="@+id/holder_pager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

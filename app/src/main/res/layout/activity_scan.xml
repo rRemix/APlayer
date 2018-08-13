@@ -37,7 +37,7 @@
             android:layout_marginTop="@dimen/d22_size"
             android:src="@drawable/set_scanning_divder"/>
 
-        <remix.myplayer.ui.customview.FilterSizeSeekBar
+        <remix.myplayer.ui.widget.FilterSizeSeekBar
             android:layout_marginTop="@dimen/d32_size"
             android:layout_marginLeft="@dimen/d32_size"
             android:layout_marginRight="@dimen/d32_size"

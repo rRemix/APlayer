@@ -8,9 +8,9 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.List;
 
-import remix.myplayer.adapter.BaseAdapter;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.adapter.BaseAdapter;
 import remix.myplayer.util.Util;
 
 /**

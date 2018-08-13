@@ -141,7 +141,7 @@
         android:layout_marginLeft="@dimen/float_image_margin"
         android:layout_marginRight="@dimen/float_image_margin"
         android:paddingBottom="@dimen/d4_size">
-        <remix.myplayer.ui.customview.floatwidget.FloatTextView
+        <remix.myplayer.ui.widget.floatwidget.FloatTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/md_blue_primary"

@@ -57,12 +57,12 @@
     <methods>;
 }
 #baseAdapter
--keepclassmembers class remix.myplayer.adapter.holder.BaseViewHolder
--keepclasseswithmembers class remix.myplayer.adapter.holder.BaseViewHolder {
+-keepclassmembers class BaseViewHolder
+-keepclasseswithmembers class BaseViewHolder {
     <fields>;
     <methods>;
 }
--keepclasseswithmembers class * extends remix.myplayer.adapter.holder.BaseViewHolder{
+-keepclasseswithmembers class * extends BaseViewHolder{
     <fields>;
     <methods>;
 }
