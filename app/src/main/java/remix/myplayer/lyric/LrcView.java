@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.annotation.ColorInt;
+import android.support.annotation.StringRes;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -109,7 +110,7 @@ public class LrcView extends View implements ILrcView{
     private int mTouchSlop;
 
     /** 错误提示文字 */
-    private String mText = "正在搜索";
+    private String mText = App.getContext().getString(R.string.no_lrc);
     /** 当前纵坐标*/
     private float mRowY;
 
@@ -573,6 +574,10 @@ public class LrcView extends View implements ILrcView{
     public void setText(String text) {
         mText = text;
         reset();
+    }
+
+    public void setText(@StringRes int res){
+        setText(getResources().getString(res));
     }
 
     public interface OnSeekToListener{

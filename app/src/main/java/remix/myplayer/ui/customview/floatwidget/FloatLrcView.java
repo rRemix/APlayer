@@ -31,9 +31,9 @@ import butterknife.OnClick;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.adapter.FloatColorAdapter;
-import remix.myplayer.bean.misc.FloatLrcContent;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.lyric.bean.LrcRow;
+import remix.myplayer.lyric.bean.LrcRowWrapper;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
@@ -53,7 +53,7 @@ public class FloatLrcView extends RelativeLayout {
     private Context mContext;
     private PointF mLastPoint = new PointF();
     private boolean mIsLock = false;
-    private FloatLrcContent mLrcContent;
+    private LrcRowWrapper mLrcContent;
     private Handler mUIHandler = new Handler();
     @BindView(R.id.widget_line1)
     FloatTextView mText1;

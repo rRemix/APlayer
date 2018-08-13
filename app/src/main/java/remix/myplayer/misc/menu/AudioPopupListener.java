@@ -1,4 +1,4 @@
-package remix.myplayer.menu;
+package remix.myplayer.misc.menu;
 
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -99,9 +99,9 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                                     SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT);
                                                     lyricFragment.updateLrc(mInfo);
                                                 }
+                                                sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                             })
                                             .show();
-                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                     break;
                             }
 

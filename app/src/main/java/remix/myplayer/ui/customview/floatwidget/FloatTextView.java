@@ -43,21 +43,18 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     };
 
     public FloatTextView(Context context) {
-        super(context);
-        init();
+        this(context,null);
     }
     public FloatTextView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    private void init() {
-
+        this(context, attrs,0);
     }
 
     public FloatTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
+    }
+
+    private void init() {
     }
 
     /**控制歌词水平滚动的属性动画***/
@@ -102,6 +99,7 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
         if(lrcRow.getTime() != 0 && mCurLrcRow != null && mCurLrcRow.getTime() == lrcRow.getTime())
             return;
         mCurLrcRow = lrcRow;
+        stopAnimation();
 //        setText(mCurLrcRow.getContent());
 
         TextPaint paint = getPaint();
@@ -123,7 +121,9 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     }
 
     public void stopAnimation() {
-        if(mAnimator != null && mAnimator.isRunning())
+        if(mAnimator != null && mAnimator.isRunning()){
             mAnimator.cancel();
+        }
+        invalidate();
     }
 }

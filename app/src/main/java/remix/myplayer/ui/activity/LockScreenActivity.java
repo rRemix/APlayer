@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.v7.graphics.Palette;
@@ -27,20 +26,22 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.menu.CtrlButtonListener;
+import remix.myplayer.lyric.UpdateLyricThread;
+import remix.myplayer.lyric.bean.LrcRowWrapper;
+import remix.myplayer.misc.menu.CtrlButtonListener;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.UriRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.blur.StackBlurManager;
+import remix.myplayer.ui.customview.VerticalScrollTextView;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.LogUtil;
@@ -70,9 +71,9 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     TextView mSong;
     @BindView(R.id.lockscreen_artist)
     TextView mArtist;
-    //下一首歌曲
-    @BindView(R.id.lockscreen_next_song)
-    TextView mNextSong;
+    //歌词
+    @BindView(R.id.lockscreen_lyric)
+    VerticalScrollTextView mLyric;
     //控制按钮
     @BindView(R.id.lockscreen_prev)
     ImageButton mPrevButton;
@@ -89,13 +90,12 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     //DecorView, 跟随手指滑动
     private View mView;
     //是否正在运行
-    private static boolean mIsRunning = false;
+    private boolean mIsRunning = false;
     //高斯模糊后的bitmap
     private Bitmap mNewBitMap;
     //高斯模糊之前的bitmap
     private Bitmap mRawBitMap;
     private int mWidth;
-    private int mHeight;
     //歌曲名字体颜色
     @ColorInt
     private int mSongColor = Color.WHITE;
@@ -104,7 +104,9 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     private int mArtistColor = Color.WHITE;
     //是否正在播放
     private static boolean mIsPlay = false;
-    private Disposable mDisposable;
+    private CompositeDisposable mDisposable = new CompositeDisposable();
+    private volatile LrcRowWrapper mCurLyric;
+    private UpdateLyricThread mUpdateLyricThread;
 
 
     @Override
@@ -128,7 +130,6 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         mWidth = metric.widthPixels;
-        mHeight = metric.heightPixels;
 
         //解锁屏幕
         WindowManager.LayoutParams attr = getWindow().getAttributes();
@@ -149,6 +150,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         findView(R.id.lockscreen_arrow_container).startAnimation(AnimationUtils.loadAnimation(this, R.anim.arrow_left_to_right));
 
     }
+    private static final int LRC_INTERVAL = 400;
 
     //前后两次触摸的X
     private float mScrollX1;
@@ -204,12 +206,18 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     protected void onStop() {
         super.onStop();
         mIsRunning = false;
+        if(mUpdateLyricThread != null){
+            mUpdateLyricThread.interrupt();
+            mUpdateLyricThread = null;
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mIsRunning = true;
+        mUpdateLyricThread = new UpdateLockScreenLyricThread(this);
+        mUpdateLyricThread.start();
         UpdateUI(mInfo, mIsPlay);
     }
 
@@ -220,8 +228,9 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mDisposable != null)
+        if (mDisposable != null){
             mDisposable.dispose();
+        }
         if (mRawBitMap != null && !mRawBitMap.isRecycled())
             mRawBitMap.recycle();
         if (mNewBitMap != null && !mNewBitMap.isRecycled())
@@ -233,13 +242,31 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         mInfo = Song;
         mIsPlay = isplay;
         if (!mIsRunning) {
-//            ToastUtil.show(mContext,R.string.error);
             return;
         }
         if (mInfo == null) {
-//            ToastUtil.show(mContext,R.string.error);
             return;
         }
+
+        //歌词
+        mUpdateLyricThread.setSongAndGetLyricRows(mInfo);
+//        mDisposable.add(new SearchLrc(mInfo).getLyric()
+//                .doOnSubscribe(new Consumer<Disposable>() {
+//                    @Override
+//                    public void accept(Disposable disposable) throws Exception {
+//                        mLyric.setText(R.string.searching);
+//                    }
+//                })
+//                .subscribe(lrcRows -> {
+//                    if (id == mInfo.getId()) {
+//                        mUpdateLyricThread.setLrcRows(lrcRows);
+//                    }
+//                }, throwable -> {
+//                    LogUtil.e(throwable);
+//                    if (id == mInfo.getId()) {
+//                        mUpdateLyricThread.setLrcRows(null);
+//                    }
+//                }));
 
         //更新播放按钮
         if (mPlayButton != null) {
@@ -259,12 +286,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                     getSearchRequestWithAlbumType(mInfo),
                     new RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load();
         }
-        //下一首
-        if (mNextSong != null && MusicService.getNextMP3() != null)
-            mNextSong.setText(getString(R.string.next_song, MusicService.getNextMP3().getTitle()));
 
-        if (mInfo == null)
-            return;
 //        new ImageUriRequestImpl(this,mInfo).load();
         new ImageUriRequest<Palette.Swatch>(CONFIG) {
             @Override
@@ -279,7 +301,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
 
             @Override
             public void load() {
-                mDisposable = getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(mInfo))
+                mDisposable.add(getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(mInfo))
                         .compose(RxUtil.applySchedulerToIO())
                         .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
                             if (bitmap == null) {
@@ -290,7 +312,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                         }))
                         .onErrorResumeNext(Observable.create(e -> processBitmap(e, DEFAULT_BITMAP)))
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
+                        .subscribe(this::onSuccess, throwable -> onError(throwable.toString())));
             }
         }.load();
     }
@@ -300,12 +322,10 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
             return;
         mSongColor = result.getBodyTextColor();
         mArtistColor = result.getTitleTextColor();
-
         mImageBackground.setImageBitmap(mNewBitMap);
         mSong.setTextColor(mSongColor);
         mArtist.setTextColor(mArtistColor);
-        mNextSong.setTextColor(mSongColor);
-        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT, 0, 2, mSongColor, 0, 0, 1));
+        mLyric.setTextColor(mArtistColor);
     }
 
     private void processBitmap(ObservableEmitter<Palette.Swatch> e, Bitmap raw) {
@@ -326,6 +346,45 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
             swatch = new Palette.Swatch(Color.GRAY, 100);
         e.onNext(swatch);
         e.onComplete();
+    }
+
+    private void setCurrentLyric(LrcRowWrapper wrapper){
+        runOnUiThread(() -> {
+            mCurLyric = wrapper;
+            if(mCurLyric == null){
+                mLyric.setTextWithAnimation(R.string.no_lrc);
+            }else if(mCurLyric.getStatus() == UpdateLyricThread.Status.SEARCHING){
+                mLyric.setTextWithAnimation(R.string.searching);
+            }else if(mCurLyric.getStatus() == UpdateLyricThread.Status.ERROR ||
+                    mCurLyric.getStatus() == UpdateLyricThread.Status.NO){
+                mLyric.setTextWithAnimation(R.string.no_lrc);
+            }else{
+                mLyric.setTextWithAnimation(String.format("%s\n%s", mCurLyric.getLineOne().getContent(), mCurLyric.getLineTwo().getContent()));
+            }
+        });
+    }
+
+    private static class UpdateLockScreenLyricThread extends UpdateLyricThread{
+        private final WeakReference<LockScreenActivity> mRef;
+
+        private UpdateLockScreenLyricThread(LockScreenActivity activity) {
+            super();
+            mRef = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void run() {
+            while (true){
+                try {
+                    Thread.sleep(LRC_INTERVAL);
+                }catch (InterruptedException e){
+                    return;
+                }
+                final LockScreenActivity activity = mRef.get();
+                if(activity != null)
+                    activity.setCurrentLyric(findCurrentLyric());
+            }
+        }
     }
 
     private static class ImageUriRequestImpl extends ImageUriRequest<Palette.Swatch> {

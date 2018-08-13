@@ -1,4 +1,4 @@
-package remix.myplayer.asynctask;
+package remix.myplayer.misc.asynctask;
 
 import android.net.Uri;
 import android.os.AsyncTask;

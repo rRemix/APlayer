@@ -1,4 +1,4 @@
-package remix.myplayer.menu;
+package remix.myplayer.misc.menu;
 
 import android.content.Context;
 import android.content.Intent;

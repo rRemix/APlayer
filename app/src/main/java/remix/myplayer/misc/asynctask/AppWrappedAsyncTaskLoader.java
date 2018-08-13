@@ -1,17 +1,13 @@
+package remix.myplayer.misc.asynctask;
 
-package remix.myplayer.asynctask;
-
+import android.content.AsyncTaskLoader;
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
 
 /**
- * <a href="http://code.google.com/p/android/issues/detail?id=14944">Issue
- * 14944</a>
- *
- * @author Alexander Blom
+ * Created by Remix on 2017/10/22.
  */
-public abstract class WrappedAsyncTaskLoader<D> extends AsyncTaskLoader<D> {
 
+public abstract class AppWrappedAsyncTaskLoader<D> extends AsyncTaskLoader<D> {
     private D mData;
 
     /**
@@ -19,7 +15,7 @@ public abstract class WrappedAsyncTaskLoader<D> extends AsyncTaskLoader<D> {
      *
      * @param context The {@link Context} to use.
      */
-    public WrappedAsyncTaskLoader(Context context) {
+    public AppWrappedAsyncTaskLoader(Context context) {
         super(context);
     }
 

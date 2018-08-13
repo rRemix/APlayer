@@ -3,6 +3,7 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/white">
 
     <ImageView
@@ -104,14 +105,13 @@
             android:layout_centerVertical="true"/>
     </RelativeLayout>
 
-    <TextView
-        android:layout_width="@dimen/d160_size"
+    <remix.myplayer.ui.customview.VerticalScrollTextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/s12_size"
-        android:text="下一首歌曲："
-        android:maxLines="1"
+        android:textSize="@dimen/s16_size"
+        android:maxLines="2"
         android:ellipsize="end"
-        android:id="@+id/lockscreen_next_song"
+        android:id="@+id/lockscreen_lyric"
         android:gravity="center"
         android:layout_marginTop="@dimen/d40_size"
         android:paddingStart="@dimen/d12_size"
@@ -119,15 +119,31 @@
         android:paddingTop="@dimen/d12_size"
         android:paddingBottom="@dimen/d12_size"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/lockscreen_button_container"/>
+        android:lineSpacingExtra="@dimen/d8_size"
+        android:layout_below="@id/lockscreen_button_container"
+        tools:text="歌词" />
+    <!--<remix.myplayer.lyric.LrcView-->
+        <!--android:visibility="visible"-->
+        <!--android:id="@+id/lockscreen_lrcview"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_marginLeft="@dimen/d10_size"-->
+        <!--android:layout_marginRight="@dimen/d10_size"-->
+        <!--android:paddingLeft="@dimen/d30_size"-->
+        <!--android:paddingRight="@dimen/d30_size"-->
+        <!--android:layout_marginTop="@dimen/d10_size"-->
+        <!--android:layout_marginBottom="@dimen/d10_size"-->
+        <!--android:textColor="@color/day_enable_text_color"-->
+        <!--android:layout_below="@+id/lockscreen_button_container"-->
+        <!--android:layout_above="@+id/lockscreen_arrow_container"/>-->
 
     <LinearLayout
         android:id="@+id/lockscreen_arrow_container"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_below="@id/lockscreen_next_song"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/d12_size">
         <ImageView

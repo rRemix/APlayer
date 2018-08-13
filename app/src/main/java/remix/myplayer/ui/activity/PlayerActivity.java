@@ -63,9 +63,9 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.lyric.LrcView;
-import remix.myplayer.menu.AudioPopupListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.menu.AudioPopupListener;
 import remix.myplayer.misc.tageditor.TagReceiver;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
@@ -585,7 +585,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                         AudioManager.FLAG_PLAY_SOUND);
                 break;
             case R.id.next_song:
-//                mNextSong.setVisibility(View.GONE);
+//                mLyric.setVisibility(View.GONE);
 //                mVolumeContainer.setVisibility(View.VISIBLE);
                 mNextSong.startAnimation(makeAnimation(mNextSong,false));
                 mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer,true));
@@ -1005,7 +1005,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     mCurrentTime = progress;
                     mHandler.sendEmptyMessage(UPDATE_TIME_ALL);
                     try {
-                        sleep(1000);
+                        //1000ms时间有点长
+                        sleep(500);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -40,12 +40,9 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.R;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
@@ -55,7 +52,6 @@ import remix.myplayer.appwidgets.medium.AppWidgetMedium;
 import remix.myplayer.appwidgets.medium.AppWidgetMediumTransparent;
 import remix.myplayer.appwidgets.small.AppWidgetSmall;
 import remix.myplayer.appwidgets.small.AppWidgetSmallTransparent;
-import remix.myplayer.bean.misc.FloatLrcContent;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.PlayListSongs;
@@ -63,8 +59,8 @@ import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.lyric.SearchLrc;
-import remix.myplayer.lyric.bean.LrcRow;
+import remix.myplayer.lyric.UpdateLyricThread;
+import remix.myplayer.lyric.bean.LrcRowWrapper;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
@@ -90,6 +86,7 @@ import remix.myplayer.util.Util;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
+import static remix.myplayer.lyric.UpdateLyricThread.LRC_INTERVAL;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 
@@ -189,8 +186,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private boolean mShowFloatLrc = false;
     /** 桌面歌词控件*/
     private FloatLrcView mFloatLrcView;
-    /** 当前歌词*/
-    private volatile List<LrcRow> mLrcRows = null;
     /** 已经生成过的随机数 用于随机播放模式*/
     private volatile List<Integer> mRandomList = new ArrayList<>();
     /** service是否停止运行*/
@@ -1031,7 +1026,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             //更新桌面歌词播放按钮
             if(mFloatLrcView != null){
                 mFloatLrcView.setPlayIcon(MusicService.isPlay());
-                mFloatLrcView.stopAnimation();
             }
             updateMediaSession(control);
             mShortcutManager.updateContinueShortcut();
@@ -1506,23 +1500,61 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             mWakeLock.acquire(mCurrentSong != null ? mCurrentSong.getDuration() : 30000L);
     }
 
+    private boolean judgeCommand(){
+        final int control = Global.Operation;
+        return control != Command.TOGGLE && control != Command.PAUSE && control != Command.START;
+    }
+
     /**
      * 更新桌面歌词
      */
-    @SuppressLint("CheckResult")
+    private boolean mFirstUpdateLrc = true;
     private void updateFloatLrc(boolean force) {
-        final int control = Global.Operation;
-        Observable.just(!checkNoPermission() && mShowFloatLrc && (control != Command.TOGGLE && control != Command.PAUSE && control != Command.START || mLrcRows == null || force))
-                .flatMap((Function<Boolean, ObservableSource<List<LrcRow>>>) filter -> filter ? new SearchLrc(mCurrentSong).getLyric() : Observable.empty())
-                .doOnSubscribe(disposable -> createFloatLrcThreadIfNeed())
-                .subscribe(lrcRows -> mLrcRows = lrcRows, throwable -> mLrcRows = null);
+        if(checkNoPermission()){ //没有权限
+            return;
+        }
+        if(!mShowFloatLrc){ //移除桌面歌词
+            mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
+        } else if(judgeCommand() || force || mFirstUpdateLrc){ //更新
+            createFloatLrcThreadIfNeed();
+            mUpdateFloatLrcThread.setSongAndGetLyricRows(mCurrentSong);
+            mFirstUpdateLrc = false;
+        }
+//        //没有权限或者关闭桌面歌词或者不需要更新
+//        final int control = Global.Operation;
+//        Single.create(new SingleOnSubscribe<Boolean>() {
+//            //不需要更新的操作
+//            private boolean judgeCommand(){
+//                return control != Command.TOGGLE && control != Command.PAUSE && control != Command.START;
+//            }
+//            @Override
+//            public void subscribe(SingleEmitter<Boolean> emitter) {
+//                if(checkNoPermission()) {
+//                    emitter.onError(new Throwable("No Permission for display on other app"));
+//                } else if(!mShowFloatLrc) {
+//                    emitter.onError(new Throwable("User closed desktop lyric"));
+//                } else {
+//                    emitter.onSuccess(judgeCommand() || force || mLrcRows == null);
+//                }
+//            }
+//        }).filter(filter -> filter).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+//        .doOnSubscribe(disposable -> createFloatLrcThreadIfNeed())
+//        .subscribe(update -> {
+//            if(update) {
+//                mUpdateFloatLrcThread.setSongAndGetLyricRows(mCurrentSong);
+//                mLrcRows = new ArrayList<>();
+//            }
+//        }, throwable -> {
+//            mUpdateFloatLrcThread.setSongAndGetLyricRows(null);
+//        });
     }
 
     /**
      * 创建更新桌面歌词的线程
      */
     private void createFloatLrcThreadIfNeed() {
-        if(mShowFloatLrc && !isFloatLrcShowing()){
+        LogUtil.d("DesktopLrc","createFloatLrcThreadIfNeed" + " isFloatShowing: " + isFloatLrcShowing());
+        if(mShowFloatLrc && !isFloatLrcShowing() && mUpdateFloatLrcThread == null){
             mUpdateFloatLrcThread = new UpdateFloatLrcThread();
             mUpdateFloatLrcThread.start();
         }
@@ -1593,15 +1625,13 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
 
     /** 更新桌面歌词*/
-    private static final int LRC_THRESHOLD = 400;
-    private static final int LRC_INTERVAL = 400;
 //    public String mCurrentLrc;
     private UpdateFloatLrcThread mUpdateFloatLrcThread;
     private boolean mNeedShowFloatLrc;
-    private FloatLrcContent mCurrentLrc = new FloatLrcContent();
-    private LrcRow EMPTY_ROW = new LrcRow("",0,"");
-    private class UpdateFloatLrcThread extends Thread{
+    private LrcRowWrapper mCurrentLrc = new LrcRowWrapper();
+    private class UpdateFloatLrcThread extends UpdateLyricThread{
         UpdateFloatLrcThread(){
+            super();
             LogUtil.d("DesktopLrc","创建线程");
         }
 
@@ -1609,10 +1639,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             interrupt();
             mNeedShowFloatLrc = true;
             mShowFloatLrc = false;
-        }
-
-        void quitImmediately(){
-            interrupt();
         }
 
         void quitDelay(){
@@ -1641,85 +1667,24 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 }
                 //当前应用在前台
                 if(Util.isAppOnForeground()){
-                    if(isFloatLrcShowing())
+                    if(isFloatLrcShowing()){
                         mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
+                    }
+
                 } else{
                     if(!isFloatLrcShowing()) {
                         mUpdateUIHandler.removeMessages(Constants.CREATE_FLOAT_LRC);
                         LogUtil.d("DesktopLrc","请求创建桌面歌词");
                         mUpdateUIHandler.sendEmptyMessageDelayed(Constants.CREATE_FLOAT_LRC,50);
                     } else {
-                        if(mLrcRows == null || mLrcRows.size() == 0) {
-                            mCurrentLrc.Line1 = new LrcRow("",0,getResources().getString(R.string.no_lrc));
-                            mCurrentLrc.Line2 = EMPTY_ROW;
-                            mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
-                            continue;
-                        }
-                        findCurrentLyric();
+                        mCurrentLrc = findCurrentLyric();
+                        LogUtil.d("DesktopLrc","当前歌词: " + mCurrentLrc);
+                        mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
                     }
                 }
             }
         }
 
-        private void findCurrentLyric() {
-            int progress = getProgress();
-            if(mLrcRows == null || mLrcRows.size() == 0)
-                return;
-            for(int i = mLrcRows.size() - 1;i >= 0 ;i--){
-                LrcRow lrcRow = mLrcRows.get(i);
-                int interval = progress - lrcRow.getTime();
-                if(i == 0 && interval < 0){
-                    //未开始歌唱前显示歌曲信息
-                    mCurrentLrc.Line1 = new LrcRow("",0, mCurrentSong.getTitle());
-                    mCurrentLrc.Line2 = new LrcRow("",0, mCurrentSong.getArtist() + " - " + mCurrentSong.getAlbum());
-                    mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
-                    break;
-                }
-                else if(progress >= lrcRow.getTime()){
-                    if(lrcRow.hasTranslate()){
-                        mCurrentLrc.Line1 = new LrcRow(lrcRow);
-                        mCurrentLrc.Line1.setContent(lrcRow.getContent());
-                        mCurrentLrc.Line2 = new LrcRow(lrcRow);
-                        mCurrentLrc.Line2.setContent(lrcRow.getTranslate());
-                    } else {
-                        mCurrentLrc.Line1 = lrcRow;
-                        mCurrentLrc.Line2 = new LrcRow(i + 1 < mLrcRows.size() ? mLrcRows.get(i + 1) : EMPTY_ROW);
-                    }
-                    mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
-                    break;
-                }
-            }
-//            for(int i = 0; i < mLrcRows.size(); i++){
-//                LrcRow lrcRow = mLrcRows.get(i);
-//                int interval = progress - lrcRow.getTime();
-//                if(i == 0 && interval < 0){
-//                    //未开始歌唱前显示歌曲信息
-//                    mCurrentLrc.Line1 = new LrcRow("",0,mCurrentSong.getTitle());
-//                    mCurrentLrc.Line2 = new LrcRow("",0,mCurrentSong.getArtist() + " - " + mCurrentSong.getAlbum());
-//                    mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
-//                    break;
-//                } else if(Math.abs(interval) < LRC_THRESHOLD){
-//                    mCurrentLrc.Line1 = mLrcRows.get(i);
-//                    mCurrentLrc.Line2 = (i + 1 < mLrcRows.size() ? mLrcRows.get(i + 1) : EMPTY_ROW);
-//                    mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
-//                    break;
-//                } else if(interval > 0 && i == mLrcRows.size() - 1){
-//                    //最后一句歌词
-//                    mCurrentLrc.Line1 = mLrcRows.get(i);
-//                    mCurrentLrc.Line2 = EMPTY_ROW;
-//                    mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
-//                }
-//            }
-
-        }
-
-        /**
-         * 根据当前歌词获得间隔时间
-         * @return
-         */
-        private int getInterval(){
-            return mCurrentLrc != null && mCurrentLrc.Line1 != null && mCurrentLrc.Line1.getTotalTime() > 0 ? (int) mCurrentLrc.Line1.getTotalTime() : LRC_INTERVAL;
-        }
     }
 
     /**
@@ -1784,8 +1749,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW,false);
         mShowFloatLrc = false;
         mUpdateFloatLrcThread = null;
-        if(mLrcRows != null)
-            mLrcRows.clear();
         mUpdateUIHandler.removeMessages(Constants.CREATE_FLOAT_LRC);
         mUpdateUIHandler.sendEmptyMessageDelayed(Constants.REMOVE_FLOAT_LRC,LRC_INTERVAL);
     }
@@ -1930,9 +1893,18 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     UpdateHelper.update(mCurrentSong,mIsplay);
                     break;
                 case Constants.UPDATE_FLOAT_LRC_CONTENT:
+                    LrcRowWrapper wrapper = musicService.mCurrentLrc;
                     if(musicService.mFloatLrcView != null){
-                        if(musicService.mCurrentLrc != null)
-                            musicService.mFloatLrcView.setText(musicService.mCurrentLrc.Line1,musicService.mCurrentLrc.Line2);
+                        if(wrapper == null){
+                            musicService.mFloatLrcView.setText(UpdateLyricThread.NO_ROW,UpdateLyricThread.EMPTY_ROW);
+                        } else if(wrapper.getStatus() == UpdateLyricThread.Status.SEARCHING){
+                            musicService.mFloatLrcView.setText(UpdateLyricThread.SEARCHING_ROW,UpdateLyricThread.EMPTY_ROW);
+                        } else if(wrapper.getStatus() == UpdateLyricThread.Status.ERROR ||
+                                wrapper.getStatus() == UpdateLyricThread.Status.NO){
+                            musicService.mFloatLrcView.setText(UpdateLyricThread.NO_ROW,UpdateLyricThread.EMPTY_ROW);
+                        } else{
+                            musicService.mFloatLrcView.setText(wrapper.getLineOne(),wrapper.getLineTwo());
+                        }
                     }
                     break;
                 case Constants.REMOVE_FLOAT_LRC:
@@ -1965,6 +1937,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 //屏幕熄灭 关闭桌面歌词
                 if(mShowFloatLrc && isFloatLrcShowing() && mUpdateFloatLrcThread != null) {
                     mUpdateFloatLrcThread.quitImmediately();
+                    mUpdateFloatLrcThread = null;
                 }
             }
         }
