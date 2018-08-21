@@ -42,7 +42,11 @@ class VolumeController {
 
             override fun onFinish() {
                 directTo(0f)
-                mediaPlayer?.pause()
+                try {
+                    mediaPlayer?.pause()
+                }catch (e: IllegalStateException){
+                    LogUtil.d("VolumeController",e.toString())
+                }
             }
 
         }.start()

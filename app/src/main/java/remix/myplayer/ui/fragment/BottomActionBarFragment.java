@@ -1,6 +1,7 @@
 package remix.myplayer.ui.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -161,6 +162,7 @@ public class BottomActionBarFragment extends BaseFragment{
         }
     }
 
+    @SuppressLint("NewApi")
     public void startPlayerActivity(){
         if(MusicService.getCurrentMP3() == null)
             return;
@@ -171,9 +173,12 @@ public class BottomActionBarFragment extends BaseFragment{
         intent.putExtra("Rect",mCoverRect);
         intent.putExtra("AnimUrl",mAnimUrl);
 
-        ActivityOptionsCompat options = ActivityOptionsCompat
-                .makeSceneTransitionAnimation(getActivity(), mCover, "image");
-        ActivityCompat.startActivity(mContext, intent, options.toBundle());
+        Activity activity = getActivity();
+        if (activity != null && !activity.isDestroyed() ) {
+            ActivityOptionsCompat options = ActivityOptionsCompat
+                    .makeSceneTransitionAnimation(getActivity(), mCover, "image");
+            ActivityCompat.startActivity(mContext, intent, options.toBundle());
+        }
     }
 
     private GestureDetector mGestureDetector;

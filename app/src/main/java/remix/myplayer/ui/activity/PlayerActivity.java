@@ -575,14 +575,18 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     void onVolumeClick(View view){
         switch (view.getId()){
             case R.id.volume_down:
-                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                        AudioManager.ADJUST_LOWER,
-                        AudioManager.FLAG_PLAY_SOUND);
+                if(mAudioManager != null){
+                    mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                            AudioManager.ADJUST_LOWER,
+                            AudioManager.FLAG_PLAY_SOUND);
+                }
                 break;
             case R.id.volume_up:
-                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                        AudioManager.ADJUST_RAISE,
-                        AudioManager.FLAG_PLAY_SOUND);
+                if(mAudioManager != null){
+                    mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                            AudioManager.ADJUST_RAISE,
+                            AudioManager.FLAG_PLAY_SOUND);
+                }
                 break;
             case R.id.next_song:
 //                mLyric.setVisibility(View.GONE);

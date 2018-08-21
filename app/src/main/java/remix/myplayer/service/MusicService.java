@@ -1229,7 +1229,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 生成随机播放列表
      * @param current
      */
-    public void makeShuffleList(int current) {
+    public synchronized void makeShuffleList(int current) {
         if(mRandomList == null)
             mRandomList = new ArrayList<>();
         mRandomList.clear();
@@ -1520,33 +1520,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             mUpdateFloatLrcThread.setSongAndGetLyricRows(mCurrentSong);
             mFirstUpdateLrc = false;
         }
-//        //没有权限或者关闭桌面歌词或者不需要更新
-//        final int control = Global.Operation;
-//        Single.create(new SingleOnSubscribe<Boolean>() {
-//            //不需要更新的操作
-//            private boolean judgeCommand(){
-//                return control != Command.TOGGLE && control != Command.PAUSE && control != Command.START;
-//            }
-//            @Override
-//            public void subscribe(SingleEmitter<Boolean> emitter) {
-//                if(checkNoPermission()) {
-//                    emitter.onError(new Throwable("No Permission for display on other app"));
-//                } else if(!mShowFloatLrc) {
-//                    emitter.onError(new Throwable("User closed desktop lyric"));
-//                } else {
-//                    emitter.onSuccess(judgeCommand() || force || mLrcRows == null);
-//                }
-//            }
-//        }).filter(filter -> filter).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
-//        .doOnSubscribe(disposable -> createFloatLrcThreadIfNeed())
-//        .subscribe(update -> {
-//            if(update) {
-//                mUpdateFloatLrcThread.setSongAndGetLyricRows(mCurrentSong);
-//                mLrcRows = new ArrayList<>();
-//            }
-//        }, throwable -> {
-//            mUpdateFloatLrcThread.setSongAndGetLyricRows(null);
-//        });
     }
 
     /**

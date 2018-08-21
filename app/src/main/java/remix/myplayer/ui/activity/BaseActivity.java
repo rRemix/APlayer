@@ -24,7 +24,7 @@ import remix.myplayer.util.StatusBarUtil;
 
 public class BaseActivity extends AppCompatActivity {
     protected Context mContext;
-
+    private boolean mIsDestroyed;
     protected <T extends View> T findView(int id){
         return (T)findViewById(id);
     }
@@ -132,7 +132,12 @@ public class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ActivityManager.RemoveActivity(this);
+        mIsDestroyed = true;
+    }
 
+    @Override
+    public boolean isDestroyed() {
+        return Build.VERSION.SDK_INT >= 17 ? super.isDestroyed() : mIsDestroyed;
     }
 
     @Override

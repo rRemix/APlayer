@@ -15,15 +15,12 @@ import android.widget.RemoteViews;
 
 import remix.myplayer.App;
 import remix.myplayer.R;
-import remix.myplayer.appwidgets.medium.AppWidgetMedium;
-import remix.myplayer.appwidgets.small.AppWidgetSmall;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.request.RemoteUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.MainActivity;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -47,28 +44,19 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
     private static int IMAGE_SIZE_BIG = DensityUtil.dip2px(App.getContext(),270);
     private static int IMAGE_SIZE_MEDIUM = DensityUtil.dip2px(App.getContext(),72);
 
-    protected PendingIntent buildPendingIntent(Context context,ComponentName componentName,int operation) {
+    protected PendingIntent buildServicePendingIntent(Context context, ComponentName componentName, int cmd) {
         Intent intent = new Intent(MusicService.ACTION_APPWIDGET_OPERATE);
-        intent.putExtra("Control",operation);
+        intent.putExtra("Control",cmd);
         intent.setComponent(componentName);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            return PendingIntent.getForegroundService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isAllowForForegroundService(cmd)) {
+            return PendingIntent.getForegroundService(context, cmd, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         } else {
-            return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            return PendingIntent.getService(context, cmd, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
     }
 
-    protected PendingIntent buildSkinPendingIntent(Context context, String widgetName){
-        Intent intent = new Intent(MusicService.ACTION_WIDGET_UPDATE);
-        intent.putExtra("WidgetName",widgetName);
-        intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-        return PendingIntent.getBroadcast(context,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
-    protected PendingIntent buildTimerPendingIntent(Context context){
-        Intent intent = new Intent(MusicService.ACTION_CMD);
-        intent.putExtra("Control",Command.TOGGLE_TIMER);
-        return PendingIntent.getBroadcast(context,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+    private boolean isAllowForForegroundService(int cmd){
+        return cmd != Command.CHANGE_MODEL && cmd != Command.LOVE && cmd != Command.TOGGLE_TIMER;
     }
 
     protected boolean hasInstances(Context context) {
@@ -130,21 +118,13 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
     }
 
     protected void buildAction(Context context, RemoteViews views) {
-        ComponentName componentName = new ComponentName(context,MusicService.class);
-        views.setOnClickPendingIntent(R.id.appwidget_toggle,buildPendingIntent(context,componentName, Command.TOGGLE));
-        views.setOnClickPendingIntent(R.id.appwidget_prev,buildPendingIntent(context,componentName, Command.PREV));
-        views.setOnClickPendingIntent(R.id.appwidget_next,buildPendingIntent(context,componentName, Command.NEXT));
-        views.setOnClickPendingIntent(R.id.appwidget_model,buildPendingIntent(context,componentName, Command.CHANGE_MODEL));
-        views.setOnClickPendingIntent(R.id.appwidget_love,buildPendingIntent(context,componentName, Command.LOVE));
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            final String widgetName = this instanceof AppWidgetSmall ? "SmallWidget" : this instanceof AppWidgetMedium ? "MediumWidget" : "BigWidget";
-            views.setOnClickPendingIntent(R.id.appwidget_skin, buildSkinPendingIntent(context,widgetName));
-            views.setOnClickPendingIntent(R.id.appwidget_timer,buildTimerPendingIntent(context));
-        }else{
-            views.setOnClickPendingIntent(R.id.appwidget_skin,buildPendingIntent(context,componentName,Constants.UPDATE_APPWIDGET));
-            views.setOnClickPendingIntent(R.id.appwidget_timer,buildPendingIntent(context,componentName, Command.TOGGLE_TIMER));
-        }
+        ComponentName componentNameForService = new ComponentName(context,MusicService.class);
+        views.setOnClickPendingIntent(R.id.appwidget_toggle, buildServicePendingIntent(context,componentNameForService, Command.TOGGLE));
+        views.setOnClickPendingIntent(R.id.appwidget_prev, buildServicePendingIntent(context,componentNameForService, Command.PREV));
+        views.setOnClickPendingIntent(R.id.appwidget_next, buildServicePendingIntent(context,componentNameForService, Command.NEXT));
+        views.setOnClickPendingIntent(R.id.appwidget_model, buildServicePendingIntent(context,componentNameForService, Command.CHANGE_MODEL));
+        views.setOnClickPendingIntent(R.id.appwidget_love, buildServicePendingIntent(context,componentNameForService, Command.LOVE));
+        views.setOnClickPendingIntent(R.id.appwidget_timer, buildServicePendingIntent(context,componentNameForService, Command.TOGGLE_TIMER));
 
         Intent action = new Intent(context, MainActivity.class);
         action.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
