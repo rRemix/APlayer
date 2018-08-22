@@ -23,6 +23,10 @@ public class Album {
         return Count;
     }
 
+    public void setCount(int count){
+        this.Count = count;
+    }
+
     public int getAlbumID() {
         return AlbumID;
     }

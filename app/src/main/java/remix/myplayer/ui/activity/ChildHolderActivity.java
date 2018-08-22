@@ -21,7 +21,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.adapter.ChildHolderAdapter;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.helper.UpdateHelper;
@@ -35,8 +34,9 @@ import remix.myplayer.request.UriRequest;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
+import remix.myplayer.ui.adapter.ChildHolderAdapter;
 import remix.myplayer.ui.fragment.BottomActionBarFragment;
+import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -61,7 +61,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
     private boolean mIsRunning = false;
     //获得歌曲信息列表的参数
-    public static int ID;
+    private int ID;
     private int mType;
     private String mArg;
     private List<Song> mInfoList;
@@ -104,6 +104,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
         mAdapter = new ChildHolderAdapter(this,R.layout.item_child_holder,mType,mArg,mMultiChoice,mRecyclerView);
         mMultiChoice.setAdapter(mAdapter);
+        mMultiChoice.setExtra(ID);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {

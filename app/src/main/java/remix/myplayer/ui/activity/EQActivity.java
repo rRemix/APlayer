@@ -23,7 +23,7 @@ import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.customview.EQSeekBar;
+import remix.myplayer.ui.widget.EQSeekBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;

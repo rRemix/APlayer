@@ -57,15 +57,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.bean.misc.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.lyric.LrcView;
-import remix.myplayer.menu.AudioPopupListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.menu.AudioPopupListener;
 import remix.myplayer.misc.tageditor.TagReceiver;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
@@ -76,13 +75,14 @@ import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.customview.AudioViewPager;
-import remix.myplayer.ui.customview.playpause.PlayPauseView;
+import remix.myplayer.ui.adapter.PagerAdapter;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.PlayQueueDialog;
 import remix.myplayer.ui.fragment.CoverFragment;
 import remix.myplayer.ui.fragment.LyricFragment;
 import remix.myplayer.ui.fragment.RecordFragment;
+import remix.myplayer.ui.widget.AudioViewPager;
+import remix.myplayer.ui.widget.playpause.PlayPauseView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -575,17 +575,21 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     void onVolumeClick(View view){
         switch (view.getId()){
             case R.id.volume_down:
-                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                        AudioManager.ADJUST_LOWER,
-                        AudioManager.FLAG_PLAY_SOUND);
+                if(mAudioManager != null){
+                    mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                            AudioManager.ADJUST_LOWER,
+                            AudioManager.FLAG_PLAY_SOUND);
+                }
                 break;
             case R.id.volume_up:
-                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                        AudioManager.ADJUST_RAISE,
-                        AudioManager.FLAG_PLAY_SOUND);
+                if(mAudioManager != null){
+                    mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                            AudioManager.ADJUST_RAISE,
+                            AudioManager.FLAG_PLAY_SOUND);
+                }
                 break;
             case R.id.next_song:
-//                mNextSong.setVisibility(View.GONE);
+//                mLyric.setVisibility(View.GONE);
 //                mVolumeContainer.setVisibility(View.VISIBLE);
                 mNextSong.startAnimation(makeAnimation(mNextSong,false));
                 mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer,true));
@@ -1005,7 +1009,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     mCurrentTime = progress;
                     mHandler.sendEmptyMessage(UPDATE_TIME_ALL);
                     try {
-                        sleep(1000);
+                        //1000ms时间有点长
+                        sleep(500);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

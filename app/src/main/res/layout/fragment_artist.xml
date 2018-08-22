@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="?attr/background_grid_color">
 
-    <remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView
+    <remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/artist_recycleview"

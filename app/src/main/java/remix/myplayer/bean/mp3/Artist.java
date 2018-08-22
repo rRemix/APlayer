@@ -19,6 +19,10 @@ public class Artist {
         return Count;
     }
 
+    public void setCount(int count){
+        this.Count = count;
+    }
+
     public int getArtistID() {
         return ArtistID;
     }

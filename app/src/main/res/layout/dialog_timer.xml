@@ -70,7 +70,7 @@
             android:gravity="center"
             android:layout_marginTop="@dimen/d24_size"
             android:layout_marginBottom="@dimen/d20_size">
-            <remix.myplayer.ui.customview.CircleSeekBar
+            <remix.myplayer.ui.widget.CircleSeekBar
                 android:layout_gravity="center"
                 android:id="@+id/close_seekbar"
                 android:layout_width="@dimen/d180_size"

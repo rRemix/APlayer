@@ -78,7 +78,7 @@ public class Tag extends ContextWrapper{
 
     public Tag(Context context, Song song){
         super(context);
-        mInfo = song;
+        mInfo = song != null ? song : MusicService.getCurrentMP3();
         mTagEditor = new TagEditor(mInfo.getUrl());
     }
 

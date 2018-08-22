@@ -105,7 +105,7 @@
             tools:text="周杰伦" />
     </android.support.constraint.ConstraintLayout>
 
-    <remix.myplayer.ui.customview.ColumnView
+    <remix.myplayer.ui.widget.ColumnView
         android:visibility="gone"
         android:layout_width="@dimen/d18_size"
         android:layout_height="@dimen/d16_size"

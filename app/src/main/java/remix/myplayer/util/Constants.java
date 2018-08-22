@@ -71,7 +71,6 @@ public class Constants {
     //刷新适配器
     public final static int NOTIFYDATACHANGED = 0;
 
-
     //更新桌面歌词内容
     public static final int UPDATE_FLOAT_LRC_CONTENT = 500;
     //移除桌面歌词

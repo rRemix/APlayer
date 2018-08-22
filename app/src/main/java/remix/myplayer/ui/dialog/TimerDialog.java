@@ -29,7 +29,7 @@ import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.customview.CircleSeekBar;
+import remix.myplayer.ui.widget.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;

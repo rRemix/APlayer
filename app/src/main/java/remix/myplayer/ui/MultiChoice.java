@@ -14,16 +14,16 @@ import java.util.List;
 import java.util.Set;
 
 import remix.myplayer.R;
-import remix.myplayer.adapter.AlbumAdapter;
-import remix.myplayer.adapter.ArtistAdapter;
-import remix.myplayer.adapter.ChildHolderAdapter;
-import remix.myplayer.adapter.PlayListAdapter;
-import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
+import remix.myplayer.ui.adapter.AlbumAdapter;
+import remix.myplayer.ui.adapter.ArtistAdapter;
+import remix.myplayer.ui.adapter.ChildHolderAdapter;
+import remix.myplayer.ui.adapter.PlayListAdapter;
+import remix.myplayer.ui.adapter.SongAdapter;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.FolderFragment;
@@ -67,6 +67,7 @@ public class MultiChoice implements OnMultiItemClickListener {
 
     /** 更新optionmenu */
     private OnUpdateOptionMenuListener mUpdateOptionMenuListener;
+    private Object mExtra;
 
     public MultiChoice(Context context){
         mContext = context;
@@ -224,7 +225,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                     if (arg instanceof Integer)
                         idList.add((Integer) arg);
                 }
-                num = PlayListUtil.deleteMultiSongs(idList,ChildHolderActivity.ID);
+                num = PlayListUtil.deleteMultiSongs(idList, (Integer) mExtra);
                 break;
             case Constants.SONG:
             case Constants.ALBUM:
@@ -397,5 +398,9 @@ public class MultiChoice implements OnMultiItemClickListener {
             return Constants.PLAYLISTSONG;
         else
             return -1;
+    }
+
+    public void setExtra(int extra) {
+        mExtra = extra;
     }
 }

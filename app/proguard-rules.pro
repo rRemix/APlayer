@@ -56,16 +56,7 @@
     <fields>;
     <methods>;
 }
-#baseAdapter
--keepclassmembers class remix.myplayer.adapter.holder.BaseViewHolder
--keepclasseswithmembers class remix.myplayer.adapter.holder.BaseViewHolder {
-    <fields>;
-    <methods>;
-}
--keepclasseswithmembers class * extends remix.myplayer.adapter.holder.BaseViewHolder{
-    <fields>;
-    <methods>;
-}
+-keep class * extends remix.myplayer.ui.adapter.holder.BaseViewHolder{*;}
 
 -keep class **.R$* {*;}
 -keep public class remix.myplayer.R$*{
@@ -89,27 +80,11 @@ public static final int *;
    public static final int *;
 }
 
-#友盟统计
--keep class com.umeng.update.protobuffer.** {
-        public <fields>;
-        public <methods>;
-}
--keep class com.umeng.update.UmengUpdateAgent {
-        public <methods>;
-}
--keep public class com.umeng.example.R$*{
-    public static final int *;
-}
--keepclassmembers class * {
-    public <init> (org.json.JSONObject);
-}
-
 # fresco
 -keep class android.support.v4.** { *; }
 -keep interface android.support.v4.app.** { *; }
 -dontwarn okio.**
 -dontwarn com.squareup.wire.**
--dontwarn com.umeng.update.**
 -dontwarn android.support.v4.**
 -keep class okio.** {*;}
 -keep class com.squareup.wire.** {*;}
@@ -132,15 +107,6 @@ public static final int *;
 }
 -keep class com.facebook.imagepipeline.animated.factory.AnimatedFactoryImpl {
     public AnimatedFactoryImpl(com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory,com.facebook.imagepipeline.core.ExecutorSupplier);
-}
-
-# bomb
--dontwarn cn.bmob.v3.**
--keep class cn.bmob.v3.** {*;}
-
-# 确保JavaBean不被混淆-否则gson将无法将数据解析成具体对象
--keep class * extends cn.bmob.v3.BmobObject {
-    *;
 }
 
 # keep okhttp3、okio

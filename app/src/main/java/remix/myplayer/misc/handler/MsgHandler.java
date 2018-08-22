@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 
 import remix.myplayer.App;
@@ -14,11 +15,11 @@ import remix.myplayer.util.ToastUtil;
  */
 public class MsgHandler extends Handler {
     private Method mMethod;
-    private Object mFrom;
+    private WeakReference<Object> mRef;
 
     public MsgHandler(Looper looper, Object from, Class clazz) {
         super(looper);
-        mFrom = from;
+        mRef = new WeakReference<>(from);
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.isAnnotationPresent(OnHandleMessage.class)) {
                 mMethod = method;
@@ -36,10 +37,10 @@ public class MsgHandler extends Handler {
 
     @Override
     public void handleMessage(Message msg) {
-        if (mMethod == null)
+        if (mMethod == null || mRef.get() == null)
             return;
         try {
-            mMethod.invoke(mFrom, msg);
+            mMethod.invoke(mRef.get(), msg);
         } catch (Exception e) {
             ToastUtil.show(App.getContext(),"调用Method失败:" + e.toString());
         }

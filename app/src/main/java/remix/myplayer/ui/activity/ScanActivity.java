@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.ui.customview.FilterSizeSeekBar;
+import remix.myplayer.ui.widget.FilterSizeSeekBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 

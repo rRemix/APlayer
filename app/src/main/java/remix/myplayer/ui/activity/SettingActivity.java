@@ -70,9 +70,9 @@ import remix.myplayer.util.Util;
 
 import static remix.myplayer.App.IS_GOOGLEPLAY;
 import static remix.myplayer.bean.misc.Category.ALL_LIBRARY_STRING;
-import static remix.myplayer.helper.M3UHelperKt.exportPlayListToFile;
-import static remix.myplayer.helper.M3UHelperKt.importLocalPlayList;
-import static remix.myplayer.helper.M3UHelperKt.importM3UFile;
+import static remix.myplayer.helper.M3UHelper.exportPlayListToFile;
+import static remix.myplayer.helper.M3UHelper.importLocalPlayList;
+import static remix.myplayer.helper.M3UHelper.importM3UFile;
 import static remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM;
 
 /**

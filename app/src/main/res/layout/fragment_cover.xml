@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <remix.myplayer.ui.customview.WidthFitSquareCardView
+    <remix.myplayer.ui.widget.WidthFitSquareCardView
         android:id="@+id/cover_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -26,6 +26,6 @@
             app:actualImageScaleType="centerCrop"
             app:placeholderImageScaleType="centerCrop"
             app:fadeDuration="0"/>
-    </remix.myplayer.ui.customview.WidthFitSquareCardView>
+    </remix.myplayer.ui.widget.WidthFitSquareCardView>
 
 </RelativeLayout>

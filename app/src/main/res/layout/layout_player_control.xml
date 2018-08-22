@@ -38,7 +38,7 @@
             android:id="@+id/playbar_play_container"
             android:layout_width="@dimen/d56_size"
             android:layout_height="@dimen/d56_size">
-            <remix.myplayer.ui.customview.playpause.PlayPauseView
+            <remix.myplayer.ui.widget.playpause.PlayPauseView
                 android:id="@+id/playbar_play_pause"
                 android:layout_width="@dimen/player_button_size"
                 android:layout_height="@dimen/player_button_size"
