@@ -61,7 +61,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
     private boolean mIsRunning = false;
     //获得歌曲信息列表的参数
-    public static int ID;
+    private int ID;
     private int mType;
     private String mArg;
     private List<Song> mInfoList;
@@ -104,6 +104,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
         mAdapter = new ChildHolderAdapter(this,R.layout.item_child_holder,mType,mArg,mMultiChoice,mRecyclerView);
         mMultiChoice.setAdapter(mAdapter);
+        mMultiChoice.setExtra(ID);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {

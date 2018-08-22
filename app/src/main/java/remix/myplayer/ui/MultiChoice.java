@@ -67,6 +67,7 @@ public class MultiChoice implements OnMultiItemClickListener {
 
     /** 更新optionmenu */
     private OnUpdateOptionMenuListener mUpdateOptionMenuListener;
+    private Object mExtra;
 
     public MultiChoice(Context context){
         mContext = context;
@@ -224,7 +225,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                     if (arg instanceof Integer)
                         idList.add((Integer) arg);
                 }
-                num = PlayListUtil.deleteMultiSongs(idList,ChildHolderActivity.ID);
+                num = PlayListUtil.deleteMultiSongs(idList, (Integer) mExtra);
                 break;
             case Constants.SONG:
             case Constants.ALBUM:
@@ -397,5 +398,9 @@ public class MultiChoice implements OnMultiItemClickListener {
             return Constants.PLAYLISTSONG;
         else
             return -1;
+    }
+
+    public void setExtra(int extra) {
+        mExtra = extra;
     }
 }

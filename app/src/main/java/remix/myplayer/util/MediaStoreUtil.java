@@ -80,7 +80,7 @@ public class MediaStoreUtil {
             if(cursor != null){
                 while (cursor.moveToNext()){
                     artists.add(new Artist(cursor.getInt(0),cursor.getString(1),
-                            getSongCount(Constants.ARTIST,cursor.getInt(0))));
+                           0));
                 }
             }
         }finally {
@@ -94,7 +94,6 @@ public class MediaStoreUtil {
     public static List<Album> getAllAlbum(){
         ArrayList<Album> albums = new ArrayList<>();
         Cursor cursor = null;
-
         try {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
@@ -109,7 +108,8 @@ public class MediaStoreUtil {
                     albums.add(new Album(cursor.getInt(0),
                             Util.processInfo(cursor.getString(1), Util.ALBUMTYPE),
                             cursor.getInt(2),
-                            Util.processInfo(cursor.getString(3), Util.ARTISTTYPE),getSongCount(Constants.ALBUM,cursor.getInt(0))));
+                            Util.processInfo(cursor.getString(3), Util.ARTISTTYPE),
+                            0));
                 }
             }
         }finally {
@@ -1167,13 +1167,15 @@ public class MediaStoreUtil {
         try {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{MediaStore.Audio.Media._ID},
-                    MediaStore.Audio.Media.DATA + "=?",
+                    MediaStore.Audio.Media.DATA + " = ?",
                     new String[]{url},
                     null);
             if(cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()){
                 return cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
             }
-        } finally {
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally{
             if(cursor != null && !cursor.isClosed()){
                 cursor.close();
             }

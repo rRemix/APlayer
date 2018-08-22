@@ -4,12 +4,11 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
-import android.widget.TextView;
 
 import remix.myplayer.App;
-import remix.myplayer.R;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.Util;
 
 /**
  * @ClassName
@@ -17,11 +16,9 @@ import remix.myplayer.util.MediaStoreUtil;
  * @Author Xiaoborui
  * @Date 2016/10/11 14:07
  */
-public class AsynLoadSongNum extends AsyncTask<Integer, Integer, Integer> {
-    private final TextView mNum;
+public abstract class AsynLoadSongNum extends AsyncTask<Integer, Integer, Integer> {
     private final int mType;
-    public AsynLoadSongNum(TextView textView,int type) {
-        mNum = textView;
+    public AsynLoadSongNum(int type) {
         mType = type;
     }
 
@@ -40,24 +37,9 @@ public class AsynLoadSongNum extends AsyncTask<Integer, Integer, Integer> {
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(cursor != null && !cursor.isClosed())
-                cursor.close();
+            Util.closeCursor(cursor);
         }
         return 0;
     }
 
-    @Override
-    protected void onPostExecute(Integer num) {
-        if (mNum != null) {
-            if(mType == Constants.ALBUM){
-                String album = "";
-                if(mNum.getText() != null) {
-                    album = mNum.getText().toString();
-                }
-                mNum.setText(App.getContext().getString(R.string.song_count_2,album,num));
-            } else {
-                mNum.setText(App.getContext().getString(R.string.song_count_1,num));
-            }
-        }
-    }
 }

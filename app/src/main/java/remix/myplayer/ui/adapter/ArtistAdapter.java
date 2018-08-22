@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -23,8 +24,10 @@ import com.github.promeg.pinyinhelper.Pinyin;
 
 import butterknife.BindView;
 import io.reactivex.disposables.Disposable;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Artist;
+import remix.myplayer.misc.asynctask.AsynLoadSongNum;
 import remix.myplayer.misc.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -106,7 +109,11 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         holder.mText1.setText(artist.getArtist());
         final int artistId = artist.getArtistID();
         if(holder instanceof ArtistListHolder && holder.mText2 != null){
-            holder.mText2.setText(mContext.getString(R.string.song_count_1,artist.getCount()));
+            if(artist.getCount() > 0){
+                holder.mText2.setText(mContext.getString(R.string.song_count_1,artist.getCount()));
+            }else {
+                new ArtistSongCountLoader(Constants.ARTIST,holder,artist).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId);
+            }
         }
         //设置封面
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
@@ -239,6 +246,24 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     static class ArtistGridHolder extends ArtistHolder{
         ArtistGridHolder(View v) {
             super(v);
+        }
+    }
+
+    private static class ArtistSongCountLoader extends AsynLoadSongNum {
+        private final ArtistHolder mHolder;
+        private final Artist mArtist;
+        ArtistSongCountLoader(int type,ArtistHolder holder, Artist artist) {
+            super(type);
+            mHolder = holder;
+            mArtist = artist;
+        }
+
+        @Override
+        protected void onPostExecute(Integer num) {
+            if(mHolder.mText2 != null && num > 0){
+                mArtist.setCount(num);
+                mHolder.mText2.setText(App.getContext().getString(R.string.song_count_1,num));
+            }
         }
     }
 

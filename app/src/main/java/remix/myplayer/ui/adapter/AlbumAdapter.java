@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -24,8 +25,10 @@ import com.github.promeg.pinyinhelper.Pinyin;
 
 import butterknife.BindView;
 import io.reactivex.disposables.Disposable;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Album;
+import remix.myplayer.misc.asynctask.AsynLoadSongNum;
 import remix.myplayer.misc.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -114,7 +117,13 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         Disposable disposable = new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(album),new RequestConfig.Builder(imageSize,imageSize).build()).loadImage();
         holder.mImage.setTag(disposable);
         if(holder instanceof AlbumListHolder){
-            holder.mText2.setText(mContext.getString(R.string.song_count_2,album.getArtist(),album.getCount()));
+            if(album.getCount() > 0){
+                holder.mText2.setText(mContext.getString(R.string.song_count_2,album.getArtist(),album.getCount()));
+            }else{
+                new AlbumSongCountLoader(Constants.ALBUM,holder,album).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,album.getAlbumID());
+            }
+        }else{
+            holder.mText2.setText(album.getArtist());
         }
 
         //背景点击效果
@@ -252,6 +261,24 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         HeaderHolder(View itemView) {
             super(itemView);
             mRoot = itemView;
+        }
+    }
+
+    private static class AlbumSongCountLoader extends AsynLoadSongNum{
+        private final AlbumHolder mHolder;
+        private final Album mAlbum;
+        AlbumSongCountLoader(int type, AlbumHolder holder, Album album) {
+            super(type);
+            mHolder = holder;
+            mAlbum = album;
+        }
+
+        @Override
+        protected void onPostExecute(Integer num) {
+            if(mHolder.mText2 != null && num > 0){
+                mAlbum.setCount(num);
+                mHolder.mText2.setText(App.getContext().getString(R.string.song_count_2,mAlbum.getArtist(),num));
+            }
         }
     }
 }
