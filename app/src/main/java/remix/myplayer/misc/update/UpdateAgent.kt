@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Environment
 import android.text.TextUtils
 import remix.myplayer.App
+import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.bean.github.Release
 import remix.myplayer.request.network.HttpClient
@@ -16,10 +17,13 @@ import remix.myplayer.util.Util
 object UpdateAgent {
     private const val TAG = "UpdateAgent"
 
+    @JvmStatic
     var listener: Listener? = null
 
+    @JvmStatic
     var forceCheck = false
 
+    @JvmStatic
     fun check(context: Context) {
         if (listener == null)
             return
@@ -30,6 +34,10 @@ object UpdateAgent {
                 }
                 .subscribe({
                     val release = it
+                    if (BuildConfig.DEBUG) {
+                        release.name = release.name + "-Force"
+                        release.name = release.name.replaceFirst("84", "86")
+                    }
                     if (release == null || release.assets == null || release.assets.size == 0) {
                         listener?.onUpdateReturned(UpdateStatus.No, context.getString(R.string.no_update), null)
                         return@subscribe
@@ -40,7 +48,7 @@ object UpdateAgent {
                         listener?.onUpdateReturned(UpdateStatus.No, context.getString(R.string.no_update), null)
                         //删除以前的安装包
                         val downloadDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-                        if(downloadDir.exists() && downloadDir.listFiles() != null && downloadDir.listFiles().isNotEmpty()){
+                        if (downloadDir.exists() && downloadDir.listFiles() != null && downloadDir.listFiles().isNotEmpty()) {
                             Util.deleteFilesByDirectory(downloadDir)
                         }
                         return@subscribe

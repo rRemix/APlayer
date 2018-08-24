@@ -1,6 +1,5 @@
 package remix.myplayer.util;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -15,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import remix.myplayer.App;
 import remix.myplayer.bean.lastfm.LastFmAlbum;
 import remix.myplayer.bean.lastfm.LastFmArtist;
 import remix.myplayer.bean.mp3.Album;
@@ -29,30 +29,29 @@ import remix.myplayer.request.UriRequest;
  */
 
 public class ImageUriUtil {
-    private ImageUriUtil(){}
-    private static final String TAG = "ImageUriUtil";
-    private static Context mContext;
-    public static void setContext(Context context){
-        mContext = context;
+    private ImageUriUtil() {
     }
+
+    private static final String TAG = "ImageUriUtil";
+
 
     /**
      * 获得某歌手在本地数据库的封面
      */
-    public static File getArtistThumbInMediaCache(int artistId){
+    public static File getArtistThumbInMediaCache(int artistId) {
         Cursor cursor = null;
         try {
-            cursor = mContext.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Albums.ALBUM_ART},
-                    MediaStore.Audio.Media.ARTIST_ID + "=?",new String[]{artistId + ""},null);
-            if(cursor != null && cursor.moveToFirst()) {
+            cursor = App.getContext().getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.Albums.ALBUM_ART},
+                    MediaStore.Audio.Media.ARTIST_ID + "=?", new String[]{artistId + ""}, null);
+            if (cursor != null && cursor.moveToFirst()) {
                 String imagePath = cursor.getString(0);
-                if(!TextUtils.isEmpty(imagePath))
+                if (!TextUtils.isEmpty(imagePath))
                     return new File(imagePath);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(cursor != null )
+            if (cursor != null)
                 cursor.close();
         }
         return null;
@@ -60,14 +59,15 @@ public class ImageUriUtil {
 
     /**
      * 判断某专辑在本地数据库是否有封面
+     *
      * @param uri
      * @return
      */
-    public static boolean isAlbumThumbExistInMediaCache(Uri uri){
+    public static boolean isAlbumThumbExistInMediaCache(Uri uri) {
         boolean exist = false;
         InputStream stream = null;
         try {
-            stream = mContext.getContentResolver().openInputStream(uri);
+            stream = App.getContext().getContentResolver().openInputStream(uri);
             exist = true;
         } catch (Exception e) {
             exist = false;
@@ -85,15 +85,16 @@ public class ImageUriUtil {
 
     /**
      * 返回自定义的封面
+     *
      * @param arg
      * @param type
      * @return
      */
-    public static File getCustomThumbIfExist(int arg, int type){
-        File img = type == ImageUriRequest.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + Util.hashKeyForDisk(arg * 255 + ""))
-                : type == ImageUriRequest.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + Util.hashKeyForDisk(arg* 255 + ""))
-                : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + Util.hashKeyForDisk(arg * 255 + ""));
-        if(img.exists()){
+    public static File getCustomThumbIfExist(int arg, int type) {
+        File img = type == ImageUriRequest.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/album") + "/" + Util.hashKeyForDisk(arg * 255 + ""))
+                : type == ImageUriRequest.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/artist") + "/" + Util.hashKeyForDisk(arg * 255 + ""))
+                : new File(DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/playlist") + "/" + Util.hashKeyForDisk(arg * 255 + ""));
+        if (img.exists()) {
             return img;
         }
         return null;
@@ -131,10 +132,11 @@ public class ImageUriUtil {
 
     /**
      * 根据专辑信息构建请求参数
+     *
      * @param album
      * @return
      */
-    public static UriRequest getSearchRequest(Album album){
+    public static UriRequest getSearchRequest(Album album) {
 //        if(album == null)
 //            return SearchRequest.DEFAULT_REQUEST;
 //        boolean isAlbumAvailable = !TextUtils.isEmpty(album.getAlbum()) && !album.getAlbum().contains(mContext.getString(R.string.unknown_album));
@@ -143,17 +145,18 @@ public class ImageUriUtil {
 //            return new SearchRequest(album.getAlbumID(),album.getArtist() + "-" + album.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,ImageUriRequest.URL_ALBUM);
 //        }
 //        return SearchRequest.DEFAULT_REQUEST;
-        if(album == null)
+        if (album == null)
             return UriRequest.DEFAULT_REQUEST;
-        return new UriRequest(album.getAlbumID(),ImageUriRequest.URL_ALBUM,UriRequest.TYPE_NETEASE_ALBUM,album.getAlbum(),album.getArtist());
+        return new UriRequest(album.getAlbumID(), ImageUriRequest.URL_ALBUM, UriRequest.TYPE_NETEASE_ALBUM, album.getAlbum(), album.getArtist());
     }
 
     /**
      * 根据艺术家信息构建请求参数
+     *
      * @param artist
      * @return
      */
-    public static UriRequest getSearchRequest(Artist artist){
+    public static UriRequest getSearchRequest(Artist artist) {
 //        if(artist == null)
 //            return SearchRequest.DEFAULT_REQUEST;
 //        boolean isArtistAvailable = !TextUtils.isEmpty(artist.getArtist()) && !artist.getArtist().contains(mContext.getString(R.string.unknown_artist));
@@ -161,14 +164,14 @@ public class ImageUriUtil {
 //            return new SearchRequest(artist.getArtistID(),artist.getArtist(), SearchRequest.TYPE_NETEASE_ARTIST,ImageUriRequest.URL_ARTIST);
 //        }
 //        return SearchRequest.DEFAULT_REQUEST;
-        if(artist == null)
+        if (artist == null)
             return UriRequest.DEFAULT_REQUEST;
-        return new UriRequest(artist.getArtistID(),ImageUriRequest.URL_ARTIST,UriRequest.TYPE_NETEASE_ARTIST,artist.getArtist());
+        return new UriRequest(artist.getArtistID(), ImageUriRequest.URL_ARTIST, UriRequest.TYPE_NETEASE_ARTIST, artist.getArtist());
     }
 
-    public static UriRequest getSearchRequestWithAlbumType(Song song){
-        return new UriRequest(song.getAlbumId(),ImageUriRequest.URL_ALBUM,UriRequest.TYPE_NETEASE_SONG,
-                song.getTitle(),song.getAlbum(),song.getArtist());
+    public static UriRequest getSearchRequestWithAlbumType(Song song) {
+        return new UriRequest(song.getAlbumId(), ImageUriRequest.URL_ALBUM, UriRequest.TYPE_NETEASE_SONG,
+                song.getTitle(), song.getAlbum(), song.getArtist());
     }
 
     public static boolean isArtistNameUnknownOrEmpty(@Nullable String artistName) {
@@ -177,13 +180,13 @@ public class ImageUriUtil {
         return artistName.equals("unknown") || artistName.equals("<unknown>") || artistName.equals("未知艺术家");
     }
 
-    public static boolean isAlbumNameUnknownOrEmpty(@Nullable String albumName){
+    public static boolean isAlbumNameUnknownOrEmpty(@Nullable String albumName) {
         if (TextUtils.isEmpty(albumName)) return true;
         albumName = albumName.trim().toLowerCase();
         return albumName.equals("unknown") || albumName.equals("<unknown>") || albumName.equals("未知专辑");
     }
 
-    public static boolean isSongNameUnknownOrEmpty(@Nullable String songName){
+    public static boolean isSongNameUnknownOrEmpty(@Nullable String songName) {
         if (TextUtils.isEmpty(songName)) return true;
         songName = songName.trim().toLowerCase();
         return songName.equals("unknown") || songName.equals("<unknown>") || songName.equals("未知歌曲");
@@ -192,6 +195,7 @@ public class ImageUriUtil {
     public enum ImageSize {
         SMALL, MEDIUM, LARGE, EXTRALARGE, MEGA, UNKNOWN
     }
+
     public static String getLargestAlbumImageUrl(List<LastFmAlbum.Album.Image> images) {
         HashMap imageUrls = new HashMap();
         for (LastFmAlbum.Album.Image image : images) {

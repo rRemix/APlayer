@@ -1,6 +1,5 @@
 package remix.myplayer.util;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
@@ -12,6 +11,8 @@ import android.support.v7.graphics.Palette;
 import java.util.Collections;
 import java.util.Comparator;
 
+import remix.myplayer.App;
+
 /**
  * @ClassName
  * @Description
@@ -19,29 +20,27 @@ import java.util.Comparator;
  * @Date 2016/7/28 10:53
  */
 public class ColorUtil {
-    private static Context mContext;
-    private ColorUtil(){}
-    public static void setContext(Context context){
-        mContext = context;
+    private ColorUtil() {
     }
 
     @ColorInt
-    public static int getColor(@ColorRes int colorRes){
-        return ContextCompat.getColor(mContext, colorRes);
+    public static int getColor(@ColorRes int colorRes) {
+        return ContextCompat.getColor(App.getContext(), colorRes);
     }
 
     /**
      * 调整颜色透明度
+     *
      * @param paramInt
      * @param paramFloat
      * @return
      */
     @ColorInt
-    public static int adjustAlpha(@ColorInt int paramInt, @FloatRange(from=0.0D, to=1.0D) float paramFloat) {
+    public static int adjustAlpha(@ColorInt int paramInt, @FloatRange(from = 0.0D, to = 1.0D) float paramFloat) {
         return Color.argb(Math.round(Color.alpha(paramInt) * paramFloat), Color.red(paramInt), Color.green(paramInt), Color.blue(paramInt));
     }
 
-    public static int blendColors(int paramInt1, int paramInt2, @FloatRange(from=0.0D, to=1.0D) float paramFloat) {
+    public static int blendColors(int paramInt1, int paramInt2, @FloatRange(from = 0.0D, to = 1.0D) float paramFloat) {
         float f1 = 1.0F - paramFloat;
         float f2 = Color.alpha(paramInt1);
         float f3 = Color.alpha(paramInt2);
@@ -51,11 +50,12 @@ public class ColorUtil {
         float f7 = Color.green(paramInt2);
         float f8 = Color.blue(paramInt1);
         float f9 = Color.blue(paramInt2);
-        return Color.argb((int)(f2 * f1 + f3 * paramFloat), (int)(f4 * f1 + f5 * paramFloat), (int)(f6 * f1 + f7 * paramFloat), (int)(f1 * f8 + f9 * paramFloat));
+        return Color.argb((int) (f2 * f1 + f3 * paramFloat), (int) (f4 * f1 + f5 * paramFloat), (int) (f6 * f1 + f7 * paramFloat), (int) (f1 * f8 + f9 * paramFloat));
     }
 
     /**
      * 让颜色更加深
+     *
      * @param paramInt
      * @return
      */
@@ -66,6 +66,7 @@ public class ColorUtil {
 
     /**
      * 反转颜色
+     *
      * @param paramInt
      * @return
      */
@@ -79,6 +80,7 @@ public class ColorUtil {
 
     /**
      * 是否是亮色
+     *
      * @param paramInt
      * @return
      */
@@ -88,6 +90,7 @@ public class ColorUtil {
 
     /**
      * 让颜色更加明亮
+     *
      * @param paramInt
      * @return
      */
@@ -98,12 +101,13 @@ public class ColorUtil {
 
     /**
      * 转换颜色
+     *
      * @param paramInt
      * @param paramFloat
      * @return
      */
     @ColorInt
-    public static int shiftColor(@ColorInt int paramInt, @FloatRange(from=0.0D, to=2.0D) float paramFloat) {
+    public static int shiftColor(@ColorInt int paramInt, @FloatRange(from = 0.0D, to = 2.0D) float paramFloat) {
         if (paramFloat == 1.0F)
             return paramInt;
         int i = Color.alpha(paramInt);
@@ -119,13 +123,14 @@ public class ColorUtil {
 
     /**
      * 改变颜色透明度
+     *
      * @param paramInt
      * @param paramFloat
      * @return
      */
     @ColorInt
-    public static int withAlpha(@ColorInt int paramInt, @FloatRange(from=0.0D, to=1.0D) float paramFloat) {
-        return (Math.min(255, Math.max(0, (int)(255.0F * paramFloat))) << 24) + (0xFFFFFF & paramInt);
+    public static int withAlpha(@ColorInt int paramInt, @FloatRange(from = 0.0D, to = 1.0D) float paramFloat) {
+        return (Math.min(255, Math.max(0, (int) (255.0F * paramFloat))) << 24) + (0xFFFFFF & paramInt);
     }
 
     @ColorInt
@@ -150,7 +155,7 @@ public class ColorUtil {
         return fallback;
     }
 
-    public static Palette.Swatch getSwatch(Palette palette){
+    public static Palette.Swatch getSwatch(Palette palette) {
         if (palette != null) {
             if (palette.getVibrantSwatch() != null) {
                 return palette.getVibrantSwatch();

@@ -46,7 +46,7 @@ public class AlipayUtil {
     /**
      * 打开 Intent Scheme Url
      *
-     * @param activity Parent Activity
+     * @param activity      Parent Activity
      * @param intentFullUrl Intent 跳转地址
      * @return 是否成功调用
      */
@@ -55,10 +55,10 @@ public class AlipayUtil {
             activity.startActivity(Intent.parseUri(intentFullUrl, Intent.URI_INTENT_SCHEME));
             return true;
         } catch (Exception e) {
-            ClipboardManager clipboardManager = (ClipboardManager)activity.getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipboardManager clipboardManager = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clipData = ClipData.newPlainText("text", "lin_kin_p@163.com");
             clipboardManager.setPrimaryClip(clipData);
-            Toast toast = Toast.makeText(activity,activity.getString(R.string.jump_alipay_error),Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(activity, activity.getString(R.string.jump_alipay_error), Toast.LENGTH_SHORT);
             ((TextView) toast.getView().findViewById(Resources.getSystem().getIdentifier("message", "id", "android"))).setGravity(Gravity.CENTER);
             toast.show();
             return false;
@@ -67,6 +67,7 @@ public class AlipayUtil {
 
     /**
      * 判断支付宝客户端是否已安装，建议调用转账前检查
+     *
      * @param context Context
      * @return 支付宝客户端是否已安装
      */

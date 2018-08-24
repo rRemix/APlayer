@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.DrawableRes;
 import android.widget.RemoteViews;
 
 import remix.myplayer.App;
@@ -25,6 +26,7 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PlayListUtil;
 
+import static remix.myplayer.appwidgets.AppWidgetSkin.WHITE_1F;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
@@ -64,6 +66,11 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
         return appIds != null && appIds.length > 0;
     }
 
+    @DrawableRes
+    private int getDefaultDrawableRes(){
+        return mSkin == WHITE_1F ? R.drawable.album_empty_bg_night : R.drawable.album_empty_bg_day;
+    }
+
     protected void updateCover(final Context context, final RemoteViews remoteViews,final int[] appWidgetIds, boolean reloadCover){
         Song song = MusicService.getCurrentMP3();
         if(song == null)
@@ -75,7 +82,7 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
                 remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
             } else {
                 LogUtil.d(TAG,"Bitmap复用失败: " + mBitmap);
-                remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_night);
+                remoteViews.setImageViewResource(R.id.appwidget_image,getDefaultDrawableRes());
             }
             pushUpdate(context,appWidgetIds,remoteViews);
         } else {
@@ -86,7 +93,7 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
                     LogUtil.d(TAG,"onError: " + errMsg + " --- 清空bitmap: " + mBitmap);
 //                    Recycler.recycleBitmap(mBitmap);
                     mBitmap = null;
-                    remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
+                    remoteViews.setImageViewResource(R.id.appwidget_image,getDefaultDrawableRes());
                     pushUpdate(context,appWidgetIds,remoteViews);
                 }
 
@@ -104,7 +111,7 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
                         if(mBitmap != null) {
                             remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
                         } else {
-                            remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
+                            remoteViews.setImageViewResource(R.id.appwidget_image,getDefaultDrawableRes());
                         }
 
                     } catch (Exception e){

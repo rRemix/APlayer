@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 
+import remix.myplayer.App;
 import remix.myplayer.R;
 
 /**
@@ -22,13 +23,11 @@ import remix.myplayer.R;
 
 public class PermissionUtil {
     private static final String TAG = "PermissionUtil";
-    private static Context mContext;
-    private PermissionUtil(){}
-    private static boolean mHasPermission = false;
 
-    public static void setContext(Context context){
-        mContext = context;
+    private PermissionUtil() {
     }
+
+    private static boolean mHasPermission = false;
 
     private static final int PERMISSIONCODE = 100;
     private static final String[] PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -37,26 +36,28 @@ public class PermissionUtil {
 
     /**
      * 判断是否系统为6.0及以上
+     *
      * @return
      */
-    public static boolean isAndroidM(){
+    public static boolean isAndroidM() {
         return Build.VERSION.SDK_INT >= 23;
     }
 
     /**
      * 判断是否拥有权限
+     *
      * @param permission 所需权限
      * @return
      */
     public static boolean hasPermission(String permission) {
-        return ContextCompat.checkSelfPermission(mContext, permission) ==
+        return ContextCompat.checkSelfPermission(App.getContext(), permission) ==
                 PackageManager.PERMISSION_GRANTED;
     }
 
     /**
      * 申请某个权限
      */
-    public static void RequestPermission(final Activity activity, String permission){
+    public static void RequestPermission(final Activity activity, String permission) {
         if (!hasPermission(permission)) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                 ToastUtil.show(activity, R.string.need_permission);
@@ -82,7 +83,7 @@ public class PermissionUtil {
     /**
      * 弹出一个对话框让用户授权
      */
-    private static void showMessageOKCancel(Context context,String message, DialogInterface.OnClickListener okListener) {
+    private static void showMessageOKCancel(Context context, String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(context)
                 .setMessage(message)
                 .setPositiveButton("OK", okListener)

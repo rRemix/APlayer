@@ -251,7 +251,7 @@
     <string name="always">总是</string>
     <string name="never">从不</string>
     <string name="wifi_only">仅在wifi下</string>
-    <string name="auto_download_album_cover">自动下载专辑封面</string>
+    <string name="auto_download_album_artist_cover">自动下载专辑与艺术家封面</string>
     <string name="zero_size">0MB</string>
     <string name="library">曲库</string>
     <string name="library_category">曲库目录</string>
@@ -345,4 +345,6 @@
     <string name="empty_path_report_to_developer">安装路径为空,请反馈给开发者</string>
     <string name="rename">重命名</string>
     <string name="no_equalizer">没有找到均衡器</string>
+    <string name="clear_download_cover">是否清除已经下载的封面</string>
+    <string name="updating">更新中</string>
 </resources>

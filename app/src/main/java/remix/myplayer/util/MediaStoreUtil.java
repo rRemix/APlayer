@@ -139,6 +139,13 @@ public class MediaStoreUtil {
         return 0;
     }
 
+    public static void logSong(Cursor cursor){
+        for(int i = 0 ; i < cursor.getColumnCount();i++){
+            LogUtil.i(TAG,"Column: " + cursor.getColumnName(i) +
+                            " Value: " + cursor.getString(i));
+        }
+    }
+
     public static List<Song> getAllSong(){
         ArrayList<Song> songs = new ArrayList<>();
         Cursor cursor = null;

@@ -45,35 +45,31 @@ import remix.myplayer.bean.mp3.Song;
  * 通用工具类
  */
 public class Util {
-    private static Context mContext;
-
-    public static void setContext(Context context) {
-        mContext = context;
-    }
-
     /**
-     * 注销receiver
+     * 注销Receiver
      */
-    public static void unregisterReceiver(Context context, BroadcastReceiver receiver){
+    public static void unregisterReceiver(Context context, BroadcastReceiver receiver) {
         try {
-            if(context != null){
+            if (context != null) {
                 context.unregisterReceiver(receiver);
                 receiver = null;
             }
-        } catch (Exception e){
-            LogUtil.e("unregisterReceiver error",e.toString());
+        } catch (Exception e) {
+            LogUtil.e("unregisterReceiver error", e.toString());
         }
     }
+
 
     /**
      * 判断列表是否为空
      */
-    public static boolean isEmptyList(List list){
+    public static boolean isEmptyList(List list) {
         return list == null || list.size() == 0;
     }
 
     /**
      * 判断app是否运行在前台
+     *
      * @return
      */
     public static boolean isAppOnForeground() {
@@ -96,11 +92,12 @@ public class Util {
 
     /**
      * 震动
+     *
      * @param context
      * @param milliseconds
      */
     public static void vibrate(final Context context, final long milliseconds) {
-        if(context == null)
+        if (context == null)
             return;
         Vibrator vibrator = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
         vibrator.vibrate(milliseconds);
@@ -108,6 +105,7 @@ public class Util {
 
     /**
      * 获得目录大小
+     *
      * @param file
      * @return
      * @throws Exception
@@ -132,22 +130,23 @@ public class Util {
 
     /**
      * 删除某个目录
+     *
      * @param directory
      */
     public static void deleteFilesByDirectory(File directory) {
-        if(directory == null)
+        if (directory == null)
             return;
-        if(directory.isFile()){
+        if (directory.isFile()) {
             deleteFileSafely(directory);
             return;
         }
-        if(directory.isDirectory()){
+        if (directory.isDirectory()) {
             File[] childFile = directory.listFiles();
-            if(childFile == null || childFile.length == 0){
+            if (childFile == null || childFile.length == 0) {
                 deleteFileSafely(directory);
                 return;
             }
-            for(File f : childFile){
+            for (File f : childFile) {
                 deleteFilesByDirectory(f);
             }
             deleteFileSafely(directory);
@@ -156,6 +155,7 @@ public class Util {
 
     /**
      * 安全删除文件 小米、华为等手机极有可能在删除一个文件后再创建同名文件出现bug
+     *
      * @param file
      * @return
      */
@@ -180,26 +180,26 @@ public class Util {
 
     /**
      * 获得歌曲格式
+     *
      * @param mimeType
      * @return
      */
-    public static String getType(String mimeType){
-        if(mimeType.equals(MediaFormat.MIMETYPE_AUDIO_MPEG)){
+    public static String getType(String mimeType) {
+        if (mimeType.equals(MediaFormat.MIMETYPE_AUDIO_MPEG)) {
             return "mp3";
-        }
-        else if (mimeType.equals(MediaFormat.MIMETYPE_AUDIO_FLAC))
+        } else if (mimeType.equals(MediaFormat.MIMETYPE_AUDIO_FLAC))
             return "flac";
-        else if(mimeType.equals(MediaFormat.MIMETYPE_AUDIO_AAC))
+        else if (mimeType.equals(MediaFormat.MIMETYPE_AUDIO_AAC))
             return "aac";
-        else if(mimeType.contains("ape"))
+        else if (mimeType.contains("ape"))
             return "ape";
         else {
             try {
-                if(mimeType.contains("audio/"))
-                    return mimeType.substring(6,mimeType.length() - 1);
+                if (mimeType.contains("audio/"))
+                    return mimeType.substring(6, mimeType.length() - 1);
                 else
                     return mimeType;
-            }catch (Exception e){
+            } catch (Exception e) {
                 return mimeType;
             }
         }
@@ -207,20 +207,21 @@ public class Util {
 
     /**
      * 转换时间
+     *
      * @param duration
      * @return 00:00格式的时间
      */
     public static String getTime(long duration) {
-        int minute = (int)duration / 1000 / 60;
-        int second = ((int)duration - minute * 60000) / 1000;
+        int minute = (int) duration / 1000 / 60;
+        int second = ((int) duration - minute * 60000) / 1000;
         //如果分钟数小于10
-        if(minute < 10) {
-            if(second < 10)
+        if (minute < 10) {
+            if (second < 10)
                 return "0" + minute + ":0" + second;
             else
                 return "0" + minute + ":" + second;
         } else {
-            if(second < 10)
+            if (second < 10)
                 return minute + ":0" + second;
             else
                 return minute + ":" + second;
@@ -229,6 +230,7 @@ public class Util {
 
     /**
      * 检测 响应某个意图的Activity 是否存在
+     *
      * @param context
      * @param intent
      * @return
@@ -242,41 +244,45 @@ public class Util {
 
     /**
      * 安全的启动activity
+     *
      * @param context
      * @param intent
      */
-    public static void startActivitySafely(Context context,Intent intent){
-        if(isIntentAvailable(context,intent)){
+    public static void startActivitySafely(Context context, Intent intent) {
+        if (isIntentAvailable(context, intent)) {
             context.startActivity(intent);
         }
     }
 
     /**
      * 判断网路是否连接
+     *
      * @return
      */
     public static boolean isNetWorkConnected() {
-        if(mContext != null) {
-            ConnectivityManager mConnectivityManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo mNetWorkInfo = mConnectivityManager.getActiveNetworkInfo();
-            if(mNetWorkInfo != null)
-                return mNetWorkInfo.isAvailable() && mNetWorkInfo.isConnected();
+        ConnectivityManager connectivityManager = (ConnectivityManager) App.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connectivityManager != null){
+            NetworkInfo netWorkInfo = connectivityManager.getActiveNetworkInfo();
+            if (netWorkInfo != null)
+                return netWorkInfo.isAvailable() && netWorkInfo.isConnected();
         }
         return false;
     }
 
     /**
      * 删除歌曲
+     *
      * @param path 歌曲路径
      * @return 是否删除成功
      */
-    public static boolean deleteFile(String path){
+    public static boolean deleteFile(String path) {
         File file = new File(path);
         return file.exists() && file.delete();
     }
 
     /**
      * 处理歌曲名、歌手名或者专辑名
+     *
      * @param origin 原始数据
      * @param type 处理类型 0:歌曲名 1:歌手名 2:专辑名
      * @return
@@ -284,17 +290,18 @@ public class Util {
     public static final int SONGTYPE = 0;
     public static final int ARTISTTYPE = 1;
     public static final int ALBUMTYPE = 2;
-    public static String processInfo(String origin,int type){
-        if(type == SONGTYPE){
-            if(origin == null || origin.equals("") || origin.contains("unknown") ){
-                return mContext.getString(R.string.unknown_song);
+
+    public static String processInfo(String origin, int type) {
+        if (type == SONGTYPE) {
+            if (origin == null || origin.equals("") || origin.contains("unknown")) {
+                return App.getContext().getString(R.string.unknown_song);
             } else {
 //                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
                 return origin;
             }
-        } else{
-            if(origin == null || origin.equals("") || origin.contains("unknown") ){
-                return mContext.getString(type == ARTISTTYPE ? R.string.unknown_artist : R.string.unknown_album);
+        } else {
+            if (origin == null || origin.equals("") || origin.contains("unknown")) {
+                return App.getContext().getString(type == ARTISTTYPE ? R.string.unknown_artist : R.string.unknown_album);
             } else {
                 return origin;
             }
@@ -302,33 +309,33 @@ public class Util {
     }
 
     /**
-     *
      * @param map
      * @param position
      * @return
      */
-    public static  <T extends Object> String getMapkeyByPosition(Map<String,List<T>> map, int position){
-        if(map == null || map.size() == 0 || position < 0)
+    public static <T extends Object> String getMapkeyByPosition(Map<String, List<T>> map, int position) {
+        if (map == null || map.size() == 0 || position < 0)
             return "";
         Iterator it = map.keySet().iterator();
         String key = "";
-        for(int i = 0 ; i <= position ; i++)
+        for (int i = 0; i <= position; i++)
             key = it.next().toString();
         return key;
     }
 
 
-
     /**
      * 判断是否连续点击
+     *
      * @return
      */
     private static long mLastClickTime;
     private static final int INTERVAL = 500;
+
     public static boolean isFastDoubleClick() {
         long time = System.currentTimeMillis();
         long timeInterval = time - mLastClickTime;
-        if(0 < timeInterval && timeInterval < INTERVAL)
+        if (0 < timeInterval && timeInterval < INTERVAL)
             return true;
         mLastClickTime = time;
         return false;
@@ -336,6 +343,7 @@ public class Util {
 
     /**
      * 返回关键词的MD值
+     *
      * @param key
      * @return
      */
@@ -366,17 +374,18 @@ public class Util {
     /**
      * 浏览器打开指定地址
      */
-    public static void openUrl(String url){
-        if(TextUtils.isEmpty(url))
+    public static void openUrl(String url) {
+        if (TextUtils.isEmpty(url))
             return;
         Uri uri = Uri.parse(url);
         Intent it = new Intent(Intent.ACTION_VIEW, uri);
         it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mContext.startActivity(it);
+        App.getContext().startActivity(it);
     }
 
     /**
      * 根据字符串形式的时间，得到毫秒值
+     *
      * @param strTime 时间字符串
      * @return
      */
@@ -384,16 +393,16 @@ public class Util {
         int min;
         int sec;
         int mill;
-        if(strTime.substring(1,3).matches("[0-9]*"))
+        if (strTime.substring(1, 3).matches("[0-9]*"))
             min = Integer.parseInt(strTime.substring(1, 3));
         else
             return -1;
-        if(strTime.substring(4,6).matches("[0-9]*"))
+        if (strTime.substring(4, 6).matches("[0-9]*"))
             sec = Integer.parseInt(strTime.substring(4, 6));
         else
             return -1;
-        if(strTime.substring(7,9).matches("[0-9]*"))
-            mill = Integer.parseInt(strTime.substring(7,9));
+        if (strTime.substring(7, 9).matches("[0-9]*"))
+            mill = Integer.parseInt(strTime.substring(7, 9));
         else
             return -1;
         return min * 60000 + sec * 1000 + mill;
@@ -401,12 +410,13 @@ public class Util {
 
     /**
      * 判断是否有权限
+     *
      * @return
      */
     public static boolean hasPermissions(String[] permissions) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && permissions != null) {
             for (String permission : permissions) {
-                if (mContext.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                if (App.getContext().checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
                     return false;
                 }
             }
@@ -417,14 +427,16 @@ public class Util {
     /**
      * 是否有读写权限
      */
-    private static final String[] PERMISSION_STORAGE = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
-    public static boolean hasStoragePermissions(){
+    private static final String[] PERMISSION_STORAGE = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+    public static boolean hasStoragePermissions() {
         return hasPermissions(PERMISSION_STORAGE);
     }
 
 
     /**
      * 判断wifi是否打开
+     *
      * @return
      */
     public static boolean isWifi(Context context) {
@@ -435,7 +447,7 @@ public class Util {
     /**
      * 获取app当前的渠道号或application中指定的meta-data
      *
-     * @return 如果没有获取成功(没有对应值，或者异常)，则返回值为空
+     * @return 如果没有获取成功(没有对应值 ， 或者异常)，则返回值为空
      */
     public static String getAppMetaData(String key) {
         if (TextUtils.isEmpty(key)) {
@@ -498,7 +510,7 @@ public class Util {
     }
 
     public static void closeStream(Closeable closeable) {
-        if(closeable != null) {
+        if (closeable != null) {
             try {
                 closeable.close();
             } catch (IOException e) {
@@ -507,25 +519,25 @@ public class Util {
         }
     }
 
-    public static void closeCursor(Cursor cursor){
-        if(cursor != null && !cursor.isClosed())
+    public static void closeCursor(Cursor cursor) {
+        if (cursor != null && !cursor.isClosed())
             cursor.close();
     }
 
-    public static void installApk(Context context,String path) {
-        if(path == null){
-            ToastUtil.show(mContext,context.getString(R.string.empty_path_report_to_developer));
+    public static void installApk(Context context, String path) {
+        if (path == null) {
+            ToastUtil.show(App.getContext(), context.getString(R.string.empty_path_report_to_developer));
             return;
         }
         File installFile = new File(path);
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Uri apkUri = FileProvider.getUriForFile( context, context.getApplicationContext().getPackageName() + ".fileprovider", installFile);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri apkUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".fileprovider", installFile);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
             context.startActivity(intent);
-        }else{
+        } else {
             intent.setDataAndType(Uri.fromFile(installFile), "application/vnd.android.package-archive");
             context.startActivity(intent);
         }

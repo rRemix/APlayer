@@ -18,12 +18,9 @@ import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CrashHandler;
-import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
@@ -79,12 +76,8 @@ public class App extends MultiDexApplication {
     private void initUtil() {
         //初始化工具类
         DBManager.initialInstance(new DBOpenHelper(this));
-        PermissionUtil.setContext(this);
-        MediaStoreUtil.setContext(this);
-        Util.setContext(this);
-        ImageUriUtil.setContext(this);
         DiskCache.init(this);
-        ColorUtil.setContext(this);
+        MediaStoreUtil.setContext(this);
         PlayListUtil.setContext(this);
         final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)

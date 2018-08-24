@@ -3,14 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <remix.myplayer.ui.widget.WidthFitSquareFrameLayout
+        android:id="@+id/cover_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="@dimen/record_margin"
-        android:layout_marginRight="@dimen/record_margin"
-        android:layout_marginTop="@dimen/d12_size"
         android:layout_centerHorizontal="true"
-        android:id="@+id/record_container"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="4dp"
         android:background="@drawable/note_bg">
         <remix.myplayer.ui.widget.PagerEditText
             android:layout_width="match_parent"
@@ -37,7 +38,6 @@
             android:text="@string/record_share"
             android:textColor="#b8a179"
             android:textSize="@dimen/s14_size"/>
-    </FrameLayout>
-
+    </remix.myplayer.ui.widget.WidthFitSquareFrameLayout>
 
 </RelativeLayout>
