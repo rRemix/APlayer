@@ -251,7 +251,7 @@
     <string name="always">Always</string>
     <string name="never">Never</string>
     <string name="wifi_only">Only on Wi-Fi</string>
-    <string name="auto_download_album_cover">Auto download album cover</string>
+    <string name="auto_download_album_artist_cover">Auto download album and artist cover</string>
     <string name="zero_size">0MB</string>
     <string name="library">Library</string>
     <string name="library_category">Library categories</string>
@@ -345,4 +345,6 @@
     <string name="empty_path_report_to_developer">Path of apk is empty,please report issue to developer</string>
     <string name="rename">Rename</string>
     <string name="no_equalizer">No equalizer found</string>
+    <string name="clear_download_cover">Whether to clear the cover already downloaded</string>
+    <string name="updating">Updating</string>
 </resources>

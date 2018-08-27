@@ -310,22 +310,41 @@
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
 
+                <View
+                    android:layout_below="@id/setting_library_category_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="?attr/divider_color"/>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/setting_cover_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cover"
+                    android:layout_gravity="start"
+                    android:layout_margin="@dimen/d14_size"
+                    android:textSize="@dimen/s16_size"
+                    android:textColor="?attr/colorAccent"/>
+
                 <RelativeLayout
                     android:id="@+id/setting_ignore_mediastore_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/setting_library_category_container"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
-                    android:background="?attr/background_common"
-                    android:visibility="gone">
+                    android:background="?attr/background_common">
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:gravity="center_vertical"
                         android:layout_centerVertical="true"
-                        android:layout_alignParentLeft="true"
+                        android:layout_toLeftOf="@+id/setting_ignore_mediastore_switch"
                         android:layout_marginLeft="@dimen/d16_size"
                         android:layout_marginRight="@dimen/d16_size">
                         <TextView
@@ -353,26 +372,6 @@
                         android:layout_marginRight="@dimen/d14_size"/>
                 </RelativeLayout>
 
-                <View
-                    android:layout_below="@id/setting_ignore_mediastore_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="?attr/divider_color"/>
-            </RelativeLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
-                    android:id="@+id/setting_cover_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/cover"
-                    android:layout_gravity="start"
-                    android:layout_margin="@dimen/d14_size"
-                    android:textSize="@dimen/s16_size"
-                    android:textColor="?attr/colorAccent"/>
                 <LinearLayout
                     android:id="@+id/setting_album_cover_container"
                     android:layout_width="match_parent"
@@ -386,7 +385,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/auto_download_album_cover"
+                        android:text="@string/auto_download_album_artist_cover"
                         android:textColor="?attr/text_color_primary"
                         android:textSize="@dimen/s16_size"
                         android:layout_marginBottom="@dimen/d2_size"/>

@@ -8,6 +8,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
+import android.os.Looper;
 
 import remix.myplayer.App;
 import remix.myplayer.service.Command;
@@ -37,7 +38,7 @@ public class ShakeDetector extends ContextWrapper implements SensorEventListener
     private float mLastY;
     private float mLastZ;
     private boolean mDetect = false;
-    private Handler mHandler = new Handler();
+    private Handler mHandler = new Handler(Looper.getMainLooper());
     private Runnable mRunnable = () -> sendBroadcast(new Intent(MusicService.ACTION_CMD)
             .putExtra("Control", Command.NEXT));
 

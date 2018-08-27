@@ -16,10 +16,13 @@ import remix.myplayer.util.Util
 object UpdateAgent {
     private const val TAG = "UpdateAgent"
 
+    @JvmStatic
     var listener: Listener? = null
 
+    @JvmStatic
     var forceCheck = false
 
+    @JvmStatic
     fun check(context: Context) {
         if (listener == null)
             return
@@ -40,7 +43,7 @@ object UpdateAgent {
                         listener?.onUpdateReturned(UpdateStatus.No, context.getString(R.string.no_update), null)
                         //删除以前的安装包
                         val downloadDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-                        if(downloadDir.exists() && downloadDir.listFiles() != null && downloadDir.listFiles().isNotEmpty()){
+                        if (downloadDir.exists() && downloadDir.listFiles() != null && downloadDir.listFiles().isNotEmpty()) {
                             Util.deleteFilesByDirectory(downloadDir)
                         }
                         return@subscribe

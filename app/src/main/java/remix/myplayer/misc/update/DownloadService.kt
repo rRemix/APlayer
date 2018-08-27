@@ -58,6 +58,7 @@ class DownloadService : IntentService("DownloadService") {
         val release: Release = intent.getParcelableExtra(EXTRA_RESPONSE) as Release
         var inStream: InputStream? = null
         var outStream: FileOutputStream? = null
+
         try {
             val downloadUrl = release.assets[0].browser_download_url
             val downloadDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
@@ -79,6 +80,9 @@ class DownloadService : IntentService("DownloadService") {
                 }
             }
             postNotification(release.assets[0].size, 0)
+            if (isForce(release)) {
+                sendBroadcast(Intent(ACTION_SHOW_DIALOG))
+            }
             HttpsURLConnection.setDefaultSSLSocketFactory(OkHttpHelper.getSSLSocketFactory())
             val url = URL(downloadUrl)
 
@@ -109,6 +113,7 @@ class DownloadService : IntentService("DownloadService") {
         } catch (ex: Exception) {
             ToastUtil.show(this, R.string.update_error, ex.message)
         } finally {
+            sendBroadcast(Intent(ACTION_DISMISS_DIALOG))
             Util.closeStream(inStream)
             Util.closeStream(outStream)
         }
@@ -150,8 +155,16 @@ class DownloadService : IntentService("DownloadService") {
 //        }
     }
 
+
+    private fun isForce(release: Release?): Boolean {
+        val split = release?.name?.split("-")
+        return split != null && split.size > 2
+    }
+
     companion object {
         const val ACTION_DOWNLOAD_COMPLETE = "remix.myplayer.ACTION.DOWNLOAD_COMPLETE"
+        const val ACTION_SHOW_DIALOG = "remix.myplayer.ACTION_SHOW_DIALOG"
+        const val ACTION_DISMISS_DIALOG = "remix.myplayer.ACTION_DISMISS_DIALOG"
         const val EXTRA_RESPONSE = "update_info"
         const val EXTRA_PATH = "file_path"
         private const val TAG = "DownloadService"

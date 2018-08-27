@@ -14,7 +14,7 @@ import java.io.InputStreamReader;
 import remix.myplayer.lyric.SearchLrc;
 
 public class LyricUtil {
-    private static final String TAG = "PermissionUtil";
+    private static final String TAG = "LyricUtil";
     private LyricUtil(){}
 
 

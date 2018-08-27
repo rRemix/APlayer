@@ -18,12 +18,9 @@ import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CrashHandler;
-import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
@@ -61,7 +58,7 @@ public class App extends MultiDexApplication {
             new DynamicShortcutManager(this).setUpShortcut();
 
         //加载第三方库
-        loadThirdParty();
+        loadLibrary();
 
         //处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
         RxJavaPlugins.setErrorHandler(throwable -> {
@@ -79,12 +76,8 @@ public class App extends MultiDexApplication {
     private void initUtil() {
         //初始化工具类
         DBManager.initialInstance(new DBOpenHelper(this));
-        PermissionUtil.setContext(this);
-        MediaStoreUtil.setContext(this);
-        Util.setContext(this);
-        ImageUriUtil.setContext(this);
         DiskCache.init(this);
-        ColorUtil.setContext(this);
+        MediaStoreUtil.setContext(this);
         PlayListUtil.setContext(this);
         final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
@@ -110,8 +103,18 @@ public class App extends MultiDexApplication {
         return mContext;
     }
 
-    private void loadThirdParty() {
+    private void loadLibrary() {
         //bugly
+//        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
+//        strategy.setCrashHandleCallback(new CrashReport.CrashHandleCallback() {
+//            public Map<String, String> onCrashHandleStart(int crashType, String errorType,
+//                                                          String errorMessage, String errorStack) {
+//                LinkedHashMap<String, String> map = new LinkedHashMap<>();
+//                map.put("Key", "Value");
+//                return map;
+//            }
+//
+//        });
         CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG);
     }
 }

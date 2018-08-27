@@ -8,7 +8,6 @@ import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.EditText;
 
 import butterknife.BindView;
@@ -28,8 +27,6 @@ import remix.myplayer.ui.activity.RecordShareActivity;
 public class RecordFragment extends BaseFragment{
     @BindView(R.id.edit_record)
     EditText mEdit;
-    @BindView(R.id.record_container)
-    View mRecordContainer;
 
     public static final int REQUEST_SHARE = 1;
     private boolean mShareSuccess;
@@ -59,19 +56,19 @@ public class RecordFragment extends BaseFragment{
             intent.putExtras(arg);
             startActivityForResult(intent,REQUEST_SHARE);
         });
-        mRecordContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                mRecordContainer.getViewTreeObserver().removeOnPreDrawListener(this);
-
-                int containerWidth = mRecordContainer.getWidth();
-                int containerHeight = mRecordContainer.getHeight();
-                ViewGroup.LayoutParams lp = mRecordContainer.getLayoutParams();
-                lp.width = lp.height = containerWidth > containerHeight ? mRecordContainer.getHeight() : mRecordContainer.getWidth();
-                mRecordContainer.setLayoutParams(lp);
-                return true;
-            }
-        });
+//        mRecordContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+//            @Override
+//            public boolean onPreDraw() {
+//                mRecordContainer.getViewTreeObserver().removeOnPreDrawListener(this);
+//
+//                int containerWidth = mRecordContainer.getWidth();
+//                int containerHeight = mRecordContainer.getHeight();
+//                ViewGroup.LayoutParams lp = mRecordContainer.getLayoutParams();
+//                lp.width = lp.height = containerWidth > containerHeight ? mRecordContainer.getHeight() : mRecordContainer.getWidth();
+//                mRecordContainer.setLayoutParams(lp);
+//                return true;
+//            }
+//        });
 
         return rootView;
     }

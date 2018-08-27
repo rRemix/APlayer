@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.lang.reflect.Field;
 
 import remix.myplayer.App;
@@ -432,4 +434,16 @@ public class Theme {
         }
     }
 
+    public static MaterialDialog.Builder getBaseDialog(Context context){
+        return new MaterialDialog.Builder(context)
+                .contentColorAttr(R.attr.text_color_primary)
+                .titleColorAttr(R.attr.text_color_primary)
+                .positiveColorAttr(R.attr.text_color_primary)
+                .negativeColorAttr(R.attr.text_color_primary)
+                .neutralColorAttr(R.attr.text_color_primary)
+                .buttonRippleColorAttr(R.attr.ripple_color)
+                .backgroundColorAttr(R.attr.background_color_3)
+                .itemsColorAttr(R.attr.text_color_primary)
+                .theme(ThemeStore.getMDDialogTheme());
+    }
 }

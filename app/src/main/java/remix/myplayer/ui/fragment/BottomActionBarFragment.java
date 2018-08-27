@@ -35,6 +35,7 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
@@ -162,7 +163,7 @@ public class BottomActionBarFragment extends BaseFragment{
         }
     }
 
-    @SuppressLint("NewApi")
+
     public void startPlayerActivity(){
         if(MusicService.getCurrentMP3() == null)
             return;
@@ -174,7 +175,7 @@ public class BottomActionBarFragment extends BaseFragment{
         intent.putExtra("AnimUrl",mAnimUrl);
 
         Activity activity = getActivity();
-        if (activity != null && !activity.isDestroyed() ) {
+        if (activity != null && !((BaseActivity)activity).isDestroyed() ) {
             ActivityOptionsCompat options = ActivityOptionsCompat
                     .makeSceneTransitionAnimation(getActivity(), mCover, "image");
             ActivityCompat.startActivity(mContext, intent, options.toBundle());

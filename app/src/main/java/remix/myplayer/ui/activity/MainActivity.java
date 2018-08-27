@@ -82,7 +82,6 @@ import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.SimpleUriRequest;
 import remix.myplayer.request.network.RxUtil;
-import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -101,6 +100,7 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -109,7 +109,9 @@ import remix.myplayer.util.Util;
 
 import static remix.myplayer.App.IS_GOOGLEPLAY;
 import static remix.myplayer.bean.misc.Category.DEFAULT_LIBRARY;
+import static remix.myplayer.misc.update.DownloadService.ACTION_DISMISS_DIALOG;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DOWNLOAD_COMPLETE;
+import static remix.myplayer.misc.update.DownloadService.ACTION_SHOW_DIALOG;
 import static remix.myplayer.service.MusicService.ACTION_LOAD_FINISH;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.Util.installApk;
@@ -191,6 +193,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_LOAD_FINISH);
         intentFilter.addAction(ACTION_DOWNLOAD_COMPLETE);
+        intentFilter.addAction(ACTION_SHOW_DIALOG);
+        intentFilter.addAction(ACTION_DISMISS_DIALOG);
         registerReceiver(mReceiver, intentFilter);
 
         //初始化控件
@@ -313,10 +317,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     //初始化ViewPager
     private void setUpPager() {
         String categoryJson = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, "");
-        List<Category> categories = TextUtils.isEmpty(categoryJson) ? new ArrayList<>() : new Gson().fromJson(categoryJson, new TypeToken<List<Category>>(){}.getType());
+        List<Category> categories = TextUtils.isEmpty(categoryJson) ? new ArrayList<>() : new Gson().fromJson(categoryJson, new TypeToken<List<Category>>() {
+        }.getType());
         if (categories.size() == 0) {
             categories.addAll(DEFAULT_LIBRARY);
-            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, new Gson().toJson(DEFAULT_LIBRARY, new TypeToken<List<Category>>() {}.getType()));
+            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, new Gson().toJson(DEFAULT_LIBRARY, new TypeToken<List<Category>>() {
+            }.getType()));
         }
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mPagerAdapter.setList(categories);
@@ -339,9 +345,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             public void onPageSelected(int position) {
                 showAddPlayListButton(mPagerAdapter.getList().get(position).getTitle().equals(getString(R.string.tab_playlist)));
                 mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getTag());
-                LogUtil.d("MenuParse","LayoutID: " + mMenuLayoutId);
+                LogUtil.d("MenuParse", "LayoutID: " + mMenuLayoutId);
                 mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(position);
-                 LogUtil.d("MenuParse","CurrentFragment: " + mCurrentFragment);
+                LogUtil.d("MenuParse", "CurrentFragment: " + mCurrentFragment);
                 mMultiChoice.setAdapter(mCurrentFragment.getAdapter());
                 invalidateOptionsMenu();
             }
@@ -354,18 +360,19 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     }
 
     private int mMenuLayoutId = R.menu.menu_main;
+
     public int parseMenuId(int tag) {
         return tag == Category.TAG_SONG ? R.menu.menu_main :
                 tag == Category.TAG_ALBUM ? R.menu.menu_album :
-                tag == Category.TAG_ARTIST ? R.menu.menu_artist :
-                tag == Category.TAG_PLAYLIST ? R.menu.menu_playlist :
-                tag == Category.TAG_FOLDER ? R.menu.menu_folder : R.menu.menu_main_simple;
+                        tag == Category.TAG_ARTIST ? R.menu.menu_artist :
+                                tag == Category.TAG_PLAYLIST ? R.menu.menu_playlist :
+                                        tag == Category.TAG_FOLDER ? R.menu.menu_folder : R.menu.menu_main_simple;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        if(mCurrentFragment instanceof FolderFragment)
+        if (mCurrentFragment instanceof FolderFragment)
             return true;
         String sortOrder = null;
         if (mCurrentFragment instanceof SongFragment) {
@@ -560,7 +567,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                     mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                 } else if (data.getBooleanExtra("needRefreshLibrary", false)) { //刷新Library
                     List<Category> categories = (List<Category>) data.getSerializableExtra("Category");
-                    LogUtil.d("MainPagerAdapter","更新过后: " + categories);
+                    LogUtil.d("MainPagerAdapter", "更新过后: " + categories);
                     if (categories != null && categories.size() > 0) {
                         mPagerAdapter.setList(categories);
                         mPagerAdapter.notifyDataSetChanged();
@@ -735,19 +742,13 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      * 解析外部打开Intent
      */
     private void parseIntent() {
-        final Intent param = getIntent();
-        if (param != null && param.getData() != null) {
-            int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
-            if (id < 0)
-                return;
-            Intent intent = new Intent(MusicService.ACTION_CMD);
-            Bundle arg = new Bundle();
-            arg.putInt("Control", Command.PLAYSELECTEDSONG);
-            arg.putInt("Position", 0);
-            intent.putExtras(arg);
-            ArrayList<Integer> list = new ArrayList<>();
-            list.add(id);
-            Global.setPlayQueue(list, mContext, intent);
+        if (getIntent() == null) {
+            return;
+        }
+        final Intent intent = getIntent();
+        final Uri uri = intent.getData();
+        if (uri != null && uri.toString().length() > 0) {
+            MusicUtil.playFromUri(uri);
             setIntent(new Intent());
         }
     }
@@ -756,13 +757,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      * 检查更新
      */
     private static boolean mAlreadyCheck;
-
     private void checkUpdate() {
         if (!IS_GOOGLEPLAY && !mAlreadyCheck) {
-            UpdateAgent.INSTANCE.setForceCheck(false);
-            UpdateAgent.INSTANCE.setListener(new UpdateListener(mContext));
+            UpdateAgent.setForceCheck(false);
+            UpdateAgent.setListener(new UpdateListener(mContext));
             mAlreadyCheck = true;
-            UpdateAgent.INSTANCE.check(this);
+            UpdateAgent.check(this);
         }
     }
 
@@ -772,6 +772,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      * @param context
      * @param path
      */
+    private String mInstallPath;
     private void checkIsAndroidO(Context context, String path) {
         if (!TextUtils.isEmpty(path) && !path.equals(mInstallPath))
             mInstallPath = path;
@@ -791,9 +792,31 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
+    private void dismissForceDialog(){
+        if(mForceDialog != null && mForceDialog.isShowing()){
+            mForceDialog.dismiss();
+            mForceDialog = null;
+        }
+    }
 
-    private String mInstallPath;
+    private void showForceDialog(){
+        dismissForceDialog();
+        mForceDialog = new MaterialDialog.Builder(this)
+                .canceledOnTouchOutside(false)
+                .cancelable(false)
+                .title(R.string.updating)
+                .titleColorAttr(R.attr.text_color_primary)
+                .content(R.string.please_wait)
+                .contentColorAttr(R.attr.text_color_primary)
+                .progress(true, 0)
+                .backgroundColorAttr(R.attr.background_color_3)
+                .progressIndeterminateStyle(false).build();
+        mForceDialog.show();
+    }
 
+
+
+    private MaterialDialog mForceDialog;
     public static class MainReceiver extends BroadcastReceiver {
         private final WeakReference<MainActivity> mRef;
 
@@ -816,6 +839,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                     break;
                 case ACTION_DOWNLOAD_COMPLETE:
                     mainActivity.checkIsAndroidO(context, intent.getStringExtra(DownloadService.EXTRA_PATH));
+                    break;
+                case ACTION_SHOW_DIALOG:
+                    mainActivity.showForceDialog();
+                    break;
+                case ACTION_DISMISS_DIALOG:
+                    mainActivity.dismissForceDialog();
                     break;
             }
 
