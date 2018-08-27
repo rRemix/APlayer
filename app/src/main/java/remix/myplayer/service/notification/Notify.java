@@ -119,7 +119,7 @@ public abstract class Notify {
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
             return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }else{
-            if(operation != Command.TOGGLE_FLOAT_LRC){
+            if(operation != Command.TOGGLE_FLOAT_LRC && operation != Command.CLOSE_NOTIFY){
                 return PendingIntent.getForegroundService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             }else{
                 PendingIntent.getService(context,operation,intent,PendingIntent.FLAG_UPDATE_CURRENT);

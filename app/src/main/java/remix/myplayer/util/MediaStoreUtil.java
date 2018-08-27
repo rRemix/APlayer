@@ -69,6 +69,8 @@ public class MediaStoreUtil {
     }
 
     public static List<Artist> getAllArtist(){
+        if(!hasStoragePermissions())
+            return new ArrayList<>();
         ArrayList<Artist> artists = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -92,6 +94,8 @@ public class MediaStoreUtil {
     }
 
     public static List<Album> getAllAlbum(){
+        if(!hasStoragePermissions())
+            return new ArrayList<>();
         ArrayList<Album> albums = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -147,6 +151,8 @@ public class MediaStoreUtil {
     }
 
     public static List<Song> getAllSong(){
+        if(!hasStoragePermissions())
+            return new ArrayList<>();
         ArrayList<Song> songs = new ArrayList<>();
         Cursor cursor = null;
 

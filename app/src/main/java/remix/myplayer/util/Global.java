@@ -7,7 +7,6 @@ package remix.myplayer.util;
 import android.content.Context;
 import android.content.Intent;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -165,18 +164,4 @@ public class Global {
         return PlayListUtil.addMultiSongs(infos);
     }
 
-    /**
-     * 所有可能的歌词目录
-     */
-    public static ArrayList<File> LyricDir = new ArrayList<>();
-
-    /**
-     * 上次退出时正在播放的歌曲的id
-     */
-    public static int LastSongID = -1;
-
-    /**
-     * 上次退出时正在播放的歌曲的pos
-     */
-    public static int LastSongPos = 0;
 }

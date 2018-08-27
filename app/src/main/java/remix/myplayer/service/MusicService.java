@@ -268,7 +268,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
         Single.create((SingleOnSubscribe<String>) emitter -> {
             if(!mLoadFinished && (mHasPermission = Util.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}))) {
-                loadAsync();
+                load();
             }
             String action = commandIntent != null ? commandIntent.getAction() : "";
             if(!TextUtils.isEmpty(action)){
@@ -629,8 +629,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @param position 播放位置
      */
     @Override
-    public void playSelectSong(int position){
-        if((mCurrentIndex = position) == -1 || (mCurrentIndex > Global.PlayQueue.size() - 1)) {
+    public synchronized void playSelectSong(int position){
+        if((mCurrentIndex = position) == -1 || (mCurrentIndex >= Global.PlayQueue.size())) {
             ToastUtil.show(mContext,R.string.illegal_arg);
             return;
         }
@@ -643,7 +643,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         //如果是随机播放 需要调整下RandomList
         //保证正常播放队列和随机播放队列中当前歌曲的索引一致
         int index = mRandomList.indexOf(mCurrentId);
-        if(mPlayModel == Constants.PLAY_SHUFFLE && index != mCurrentIndex && index < mRandomList.size()){
+        if(mPlayModel == Constants.PLAY_SHUFFLE &&
+                index != mCurrentIndex &&
+                index < mRandomList.size() &&
+                mCurrentIndex < mRandomList.size()){
             Collections.swap(mRandomList,mCurrentIndex,index);
         }
 
@@ -1134,7 +1137,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 根据当前播放模式，切换到上一首或者下一首
      * @param isNext 是否是播放下一首
      */
-    public void playNextOrPrev(boolean isNext){
+    public synchronized void playNextOrPrev(boolean isNext){
         if(Global.PlayQueue == null || Global.PlayQueue.size() == 0) {
             ToastUtil.show(mContext,getString(R.string.list_is_empty));
             return;
@@ -1171,7 +1174,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /**
      * 更新下一首歌曲
      */
-    public void updateNextSong(){
+    public synchronized void updateNextSong(){
         if(Global.PlayQueue == null || Global.PlayQueue.size() == 0){
             ToastUtil.show(mContext,R.string.list_is_empty);
             return;
@@ -1326,10 +1329,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 读取歌曲id列表与播放队列
      */
     private void loadSync() {
-        mPlaybackHandler.post(this::loadAsync);
+        mPlaybackHandler.post(this::load);
     }
 
-    private void loadAsync(){
+    private synchronized void load(){
         final boolean isFirst = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, "First", true);
         SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,"First",false);
         //读取sd卡歌曲id

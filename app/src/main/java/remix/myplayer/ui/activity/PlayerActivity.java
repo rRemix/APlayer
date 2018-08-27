@@ -322,6 +322,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mInfo = MusicService.getCurrentMP3();
         mIsPlay = MusicService.isPlay();
         mAnimUrl = getIntent().getParcelableExtra("AnimUrl");
+        mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
         setUpSize();
         setUpTop();
@@ -718,8 +719,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             }
         });
 
-        //音量控制
-        mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));

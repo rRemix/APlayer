@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.os.Environment
 import android.text.TextUtils
 import remix.myplayer.App
-import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.bean.github.Release
 import remix.myplayer.request.network.HttpClient
@@ -34,10 +33,6 @@ object UpdateAgent {
                 }
                 .subscribe({
                     val release = it
-                    if (BuildConfig.DEBUG) {
-                        release.name = release.name + "-Force"
-                        release.name = release.name.replaceFirst("84", "86")
-                    }
                     if (release == null || release.assets == null || release.assets.size == 0) {
                         listener?.onUpdateReturned(UpdateStatus.No, context.getString(R.string.no_update), null)
                         return@subscribe

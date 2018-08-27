@@ -58,7 +58,7 @@ public class App extends MultiDexApplication {
             new DynamicShortcutManager(this).setUpShortcut();
 
         //加载第三方库
-        loadThirdParty();
+        loadLibrary();
 
         //处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
         RxJavaPlugins.setErrorHandler(throwable -> {
@@ -103,8 +103,18 @@ public class App extends MultiDexApplication {
         return mContext;
     }
 
-    private void loadThirdParty() {
+    private void loadLibrary() {
         //bugly
+//        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
+//        strategy.setCrashHandleCallback(new CrashReport.CrashHandleCallback() {
+//            public Map<String, String> onCrashHandleStart(int crashType, String errorType,
+//                                                          String errorMessage, String errorStack) {
+//                LinkedHashMap<String, String> map = new LinkedHashMap<>();
+//                map.put("Key", "Value");
+//                return map;
+//            }
+//
+//        });
         CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG);
     }
 }
