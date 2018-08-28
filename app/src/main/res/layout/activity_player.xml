@@ -63,6 +63,7 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/layout_player_seekbar"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
@@ -105,8 +106,10 @@
         </RelativeLayout>
 
         <!-- 三个播放控制按钮和两个控制播放模式 -->
-        <include layout="@layout/layout_player_control"/>
+        <include layout="@layout/layout_player_control"
+            android:id="@+id/layout_player_control"/>
 
-        <include layout="@layout/layout_player_volume"/>
+        <include layout="@layout/layout_player_volume"
+            android:id="@+id/layout_player_volume"/>
     </LinearLayout>
 </FrameLayout>

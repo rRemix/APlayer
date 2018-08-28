@@ -96,6 +96,7 @@ import remix.myplayer.util.Util;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
+import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -105,7 +106,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * 播放界面
  */
 public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback,
-        FileChooserDialog.FileCallback,OnTagEditListener {
+        FileChooserDialog.FileCallback, OnTagEditListener {
     private static final String TAG = "PlayerActivity";
     //是否正在运行
     public boolean mIsForeground;
@@ -237,10 +238,14 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private float mEventX1;
     private float mEventX2;
 
-    /** 更新Handler */
+    /**
+     * 更新Handler
+     */
     private MsgHandler mHandler;
 
-    /** 更新封面与背景的Handler */
+    /**
+     * 更新封面与背景的Handler
+     */
     private Uri mUri;
     private static final int UPDATE_BG = 101;
     private static final int UPDATE_TIME_ONLY = 102;
@@ -250,17 +255,20 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private Palette.Swatch mSwatch;
     private AudioManager mAudioManager;
 
+    //底部显示控制
+    private int mBottomConfig;
+
     private static final int DELAY_SHOW_NEXT_SONG = 3000;
     private Runnable mVolumeRunnable = () -> {
-        mNextSong.startAnimation(makeAnimation(mNextSong,true));
-        mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer,false));
+        mNextSong.startAnimation(makeAnimation(mNextSong, true));
+        mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer, false));
     };
 
     private TagReceiver mTagReceiver;
 
     @Override
     protected void setUpTheme() {
-        if(ThemeStore.isDay())
+        if (ThemeStore.isDay())
             super.setUpTheme();
         else {
             setTheme(R.style.AudioHolderStyle_Night);
@@ -269,33 +277,33 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     @Override
     protected void setStatusBar() {
-        if(ThemeStore.isDay()){
+        if (ThemeStore.isDay()) {
             //获得miui版本
             String miui = "";
             int miuiVersion = 0;
-            if(Build.MANUFACTURER.equalsIgnoreCase("Xiaomi")){
+            if (Build.MANUFACTURER.equalsIgnoreCase("Xiaomi")) {
                 try {
                     Class<?> c = Class.forName("android.os.SystemProperties");
-                    Method get = c.getMethod("get", String.class, String.class );
-                    miui = (String)(get.invoke(c, "ro.miui.ui.version.name", "unknown" ));
-                    if(!TextUtils.isEmpty(miui) && miui.length() >= 2 && TextUtils.isDigitsOnly(miui.substring(1,miui.length()))){
-                        miuiVersion = Integer.valueOf(miui.substring(1,miui.length()));
+                    Method get = c.getMethod("get", String.class, String.class);
+                    miui = (String) (get.invoke(c, "ro.miui.ui.version.name", "unknown"));
+                    if (!TextUtils.isEmpty(miui) && miui.length() >= 2 && TextUtils.isDigitsOnly(miui.substring(1, miui.length()))) {
+                        miuiVersion = Integer.valueOf(miui.substring(1, miui.length()));
                     }
-                }catch (Exception e){
-                    LogUtil.d(TAG,e.toString());
+                } catch (Exception e) {
+                    LogUtil.d(TAG, e.toString());
                 }
             }
-            if(Build.MANUFACTURER.equalsIgnoreCase("Meizu")){
+            if (Build.MANUFACTURER.equalsIgnoreCase("Meizu")) {
                 StatusBarUtil.setTransparent(this);
-                StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this,true);
-            } else if (Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") && miuiVersion >= 6 && miuiVersion < 9){
+                StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this, true);
+            } else if (Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") && miuiVersion >= 6 && miuiVersion < 9) {
                 StatusBarUtil.setTransparent(this);
-                StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
-            }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true, this);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 StatusBarUtil.setTransparent(this);
                 getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            }  else {
-                StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.statusbar_gray_color));
+            } else {
+                StatusBarUtil.setColorNoTranslucent(this, ColorUtil.getColor(R.color.statusbar_gray_color));
             }
         } else {
             StatusBarUtil.setTransparent(this);
@@ -305,8 +313,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mFromNotify = getIntent().getBooleanExtra("Notify",false);
-        mFromActivity =  getIntent().getBooleanExtra("FromActivity",false);
+        mFromNotify = getIntent().getBooleanExtra("Notify", false);
+        mFromActivity = getIntent().getBooleanExtra("FromActivity", false);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
@@ -314,7 +322,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
         mHandler = new MsgHandler(this);
         mTagReceiver = new TagReceiver(this);
-        registerReceiver(mTagReceiver,new IntentFilter(Constants.TAG_EDIT));
+        registerReceiver(mTagReceiver, new IntentFilter(Constants.TAG_EDIT));
 //        mHandler.postDelayed(() -> sendBroadcast(new Intent(Constants.TAG_EDIT)
 //                .putExtra("newSong",new Song())),2000);
 
@@ -324,6 +332,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mAnimUrl = getIntent().getParcelableExtra("AnimUrl");
         mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
+        setUpBottom();
         setUpSize();
         setUpTop();
         setUpGuide();
@@ -338,10 +347,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mContainer.addView(mAnimCover);
 
         //设置封面
-        if(mInfo != null){
-            if(mAnimUrl != null && !TextUtils.isEmpty(mAnimUrl.getUrl()) && mAnimUrl.getAlbumId() == mInfo.getAlbumId()){
+        if (mInfo != null) {
+            if (mAnimUrl != null && !TextUtils.isEmpty(mAnimUrl.getUrl()) && mAnimUrl.getAlbumId() == mInfo.getAlbumId()) {
                 mAnimCover.setImageURI(mAnimUrl.getUrl());
-            }else{
+            } else {
                 new LibraryUriRequest(mAnimCover,
                         getSearchRequestWithAlbumType(mInfo),
                         new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
@@ -349,14 +358,14 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         }
 
         //恢复位置信息
-        if(savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null){
+        if (savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null) {
             mOriginRect = savedInstanceState.getParcelable("Rect");
         }
     }
 
+
     /**
      * 计算图片缩放比例，以及位移距离
-     *
      */
     private void getMoveInfo(Rect destRect) {
         // 计算图片缩放比例，并存储在 bundle 中
@@ -372,8 +381,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     protected void onStart() {
         super.onStart();
         //只有从Activity启动，才使用动画
-        if(!mFromNotify && mFromActivity) {
-            overridePendingTransition(0,0);
+        if (!mFromNotify && mFromActivity) {
+            overridePendingTransition(0, 0);
             mFromActivity = false;
         }
     }
@@ -385,7 +394,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mIsForeground = true;
 //        if(mFistStart)
 //            UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
-        if(mNeedUpdateUI){
+        if (mNeedUpdateUI) {
             UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
             mNeedUpdateUI = false;
         }
@@ -402,26 +411,26 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("Rect",mOriginRect);
+        outState.putParcelable("Rect", mOriginRect);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if(mOriginRect == null && savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null)
+        if (mOriginRect == null && savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null)
             mOriginRect = savedInstanceState.getParcelable("Rect");
     }
 
     @Override
     public void onBackPressed() {
-        if(mFromNotify){
+        if (mFromNotify) {
             finish();
-            overridePendingTransition(0,R.anim.audio_out);
+            overridePendingTransition(0, R.anim.audio_out);
             return;
         }
-        if(mPager.getCurrentItem() == 1){
-            if(mIsBacking || mAnimCover == null){
-               return;
+        if (mPager.getCurrentItem() == 1) {
+            if (mIsBacking || mAnimCover == null) {
+                return;
             }
             mIsBacking = true;
 
@@ -467,7 +476,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             playBackAnimation();
         } else {
             finish();
-            overridePendingTransition(0,R.anim.audio_out);
+            overridePendingTransition(0, R.anim.audio_out);
         }
 
     }
@@ -479,10 +488,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
         Spring coverSpring = SpringSystem.create().createSpring();
         coverSpring.setSpringConfig(COVER_OUT_SPRING_CONFIG);
-        coverSpring.addListener(new SimpleSpringListener(){
+        coverSpring.addListener(new SimpleSpringListener() {
             @Override
             public void onSpringUpdate(Spring spring) {
-                if(mAnimCover == null)
+                if (mAnimCover == null)
                     return;
                 final double currentVal = spring.getCurrentValue();
                 mAnimCover.setTranslationX((float) (transitionX * currentVal));
@@ -490,15 +499,17 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
                 mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
             }
+
             @Override
             public void onSpringActivate(Spring spring) {
                 //隐藏fragment中的image
                 mCoverFragment.hideImage();
             }
+
             @Override
             public void onSpringAtRest(Spring spring) {
                 finish();
-                overridePendingTransition(0,0);
+                overridePendingTransition(0, 0);
             }
         });
         coverSpring.setOvershootClampingEnabled(true);
@@ -508,10 +519,11 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     /**
      * 上一首 下一首 播放、暂停
+     *
      * @param v
      */
-    @OnClick({R.id.playbar_next,R.id.playbar_prev,R.id.playbar_play_container})
-    public void onCtrlClick(View v){
+    @OnClick({R.id.playbar_next, R.id.playbar_prev, R.id.playbar_play_container})
+    public void onCtrlClick(View v) {
         Intent intent = new Intent(MusicService.ACTION_CMD);
         switch (v.getId()) {
             case R.id.playbar_prev:
@@ -529,31 +541,32 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     /**
      * 播放模式 播放列表 关闭 隐藏
+     *
      * @param v
      */
-    @OnClick({R.id.playbar_model,R.id.playbar_playinglist,R.id.top_hide,R.id.top_more})
-    public void onOtherClick(View v){
-        switch (v.getId()){
+    @OnClick({R.id.playbar_model, R.id.playbar_playinglist, R.id.top_hide, R.id.top_more})
+    public void onOtherClick(View v) {
+        switch (v.getId()) {
             //设置播放模式
             case R.id.playbar_model:
                 int currentModel = MusicService.getPlayModel();
                 currentModel = (currentModel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentModel);
                 MusicService.getInstance().setPlayModel(currentModel);
-                Theme.TintDrawable(mPlayModel,currentModel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                Theme.TintDrawable(mPlayModel, currentModel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                         currentModel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                                R.drawable.play_btn_loop_one,ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b));
+                                R.drawable.play_btn_loop_one, ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b));
 
                 String msg = currentModel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
                         currentModel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
                 //刷新下一首
-                if(currentModel != Constants.PLAY_SHUFFLE && MusicService.getNextMP3() != null){
-                    mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
+                if (currentModel != Constants.PLAY_SHUFFLE && MusicService.getNextMP3() != null) {
+                    mNextSong.setText(getString(R.string.next_song, MusicService.getNextMP3().getTitle()));
                 }
-                ToastUtil.show(this,msg);
+                ToastUtil.show(this, msg);
                 break;
             //打开正在播放列表
             case R.id.playbar_playinglist:
-                Intent intent = new Intent(this,PlayQueueDialog.class);
+                Intent intent = new Intent(this, PlayQueueDialog.class);
                 startActivity(intent);
                 break;
             //关闭
@@ -563,27 +576,27 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             //弹出窗口
             case R.id.top_more:
                 @SuppressLint("RestrictedApi")
-                Context wrapper = new ContextThemeWrapper(this,Theme.getPopupMenuStyle());
-                final PopupMenu popupMenu = new PopupMenu(wrapper,v, Gravity.TOP);
+                Context wrapper = new ContextThemeWrapper(this, Theme.getPopupMenuStyle());
+                final PopupMenu popupMenu = new PopupMenu(wrapper, v, Gravity.TOP);
                 popupMenu.getMenuInflater().inflate(R.menu.menu_audio_item, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new AudioPopupListener(this,mInfo));
+                popupMenu.setOnMenuItemClickListener(new AudioPopupListener(this, mInfo));
                 popupMenu.show();
                 break;
         }
     }
 
-    @OnClick({R.id.volume_down,R.id.volume_up,R.id.next_song})
-    void onVolumeClick(View view){
-        switch (view.getId()){
+    @OnClick({R.id.volume_down, R.id.volume_up, R.id.next_song})
+    void onVolumeClick(View view) {
+        switch (view.getId()) {
             case R.id.volume_down:
-                if(mAudioManager != null){
+                if (mAudioManager != null) {
                     mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
                             AudioManager.ADJUST_LOWER,
                             AudioManager.FLAG_PLAY_SOUND);
                 }
                 break;
             case R.id.volume_up:
-                if(mAudioManager != null){
+                if (mAudioManager != null) {
                     mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
                             AudioManager.ADJUST_RAISE,
                             AudioManager.FLAG_PLAY_SOUND);
@@ -592,21 +605,23 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             case R.id.next_song:
 //                mLyric.setVisibility(View.GONE);
 //                mVolumeContainer.setVisibility(View.VISIBLE);
-                mNextSong.startAnimation(makeAnimation(mNextSong,false));
-                mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer,true));
-                mHandler.removeCallbacks(mVolumeRunnable);
-                mHandler.postDelayed(mVolumeRunnable,DELAY_SHOW_NEXT_SONG);
+                if (mBottomConfig == 2) {
+                    mNextSong.startAnimation(makeAnimation(mNextSong, false));
+                    mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer, true));
+                    mHandler.removeCallbacks(mVolumeRunnable);
+                    mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
+                }
                 break;
         }
-        if(view.getId() != R.id.next_song){
+        if (view.getId() != R.id.next_song) {
             final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
             final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
             mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));
         }
     }
 
-    private AlphaAnimation makeAnimation(View view,boolean show){
-        AlphaAnimation alphaAnimation = new AlphaAnimation(show ? 0 : 1,show ? 1 : 0);
+    private AlphaAnimation makeAnimation(View view, boolean show) {
+        AlphaAnimation alphaAnimation = new AlphaAnimation(show ? 0 : 1, show ? 1 : 0);
         alphaAnimation.setDuration(300);
         alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -647,11 +662,11 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mDotList.add(findView(R.id.guide_01));
         mDotList.add(findView(R.id.guide_02));
         mDotList.add(findView(R.id.guide_03));
-        int width = DensityUtil.dip2px(this,8);
-        int height = DensityUtil.dip2px(this,2);
-        mHighLightIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getAccentColor(),width,height);
-        mNormalIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.adjustAlpha(ThemeStore.getAccentColor(),0.3f),width,height);
-        for(int i = 0; i < mDotList.size(); i++){
+        int width = DensityUtil.dip2px(this, 8);
+        int height = DensityUtil.dip2px(this, 2);
+        mHighLightIndicator = Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getAccentColor(), width, height);
+        mNormalIndicator = Theme.getShape(GradientDrawable.RECTANGLE, ColorUtil.adjustAlpha(ThemeStore.getAccentColor(), 0.3f), width, height);
+        for (int i = 0; i < mDotList.size(); i++) {
             mDotList.get(i).setImageDrawable(mNormalIndicator);
         }
     }
@@ -673,25 +688,25 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //        lp.addRule(RelativeLayout.RIGHT_OF,R.id.text_hasplay);
 //        lp.addRule(RelativeLayout.CENTER_VERTICAL);
 //        seekbarContainer.addView(mProgressSeekBar,lp);
-        if(mInfo == null)
+        if (mInfo == null)
             return;
         //初始化已播放时间与剩余时间
-        mDuration = (int)mInfo.getDuration();
+        mDuration = (int) mInfo.getDuration();
         final int temp = MusicService.getProgress();
         mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
 
-        if(mDuration > 0 && mDuration - mCurrentTime > 0){
+        if (mDuration > 0 && mDuration - mCurrentTime > 0) {
             mHasPlay.setText(Util.getTime(mCurrentTime));
             mRemainPlay.setText(Util.getTime(mDuration - mCurrentTime));
         }
 
         //初始化seekbar
-        if(mDuration > 0 && mDuration < Integer.MAX_VALUE)
+        if (mDuration > 0 && mDuration < Integer.MAX_VALUE)
             mProgressSeekBar.setMax(mDuration);
         else
             mProgressSeekBar.setMax(1000);
 
-        if(mCurrentTime > 0 && mCurrentTime < mDuration)
+        if (mCurrentTime > 0 && mCurrentTime < mDuration)
             mProgressSeekBar.setProgress(mCurrentTime);
         else
             mProgressSeekBar.setProgress(0);
@@ -701,13 +716,15 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mHandler.sendEmptyMessage(UPDATE_TIME_ONLY);
                 mCurrentTime = progress;
-                if(mLrcView != null)
-                    mLrcView.seekTo(progress,true,fromUser);
+                if (mLrcView != null)
+                    mLrcView.seekTo(progress, true, fromUser);
             }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 mIsDragSeekBarFromUser = true;
             }
+
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 //没有播放拖动进度条无效
@@ -725,40 +742,47 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mHandler.removeCallbacks(mVolumeRunnable);
-                mHandler.postDelayed(mVolumeRunnable,DELAY_SHOW_NEXT_SONG);
+                if (mBottomConfig == 2) {
+                    mHandler.removeCallbacks(mVolumeRunnable);
+                    mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
+                }
                 mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
                         (int) (seekBar.getProgress() / 100f * max),
                         AudioManager.FLAG_PLAY_SOUND);
             }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
+
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-        mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
+        if (mBottomConfig == 2) {
+            mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
+        }
     }
 
     /**
      * 更新顶部歌曲信息
+     *
      * @param song
      */
     public void updateTopStatus(Song song) {
-        if(song == null)
+        if (song == null)
             return;
         String title = song.getTitle() == null ? "" : song.getTitle();
-        String artist =  song.getArtist() == null ? "" : song.getArtist();
-        String album =  song.getAlbum() == null ? "" : song.getAlbum();
+        String artist = song.getArtist() == null ? "" : song.getArtist();
+        String album = song.getAlbum() == null ? "" : song.getAlbum();
 
-        if(title.equals(""))
+        if (title.equals(""))
             mTopTitle.setText(getString(R.string.unknown_song));
         else
             mTopTitle.setText(title);
-        if(artist.equals(""))
+        if (artist.equals(""))
             mTopDetail.setText(song.getAlbum());
-        else if(album.equals(""))
+        else if (album.equals(""))
             mTopDetail.setText(song.getArtist());
         else
             mTopDetail.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
@@ -766,10 +790,11 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     /**
      * 更新播放、暂停按钮
+     *
      * @param isPlay
      */
     public void updatePlayButton(final boolean isPlay) {
-        mPlayPauseView.updateState(isPlay,true);
+        mPlayPauseView.updateState(isPlay, true);
     }
 
     /**
@@ -783,17 +808,17 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      * 初始化viewpager
      */
     @SuppressLint("ClickableViewAccessibility")
-    private void setUpViewPager(){
+    private void setUpViewPager() {
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         //activity重启后复用以前的fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-        if(fragmentManager.getFragments() != null && fragmentManager.getFragments().size() > 0){
-            for(Fragment fragment : fragmentManager.getFragments()){
-                if(fragment instanceof RecordFragment){
+        if (fragmentManager.getFragments() != null && fragmentManager.getFragments().size() > 0) {
+            for (Fragment fragment : fragmentManager.getFragments()) {
+                if (fragment instanceof RecordFragment) {
                     mRecordFragment = (RecordFragment) fragment;
-                }else if(fragment instanceof CoverFragment){
+                } else if (fragment instanceof CoverFragment) {
                     mCoverFragment = (CoverFragment) fragment;
-                }else if(fragment instanceof LyricFragment)
+                } else if (fragment instanceof LyricFragment)
                     mLyricFragment = (LyricFragment) fragment;
             }
         }
@@ -802,10 +827,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         bundle.putParcelable("Song", mInfo);
 
         //初始化所有fragment
-        if(mRecordFragment == null)
+        if (mRecordFragment == null)
             mRecordFragment = new RecordFragment();
         mAdapter.addFragment(mRecordFragment);
-        if(mCoverFragment == null)
+        if (mCoverFragment == null)
             mCoverFragment = new CoverFragment();
         mCoverFragment.setOnFirstLoadFinishListener(() -> mAnimCover.setVisibility(View.INVISIBLE));
 
@@ -819,12 +844,12 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 return;
             }
 
-            if(mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
+            if (mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
                 //获取传入的界面信息
                 mOriginRect = getIntent().getParcelableExtra("Rect");
             }
 
-            if(mOriginRect == null) {
+            if (mOriginRect == null) {
                 return;
             }
             // 获取上一个界面中，图片的宽度和高度
@@ -851,10 +876,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
             final Spring spring = SpringSystem.create().createSpring();
             spring.setSpringConfig(COVER_IN_SPRING_CONFIG);
-            spring.addListener(new SimpleSpringListener(){
+            spring.addListener(new SimpleSpringListener() {
                 @Override
                 public void onSpringUpdate(Spring spring) {
-                    if(mAnimCover == null)
+                    if (mAnimCover == null)
                         return;
                     final double currentVal = spring.getCurrentValue();
                     mAnimCover.setTranslationX((float) (transitionX * currentVal));
@@ -862,6 +887,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
                     mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
                 }
+
                 @Override
                 public void onSpringAtRest(Spring spring) {
                     //入场动画结束时显示fragment中的封面
@@ -872,6 +898,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //                    },24);
 
                 }
+
                 @Override
                 public void onSpringActivate(Spring spring) {
                     overridePendingTransition(0, 0);
@@ -886,7 +913,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
         mAdapter.addFragment(mCoverFragment);
 
-        if(mLyricFragment == null)
+        if (mLyricFragment == null)
             mLyricFragment = new LyricFragment();
         mLyricFragment.setOnInflateFinishListener(view -> {
             mLrcView = (LrcView) view;
@@ -894,6 +921,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 @Override
                 public void onClick() {
                 }
+
                 @Override
                 public void onLongClick() {
                 }
@@ -914,20 +942,20 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mPager.setAdapter(mAdapter);
         mPager.setOffscreenPageLimit(mAdapter.getCount() - 1);
 
-        final int THRESHOLD_Y = DensityUtil.dip2px(mContext,40);
-        final int THRESHOLD_X = DensityUtil.dip2px(mContext,60);
+        final int THRESHOLD_Y = DensityUtil.dip2px(mContext, 40);
+        final int THRESHOLD_X = DensityUtil.dip2px(mContext, 60);
         //下滑关闭
         mPager.setOnTouchListener((v, event) -> {
-            if(event.getAction() == MotionEvent.ACTION_DOWN){
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 mEventX1 = event.getX();
                 mEventY1 = event.getY();
             }
-            if(event.getAction() == MotionEvent.ACTION_UP){
+            if (event.getAction() == MotionEvent.ACTION_UP) {
                 mEventX2 = event.getX();
                 mEventY2 = event.getY();
-                LogUtil.d("PlayerAction","ThresHoldX: " + THRESHOLD_X + " DistanceX: " + Math.abs(mEventX1 - mEventX2));
-                LogUtil.d("PlayerAction","ThresHoldY: " + THRESHOLD_Y + " DistanceY: " + (mEventY2 - mEventY1));
-                if(mEventY2 - mEventY1 > THRESHOLD_Y && Math.abs(mEventX1 - mEventX2) < THRESHOLD_X){
+                LogUtil.d("PlayerAction", "ThresHoldX: " + THRESHOLD_X + " DistanceX: " + Math.abs(mEventX1 - mEventX2));
+                LogUtil.d("PlayerAction", "ThresHoldY: " + THRESHOLD_Y + " DistanceY: " + (mEventY2 - mEventY1));
+                if (mEventY2 - mEventY1 > THRESHOLD_Y && Math.abs(mEventX1 - mEventX2) < THRESHOLD_X) {
                     onBackPressed();
                 }
             }
@@ -949,7 +977,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 else
                     mPager.setIntercept(false);
                 //歌词界面常亮
-                if(position == 2 && SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,false)){
+                if (position == 2 && SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON, false)) {
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 }
             }
@@ -963,21 +991,21 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     //更新界面
     @Override
-    public void UpdateUI(Song song, boolean isplay){
+    public void UpdateUI(Song song, boolean isplay) {
         mInfo = song;
         mIsPlay = isplay;
         //两种情况下更新ui
         //一是activity在前台  二是activity暂停后有更新的动作，当activity重新回到前台后更新ui
-        if(!mIsForeground || mInfo == null){
+        if (!mIsForeground || mInfo == null) {
             mNeedUpdateUI = true;
             return;
         }
         //当操作不为播放或者暂停且正在运行时，更新所有控件
-        if((Global.getOperation() != Command.TOGGLE || mNeedUpdateUI)) {
+        if ((Global.getOperation() != Command.TOGGLE || mNeedUpdateUI)) {
             //更新顶部信息
             updateTopStatus(mInfo);
             //更新歌词
-            if(!mFistStart){
+            if (!mFistStart) {
                 mLyricFragment.updateLrc(mInfo);
             }
             //更新进度条
@@ -986,8 +1014,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mDuration = (int) mInfo.getDuration();
             mProgressSeekBar.setMax(mDuration);
             //更新下一首歌曲
-            if(MusicService.getNextMP3() != null){
-                mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
+            if (MusicService.getNextMP3() != null) {
+                mNextSong.setText(getString(R.string.next_song, MusicService.getNextMP3().getTitle()));
             }
             updateBg();
             requestCover(Global.getOperation() != Command.TOGGLE && !mFistStart);
@@ -1001,7 +1029,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         @Override
         public void run() {
             while (mIsForeground) {
-                if(!MusicService.isPlay())
+                if (!MusicService.isPlay())
                     continue;
                 int progress = MusicService.getProgress();
                 if (progress > 0 && progress < mDuration) {
@@ -1019,20 +1047,45 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     }
 
     /**
+     * 初始化底部区域
+     */
+    private void setUpBottom() {
+        mBottomConfig = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, 2);
+        if (mBottomConfig == 0) {//仅显示下一首
+            mVolumeContainer.setVisibility(View.GONE);
+            mNextSong.setVisibility(View.VISIBLE);
+        } else if (mBottomConfig == 1) {//仅显示音量控制
+            mVolumeContainer.setVisibility(View.VISIBLE);
+            mNextSong.setVisibility(View.GONE);
+        } else if(mBottomConfig == 3){//关闭
+            View volumeLayout = findViewById(R.id.layout_player_volume);
+            volumeLayout.setVisibility(View.INVISIBLE);
+//            LinearLayout.LayoutParams volumelLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
+//            volumelLp.weight = 0;
+//            volumeLayout.setLayoutParams(volumelLp);
+
+//            View controlLayout = findViewById(R.id.layout_player_control);
+//            LinearLayout.LayoutParams controlLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
+//            controlLp.weight = 2f;
+//            controlLayout.setLayoutParams(controlLp);
+        }
+    }
+
+    /**
      * 根据主题颜色修改按钮颜色
      */
     private void setUpViewColor() {
         int accentColor = ThemeStore.getAccentColor();
         int tintColor = ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b);
 
-        setProgressDrawable(mProgressSeekBar,accentColor);
-        setProgressDrawable(mVolumeSeekbar,accentColor);
+        setProgressDrawable(mProgressSeekBar, accentColor);
+        setProgressDrawable(mVolumeSeekbar, accentColor);
         //修改thumb
-        int inset = DensityUtil.dip2px(mContext,6);
-        mProgressSeekBar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),accentColor),
-                inset,inset,inset,inset));
-        mVolumeSeekbar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),accentColor),
-                inset,inset,inset,inset));
+        int inset = DensityUtil.dip2px(mContext, 6);
+        mProgressSeekBar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE, accentColor, DensityUtil.dip2px(this, 2), DensityUtil.dip2px(this, 6)), accentColor),
+                inset, inset, inset, inset));
+        mVolumeSeekbar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE, accentColor, DensityUtil.dip2px(this, 2), DensityUtil.dip2px(this, 6)), accentColor),
+                inset, inset, inset, inset));
 //        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
 //        Drawable seekbarBackground = mProgressSeekBar.getBackground();
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && seekbarBackground instanceof RippleDrawable) {
@@ -1040,21 +1093,21 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //        }
 
         //修改控制按钮颜色
-        Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,accentColor);
-        Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,accentColor);
+        Theme.TintDrawable(mPlayBarNext, R.drawable.play_btn_next, accentColor);
+        Theme.TintDrawable(mPlayBarPrev, R.drawable.play_btn_pre, accentColor);
 
         //歌曲名颜色
         mTopTitle.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.black_333333 : R.color.white_e5e5e5));
 
         //修改顶部按钮颜色
-        Theme.TintDrawable(mTopHide,R.drawable.icon_player_back,tintColor);
-        Theme.TintDrawable(mTopMore,R.drawable.icon_player_more,tintColor);
+        Theme.TintDrawable(mTopHide, R.drawable.icon_player_back, tintColor);
+        Theme.TintDrawable(mTopMore, R.drawable.icon_player_more, tintColor);
         //播放模式与播放队列
-        int playMode = SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP);
-        Theme.TintDrawable(mPlayModel,playMode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+        int playMode = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL, Constants.PLAY_LOOP);
+        Theme.TintDrawable(mPlayModel, playMode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                 playMode == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                        R.drawable.play_btn_loop_one,tintColor);
-        Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,tintColor);
+                        R.drawable.play_btn_loop_one, tintColor);
+        Theme.TintDrawable(mPlayQueue, R.drawable.play_btn_normal_list, tintColor);
 
         //音量控制
         mVolumeDown.getDrawable().setColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP);
@@ -1064,16 +1117,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
         mPlayPauseView.setBackgroundColor(accentColor);
         //下一首背景
-        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.getColor(ThemeStore.isDay() ? R.color.white_fafafa : R.color.gray_343438),
-                DensityUtil.dip2px(this,2),0,0,DensityUtil.dip2px(this,288),DensityUtil.dip2px(this,38),1));
+        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, ColorUtil.getColor(ThemeStore.isDay() ? R.color.white_fafafa : R.color.gray_343438),
+                DensityUtil.dip2px(this, 2), 0, 0, DensityUtil.dip2px(this, 288), DensityUtil.dip2px(this, 38), 1));
         mNextSong.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_a8a8a8 : R.color.white_e5e5e5));
 
     }
 
-    private void setProgressDrawable(SeekBar seekBar,int accentColor) {
-        LayerDrawable progressDrawable =  (LayerDrawable) seekBar.getProgressDrawable();
+    private void setProgressDrawable(SeekBar seekBar, int accentColor) {
+        LayerDrawable progressDrawable = (LayerDrawable) seekBar.getProgressDrawable();
         //修改progress颜色
-        ((GradientDrawable)progressDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_efeeed : R.color.gray_343438));
+        ((GradientDrawable) progressDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_efeeed : R.color.gray_343438));
         (progressDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
         seekBar.setProgressDrawable(progressDrawable);
     }
@@ -1104,8 +1157,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     }
 
-    private void updateCover(boolean withAnimation){
-        mCoverFragment.updateCover(mInfo,mUri,withAnimation);
+    private void updateCover(boolean withAnimation) {
+        mCoverFragment.updateCover(mInfo, mUri, withAnimation);
         mFistStart = false;
     }
 
@@ -1114,11 +1167,11 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      */
     private void requestCover(boolean withAnimation) {
         //更新封面
-        if(mInfo == null){
+        if (mInfo == null) {
             mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
             updateCover(withAnimation);
         } else {
-            new ImageUriRequest<String>(){
+            new ImageUriRequest<String>() {
                 @Override
                 public void onError(String errMsg) {
                     mUri = Uri.EMPTY;
@@ -1146,11 +1199,12 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         super.onDestroy();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mHandler.remove();
-        Util.unregisterReceiver(this,mTagReceiver);
+        Util.unregisterReceiver(this, mTagReceiver);
     }
 
     /**
      * 选择歌词文件
+     *
      * @param dialog
      * @param file
      */
@@ -1166,7 +1220,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //                }
 //            }
 //        }
-        SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_MANUAL);
+        SPUtil.putValue(mContext, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", SPUtil.LYRIC_KEY.LYRIC_MANUAL);
         mLyricFragment.updateLrc(file.getAbsolutePath());
         sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
     }
@@ -1176,48 +1230,48 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     }
 
     private void updateProgressByHandler() {
-        if(mHasPlay != null
+        if (mHasPlay != null
                 && mRemainPlay != null
                 && mCurrentTime > 0
-                && (mDuration - mCurrentTime) > 0){
+                && (mDuration - mCurrentTime) > 0) {
             mHasPlay.setText(Util.getTime(mCurrentTime));
             mRemainPlay.setText(Util.getTime(mDuration - mCurrentTime));
         }
     }
 
-    private void updateSeekbarByHandler(){
+    private void updateSeekbarByHandler() {
         mProgressSeekBar.setProgress(mCurrentTime);
     }
 
     @OnHandleMessage
-    public void handleInternal(Message msg){
+    public void handleInternal(Message msg) {
 //        if(msg.what == UPDATE_BG){
 //            int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
 //            int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
 //            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
 //        }
-        if(msg.what == UPDATE_TIME_ONLY && !mIsDragSeekBarFromUser){
+        if (msg.what == UPDATE_TIME_ONLY && !mIsDragSeekBarFromUser) {
             updateProgressByHandler();
         }
-        if(msg.what == UPDATE_TIME_ALL && !mIsDragSeekBarFromUser){
+        if (msg.what == UPDATE_TIME_ALL && !mIsDragSeekBarFromUser) {
             updateProgressByHandler();
             updateSeekbarByHandler();
         }
     }
 
-    public LyricFragment getLyricFragment(){
+    public LyricFragment getLyricFragment() {
         return mLyricFragment;
     }
 
     @Override
     public void onTagEdit(Song newSong) {
-        if(newSong != null){
+        if (newSong != null) {
             updateTopStatus(newSong);
-            mLyricFragment.updateLrc(newSong,true);
+            mLyricFragment.updateLrc(newSong, true);
             Fresco.getImagePipeline().clearCaches();
             final UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(mInfo);
-            SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.NAME,request.getLastFMKey());
-            SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.NAME,request.getNeteaseCacheKey());
+            SPUtil.deleteValue(mContext, SPUtil.COVER_KEY.NAME, request.getLastFMKey());
+            SPUtil.deleteValue(mContext, SPUtil.COVER_KEY.NAME, request.getNeteaseCacheKey());
             mInfo = newSong;
             requestCover(false);
         }

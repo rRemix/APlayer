@@ -1184,11 +1184,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(mRandomList.size() == 0){
                 makeShuffleList(mCurrentId);
             }
-            if ((++mNextIndex) > mRandomList.size() - 1)
+            if ((++mNextIndex) >= mRandomList.size())
                 mNextIndex = 0;
             mNextId = mRandomList.get(mNextIndex);
         } else {
-            if ((++mNextIndex) > Global.PlayQueue.size() - 1)
+            if ((++mNextIndex) >= Global.PlayQueue.size())
                 mNextIndex = 0;
             mNextId = Global.PlayQueue.get(mNextIndex);
         }

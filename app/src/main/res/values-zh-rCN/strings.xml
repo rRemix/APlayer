@@ -347,4 +347,10 @@
     <string name="no_equalizer">没有找到均衡器</string>
     <string name="clear_download_cover">是否清除已经下载的封面</string>
     <string name="updating">更新中</string>
+    <string name="player">播放界面</string>
+    <string name="show_on_bottom">底部显示</string>
+    <string name="show_of_bottom_tip">是否显示下一首或者音量控制</string>
+    <string name="show_next_song_only">仅显示下一首</string>
+    <string name="show_vol_control_only">仅显示音量控制</string>
+    <string name="tap_to_toggle">点击切换</string>
 </resources>

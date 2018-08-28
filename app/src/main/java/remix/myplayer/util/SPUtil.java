@@ -163,6 +163,8 @@ public class SPUtil {
         String TIMER_DURATION = "timer_duration";
         //封面下载源
         String ALBUM_COVER_DOWNLOAD_SOURCE = "album_cover_download_source";
+        //播放界面底部显示
+        String BOTTOM_OF_NOW_PLAYING_SCREEN = "bottom_of_now_playing_screen";
     }
 
 }
