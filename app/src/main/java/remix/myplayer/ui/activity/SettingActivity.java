@@ -75,6 +75,7 @@ import static remix.myplayer.helper.M3UHelper.importLocalPlayList;
 import static remix.myplayer.helper.M3UHelper.importM3UFile;
 import static remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM;
 import static remix.myplayer.theme.Theme.getBaseDialog;
+import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
 
 /**
  * @ClassName SettingActivity
@@ -390,7 +391,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_screen_container, R.id.setting_scan_container, R.id.setting_classic_notify_container,
             R.id.setting_album_cover_container, R.id.setting_library_category_container, R.id.setting_immersive_container,
             R.id.setting_import_playlist_container, R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container,
-            R.id.setting_cover_source_container})
+            R.id.setting_cover_source_container,R.id.setting_player_bottom_container})
     public void onClick(View v) {
         switch (v.getId()) {
             //文件过滤
@@ -510,6 +511,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //忽略内嵌封面
             case R.id.setting_ignore_mediastore_container:
                 mIgnoreMediastoreSwitch.setChecked(!mIgnoreMediastoreSwitch.isChecked());
+                break;
+            //播放界面底部
+            case R.id.setting_player_bottom_container:
+                changeBottomOfPlayingScreen();
                 break;
         }
     }
@@ -788,6 +793,22 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE, mScanSize[which]);
                     Constants.SCAN_SIZE = mScanSize[which];
                     getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
+                    return true;
+                }).show();
+    }
+
+    private void changeBottomOfPlayingScreen() {
+        final int position = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,BOTTOM_OF_NOW_PLAYING_SCREEN,2);
+        getBaseDialog(mContext)
+                .title(R.string.show_on_bottom)
+                .items(new String[]{getString(R.string.show_next_song_only),
+                        getString(R.string.show_vol_control_only),
+                        getString(R.string.tap_to_toggle)
+                        ,getString(R.string.close)})
+                .itemsCallbackSingleChoice(position, (dialog, itemView, which, text) -> {
+                    if(position != which){
+                        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,BOTTOM_OF_NOW_PLAYING_SCREEN,which);
+                    }
                     return true;
                 }).show();
     }

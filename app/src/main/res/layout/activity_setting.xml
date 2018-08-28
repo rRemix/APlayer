@@ -317,6 +317,96 @@
                     android:background="?attr/divider_color"/>
             </RelativeLayout>
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/setting_player_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/player"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="@dimen/d14_size"
+                    android:textSize="@dimen/s16_size"
+                    android:textColor="?attr/colorAccent"/>
+                <LinearLayout
+                    android:id="@+id/setting_player_bottom_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/setting_player_title"
+                    android:paddingTop="@dimen/d10_size"
+                    android:paddingBottom="@dimen/d10_size"
+                    android:paddingLeft="@dimen/d16_size"
+                    android:background="?attr/background_common">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/show_on_bottom"
+                        android:textColor="?attr/text_color_primary"
+                        android:textSize="@dimen/s16_size"
+                        android:layout_marginBottom="@dimen/d2_size"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/show_of_bottom_tip"
+                        android:textColor="?attr/text_color"
+                        android:textSize="@dimen/s14_size"/>
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/setting_screen_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/setting_player_bottom_container"
+                    android:paddingTop="@dimen/d10_size"
+                    android:paddingBottom="@dimen/d10_size"
+                    android:background="?attr/background_common">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="@dimen/d16_size"
+                        android:layout_marginRight="@dimen/d16_size">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/screen_always_on_title"
+                            android:textColor="?attr/text_color_primary"
+                            android:textSize="@dimen/s16_size"
+                            android:layout_marginBottom="@dimen/d2_size"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/screen_always_on_tip"
+                            android:textColor="?attr/text_color"
+                            android:textSize="@dimen/s14_size"/>
+                    </LinearLayout>
+                    <android.support.v7.widget.SwitchCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOn=""
+                        android:textOff=""
+                        android:id="@+id/setting_screen_switch"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginRight="@dimen/d14_size"/>
+                </RelativeLayout>
+
+                <View
+                    android:layout_below="@id/setting_screen_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="?attr/divider_color"/>
+            </RelativeLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -555,50 +645,8 @@
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
 
-                <RelativeLayout
-                    android:id="@+id/setting_screen_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/setting_lrc_path_container"
-                    android:paddingTop="@dimen/d10_size"
-                    android:paddingBottom="@dimen/d10_size"
-                    android:background="?attr/background_common">
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center_vertical"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="@dimen/d16_size"
-                        android:layout_marginRight="@dimen/d16_size">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/screen_always_on_title"
-                            android:textColor="?attr/text_color_primary"
-                            android:textSize="@dimen/s16_size"
-                            android:layout_marginBottom="@dimen/d2_size"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/screen_always_on_tip"
-                            android:textColor="?attr/text_color"
-                            android:textSize="@dimen/s14_size"/>
-                    </LinearLayout>
-                    <android.support.v7.widget.SwitchCompat
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textOn=""
-                        android:textOff=""
-                        android:id="@+id/setting_screen_switch"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentBottom="true"
-                        android:layout_marginRight="@dimen/d14_size"/>
-                </RelativeLayout>
-
                 <View
-                    android:layout_below="@id/setting_screen_container"
+                    android:layout_below="@id/setting_lrc_path_container"
                     android:layout_width="match_parent"
                     android:layout_height="1px"
                     android:background="?attr/divider_color"/>
