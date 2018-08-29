@@ -18,16 +18,13 @@ import remix.myplayer.util.DensityUtil;
  */
 
 public class BottomBarBehavior extends CoordinatorLayout.Behavior<View> {
-    private Context mContext;
 
     public BottomBarBehavior() {
         super();
-        mContext = App.getContext();
     }
 
     public BottomBarBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mContext = context;
     }
 
     @Override
@@ -37,13 +34,13 @@ public class BottomBarBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-        float top = Math.abs(dependency.getTop());
-
-        TypedArray ta =  mContext.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
+        final float top = Math.abs(dependency.getTop());
+        final Context context = App.getContext();
+        TypedArray ta = context.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
         int actionBarSize = ta.getDimensionPixelSize(0, 0);
         ta.recycle();
         if(actionBarSize > 0){
-            int bottomBarSize = DensityUtil.dip2px(mContext,72);
+            int bottomBarSize = DensityUtil.dip2px(context,72);
             child.setTranslationY(top * bottomBarSize / actionBarSize);
             return true;
         } else {
