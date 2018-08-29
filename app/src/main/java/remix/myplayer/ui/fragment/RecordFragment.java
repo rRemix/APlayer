@@ -16,6 +16,7 @@ import butterknife.OnTextChanged;
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.RecordShareActivity;
+import remix.myplayer.ui.fragment.base.BaseMusicFragment;
 
 /**
  * Created by Remix on 2015/12/28.
@@ -24,7 +25,7 @@ import remix.myplayer.ui.activity.RecordShareActivity;
 /**
  * 心情记录的Fragment
  */
-public class RecordFragment extends BaseFragment{
+public class RecordFragment extends BaseMusicFragment {
     @BindView(R.id.edit_record)
     EditText mEdit;
 

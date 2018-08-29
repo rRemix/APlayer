@@ -1,12 +1,17 @@
-package remix.myplayer.ui.fragment;
+package remix.myplayer.ui.fragment.base;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 
 import butterknife.Unbinder;
 import remix.myplayer.App;
+import remix.myplayer.util.Util;
+
+import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONIS;
 
 /**
  * @ClassName
@@ -17,12 +22,19 @@ import remix.myplayer.App;
 public abstract class BaseFragment extends Fragment {
     protected Unbinder mUnBinder;
     protected Context mContext;
+    protected boolean mHasPermission = false;
     protected String mPageName = BaseFragment.class.getSimpleName();
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONIS);
     }
 
     @Override
@@ -43,7 +55,6 @@ public abstract class BaseFragment extends Fragment {
     public void onPause() {
         super.onPause();
     }
-
 
     protected String getStringSafely(@StringRes int res){
         if(isAdded())

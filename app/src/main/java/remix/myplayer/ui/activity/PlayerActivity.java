@@ -75,6 +75,7 @@ import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.activity.base.BaseMusicActivity;
 import remix.myplayer.ui.adapter.PagerAdapter;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.PlayQueueDialog;
@@ -105,7 +106,7 @@ import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREE
 /**
  * 播放界面
  */
-public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback,
+public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Callback,
         FileChooserDialog.FileCallback, OnTagEditListener {
     private static final String TAG = "PlayerActivity";
     //是否正在运行

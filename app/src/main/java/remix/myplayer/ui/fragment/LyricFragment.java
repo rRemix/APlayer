@@ -14,6 +14,7 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.lyric.SearchLrc;
+import remix.myplayer.ui.fragment.base.BaseMusicFragment;
 import remix.myplayer.util.LogUtil;
 
 /**
@@ -23,7 +24,7 @@ import remix.myplayer.util.LogUtil;
 /**
  * 歌词界面Fragment
  */
-public class LyricFragment extends BaseFragment {
+public class LyricFragment extends BaseMusicFragment {
     private OnInflateFinishListener mOnFindListener;
     private Song mInfo;
     @BindView(R.id.lrc_view)

@@ -5,14 +5,14 @@ import android.view.View;
 
 import remix.myplayer.R;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.BaseActivity;
+import remix.myplayer.ui.activity.base.BaseMusicActivity;
 
 /**
  * Created by Remix on 2016/3/16.
  */
 
 
-public abstract class BaseDialogActivity extends BaseActivity {
+public abstract class BaseDialogActivity extends BaseMusicActivity {
     protected <T extends View> T findView(int id){
         return (T)findViewById(id);
     }

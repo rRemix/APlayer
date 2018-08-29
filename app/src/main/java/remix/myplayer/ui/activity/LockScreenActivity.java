@@ -37,6 +37,7 @@ import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.activity.base.BaseMusicActivity;
 import remix.myplayer.ui.blur.StackBlurManager;
 import remix.myplayer.ui.widget.VerticalScrollTextView;
 import remix.myplayer.util.ColorUtil;
@@ -56,7 +57,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * 实际为将手机解锁并对Activity进行处理，使其看起来像锁屏界面
  */
 
-public class LockScreenActivity extends BaseActivity implements UpdateHelper.Callback {
+public class LockScreenActivity extends BaseMusicActivity implements UpdateHelper.Callback {
     private static final String TAG = "LockScreenActivity";
     private static final Bitmap DEFAULT_BITMAP = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_night);
     private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 210);

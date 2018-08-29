@@ -35,8 +35,9 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
+import remix.myplayer.ui.activity.base.BaseActivity;
+import remix.myplayer.ui.fragment.base.BaseMusicFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
@@ -51,7 +52,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 /**
  * 底部控制的Fragment
  */
-public class BottomActionBarFragment extends BaseFragment{
+public class BottomActionBarFragment extends BaseMusicFragment {
     //播放与下一首按钮
     @BindView(R.id.playbar_play)
     ImageView mPlayButton;

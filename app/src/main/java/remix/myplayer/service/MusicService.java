@@ -1,6 +1,5 @@
 package remix.myplayer.service;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -13,15 +12,19 @@ import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.media.session.PlaybackState;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -87,6 +90,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 import static remix.myplayer.lyric.UpdateLyricThread.LRC_INTERVAL;
+import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONIS;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 
@@ -208,6 +212,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /** 是否开启断点播放*/
     private boolean mPlayAtBreakPoint;
 
+    /** Binder*/
+    private final IBinder mMusicBinder = new MusicBinder();
+
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
     private DBObserver mPlayListSongObserver;
@@ -260,6 +267,19 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         setUp();
     }
 
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mMusicBinder;
+    }
+
+    public class MusicBinder extends Binder {
+        @NonNull
+        public MusicService getService() {
+            return MusicService.this;
+        }
+    }
+
     @SuppressLint("CheckResult")
     @Override
     public int onStartCommand(Intent commandIntent, int flags, int startId) {
@@ -267,7 +287,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mIsServiceStop = false;
 
         Single.create((SingleOnSubscribe<String>) emitter -> {
-            if(!mLoadFinished && (mHasPermission = Util.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}))) {
+            if(!mLoadFinished && (mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONIS))) {
                 load();
             }
             String action = commandIntent != null ? commandIntent.getAction() : "";
@@ -674,6 +694,16 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
     @Override
     public void onPlayListChanged() {
+    }
+
+    @Override
+    public void onServiceConnected() {
+
+    }
+
+    @Override
+    public void onServiceDisConnected() {
+
     }
 
     public class WidgetReceiver extends BroadcastReceiver {

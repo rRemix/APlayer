@@ -30,5 +30,7 @@ public class MusicEventHelper {
         void onMediaStoreChanged();
         void onPermissionChanged(boolean has);
         void onPlayListChanged();
+        void onServiceConnected();
+        void onServiceDisConnected();
     }
 }

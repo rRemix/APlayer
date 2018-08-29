@@ -27,6 +27,7 @@ import remix.myplayer.interfaces.OnFirstLoadFinishListener;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.fragment.base.BaseMusicFragment;
 import remix.myplayer.util.Global;
 
 /**
@@ -37,7 +38,7 @@ import remix.myplayer.util.Global;
  * 专辑封面Fragment
  *
  */
-public class CoverFragment extends BaseFragment {
+public class CoverFragment extends BaseMusicFragment {
     @BindView(R.id.cover_image)
     SimpleDraweeView mImage;
 //    @BindView(R.id.cover_shadow)

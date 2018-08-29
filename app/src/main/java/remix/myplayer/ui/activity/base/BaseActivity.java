@@ -1,5 +1,7 @@
-package remix.myplayer.ui.activity;
+package remix.myplayer.ui.activity.base;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -9,6 +11,8 @@ import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
 import remix.myplayer.BuildConfig;
 import remix.myplayer.R;
 import remix.myplayer.misc.manager.ActivityManager;
@@ -16,15 +20,20 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2016/3/16.
  */
 
 
+@SuppressLint("Registered")
 public class BaseActivity extends AppCompatActivity {
     protected Context mContext;
     private boolean mIsDestroyed;
+    protected boolean mHasPermission;
+    public static final String[] EXTERNAL_STORAGE_PERMISSIONIS = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
     protected <T extends View> T findView(int id){
         return (T)findViewById(id);
     }
@@ -79,6 +88,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mContext = this;
+        mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONIS);
         //严格模式
         if(BuildConfig.DEBUG){
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -140,11 +150,21 @@ public class BaseActivity extends AppCompatActivity {
         return Build.VERSION.SDK_INT >= 17 ? super.isDestroyed() : mIsDestroyed;
     }
 
+    @SuppressLint("CheckResult")
     @Override
     protected void onResume() {
         super.onResume();
-        startService(new Intent(this,MusicService.class));
+        new RxPermissions(this)
+                .request(EXTERNAL_STORAGE_PERMISSIONIS)
+                .subscribe(has -> {
+                    if(has != mHasPermission){
+                        Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
+                        intent.putExtra("permission",has);
+                        sendBroadcast(intent);
+                    }
+                });
     }
+
     @Override
     protected void onPause() {
         super.onPause();

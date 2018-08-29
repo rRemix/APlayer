@@ -55,7 +55,7 @@ import static remix.myplayer.util.Constants.TAG_EDIT;
 /**
  * 专辑、艺术家、文件夹、播放列表详情
  */
-public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdapter>
+public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter>
         implements UpdateHelper.Callback,OnTagEditListener{
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
     public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";

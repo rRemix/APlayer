@@ -42,6 +42,7 @@ import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.ui.activity.base.BaseMusicActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -57,7 +58,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 /**
  * 将分享内容与专辑封面进行处理用于分享
  */
-public class RecordShareActivity extends BaseActivity {
+public class RecordShareActivity extends BaseMusicActivity {
     private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),268);
 
     @BindView(R.id.recordshare_image)

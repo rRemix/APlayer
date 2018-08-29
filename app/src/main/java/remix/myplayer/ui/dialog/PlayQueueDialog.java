@@ -1,6 +1,5 @@
 package remix.myplayer.ui.dialog;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,15 +16,12 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.tbruyelle.rxpermissions2.RxPermissions;
-
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
-import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.handler.MsgHandler;
@@ -44,10 +40,9 @@ import remix.myplayer.util.PlayListUtil;
 /**
  * 正在播放列表Dialog
  */
-public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager.LoaderCallbacks<List<PlayListSong>>,MusicEventHelper.MusicEventCallback {
+public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager.LoaderCallbacks<List<PlayListSong>>{
     @BindView(R.id.bottom_actionbar_play_list)
     RecyclerView mRecyclerView;
-    private boolean mHasPermission = false;
     private PlayQueueAdapter mAdapter;
     private static int LOADER_ID = 0;
     private boolean mMove = false;
@@ -114,8 +109,6 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         lp.width = metrics.widthPixels;
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
-
-        MusicEventHelper.addCallback(this);
     }
 
     public PlayQueueAdapter getAdapter(){
@@ -137,7 +130,6 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MusicEventHelper.removeCallback(this);
         mHandler.remove();
     }
 
@@ -200,21 +192,6 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     @Override
     public void onPlayListChanged() {
         onMediaStoreChanged();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        new RxPermissions(this)
-                .request(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .subscribe(aBoolean -> {
-                    if(aBoolean != mHasPermission){
-                        mHasPermission = aBoolean;
-                        Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
-                        intent.putExtra("permission",mHasPermission);
-                        sendBroadcast(intent);
-                    }
-                });
     }
 
     private static class AsyncPlayQueueSongLoader extends WrappedAsyncTaskLoader<List<PlayListSong>> {

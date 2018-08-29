@@ -1,12 +1,12 @@
 package remix.myplayer.ui.activity;
 
 import android.annotation.SuppressLint;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.activity.base.BaseMusicActivity;
 import remix.myplayer.util.ColorUtil;
 
 
@@ -14,12 +14,7 @@ import remix.myplayer.util.ColorUtil;
  * Created by taeja on 16-3-15.
  */
 @SuppressLint("Registered")
-public class ToolbarActivity extends BaseActivity {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
+public class ToolbarActivity extends BaseMusicActivity {
     protected void setUpToolbar(Toolbar toolbar, String title){
         toolbar.setTitle(title);
 

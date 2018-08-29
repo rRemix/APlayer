@@ -4,13 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.activity.BaseActivity;
+import remix.myplayer.ui.activity.base.BaseMusicActivity;
 
 /**
  * Created by Remix on 2017/11/1.
  */
 
-public class AppShortcutActivity extends BaseActivity {
+public class AppShortcutActivity extends BaseMusicActivity {
     public static final int SHORTCUT_TYPE_SHUFFLE_ALL = 0;
     public static final int SHORTCUT_TYPE_MY_LOVE = 1;
     public static final int SHORTCUT_TYPE_LAST_ADDED = 2;
