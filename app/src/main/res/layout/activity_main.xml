@@ -48,13 +48,13 @@
                 android:layout_marginBottom="@dimen/d80_size"
                 app:layout_behavior="remix.myplayer.ui.BottomBarBehavior"/>
 
-            <remix.myplayer.ui.widget.BottomActionBar
-                android:id="@+id/bottom_action_bar"
+            <!-- 底部自定义ationbar -->
+            <fragment android:name="remix.myplayer.ui.fragment.BottomActionBarFragment"
+                android:id="@+id/bottom_actionbar_new"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/item_height"
                 android:layout_gravity="bottom"
-                app:layout_behavior="remix.myplayer.ui.BottomBarBehavior">
-            </remix.myplayer.ui.widget.BottomActionBar>
+                app:layout_behavior="remix.myplayer.ui.BottomBarBehavior"/>
         </android.support.design.widget.CoordinatorLayout>
 
     </LinearLayout>

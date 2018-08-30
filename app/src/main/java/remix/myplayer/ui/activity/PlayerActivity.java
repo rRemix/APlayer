@@ -1278,4 +1278,12 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
         }
     }
 
+    public void showLyricOffsetView(){
+        if(mPager.getCurrentItem() != 2){
+            mPager.setCurrentItem(2,true);
+        }
+        if(getLyricFragment() != null){
+            getLyricFragment().showLyricOffsetView();
+        }
+    }
 }

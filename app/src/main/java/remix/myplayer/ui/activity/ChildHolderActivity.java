@@ -35,7 +35,7 @@ import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.ChildHolderAdapter;
-import remix.myplayer.ui.widget.BottomActionBar;
+import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -74,10 +74,9 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
     FastScrollRecyclerView mRecyclerView;
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
-    @BindView(R.id.bottom_action_bar)
-    BottomActionBar mBottomActionBar;
 
     private String Title;
+    private BottomActionBarFragment mBottombar;
 
     private MaterialDialog mMDDialog;
 
@@ -176,9 +175,10 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
                 .progressIndeterminateStyle(false).build();
 
         //初始化底部状态栏
+        mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
             return;
-        mBottomActionBar.updateBottomStatus(MusicService.getCurrentMP3(), MusicService.isPlay());
+        mBottombar.updateBottomStatus(MusicService.getCurrentMP3(), MusicService.isPlay());
 
     }
 
@@ -321,7 +321,7 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
     @Override
     public void UpdateUI(Song Song, boolean isplay) {
         //底部状态兰
-        mBottomActionBar.updateBottomStatus(Song, isplay);
+        mBottombar.updateBottomStatus(Song, isplay);
         //更新高亮歌曲
 //        mAdapter.onUpdateHighLight();
     }

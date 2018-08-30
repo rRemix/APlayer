@@ -89,11 +89,11 @@ import remix.myplayer.ui.adapter.DrawerAdapter;
 import remix.myplayer.ui.adapter.MainPagerAdapter;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
+import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
-import remix.myplayer.ui.widget.BottomActionBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -139,9 +139,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     View mHeadRoot;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
-    @BindView(R.id.bottom_action_bar)
-    BottomActionBar mBottomActionBar;
 
+    private BottomActionBarFragment mBottomBar;
     private DrawerAdapter mDrawerAdapter;
     private MainPagerAdapter mPagerAdapter;
     //是否正在运行
@@ -187,6 +186,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        //初始化底部状态栏
+        mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //receiver
         mReceiver = new MainReceiver(this);
         IntentFilter intentFilter = new IntentFilter();
@@ -214,10 +215,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      */
     private void setUpBottomBar() {
         //初始化底部状态栏
+        mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         int lastId = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1);
         Song item;
         if (lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
-            mBottomActionBar.updateBottomStatus(item, MusicService.isPlay());
+            mBottomBar.updateBottomStatus(item, MusicService.isPlay());
         } else {
             if (Global.PlayQueue == null || Global.PlayQueue.size() == 0)
                 return;
@@ -229,7 +231,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             }
             item = MediaStoreUtil.getMP3InfoById(id);
             if (item != null) {
-                mBottomActionBar.updateBottomStatus(item, MusicService.isPlay());
+                mBottomBar.updateBottomStatus(item, MusicService.isPlay());
             }
         }
     }
@@ -687,7 +689,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if (!mIsRunning)
             return;
 
-        mBottomActionBar.updateBottomStatus(song, isPlay);
+        mBottomBar.updateBottomStatus(song, isPlay);
 //        for(Fragment temp : getSupportFragmentManager().getFragments()) {
 //            if (temp instanceof SongFragment) {
 //                SongFragment songFragment = (SongFragment) temp;

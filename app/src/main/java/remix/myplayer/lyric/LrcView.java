@@ -453,8 +453,17 @@ public class LrcView extends View implements ILrcView{
         return line - 1;
     }
 
+    private int mOffset;
+    public void setOffset(int offset){
+        mOffset = offset;
+        invalidate();
+    }
+
     @Override
     public void seekTo(int progress,boolean fromSeekBar,boolean fromSeekBarByUser) {
+        if(progress != 0){
+            progress += mOffset;
+        }
         if(mLrcRows == null || mLrcRows.size() == 0){
             return;
         }

@@ -64,7 +64,11 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                 final boolean alreadyIgnore = SPUtil.getValue(mActivity,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
                 final LyricFragment lyricFragment = ((PlayerActivity)mActivity).getLyricFragment();
                 new MaterialDialog.Builder(mActivity)
-                        .items(getString(R.string.netease), getString(R.string.kugou), getString(R.string.select_lrc), getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc))
+                        .items(getString(R.string.netease),
+                                getString(R.string.kugou),
+                                getString(R.string.select_lrc),
+                                getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc)
+                                /**,getString(R.string.change_offset)*/)
                         .itemsColorAttr(R.attr.text_color_primary)
                         .backgroundColorAttr(R.attr.background_color_3)
                         .itemsCallback((dialog, itemView, position, text) -> {
@@ -102,6 +106,9 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                                 sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                             })
                                             .show();
+                                    break;
+                                case 4://歌词时间轴调整
+                                    ((PlayerActivity) mActivity).showLyricOffsetView();
                                     break;
                             }
 

@@ -353,4 +353,8 @@
     <string name="show_next_song_only">仅显示下一首</string>
     <string name="show_vol_control_only">仅显示音量控制</string>
     <string name="tap_to_toggle">点击切换</string>
+    <string name="change_offset">歌词调整</string>
+    <string name="lyric_offset_reset">歌词已还原</string>
+    <string name="lyric_advance_x_second">提前%1$s秒</string>
+    <string name="lyric_delay_x_second">延后%1$s秒</string>
 </resources>

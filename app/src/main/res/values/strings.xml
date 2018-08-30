@@ -353,5 +353,8 @@
     <string name="show_next_song_only">Show next song only</string>
     <string name="show_vol_control_only">Show volume controls only</string>
     <string name="tap_to_toggle">Tap to toggle</string>
-
+    <string name="change_offset">Adjust</string>
+    <string name="lyric_offset_reset">Back to original</string>
+    <string name="lyric_advance_x_second">%1$s s advanced</string>
+    <string name="lyric_delay_x_second">%1$s s delayed</string>
 </resources>

@@ -22,19 +22,18 @@
         android:background="?attr/background_color_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <remix.myplayer.ui.widget.BottomActionBar
-            android:id="@+id/bottom_action_bar"
+        <fragment android:name="remix.myplayer.ui.fragment.BottomActionBarFragment"
+            android:id="@+id/bottom_actionbar_new"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_height"
             android:layout_alignParentBottom="true"/>
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/childholder_item_num"
             android:textColor="?attr/text_color"
             android:textSize="@dimen/s12_size"
-            android:layout_above="@id/bottom_action_bar"
+            android:layout_above="@id/bottom_actionbar_new"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/d14_size"
             android:layout_marginBottom="@dimen/d24_size"/>

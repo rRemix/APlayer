@@ -167,4 +167,7 @@ public class SPUtil {
         String BOTTOM_OF_NOW_PLAYING_SCREEN = "bottom_of_now_playing_screen";
     }
 
+    public interface LYRIC_OFFSET_KEY{
+        String NAME = "LyricOffset";
+    }
 }

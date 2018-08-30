@@ -43,7 +43,7 @@ class BottomActionBar @JvmOverloads constructor(context: Context, attrs: Attribu
     init {
         View.inflate(context, R.layout.bottom_actionbar,this)
         //设置整个背景着色
-        Theme.TintDrawable(bottom_action_content,
+        Theme.TintDrawable(bottom_action_bar,
                 R.drawable.commom_playercontrols_bg,
                 ColorUtil.getColor(if (ThemeStore.THEME_MODE == ThemeStore.DAY) R.color.day_background_color_3 else R.color.night_background_color_3))
         Theme.TintDrawable(playbar_next,
@@ -51,7 +51,7 @@ class BottomActionBar @JvmOverloads constructor(context: Context, attrs: Attribu
                 ColorUtil.getColor(if (ThemeStore.THEME_MODE == ThemeStore.DAY) R.color.black_323335 else R.color.white))
         //手势检测
         mGestureDetector = GestureDetector(context, GestureListener(this))
-        bottom_action_content.setOnTouchListener { v, event -> mGestureDetector.onTouchEvent(event) }
+        bottom_actionbar_root.setOnTouchListener { v, event -> mGestureDetector.onTouchEvent(event) }
 
         //获取封面位置信息
         bottom_action_bar_cover.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
