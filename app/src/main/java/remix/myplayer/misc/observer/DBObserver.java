@@ -3,9 +3,10 @@ package remix.myplayer.misc.observer;
 import android.net.Uri;
 import android.os.Handler;
 
+import remix.myplayer.Global;
 import remix.myplayer.db.DBContentProvider;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
 
 /**
@@ -34,7 +35,7 @@ public class DBObserver extends BaseObserver {
             //更新播放队列
             case DBContentProvider.PLAY_LIST_SONG_MULTIPLE:
             case DBContentProvider.PLAY_LIST_SONG_SINGLE:
-                Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
+                MusicServiceRemote.setPlayQueue(PlayListUtil.getIDList(Global.PlayQueueID));
                 break;
         }
         if(match != -1)

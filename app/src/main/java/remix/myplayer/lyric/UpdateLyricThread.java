@@ -6,12 +6,14 @@ import io.reactivex.disposables.CompositeDisposable;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.lyric.bean.LrcRowWrapper;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.util.LogUtil;
 
-import static remix.myplayer.service.MusicService.getProgress;
+import static remix.myplayer.helper.MusicServiceRemote.getCurrentSong;
+import static remix.myplayer.helper.MusicServiceRemote.getProgress;
+
 
 public abstract class UpdateLyricThread extends Thread {
     public static final LrcRow EMPTY_ROW = new LrcRow("",0,"");
@@ -25,7 +27,7 @@ public abstract class UpdateLyricThread extends Thread {
     private Status mStatus = Status.SEARCHING;
 
     public UpdateLyricThread(){
-        setSongAndGetLyricRows(MusicService.getCurrentMP3());
+        setSongAndGetLyricRows(MusicServiceRemote.getCurrentSong());
     }
 
     public UpdateLyricThread(Song song){
@@ -80,8 +82,8 @@ public abstract class UpdateLyricThread extends Thread {
         if(mStatus == Status.SEARCHING){
             return wrapper;
         }
-        Song song = MusicService.getCurrentMP3();
-        if(mStatus == Status.ERROR || mStatus == Status.NO || song == null){
+        Song song = getCurrentSong();
+        if(mStatus == Status.ERROR || mStatus == Status.NO){
             LogUtil.d("DesktopLrc","当前歌词 -- findCurrentLyricError");
             return wrapper;
         }

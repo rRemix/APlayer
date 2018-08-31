@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import remix.myplayer.App;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 
@@ -68,7 +69,7 @@ public class MusicUtil {
             arg.putInt("Control", Command.PLAYSELECTEDSONG);
             arg.putInt("Position", 0);
             intent.putExtras(arg);
-            Global.setPlayQueue(songs, App.getContext(), intent);
+            MusicServiceRemote.setPlayQueue(songs,intent);
         }
     }
 
@@ -89,7 +90,7 @@ public class MusicUtil {
             cursor = context.getContentResolver().query(uri, projection, null, null,
                     null);
             if (cursor != null && cursor.moveToFirst()) {
-                final int column_index = cursor.getColumnIndexOrThrow(column);
+                final int column_index = cursor.getColumnIndex(column);
                 return cursor.getString(column_index);
             }
         } finally {

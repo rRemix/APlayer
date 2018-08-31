@@ -19,14 +19,14 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.App;
+import remix.myplayer.Global;
 import remix.myplayer.R;
-import remix.myplayer.service.MusicService;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.widget.EQSeekBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -60,20 +60,20 @@ public class EQActivity extends ToolbarActivity {
 
     private EQReceiver mEQReceiver;
 
-    public static void Init(){
-        new Thread(){
+    public static void Init() {
+        new Thread() {
             @Override
             public void run() {
                 try {
                     Thread.sleep(600);
-                    int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
-                    LogUtil.d(TAG,"AudioSessionId:" + AudioSessionId);
-                    if(AudioSessionId  == 0) {
-                        LogUtil.d(TAG,"AudioSessionId Error");
+                    int AudioSessionId = MusicServiceRemote.getMediaPlayer().getAudioSessionId();
+                    LogUtil.d(TAG, "AudioSessionId:" + AudioSessionId);
+                    if (AudioSessionId == 0) {
+                        LogUtil.d(TAG, "AudioSessionId Error");
                         return;
                     }
                     //是否启用音效设置
-                    mEnable = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,"EnableEQ",false) & Global.getHeadsetOn();
+                    mEnable = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "EnableEQ", false) & Global.getHeadsetOn();
 
                     //EQ
                     mEqualizer = new Equalizer(0, AudioSessionId);
@@ -83,11 +83,11 @@ public class EQActivity extends ToolbarActivity {
                     mBandNumber = mEqualizer.getNumberOfBands();
 
                     //得到之前存储的每个频率的db值
-                    for(short i = 0 ; i < mBandNumber; i++){
-                        short temp = (short)(SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,"Band" + i,0));
+                    for (short i = 0; i < mBandNumber; i++) {
+                        short temp = (short) (SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "Band" + i, 0));
                         mBandFrequencys.add(temp);
-                        if (mEnable){
-                            mEqualizer.setBandLevel(i,temp);
+                        if (mEnable) {
+                            mEqualizer.setBandLevel(i, temp);
                         }
                     }
 
@@ -102,13 +102,13 @@ public class EQActivity extends ToolbarActivity {
 
                     //获得所有频率值
                     short temp = (short) ((mMaxEQLevel - mMinEQLevel) / 30);
-                    for(short i = 0 ; i < 31; i++){
-                        mBandLevels.add((short)(1500 - (i * temp)));
+                    for (short i = 0; i < 31; i++) {
+                        mBandLevels.add((short) (1500 - (i * temp)));
                     }
                     //初始化完成
                     mHasInitial = true;
-                }catch (Exception e){
-                    LogUtil.d(TAG,e.toString());
+                } catch (Exception e) {
+                    LogUtil.d(TAG, e.toString());
                 }
             }
 
@@ -119,13 +119,13 @@ public class EQActivity extends ToolbarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Util.unregisterReceiver(this,mEQReceiver);
+        Util.unregisterReceiver(this, mEQReceiver);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(!mHasInitial){
-            ToastUtil.show(this,R.string.eq_initial_failed);
+        if (!mHasInitial) {
+            ToastUtil.show(this, R.string.eq_initial_failed);
             finish();
         }
 
@@ -133,17 +133,17 @@ public class EQActivity extends ToolbarActivity {
         setContentView(R.layout.activity_eq);
         ButterKnife.bind(this);
 
-        setUpToolbar(mToolBar,getString(R.string.eq));
+        setUpToolbar(mToolBar, getString(R.string.eq));
 
         mSwitch.setChecked(mEnable);
 //        Theme.TintDrawable(mLockScreenSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
 //        Theme.TintDrawable(mLockScreenSwitch.getTrackDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
         mSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(isChecked == mEnable)
+            if (isChecked == mEnable)
                 return;
 
-            if(!Global.getHeadsetOn()){
-                ToastUtil.show(EQActivity.this,R.string.plz_earphone);
+            if (!Global.getHeadsetOn()) {
+                ToastUtil.show(EQActivity.this, R.string.plz_earphone);
                 mSwitch.setChecked(false);
                 return;
             }
@@ -152,7 +152,7 @@ public class EQActivity extends ToolbarActivity {
         });
 
         //初始化重置按钮背景
-        mReset.setBackground(Theme.getCorner(1.0f,5,0,ThemeStore.getAccentColor()));
+        mReset.setBackground(Theme.getCorner(1.0f, 5, 0, ThemeStore.getAccentColor()));
 
         addEQSeekBar();
 //        for(int i = 0 ; i < mEQSeekBars.size() ;i++){
@@ -162,16 +162,16 @@ public class EQActivity extends ToolbarActivity {
 //        }
 
         mEQReceiver = new EQReceiver();
-        registerReceiver(mEQReceiver,new IntentFilter(Constants.SOUNDEFFECT_ACTION));
+        registerReceiver(mEQReceiver, new IntentFilter(Constants.SOUNDEFFECT_ACTION));
     }
 
     /**
      * 根据BandNumber数量，添加EQSeekBar
      */
     private void addEQSeekBar() {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams( DensityUtil.dip2px(this,30), ViewGroup.LayoutParams.MATCH_PARENT);
-        lp.setMargins(DensityUtil.dip2px(this,20),0,DensityUtil.dip2px(this,20),0);
-        for(int i = 0 ; i < mBandNumber ;i++){
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(DensityUtil.dip2px(this, 30), ViewGroup.LayoutParams.MATCH_PARENT);
+        lp.setMargins(DensityUtil.dip2px(this, 20), 0, DensityUtil.dip2px(this, 20), 0);
+        for (int i = 0; i < mBandNumber; i++) {
             EQSeekBar eqSeekBar = new EQSeekBar(this);
             eqSeekBar.setLayoutParams(lp);
 
@@ -179,10 +179,10 @@ public class EQActivity extends ToolbarActivity {
             eqSeekBar.setMax(mMaxEQLevel - mMinEQLevel);
             eqSeekBar.setTag(mCenterFres.get(i));
             int fre_temp = mCenterFres.get(i);
-            String hz = fre_temp > 1000 ?  fre_temp / 1000 + "K" : fre_temp + "";
+            String hz = fre_temp > 1000 ? fre_temp / 1000 + "K" : fre_temp + "";
             eqSeekBar.setFreText(hz);
             int temp = mBandFrequencys.get(i);
-            setSeekBarProgress(eqSeekBar,temp);
+            setSeekBarProgress(eqSeekBar, temp);
             mEQSeekBars.add(eqSeekBar);
             mEQContainer.addView(eqSeekBar);
         }
@@ -190,7 +190,7 @@ public class EQActivity extends ToolbarActivity {
             @Override
             public boolean onPreDraw() {
                 mEQContainer.getViewTreeObserver().removeOnPreDrawListener(this);
-                for(EQSeekBar eqSeekBar : mEQSeekBars){
+                for (EQSeekBar eqSeekBar : mEQSeekBars) {
                     eqSeekBar.setEnabled(mEnable);
                 }
                 return true;
@@ -201,9 +201,9 @@ public class EQActivity extends ToolbarActivity {
 
     public void updateEnable(boolean enable) {
         mEnable = enable;
-        SPUtil.putValue(EQActivity.this,SPUtil.SETTING_KEY.NAME,"EnableEQ",enable);
+        SPUtil.putValue(EQActivity.this, SPUtil.SETTING_KEY.NAME, "EnableEQ", enable);
 
-        if(mSwitch != null) {
+        if (mSwitch != null) {
             mSwitch.setChecked(enable);
 //            mLockScreenSwitch.setThumbResource(enable ? R.drawable.timer_btn_seleted_btn : R.drawable.timer_btn_normal_btn);
 //            mLockScreenSwitch.setTrackResource(enable ? R.drawable.timer_btn_seleted_focus : R.drawable.timer_btn_normal_focus);
@@ -219,48 +219,50 @@ public class EQActivity extends ToolbarActivity {
 //        }
 
         mEqualizer.setEnabled(mEnable);
-        for(short i = 0 ; i < mEQSeekBars.size() ;i++){
+        for (short i = 0; i < mEQSeekBars.size(); i++) {
             mEQSeekBars.get(i).setEnabled(enable);
-            mEqualizer.setBandLevel(i,enable ? mBandFrequencys.get(i) : (short)0);
+            mEqualizer.setBandLevel(i, enable ? mBandFrequencys.get(i) : (short) 0);
         }
     }
 
-    private class EQSeekbarOnChangeListener implements EQSeekBar.OnSeekBarChangeListener{
+    private class EQSeekbarOnChangeListener implements EQSeekBar.OnSeekBarChangeListener {
         @Override
         public void onProgressChanged(EQSeekBar seekBar, int position, boolean fromUser) {
-            if(!seekBar.canDrag())
+            if (!seekBar.canDrag())
                 return;
             try {
                 int fre = Integer.valueOf(seekBar.getTag().toString());
-                for(int i = 0 ; i < mCenterFres.size() ; i++){
-                    if(fre == mCenterFres.get(i)){
+                for (int i = 0; i < mCenterFres.size(); i++) {
+                    if (fre == mCenterFres.get(i)) {
                         short temp = (mBandLevels.get(position));
-                        if(temp > mMaxEQLevel || temp < mMinEQLevel){
-                            ToastUtil.show(EQActivity.this,getString(R.string.arg_illegal),fre);
+                        if (temp > mMaxEQLevel || temp < mMinEQLevel) {
+                            ToastUtil.show(EQActivity.this, getString(R.string.arg_illegal), fre);
                             return;
                         }
                         //设置db值
-                        mEqualizer.setBandLevel((short)i,temp);
+                        mEqualizer.setBandLevel((short) i, temp);
                         //db值存储到sp
-                        SPUtil.putValue(EQActivity.this,SPUtil.SETTING_KEY.NAME,"Band" + i,temp );
+                        SPUtil.putValue(EQActivity.this, SPUtil.SETTING_KEY.NAME, "Band" + i, temp);
                         break;
                     }
                 }
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
         @Override
         public void onStartTrackingTouch(EQSeekBar seekBar) {
         }
+
         @Override
         public void onStopTrackingTouch(EQSeekBar seekBar) {
         }
     }
 
 
-    private void setSeekBarProgress(EQSeekBar seekBar,int frequency){
-        if(frequency <= mBandLevels.get(mBandLevels.size() / 2))
+    private void setSeekBarProgress(EQSeekBar seekBar, int frequency) {
+        if (frequency <= mBandLevels.get(mBandLevels.size() / 2))
             frequency = mMaxEQLevel - frequency;
         else
             frequency = Math.abs(mMinEQLevel) - frequency;
@@ -268,28 +270,28 @@ public class EQActivity extends ToolbarActivity {
     }
 
     //重置音效设置
-    public void onReset(View v){
-        if(!Global.getHeadsetOn()){
-            ToastUtil.show(EQActivity.this,R.string.plz_earphone);
+    public void onReset(View v) {
+        if (!Global.getHeadsetOn()) {
+            ToastUtil.show(EQActivity.this, R.string.plz_earphone);
             return;
         }
         updateEnable(true);
-        if(mBandFrequencys != null)
+        if (mBandFrequencys != null)
             mBandFrequencys.clear();
-        for(short i = 0 ; i < mEQSeekBars.size() ;i++){
+        for (short i = 0; i < mEQSeekBars.size(); i++) {
             //设置db值
-            mEqualizer.setBandLevel(i,(short) 0);
+            mEqualizer.setBandLevel(i, (short) 0);
             //db值存储到sp
-            SPUtil.putValue(EQActivity.this,SPUtil.SETTING_KEY.NAME,"Band" + i,(short)0 );
+            SPUtil.putValue(EQActivity.this, SPUtil.SETTING_KEY.NAME, "Band" + i, (short) 0);
             //设置seekbar进度
-            setSeekBarProgress(mEQSeekBars.get(i),0);
+            setSeekBarProgress(mEQSeekBars.get(i), 0);
             //存储每个频率的db值到内存
-            mBandFrequencys.add((short)0);
+            mBandFrequencys.add((short) 0);
         }
     }
 
 
-    public static void setEnable(boolean enable){
+    public static void setEnable(boolean enable) {
         mEnable = enable;
     }
 
@@ -299,10 +301,10 @@ public class EQActivity extends ToolbarActivity {
     public class EQReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(Constants.SOUNDEFFECT_ACTION.equals(intent.getAction())){
+            if (Constants.SOUNDEFFECT_ACTION.equals(intent.getAction())) {
                 //耳机拔出 关闭均衡器
                 boolean enable = Global.getHeadsetOn();
-                if(!enable){
+                if (!enable) {
                     mEnable = false;
                     updateEnable(false);
                 }

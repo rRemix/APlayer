@@ -104,7 +104,7 @@ public class ColumnView extends View {
         public void handleMessage(Message msg) {
 //            Log.d(TAG,"action:" + msg.what);
 //            Log.d(TAG,"info:" + msg.obj.toString());
-//            Log.d(TAG,"isplay:" + MusicService.isPlay());
+//            Log.d(TAG,"isplay:" + MusicService.isPlaying());
             for(int i = 0 ; i < mObjectAnimList.size(); i++){
                 int from = mHeightList.get(i);
                 int to = msg.what == STARTANIM ? new Random().nextInt(mRawHeight) : (int)(mRawHeight * 0.1);
@@ -237,7 +237,7 @@ public class ColumnView extends View {
             public void run() {
                 Message msg = new Message();
                 msg.what = STARTANIM;
-//                msg.obj = (Song) MusicService.getCurrentMP3();
+//                msg.obj = (Song) MusicService.getCurrentSong();
                 mHandler.sendMessage(msg);
             }
         },50,300);
@@ -252,7 +252,7 @@ public class ColumnView extends View {
         }
         Message msg = new Message();
         msg.what = STOPANIM;
-//        msg.obj = (Song) MusicService.getCurrentMP3();
+//        msg.obj = (Song) MusicService.getCurrentSong();
         mHandler.sendMessage(msg);
     }
 

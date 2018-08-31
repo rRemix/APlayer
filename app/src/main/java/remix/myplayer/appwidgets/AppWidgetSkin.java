@@ -3,10 +3,13 @@ package remix.myplayer.appwidgets;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 
+import remix.myplayer.App;
 import remix.myplayer.R;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.SPUtil;
+
+import static remix.myplayer.helper.MusicServiceRemote.isPlaying;
 
 public enum AppWidgetSkin {
     WHITE_1F(ColorUtil.getColor(R.color.appwidget_title_color_white_1f),
@@ -14,18 +17,18 @@ public enum AppWidgetSkin {
             ColorUtil.getColor(R.color.appwidget_progress_color_white_1f),
             ColorUtil.getColor(R.color.appwidget_btn_color_white_1f),
             R.drawable.bg_corner_app_widget_white_1f,
-            R.drawable.widget_btn_timer,R.drawable.widget_btn_next_normal,R.drawable.widget_btn_previous_normal,
-            R.drawable.widget_btn_like_nor,R.drawable.widget_btn_one_normal,R.drawable.widget_btn_loop_normal,
-            R.drawable.widget_btn_shuffle_normal,R.drawable.widget_btn_play_normal,R.drawable.widget_btn_stop_normal),
+            R.drawable.widget_btn_timer, R.drawable.widget_btn_next_normal, R.drawable.widget_btn_previous_normal,
+            R.drawable.widget_btn_like_nor, R.drawable.widget_btn_one_normal, R.drawable.widget_btn_loop_normal,
+            R.drawable.widget_btn_shuffle_normal, R.drawable.widget_btn_play_normal, R.drawable.widget_btn_stop_normal),
     TRANSPARENT(ColorUtil.getColor(R.color.appwidget_title_color_transparent),
             ColorUtil.getColor(R.color.appwidget_artist_color_transparent),
             ColorUtil.getColor(R.color.appwidget_progress_color_transparent),
             ColorUtil.getColor(R.color.appwidget_btn_color_transparent),
             R.drawable.bg_corner_app_widget_transparent,
-            R.drawable.widget_btn_timer_transparent,R.drawable.widget_btn_next_normal_transparent,
+            R.drawable.widget_btn_timer_transparent, R.drawable.widget_btn_next_normal_transparent,
             R.drawable.widget_btn_previous_normal_transparent, R.drawable.widget_btn_like_nor_transparent,
-            R.drawable.widget_btn_one_normal_transparent,R.drawable.widget_btn_loop_normal_transparent,
-            R.drawable.widget_btn_shuffle_normal_transparent,R.drawable.widget_btn_play_normal_transparent,
+            R.drawable.widget_btn_one_normal_transparent, R.drawable.widget_btn_loop_normal_transparent,
+            R.drawable.widget_btn_shuffle_normal_transparent, R.drawable.widget_btn_play_normal_transparent,
             R.drawable.widget_btn_stop_normal_transparent);
 
     private int mTitleColor;
@@ -45,9 +48,9 @@ public enum AppWidgetSkin {
 
     AppWidgetSkin(@ColorInt int titleColor, @ColorInt int artistColor,
                   @ColorInt int progressColor, @ColorInt int btnColor, @DrawableRes int background,
-                  @DrawableRes int timerRes,@DrawableRes int nextRes,@DrawableRes int prevRes,
-                  @DrawableRes int loveRes,@DrawableRes int repeatRes,@DrawableRes int normalRes,@DrawableRes int shuffleRes,
-                  @DrawableRes int playRes,@DrawableRes int pauseRes) {
+                  @DrawableRes int timerRes, @DrawableRes int nextRes, @DrawableRes int prevRes,
+                  @DrawableRes int loveRes, @DrawableRes int repeatRes, @DrawableRes int normalRes, @DrawableRes int shuffleRes,
+                  @DrawableRes int playRes, @DrawableRes int pauseRes) {
         mTitleColor = titleColor;
         mArtistColor = artistColor;
         mProgressColor = progressColor;
@@ -98,7 +101,7 @@ public enum AppWidgetSkin {
 //    }
 //
 //    public Bitmap getPlayPauseBitmap(){
-//        return MusicService.isPlay() ? getPauseBitmap() : getPlayBitmap();
+//        return MusicService.isPlaying() ? getPauseBitmap() : getPlayBitmap();
 //    }
 //
 //    private Bitmap getPlayBitmap(){
@@ -129,7 +132,7 @@ public enum AppWidgetSkin {
         return mLoveRes;
     }
 
-    public int getLovedRes(){
+    public int getLovedRes() {
         return R.drawable.widget_btn_like_prs;
     }
 
@@ -145,13 +148,14 @@ public enum AppWidgetSkin {
         return mModeShuffleRes;
     }
 
-    public int getModeRes(){
-        return MusicService.getPlayModel() == Constants.PLAY_SHUFFLE ? mModeShuffleRes :
-                MusicService.getPlayModel() == Constants.PLAY_REPEATONE ? mModeRepeatRes : mModeNormalRes;
+    public int getModeRes() {
+        final int playModel = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL, Constants.PLAY_LOOP);
+        return playModel == Constants.PLAY_SHUFFLE ? mModeShuffleRes :
+                playModel == Constants.PLAY_REPEATONE ? mModeRepeatRes : mModeNormalRes;
     }
 
-    public int getPlayPauseRes(){
-        return MusicService.isPlay() ? getPauseRes() : getPlayRes();
+    public int getPlayPauseRes() {
+        return isPlaying() ? getPauseRes() : getPlayRes();
     }
 
     public int getPlayRes() {

@@ -3,8 +3,8 @@ package remix.myplayer.misc.observer;
 import android.net.Uri;
 import android.os.Handler;
 
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -22,9 +22,9 @@ public class MediaStoreObserver extends BaseObserver {
 
     @Override
     void onAccept(Uri uri) {
-        Global.AllSongList = MediaStoreUtil.getAllSongsId();
+        MusicServiceRemote.setAllSong(MediaStoreUtil.getAllSongsId());
 //        Global.FolderMap = MediaStoreUtil.getFolder();
-//        Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
+//        Global.mAllSong = MediaStoreUtil.getAllSongsIdWithFolder();
         mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
     }
 

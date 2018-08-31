@@ -22,6 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.LoaderIds;
@@ -39,13 +40,14 @@ import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
 
+import static remix.myplayer.helper.MusicServiceRemote.getCurrentSong;
+import static remix.myplayer.helper.MusicServiceRemote.isPlaying;
 import static remix.myplayer.util.Constants.TAG_EDIT;
 
 /**
@@ -55,8 +57,8 @@ import static remix.myplayer.util.Constants.TAG_EDIT;
 /**
  * 专辑、艺术家、文件夹、播放列表详情
  */
-public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter>
-        implements UpdateHelper.Callback,OnTagEditListener{
+public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapter>
+        implements UpdateHelper.Callback, OnTagEditListener {
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
     public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
     private boolean mIsRunning = false;
@@ -95,28 +97,28 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
 
         mRefreshHandler = new MsgHandler(this);
         mTagEditReceiver = new TagReceiver(this);
-        registerReceiver(mTagEditReceiver,new IntentFilter(TAG_EDIT));
+        registerReceiver(mTagEditReceiver, new IntentFilter(TAG_EDIT));
 
         //参数id，类型，标题
         ID = getIntent().getIntExtra("Id", -1);
         mType = getIntent().getIntExtra("Type", -1);
         mArg = getIntent().getStringExtra("Title");
 
-        mAdapter = new ChildHolderAdapter(this,R.layout.item_child_holder,mType,mArg,mMultiChoice,mRecyclerView);
+        mAdapter = new ChildHolderAdapter(this, R.layout.item_child_holder, mType, mArg, mMultiChoice, mRecyclerView);
         mMultiChoice.setAdapter(mAdapter);
         mMultiChoice.setExtra(ID);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(position < 0 || mInfoList == null || position >= mInfoList.size())
+                if (position < 0 || mInfoList == null || position >= mInfoList.size())
                     return;
                 int songId = mInfoList.get(position).getId();
-                if(!mMultiChoice.itemClick(position,songId,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
+                if (!mMultiChoice.itemClick(position, songId, mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)) {
                     if (mInfoList != null && mInfoList.size() == 0)
                         return;
                     ArrayList<Integer> idList = new ArrayList<>();
                     for (Song info : mInfoList) {
-                        if(info != null && info.getId() > 0)
+                        if (info != null && info.getId() > 0)
                             idList.add(info.getId());
                     }
                     //设置正在播放列表
@@ -125,7 +127,7 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
                     arg.putInt("Control", Command.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayQueue(idList,mContext,intent);
+                    MusicServiceRemote.setPlayQueue(idList, intent);
 
 //                    startActivity(new Intent(mContext,CustomSortActivity.class)
 //                            .putExtra("list",new ArrayList<>(mInfoList))
@@ -136,7 +138,7 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
 
             @Override
             public void onItemLongClick(View view, int position) {
-                mMultiChoice.itemLongClick(position,mInfoList.get(position).getId(), TAG,mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
+                mMultiChoice.itemLongClick(position, mInfoList.get(position).getId(), TAG, mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
             }
         });
 
@@ -148,20 +150,20 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
                 : ThemeStore.getTextColorPrimary());
 
         //标题
-        if(mType != Constants.FOLDER) {
-            if(mArg.contains("unknown")){
-                if(mType == Constants.ARTIST)
+        if (mType != Constants.FOLDER) {
+            if (mArg.contains("unknown")) {
+                if (mType == Constants.ARTIST)
                     Title = getString(R.string.unknown_artist);
-                else if(mType == Constants.ALBUM){
+                else if (mType == Constants.ALBUM) {
                     Title = getString(R.string.unknown_album);
                 }
             } else {
                 Title = mArg;
             }
         } else
-            Title = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
+            Title = mArg.substring(mArg.lastIndexOf("/") + 1, mArg.length());
         //初始化toolbar
-        setUpToolbar(mToolBar,Title);
+        setUpToolbar(mToolBar, Title);
 
         //加载歌曲列表
 
@@ -176,64 +178,62 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
 
         //初始化底部状态栏
         mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
-            return;
-        mBottombar.updateBottomStatus(MusicService.getCurrentMP3(), MusicService.isPlay());
+        mBottombar.updateBottomStatus(getCurrentSong(), isPlaying());
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        if(mType == Constants.PLAYLIST){
-            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, SortOrder.PlayListSongSortOrder.SONG_A_Z);
-        } else if(mType == Constants.ALBUM){
-            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
-        } else if(mType == Constants.ARTIST){
-            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
+        if (mType == Constants.PLAYLIST) {
+            mSortOrder = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, SortOrder.PlayListSongSortOrder.SONG_A_Z);
+        } else if (mType == Constants.ALBUM) {
+            mSortOrder = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_TRACK_NUMBER);
+        } else if (mType == Constants.ARTIST) {
+            mSortOrder = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
         } else {
-            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
+            mSortOrder = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
         }
-        if(TextUtils.isEmpty(mSortOrder))
+        if (TextUtils.isEmpty(mSortOrder))
             return true;
-        setUpMenuItem(menu,mSortOrder);
+        setUpMenuItem(menu, mSortOrder);
         return true;
     }
 
     @Override
     protected void saveSortOrder(String sortOrder) {
         boolean update = false;
-        if(mType == Constants.PLAYLIST){
+        if (mType == Constants.PLAYLIST) {
             //手动排序或者排序发生变化
-            if(sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM) ||
-                    !mSortOrder.equalsIgnoreCase(sortOrder)){
+            if (sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM) ||
+                    !mSortOrder.equalsIgnoreCase(sortOrder)) {
                 //选择的是手动排序
-                if(sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)){
-                    startActivity(new Intent(mContext,CustomSortActivity.class)
-                            .putExtra("list",new ArrayList<>(mInfoList))
+                if (sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)) {
+                    startActivity(new Intent(mContext, CustomSortActivity.class)
+                            .putExtra("list", new ArrayList<>(mInfoList))
                             .putExtra("id", ID)
-                            .putExtra("name",mArg));
+                            .putExtra("name", mArg));
                 } else {
                     update = true;
                 }
             }
-        } else{
+        } else {
             //排序发生变化
-            if(!mSortOrder.equalsIgnoreCase(sortOrder)){
+            if (!mSortOrder.equalsIgnoreCase(sortOrder)) {
                 update = true;
             }
         }
-        if(mType == Constants.PLAYLIST){
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,sortOrder);
-        } else if(mType == Constants.ALBUM){
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,sortOrder);
-        } else if(mType == Constants.ARTIST){
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,sortOrder);
+        if (mType == Constants.PLAYLIST) {
+            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, sortOrder);
+        } else if (mType == Constants.ALBUM) {
+            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, sortOrder);
+        } else if (mType == Constants.ARTIST) {
+            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, sortOrder);
         } else {
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,sortOrder);
+            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, sortOrder);
         }
         mSortOrder = sortOrder;
-        if(update)
+        if (update)
             updateList(true);
 
     }
@@ -242,7 +242,7 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
     protected int getMenuLayoutId() {
         return mType == Constants.PLAYLIST ? R.menu.menu_child_for_playlist :
                 mType == Constants.ALBUM ? R.menu.menu_child_for_album :
-                mType == Constants.ARTIST ? R.menu.menu_child_for_artist : R.menu.menu_child_for_folder;
+                        mType == Constants.ARTIST ? R.menu.menu_child_for_artist : R.menu.menu_child_for_folder;
     }
 
     @Override
@@ -252,7 +252,7 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
 
     @Override
     public void onBackPressed() {
-        if(mMultiChoice.isShow()) {
+        if (mMultiChoice.isShow()) {
             onMultiBackPress();
         } else {
             finish();
@@ -270,36 +270,37 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
     }
 
     public void onTagEdit(Song newSong) {
-        if(newSong == null)
+        if (newSong == null)
             return;
         Fresco.getImagePipeline().clearCaches();
         final UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(newSong);
-        SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.NAME,request.getLastFMKey());
-        SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.NAME,request.getNeteaseCacheKey());
-        if(mType == Constants.ARTIST || mType == Constants.ALBUM) {
+        SPUtil.deleteValue(mContext, SPUtil.COVER_KEY.NAME, request.getLastFMKey());
+        SPUtil.deleteValue(mContext, SPUtil.COVER_KEY.NAME, request.getNeteaseCacheKey());
+        if (mType == Constants.ARTIST || mType == Constants.ALBUM) {
             ID = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
             Title = mType == Constants.ARTIST ? newSong.getArtist() : newSong.getAlbum();
             mToolBar.setTitle(Title);
-            if(mIsRunning)
+            if (mIsRunning)
                 updateList(true);
         }
     }
 
     /**
      * 根据参数(专辑id 歌手id 文件夹名 播放列表名)获得对应的歌曲信息列表
+     *
      * @return 对应歌曲信息列表
      */
-    private List<Song> getMP3List(){
-        if(ID < 0)
+    private List<Song> getMP3List() {
+        if (ID < 0)
             return null;
         switch (mType) {
             //专辑id
             case Constants.ALBUM:
-                mInfoList = MediaStoreUtil.getMP3InfoByArg(ID, Constants.ALBUM);
+                mInfoList = MediaStoreUtil.getMP3InfoByArg(mArg, Constants.ALBUM);
                 break;
             //歌手id
             case Constants.ARTIST:
-                mInfoList = MediaStoreUtil.getMP3InfoByArg(ID, Constants.ARTIST);
+                mInfoList = MediaStoreUtil.getMP3InfoByArg(mArg, Constants.ARTIST);
                 break;
             //文件夹名
             case Constants.FOLDER:
@@ -309,7 +310,7 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
             case Constants.PLAYLIST:
                 /* 播放列表歌曲id列表 */
                 List<Integer> playListSongIDList = PlayListUtil.getIDList(ID);
-                if(playListSongIDList == null)
+                if (playListSongIDList == null)
                     return mInfoList;
                 mInfoList = PlayListUtil.getMP3ListByIds(playListSongIDList, ID);
                 break;
@@ -319,9 +320,9 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
 
     //更新界面
     @Override
-    public void UpdateUI(Song Song, boolean isplay) {
+    public void UpdateUI(Song Song, boolean isPlay) {
         //底部状态兰
-        mBottombar.updateBottomStatus(Song, isplay);
+        mBottombar.updateBottomStatus(Song, isPlay);
         //更新高亮歌曲
 //        mAdapter.onUpdateHighLight();
     }
@@ -329,8 +330,8 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
     @Override
     protected void onPause() {
         super.onPause();
-        if(mMultiChoice.isShow()){
-            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
+        if (mMultiChoice.isShow()) {
+            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI, 500);
         }
     }
 
@@ -348,11 +349,10 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
     }
 
     private void updateList(boolean reset) {
-        if(mIsRunning){
-            if(mHasPermission){
+        if (mIsRunning) {
+            if (mHasPermission) {
                 new GetSongThread(reset).start();
-            }
-            else {
+            } else {
                 mInfoList = null;
                 mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
             }
@@ -363,35 +363,36 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
     protected void onDestroy() {
         super.onDestroy();
         mRefreshHandler.remove();
-        Util.unregisterReceiver(this,mTagEditReceiver);
+        Util.unregisterReceiver(this, mTagEditReceiver);
     }
 
     @OnHandleMessage
-    public void handleInternal(Message msg){
-        switch (msg.what){
+    public void handleInternal(Message msg) {
+        switch (msg.what) {
             case Constants.CLEAR_MULTI:
                 mAdapter.notifyDataSetChanged();
                 break;
             case Constants.UPDATE_ADAPTER:
                 mAdapter.setData(mInfoList);
-                mNum.setText(getString(R.string.song_count,mInfoList.size()));
+                mNum.setText(getString(R.string.song_count, mInfoList.size()));
                 break;
             case START:
-                if(mMDDialog != null && !mMDDialog.isShowing()){
+                if (mMDDialog != null && !mMDDialog.isShowing()) {
                     mMDDialog.show();
                 }
                 break;
             case END:
-                if(mMDDialog != null && mMDDialog.isShowing()){
+                if (mMDDialog != null && mMDDialog.isShowing()) {
                     mMDDialog.dismiss();
                 }
                 break;
         }
     }
 
-    private class GetSongThread extends Thread{
+    private class GetSongThread extends Thread {
         //是否需要重新查询歌曲列表
         private boolean mNeedReset;
+
         GetSongThread(boolean needReset) {
             this.mNeedReset = needReset;
         }
@@ -399,7 +400,7 @@ public class ChildHolderActivity extends LibraryActivity<Song,ChildHolderAdapter
         @Override
         public void run() {
             mRefreshHandler.sendEmptyMessage(START);
-            if(mNeedReset)
+            if (mNeedReset)
                 mInfoList = getMP3List();
             mRefreshHandler.sendEmptyMessage(END);
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);

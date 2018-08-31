@@ -33,6 +33,6 @@ public class UpdateHelper {
     }
 
     public interface Callback{
-        void UpdateUI(Song Song, boolean isplay);
+        void UpdateUI(Song Song, boolean isPlay);
     }
 }

@@ -13,14 +13,15 @@ import com.soundcloud.android.crop.Crop;
 import java.util.ArrayList;
 import java.util.List;
 
+import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.CustomThumb;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.AddtoPlayListDialog;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
@@ -60,7 +61,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 arg.putInt("Control", Command.PLAYSELECTEDSONG);
                 arg.putInt("Position", 0);
                 intent.putExtras(arg);
-                Global.setPlayQueue(idList,mContext,intent);
+                MusicServiceRemote.setPlayQueue(idList,intent);
                 break;
             //添加到播放队列
             case R.id.menu_add_to_play_queue:
@@ -68,7 +69,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                     ToastUtil.show(mContext,R.string.list_is_empty);
                     return true;
                 }
-                ToastUtil.show(mContext,mContext.getString(R.string.add_song_playqueue_success,Global.AddSongToPlayQueue(idList)));
+                ToastUtil.show(mContext,mContext.getString(R.string.add_song_playqueue_success, MusicService.AddSongToPlayQueue(idList)));
                 break;
             //添加到播放列表
             case R.id.menu_add_to_playlist:

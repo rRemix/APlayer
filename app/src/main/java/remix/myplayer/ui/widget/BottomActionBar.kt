@@ -18,9 +18,9 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.misc.AnimationUrl
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.request.LibraryUriRequest
 import remix.myplayer.request.RequestConfig
-import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.PlayerActivity
@@ -108,7 +108,7 @@ class BottomActionBar @JvmOverloads constructor(context: Context, attrs: Attribu
     }
 
     fun startPlayerActivity() {
-        if (MusicService.getCurrentMP3() == null)
+        if (MusicServiceRemote.getCurrentSong() == null)
             return
         val intent = Intent(context, PlayerActivity::class.java)
         val bundle = Bundle()

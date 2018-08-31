@@ -13,10 +13,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.adapter.AlbumAdapter;
@@ -30,7 +32,6 @@ import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
@@ -119,7 +120,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                 break;
         }
 
-        num = Global.AddSongToPlayQueue(idList);
+        num = MusicService.AddSongToPlayQueue(idList);
         ToastUtil.show(mContext,mContext.getString(R.string.add_song_playqueue_success,num));
         updateOptionMenu(false);
     }

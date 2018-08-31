@@ -1,6 +1,5 @@
 package remix.myplayer.ui.activity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,7 +38,6 @@ import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.activity.base.BaseMusicActivity;
 import remix.myplayer.util.ColorUtil;
@@ -80,7 +77,6 @@ public class RecordShareActivity extends BaseMusicActivity {
     @BindView(R.id.recordshare_container)
     LinearLayout mContainer;
 
-    private boolean mHasPermission = false;
     //当前正在播放的歌曲
     private Song mInfo;
     //处理图片的进度条
@@ -259,19 +255,6 @@ public class RecordShareActivity extends BaseMusicActivity {
             mProgressDialog.dismiss();
     }
 
-    public void onResume() {
-        super.onResume();
-        new RxPermissions(this)
-                .request(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .subscribe(aBoolean -> {
-                    if(aBoolean != mHasPermission){
-                        mHasPermission = aBoolean;
-                        Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
-                        intent.putExtra("permission",mHasPermission);
-                        sendBroadcast(intent);
-                    }
-                });
-    }
 
     public void onPause() {
         super.onPause();

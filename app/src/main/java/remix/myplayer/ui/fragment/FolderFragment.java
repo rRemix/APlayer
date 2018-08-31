@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Folder;
 import remix.myplayer.interfaces.LoaderIds;
@@ -24,7 +25,6 @@ import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.ui.adapter.FolderAdapter;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**

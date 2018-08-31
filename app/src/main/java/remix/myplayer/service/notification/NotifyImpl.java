@@ -37,15 +37,15 @@ public class NotifyImpl extends Notify {
     public void updateForPlaying() {
         mRemoteBigView = new RemoteViews(mService.getPackageName(),R.layout.notification_big);
         mRemoteView = new RemoteViews(mService.getPackageName(),R.layout.notification);
-        boolean isPlay = MusicService.isPlay();
+        boolean isPlay = mService.isPlaying();
 
         buildAction(mService);
         Notification notification = buildNotification(mService);
 
-        if((MusicService.getCurrentMP3() != null)) {
+        final Song song = mService.getCurrentSong();
+        if(song != null) {
             boolean isSystemColor = SPUtil.getValue(mService,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR,true);
 
-            Song song = MusicService.getCurrentMP3();
             //设置歌手，歌曲名
             mRemoteBigView.setTextViewText(R.id.notify_song, song.getTitle());
             mRemoteBigView.setTextViewText(R.id.notify_artist_album, song.getArtist() + " - " + song.getAlbum());
@@ -112,7 +112,7 @@ public class NotifyImpl extends Notify {
                 .setContentTitle("")
                 .setShowWhen(false)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setOngoing(MusicService.isPlay())
+                .setOngoing(mService.isPlaying())
                 .setContentIntent(getContentIntent())
                 .setSmallIcon(R.drawable.notifbar_icon);
         builder.setCustomBigContentView(mRemoteBigView);

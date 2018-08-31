@@ -24,9 +24,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
+import remix.myplayer.helper.SleepTimer;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.widget.CircleSeekBar;
@@ -66,10 +66,7 @@ public class TimerDialog extends BaseDialogActivity {
     @BindView(R.id.close_stop)
     TextView mCancel;
 
-    //是否正在计时
-    public static boolean mIsTiming = false;
-    //是否正在运行
-    public static boolean mIsRunning = false;
+
     //定时时间 单位秒
     private int mTime;
     //设置的定时时间 用于保存默认设置
@@ -100,8 +97,8 @@ public class TimerDialog extends BaseDialogActivity {
 
 
         //如果正在计时，设置seekbar的进度
-        if(mIsTiming) {
-            mTime = (int) (MusicService.getInstance().getMillUntilFinish() / 1000);
+        if(SleepTimer.isTicking()) {
+            mTime = (int) (SleepTimer.getMillisUntilFinish() / 1000);
             if(mTime > 0){
                 mSeekbar.setProgress(mTime);
                 mSeekbar.setStart(true);
@@ -142,7 +139,7 @@ public class TimerDialog extends BaseDialogActivity {
         if(hasDefault && time > 0){
             //如果有默认设置并且没有开始计时，直接开始计时
             //如果有默认设置但已经开始计时，打开该popupwindow,并更改switch外观
-            if(!mIsTiming) {
+            if(!SleepTimer.isTicking()) {
                 mTime = time;
                 toggle();
             }
@@ -166,7 +163,7 @@ public class TimerDialog extends BaseDialogActivity {
             }
         });
 
-        mToggle.setText(mIsTiming ? R.string.cancel_timer : R.string.start_timer);
+        mToggle.setText(SleepTimer.isTicking() ? R.string.cancel_timer : R.string.start_timer);
 
         //分钟 秒 背景框
         ButterKnife.apply(new View[]{findView(R.id.timer_minute_container), findView(R.id.timer_second_container)},
@@ -187,7 +184,7 @@ public class TimerDialog extends BaseDialogActivity {
      * 根据是否已经开始计时来取消或开始计时
      */
     private void toggle(){
-        if(mTime <= 0 && !mIsTiming) {
+        if(mTime <= 0 && !SleepTimer.isTicking()) {
             ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
             return;
         }
@@ -196,7 +193,7 @@ public class TimerDialog extends BaseDialogActivity {
 //        if(mIsTiming){
 //            mSaveTime = mTime / 60;
 //        }
-        MusicService.getInstance().toggleTimer(!mIsTiming,mTime * 1000);
+        SleepTimer.toggleTimer(mTime * 1000);
         finish();
     }
 
@@ -234,14 +231,14 @@ public class TimerDialog extends BaseDialogActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mIsRunning = true;
-        if(mIsTiming) {
+
+        if(SleepTimer.isTicking()) {
             mUpdateTimer = new Timer();
             mUpdateTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     int min,sec,remain;
-                    remain = (int) MusicService.getInstance().getMillUntilFinish() / 1000;
+                    remain = (int) SleepTimer.getMillisUntilFinish() / 1000;
                     min = remain / 60;
                     sec = remain % 60;
                     Message msg = new Message();
@@ -260,7 +257,6 @@ public class TimerDialog extends BaseDialogActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mIsRunning = false;
         if(mUpdateTimer != null){
             mUpdateTimer.cancel();
             mUpdateTimer = null;

@@ -5,10 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 
+import remix.myplayer.Global;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 
 /**
  * Created by Remix on 2016/3/23.
@@ -21,30 +22,30 @@ import remix.myplayer.util.Global;
 public class HeadsetPlugReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent == null)
+        if (intent == null)
             return;
         final String action = intent.getAction();
         boolean headsetOn = true;
-        if(AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)){
+        if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
             headsetOn = false;
         }
-        if(intent.hasExtra("state")){
+        if (intent.hasExtra("state")) {
             headsetOn = intent.getIntExtra("state", -1) == 1;
         }
 
         Global.setHeadsetOn(headsetOn);
         Intent eqintent = new Intent(Constants.SOUNDEFFECT_ACTION);
-        eqintent.putExtra("IsHeadsetOn",Global.getHeadsetOn());
+        eqintent.putExtra("IsHeadsetOn", Global.getHeadsetOn());
         context.sendBroadcast(eqintent);
 
-        if(!headsetOn && MusicService.isPlay()){
+        if (!headsetOn && MusicServiceRemote.isPlaying()) {
             Intent ctlIntent = new Intent(MusicService.ACTION_CMD);
             ctlIntent.putExtra("Control", Command.PAUSE);
             context.sendBroadcast(ctlIntent);
         }
         try {
             abortBroadcast();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

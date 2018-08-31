@@ -58,11 +58,6 @@ public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseMusic
     protected abstract void initView();
 
     @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         if(mAdapter != null){

@@ -64,10 +64,12 @@ import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import remix.myplayer.App;
+import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.Category;
 import remix.myplayer.bean.misc.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
@@ -82,7 +84,6 @@ import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.SimpleUriRequest;
 import remix.myplayer.request.network.RxUtil;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.DrawerAdapter;
@@ -97,7 +98,6 @@ import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.MusicUtil;
@@ -143,8 +143,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private BottomActionBarFragment mBottomBar;
     private DrawerAdapter mDrawerAdapter;
     private MainPagerAdapter mPagerAdapter;
-    //是否正在运行
-    private static boolean mIsRunning = false;
 
     private MsgHandler mRefreshHandler;
     //设置界面
@@ -162,14 +160,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if (mMultiChoice.isShow()) {
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
-        mIsRunning = true;
-        UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mIsRunning = false;
         if (mMultiChoice.isShow()) {
             mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI, 500);
         }
@@ -213,27 +208,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     /**
      * 初始化底部显示控件
      */
-    private void setUpBottomBar() {
+    private void setUpBottomBar(Song song) {
+        if (song == null)
+            return;
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        int lastId = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1);
-        Song item;
-        if (lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
-            mBottomBar.updateBottomStatus(item, MusicService.isPlay());
-        } else {
-            if (Global.PlayQueue == null || Global.PlayQueue.size() == 0)
-                return;
-            int id = Global.PlayQueue.get(0);
-            for (int i = 0; i < Global.PlayQueue.size(); i++) {
-                id = Global.PlayQueue.get(i);
-                if (id != lastId)
-                    break;
-            }
-            item = MediaStoreUtil.getMP3InfoById(id);
-            if (item != null) {
-                mBottomBar.updateBottomStatus(item, MusicService.isPlay());
-            }
-        }
+        mBottomBar.updateBottomStatus(song, MusicServiceRemote.isPlaying());
     }
 
     @Override
@@ -679,16 +659,28 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         } else if (mMultiChoice.isShow()) {
             onMultiBackPress();
         } else {
-            super.onBackPressed();
+//            super.onBackPressed();
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            startActivity(intent);
         }
+    }
+
+    @Override
+    public void onServiceConnected() {
+        super.onServiceConnected();
+        UpdateUI(MusicServiceRemote.getCurrentSong(),MusicServiceRemote.isPlaying());
+    }
+
+    @Override
+    public void onServiceDisConnected() {
+        super.onServiceDisConnected();
     }
 
     //更新界面
     @Override
     public void UpdateUI(Song song, boolean isPlay) {
-        if (!mIsRunning)
-            return;
-
         mBottomBar.updateBottomStatus(song, isPlay);
 //        for(Fragment temp : getSupportFragmentManager().getFragments()) {
 //            if (temp instanceof SongFragment) {
@@ -757,6 +749,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      * 检查更新
      */
     private static boolean mAlreadyCheck;
+
     private void checkUpdate() {
         if (!IS_GOOGLEPLAY && !mAlreadyCheck) {
             UpdateAgent.setForceCheck(false);
@@ -773,6 +766,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      * @param path
      */
     private String mInstallPath;
+
     private void checkIsAndroidO(Context context, String path) {
         if (!TextUtils.isEmpty(path) && !path.equals(mInstallPath))
             mInstallPath = path;
@@ -792,14 +786,14 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-    private void dismissForceDialog(){
-        if(mForceDialog != null && mForceDialog.isShowing()){
+    private void dismissForceDialog() {
+        if (mForceDialog != null && mForceDialog.isShowing()) {
             mForceDialog.dismiss();
             mForceDialog = null;
         }
     }
 
-    private void showForceDialog(){
+    private void showForceDialog() {
         dismissForceDialog();
         mForceDialog = new MaterialDialog.Builder(this)
                 .canceledOnTouchOutside(false)
@@ -815,8 +809,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     }
 
 
-
     private MaterialDialog mForceDialog;
+
     public static class MainReceiver extends BroadcastReceiver {
         private final WeakReference<MainActivity> mRef;
 
@@ -834,8 +828,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             MainActivity mainActivity = mRef.get();
             switch (action) {
                 case ACTION_LOAD_FINISH:
-                    mainActivity.setUpBottomBar();
-                    mainActivity.UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
+                    mainActivity.setUpBottomBar(intent.getParcelableExtra("Song"));
+                    mainActivity.UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
                     break;
                 case ACTION_DOWNLOAD_COMPLETE:
                     mainActivity.checkIsAndroidO(context, intent.getStringExtra(DownloadService.EXTRA_PATH));

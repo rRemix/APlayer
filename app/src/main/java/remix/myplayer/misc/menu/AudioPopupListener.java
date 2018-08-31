@@ -17,6 +17,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
@@ -30,7 +31,6 @@ import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.ui.fragment.LyricFragment;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
@@ -38,6 +38,8 @@ import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
 import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
+import static remix.myplayer.helper.MusicServiceRemote.getCurrentSong;
+import static remix.myplayer.helper.MusicServiceRemote.getMediaPlayer;
 
 /**
  * @ClassName AudioPopupListener
@@ -45,24 +47,24 @@ import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
  * @Author Xiaoborui
  * @Date 2016/8/29 15:33
  */
-public class AudioPopupListener<ActivityCallback extends AppCompatActivity & FileChooserDialog.FileCallback> extends ContextWrapper implements PopupMenu.OnMenuItemClickListener{
+public class AudioPopupListener<ActivityCallback extends AppCompatActivity & FileChooserDialog.FileCallback> extends ContextWrapper implements PopupMenu.OnMenuItemClickListener {
     private ActivityCallback mActivity;
     private Song mInfo;
     private Tag mTag;
 
-    public AudioPopupListener(ActivityCallback activity, Song song){
+    public AudioPopupListener(ActivityCallback activity, Song song) {
         super(activity);
         mActivity = activity;
         mInfo = song;
-        mTag = new Tag(activity,song);
+        mTag = new Tag(activity, song);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menu_lyric:
-                final boolean alreadyIgnore = SPUtil.getValue(mActivity,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
-                final LyricFragment lyricFragment = ((PlayerActivity)mActivity).getLyricFragment();
+                final boolean alreadyIgnore = SPUtil.getValue(mActivity, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", SPUtil.LYRIC_KEY.LYRIC_DEFAULT) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
+                final LyricFragment lyricFragment = ((PlayerActivity) mActivity).getLyricFragment();
                 new MaterialDialog.Builder(mActivity)
                         .items(getString(R.string.netease),
                                 getString(R.string.kugou),
@@ -72,11 +74,11 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                         .itemsColorAttr(R.attr.text_color_primary)
                         .backgroundColorAttr(R.attr.background_color_3)
                         .itemsCallback((dialog, itemView, position, text) -> {
-                            switch (position){
+                            switch (position) {
                                 case 0: //网易 酷狗
                                 case 1:
-                                    SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
-                                    lyricFragment.updateLrc(mInfo,true);
+                                    SPUtil.putValue(mActivity, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
+                                    lyricFragment.updateLrc(mInfo, true);
                                     sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                     break;
                                 case 2: //手动选择歌词
@@ -94,13 +96,13 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                             .titleColorAttr(R.attr.text_color_primary)
                                             .backgroundColorAttr(R.attr.background_color_3)
                                             .onPositive((dialog1, which) -> {
-                                                if(!alreadyIgnore){//忽略
+                                                if (!alreadyIgnore) {//忽略
                                                     if (mInfo != null) {
-                                                        SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_IGNORE);
+                                                        SPUtil.putValue(mActivity, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", SPUtil.LYRIC_KEY.LYRIC_IGNORE);
                                                         lyricFragment.updateLrc(mInfo);
                                                     }
                                                 } else {//取消忽略
-                                                    SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT);
+                                                    SPUtil.putValue(mActivity, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", SPUtil.LYRIC_KEY.LYRIC_DEFAULT);
                                                     lyricFragment.updateLrc(mInfo);
                                                 }
                                                 sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
@@ -126,20 +128,20 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                 break;
             case R.id.menu_eq:
                 Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-                audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
-                if(Util.isIntentAvailable(mActivity,audioEffectIntent)){
+                audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, getMediaPlayer().getAudioSessionId());
+                if (Util.isIntentAvailable(mActivity, audioEffectIntent)) {
                     mActivity.startActivityForResult(audioEffectIntent, 0);
                 } else {
-                    mActivity.startActivity(new Intent(mActivity,EQActivity.class));
+                    mActivity.startActivity(new Intent(mActivity, EQActivity.class));
                 }
                 break;
             case R.id.menu_collect:
-                PlayListSong info = new PlayListSong(mInfo.getId(), Global.MyLoveID,Constants.MYLOVE);
+                PlayListSong info = new PlayListSong(mInfo.getId(), Global.MyLoveID, Constants.MYLOVE);
                 ToastUtil.show(mActivity,
-                        PlayListUtil.addSong(info) > 0 ? getString(R.string.add_song_playlist_success, 1,Constants.MYLOVE) : getString(R.string.add_song_playlist_error));
+                        PlayListUtil.addSong(info) > 0 ? getString(R.string.add_song_playlist_success, 1, Constants.MYLOVE) : getString(R.string.add_song_playlist_error));
                 break;
             case R.id.menu_add_to_playlist:
-                Intent intentAdd = new Intent(this,AddtoPlayListDialog.class);
+                Intent intentAdd = new Intent(this, AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
                 ardAdd.putSerializable("list", new ArrayList<>(Collections.singletonList(mInfo.getId())));
                 intentAdd.putExtras(ardAdd);
@@ -152,14 +154,14 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                         .negativeText(R.string.cancel)
                         .checkBoxPromptRes(R.string.delete_source, false, null)
                         .onAny((dialog, which) -> {
-                            if(which == POSITIVE){
-                                if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0){
-                                    if(PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)){
+                            if (which == POSITIVE) {
+                                if (MediaStoreUtil.delete(mInfo.getId(), Constants.SONG, dialog.isPromptCheckBoxChecked()) > 0) {
+                                    if (PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)) {
                                         ToastUtil.show(mActivity, getString(R.string.delete_success));
                                         //移除的是正在播放的歌曲
-                                        if(MusicService.getCurrentMP3() == null)
+                                        if (getCurrentSong() == null)
                                             return;
-                                        if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
+                                        if (mInfo.getId() == getCurrentSong().getId()) {
                                             Intent intent = new Intent(MusicService.ACTION_CMD);
                                             intent.putExtra("Control", Command.NEXT);
                                             mActivity.sendBroadcast(intent);
@@ -185,13 +187,15 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
         return true;
     }
 
-    private class TextInputEditWatcher implements TextWatcher{
+    private class TextInputEditWatcher implements TextWatcher {
         private TextInputLayout mInputLayout;
         private String mError;
-        TextInputEditWatcher(TextInputLayout layout,String error){
+
+        TextInputEditWatcher(TextInputLayout layout, String error) {
             mError = error;
             mInputLayout = layout;
         }
+
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
         }
@@ -202,9 +206,9 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
 
         @Override
         public void afterTextChanged(Editable s) {
-            if(s == null || TextUtils.isEmpty(s.toString())){
+            if (s == null || TextUtils.isEmpty(s.toString())) {
                 mInputLayout.setError(mError);
-            }else {
+            } else {
                 mInputLayout.setError("");
             }
         }

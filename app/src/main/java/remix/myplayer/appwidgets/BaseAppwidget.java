@@ -43,12 +43,12 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
 
     protected AppWidgetSkin mSkin;
     protected Bitmap mBitmap;
-    private static int IMAGE_SIZE_BIG = DensityUtil.dip2px(App.getContext(),270);
-    private static int IMAGE_SIZE_MEDIUM = DensityUtil.dip2px(App.getContext(),72);
+    private static int IMAGE_SIZE_BIG = DensityUtil.dip2px(App.getContext(), 270);
+    private static int IMAGE_SIZE_MEDIUM = DensityUtil.dip2px(App.getContext(), 72);
 
     protected PendingIntent buildServicePendingIntent(Context context, ComponentName componentName, int cmd) {
         Intent intent = new Intent(MusicService.ACTION_APPWIDGET_OPERATE);
-        intent.putExtra("Control",cmd);
+        intent.putExtra("Control", cmd);
         intent.setComponent(componentName);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isAllowForForegroundService(cmd)) {
             return PendingIntent.getForegroundService(context, cmd, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -57,7 +57,7 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
         }
     }
 
-    private boolean isAllowForForegroundService(int cmd){
+    private boolean isAllowForForegroundService(int cmd) {
         return cmd != Command.CHANGE_MODEL && cmd != Command.LOVE && cmd != Command.TOGGLE_TIMER;
     }
 
@@ -67,57 +67,57 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
     }
 
     @DrawableRes
-    private int getDefaultDrawableRes(){
+    private int getDefaultDrawableRes() {
         return mSkin == WHITE_1F ? R.drawable.album_empty_bg_night : R.drawable.album_empty_bg_day;
     }
 
-    protected void updateCover(final Context context, final RemoteViews remoteViews,final int[] appWidgetIds, boolean reloadCover){
-        Song song = MusicService.getCurrentMP3();
-        if(song == null)
+    protected void updateCover(final MusicService service, final RemoteViews remoteViews, final int[] appWidgetIds, boolean reloadCover) {
+        Song song = service.getCurrentSong();
+        if (song == null)
             return;
         //设置封面
-        if(!reloadCover){
-            if(mBitmap != null && !mBitmap.isRecycled()) {
-                LogUtil.d(TAG,"复用Bitmap: " + mBitmap);
+        if (!reloadCover) {
+            if (mBitmap != null && !mBitmap.isRecycled()) {
+                LogUtil.d(TAG, "复用Bitmap: " + mBitmap);
                 remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
             } else {
-                LogUtil.d(TAG,"Bitmap复用失败: " + mBitmap);
-                remoteViews.setImageViewResource(R.id.appwidget_image,getDefaultDrawableRes());
+                LogUtil.d(TAG, "Bitmap复用失败: " + mBitmap);
+                remoteViews.setImageViewResource(R.id.appwidget_image, getDefaultDrawableRes());
             }
-            pushUpdate(context,appWidgetIds,remoteViews);
+            pushUpdate(service, appWidgetIds, remoteViews);
         } else {
-            final int size = this.getClass().getSimpleName().contains("Big") ? IMAGE_SIZE_BIG : IMAGE_SIZE_MEDIUM ;
-            new RemoteUriRequest(getSearchRequestWithAlbumType(song),new RequestConfig.Builder(size, size).build()){
+            final int size = this.getClass().getSimpleName().contains("Big") ? IMAGE_SIZE_BIG : IMAGE_SIZE_MEDIUM;
+            new RemoteUriRequest(getSearchRequestWithAlbumType(song), new RequestConfig.Builder(size, size).build()) {
                 @Override
                 public void onError(String errMsg) {
-                    LogUtil.d(TAG,"onError: " + errMsg + " --- 清空bitmap: " + mBitmap);
+                    LogUtil.d(TAG, "onError: " + errMsg + " --- 清空bitmap: " + mBitmap);
 //                    Recycler.recycleBitmap(mBitmap);
                     mBitmap = null;
-                    remoteViews.setImageViewResource(R.id.appwidget_image,getDefaultDrawableRes());
-                    pushUpdate(context,appWidgetIds,remoteViews);
+                    remoteViews.setImageViewResource(R.id.appwidget_image, getDefaultDrawableRes());
+                    pushUpdate(service, appWidgetIds, remoteViews);
                 }
 
                 @Override
                 public void onSuccess(Bitmap result) {
                     try {
-                        if(result != mBitmap && mBitmap != null){
-                            LogUtil.d(TAG,"onSuccess --- 回收Bitmap: " + mBitmap);
+                        if (result != mBitmap && mBitmap != null) {
+                            LogUtil.d(TAG, "onSuccess --- 回收Bitmap: " + mBitmap);
 //                            Recycler.recycleBitmap(mBitmap);
                             mBitmap = null;
                         }
 //                        mBitmap = MusicService.copy(result);
                         mBitmap = result;
-                        LogUtil.d(TAG,"onSuccess --- 获取Bitmap: " + mBitmap);
-                        if(mBitmap != null) {
+                        LogUtil.d(TAG, "onSuccess --- 获取Bitmap: " + mBitmap);
+                        if (mBitmap != null) {
                             remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
                         } else {
-                            remoteViews.setImageViewResource(R.id.appwidget_image,getDefaultDrawableRes());
+                            remoteViews.setImageViewResource(R.id.appwidget_image, getDefaultDrawableRes());
                         }
 
-                    } catch (Exception e){
-                        LogUtil.d(TAG,"onSuccess --- 发生异常: " + e);
+                    } catch (Exception e) {
+                        LogUtil.d(TAG, "onSuccess --- 发生异常: " + e);
                     } finally {
-                        pushUpdate(context,appWidgetIds,remoteViews);
+                        pushUpdate(service, appWidgetIds, remoteViews);
                     }
                 }
             }.load();
@@ -125,13 +125,13 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
     }
 
     protected void buildAction(Context context, RemoteViews views) {
-        ComponentName componentNameForService = new ComponentName(context,MusicService.class);
-        views.setOnClickPendingIntent(R.id.appwidget_toggle, buildServicePendingIntent(context,componentNameForService, Command.TOGGLE));
-        views.setOnClickPendingIntent(R.id.appwidget_prev, buildServicePendingIntent(context,componentNameForService, Command.PREV));
-        views.setOnClickPendingIntent(R.id.appwidget_next, buildServicePendingIntent(context,componentNameForService, Command.NEXT));
-        views.setOnClickPendingIntent(R.id.appwidget_model, buildServicePendingIntent(context,componentNameForService, Command.CHANGE_MODEL));
-        views.setOnClickPendingIntent(R.id.appwidget_love, buildServicePendingIntent(context,componentNameForService, Command.LOVE));
-        views.setOnClickPendingIntent(R.id.appwidget_timer, buildServicePendingIntent(context,componentNameForService, Command.TOGGLE_TIMER));
+        ComponentName componentNameForService = new ComponentName(context, MusicService.class);
+        views.setOnClickPendingIntent(R.id.appwidget_toggle, buildServicePendingIntent(context, componentNameForService, Command.TOGGLE));
+        views.setOnClickPendingIntent(R.id.appwidget_prev, buildServicePendingIntent(context, componentNameForService, Command.PREV));
+        views.setOnClickPendingIntent(R.id.appwidget_next, buildServicePendingIntent(context, componentNameForService, Command.NEXT));
+        views.setOnClickPendingIntent(R.id.appwidget_model, buildServicePendingIntent(context, componentNameForService, Command.CHANGE_MODEL));
+        views.setOnClickPendingIntent(R.id.appwidget_love, buildServicePendingIntent(context, componentNameForService, Command.LOVE));
+        views.setOnClickPendingIntent(R.id.appwidget_timer, buildServicePendingIntent(context, componentNameForService, Command.TOGGLE_TIMER));
 
         Intent action = new Intent(context, MainActivity.class);
         action.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -147,23 +147,23 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(new ComponentName(context, getClass()), remoteViews);
     }
 
-    protected void updateRemoteViews(RemoteViews remoteViews,Song song){
+    protected void updateRemoteViews(MusicService service,RemoteViews remoteViews, Song song) {
 //        int skin = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
 //        mSkin = skin == SKIN_TRANSPARENT ? AppWidgetSkin.TRANSPARENT : AppWidgetSkin.WHITE_1F;
 //        updateBackground(remoteViews);
-        updateTitle(remoteViews,song);
-        updateArtist(remoteViews,song);
+        updateTitle(remoteViews, song);
+        updateArtist(remoteViews, song);
 //        updateSkin(remoteViews);
         updatePlayPause(remoteViews);
-        updateLove(remoteViews,song);
+        updateLove(remoteViews, song);
         updateModel(remoteViews);
         updateNextAndPrev(remoteViews);
-        updateProgress(remoteViews,song);
+        updateProgress(service,remoteViews, song);
         updateTimer(remoteViews);
     }
 
     private void updateTimer(RemoteViews remoteViews) {
-        remoteViews.setImageViewResource(R.id.appwidget_timer,mSkin.getTimerRes());
+        remoteViews.setImageViewResource(R.id.appwidget_timer, mSkin.getTimerRes());
     }
 
 //    protected void updateSkin(RemoteViews remoteViews){
@@ -171,17 +171,17 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
 //        remoteViews.setImageViewBitmap(R.id.appwidget_skin,drawableToBitmap(skinDrawable));
 //    }
 
-    protected void updateProgress(RemoteViews remoteViews, Song song) {
+    protected void updateProgress(MusicService service,RemoteViews remoteViews, Song song) {
         //设置时间
-        remoteViews.setTextColor(R.id.appwidget_progress,mSkin.getProgressColor());
+        remoteViews.setTextColor(R.id.appwidget_progress, mSkin.getProgressColor());
         //进度
-        remoteViews.setProgressBar(R.id.appwidget_seekbar,(int)song.getDuration(),MusicService.getProgress(),false);
+        remoteViews.setProgressBar(R.id.appwidget_seekbar, (int) song.getDuration(), service.getProgress(), false);
     }
 
     protected void updateLove(RemoteViews remoteViews, Song song) {
         //是否收藏
-        if(PlayListUtil.isLove(song.getId()) != PlayListUtil.EXIST){
-            remoteViews.setImageViewResource(R.id.appwidget_love,mSkin.getLoveRes());
+        if (PlayListUtil.isLove(song.getId()) != PlayListUtil.EXIST) {
+            remoteViews.setImageViewResource(R.id.appwidget_love, mSkin.getLoveRes());
         } else {
             remoteViews.setImageViewResource(R.id.appwidget_love, mSkin.getLovedRes());
         }
@@ -189,8 +189,8 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
 
     protected void updateNextAndPrev(RemoteViews remoteViews) {
         //上下首歌曲
-        remoteViews.setImageViewResource(R.id.appwidget_next,mSkin.getNextRes());
-        remoteViews.setImageViewResource(R.id.appwidget_prev,mSkin.getPrevRes());
+        remoteViews.setImageViewResource(R.id.appwidget_next, mSkin.getNextRes());
+        remoteViews.setImageViewResource(R.id.appwidget_prev, mSkin.getPrevRes());
     }
 
     protected void updateModel(RemoteViews remoteViews) {
@@ -200,23 +200,23 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
 
     protected void updatePlayPause(RemoteViews remoteViews) {
         //播放暂停按钮
-        remoteViews.setImageViewResource(R.id.appwidget_toggle,mSkin.getPlayPauseRes());
+        remoteViews.setImageViewResource(R.id.appwidget_toggle, mSkin.getPlayPauseRes());
     }
 
     protected void updateTitle(RemoteViews remoteViews, Song song) {
         //歌曲名
         remoteViews.setTextColor(R.id.appwidget_title, mSkin.getTitleColor());
-        remoteViews.setTextViewText(R.id.appwidget_title,song.getTitle());
+        remoteViews.setTextViewText(R.id.appwidget_title, song.getTitle());
     }
 
-    protected void updateArtist(RemoteViews remoteViews, Song song){
+    protected void updateArtist(RemoteViews remoteViews, Song song) {
         //歌手名
-        remoteViews.setTextColor(R.id.appwidget_artist,mSkin.getArtistColor());
-        remoteViews.setTextViewText(R.id.appwidget_artist,song.getArtist());
+        remoteViews.setTextColor(R.id.appwidget_artist, mSkin.getArtistColor());
+        remoteViews.setTextViewText(R.id.appwidget_artist, song.getArtist());
     }
 
     protected void updateBackground(RemoteViews remoteViews) {
-        remoteViews.setImageViewResource(R.id.appwidget_clickable,mSkin.getBackground());
+        remoteViews.setImageViewResource(R.id.appwidget_clickable, mSkin.getBackground());
     }
 
     public static Bitmap drawableToBitmap(Drawable drawable) {
@@ -237,5 +237,5 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
         return bitmap;
     }
 
-    public abstract void updateWidget(final Context context,final int[] appWidgetIds, boolean reloadCover);
+    public abstract void updateWidget(final MusicService service, final int[] appWidgetIds, boolean reloadCover);
 }

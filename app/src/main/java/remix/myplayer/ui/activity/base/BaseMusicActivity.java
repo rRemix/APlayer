@@ -19,7 +19,7 @@ public class BaseMusicActivity extends BaseActivity implements MusicEventHelper.
         mServiceToken = MusicServiceRemote.bindToService(this, new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                BaseMusicActivity.this.onServiceDisConnected();
+                BaseMusicActivity.this.onServiceConnected();
             }
 
             @Override

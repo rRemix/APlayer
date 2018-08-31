@@ -17,6 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
@@ -28,7 +29,6 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.adapter.SongAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -70,7 +70,7 @@ public class RecentlyActivity extends LibraryActivity<Song,SongAdapter> implemen
                     arg.putInt("Control", Command.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayQueue(mIdList,mContext,intent);
+                    MusicServiceRemote.setPlayQueue(mIdList,intent);
                 }
             }
 
@@ -112,7 +112,7 @@ public class RecentlyActivity extends LibraryActivity<Song,SongAdapter> implemen
     }
 
     @Override
-    public void UpdateUI(Song Song, boolean isplay) {
+    public void UpdateUI(Song Song, boolean isPlay) {
 //        if(mAdapter != null)
 //            mAdapter.onUpdateHighLight();
     }

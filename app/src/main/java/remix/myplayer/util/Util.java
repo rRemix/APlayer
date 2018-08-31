@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -21,6 +22,7 @@ import android.os.Parcelable;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -45,6 +47,25 @@ import remix.myplayer.bean.mp3.Song;
  * 通用工具类
  */
 public class Util {
+
+    /**
+     * 注册本地Receiver
+     */
+    public static void registerLocalReceiver(BroadcastReceiver receiver, IntentFilter filter){
+        LocalBroadcastManager.getInstance(App.getContext()).registerReceiver(receiver,filter);
+    }
+
+    /**
+     * 注销本地Receiver
+     */
+    public static void unregisterLocalReceiver(BroadcastReceiver receiver){
+        LocalBroadcastManager.getInstance(App.getContext()).unregisterReceiver(receiver);
+    }
+
+    public static void sendLocalBroadcast(Intent intent){
+        LocalBroadcastManager.getInstance(App.getContext()).sendBroadcast(intent);
+    }
+
     /**
      * 注销Receiver
      */
