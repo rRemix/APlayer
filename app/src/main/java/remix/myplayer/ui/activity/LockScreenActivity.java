@@ -230,19 +230,11 @@ public class LockScreenActivity extends BaseMusicActivity implements UpdateHelpe
         super.onServiceDisConnected();
     }
 
-    private int mSongId = -1;
     @Override
     public void UpdateUI(Song song, boolean isPlay) {
         if (!mIsForeground) {
             return;
         }
-        if(song == null){
-            return;
-        }
-        if(mSongId == song.getId()){
-            return;
-        }
-        mSongId = song.getId();
         //歌词
         mUpdateLyricThread.setSongAndGetLyricRows(song);
 //        mDisposable.add(new SearchLrc(mInfo).getLyric()
@@ -346,7 +338,7 @@ public class LockScreenActivity extends BaseMusicActivity implements UpdateHelpe
             if (mCurLyric == null) {
                 mLyric.setTextWithAnimation(R.string.no_lrc);
             } else if (mCurLyric.getStatus() == UpdateLyricThread.Status.SEARCHING) {
-                mLyric.setTextWithAnimation(R.string.searching);
+                mLyric.setText("");
             } else if (mCurLyric.getStatus() == UpdateLyricThread.Status.ERROR ||
                     mCurLyric.getStatus() == UpdateLyricThread.Status.NO) {
                 mLyric.setTextWithAnimation(R.string.no_lrc);

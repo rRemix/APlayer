@@ -679,20 +679,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         super.onServiceDisConnected();
     }
 
-    //更新界面
-    private int mSongId = -1;
     @Override
     public void UpdateUI(Song song, boolean isPlay) {
         if (!mIsForeground) {
             return;
         }
-        if(song == null){
-            return;
-        }
-        if(mSongId == song.getId()){
-            return;
-        }
-        mSongId = song.getId();
         mBottomBar.updateBottomStatus(song, isPlay);
 //        for(Fragment temp : getSupportFragmentManager().getFragments()) {
 //            if (temp instanceof SongFragment) {
