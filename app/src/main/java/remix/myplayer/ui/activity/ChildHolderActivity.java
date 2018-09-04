@@ -61,7 +61,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         implements UpdateHelper.Callback, OnTagEditListener {
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
     public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
-    private boolean mIsRunning = false;
     //获得歌曲信息列表的参数
     private int ID;
     private int mType;
@@ -280,7 +279,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
             ID = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
             Title = mType == Constants.ARTIST ? newSong.getArtist() : newSong.getAlbum();
             mToolBar.setTitle(Title);
-            if (mIsRunning)
+            if (mIsForeground)
                 updateList(true);
         }
     }
@@ -338,18 +337,11 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     @Override
     protected void onResume() {
         super.onResume();
-        mIsRunning = true;
         updateList(true);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mIsRunning = false;
-    }
-
     private void updateList(boolean reset) {
-        if (mIsRunning) {
+        if (mIsForeground) {
             if (mHasPermission) {
                 new GetSongThread(reset).start();
             } else {

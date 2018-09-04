@@ -9,8 +9,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 
-import static remix.myplayer.helper.MusicServiceRemote.isPlaying;
-
 public enum AppWidgetSkin {
     WHITE_1F(ColorUtil.getColor(R.color.appwidget_title_color_white_1f),
             ColorUtil.getColor(R.color.appwidget_artist_color_white_1f),
@@ -152,10 +150,6 @@ public enum AppWidgetSkin {
         final int playModel = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL, Constants.PLAY_LOOP);
         return playModel == Constants.PLAY_SHUFFLE ? mModeShuffleRes :
                 playModel == Constants.PLAY_REPEATONE ? mModeRepeatRes : mModeNormalRes;
-    }
-
-    public int getPlayPauseRes() {
-        return isPlaying() ? getPauseRes() : getPlayRes();
     }
 
     public int getPlayRes() {

@@ -314,14 +314,14 @@ public class Util {
 
     public static String processInfo(String origin, int type) {
         if (type == SONGTYPE) {
-            if (origin == null || origin.equals("") || origin.contains("unknown")) {
+            if (origin == null || origin.equals("") ) {
                 return App.getContext().getString(R.string.unknown_song);
             } else {
 //                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
                 return origin;
             }
         } else {
-            if (origin == null || origin.equals("") || origin.contains("unknown")) {
+            if (origin == null || origin.equals("") ) {
                 return App.getContext().getString(type == ARTISTTYPE ? R.string.unknown_artist : R.string.unknown_album);
             } else {
                 return origin;

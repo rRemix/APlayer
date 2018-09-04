@@ -30,7 +30,8 @@ import remix.myplayer.util.Util;
 @SuppressLint("Registered")
 public class BaseActivity extends AppCompatActivity {
     protected Context mContext;
-    private boolean mIsDestroyed;
+    protected boolean mIsDestroyed;
+    protected boolean mIsForeground;
     protected boolean mHasPermission;
     public static final String[] EXTERNAL_STORAGE_PERMISSIONIS = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
@@ -154,6 +155,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mIsForeground = true;
         new RxPermissions(this)
                 .request(EXTERNAL_STORAGE_PERMISSIONIS)
                 .subscribe(has -> {
@@ -166,8 +168,8 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
+        mIsForeground = false;
     }
-
 }

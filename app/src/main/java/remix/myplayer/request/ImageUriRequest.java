@@ -125,9 +125,13 @@ public abstract class ImageUriRequest<T> {
         return Observable.create(observer -> {
             String imageUrl = "";
             if (request.getSearchType() == URL_ALBUM) {//专辑封面
-                //忽略内嵌封面
+                //忽略多媒体缓存
                 if (IGNORE_MEDIA_STORE) {
+                    //todo 同一专辑不能内嵌封面 这里按专辑读取，读取出来的是同一歌曲，需要另行处理
                     Song song = MediaStoreUtil.getMP3InfoByAlbumId(request.getID());
+//                    MediaStoreUtil.makeSongCursor(App.getContext(),
+//                            MediaStore.Audio.Media.ALBUM_ID + "=" + request.getID() + " and " +
+//                                MediaStore.Audio.Media.TITLE + "=?",new String[]{request.getTitle()},null);
                     imageUrl = resolveEmbeddedPicture(song);
                 } else {
                     Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getID());
@@ -156,37 +160,42 @@ public abstract class ImageUriRequest<T> {
      * @return
      */
     private String resolveEmbeddedPicture(Song song) throws IOException {
+        if (song == null)
+            return "";
         String imageUrl = null;
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        String imageName = ((song.getArtist() + " - " + song.getTitle()) + ".jpg")
+                .replaceAll("#", "")
+                .replaceAll("\\?", "")
+                .replaceAll("/", "");
+        MediaMetadataRetriever retriever = null;
         try {
-            if (song == null)
-                return "";
-            retriever.setDataSource(song.getUrl());
-
-            byte[] picture = retriever.getEmbeddedPicture();
-            if (picture != null) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-                //保存bitmap
-                File cacheDir = DiskCache.getDiskCacheDir(App.getContext(), "embedded/");
-                if (bitmap != null && (cacheDir.exists() || cacheDir.mkdirs())) {
-                    File original = new File(cacheDir, (song.getArtist() + " - " + song.getTitle()).replaceAll("/", " ") + ".jpg");
-                    if (original.exists()) {
-                        imageUrl = "file://" + original.getAbsolutePath();
-                    } else {
+            File cacheDir = DiskCache.getDiskCacheDir(App.getContext(), "embedded/");
+            File original = new File(cacheDir, imageName);
+            if (original.exists()) {
+                imageUrl = "file://" + original.getAbsolutePath();
+            } else {
+                retriever = new MediaMetadataRetriever();
+                retriever.setDataSource(song.getUrl());
+                byte[] picture = retriever.getEmbeddedPicture();
+                if (picture != null) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+                    //保存bitmap
+                    if (bitmap != null && (cacheDir.exists() || cacheDir.mkdirs())) {
                         FileOutputStream fileOutputStream = new FileOutputStream(original);
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
                         fileOutputStream.flush();
                         fileOutputStream.close();
                         imageUrl = "file://" + original.getAbsolutePath();
                     }
+                } else {
+                    File cover = fallback(song);
+                    if (cover != null && cover.exists())
+                        imageUrl = "file://" + cover.getAbsolutePath();
                 }
-            } else {
-                File cover = fallback(song);
-                if (cover != null && cover.exists())
-                    imageUrl = "file://" + cover.getAbsolutePath();
             }
         } finally {
-            retriever.release();
+            if (retriever != null)
+                retriever.release();
         }
         return imageUrl;
     }

@@ -154,7 +154,7 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
         updateTitle(remoteViews, song);
         updateArtist(remoteViews, song);
 //        updateSkin(remoteViews);
-        updatePlayPause(remoteViews);
+        updatePlayPause(service,remoteViews);
         updateLove(remoteViews, song);
         updateModel(remoteViews);
         updateNextAndPrev(remoteViews);
@@ -198,9 +198,9 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
         remoteViews.setImageViewResource(R.id.appwidget_model, mSkin.getModeRes());
     }
 
-    protected void updatePlayPause(RemoteViews remoteViews) {
+    protected void updatePlayPause(MusicService service,RemoteViews remoteViews) {
         //播放暂停按钮
-        remoteViews.setImageViewResource(R.id.appwidget_toggle, mSkin.getPlayPauseRes());
+        remoteViews.setImageViewResource(R.id.appwidget_toggle,service.isPlaying() ? mSkin.getPauseRes() : mSkin.getPlayRes());
     }
 
     protected void updateTitle(RemoteViews remoteViews, Song song) {

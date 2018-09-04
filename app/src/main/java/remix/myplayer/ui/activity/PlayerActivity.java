@@ -110,8 +110,6 @@ import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREE
 public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Callback,
         FileChooserDialog.FileCallback, OnTagEditListener {
     private static final String TAG = "PlayerActivity";
-    //是否正在运行
-    public boolean mIsForeground;
     //上次选中的Fragment
     private int mPrevPosition = 1;
     //第一次启动的标志变量
@@ -390,14 +388,12 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
     @Override
     public void onResume() {
         super.onResume();
-        //更新界面
-        mIsForeground = true;
 //        if(mFistStart)
 //            UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlaying());
-//        if (mNeedUpdateUI) {
-//            UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
-//            mNeedUpdateUI = false;
-//        }
+        if (mNeedUpdateUI) {
+            UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
+            mNeedUpdateUI = false;
+        }
         //更新进度条
         new ProgressThread().start();
     }
@@ -1007,10 +1003,10 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
         mInfo = song;
         //两种情况下更新ui
         //一是activity在前台  二是activity暂停后有更新的动作，当activity重新回到前台后更新ui
-//        if (!mIsForeground || mInfo == null) {
-//            mNeedUpdateUI = true;
-//            return;
-//        }
+        if (!mIsForeground || mInfo == null) {
+            mNeedUpdateUI = true;
+            return;
+        }
         //当操作不为播放或者暂停且正在运行时，更新所有控件
         if ((Global.getOperation() != Command.TOGGLE || mNeedUpdateUI)) {
             //更新顶部信息

@@ -160,6 +160,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if (mMultiChoice.isShow()) {
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
+        UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
     }
 
     @Override
@@ -659,18 +660,18 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         } else if (mMultiChoice.isShow()) {
             onMultiBackPress();
         } else {
-//            super.onBackPressed();
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            startActivity(intent);
+            super.onBackPressed();
+//            Intent intent = new Intent();
+//            intent.setAction(Intent.ACTION_MAIN);
+//            intent.addCategory(Intent.CATEGORY_HOME);
+//            startActivity(intent);
         }
     }
 
     @Override
     public void onServiceConnected() {
         super.onServiceConnected();
-        UpdateUI(MusicServiceRemote.getCurrentSong(),MusicServiceRemote.isPlaying());
+        UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
     }
 
     @Override
@@ -679,8 +680,19 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     }
 
     //更新界面
+    private int mSongId = -1;
     @Override
     public void UpdateUI(Song song, boolean isPlay) {
+        if (!mIsForeground) {
+            return;
+        }
+        if(song == null){
+            return;
+        }
+        if(mSongId == song.getId()){
+            return;
+        }
+        mSongId = song.getId();
         mBottomBar.updateBottomStatus(song, isPlay);
 //        for(Fragment temp : getSupportFragmentManager().getFragments()) {
 //            if (temp instanceof SongFragment) {

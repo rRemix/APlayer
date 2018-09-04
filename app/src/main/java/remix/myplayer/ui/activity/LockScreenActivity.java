@@ -200,12 +200,11 @@ public class LockScreenActivity extends BaseMusicActivity implements UpdateHelpe
     @Override
     protected void onResume() {
         super.onResume();
-        mUpdateLyricThread = new UpdateLockScreenLyricThread(this);
-        mUpdateLyricThread.start();
-    }
-
-    public void onPause() {
-        super.onPause();
+        if (mUpdateLyricThread == null) {
+            mUpdateLyricThread = new UpdateLockScreenLyricThread(this);
+            mUpdateLyricThread.start();
+        }
+        UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
     }
 
     @Override
@@ -223,7 +222,7 @@ public class LockScreenActivity extends BaseMusicActivity implements UpdateHelpe
     @Override
     public void onServiceConnected() {
         super.onServiceConnected();
-        UpdateUI(MusicServiceRemote.getCurrentSong(),MusicServiceRemote.isPlaying());
+        UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
     }
 
     @Override
@@ -231,12 +230,19 @@ public class LockScreenActivity extends BaseMusicActivity implements UpdateHelpe
         super.onServiceDisConnected();
     }
 
+    private int mSongId = -1;
     @Override
     public void UpdateUI(Song song, boolean isPlay) {
-        if (song == null) {
+        if (!mIsForeground) {
             return;
         }
-
+        if(song == null){
+            return;
+        }
+        if(mSongId == song.getId()){
+            return;
+        }
+        mSongId = song.getId();
         //歌词
         mUpdateLyricThread.setSongAndGetLyricRows(song);
 //        mDisposable.add(new SearchLrc(mInfo).getLyric()

@@ -11,11 +11,13 @@ import java.util.*
 object MusicServiceRemote {
     val TAG = MusicServiceRemote::class.java.simpleName
 
+    @JvmStatic
     var service: MusicService? = null
 
     private val connectionMap = WeakHashMap<Context, ServiceBinder>()
 
-    @JvmStatic fun bindToService(context: Context, callback: ServiceConnection): ServiceToken? {
+    @JvmStatic
+    fun bindToService(context: Context, callback: ServiceConnection): ServiceToken? {
 //        var realActivity: Activity? = (context as Activity).parent
 //        if (realActivity == null)
 //            realActivity = context
@@ -31,16 +33,17 @@ object MusicServiceRemote {
         return null
     }
 
-    @JvmStatic fun unbindFromService(token: ServiceToken?) {
+    @JvmStatic
+    fun unbindFromService(token: ServiceToken?) {
         if (token == null) {
             return
         }
         val contextWrapper = token.wrapperContext
         val binder = connectionMap.remove(contextWrapper) ?: return
         contextWrapper.unbindService(binder)
-        if (connectionMap.isEmpty()) {
-            service = null
-        }
+//        if (connectionMap.isEmpty()) {
+//            service = null
+//        }
     }
 
     class ServiceBinder(private val mCallback: ServiceConnection?) : ServiceConnection {
@@ -53,7 +56,7 @@ object MusicServiceRemote {
 
         override fun onServiceDisconnected(className: ComponentName) {
             mCallback?.onServiceDisconnected(className)
-            MusicServiceRemote.service = null
+//            MusicServiceRemote.service = null
         }
     }
 
@@ -90,7 +93,7 @@ object MusicServiceRemote {
     }
 
     @JvmStatic
-    fun getPlayModel() : Int {
+    fun getPlayModel(): Int {
         return service?.playModel ?: Constants.PLAY_LOOP
     }
 
@@ -125,7 +128,7 @@ object MusicServiceRemote {
     }
 
     @JvmStatic
-    fun setProgress(progress: Int){
+    fun setProgress(progress: Int) {
         service?.progress = progress
     }
 
