@@ -168,7 +168,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     /**
      * MediaPlayer 负责歌曲的播放等
      */
-    private IMediaPlayer mMediaPlayer;
+    private IjkMediaPlayer mMediaPlayer;
 
     /**
      * 桌面部件
