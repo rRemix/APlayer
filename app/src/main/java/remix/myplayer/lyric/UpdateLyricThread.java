@@ -41,7 +41,7 @@ public abstract class UpdateLyricThread extends Thread {
                 .doOnSubscribe(disposable -> mStatus = Status.SEARCHING)
                 .subscribe(lrcRows -> {
                     if (id == mSong.getId()) {
-
+                        mStatus = Status.NORMAL;
                         mLrcRows = lrcRows;
                     }
                 }, throwable -> {

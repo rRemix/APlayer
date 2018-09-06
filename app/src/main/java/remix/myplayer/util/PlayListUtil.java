@@ -401,6 +401,7 @@ public class PlayListUtil {
             info.Count = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
             info._Id = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
             info.Name = cursor.getString(cursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
+            info.Date = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
         } catch (Exception e){
             e.printStackTrace();
         }

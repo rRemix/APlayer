@@ -74,7 +74,7 @@ public class AddtoPlayListAdapter extends RecyclerView.Adapter<AddtoPlayListAdap
         @BindView(R.id.item_root)
         RelativeLayout mContainer;
 
-        public PlayListAddToHolder(View itemView){
+        PlayListAddToHolder(View itemView){
            super(itemView);
         }
     }

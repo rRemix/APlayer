@@ -35,7 +35,6 @@ class DownloadService : IntentService("DownloadService") {
 
     override fun onCreate() {
         super.onCreate()
-        //todo 创建通知栏通道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannelIfNeed()
         }

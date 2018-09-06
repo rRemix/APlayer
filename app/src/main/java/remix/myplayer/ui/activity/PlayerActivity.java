@@ -390,11 +390,11 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         super.onResume();
 //        if(mFistStart)
 //            UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlaying());
-        if (mNeedUpdateUI) {
-            onMetaChanged();
-            onPlayStateChange();
-            mNeedUpdateUI = false;
-        }
+//        if (mNeedUpdateUI) {
+//            onMetaChanged();
+//            onPlayStateChange();
+//            mNeedUpdateUI = false;
+//        }
         //更新进度条
         new ProgressThread().start();
     }
@@ -995,10 +995,10 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         mInfo = MusicServiceRemote.getCurrentSong();
         //两种情况下更新ui
         //一是activity在前台  二是activity暂停后有更新的动作，当activity重新回到前台后更新ui
-        if (!mIsForeground) {
-            mNeedUpdateUI = true;
-            return;
-        }
+//        if (!mIsForeground) {
+//            mNeedUpdateUI = true;
+//            return;
+//        }
         //当操作不为播放或者暂停且正在运行时，更新所有控件
         if ((Global.getOperation() != Command.TOGGLE || mNeedUpdateUI)) {
             //更新顶部信息

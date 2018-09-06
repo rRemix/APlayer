@@ -68,7 +68,6 @@ public class PlayQueueAdapter extends BaseAdapter<PlayListSong, PlayQueueAdapter
                 }
             }
 
-            //todo 更新界面
         });
         if (mOnItemClickLitener != null) {
             holder.mContainer.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition()));
