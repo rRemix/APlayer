@@ -381,7 +381,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     private void setUp() {
         mShortcutManager = new DynamicShortcutManager(mService);
-        mVolumeController = new VolumeController();
+        mVolumeController = new VolumeController(this);
         mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
@@ -1247,14 +1247,14 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * @param control
      */
     private void update(int control) {
-        if (updateAllView(control)) {
-            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
-        } else if (!mMediaPlayer.playedOnce()) {
-            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
-        } else if (updatePlayStateOnly(control)) {
-            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_PLAY_STATE);
+        mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
+//        if (updateAllView(control)) {
 //            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
-        }
+//        } else if (!mMediaPlayer.playedOnce()) {
+//            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
+//        } else if (updatePlayStateOnly(control)) {
+//            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_PLAY_STATE);
+//        }
     }
 
     public MediaSessionCompat getMediaSession() {
