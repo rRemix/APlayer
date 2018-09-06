@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -24,6 +25,7 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -127,12 +129,18 @@ public abstract class ImageUriRequest<T> {
             if (request.getSearchType() == URL_ALBUM) {//专辑封面
                 //忽略多媒体缓存
                 if (IGNORE_MEDIA_STORE) {
-                    //todo 同一专辑不能内嵌封面 这里按专辑读取，读取出来的是同一歌曲，需要另行处理
-                    Song song = MediaStoreUtil.getMP3InfoByAlbumId(request.getID());
-//                    MediaStoreUtil.makeSongCursor(App.getContext(),
-//                            MediaStore.Audio.Media.ALBUM_ID + "=" + request.getID() + " and " +
-//                                MediaStore.Audio.Media.TITLE + "=?",new String[]{request.getTitle()},null);
-                    imageUrl = resolveEmbeddedPicture(song);
+                    final String selection = TextUtils.isEmpty(request.getTitle()) ?
+                            MediaStore.Audio.Media.ALBUM_ID + "=" + request.getID() :
+                            MediaStore.Audio.Media.ALBUM_ID + "=" + request.getID() + " and " +
+                                    MediaStore.Audio.Media.TITLE + "=?";
+                    final String[] selectionValues = TextUtils.isEmpty(request.getTitle()) ?
+                            null :
+                            new String[]{request.getTitle()};
+
+                    List<Song> songs = MediaStoreUtil.getSongs(selection, selectionValues);
+                    if(songs.size() > 0){
+                        imageUrl = resolveEmbeddedPicture(songs.get(0));
+                    }
                 } else {
                     Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getID());
                     if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {

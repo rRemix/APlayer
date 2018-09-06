@@ -86,7 +86,7 @@ public class MediaStoreUtil {
                     SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER, SortOrder.ArtistSortOrder.ARTIST_A_Z));
             if (cursor != null) {
                 while (cursor.moveToNext()) {
-                    artists.add(new Artist(cursor.getInt(1), cursor.getString(0),
+                    artists.add(new Artist(cursor.getInt(0), cursor.getString(1),
                             0));
                 }
             }
@@ -117,8 +117,8 @@ public class MediaStoreUtil {
                     SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER, SortOrder.AlbumSortOrder.ALBUM_A_Z));
             if (cursor != null) {
                 while (cursor.moveToNext()) {
-                    albums.add(new Album(cursor.getInt(1),
-                            Util.processInfo(cursor.getString(0), Util.ALBUMTYPE),
+                    albums.add(new Album(cursor.getInt(0),
+                            Util.processInfo(cursor.getString(1), Util.ALBUMTYPE),
                             cursor.getInt(2),
                             Util.processInfo(cursor.getString(3), Util.ARTISTTYPE),
                             0));
@@ -1258,8 +1258,10 @@ public class MediaStoreUtil {
         List<Song> songs = new ArrayList<>();
         Cursor cursor = makeSongCursor(selection, selectionValues, sortOrder);
         try {
-            if (cursor != null) {
-                songs.add(getMP3Info(cursor));
+            if (cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    songs.add(getMP3Info(cursor));
+                }
             }
         } finally {
             Util.closeCursor(cursor);
