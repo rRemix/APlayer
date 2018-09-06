@@ -72,6 +72,6 @@ class UpdateListener(val mContext: Context) : Listener {
 
     private fun isForce(release: Release?): Boolean {
         val split = release?.name?.split("-")
-        return split != null && split.size > 2
+        return split != null && split.size > 3
     }
 }
