@@ -519,7 +519,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     public native void _prepareAsync() throws IllegalStateException;
 
-    @Override
     public boolean playedOnce(){
         return mPlayedOnce;
     }

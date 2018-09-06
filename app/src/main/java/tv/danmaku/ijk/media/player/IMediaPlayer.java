@@ -143,8 +143,6 @@ public interface IMediaPlayer {
 
     void setOnTimedTextListener(OnTimedTextListener listener);
 
-    boolean playedOnce();
-
     /*--------------------
      * Listeners
      */
