@@ -6,10 +6,11 @@ import android.content.Intent;
 import android.media.AudioManager;
 
 import remix.myplayer.Global;
-import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
+
+import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 /**
  * Created by Remix on 2016/3/23.
@@ -36,12 +37,12 @@ public class HeadsetPlugReceiver extends BroadcastReceiver {
         Global.setHeadsetOn(headsetOn);
         Intent eqintent = new Intent(Constants.SOUNDEFFECT_ACTION);
         eqintent.putExtra("IsHeadsetOn", Global.getHeadsetOn());
-        context.sendBroadcast(eqintent);
+        sendLocalBroadcast(eqintent);
 
-        if (!headsetOn && MusicServiceRemote.isPlaying()) {
+        if (!headsetOn /**&& MusicServiceRemote.isPlaying()*/) {
             Intent ctlIntent = new Intent(MusicService.ACTION_CMD);
             ctlIntent.putExtra("Control", Command.PAUSE);
-            context.sendBroadcast(ctlIntent);
+            sendLocalBroadcast(ctlIntent);
         }
         try {
             abortBroadcast();

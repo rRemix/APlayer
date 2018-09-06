@@ -29,6 +29,7 @@ import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.menu.CtrlButtonListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -121,10 +122,37 @@ public class BottomActionBarFragment extends BaseMusicFragment {
         return rootView;
     }
 
-    //更新界面
-    public void updateBottomStatus(Song song, boolean isPlaying) {
-        if (song == null)
+    @Override
+    public void onMetaChanged() {
+        super.onMetaChanged();
+        updateSong();
+    }
+
+    @Override
+    public void onPlayStateChange() {
+        super.onPlayStateChange();
+        updatePlayStatus();
+    }
+
+    public void updatePlayStatus(){
+        //设置按钮着色
+        if (mPlayButton == null)
             return;
+        if (MusicServiceRemote.isPlaying()) {
+            Theme.TintDrawable(mPlayButton,
+                    R.drawable.bf_btn_stop,
+                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
+        } else {
+            Theme.TintDrawable(mPlayButton,
+                    R.drawable.bf_btn_play,
+                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
+        }
+    }
+
+    //更新界面
+    public void updateSong() {
+        final Song song = MusicServiceRemote.getCurrentSong();
+        LogUtil.d("BottomBar","CurrentSong: " + song);
         //歌曲名 艺术家
         if (mTitle != null)
             mTitle.setText(song.getTitle());
@@ -149,18 +177,7 @@ public class BottomActionBarFragment extends BaseMusicFragment {
                     mAnimUrl.setUrl("");
                 }
             }.load();
-        //设置按钮着色
-        if (mPlayButton == null)
-            return;
-        if (isPlaying) {
-            Theme.TintDrawable(mPlayButton,
-                    R.drawable.bf_btn_stop,
-                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
-        } else {
-            Theme.TintDrawable(mPlayButton,
-                    R.drawable.bf_btn_play,
-                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
-        }
+
     }
 
 

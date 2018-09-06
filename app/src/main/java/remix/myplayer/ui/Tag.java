@@ -150,8 +150,8 @@ public class Tag extends ContextWrapper {
                     mTagEditor.save(mInfo, title, album, artist, year, genre, track, "")
                             .compose(RxUtil.applyScheduler())
                             .subscribe(song -> {
-                                sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
-                                sendBroadcast(new Intent(Constants.TAG_EDIT)
+                                Util.sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
+                                Util.sendLocalBroadcast(new Intent(Constants.TAG_EDIT)
                                         .putExtra("newSong", song));
                                 setCurrentSong(song);
                                 ToastUtil.show(this, R.string.save_success);

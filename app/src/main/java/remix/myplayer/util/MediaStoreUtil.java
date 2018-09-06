@@ -80,8 +80,8 @@ public class MediaStoreUtil {
         Cursor cursor = null;
         try {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{"distinct " + MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ARTIST_ID},
-                    MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST,
+                    new String[]{"distinct " + MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.ARTIST},
+                    MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
                     null,
                     SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER, SortOrder.ArtistSortOrder.ARTIST_A_Z));
             if (cursor != null) {
@@ -108,11 +108,11 @@ public class MediaStoreUtil {
                     null, null, null, null);
 
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{"distinct " + MediaStore.Audio.Media.ALBUM,
-                            MediaStore.Audio.Media.ALBUM_ID,
+                    new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
+                            MediaStore.Audio.Media.ALBUM,
                             MediaStore.Audio.Media.ARTIST_ID,
                             MediaStore.Audio.Media.ARTIST},
-                    MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM,
+                    MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
                     null,
                     SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER, SortOrder.AlbumSortOrder.ALBUM_A_Z));
             if (cursor != null) {
@@ -305,38 +305,37 @@ public class MediaStoreUtil {
 
     /**
      * 根据歌手或者专辑id获取所有歌曲
-     *
-     * @param name 歌手 专辑
+     * @param id 歌手id 专辑id
      * @param type 1:专辑  2:歌手
      * @return 对应所有歌曲的id
      */
-    public static ArrayList<Song> getMP3InfoByArg(String name, int type) {
+    public static ArrayList<Song> getMP3InfoByArg(int id, int type) {
         Cursor cursor = null;
         ContentResolver resolver = mContext.getContentResolver();
         ArrayList<Song> songs = new ArrayList<>();
         try {
             if (type == Constants.ALBUM) {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                        MediaStore.Audio.Media.ALBUM + " = ?" + " and " + MediaStoreUtil.getBaseSelection(),
-                        new String[]{name},
-                        SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_TRACK_NUMBER));
+                         MediaStore.Audio.Media.ALBUM_ID + "=" + id + " and " + MediaStoreUtil.getBaseSelection(),
+                        null,
+                        SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
             }
             if (type == Constants.ARTIST) {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                        MediaStore.Audio.Media.ARTIST + " = ?" + " and " + MediaStoreUtil.getBaseSelection(),
-                        new String[]{name},
-                        SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
+                        MediaStore.Audio.Media.ARTIST_ID + "=" + id + " and " + MediaStoreUtil.getBaseSelection(),
+                        null,
+                        SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
             }
 
-            if (cursor != null && cursor.getCount() > 0) {
+            if(cursor != null && cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
                     songs.add(getMP3Info(cursor));
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if (cursor != null && !cursor.isClosed())
+            if(cursor != null && !cursor.isClosed())
                 cursor.close();
         }
         return songs;

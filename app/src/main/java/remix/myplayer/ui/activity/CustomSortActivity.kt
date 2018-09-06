@@ -14,7 +14,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.interfaces.OnItemClickListener
+import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.adapter.CustomSortAdapter
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
@@ -38,18 +38,18 @@ class CustomSortActivity : ToolbarActivity() {
         setContentView(R.layout.activity_custom_sort)
         ButterKnife.bind(this@CustomSortActivity)
 
-        mPlayListID = intent.getIntExtra("id",-1)
+        mPlayListID = intent.getIntExtra("id", -1)
         mPlayListName = intent.getStringExtra("name")
         mInfoList = intent.getSerializableExtra("list") as List<Song>
 
-        setUpToolbar(findViewById(R.id.toolbar),mPlayListName)
+        setUpToolbar(findViewById(R.id.toolbar), mPlayListName)
 
         mAdapter = CustomSortAdapter(mContext, R.layout.item_custom_sort)
         mAdapter.setHasStableIds(true)
         mAdapter.setData(mInfoList)
-        mAdapter.setOnItemClickListener(object : OnItemClickListener{
+        mAdapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemLongClick(view: View?, position: Int) {
-                Util.vibrate(mContext,150)
+                Util.vibrate(mContext, 150)
             }
 
             override fun onItemClick(view: View?, position: Int) {
@@ -66,8 +66,8 @@ class CustomSortActivity : ToolbarActivity() {
 
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
                 LogUtil.d("ChildHolderAdapter", "from: " + viewHolder.adapterPosition + " to: " + target.adapterPosition)
-                Collections.swap(mAdapter.datas, if(viewHolder.adapterPosition  >= 0) viewHolder.adapterPosition  else 0 ,
-                        if(target.adapterPosition >= 0) target.adapterPosition else 0)
+                Collections.swap(mAdapter.datas, if (viewHolder.adapterPosition >= 0) viewHolder.adapterPosition else 0,
+                        if (target.adapterPosition >= 0) target.adapterPosition else 0)
                 mAdapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
                 return true
             }
@@ -99,15 +99,15 @@ class CustomSortActivity : ToolbarActivity() {
 
 
     @OnClick(R.id.custom_sort_save)
-    fun onClick(){
+    fun onClick() {
         doAsync {
             uiThread {
                 mMDDialog.show()
             }
             Thread.sleep(1000)
-            val result = PlayListUtil.clearTable(mPlayListName) + PlayListUtil.addMultiSongs(mInfoList?.map {it.Id }, mPlayListName, mPlayListID)
+            val result = PlayListUtil.clearTable(mPlayListName) + PlayListUtil.addMultiSongs(mInfoList?.map { it.Id }, mPlayListName, mPlayListID)
             uiThread {
-                ToastUtil.show(mContext,if(result > 0) R.string.save_success else R.string.save_error)
+                ToastUtil.show(mContext, if (result > 0) R.string.save_success else R.string.save_error)
                 mMDDialog.dismiss()
                 finish()
             }

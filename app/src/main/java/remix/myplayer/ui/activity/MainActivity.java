@@ -51,6 +51,7 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,11 +72,10 @@ import remix.myplayer.bean.misc.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
-import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.misc.receiver.ExitReceiver;
 import remix.myplayer.misc.update.DownloadService;
 import remix.myplayer.misc.update.UpdateAgent;
@@ -84,13 +84,13 @@ import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.SimpleUriRequest;
 import remix.myplayer.request.network.RxUtil;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.DrawerAdapter;
 import remix.myplayer.ui.adapter.MainPagerAdapter;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
-import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
@@ -112,14 +112,15 @@ import static remix.myplayer.bean.misc.Category.DEFAULT_LIBRARY;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DISMISS_DIALOG;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DOWNLOAD_COMPLETE;
 import static remix.myplayer.misc.update.DownloadService.ACTION_SHOW_DIALOG;
-import static remix.myplayer.service.MusicService.ACTION_LOAD_FINISH;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.Util.installApk;
+import static remix.myplayer.util.Util.registerLocalReceiver;
+import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 /**
  *
  */
-public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback {
+public class MainActivity extends MultiChoiceActivity {
     private final static String TAG = "MainActivity";
     @BindView(R.id.tabs)
     TabLayout mTablayout;
@@ -140,7 +141,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
 
-    private BottomActionBarFragment mBottomBar;
     private DrawerAdapter mDrawerAdapter;
     private MainPagerAdapter mPagerAdapter;
 
@@ -160,7 +160,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if (mMultiChoice.isShow()) {
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
-        UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
     }
 
     @Override
@@ -174,7 +173,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Util.unregisterReceiver(mContext, mReceiver);
+        unregisterLocalReceiver(mReceiver);
     }
 
     @Override
@@ -182,16 +181,14 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        //初始化底部状态栏
-        mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //receiver
         mReceiver = new MainReceiver(this);
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ACTION_LOAD_FINISH);
+//        intentFilter.addAction(ACTION_LOAD_FINISH);
         intentFilter.addAction(ACTION_DOWNLOAD_COMPLETE);
         intentFilter.addAction(ACTION_SHOW_DIALOG);
         intentFilter.addAction(ACTION_DISMISS_DIALOG);
-        registerReceiver(mReceiver, intentFilter);
+        registerLocalReceiver(mReceiver, intentFilter);
 
         //初始化控件
         setUpToolbar(mToolBar);
@@ -204,17 +201,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         mRefreshHandler = new MsgHandler(this);
         mRefreshHandler.postDelayed(this::checkUpdate, 500);
         mRefreshHandler.postDelayed(this::parseIntent, 600);
-    }
-
-    /**
-     * 初始化底部显示控件
-     */
-    private void setUpBottomBar(Song song) {
-        if (song == null)
-            return;
-        //初始化底部状态栏
-        mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        mBottomBar.updateBottomStatus(song, MusicServiceRemote.isPlaying());
     }
 
     @Override
@@ -668,49 +654,28 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-    @Override
-    public void onServiceConnected() {
-        super.onServiceConnected();
-        UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
-    }
-
-    @Override
-    public void onServiceDisConnected() {
-        super.onServiceDisConnected();
-    }
-
-    @Override
-    public void UpdateUI(Song song, boolean isPlay) {
-        if (!mIsForeground) {
-            return;
-        }
-        mBottomBar.updateBottomStatus(song, isPlay);
-//        for(Fragment temp : getSupportFragmentManager().getFragments()) {
-//            if (temp instanceof SongFragment) {
-//                SongFragment songFragment = (SongFragment) temp;
-//                if(songFragment.getAdapter() != null){
-//                    songFragment.getAdapter().onUpdateHighLight();
-//                }
-//            }
-//        }
-        updateHeader(song, isPlay);
-    }
-
-    /**
-     * 更新侧滑菜单
-     *
-     * @param song
-     */
     private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 108);
+    @Override
+    public void onMetaChanged() {
 
-    private void updateHeader(Song song, boolean isPlay) {
-        if (song == null)
-            return;
-        mHeadText.setText(getString(R.string.play_now, song.getTitle()));
+        super.onMetaChanged();
+        mHeadText.setText(getString(R.string.play_now, MusicServiceRemote.getCurrentSong().getTitle()));
         new LibraryUriRequest(mHeadImg,
-                getSearchRequestWithAlbumType(song),
+                getSearchRequestWithAlbumType(MusicServiceRemote.getCurrentSong()),
                 new RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load();
-        mHeadImg.setBackgroundResource(isPlay && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
+    }
+
+    @Override
+    public void onPlayStateChange() {
+        super.onPlayStateChange();
+        mHeadImg.setBackgroundResource(MusicServiceRemote.isPlaying() && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
+    }
+
+    @Override
+    public void onServiceConnected(@NotNull MusicService service) {
+        super.onServiceConnected(service);
+        onMetaChanged();
+        onPlayStateChange();
     }
 
     @OnHandleMessage
@@ -830,10 +795,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 return;
             MainActivity mainActivity = mRef.get();
             switch (action) {
-                case ACTION_LOAD_FINISH:
-                    mainActivity.setUpBottomBar(intent.getParcelableExtra("Song"));
-                    mainActivity.UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
-                    break;
                 case ACTION_DOWNLOAD_COMPLETE:
                     mainActivity.checkIsAndroidO(context, intent.getStringExtra(DownloadService.EXTRA_PATH));
                     break;

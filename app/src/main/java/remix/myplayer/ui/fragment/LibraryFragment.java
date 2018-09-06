@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import butterknife.ButterKnife;
-import remix.myplayer.helper.MusicEventHelper;
+import remix.myplayer.helper.MusicEventCallback;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.ui.adapter.BaseAdapter;
@@ -21,7 +21,7 @@ import remix.myplayer.ui.fragment.base.BaseMusicFragment;
  * Created by Remix on 2016/12/23.
  */
 
-public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseMusicFragment implements MusicEventHelper.MusicEventCallback,LoaderManager.LoaderCallbacks<List<D>>{
+public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseMusicFragment implements MusicEventCallback,LoaderManager.LoaderCallbacks<List<D>>{
     protected A mAdapter;
     protected MultiChoice mMultiChoice;
 

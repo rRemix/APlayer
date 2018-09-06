@@ -25,9 +25,9 @@ import butterknife.ButterKnife;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.interfaces.LoaderIds;
-import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
+import remix.myplayer.misc.interfaces.LoaderIds;
+import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.adapter.SearchAdapter;
@@ -35,6 +35,7 @@ import remix.myplayer.ui.widget.SearchToolBar;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by taeja on 16-1-22.
@@ -44,7 +45,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 搜索界面，根据关键字，搜索歌曲名，艺术家，专辑中的记录
  */
-public class SearchActivity extends LibraryActivity<Song,SearchAdapter> {
+public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
     //搜索的关键字
     private String mkey;
     //搜索结果的listview
@@ -63,12 +64,12 @@ public class SearchActivity extends LibraryActivity<Song,SearchAdapter> {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
-        setUpToolbar(mSearchToolBar,"");
+        setUpToolbar(mSearchToolBar, "");
 
         mSearchToolBar.addSearchListener(new SearchToolBar.SearchListener() {
             @Override
             public void onSearch(String key, boolean isclick) {
-                if(!key.equals(mkey))
+                if (!key.equals(mkey))
                     search(key);
             }
 
@@ -86,19 +87,20 @@ public class SearchActivity extends LibraryActivity<Song,SearchAdapter> {
             }
         });
 
-        mAdapter = new SearchAdapter(this,R.layout.item_search_reulst);
+        mAdapter = new SearchAdapter(this, R.layout.item_search_reulst);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(mAdapter != null && mAdapter.getDatas() != null){
+                if (mAdapter != null && mAdapter.getDatas() != null) {
                     Intent intent = new Intent(MusicService.ACTION_CMD);
                     intent.putExtra("Control", Command.PLAY_TEMP);
-                    intent.putExtra("Song",  mAdapter.getDatas().get(position));
-                    sendBroadcast(intent);
-                }else {
-                    ToastUtil.show(mContext,R.string.illegal_arg);
+                    intent.putExtra("Song", mAdapter.getDatas().get(position));
+                    Util.sendLocalBroadcast(intent);
+                } else {
+                    ToastUtil.show(mContext, R.string.illegal_arg);
                 }
             }
+
             @Override
             public void onItemLongClick(View view, int position) {
             }
@@ -113,14 +115,14 @@ public class SearchActivity extends LibraryActivity<Song,SearchAdapter> {
 
     @Override
     public void onLoadFinished(Loader<List<Song>> loader, List<Song> data) {
-        super.onLoadFinished(loader,data);
+        super.onLoadFinished(loader, data);
         //更新界面
         UpdateUI();
     }
 
     @Override
     protected Loader<List<Song>> getLoader() {
-        return new AsyncSearchLoader(mContext,mkey);
+        return new AsyncSearchLoader(mContext, mkey);
     }
 
     @Override
@@ -143,6 +145,7 @@ public class SearchActivity extends LibraryActivity<Song,SearchAdapter> {
 
     /**
      * 搜索歌曲名，专辑，艺术家中包含该关键的记录
+     *
      * @param key 搜索关键字
      */
     private void search(String key) {
@@ -153,34 +156,35 @@ public class SearchActivity extends LibraryActivity<Song,SearchAdapter> {
 
     private static class AsyncSearchLoader extends AppWrappedAsyncTaskLoader<List<Song>> {
         private String mkey;
-        private AsyncSearchLoader(Context context,String key) {
+
+        private AsyncSearchLoader(Context context, String key) {
             super(context);
             mkey = key;
         }
 
         @Override
         public List<Song> loadInBackground() {
-            if(TextUtils.isEmpty(mkey))
+            if (TextUtils.isEmpty(mkey))
                 return new ArrayList<>();
             Cursor cursor = null;
             List<Song> songs = new ArrayList<>();
             try {
                 String selection = MediaStore.Audio.Media.TITLE + " like ? " + "or " + MediaStore.Audio.Media.ARTIST + " like ? "
-                        + "or " + MediaStore.Audio.Media.ALBUM + " like ? and " +  MediaStoreUtil.getBaseSelection();
+                        + "or " + MediaStore.Audio.Media.ALBUM + " like ? and " + MediaStoreUtil.getBaseSelection();
                 cursor = getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         null,
                         selection,
-                        new String[]{"%" + mkey + "%","%" + mkey + "%","%" + mkey + "%"}, null);
+                        new String[]{"%" + mkey + "%", "%" + mkey + "%", "%" + mkey + "%"}, null);
 
                 if (cursor != null && cursor.getCount() > 0) {
-                    Set<String> blackList = SPUtil.getStringSet(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
-                    while (cursor.moveToNext()){
-                        if(!blackList.contains(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))))
+                    Set<String> blackList = SPUtil.getStringSet(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG);
+                    while (cursor.moveToNext()) {
+                        if (!blackList.contains(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))))
                             songs.add(MediaStoreUtil.getMP3Info(cursor));
                     }
                 }
-            }finally {
-                if(cursor != null && !cursor.isClosed())
+            } finally {
+                if (cursor != null && !cursor.isClosed())
                     cursor.close();
             }
             return songs;
@@ -190,10 +194,10 @@ public class SearchActivity extends LibraryActivity<Song,SearchAdapter> {
     /**
      * 更新界面
      */
-    private void UpdateUI(){
+    private void UpdateUI() {
         boolean flag = mAdapter.getDatas() != null && mAdapter.getDatas().size() > 0;
-        mSearchResRecyclerView.setVisibility(flag? View.VISIBLE : View.GONE);
-        mSearchResBlank.setVisibility(flag? View.GONE :View.VISIBLE);
+        mSearchResRecyclerView.setVisibility(flag ? View.VISIBLE : View.GONE);
+        mSearchResBlank.setVisibility(flag ? View.GONE : View.VISIBLE);
     }
 
 }

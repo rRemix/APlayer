@@ -1,5 +1,6 @@
 package remix.myplayer.helper
 
+import android.app.Activity
 import android.content.*
 import android.os.IBinder
 import remix.myplayer.bean.mp3.Song
@@ -18,10 +19,10 @@ object MusicServiceRemote {
 
     @JvmStatic
     fun bindToService(context: Context, callback: ServiceConnection): ServiceToken? {
-//        var realActivity: Activity? = (context as Activity).parent
-//        if (realActivity == null)
-//            realActivity = context
-        val contextWrapper = ContextWrapper(context)
+        var realActivity: Activity? = (context as Activity).parent
+        if (realActivity == null)
+            realActivity = context
+        val contextWrapper = ContextWrapper(realActivity)
         contextWrapper.startService(Intent(contextWrapper, MusicService::class.java))
 
         val binder = ServiceBinder(callback)
@@ -41,9 +42,9 @@ object MusicServiceRemote {
         val contextWrapper = token.wrapperContext
         val binder = connectionMap.remove(contextWrapper) ?: return
         contextWrapper.unbindService(binder)
-//        if (connectionMap.isEmpty()) {
-//            service = null
-//        }
+        if (connectionMap.isEmpty()) {
+            service = null
+        }
     }
 
     class ServiceBinder(private val mCallback: ServiceConnection?) : ServiceConnection {
@@ -56,7 +57,7 @@ object MusicServiceRemote {
 
         override fun onServiceDisconnected(className: ComponentName) {
             mCallback?.onServiceDisconnected(className)
-//            MusicServiceRemote.service = null
+            MusicServiceRemote.service = null
         }
     }
 

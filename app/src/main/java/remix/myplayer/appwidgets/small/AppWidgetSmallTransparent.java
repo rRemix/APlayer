@@ -9,7 +9,6 @@ import remix.myplayer.R;
 import remix.myplayer.appwidgets.AppWidgetSkin;
 import remix.myplayer.appwidgets.BaseAppwidget;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.service.MusicService;
 
 public class AppWidgetSmallTransparent extends BaseAppwidget {
@@ -32,7 +31,7 @@ public class AppWidgetSmallTransparent extends BaseAppwidget {
 
     @Override
     public void updateWidget(final MusicService service, final int[] appWidgetIds, boolean reloadCover) {
-        final Song song = MusicServiceRemote.getCurrentSong();
+        final Song song = service.getCurrentSong();
         if (!hasInstances(service))
             return;
         final RemoteViews remoteViews = new RemoteViews(service.getPackageName(), R.layout.app_widget_small_transparent);

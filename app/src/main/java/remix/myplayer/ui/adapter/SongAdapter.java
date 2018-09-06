@@ -29,7 +29,7 @@ import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
-import remix.myplayer.interfaces.OnUpdateHighLightListener;
+import remix.myplayer.misc.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;

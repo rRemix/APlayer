@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import remix.myplayer.R;
-import remix.myplayer.interfaces.ModeChangeCallback;
+import remix.myplayer.misc.interfaces.ModeChangeCallback;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.util.ColorUtil;

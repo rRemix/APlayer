@@ -40,6 +40,7 @@ import remix.myplayer.util.Util;
 import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
 import static remix.myplayer.helper.MusicServiceRemote.getCurrentSong;
 import static remix.myplayer.helper.MusicServiceRemote.getMediaPlayer;
+import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 /**
  * @ClassName AudioPopupListener
@@ -79,7 +80,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                 case 1:
                                     SPUtil.putValue(mActivity, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
                                     lyricFragment.updateLrc(mInfo, true);
-                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
+                                    sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                     break;
                                 case 2: //手动选择歌词
                                     new FileChooserDialog.Builder(mActivity)
@@ -105,7 +106,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                                     SPUtil.putValue(mActivity, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", SPUtil.LYRIC_KEY.LYRIC_DEFAULT);
                                                     lyricFragment.updateLrc(mInfo);
                                                 }
-                                                sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
+                                                sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                             })
                                             .show();
                                     break;
@@ -164,7 +165,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                         if (mInfo.getId() == getCurrentSong().getId()) {
                                             Intent intent = new Intent(MusicService.ACTION_CMD);
                                             intent.putExtra("Control", Command.NEXT);
-                                            mActivity.sendBroadcast(intent);
+                                            Util.sendLocalBroadcast(intent);
                                         }
                                     }
                                 } else {

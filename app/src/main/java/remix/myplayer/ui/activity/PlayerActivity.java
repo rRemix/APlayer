@@ -49,6 +49,8 @@ import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -61,11 +63,10 @@ import remix.myplayer.R;
 import remix.myplayer.bean.misc.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
-import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.interfaces.OnTagEditListener;
 import remix.myplayer.misc.menu.AudioPopupListener;
 import remix.myplayer.misc.tageditor.TagReceiver;
 import remix.myplayer.request.ImageUriRequest;
@@ -99,6 +100,8 @@ import remix.myplayer.util.Util;
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
+import static remix.myplayer.util.Util.registerLocalReceiver;
+import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -107,8 +110,7 @@ import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREE
 /**
  * 播放界面
  */
-public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Callback,
-        FileChooserDialog.FileCallback, OnTagEditListener {
+public class PlayerActivity extends BaseMusicActivity implements FileChooserDialog.FileCallback, OnTagEditListener {
     private static final String TAG = "PlayerActivity";
     //上次选中的Fragment
     private int mPrevPosition = 1;
@@ -322,9 +324,7 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
 
         mHandler = new MsgHandler(this);
         mTagReceiver = new TagReceiver(this);
-        registerReceiver(mTagReceiver, new IntentFilter(Constants.TAG_EDIT));
-//        mHandler.postDelayed(() -> sendBroadcast(new Intent(Constants.TAG_EDIT)
-//                .putExtra("newSong",new Song())),2000);
+        registerLocalReceiver(mTagReceiver, new IntentFilter(Constants.TAG_EDIT));
 
         mInfo = MusicServiceRemote.getCurrentSong();
         mAnimUrl = getIntent().getParcelableExtra("AnimUrl");
@@ -391,7 +391,8 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
 //        if(mFistStart)
 //            UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlaying());
         if (mNeedUpdateUI) {
-            UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
+            onMetaChanged();
+            onPlayStateChange();
             mNeedUpdateUI = false;
         }
         //更新进度条
@@ -399,21 +400,12 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        mIsForeground = false;
+    public void onServiceConnected(@NotNull MusicService service) {
+        super.onServiceConnected(service);
+        onMetaChanged();
+        onPlayStateChange();
     }
 
-    @Override
-    public void onServiceConnected() {
-        super.onServiceConnected();
-        UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
-    }
-
-    @Override
-    public void onServiceDisConnected() {
-        super.onServiceDisConnected();
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -543,7 +535,7 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
                 intent.putExtra("Control", Command.TOGGLE);
                 break;
         }
-        sendBroadcast(intent);
+        Util.sendLocalBroadcast(intent);
     }
 
     /**
@@ -997,13 +989,13 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
         mPager.setCurrentItem(1);
     }
 
-    //更新界面
     @Override
-    public void UpdateUI(Song song, boolean isplay) {
-        mInfo = song;
+    public void onMetaChanged() {
+        super.onMetaChanged();
+        mInfo = MusicServiceRemote.getCurrentSong();
         //两种情况下更新ui
         //一是activity在前台  二是activity暂停后有更新的动作，当activity重新回到前台后更新ui
-        if (!mIsForeground || mInfo == null) {
+        if (!mIsForeground) {
             mNeedUpdateUI = true;
             return;
         }
@@ -1025,9 +1017,15 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
             updateBg();
             requestCover(Global.getOperation() != Command.TOGGLE && !mFistStart);
         }
+    }
+
+    @Override
+    public void onPlayStateChange() {
+        super.onPlayStateChange();
         //更新按钮状态
-        if(mIsPlay != isplay)
-            updatePlayButton(isplay);
+        final boolean isPlay = MusicServiceRemote.isPlaying();
+        if (mIsPlay != isPlay)
+            updatePlayButton(isPlay);
     }
 
     //更新进度条线程
@@ -1063,7 +1061,7 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
         } else if (mBottomConfig == 1) {//仅显示音量控制
             mVolumeContainer.setVisibility(View.VISIBLE);
             mNextSong.setVisibility(View.GONE);
-        } else if(mBottomConfig == 3){//关闭
+        } else if (mBottomConfig == 3) {//关闭
             View volumeLayout = findViewById(R.id.layout_player_volume);
             volumeLayout.setVisibility(View.INVISIBLE);
 //            LinearLayout.LayoutParams volumelLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
@@ -1205,7 +1203,7 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
         super.onDestroy();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mHandler.remove();
-        Util.unregisterReceiver(this, mTagReceiver);
+        unregisterLocalReceiver(mTagReceiver);
     }
 
     /**
@@ -1228,7 +1226,7 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
 //        }
         SPUtil.putValue(mContext, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", SPUtil.LYRIC_KEY.LYRIC_MANUAL);
         mLyricFragment.updateLrc(file.getAbsolutePath());
-        sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
+        Util.sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
     }
 
     @Override
@@ -1283,11 +1281,11 @@ public class PlayerActivity extends BaseMusicActivity implements UpdateHelper.Ca
         }
     }
 
-    public void showLyricOffsetView(){
-        if(mPager.getCurrentItem() != 2){
-            mPager.setCurrentItem(2,true);
+    public void showLyricOffsetView() {
+        if (mPager.getCurrentItem() != 2) {
+            mPager.setCurrentItem(2, true);
         }
-        if(getLyricFragment() != null){
+        if (getLyricFragment() != null) {
             getLyricFragment().showLyricOffsetView();
         }
     }

@@ -30,7 +30,9 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
-import remix.myplayer.util.Util;
+
+import static remix.myplayer.util.Util.registerLocalReceiver;
+import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 /**
  * Created by taeja on 16-4-13.
@@ -119,7 +121,7 @@ public class EQActivity extends ToolbarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Util.unregisterReceiver(this, mEQReceiver);
+        unregisterLocalReceiver(mEQReceiver);
     }
 
     @Override
@@ -162,7 +164,7 @@ public class EQActivity extends ToolbarActivity {
 //        }
 
         mEQReceiver = new EQReceiver();
-        registerReceiver(mEQReceiver, new IntentFilter(Constants.SOUNDEFFECT_ACTION));
+        registerLocalReceiver(mEQReceiver, new IntentFilter(Constants.SOUNDEFFECT_ACTION));
     }
 
     /**

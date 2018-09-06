@@ -55,7 +55,7 @@ public class SongPopupListener
                 Intent intent = new Intent(MusicService.ACTION_CMD);
                 intent.putExtra("Control", Command.ADD_TO_NEXT_SONG);
                 intent.putExtra("song",mSong);
-                mActivity.sendBroadcast(intent);
+                Util.sendLocalBroadcast(intent);
                 break;
             case R.id.menu_add_to_playlist:
                 Intent intentAdd = new Intent(mActivity,AddtoPlayListDialog.class);

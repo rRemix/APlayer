@@ -26,7 +26,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
-import remix.myplayer.interfaces.OnUpdateHighLightListener;
+import remix.myplayer.misc.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;

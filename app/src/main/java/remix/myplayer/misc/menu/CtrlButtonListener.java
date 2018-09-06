@@ -7,6 +7,7 @@ import android.view.View;
 import remix.myplayer.R;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2015/12/3.
@@ -17,9 +18,11 @@ import remix.myplayer.service.MusicService;
  */
 public class CtrlButtonListener implements View.OnClickListener {
     private Context context;
+
     public CtrlButtonListener(Context context) {
         this.context = context;
     }
+
     @Override
     public void onClick(View v) {
         Intent intent = new Intent(MusicService.ACTION_CMD);
@@ -37,6 +40,6 @@ public class CtrlButtonListener implements View.OnClickListener {
                 intent.putExtra("Control", Command.TOGGLE);
                 break;
         }
-        context.sendBroadcast(intent);
+        Util.sendLocalBroadcast(intent);
     }
 }

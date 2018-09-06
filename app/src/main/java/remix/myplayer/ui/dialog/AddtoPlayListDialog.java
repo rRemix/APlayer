@@ -28,7 +28,7 @@ import butterknife.OnClick;
 import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.db.PlayLists;
-import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.AddtoPlayListAdapter;
 import remix.myplayer.util.Constants;

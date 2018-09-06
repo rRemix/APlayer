@@ -1,7 +1,7 @@
 package remix.myplayer.ui.adapter;
 
 import android.content.Context;
-import android.os.Handler;
+import android.content.Intent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -13,11 +13,13 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
+import remix.myplayer.service.Command;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -61,12 +63,12 @@ public class PlayQueueAdapter extends BaseAdapter<PlayListSong, PlayQueueAdapter
         //删除按钮
         holder.mDelete.setOnClickListener(v -> {
             if (PlayListUtil.deleteSong(audioId, Global.PlayQueueID)) {
-//                if(MusicService.getCurrentSong() != null && MusicService.getCurrentSong().getID() == audioId){
-//                    mContext.sendBroadcast(new Intent(Constants.CTL_ACTION).putExtra("Control", Constants.NEXT));
-//                }
+                if(MusicServiceRemote.getCurrentSong().getId() == audioId){
+                    Util.sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.NEXT));
+                }
             }
-            //更新界面
-            new Handler().sendEmptyMessage(Constants.NOTIFYDATACHANGED);
+
+            //todo 更新界面
         });
         if (mOnItemClickLitener != null) {
             holder.mContainer.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition()));

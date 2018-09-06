@@ -15,6 +15,8 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,19 +26,17 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
-import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.interfaces.LoaderIds;
-import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.interfaces.LoaderIds;
+import remix.myplayer.misc.interfaces.OnItemClickListener;
+import remix.myplayer.misc.interfaces.OnTagEditListener;
 import remix.myplayer.misc.tageditor.TagReceiver;
 import remix.myplayer.request.UriRequest;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.ChildHolderAdapter;
-import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -44,11 +44,10 @@ import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
-import remix.myplayer.util.Util;
 
-import static remix.myplayer.helper.MusicServiceRemote.getCurrentSong;
-import static remix.myplayer.helper.MusicServiceRemote.isPlaying;
 import static remix.myplayer.util.Constants.TAG_EDIT;
+import static remix.myplayer.util.Util.registerLocalReceiver;
+import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -58,11 +57,11 @@ import static remix.myplayer.util.Constants.TAG_EDIT;
  * 专辑、艺术家、文件夹、播放列表详情
  */
 public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapter>
-        implements UpdateHelper.Callback, OnTagEditListener {
+        implements OnTagEditListener {
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
     public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
     //获得歌曲信息列表的参数
-    private int ID;
+    private int mId;
     private int mType;
     private String mArg;
     private List<Song> mInfoList;
@@ -77,8 +76,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     Toolbar mToolBar;
 
     private String Title;
-    private BottomActionBarFragment mBottombar;
-
     private MaterialDialog mMDDialog;
 
     //当前排序
@@ -96,16 +93,16 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
 
         mRefreshHandler = new MsgHandler(this);
         mTagEditReceiver = new TagReceiver(this);
-        registerReceiver(mTagEditReceiver, new IntentFilter(TAG_EDIT));
+        registerLocalReceiver(mTagEditReceiver, new IntentFilter(TAG_EDIT));
 
         //参数id，类型，标题
-        ID = getIntent().getIntExtra("Id", -1);
+        mId = getIntent().getIntExtra("Id", -1);
         mType = getIntent().getIntExtra("Type", -1);
         mArg = getIntent().getStringExtra("Title");
 
         mAdapter = new ChildHolderAdapter(this, R.layout.item_child_holder, mType, mArg, mMultiChoice, mRecyclerView);
         mMultiChoice.setAdapter(mAdapter);
-        mMultiChoice.setExtra(ID);
+        mMultiChoice.setExtra(mId);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -131,7 +128,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
 //                    startActivity(new Intent(mContext,CustomSortActivity.class)
 //                            .putExtra("list",new ArrayList<>(mInfoList))
 //                            .putExtra("name",mArg)
-//                            .putExtra("id",ID);
+//                            .putExtra("id",mId);
                 }
             }
 
@@ -175,9 +172,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
                 .backgroundColorAttr(R.attr.background_color_3)
                 .progressIndeterminateStyle(false).build();
 
-        //初始化底部状态栏
-        mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        mBottombar.updateBottomStatus(getCurrentSong(), isPlaying());
 
     }
 
@@ -210,7 +204,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
                 if (sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)) {
                     startActivity(new Intent(mContext, CustomSortActivity.class)
                             .putExtra("list", new ArrayList<>(mInfoList))
-                            .putExtra("id", ID)
+                            .putExtra("id", mId)
                             .putExtra("name", mArg));
                 } else {
                     update = true;
@@ -264,6 +258,11 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     }
 
     @Override
+    public void onServiceConnected(@NotNull MusicService service) {
+        super.onServiceConnected(service);
+    }
+
+    @Override
     public void onPlayListChanged() {
         updateList(true);
     }
@@ -276,7 +275,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         SPUtil.deleteValue(mContext, SPUtil.COVER_KEY.NAME, request.getLastFMKey());
         SPUtil.deleteValue(mContext, SPUtil.COVER_KEY.NAME, request.getNeteaseCacheKey());
         if (mType == Constants.ARTIST || mType == Constants.ALBUM) {
-            ID = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
+            mId = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
             Title = mType == Constants.ARTIST ? newSong.getArtist() : newSong.getAlbum();
             mToolBar.setTitle(Title);
             if (mIsForeground)
@@ -290,16 +289,16 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
      * @return 对应歌曲信息列表
      */
     private List<Song> getMP3List() {
-        if (ID < 0)
+        if (mId < 0)
             return null;
         switch (mType) {
             //专辑id
             case Constants.ALBUM:
-                mInfoList = MediaStoreUtil.getMP3InfoByArg(mArg, Constants.ALBUM);
+                mInfoList = MediaStoreUtil.getMP3InfoByArg(mId, Constants.ALBUM);
                 break;
             //歌手id
             case Constants.ARTIST:
-                mInfoList = MediaStoreUtil.getMP3InfoByArg(mArg, Constants.ARTIST);
+                mInfoList = MediaStoreUtil.getMP3InfoByArg(mId, Constants.ARTIST);
                 break;
             //文件夹名
             case Constants.FOLDER:
@@ -308,22 +307,13 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
             //播放列表名
             case Constants.PLAYLIST:
                 /* 播放列表歌曲id列表 */
-                List<Integer> playListSongIDList = PlayListUtil.getIDList(ID);
+                List<Integer> playListSongIDList = PlayListUtil.getIDList(mId);
                 if (playListSongIDList == null)
                     return mInfoList;
-                mInfoList = PlayListUtil.getMP3ListByIds(playListSongIDList, ID);
+                mInfoList = PlayListUtil.getMP3ListByIds(playListSongIDList, mId);
                 break;
         }
         return mInfoList;
-    }
-
-    //更新界面
-    @Override
-    public void UpdateUI(Song Song, boolean isPlay) {
-        //底部状态兰
-        mBottombar.updateBottomStatus(Song, isPlay);
-        //更新高亮歌曲
-//        mAdapter.onUpdateHighLight();
     }
 
     @Override
@@ -355,7 +345,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     protected void onDestroy() {
         super.onDestroy();
         mRefreshHandler.remove();
-        Util.unregisterReceiver(this, mTagEditReceiver);
+        unregisterLocalReceiver(mTagEditReceiver);
     }
 
     @OnHandleMessage

@@ -58,12 +58,11 @@ import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
-import remix.myplayer.helper.MusicEventHelper;
+import remix.myplayer.helper.MusicEventCallback;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.helper.SleepTimer;
-import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.lyric.UpdateLyricThread;
-import remix.myplayer.lyric.bean.LrcRowWrapper;
+import remix.myplayer.lyric.bean.LyricRowWrapper;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
@@ -89,6 +88,9 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import static remix.myplayer.lyric.UpdateLyricThread.LRC_INTERVAL;
 import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONIS;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
+import static remix.myplayer.util.Util.registerLocalReceiver;
+import static remix.myplayer.util.Util.sendLocalBroadcast;
+import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 
 /**
@@ -101,7 +103,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * 回调相关activity的界面更新
  * 通知栏的控制
  */
-public class MusicService extends BaseService implements Playback, MusicEventHelper.MusicEventCallback {
+public class MusicService extends BaseService implements Playback, MusicEventCallback {
     private final static String TAG = "MusicService";
     /**
      * 所有歌曲id
@@ -292,9 +294,12 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
     protected boolean mHasPermission = false;
 
     public static final String APLAYER_PACKAGE_NAME = "remix.myplayer";
-    public static final String ACTION_MEDIA_CHANGE = APLAYER_PACKAGE_NAME + ".media.change";
-    public static final String ACTION_PERMISSION_CHANGE = APLAYER_PACKAGE_NAME + ".permission.change";
-    public static final String ACTION_PLAYLIST_CHANGE = APLAYER_PACKAGE_NAME + ".playlist.change";
+    public static final String MEDIA_STORE_CHANGE = APLAYER_PACKAGE_NAME + ".media_store.change";
+    public static final String PERMISSION_CHANGE = APLAYER_PACKAGE_NAME + ".permission.change";
+    public static final String PLAYLIST_CHANGE = APLAYER_PACKAGE_NAME + ".playlist.change";
+    public static final String META_CHANGE = APLAYER_PACKAGE_NAME + ".meta.change";
+    public static final String PLAY_STATE_CHANGE = APLAYER_PACKAGE_NAME + ".play_state.change";
+
     public static final String ACTION_APPWIDGET_OPERATE = APLAYER_PACKAGE_NAME + "appwidget.operate";
     public static final String ACTION_SHORTCUT_SHUFFLE = APLAYER_PACKAGE_NAME + ".shortcut.shuffle";
     public static final String ACTION_SHORTCUT_MYLOVE = APLAYER_PACKAGE_NAME + ".shortcut.my_love";
@@ -375,8 +380,6 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
     }
 
     private void setUp() {
-        MusicEventHelper.addCallback(this);
-
         mShortcutManager = new DynamicShortcutManager(mService);
         mVolumeController = new VolumeController();
         mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
@@ -414,19 +417,19 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
         //初始化Receiver
         mMusicEventReceiver = new MusicEventReceiver();
         IntentFilter eventFilter = new IntentFilter();
-        eventFilter.addAction(ACTION_MEDIA_CHANGE);
-        eventFilter.addAction(ACTION_PERMISSION_CHANGE);
-        eventFilter.addAction(ACTION_PLAYLIST_CHANGE);
-        registerReceiver(mMusicEventReceiver, eventFilter);
+        eventFilter.addAction(MEDIA_STORE_CHANGE);
+        eventFilter.addAction(PERMISSION_CHANGE);
+        eventFilter.addAction(PLAYLIST_CHANGE);
+        registerLocalReceiver(mMusicEventReceiver, eventFilter);
 
         mControlRecevier = new ControlReceiver();
-        registerReceiver(mControlRecevier, new IntentFilter(ACTION_CMD));
+        registerLocalReceiver(mControlRecevier, new IntentFilter(ACTION_CMD));
 
         mHeadSetReceiver = new HeadsetPlugReceiver();
         IntentFilter noisyFilter = new IntentFilter();
         noisyFilter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         noisyFilter.addAction(Intent.ACTION_HEADSET_PLUG);
-        registerReceiver(mHeadSetReceiver, noisyFilter);
+        registerLocalReceiver(mHeadSetReceiver, noisyFilter);
 
         mWidgetReceiver = new WidgetReceiver();
         registerReceiver(mWidgetReceiver, new IntentFilter(ACTION_WIDGET_UPDATE));
@@ -438,9 +441,9 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
         registerReceiver(mScreenReceiver, screenFilter);
 
         //监听数据库变化
-        mMediaStoreObserver = new MediaStoreObserver(mUpdateUIHandler);
-        mPlayListObserver = new DBObserver(mUpdateUIHandler);
-        mPlayListSongObserver = new DBObserver(mUpdateUIHandler);
+        mMediaStoreObserver = new MediaStoreObserver(this);
+        mPlayListObserver = new DBObserver(this);
+        mPlayListSongObserver = new DBObserver(this);
         getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mMediaStoreObserver);
         getContentResolver().registerContentObserver(PlayLists.CONTENT_URI, true, mPlayListObserver);
         getContentResolver().registerContentObserver(PlayListSongs.CONTENT_URI, true, mPlayListSongObserver);
@@ -565,7 +568,6 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
     private void unInit() {
         if (mAlreadyUnInit)
             return;
-        MusicEventHelper.removeCallback(this);
         closeAudioEffectSession();
         if (mMediaPlayer != null) {
             if (isPlaying())
@@ -597,11 +599,11 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
         mMediaSession.setActive(false);
         mMediaSession.release();
 
-        Util.unregisterReceiver(this, mControlRecevier);
-        Util.unregisterReceiver(this, mHeadSetReceiver);
-        Util.unregisterReceiver(this, mWidgetReceiver);
-        Util.unregisterReceiver(this, mMusicEventReceiver);
+        unregisterLocalReceiver(mControlRecevier);
+        unregisterLocalReceiver(mHeadSetReceiver);
+        unregisterLocalReceiver(mMusicEventReceiver);
         Util.unregisterReceiver(this, mScreenReceiver);
+        Util.unregisterReceiver(this, mWidgetReceiver);
 
         releaseWakeLock();
         getContentResolver().unregisterContentObserver(mMediaStoreObserver);
@@ -719,6 +721,11 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
         return PlayListUtil.addMultiSongs(infos);
     }
 
+    public void setPlay(boolean isPlay) {
+        mIsPlay = isPlay;
+        sendLocalBroadcast(new Intent(PLAY_STATE_CHANGE));
+    }
+
     /**
      * 播放下一首
      */
@@ -746,7 +753,7 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
                 AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
         if (!mAudioFocus)
             return;
-        mIsPlay = true;
+        setPlay(true);
         //eq可用
         Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
@@ -789,7 +796,7 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
         if (updateMediaSessionOnly)
             updateMediaSession(Global.Operation);
         else {
-            mIsPlay = false;
+            setPlay(false);
             update(Global.Operation);
             mVolumeController.fadeOut();
         }
@@ -850,7 +857,17 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
     }
 
     @Override
-    public void onServiceConnected() {
+    public void onMetaChanged() {
+
+    }
+
+    @Override
+    public void onPlayStateChange() {
+
+    }
+
+    @Override
+    public void onServiceConnected(MusicService service) {
 
     }
 
@@ -959,27 +976,40 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
         }
     }
 
-
     private void handleMusicEvent(Intent intent) {
         if (intent == null)
             return;
         String action = intent.getAction();
-        List<MusicEventHelper.MusicEventCallback> callbacks = MusicEventHelper.getCallbacks();
-        if (callbacks == null)
-            return;
-        if (ACTION_MEDIA_CHANGE.equals(action)) {
-            for (MusicEventHelper.MusicEventCallback callback : callbacks) {
-                callback.onMediaStoreChanged();
-            }
-        } else if (ACTION_PERMISSION_CHANGE.equals(action)) {
-            for (MusicEventHelper.MusicEventCallback callback : callbacks) {
-                callback.onPermissionChanged(intent.getBooleanExtra("permission", false));
-            }
-        } else if (ACTION_PLAYLIST_CHANGE.equals(action)) {
-            for (MusicEventHelper.MusicEventCallback callback : callbacks) {
-                callback.onPlayListChanged();
-            }
+        if (MEDIA_STORE_CHANGE.equals(action)) {
+            onMediaStoreChanged();
+        } else if (PERMISSION_CHANGE.equals(action)) {
+            onPermissionChanged(intent.getBooleanExtra("permission", false));
+        } else if (PLAYLIST_CHANGE.equals(action)) {
+            onPlayListChanged();
         }
+    }
+
+    private void handleMetaChange() {
+        updateAppwidget();
+        if (mNeedShowFloatLrc) {
+            mShowFloatLrc = true;
+            mNeedShowFloatLrc = false;
+        }
+        updateFloatLrc(false);
+        //更新通知栏
+        if (mNotify != null)
+            mNotify.updateForPlaying();
+        updateMediaSession(Global.Operation);
+        sendLocalBroadcast(new Intent(MusicService.META_CHANGE));
+    }
+
+    private void handlePlayStateChange() {
+        //更新桌面歌词播放按钮
+        if (mFloatLrcView != null)
+            mFloatLrcView.setPlayIcon(isPlaying());
+        if (mShortcutManager != null)
+            mShortcutManager.updateContinueShortcut();
+        sendLocalBroadcast(new Intent(MusicService.PLAY_STATE_CHANGE));
     }
 
     /**
@@ -1204,19 +1234,11 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
      * @param control
      */
     private void update(int control) {
-        if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT
-                || control == Command.TOGGLE || control == Command.PAUSE || control == Command.START
-                || control == Command.PLAY_TEMP) {
-            //更新ui
-            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
-            //更新通知栏
-            mNotify.updateForPlaying();
-            //更新桌面歌词播放按钮
-            if (mFloatLrcView != null) {
-                mFloatLrcView.setPlayIcon(isPlaying());
-            }
-            updateMediaSession(control);
-            mShortcutManager.updateContinueShortcut();
+        if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT || control == Command.PLAY_TEMP) {
+            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
+        } else if (control == Command.TOGGLE || control == Command.PAUSE || control == Command.START) {
+//            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_PLAY_STATE);
+            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
         }
     }
 
@@ -1355,7 +1377,7 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
             ToastUtil.show(mService, R.string.song_lose_effect);
             return;
         }
-        mIsPlay = true;
+        setPlay(true);
         prepare(mCurrentSong.getUrl());
 
     }
@@ -1548,7 +1570,8 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
         }
         restoreLastSong();
         mLoadFinished = true;
-        sendBroadcast(new Intent(ACTION_LOAD_FINISH).putExtra("Song", mCurrentSong));
+        mUpdateUIHandler.postDelayed(() -> sendLocalBroadcast(new Intent(META_CHANGE)), 400);
+//        sendLocalBroadcast(new Intent(ACTION_LOAD_FINISH).putExtra("Song", mCurrentSong));
 //        openAudioEffectSession();
     }
 
@@ -1724,11 +1747,11 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
 //    public String mCurrentLrc;
     private UpdateFloatLrcThread mUpdateFloatLrcThread;
     private boolean mNeedShowFloatLrc;
-    private LrcRowWrapper mCurrentLrc = new LrcRowWrapper();
+    private LyricRowWrapper mCurrentLrc = new LyricRowWrapper();
 
     private class UpdateFloatLrcThread extends UpdateLyricThread {
         UpdateFloatLrcThread() {
-            super();
+            super(MusicService.this);
             LogUtil.d("DesktopLrc", "创建线程");
         }
 
@@ -1908,7 +1931,8 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
                     break;
             }
             //通知更新ui
-            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
+//            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
+            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
         }
     }
 
@@ -1941,7 +1965,7 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
                         keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY ?
                                 Command.TOGGLE :
                                 keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Command.NEXT : Command.PREV);
-                mService.sendBroadcast(intent);
+                sendLocalBroadcast(intent);
                 return true;
             }
             //如果是第一次按下，开启一条线程去判断用户操作
@@ -1960,7 +1984,7 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
             public void run() {
                 Intent intent = new Intent(ACTION_CMD);
                 intent.putExtra("Control", mHeadSetHookCount == 1 ? Command.TOGGLE : mHeadSetHookCount == 2 ? Command.NEXT : Command.PREV);
-                mService.sendBroadcast(intent);
+                sendLocalBroadcast(intent);
                 mHeadSetHookCount = 0;
             }
         }
@@ -1972,6 +1996,11 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
         PlaybackHandler(MusicService service, Looper looper) {
             super(looper);
             mRef = new WeakReference<>(service);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
         }
     }
 
@@ -1989,17 +2018,14 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
                 return;
             MusicService musicService = mRef.get();
             switch (msg.what) {
-                case Constants.UPDATE_UI:
-                    musicService.updateAppwidget();
-                    if (musicService.mNeedShowFloatLrc) {
-                        musicService.mShowFloatLrc = true;
-                        musicService.mNeedShowFloatLrc = false;
-                    }
-                    musicService.updateFloatLrc(false);
-                    UpdateHelper.update(musicService.mCurrentSong, musicService.mIsPlay);
+                case Constants.UPDATE_PLAY_STATE:
+                    musicService.handlePlayStateChange();
+                    break;
+                case Constants.UPDATE_META_DATA:
+                    musicService.handleMetaChange();
                     break;
                 case Constants.UPDATE_FLOAT_LRC_CONTENT:
-                    LrcRowWrapper wrapper = musicService.mCurrentLrc;
+                    LyricRowWrapper wrapper = musicService.mCurrentLrc;
                     if (musicService.mFloatLrcView != null) {
                         if (wrapper == null) {
                             musicService.mFloatLrcView.setText(UpdateLyricThread.NO_ROW, UpdateLyricThread.EMPTY_ROW);
@@ -2019,12 +2045,6 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
                 case Constants.CREATE_FLOAT_LRC:
                     musicService.createFloatLrc();
                     break;
-                case Constants.UPDATE_ADAPTER:
-                    musicService.handleMusicEvent(new Intent(ACTION_MEDIA_CHANGE));
-                    break;
-                case Constants.UPDATE_PLAYLIST:
-                    musicService.handleMusicEvent(new Intent(ACTION_PLAYLIST_CHANGE));
-                    break;
             }
         }
     }
@@ -2032,7 +2052,7 @@ public class MusicService extends BaseService implements Playback, MusicEventHel
     private class ScreenReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
+            final String action = intent.getAction();
             if (Intent.ACTION_SCREEN_ON.equals(action)) {
                 //显示锁屏
                 if (mIsPlay && SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN) == Constants.APLAYER_LOCKSCREEN)

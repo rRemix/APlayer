@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.interfaces.OnTagEditListener;
+import remix.myplayer.misc.interfaces.OnTagEditListener;
 
 public class TagReceiver extends BroadcastReceiver {
     private final OnTagEditListener mListener;

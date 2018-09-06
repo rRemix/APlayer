@@ -11,7 +11,7 @@ import static remix.myplayer.lyric.UpdateLyricThread.EMPTY_ROW;
  * @Date 2017/5/10 13:37
  */
 
-public class LrcRowWrapper {
+public class LyricRowWrapper {
     public LrcRow LineOne = EMPTY_ROW;
     public LrcRow LineTwo = EMPTY_ROW;
     public UpdateLyricThread.Status mStatus;
@@ -42,7 +42,7 @@ public class LrcRowWrapper {
 
     @Override
     public String toString() {
-        return "LrcRowWrapper{" +
+        return "LyricRowWrapper{" +
                 "LineOne=" + LineOne +
                 ", LineTwo=" + LineTwo +
                 '}';

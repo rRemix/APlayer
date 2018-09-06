@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -29,9 +30,8 @@ import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
-import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.lyric.UpdateLyricThread;
-import remix.myplayer.lyric.bean.LrcRowWrapper;
+import remix.myplayer.lyric.bean.LyricRowWrapper;
 import remix.myplayer.misc.menu.CtrlButtonListener;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
@@ -58,7 +58,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * 实际为将手机解锁并对Activity进行处理，使其看起来像锁屏界面
  */
 
-public class LockScreenActivity extends BaseMusicActivity implements UpdateHelper.Callback {
+public class LockScreenActivity extends BaseMusicActivity {
     private static final String TAG = "LockScreenActivity";
     private static final Bitmap DEFAULT_BITMAP = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_night);
     private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 210);
@@ -95,7 +95,7 @@ public class LockScreenActivity extends BaseMusicActivity implements UpdateHelpe
 
     //是否正在播放
     private CompositeDisposable mDisposable = new CompositeDisposable();
-    private volatile LrcRowWrapper mCurLyric;
+    private volatile LyricRowWrapper mCurLyric;
     private UpdateLyricThread mUpdateLyricThread;
 
 
@@ -189,27 +189,17 @@ public class LockScreenActivity extends BaseMusicActivity implements UpdateHelpe
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        if (mUpdateLyricThread != null) {
-            mUpdateLyricThread.interrupt();
-            mUpdateLyricThread = null;
-        }
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
-        if (mUpdateLyricThread == null) {
-            mUpdateLyricThread = new UpdateLockScreenLyricThread(this);
-            mUpdateLyricThread.start();
-        }
-        UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mUpdateLyricThread != null) {
+            mUpdateLyricThread.interrupt();
+            mUpdateLyricThread = null;
+        }
         if (mDisposable != null) {
             mDisposable.dispose();
         }
@@ -220,45 +210,24 @@ public class LockScreenActivity extends BaseMusicActivity implements UpdateHelpe
     }
 
     @Override
-    public void onServiceConnected() {
-        super.onServiceConnected();
-        UpdateUI(MusicServiceRemote.getCurrentSong(), MusicServiceRemote.isPlaying());
-    }
-
-    @Override
-    public void onServiceDisConnected() {
-        super.onServiceDisConnected();
-    }
-
-    @Override
-    public void UpdateUI(Song song, boolean isPlay) {
-        if (!mIsForeground) {
-            return;
+    public void onServiceConnected(@NonNull MusicService service) {
+        super.onServiceConnected(service);
+        if (mUpdateLyricThread == null) {
+            mUpdateLyricThread = new UpdateLockScreenLyricThread(this, service);
+            mUpdateLyricThread.start();
         }
+        onMetaChanged();
+        onPlayStateChange();
+    }
+
+
+    @Override
+    public void onMetaChanged() {
+        super.onMetaChanged();
+        final Song song = MusicServiceRemote.getCurrentSong();
         //歌词
-        mUpdateLyricThread.setSongAndGetLyricRows(song);
-//        mDisposable.add(new SearchLrc(mInfo).getLyric()
-//                .doOnSubscribe(new Consumer<Disposable>() {
-//                    @Override
-//                    public void accept(Disposable disposable) throws Exception {
-//                        mLyric.setText(R.string.searching);
-//                    }
-//                })
-//                .subscribe(lrcRows -> {
-//                    if (id == mInfo.getId()) {
-//                        mUpdateLyricThread.setLrcRows(lrcRows);
-//                    }
-//                }, throwable -> {
-//                    LogUtil.e(throwable);
-//                    if (id == mInfo.getId()) {
-//                        mUpdateLyricThread.setLrcRows(null);
-//                    }
-//                }));
-
-        //更新播放按钮
-        if (mPlayButton != null) {
-            mPlayButton.setImageResource(MusicServiceRemote.isPlaying() ? R.drawable.lock_btn_pause : R.drawable.lock_btn_play);
-        }
+        if (mUpdateLyricThread != null)
+            mUpdateLyricThread.setSongAndGetLyricRows(song);
         //标题
         if (mSong != null) {
             mSong.setText(song.getTitle());
@@ -304,6 +273,15 @@ public class LockScreenActivity extends BaseMusicActivity implements UpdateHelpe
         }.load();
     }
 
+    @Override
+    public void onPlayStateChange() {
+        super.onPlayStateChange();
+        //更新播放按钮
+        if (mPlayButton != null) {
+            mPlayButton.setImageResource(MusicServiceRemote.isPlaying() ? R.drawable.lock_btn_pause : R.drawable.lock_btn_play);
+        }
+    }
+
     private void setResult(Palette result) {
         if (result == null)
             return;
@@ -332,7 +310,7 @@ public class LockScreenActivity extends BaseMusicActivity implements UpdateHelpe
         e.onComplete();
     }
 
-    private void setCurrentLyric(LrcRowWrapper wrapper) {
+    private void setCurrentLyric(LyricRowWrapper wrapper) {
         runOnUiThread(() -> {
             mCurLyric = wrapper;
             if (mCurLyric == null) {
@@ -351,8 +329,8 @@ public class LockScreenActivity extends BaseMusicActivity implements UpdateHelpe
     private static class UpdateLockScreenLyricThread extends UpdateLyricThread {
         private final WeakReference<LockScreenActivity> mRef;
 
-        private UpdateLockScreenLyricThread(LockScreenActivity activity) {
-            super();
+        private UpdateLockScreenLyricThread(LockScreenActivity activity, MusicService service) {
+            super(service);
             mRef = new WeakReference<>(activity);
         }
 

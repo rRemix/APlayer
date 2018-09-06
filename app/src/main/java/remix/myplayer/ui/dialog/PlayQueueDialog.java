@@ -24,15 +24,16 @@ import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.helper.MusicServiceRemote;
-import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.adapter.PlayQueueAdapter;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -67,7 +68,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
                 arg.putInt("Control", Command.PLAYSELECTEDSONG);
                 arg.putInt("Position", position);
                 intent.putExtras(arg);
-                sendBroadcast(intent);
+                Util.sendLocalBroadcast(intent);
 
                 mHandler.postDelayed(() -> mAdapter.notifyDataSetChanged(), 50);
             }

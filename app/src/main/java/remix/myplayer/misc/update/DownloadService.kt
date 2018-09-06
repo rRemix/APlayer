@@ -16,6 +16,7 @@ import remix.myplayer.request.network.OkHttpHelper
 import remix.myplayer.util.LogUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
+import remix.myplayer.util.Util.sendLocalBroadcast
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -81,7 +82,7 @@ class DownloadService : IntentService("DownloadService") {
             }
             postNotification(release.assets[0].size, 0)
             if (isForce(release)) {
-                sendBroadcast(Intent(ACTION_SHOW_DIALOG))
+                sendLocalBroadcast(Intent(ACTION_SHOW_DIALOG))
             }
             HttpsURLConnection.setDefaultSSLSocketFactory(OkHttpHelper.getSSLSocketFactory())
             val url = URL(downloadUrl)
@@ -113,7 +114,7 @@ class DownloadService : IntentService("DownloadService") {
         } catch (ex: Exception) {
             ToastUtil.show(this, R.string.update_error, ex.message)
         } finally {
-            sendBroadcast(Intent(ACTION_DISMISS_DIALOG))
+            sendLocalBroadcast(Intent(ACTION_DISMISS_DIALOG))
             Util.closeStream(inStream)
             Util.closeStream(outStream)
         }
@@ -121,7 +122,7 @@ class DownloadService : IntentService("DownloadService") {
     }
 
     private fun sendCompleteBroadcast(path: String) {
-        sendBroadcast(Intent(ACTION_DOWNLOAD_COMPLETE)
+        sendLocalBroadcast(Intent(ACTION_DOWNLOAD_COMPLETE)
                 .putExtra(EXTRA_PATH, path))
     }
 
@@ -131,7 +132,7 @@ class DownloadService : IntentService("DownloadService") {
                 .setContentTitle(getString(R.string.downloading))
 //                .setContentText(getString(if(isFinish) R.string.download_complete_to_do else R.string.please_wait))
                 .setProgress(targetSize.toInt(), downloadSize.toInt(), false)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.notifbar_icon)
                 .setAutoCancel(false)
                 .setShowWhen(false)
                 .setOngoing(true)

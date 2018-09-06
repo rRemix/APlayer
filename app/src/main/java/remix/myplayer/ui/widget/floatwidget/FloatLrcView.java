@@ -4,18 +4,17 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +29,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.App;
 import remix.myplayer.R;
-import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.lyric.bean.LrcRow;
-import remix.myplayer.lyric.bean.LrcRowWrapper;
+import remix.myplayer.lyric.bean.LyricRowWrapper;
+import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
@@ -40,8 +39,8 @@ import remix.myplayer.ui.adapter.FloatColorAdapter;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
-import static remix.myplayer.helper.MusicServiceRemote.isPlaying;
 
 /**
  * @ClassName
@@ -52,10 +51,10 @@ import static remix.myplayer.helper.MusicServiceRemote.isPlaying;
 
 public class FloatLrcView extends RelativeLayout {
     private WindowManager mWindowManager;
-    private Context mContext;
+    private MusicService mService;
     private PointF mLastPoint = new PointF();
     private boolean mIsLock = false;
-    private LrcRowWrapper mLrcContent;
+    private LyricRowWrapper mLrcContent;
     private Handler mUIHandler = new Handler();
     @BindView(R.id.widget_line1)
     FloatTextView mText1;
@@ -111,27 +110,18 @@ public class FloatLrcView extends RelativeLayout {
         }
     };
 
-    public FloatLrcView(Context context) {
-        super(context);
-        init(context);
+    public FloatLrcView(MusicService service) {
+        super(service);
+        init(service);
     }
 
-    public FloatLrcView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        init(context);
-    }
-
-    public FloatLrcView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context);
-    }
 
     private void init(Context context) {
-        mContext = context;
+        mService = (MusicService) context;
         mNotify = new UnLockNotify();
-        mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        mWindowManager = (WindowManager) mService.getSystemService(Context.WINDOW_SERVICE);
 
-        ButterKnife.bind(this, inflate(context, R.layout.layout_floatwidget, this));
+        ButterKnife.bind(this, inflate(mService, R.layout.layout_floatwidget, this));
         setUpView();
     }
 
@@ -140,7 +130,7 @@ public class FloatLrcView extends RelativeLayout {
             @Override
             public boolean onPreDraw() {
                 mColorRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-                mColorAdapter = new FloatColorAdapter(mContext, R.layout.item_float_lrc_color, mColorRecyclerView.getMeasuredWidth());
+                mColorAdapter = new FloatColorAdapter(mService, R.layout.item_float_lrc_color, mColorRecyclerView.getMeasuredWidth());
                 mColorAdapter.setData(ThemeStore.getAllThemeColor());
                 mColorAdapter.setOnItemClickListener(new OnItemClickListener() {
                     @Override
@@ -157,7 +147,7 @@ public class FloatLrcView extends RelativeLayout {
 
                     }
                 });
-                mColorRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
+                mColorRecyclerView.setLayoutManager(new LinearLayoutManager(mService, LinearLayoutManager.HORIZONTAL, false));
                 mColorRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
                 mColorRecyclerView.setAdapter(mColorAdapter);
                 return true;
@@ -166,13 +156,13 @@ public class FloatLrcView extends RelativeLayout {
     }
 
     private void setUpView() {
-        mText1.setTextColor(ThemeStore.getThemeColorInt(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_COLOR, ThemeStore.getThemeColor())));
+        mText1.setTextColor(ThemeStore.getThemeColorInt(SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_COLOR, ThemeStore.getThemeColor())));
         mText1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
         mText2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
-        mIsLock = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_LOCK, false);
+        mIsLock = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_LOCK, false);
 
-        mTextSizeType = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_SIZE, MEDIUM);
-        setPlayIcon(isPlaying());
+        mTextSizeType = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_SIZE, MEDIUM);
+        setPlayIcon(mService.isPlaying());
 
         getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
@@ -263,7 +253,7 @@ public class FloatLrcView extends RelativeLayout {
                     }
                     //保存y坐标
                     WindowManager.LayoutParams params = (WindowManager.LayoutParams) getLayoutParams();
-                    SPUtil.putValue(mContext, "Setting", SPUtil.SETTING_KEY.FLOAT_Y, params.y);
+                    SPUtil.putValue(mService, "Setting", SPUtil.SETTING_KEY.FLOAT_Y, params.y);
                 } else {
 //                    mUIHandler.removeCallbacks(mLongClickRunnable);
                 }
@@ -286,11 +276,11 @@ public class FloatLrcView extends RelativeLayout {
         switch (view.getId()) {
             //关闭桌面歌词
             case R.id.widget_close:
-                SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
+                SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
                 Intent closeIntent = new Intent(MusicService.ACTION_CMD);
                 closeIntent.putExtra("FloatLrc", false);
                 closeIntent.putExtra("Control", Command.TOGGLE_FLOAT_LRC);
-                mContext.sendBroadcast(closeIntent);
+                Util.sendLocalBroadcast(closeIntent);
                 break;
             //锁定
             case R.id.widget_lock:
@@ -316,8 +306,8 @@ public class FloatLrcView extends RelativeLayout {
             case R.id.widget_prev:
                 Intent ctlIntent = new Intent(MusicService.ACTION_CMD);
                 ctlIntent.putExtra("Control", view.getId() == R.id.widget_next ? Command.NEXT : view.getId() == R.id.widget_prev ? Command.PREV : Command.TOGGLE);
-                mContext.sendBroadcast(ctlIntent);
-                mUIHandler.postDelayed(() -> mPlay.setImageResource(isPlaying() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal), 100);
+                Util.sendLocalBroadcast(ctlIntent);
+                mUIHandler.postDelayed(() -> mPlay.setImageResource(mService.isPlaying() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal), 100);
                 //操作后重置消息的时间
                 resetHide();
                 break;
@@ -342,7 +332,7 @@ public class FloatLrcView extends RelativeLayout {
                 if (needRefresh) {
                     mText1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
                     mText2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
-                    SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_SIZE, mTextSizeType);
+                    SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_SIZE, mTextSizeType);
                     //操作后重置消息的时间
                     resetHide();
                 }
@@ -352,9 +342,9 @@ public class FloatLrcView extends RelativeLayout {
 
     public void saveLock(boolean lock, boolean toast) {
         mIsLock = lock;
-        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_LOCK, mIsLock);
+        SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_LOCK, mIsLock);
         if (toast) {
-            ToastUtil.show(mContext, !mIsLock ? R.string.float_unlock : R.string.float_lock);
+            ToastUtil.show(mService, !mIsLock ? R.string.float_unlock : R.string.float_lock);
         }
         WindowManager.LayoutParams params = (WindowManager.LayoutParams) getLayoutParams();
         if (params != null) {
@@ -426,10 +416,7 @@ public class FloatLrcView extends RelativeLayout {
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setOngoing(true)
                     .setTicker(mContext.getString(R.string.float_lock_ticker))
-                    .setContentIntent(PendingIntent.getBroadcast(mContext,
-                            10,
-                            new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.UNLOCK_DESKTOP_LYRIC),
-                            PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentIntent(buildPendingIntent())
                     .setSmallIcon(R.drawable.notifbar_icon)
                     .build();
             mNotificationManager.notify(UNLOCK_NOTIFICATION_ID, notification);
@@ -437,6 +424,13 @@ public class FloatLrcView extends RelativeLayout {
 
         void cancel() {
             mNotificationManager.cancel(UNLOCK_NOTIFICATION_ID);
+        }
+
+        PendingIntent buildPendingIntent() {
+            Intent intent = new Intent(MusicService.ACTION_CMD);
+            intent.putExtra("Control", Command.UNLOCK_DESKTOP_LYRIC);
+            intent.setComponent(new ComponentName(mContext, MusicService.class));
+            return PendingIntent.getService(mContext,  Command.UNLOCK_DESKTOP_LYRIC, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
     }
 }

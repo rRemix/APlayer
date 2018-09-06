@@ -13,7 +13,6 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -77,6 +76,7 @@ import static remix.myplayer.helper.M3UHelper.importM3UFile;
 import static remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM;
 import static remix.myplayer.theme.Theme.getBaseDialog;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
+import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 /**
  * @ClassName SettingActivity
@@ -211,14 +211,14 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 Intent intent = new Intent(MusicService.ACTION_CMD);
                                 intent.putExtra("FloatLrc", mFloatLrcSwitch.isChecked());
                                 intent.putExtra("Control", Command.TOGGLE_FLOAT_LRC);
-                                sendBroadcast(intent);
+                                sendLocalBroadcast(intent);
                                 break;
                             //屏幕常亮
                             case R.id.setting_screen_switch:
                                 break;
                             //通知栏样式
                             case R.id.setting_notify_switch:
-                                sendBroadcast(new Intent(MusicService.ACTION_CMD)
+                                sendLocalBroadcast(new Intent(MusicService.ACTION_CMD)
                                         .putExtra("Control", Command.TOGGLE_NOTIFY)
                                         .putExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, isChecked));
                                 break;
@@ -230,7 +230,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //断点播放
                             case R.id.setting_breakpoint_switch:
-                                LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(MusicService.ACTION_CMD)
+                                sendLocalBroadcast(new Intent(MusicService.ACTION_CMD)
                                         .putExtra("Control", Command.PLAY_AT_BREAKPOINT)
                                         .putExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, view.isChecked()));
                                 break;
@@ -709,7 +709,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 .itemsCallbackSingleChoice(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true) ? 0 : 1,
                         (dialog, view, which, text) -> {
                             SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, which == 0);
-                            sendBroadcast(new Intent(MusicService.ACTION_CMD)
+                            sendLocalBroadcast(new Intent(MusicService.ACTION_CMD)
                                     .putExtra("Control", Command.TOGGLE_NOTIFY)
                                     .putExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, mNotifyStyleSwitch.isChecked()));
                             return true;
@@ -733,7 +733,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     which == 1 ? R.string.system_lockscreen_tip : R.string.lockscreen_off_tip);
                             Intent intent = new Intent(MusicService.ACTION_CMD);
                             intent.putExtra("Control", Command.TOGGLE_MEDIASESSION);
-                            sendBroadcast(intent);
+                            sendLocalBroadcast(intent);
                             return true;
                         }).show();
     }
