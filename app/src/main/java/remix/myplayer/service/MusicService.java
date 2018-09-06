@@ -1219,6 +1219,20 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
 
     /**
+     * 是否只需要更新播放状态,比如暂停
+     *
+     * @param cmd
+     * @return
+     */
+    private boolean updatePlayStateOnly(int cmd) {
+        return cmd == Command.PAUSE || cmd == Command.START || cmd == Command.TOGGLE;
+    }
+
+    private boolean updateAllView(int cmd){
+        return cmd == Command.PLAYSELECTEDSONG || cmd == Command.PREV || cmd == Command.NEXT || cmd == Command.PLAY_TEMP;
+    }
+
+    /**
      * 清除锁屏显示的内容
      */
     private void cleanMetaData() {
@@ -1230,15 +1244,16 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     /**
      * 更新
-     *
      * @param control
      */
     private void update(int control) {
-        if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT || control == Command.PLAY_TEMP) {
+        if (updateAllView(control)) {
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
-        } else if (control == Command.TOGGLE || control == Command.PAUSE || control == Command.START) {
-//            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_PLAY_STATE);
+        } else if (!mMediaPlayer.playedOnce()) {
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
+        } else if (updatePlayStateOnly(control)) {
+            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_PLAY_STATE);
+//            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
         }
     }
 
@@ -1274,7 +1289,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, mCurrentIndex)
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mCurrentSong.getTitle());
 
-        if (control == Command.TOGGLE || control == Command.PAUSE || control == Command.START) {
+        if (updatePlayStateOnly(control)) {
             mMediaSession.setMetadata(builder.build());
         } else {
             new RemoteUriRequest(getSearchRequestWithAlbumType(mCurrentSong), new RequestConfig.Builder(400, 400).build()) {
@@ -1641,23 +1656,18 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             mWakeLock.acquire(mCurrentSong != null ? mCurrentSong.getDuration() : 30000L);
     }
 
-    private boolean judgeCommand() {
-        final int control = Global.Operation;
-        return control != Command.TOGGLE && control != Command.PAUSE && control != Command.START;
-    }
 
     /**
      * 更新桌面歌词
      */
     private boolean mFirstUpdateLrc = true;
-
     private void updateFloatLrc(boolean force) {
         if (checkNoPermission()) { //没有权限
             return;
         }
         if (!mShowFloatLrc) { //移除桌面歌词
             mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
-        } else if (judgeCommand() || force || mFirstUpdateLrc) { //更新
+        } else if (!updatePlayStateOnly(Global.Operation) || force || mFirstUpdateLrc) { //更新
             createFloatLrcThreadIfNeed();
             mUpdateFloatLrcThread.setSongAndGetLyricRows(mCurrentSong);
             mFirstUpdateLrc = false;
