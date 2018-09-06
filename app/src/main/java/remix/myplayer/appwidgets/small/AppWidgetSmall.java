@@ -22,30 +22,30 @@ public class AppWidgetSmall extends BaseAppwidget {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        defaultAppWidget(context,appWidgetIds);
+        defaultAppWidget(context, appWidgetIds);
         Intent intent = new Intent(MusicService.ACTION_WIDGET_UPDATE);
-        intent.putExtra("WidgetName","SmallWidget");
-        intent.putExtra("WidgetIds",appWidgetIds);
+        intent.putExtra("WidgetName", "SmallWidget");
+        intent.putExtra("WidgetIds", appWidgetIds);
         intent.setFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
         context.sendBroadcast(intent);
     }
 
     private void defaultAppWidget(Context context, int[] appWidgetIds) {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);
-        buildAction(context,remoteViews);
-        pushUpdate(context,appWidgetIds,remoteViews);
+        buildAction(context, remoteViews);
+        pushUpdate(context, appWidgetIds, remoteViews);
     }
 
     @Override
-    public void updateWidget(final Context context,final int[] appWidgetIds, boolean reloadCover){
-        final Song song = MusicService.getCurrentMP3();
-        if(song == null || !hasInstances(context))
+    public void updateWidget(final MusicService service, final int[] appWidgetIds, boolean reloadCover) {
+        final Song song = service.getCurrentSong();
+        if (song == null || !hasInstances(service))
             return;
-        final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);
-        buildAction(context,remoteViews);
+        final RemoteViews remoteViews = new RemoteViews(service.getPackageName(), R.layout.app_widget_small);
+        buildAction(service, remoteViews);
         mSkin = AppWidgetSkin.WHITE_1F;
-        updateRemoteViews(remoteViews,song);
+        updateRemoteViews(service,remoteViews, song);
         //设置封面
-        updateCover(context,remoteViews,appWidgetIds,reloadCover);
+        updateCover(service, remoteViews, appWidgetIds, reloadCover);
     }
 }

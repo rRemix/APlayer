@@ -18,8 +18,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
+import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.SongChooseAdaper;
 import remix.myplayer.util.ColorUtil;
@@ -34,7 +34,7 @@ import remix.myplayer.util.ToastUtil;
  * @Date 2016/10/21 09:34
  */
 
-public class SongChooseActivity extends PermissionActivity<Song,SongChooseAdaper> {
+public class SongChooseActivity extends LibraryActivity<Song,SongChooseAdaper> {
     public static final String TAG = SongChooseActivity.class.getSimpleName();
 
     private int mPlayListID;

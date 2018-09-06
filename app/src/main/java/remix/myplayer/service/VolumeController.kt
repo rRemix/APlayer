@@ -3,6 +3,7 @@ package remix.myplayer.service
 import android.os.CountDownTimer
 import android.os.Handler
 import android.support.annotation.FloatRange
+import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.util.LogUtil
 
 /**
@@ -12,7 +13,7 @@ import remix.myplayer.util.LogUtil
 class VolumeController {
     private val mHandler: Handler = Handler()
     private val mFadeInRunnable: Runnable = Runnable {
-        val mediaPlayer = MusicService.getMediaPlayer()
+        val mediaPlayer = MusicServiceRemote.getMediaPlayer()
         object : CountDownTimer(DURATION_IN_MS, DURATION_IN_MS / 10) {
             override fun onFinish() {
                 directTo(1f)
@@ -29,7 +30,7 @@ class VolumeController {
         }.start()
     }
     private val mFadeOutRunnable: Runnable = Runnable {
-        val mediaPlayer = MusicService.getMediaPlayer()
+        val mediaPlayer = MusicServiceRemote.getMediaPlayer()
         object : CountDownTimer(DURATION_IN_MS,DURATION_IN_MS / 10){
             override fun onTick(millisUntilFinished: Long) {
                 val volume = millisUntilFinished * 1.0f / DURATION_IN_MS
@@ -57,7 +58,7 @@ class VolumeController {
     }
 
     private fun directTo(@FloatRange(from = 0.0, to = 1.0) leftVolume: Float, @FloatRange(from = 0.0, to = 1.0) rightVolume: Float){
-        val mediaPlayer = MusicService.getMediaPlayer()
+        val mediaPlayer = MusicServiceRemote.getMediaPlayer()
         try {
             mediaPlayer?.setVolume(leftVolume, rightVolume)
         }catch (e: IllegalStateException){

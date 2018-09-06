@@ -8,7 +8,8 @@ import android.os.Build;
 
 import remix.myplayer.R;
 import remix.myplayer.appshortcuts.AppShortcutActivity;
-import remix.myplayer.service.MusicService;
+
+import static remix.myplayer.helper.MusicServiceRemote.isPlaying;
 
 /**
  * Created by Remix on 2017/11/16.
@@ -21,10 +22,10 @@ public class ContinuePlayShortcutType extends BaseShortcutType {
 
     @Override
     public ShortcutInfo getShortcutInfo() {
-        return new ShortcutInfo.Builder(mContext,ID_PREFIX + "continue_play")
-                .setShortLabel(mContext.getString(MusicService.isPlay() ?  R.string.pause_play : R.string.continue_play))
-                .setLongLabel(mContext.getString(MusicService.isPlay() ?  R.string.pause_play : R.string.continue_play))
-                .setIcon(Icon.createWithResource(mContext, MusicService.isPlay() ? R.drawable.icon_appshortcut_pause : R.drawable.icon_appshortcut_play))
+        return new ShortcutInfo.Builder(mContext, ID_PREFIX + "continue_play")
+                .setShortLabel(mContext.getString(isPlaying() ? R.string.pause_play : R.string.continue_play))
+                .setLongLabel(mContext.getString(isPlaying() ? R.string.pause_play : R.string.continue_play))
+                .setIcon(Icon.createWithResource(mContext, isPlaying() ? R.drawable.icon_appshortcut_pause : R.drawable.icon_appshortcut_play))
                 .setIntent(getIntent(AppShortcutActivity.SHORTCUT_TYPE_CONTINUE_PLAY))
                 .build();
     }

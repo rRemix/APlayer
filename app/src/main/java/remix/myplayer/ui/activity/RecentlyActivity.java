@@ -17,18 +17,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.interfaces.LoaderIds;
-import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.interfaces.LoaderIds;
+import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.adapter.SongAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -39,7 +38,7 @@ import remix.myplayer.util.MediaStoreUtil;
  * 最近添加歌曲的界面
  * 目前为最近7天添加
  */
-public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> implements UpdateHelper.Callback{
+public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
     public static final String TAG = RecentlyActivity.class.getSimpleName();
 
     @BindView(R.id.recently_placeholder)
@@ -58,27 +57,27 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
 
         mHandler = new MsgHandler(this);
 
-        mAdapter = new SongAdapter(this, R.layout.item_song_recycle,mMultiChoice,SongAdapter.RECENTLY,mRecyclerView);
+        mAdapter = new SongAdapter(this, R.layout.item_song_recycle, mMultiChoice, SongAdapter.RECENTLY, mRecyclerView);
         mMultiChoice.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 int id = getSongId(position);
-                if(id > 0 && !mMultiChoice.itemClick(position,id,TAG)){
+                if (id > 0 && !mMultiChoice.itemClick(position, id, TAG)) {
                     Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Command.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayQueue(mIdList,mContext,intent);
+                    MusicServiceRemote.setPlayQueue(mIdList, intent);
                 }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
                 int id = getSongId(position);
-                if(id > 0)
-                    mMultiChoice.itemLongClick(position,id,TAG,Constants.SONG);
+                if (id > 0)
+                    mMultiChoice.itemLongClick(position, id, TAG, Constants.SONG);
             }
         });
 
@@ -86,17 +85,18 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
 
-        setUpToolbar(mToolBar,getString(R.string.recently));
+        setUpToolbar(mToolBar, getString(R.string.recently));
     }
 
     /**
      * 获得歌曲id
+     *
      * @param position
      * @return
      */
-    private int getSongId(int position){
+    private int getSongId(int position) {
         int id = -1;
-        if(mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1){
+        if (mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1) {
             id = mAdapter.getDatas().get(position).getId();
         }
         return id;
@@ -104,25 +104,20 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
 
     @Override
     public void onBackPressed() {
-        if(mMultiChoice.isShow()) {
+        if (mMultiChoice.isShow()) {
             onMultiBackPress();
         } else {
             finish();
         }
     }
 
-    @Override
-    public void UpdateUI(Song Song, boolean isplay) {
-//        if(mAdapter != null)
-//            mAdapter.onUpdateHighLight();
-    }
 
     @Override
     public void onLoadFinished(android.content.Loader<List<Song>> loader, List<Song> data) {
         super.onLoadFinished(loader, data);
-        if(data != null){
+        if (data != null) {
             mIdList = new ArrayList<>();
-            for(Song song : data){
+            for (Song song : data) {
                 mIdList.add(song.getId());
             }
             mRecyclerView.setVisibility(data.size() > 0 ? View.VISIBLE : View.GONE);
@@ -136,7 +131,7 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
     @Override
     protected void onResume() {
         super.onResume();
-        if(mMultiChoice.isShow()){
+        if (mMultiChoice.isShow()) {
             mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
     }
@@ -144,20 +139,20 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
     @Override
     protected void onPause() {
         super.onPause();
-        if(mMultiChoice.isShow()){
-            mHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
+        if (mMultiChoice.isShow()) {
+            mHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI, 500);
         }
     }
 
     @OnHandleMessage
-    public void handleMessage(Message msg){
-        switch (msg.what){
+    public void handleMessage(Message msg) {
+        switch (msg.what) {
             case Constants.CLEAR_MULTI:
-                if(mAdapter != null)
+                if (mAdapter != null)
                     mAdapter.notifyDataSetChanged();
                 break;
             case Constants.UPDATE_ADAPTER:
-                if(mAdapter != null)
+                if (mAdapter != null)
                     mAdapter.notifyDataSetChanged();
         }
     }
@@ -184,7 +179,7 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
 
         @NonNull
         private List<Song> getLastAddedSongs() {
-           return MediaStoreUtil.getLastAddedSong();
+            return MediaStoreUtil.getLastAddedSong();
         }
     }
 }

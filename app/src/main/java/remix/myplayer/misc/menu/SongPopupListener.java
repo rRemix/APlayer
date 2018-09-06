@@ -21,7 +21,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.Tag;
 import remix.myplayer.ui.dialog.AddtoPlayListDialog;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
@@ -56,7 +55,7 @@ public class SongPopupListener
                 Intent intent = new Intent(MusicService.ACTION_CMD);
                 intent.putExtra("Control", Command.ADD_TO_NEXT_SONG);
                 intent.putExtra("song",mSong);
-                mActivity.sendBroadcast(intent);
+                Util.sendLocalBroadcast(intent);
                 break;
             case R.id.menu_add_to_playlist:
                 Intent intentAdd = new Intent(mActivity,AddtoPlayListDialog.class);
@@ -66,7 +65,7 @@ public class SongPopupListener
                 mActivity.startActivity(intentAdd);
                 break;
             case R.id.menu_add_to_play_queue:
-                ToastUtil.show(mActivity, mActivity.getString(R.string.add_song_playqueue_success, Global.AddSongToPlayQueue(Collections.singletonList(mSong.getId()))));
+                ToastUtil.show(mActivity, mActivity.getString(R.string.add_song_playqueue_success, MusicService.AddSongToPlayQueue(Collections.singletonList(mSong.getId()))));
                 break;
             case R.id.menu_detail:
                 mTag.detail();

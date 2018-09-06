@@ -16,15 +16,15 @@ import java.util.List;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.interfaces.LoaderIds;
-import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
+import remix.myplayer.misc.interfaces.LoaderIds;
+import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.adapter.SongAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -64,7 +64,7 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
                     arg.putInt("Control", Command.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayQueue(Global.AllSongList,mContext,intent);
+                    MusicServiceRemote.setAllSongAsPlayQueue(intent);
                 }
             }
             @Override
@@ -91,13 +91,11 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
     private synchronized void setAllSongList(){
         if(mAdapter == null || mAdapter.getDatas() == null)
             return;
-        if(Global.AllSongList == null)
-            Global.AllSongList = new ArrayList<>();
-        else
-            Global.AllSongList.clear();
+        List<Integer> allSong = new ArrayList<>();
         for(Song song : mAdapter.getDatas()){
-            Global.AllSongList.add(song.getId());
+            allSong.add(song.getId());
         }
+        MusicServiceRemote.setAllSong(allSong);
     }
 
     private int getSongID(int position){

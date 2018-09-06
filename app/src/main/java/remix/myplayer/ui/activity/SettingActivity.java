@@ -13,7 +13,6 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -41,9 +40,11 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
 import remix.myplayer.App;
+import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.Category;
 import remix.myplayer.bean.mp3.PlayList;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
@@ -62,7 +63,6 @@ import remix.myplayer.ui.dialog.FolderChooserDialog;
 import remix.myplayer.ui.dialog.ThemeDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -76,6 +76,7 @@ import static remix.myplayer.helper.M3UHelper.importM3UFile;
 import static remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM;
 import static remix.myplayer.theme.Theme.getBaseDialog;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
+import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 /**
  * @ClassName SettingActivity
@@ -201,7 +202,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                                         intent.setData(Uri.parse("package:" + getPackageName()));
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        Util.startActivitySafely(mContext,intent);
+                                        Util.startActivitySafely(mContext, intent);
                                     }
                                     ToastUtil.show(mContext, R.string.plz_give_float_permission);
                                     return;
@@ -210,14 +211,14 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 Intent intent = new Intent(MusicService.ACTION_CMD);
                                 intent.putExtra("FloatLrc", mFloatLrcSwitch.isChecked());
                                 intent.putExtra("Control", Command.TOGGLE_FLOAT_LRC);
-                                sendBroadcast(intent);
+                                sendLocalBroadcast(intent);
                                 break;
                             //屏幕常亮
                             case R.id.setting_screen_switch:
                                 break;
                             //通知栏样式
                             case R.id.setting_notify_switch:
-                                sendBroadcast(new Intent(MusicService.ACTION_CMD)
+                                sendLocalBroadcast(new Intent(MusicService.ACTION_CMD)
                                         .putExtra("Control", Command.TOGGLE_NOTIFY)
                                         .putExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, isChecked));
                                 break;
@@ -229,7 +230,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //断点播放
                             case R.id.setting_breakpoint_switch:
-                                LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(MusicService.ACTION_CMD)
+                                sendLocalBroadcast(new Intent(MusicService.ACTION_CMD)
                                         .putExtra("Control", Command.PLAY_AT_BREAKPOINT)
                                         .putExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, view.isChecked()));
                                 break;
@@ -391,7 +392,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_screen_container, R.id.setting_scan_container, R.id.setting_classic_notify_container,
             R.id.setting_album_cover_container, R.id.setting_library_category_container, R.id.setting_immersive_container,
             R.id.setting_import_playlist_container, R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container,
-            R.id.setting_cover_source_container,R.id.setting_player_bottom_container})
+            R.id.setting_cover_source_container, R.id.setting_player_bottom_container})
     public void onClick(View v) {
         switch (v.getId()) {
             //文件过滤
@@ -588,17 +589,17 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
      * 配置封面下载源
      */
     private void configureCoverDownloadSource() {
-        final int oldChoice = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,DOWNLOAD_LASTFM);
+        final int oldChoice = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, DOWNLOAD_LASTFM);
         getBaseDialog(mContext)
                 .title(R.string.cover_download_source)
                 .positiveText(R.string.choose)
                 .items(new String[]{getString(R.string.lastfm), getString(R.string.netease)})
                 .itemsCallbackSingleChoice(oldChoice,
                         (dialog, view, which, text) -> {
-                            if(oldChoice != which){
+                            if (oldChoice != which) {
                                 mNeedRefreshAdapter = true;
                                 ImageUriRequest.DOWNLOAD_SOURCE = which;
-                                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,which);
+                                SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, which);
                             }
                             return true;
                         })
@@ -631,16 +632,17 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     /**
      * 当用户选择从不下载时询问是否清除已有封面
+     *
      * @param text
      */
     private void clearDownloadCover(CharSequence text) {
-        if(getString(R.string.never).contentEquals(text)){
+        if (getString(R.string.never).contentEquals(text)) {
             getBaseDialog(mContext)
                     .title(R.string.clear_download_cover)
                     .positiveText(R.string.confirm)
                     .negativeText(R.string.cancel)
                     .onPositive((clearDialog, action) -> {
-                        SPUtil.deleteFile(mContext,SPUtil.COVER_KEY.NAME);
+                        SPUtil.deleteFile(mContext, SPUtil.COVER_KEY.NAME);
                         Fresco.getImagePipeline().clearCaches();
                         mNeedRefreshAdapter = true;
                     }).show();
@@ -676,18 +678,18 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
      * 启动均衡器
      */
     private void startEqualizer() {
-        final int sessionId = MusicService.getMediaPlayer().getAudioSessionId();
+        final int sessionId = MusicServiceRemote.getMediaPlayer().getAudioSessionId();
         if (sessionId == AudioEffect.ERROR_BAD_VALUE) {
             Toast.makeText(mContext, getResources().getString(R.string.no_audio_ID), Toast.LENGTH_LONG).show();
             return;
         }
         Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-        audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
+        audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicServiceRemote.getMediaPlayer().getAudioSessionId());
         audioEffectIntent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
         if (Util.isIntentAvailable(this, audioEffectIntent)) {
             startActivityForResult(audioEffectIntent, REQUEST_EQ);
         } else {
-            ToastUtil.show(mContext,R.string.no_equalizer);
+            ToastUtil.show(mContext, R.string.no_equalizer);
 //            startActivity(new Intent(this, EQActivity.class));
         }
     }
@@ -707,7 +709,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 .itemsCallbackSingleChoice(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true) ? 0 : 1,
                         (dialog, view, which, text) -> {
                             SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, which == 0);
-                            sendBroadcast(new Intent(MusicService.ACTION_CMD)
+                            sendLocalBroadcast(new Intent(MusicService.ACTION_CMD)
                                     .putExtra("Control", Command.TOGGLE_NOTIFY)
                                     .putExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, mNotifyStyleSwitch.isChecked()));
                             return true;
@@ -731,7 +733,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     which == 1 ? R.string.system_lockscreen_tip : R.string.lockscreen_off_tip);
                             Intent intent = new Intent(MusicService.ACTION_CMD);
                             intent.putExtra("Control", Command.TOGGLE_MEDIASESSION);
-                            sendBroadcast(intent);
+                            sendLocalBroadcast(intent);
                             return true;
                         }).show();
     }
@@ -798,16 +800,16 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     }
 
     private void changeBottomOfPlayingScreen() {
-        final int position = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,BOTTOM_OF_NOW_PLAYING_SCREEN,2);
+        final int position = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, 2);
         getBaseDialog(mContext)
                 .title(R.string.show_on_bottom)
                 .items(new String[]{getString(R.string.show_next_song_only),
                         getString(R.string.show_vol_control_only),
                         getString(R.string.tap_to_toggle)
-                        ,getString(R.string.close)})
+                        , getString(R.string.close)})
                 .itemsCallbackSingleChoice(position, (dialog, itemView, which, text) -> {
-                    if(position != which){
-                        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,BOTTOM_OF_NOW_PLAYING_SCREEN,which);
+                    if (position != which) {
+                        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, which);
                     }
                     return true;
                 }).show();

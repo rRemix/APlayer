@@ -15,18 +15,18 @@ import remix.myplayer.util.Util;
 public class AppWidgetMediumTransparent extends BaseAppwidget {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        defaultAppWidget(context,appWidgetIds);
+        defaultAppWidget(context, appWidgetIds);
         Intent intent = new Intent(MusicService.ACTION_WIDGET_UPDATE);
-        intent.putExtra("WidgetName","MediumWidgetTransparent");
-        intent.putExtra("WidgetIds",appWidgetIds);
+        intent.putExtra("WidgetName", "MediumWidgetTransparent");
+        intent.putExtra("WidgetIds", appWidgetIds);
         intent.setFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
         context.sendBroadcast(intent);
     }
 
     private void defaultAppWidget(Context context, int[] appWidgetIds) {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_medium_transparent);
-        buildAction(context,remoteViews);
-        pushUpdate(context,appWidgetIds,remoteViews);
+        buildAction(context, remoteViews);
+        pushUpdate(context, appWidgetIds, remoteViews);
     }
 
     @Override
@@ -35,22 +35,22 @@ public class AppWidgetMediumTransparent extends BaseAppwidget {
     }
 
     @Override
-    public void updateWidget(final Context context,final int[] appWidgetIds, boolean reloadCover){
-        final Song song = MusicService.getCurrentMP3();
-        if(song == null || !hasInstances(context))
+    public void updateWidget(final MusicService service, final int[] appWidgetIds, boolean reloadCover) {
+        final Song song = service.getCurrentSong();
+        if (song == null || !hasInstances(service))
             return;
-        final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_medium_transparent);
-        buildAction(context,remoteViews);
+        final RemoteViews remoteViews = new RemoteViews(service.getPackageName(), R.layout.app_widget_medium_transparent);
+        buildAction(service, remoteViews);
         mSkin = AppWidgetSkin.TRANSPARENT;
-        updateRemoteViews(remoteViews,song);
+        updateRemoteViews(service, remoteViews, song);
         //设置时间
-        long currentTime = MusicService.getProgress();
-        long remainTime = song.getDuration() - MusicService.getProgress();
-        if(currentTime > 0 && remainTime > 0){
+        long currentTime = service.getProgress();
+        long remainTime = song.getDuration() - service.getProgress();
+        if (currentTime > 0 && remainTime > 0) {
             remoteViews.setTextViewText(R.id.appwidget_progress, Util.getTime(currentTime) + "/" + Util.getTime(remainTime));
         }
         //设置封面
-        updateCover(context,remoteViews,appWidgetIds,reloadCover);
+        updateCover(service, remoteViews, appWidgetIds, reloadCover);
     }
 }
 

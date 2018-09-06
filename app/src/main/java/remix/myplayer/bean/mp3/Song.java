@@ -17,6 +17,8 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
  * 歌曲信息
  */
 public class Song implements Cloneable, Parcelable {
+    public static Song EMPTY_SONG = new Song(-1,"","","",-1,"",-1,-1,"","",-1,"","",-1);
+
     public int Id;
     public String Title;
     public String Displayname;
@@ -31,11 +33,13 @@ public class Song implements Cloneable, Parcelable {
     public String Year = "";
     public String TitleKey;
     public long AddTime;
-    public Song(){}
+
+    public Song() {
+    }
 
     public Song(int id, String displayname, String title, String album,
-                int albumid, String artist, int artistId,long duration, String realTime,
-                String url, long size, String year, String titleKey, long addTime){
+                int albumid, String artist, int artistId, long duration, String realTime,
+                String url, long size, String year, String titleKey, long addTime) {
         Id = id;
         Title = title;
         Displayname = displayname;
@@ -52,12 +56,12 @@ public class Song implements Cloneable, Parcelable {
         AddTime = addTime;
     }
 
-    public Song(int id){
+    public Song(int id) {
         Id = id;
     }
 
     public Song(Song info) {
-        if(info == null)
+        if (info == null)
             return;
         this.Id = info.getId();
         this.Title = info.getTitle();
@@ -76,10 +80,10 @@ public class Song implements Cloneable, Parcelable {
 
     @Override
     public Object clone() {
-        Object o=null;
+        Object o = null;
         try {
             o = super.clone();//Object 中的clone()识别出你要复制的是哪一个对象。
-        } catch(CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             System.out.println(e.toString());
         }
         return o;
@@ -104,7 +108,7 @@ public class Song implements Cloneable, Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Song  && ((Song)o).getId() == this.getId();
+        return o instanceof Song && ((Song) o).getId() == this.getId();
     }
 
     public long getAddTime() {
@@ -123,25 +127,29 @@ public class Song implements Cloneable, Parcelable {
         TitleKey = titleKey;
     }
 
-    public void setYear(String year){
+    public void setYear(String year) {
         Year = year;
     }
 
-    public String getYear(){
+    public String getYear() {
         return Year;
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         Title = title;
     }
 
-    public String getTitle(){
+    public String getTitle() {
         return Title;
     }
 
-    public int getAlbumId(){return AlbumId;}
+    public int getAlbumId() {
+        return AlbumId;
+    }
 
-    public void setAlbumId(int albumId){AlbumId = albumId;}
+    public void setAlbumId(int albumId) {
+        AlbumId = albumId;
+    }
 
     public int getArtistId() {
         return ArtistId;
@@ -184,7 +192,7 @@ public class Song implements Cloneable, Parcelable {
     }
 
     public long getDuration() {
-        if (Duration <= 0){
+        if (Duration <= 0) {
             IjkMediaPlayer ijkMediaPlayer = new IjkMediaPlayer();
             try {
                 ijkMediaPlayer.setDataSource(Url);
@@ -192,13 +200,13 @@ public class Song implements Cloneable, Parcelable {
                 ijkMediaPlayer.prepareAsync();
                 Thread.sleep(20);
                 Duration = ijkMediaPlayer.getDuration();
-                LogUtil.d("UpdateDuration","Duration: " + Duration);
-                if(Duration > 0){
+                LogUtil.d("UpdateDuration", "Duration: " + Duration);
+                if (Duration > 0) {
                     ContentValues contentValues = new ContentValues();
-                    contentValues.put(MediaStore.Audio.Media.DURATION,Duration);
+                    contentValues.put(MediaStore.Audio.Media.DURATION, Duration);
                     int updateCount = App.getContext().getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                            contentValues, MediaStore.Audio.Media._ID + "=?",new String[]{Id + ""});
-                    LogUtil.d("UpdateDuration","UpdateCount: " + updateCount);
+                            contentValues, MediaStore.Audio.Media._ID + "=?", new String[]{Id + ""});
+                    LogUtil.d("UpdateDuration", "UpdateCount: " + updateCount);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

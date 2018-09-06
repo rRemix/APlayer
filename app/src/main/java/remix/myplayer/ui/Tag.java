@@ -29,8 +29,11 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
+import static remix.myplayer.helper.MusicServiceRemote.getCurrentSong;
+import static remix.myplayer.helper.MusicServiceRemote.setCurrentSong;
 
-public class Tag extends ContextWrapper{
+
+public class Tag extends ContextWrapper {
     @BindView(R.id.song_layout)
     @Nullable
     TextInputLayout mSongLayout;
@@ -76,66 +79,66 @@ public class Tag extends ContextWrapper{
     private final Song mInfo;
     private final TagEditor mTagEditor;
 
-    public Tag(Context context, Song song){
+    public Tag(Context context, Song song) {
         super(context);
-        mInfo = song != null ? song : MusicService.getCurrentMP3();
+        mInfo = song != null ? song : getCurrentSong();
         mTagEditor = new TagEditor(mInfo.getUrl());
     }
 
-    public void detail(){
+    public void detail() {
         MaterialDialog detailDialog = new MaterialDialog.Builder(this)
                 .title(R.string.song_detail)
                 .titleColorAttr(R.attr.text_color_primary)
-                .customView(R.layout.dialog_song_detail,true)
+                .customView(R.layout.dialog_song_detail, true)
                 .positiveText(R.string.confirm)
                 .positiveColorAttr(R.attr.text_color_primary)
                 .backgroundColorAttr(R.attr.background_color_3)
                 .build();
         detailDialog.show();
         mDetailRootView = detailDialog.getCustomView();
-        if(mDetailRootView != null){
-            ButterKnife.bind(this,mDetailRootView);
+        if (mDetailRootView != null) {
+            ButterKnife.bind(this, mDetailRootView);
 
             //歌曲路径
-            if(mDetailPath != null)
+            if (mDetailPath != null)
                 mDetailPath.setText(mInfo.getUrl());
             //歌曲名称
-            if(mDetailName != null)
+            if (mDetailName != null)
                 mDetailName.setText(mInfo.getDisplayname());
             //歌曲大小
-            if(mDetailSize != null)
-                mDetailSize.setText(getString(R.string.cache_size,1.0f * mInfo.getSize() / ByteConstants.MB));
+            if (mDetailSize != null)
+                mDetailSize.setText(getString(R.string.cache_size, 1.0f * mInfo.getSize() / ByteConstants.MB));
             //歌曲格式
-            if(mDetailMime != null){
+            if (mDetailMime != null) {
                 mDetailMime.setText(mTagEditor.getFormat());
             }
             //歌曲时长
-            if(mDetailDuration != null)
+            if (mDetailDuration != null)
                 mDetailDuration.setText(Util.getTime(mInfo.getDuration()));
             //歌曲码率
-            if(mDetailBitRate != null)
+            if (mDetailBitRate != null)
                 mDetailBitRate.setText(String.format("%s kb/s", mTagEditor.getBitrate()));
             //歌曲采样率
-            if(mDetailSampleRate != null)
+            if (mDetailSampleRate != null)
                 mDetailSampleRate.setText(String.format("%s Hz", mTagEditor.getSamplingRate()));
         }
     }
 
-    public void edit(){
+    public void edit() {
         MaterialDialog editDialog = new MaterialDialog.Builder(this)
                 .title(R.string.song_edit)
                 .titleColorAttr(R.attr.text_color_primary)
-                .customView(R.layout.dialog_song_edit,true)
+                .customView(R.layout.dialog_song_edit, true)
                 .negativeText(R.string.cancel)
                 .negativeColorAttr(R.attr.text_color_primary)
                 .positiveText(R.string.confirm)
                 .positiveColorAttr(R.attr.text_color_primary)
                 .backgroundColorAttr(R.attr.background_color_3)
                 .onPositive((dialog, which) -> {
-                    String title,artist,album,genre,year,track;
+                    String title, artist, album, genre, year, track;
                     title = mSongLayout != null ? mSongLayout.getEditText().getText().toString().trim() : "";
-                    if(TextUtils.isEmpty(title)){
-                        ToastUtil.show(this,R.string.song_not_empty);
+                    if (TextUtils.isEmpty(title)) {
+                        ToastUtil.show(this, R.string.song_not_empty);
                         return;
                     }
                     artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString().trim() : "";
@@ -144,50 +147,50 @@ public class Tag extends ContextWrapper{
                     genre = mGenreLayout.getEditText() != null ? mGenreLayout.getEditText().getText().toString().trim() : "";
                     track = mTrackLayout.getEditText() != null ? mTrackLayout.getEditText().getText().toString().trim() : "";
 
-                    mTagEditor.save(mInfo,title,album,artist,year,genre,track,"")
+                    mTagEditor.save(mInfo, title, album, artist, year, genre, track, "")
                             .compose(RxUtil.applyScheduler())
                             .subscribe(song -> {
-                                sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
-                                sendBroadcast(new Intent(Constants.TAG_EDIT)
-                                        .putExtra("newSong",song));
-                                MusicService.setCurrentMP3(song);
-                                ToastUtil.show(this,R.string.save_success);
-                            }, throwable -> ToastUtil.show(this,R.string.tag_save_error,throwable.toString()));
+                                Util.sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
+                                Util.sendLocalBroadcast(new Intent(Constants.TAG_EDIT)
+                                        .putExtra("newSong", song));
+                                setCurrentSong(song);
+                                ToastUtil.show(this, R.string.save_success);
+                            }, throwable -> ToastUtil.show(this, R.string.tag_save_error, throwable.toString()));
                 }).build();
         editDialog.show();
 
         View editDialogCustomView = editDialog.getCustomView();
-        if(editDialogCustomView != null){
+        if (editDialogCustomView != null) {
             ButterKnife.bind(this, editDialogCustomView);
 
-            if(!ThemeStore.isDay()){
+            if (!ThemeStore.isDay()) {
                 mSongLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
                 mSongLayout.getEditText().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             }
-            mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout,getString(R.string.song_not_empty)));
+            mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout, getString(R.string.song_not_empty)));
             mSongLayout.getEditText().setText(mInfo.getTitle());
 
-            if(!ThemeStore.isDay()){
+            if (!ThemeStore.isDay()) {
                 mAlbumLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
             }
             mAlbumLayout.getEditText().setText(mInfo.getAlbum());
 
-            if(!ThemeStore.isDay()){
+            if (!ThemeStore.isDay()) {
                 mArtistLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
             }
             mArtistLayout.getEditText().setText(mInfo.getArtist());
 
-            if(!ThemeStore.isDay()){
+            if (!ThemeStore.isDay()) {
                 mYearLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
             }
             mYearLayout.getEditText().setText(mInfo.getYear());
 
-            if(!ThemeStore.isDay()){
+            if (!ThemeStore.isDay()) {
                 mGenreLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
             }
             mGenreLayout.getEditText().setText(mTagEditor.getGenreName());
 
-            if(!ThemeStore.isDay()){
+            if (!ThemeStore.isDay()) {
                 mTrackLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
             }
             mTrackLayout.getEditText().setText(mTagEditor.getTrackNumber());
@@ -197,10 +200,12 @@ public class Tag extends ContextWrapper{
     private class TextInputEditWatcher implements TextWatcher {
         private TextInputLayout mInputLayout;
         private String mError;
-        TextInputEditWatcher(TextInputLayout layout,String error){
+
+        TextInputEditWatcher(TextInputLayout layout, String error) {
             mError = error;
             mInputLayout = layout;
         }
+
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
         }
@@ -211,9 +216,9 @@ public class Tag extends ContextWrapper{
 
         @Override
         public void afterTextChanged(Editable s) {
-            if(s == null || TextUtils.isEmpty(s.toString())){
+            if (s == null || TextUtils.isEmpty(s.toString())) {
                 mInputLayout.setError(mError);
-            }else {
+            } else {
                 mInputLayout.setError("");
             }
         }

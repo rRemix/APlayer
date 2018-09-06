@@ -6,15 +6,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Locale;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.disposables.Disposable;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.lyric.SearchLrc;
+import remix.myplayer.misc.interfaces.OnInflateFinishListener;
+import remix.myplayer.ui.fragment.base.BaseMusicFragment;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -23,11 +30,13 @@ import remix.myplayer.util.LogUtil;
 /**
  * 歌词界面Fragment
  */
-public class LyricFragment extends BaseFragment {
+public class LyricFragment extends BaseMusicFragment {
     private OnInflateFinishListener mOnFindListener;
     private Song mInfo;
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
+    @BindView(R.id.offset_container)
+    View mOffsetContainer;
 
     private Disposable mDisposable;
 
@@ -81,8 +90,13 @@ public class LyricFragment extends BaseFragment {
             mLrcView.setText(getStringSafely(R.string.no_lrc));
             return;
         }
-        if(mLrcView == null)
-            return;
+        if(clearCache){
+            //清除offset
+            SPUtil.putValue(App.getContext(),SPUtil.LYRIC_OFFSET_KEY.NAME,mInfo.getId() + "",0);
+            if(mLrcView != null){
+                mLrcView.setOffset(0);
+            }
+        }
         final int id = mInfo.getId();
         mDisposable = new SearchLrc(mInfo).getLyric(manualPath,clearCache)
                 .doOnSubscribe(disposable -> mLrcView.setText(getStringSafely(R.string.searching)))
@@ -92,6 +106,7 @@ public class LyricFragment extends BaseFragment {
                             mLrcView.setText(getStringSafely(R.string.no_lrc));
                             return;
                         }
+                        mLrcView.setOffset(SPUtil.getValue(mContext,SPUtil.LYRIC_OFFSET_KEY.NAME,mInfo.getId() + "",0));
                         mLrcView.setLrcRows(lrcRows);
                     }
                 }, throwable -> {
@@ -103,4 +118,35 @@ public class LyricFragment extends BaseFragment {
                 });
     }
 
+    @OnClick({R.id.offset_reduce, R.id.offset_add,R.id.offset_reset})
+    void onClick(View view){
+        int original = SPUtil.getValue(mContext,SPUtil.LYRIC_OFFSET_KEY.NAME,mInfo.getId() + "",0);
+        switch (view.getId()){
+            case R.id.offset_reset:
+                if(original != 0){
+                    original = 0;
+                    SPUtil.putValue(mContext,SPUtil.LYRIC_OFFSET_KEY.NAME,mInfo.getId() + "",0);
+                }
+                ToastUtil.show(mContext,R.string.lyric_offset_reset);
+                break;
+            case R.id.offset_add:
+                original += 500;
+                SPUtil.putValue(mContext,SPUtil.LYRIC_OFFSET_KEY.NAME,mInfo.getId() + "",original);
+                break;
+            case R.id.offset_reduce:
+                original -= 500;
+                SPUtil.putValue(mContext,SPUtil.LYRIC_OFFSET_KEY.NAME,mInfo.getId() + "",original);
+                break;
+        }
+        if(original != 0){
+            ToastUtil.show(mContext,original > 0 ? R.string.lyric_advance_x_second : R.string.lyric_delay_x_second,
+                    String.format(Locale.getDefault(),"%.1f",original / 1000f));
+        }
+        mLrcView.setOffset(original);
+    }
+
+    public void showLyricOffsetView(){
+        mOffsetContainer.setVisibility(View.VISIBLE);
+        mOffsetContainer.postDelayed(() -> mOffsetContainer.setVisibility(View.GONE),3000);
+    }
 }

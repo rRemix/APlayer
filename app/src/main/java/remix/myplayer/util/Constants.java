@@ -50,26 +50,13 @@ public class Constants {
     public final static int UPDATE_APPWIDGET=  0x100;
     //更新播放信息
     public final static int UPDATE_UI = 0x101;
-    //更新音量
-    public final static int UPDATE_VOL = 0x102;
-    //更新背景
-    public final static int UPDATE_BG = 0x103;
+    //更新正在播放歌曲
+    public final static int UPDATE_META_DATA = 0x102;
+    //更新播放状态
+    public final static int UPDATE_PLAY_STATE = 0x103;
 
 
-    //腾讯Api Id
-    public final static String TECENT_APIID = "1105030910";
-    //微博Api Id
-    public final static String WEIBO_APIID = "949172486";
-    //微信APi Id
-    public final static String WECHAT_APIID = "wx10775467a6664fbb";
-    //有盟appkey
-    public final static String UMENG_APPKEY = "56d6563367e58e6aa70005af";
-    public final static String ACTION_BUTTON = "ACTION_BUTTON";
-    public final static int NOTIFY_PREV = 0;
-    public final static int NOTIFY_PLAY = 1;
-    public final static int NOTIFY_NEXT = 2;
-    //刷新适配器
-    public final static int NOTIFYDATACHANGED = 0;
+
 
     //更新桌面歌词内容
     public static final int UPDATE_FLOAT_LRC_CONTENT = 500;
@@ -80,24 +67,6 @@ public class Constants {
 
     //扫描文件默认大小设置
     public static int SCAN_SIZE = ByteConstants.MB;
-
-    //分享心情还是歌曲
-    public final static int SHARESONG = 1;
-    public final static int SHARERECORD = 0;
-
-    //更新
-    public final static int UPDATE_FOLDER = 0;
-    public final static int UPDATE_PLAYQUEUE = 1;
-    public final static int UPDATE_PLAYLIST = 2;
-    public final static int UPDATE_CHILDHOLDER = 3;
-
-
-    //码率
-    public final static int BIT_RATE = 0;
-    //采样率
-    public final static int SAMPLE_RATE = 1;
-    //类型
-    public final static int MIME = 2;
 
     //更新适配器
     public final static int UPDATE_ADAPTER = 100;

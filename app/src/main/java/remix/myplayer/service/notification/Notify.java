@@ -11,11 +11,11 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.TaskStackBuilder;
 
+import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.PlayerActivity;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 
 /**
@@ -63,7 +63,7 @@ public abstract class Notify {
 
     void pushNotify(Notification notification) {
         final int newNotifyMode;
-        if (MusicService.isPlay()) {
+        if (mService.isPlaying()) {
             newNotifyMode = NOTIFY_MODE_FOREGROUND;
         } else{
             newNotifyMode = NOTIFY_MODE_BACKGROUND;

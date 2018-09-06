@@ -1,4 +1,4 @@
-package remix.myplayer.interfaces
+package remix.myplayer.misc.interfaces
 
 import remix.myplayer.bean.mp3.Song
 

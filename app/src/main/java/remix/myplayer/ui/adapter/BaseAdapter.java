@@ -11,7 +11,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 
 /**

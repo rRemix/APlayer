@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import remix.myplayer.Global;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
@@ -400,6 +401,7 @@ public class PlayListUtil {
             info.Count = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
             info._Id = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
             info.Name = cursor.getString(cursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
+            info.Date = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
         } catch (Exception e){
             e.printStackTrace();
         }

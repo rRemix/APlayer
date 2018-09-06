@@ -51,6 +51,7 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,16 +65,17 @@ import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import remix.myplayer.App;
+import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.Category;
 import remix.myplayer.bean.misc.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
-import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.misc.receiver.ExitReceiver;
 import remix.myplayer.misc.update.DownloadService;
 import remix.myplayer.misc.update.UpdateAgent;
@@ -89,7 +91,6 @@ import remix.myplayer.ui.adapter.DrawerAdapter;
 import remix.myplayer.ui.adapter.MainPagerAdapter;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
-import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
@@ -97,7 +98,6 @@ import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.MusicUtil;
@@ -112,14 +112,15 @@ import static remix.myplayer.bean.misc.Category.DEFAULT_LIBRARY;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DISMISS_DIALOG;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DOWNLOAD_COMPLETE;
 import static remix.myplayer.misc.update.DownloadService.ACTION_SHOW_DIALOG;
-import static remix.myplayer.service.MusicService.ACTION_LOAD_FINISH;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.Util.installApk;
+import static remix.myplayer.util.Util.registerLocalReceiver;
+import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 /**
  *
  */
-public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback {
+public class MainActivity extends MultiChoiceActivity {
     private final static String TAG = "MainActivity";
     @BindView(R.id.tabs)
     TabLayout mTablayout;
@@ -140,11 +141,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
 
-    private BottomActionBarFragment mBottomBar;
     private DrawerAdapter mDrawerAdapter;
     private MainPagerAdapter mPagerAdapter;
-    //是否正在运行
-    private static boolean mIsRunning = false;
 
     private MsgHandler mRefreshHandler;
     //设置界面
@@ -162,14 +160,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if (mMultiChoice.isShow()) {
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
-        mIsRunning = true;
-        UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mIsRunning = false;
         if (mMultiChoice.isShow()) {
             mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI, 500);
         }
@@ -178,7 +173,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Util.unregisterReceiver(mContext, mReceiver);
+        unregisterLocalReceiver(mReceiver);
     }
 
     @Override
@@ -186,16 +181,14 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        //初始化底部状态栏
-        mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //receiver
         mReceiver = new MainReceiver(this);
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ACTION_LOAD_FINISH);
+//        intentFilter.addAction(ACTION_LOAD_FINISH);
         intentFilter.addAction(ACTION_DOWNLOAD_COMPLETE);
         intentFilter.addAction(ACTION_SHOW_DIALOG);
         intentFilter.addAction(ACTION_DISMISS_DIALOG);
-        registerReceiver(mReceiver, intentFilter);
+        registerLocalReceiver(mReceiver, intentFilter);
 
         //初始化控件
         setUpToolbar(mToolBar);
@@ -208,32 +201,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         mRefreshHandler = new MsgHandler(this);
         mRefreshHandler.postDelayed(this::checkUpdate, 500);
         mRefreshHandler.postDelayed(this::parseIntent, 600);
-    }
-
-    /**
-     * 初始化底部显示控件
-     */
-    private void setUpBottomBar() {
-        //初始化底部状态栏
-        mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        int lastId = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1);
-        Song item;
-        if (lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
-            mBottomBar.updateBottomStatus(item, MusicService.isPlay());
-        } else {
-            if (Global.PlayQueue == null || Global.PlayQueue.size() == 0)
-                return;
-            int id = Global.PlayQueue.get(0);
-            for (int i = 0; i < Global.PlayQueue.size(); i++) {
-                id = Global.PlayQueue.get(i);
-                if (id != lastId)
-                    break;
-            }
-            item = MediaStoreUtil.getMP3InfoById(id);
-            if (item != null) {
-                mBottomBar.updateBottomStatus(item, MusicService.isPlay());
-            }
-        }
     }
 
     @Override
@@ -680,42 +647,35 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             onMultiBackPress();
         } else {
             super.onBackPressed();
+//            Intent intent = new Intent();
+//            intent.setAction(Intent.ACTION_MAIN);
+//            intent.addCategory(Intent.CATEGORY_HOME);
+//            startActivity(intent);
         }
     }
 
-    //更新界面
+    private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 108);
     @Override
-    public void UpdateUI(Song song, boolean isPlay) {
-        if (!mIsRunning)
-            return;
+    public void onMetaChanged() {
 
-        mBottomBar.updateBottomStatus(song, isPlay);
-//        for(Fragment temp : getSupportFragmentManager().getFragments()) {
-//            if (temp instanceof SongFragment) {
-//                SongFragment songFragment = (SongFragment) temp;
-//                if(songFragment.getAdapter() != null){
-//                    songFragment.getAdapter().onUpdateHighLight();
-//                }
-//            }
-//        }
-        updateHeader(song, isPlay);
+        super.onMetaChanged();
+        mHeadText.setText(getString(R.string.play_now, MusicServiceRemote.getCurrentSong().getTitle()));
+        new LibraryUriRequest(mHeadImg,
+                getSearchRequestWithAlbumType(MusicServiceRemote.getCurrentSong()),
+                new RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load();
     }
 
-    /**
-     * 更新侧滑菜单
-     *
-     * @param song
-     */
-    private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 108);
+    @Override
+    public void onPlayStateChange() {
+        super.onPlayStateChange();
+        mHeadImg.setBackgroundResource(MusicServiceRemote.isPlaying() && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
+    }
 
-    private void updateHeader(Song song, boolean isPlay) {
-        if (song == null)
-            return;
-        mHeadText.setText(getString(R.string.play_now, song.getTitle()));
-        new LibraryUriRequest(mHeadImg,
-                getSearchRequestWithAlbumType(song),
-                new RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load();
-        mHeadImg.setBackgroundResource(isPlay && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
+    @Override
+    public void onServiceConnected(@NotNull MusicService service) {
+        super.onServiceConnected(service);
+        onMetaChanged();
+        onPlayStateChange();
     }
 
     @OnHandleMessage
@@ -757,6 +717,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      * 检查更新
      */
     private static boolean mAlreadyCheck;
+
     private void checkUpdate() {
         if (!IS_GOOGLEPLAY && !mAlreadyCheck) {
             UpdateAgent.setForceCheck(false);
@@ -773,6 +734,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      * @param path
      */
     private String mInstallPath;
+
     private void checkIsAndroidO(Context context, String path) {
         if (!TextUtils.isEmpty(path) && !path.equals(mInstallPath))
             mInstallPath = path;
@@ -792,14 +754,14 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-    private void dismissForceDialog(){
-        if(mForceDialog != null && mForceDialog.isShowing()){
+    private void dismissForceDialog() {
+        if (mForceDialog != null && mForceDialog.isShowing()) {
             mForceDialog.dismiss();
             mForceDialog = null;
         }
     }
 
-    private void showForceDialog(){
+    private void showForceDialog() {
         dismissForceDialog();
         mForceDialog = new MaterialDialog.Builder(this)
                 .canceledOnTouchOutside(false)
@@ -815,8 +777,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     }
 
 
-
     private MaterialDialog mForceDialog;
+
     public static class MainReceiver extends BroadcastReceiver {
         private final WeakReference<MainActivity> mRef;
 
@@ -833,10 +795,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 return;
             MainActivity mainActivity = mRef.get();
             switch (action) {
-                case ACTION_LOAD_FINISH:
-                    mainActivity.setUpBottomBar();
-                    mainActivity.UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
-                    break;
                 case ACTION_DOWNLOAD_COMPLETE:
                     mainActivity.checkIsAndroidO(context, intent.getStringExtra(DownloadService.EXTRA_PATH));
                     break;

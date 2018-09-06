@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="@dimen/d300_size"
+    android:layout_height="wrap_content"
     android:background="?attr/background_color_3">
     <TextView
         android:layout_width="match_parent"
@@ -32,8 +32,7 @@
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="7"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/d1_size"
         android:id="@+id/playlist_addto_list" />
 

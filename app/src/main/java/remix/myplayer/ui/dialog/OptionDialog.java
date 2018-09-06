@@ -73,15 +73,15 @@ public class OptionDialog extends BaseDialogActivity {
         ButterKnife.bind(this);
 
         mSong = getIntent().getExtras().getParcelable("Song");
-        if(mSong == null)
+        if (mSong == null)
             return;
-        if(mIsDeletePlayList = getIntent().getExtras().getBoolean("IsDeletePlayList", false)){
+        if (mIsDeletePlayList = getIntent().getExtras().getBoolean("IsDeletePlayList", false)) {
             mPlayListName = getIntent().getExtras().getString("PlayListName");
         }
 
         //设置歌曲名与封面
         mTitle.setText(String.format("%s-%s", mSong.getTitle(), mSong.getArtist()));
-        new LibraryUriRequest(mDraweeView, ImageUriUtil.getSearchRequestWithAlbumType(mSong),new RequestConfig.Builder(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE).build()).load();
+        new LibraryUriRequest(mDraweeView, ImageUriUtil.getSearchRequestWithAlbumType(mSong), new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
         //置于底部
         Window w = getWindow();
 //        w.setWindowAnimations(R.style.AnimBottom);
@@ -96,24 +96,24 @@ public class OptionDialog extends BaseDialogActivity {
 
         //为按钮着色
         final int tintColor = ThemeStore.isDay() ?
-                ColorUtil.getColor(R.color.day_textcolor_primary ) :
+                ColorUtil.getColor(R.color.day_textcolor_primary) :
                 ColorUtil.getColor(R.color.white_f4f4f5);
-        ((ImageView)findViewById(R.id.popup_add_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_add2list),tintColor));
-        ((ImageView)findViewById(R.id.popup_ring_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_ring),tintColor));
-        ((ImageView)findViewById(R.id.popup_share_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_share),tintColor));
-        ((ImageView)findViewById(R.id.popup_delete_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_delete),tintColor));
+        ((ImageView) findViewById(R.id.popup_add_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_add2list), tintColor));
+        ((ImageView) findViewById(R.id.popup_ring_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_ring), tintColor));
+        ((ImageView) findViewById(R.id.popup_share_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_share), tintColor));
+        ((ImageView) findViewById(R.id.popup_delete_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_delete), tintColor));
 
-        ButterKnife.apply(new TextView[]{findView(R.id.popup_add_text),findView(R.id.popup_ring_text),
-                        findView(R.id.popup_share_text),findView(R.id.popup_delete_text)},
+        ButterKnife.apply(new TextView[]{findView(R.id.popup_add_text), findView(R.id.popup_ring_text),
+                        findView(R.id.popup_share_text), findView(R.id.popup_delete_text)},
                 (ButterKnife.Action<TextView>) (textView, index) -> textView.setTextColor(tintColor));
     }
 
-    @OnClick({R.id.popup_add,R.id.popup_share,R.id.popup_delete,R.id.popup_ring})
-    public void onClick(View v){
-        switch (v.getId()){
+    @OnClick({R.id.popup_add, R.id.popup_share, R.id.popup_delete, R.id.popup_ring})
+    public void onClick(View v) {
+        switch (v.getId()) {
             //添加到播放列表
             case R.id.popup_add:
-                Intent intentAdd = new Intent(OptionDialog.this,AddtoPlayListDialog.class);
+                Intent intentAdd = new Intent(OptionDialog.this, AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
                 ardAdd.putInt("Id", mSong.getId());
                 intentAdd.putExtras(ardAdd);
@@ -127,11 +127,6 @@ public class OptionDialog extends BaseDialogActivity {
                 break;
             //分享
             case R.id.popup_share:
-//                Intent intent = new Intent(MusicService.ACTION_CMD);
-//                intent.putExtra("Control",Constants.ADD_TO_NEXT_SONG);
-//                intent.putExtra("song",mSong);
-//                sendBroadcast(intent);
-//                finish();
                 startActivity(
                         Intent.createChooser(Util.createShareSongFileIntent(mSong, mContext), null));
                 finish();
@@ -139,7 +134,7 @@ public class OptionDialog extends BaseDialogActivity {
             //删除
             case R.id.popup_delete:
                 try {
-                    String title = getString(R.string.confirm_delete_from_playlist_or_library,mIsDeletePlayList ? mPlayListName : "曲库");
+                    String title = getString(R.string.confirm_delete_from_playlist_or_library, mIsDeletePlayList ? mPlayListName : "曲库");
                     new MaterialDialog.Builder(OptionDialog.this)
                             .content(title)
                             .buttonRippleColor(ThemeStore.getRippleColor())
@@ -147,12 +142,12 @@ public class OptionDialog extends BaseDialogActivity {
                             .negativeText(R.string.cancel)
                             .checkBoxPromptRes(R.string.delete_source, false, null)
                             .onAny((dialog, which) -> {
-                                if(which == POSITIVE){
+                                if (which == POSITIVE) {
                                     boolean deleteSuccess = !mIsDeletePlayList ?
-                                            MediaStoreUtil.delete(mSong.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0 :
-                                            PlayListUtil.deleteSong(mSong.getId(),mPlayListName);
+                                            MediaStoreUtil.delete(mSong.getId(), Constants.SONG, dialog.isPromptCheckBoxChecked()) > 0 :
+                                            PlayListUtil.deleteSong(mSong.getId(), mPlayListName);
 
-                                    ToastUtil.show(mContext,deleteSuccess ? R.string.delete_success : R.string.delete_error);
+                                    ToastUtil.show(mContext, deleteSuccess ? R.string.delete_success : R.string.delete_error);
                                     finish();
                                 }
                             })
@@ -162,7 +157,7 @@ public class OptionDialog extends BaseDialogActivity {
                             .contentColorAttr(R.attr.text_color_primary)
                             .theme(ThemeStore.getMDDialogTheme())
                             .show();
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
@@ -173,7 +168,7 @@ public class OptionDialog extends BaseDialogActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        overridePendingTransition(R.anim.slide_bottom_in,0);
+        overridePendingTransition(R.anim.slide_bottom_in, 0);
     }
 
     @Override

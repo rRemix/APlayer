@@ -23,8 +23,8 @@ import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.graphics.SurfaceTexture;
 import android.graphics.Rect;
+import android.graphics.SurfaceTexture;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.RingtoneManager;
@@ -67,6 +67,8 @@ import tv.danmaku.ijk.media.player.pragma.DebugLog;
  */
 public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private final static String TAG = IjkMediaPlayer.class.getName();
+    //是否已经播放过歌曲
+    private boolean mPlayedOnce;
 
     private static final int MEDIA_NOP = 0; // interface test message
     private static final int MEDIA_PREPARED = 1;
@@ -518,7 +520,13 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public native void _prepareAsync() throws IllegalStateException;
 
     @Override
+    public boolean playedOnce(){
+        return mPlayedOnce;
+    }
+
+    @Override
     public void start() throws IllegalStateException {
+        mPlayedOnce = true;
         stayAwake(true);
         _start();
     }

@@ -15,6 +15,8 @@ import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.LogUtil;
 
+import static remix.myplayer.util.Util.sendLocalBroadcast;
+
 /**
  * @ClassName
  * @Description
@@ -22,7 +24,7 @@ import remix.myplayer.util.LogUtil;
  * @Date 2017/1/22 10:27
  */
 
-public class ShakeDetector extends ContextWrapper implements SensorEventListener{
+public class ShakeDetector extends ContextWrapper implements SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor mSensor;
 
@@ -39,42 +41,43 @@ public class ShakeDetector extends ContextWrapper implements SensorEventListener
     private float mLastZ;
     private boolean mDetect = false;
     private Handler mHandler = new Handler(Looper.getMainLooper());
-    private Runnable mRunnable = () -> sendBroadcast(new Intent(MusicService.ACTION_CMD)
+    private Runnable mRunnable = () -> sendLocalBroadcast(new Intent(MusicService.ACTION_CMD)
             .putExtra("Control", Command.NEXT));
 
     private static ShakeDetector mInstance;
-    private ShakeDetector(Context context){
+
+    private ShakeDetector(Context context) {
         super(context);
     }
 
-    public synchronized static ShakeDetector getInstance(){
-        if(mInstance == null){
+    public synchronized static ShakeDetector getInstance() {
+        if (mInstance == null) {
             mInstance = new ShakeDetector(App.getContext());
         }
         return mInstance;
     }
 
-    public void beginListen(){
+    public void beginListen() {
         mDetect = true;
         //已经开始监听
-        if(mSensor != null)
+        if (mSensor != null)
             return;
-        if(mSensorManager == null)
+        if (mSensorManager == null)
             mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        if(mSensor == null)
+        if (mSensor == null)
             mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_UI);
     }
 
-    public void stopListen(){
+    public void stopListen() {
         mDetect = false;
-        if(mSensorManager == null)
+        if (mSensorManager == null)
             mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        if(mSensor == null){
+        if (mSensor == null) {
             mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         }
-        mSensorManager.unregisterListener(this,mSensor);
+        mSensorManager.unregisterListener(this, mSensor);
         mSensorManager = null;
         mSensor = null;
         mHandler.removeCallbacks(mRunnable);
@@ -82,11 +85,11 @@ public class ShakeDetector extends ContextWrapper implements SensorEventListener
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(!mDetect)
+        if (!mDetect)
             return;
         long currentUpdateTime = System.currentTimeMillis();
         long timeInterval = currentUpdateTime - mLastUpdateTime;
-        if(timeInterval < DETECTION_THRESHOLD){
+        if (timeInterval < DETECTION_THRESHOLD) {
             return;
         }
         mLastUpdateTime = currentUpdateTime;
@@ -99,10 +102,10 @@ public class ShakeDetector extends ContextWrapper implements SensorEventListener
         float deltaY = y - mLastY;
         float deltaZ = z - mLastZ;
         double speed = (Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / timeInterval) * 1000;
-        LogUtil.d("ShakeDetector","speed: " + speed + " interval: " + timeInterval + " sensorType: " + event.sensor.getType());
-        if(speed > SPEED_THRESHOLD){
+        LogUtil.d("ShakeDetector", "speed: " + speed + " interval: " + timeInterval + " sensorType: " + event.sensor.getType());
+        if (speed > SPEED_THRESHOLD) {
             mHandler.removeCallbacks(mRunnable);
-            mHandler.postDelayed(mRunnable,UPDATE_INTERVAL_TIME);
+            mHandler.postDelayed(mRunnable, UPDATE_INTERVAL_TIME);
         }
         mLastX = x;
         mLastY = y;

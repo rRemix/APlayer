@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import butterknife.BindView;
 import remix.myplayer.R;
-import remix.myplayer.interfaces.OnModeChangeListener;
+import remix.myplayer.misc.interfaces.OnModeChangeListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;

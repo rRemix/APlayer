@@ -8,9 +8,9 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.collections.forEachWithIndex
 import remix.myplayer.App
+import remix.myplayer.Global
 import remix.myplayer.R
 import remix.myplayer.request.network.RxUtil
-import remix.myplayer.util.Global
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.PlayListUtil
 import remix.myplayer.util.PlayListUtil.*

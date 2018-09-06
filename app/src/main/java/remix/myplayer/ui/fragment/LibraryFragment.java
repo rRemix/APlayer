@@ -1,7 +1,5 @@
 package remix.myplayer.ui.fragment;
 
-import android.Manifest;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -10,41 +8,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tbruyelle.rxpermissions2.RxPermissions;
-
 import java.util.List;
 
 import butterknife.ButterKnife;
-import remix.myplayer.helper.MusicEventHelper;
-import remix.myplayer.service.MusicService;
+import remix.myplayer.helper.MusicEventCallback;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.ui.adapter.BaseAdapter;
-import remix.myplayer.util.Util;
+import remix.myplayer.ui.fragment.base.BaseMusicFragment;
 
 /**
  * Created by Remix on 2016/12/23.
  */
 
-public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseFragment implements MusicEventHelper.MusicEventCallback,LoaderManager.LoaderCallbacks<List<D>>{
+public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseMusicFragment implements MusicEventCallback,LoaderManager.LoaderCallbacks<List<D>>{
     protected A mAdapter;
-    protected boolean mHasPermission = false;
     protected MultiChoice mMultiChoice;
-    private final String[] mPermissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if(mHasPermission = Util.hasPermissions(mPermissions)){
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if(mHasPermission){
             getLoaderManager().initLoader(getLoaderId(), null, this);
         }
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        MusicEventHelper.addCallback(this);
-    }
 
     @Nullable
     @Override
@@ -70,23 +58,8 @@ public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseFragm
     protected abstract void initView();
 
     @Override
-    public void onResume() {
-        super.onResume();
-        new RxPermissions(getActivity())
-                .request(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .subscribe(aBoolean -> {
-                    if(aBoolean != mHasPermission){
-                        Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
-                        intent.putExtra("permission",aBoolean);
-                        mContext.sendBroadcast(intent);
-                    }
-                });
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
-        MusicEventHelper.removeCallback(this);
         if(mAdapter != null){
             mAdapter.setData(null);
         }

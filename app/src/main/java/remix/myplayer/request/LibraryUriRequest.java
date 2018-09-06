@@ -20,6 +20,7 @@ import remix.myplayer.util.LogUtil;
  */
 
 public class LibraryUriRequest extends ImageUriRequest<String> {
+    private static final String TAG = LibraryUriRequest.class.getSimpleName();
     protected SimpleDraweeView mImage;
     UriRequest mRequest;
     public LibraryUriRequest(@NonNull SimpleDraweeView image, @NonNull UriRequest request, RequestConfig config) {
@@ -30,11 +31,11 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
     public void onError(String errMsg){
 //        mImage.setImageURI(Uri.EMPTY);
-        LogUtil.e("UriRequest","Error: " + errMsg);
+        LogUtil.i(TAG,"Error: " + errMsg);
     }
 
     public void onSuccess(String result) {
-        LogUtil.e("UriRequest","success: " + result);
+        LogUtil.i(TAG,"success: " + result);
         ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(result));
         if(mConfig.isResize()){
             imageRequestBuilder.setResizeOptions(ResizeOptions.forDimensions(mConfig.getWidth(),mConfig.getHeight()));
