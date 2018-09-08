@@ -67,7 +67,7 @@ class UpdateListener(val mContext: Context) : Listener {
     }
 
     override fun onUpdateError(throwable: Throwable) {
-        ToastUtil.show(mContext, R.string.update_error, throwable)
+//        ToastUtil.show(mContext, R.string.update_error, throwable)
     }
 
     private fun isForce(release: Release?): Boolean {

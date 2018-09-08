@@ -15,6 +15,7 @@ import remix.myplayer.appshortcuts.shortcuttype.ContinuePlayShortcutType;
 import remix.myplayer.appshortcuts.shortcuttype.LastAddedShortcutType;
 import remix.myplayer.appshortcuts.shortcuttype.MyLoveShortcutType;
 import remix.myplayer.appshortcuts.shortcuttype.ShuffleShortcutType;
+import remix.myplayer.service.MusicService;
 
 /**
  * Created by Remix on 2017/11/1.
@@ -25,7 +26,7 @@ public class DynamicShortcutManager extends ContextWrapper {
     private ShortcutManager mShortcutManger;
 
     public DynamicShortcutManager(Context base) {
-        super(base);
+        super(base.getApplicationContext());
         mContext = base;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
             mShortcutManger = getSystemService(ShortcutManager.class);
@@ -45,8 +46,8 @@ public class DynamicShortcutManager extends ContextWrapper {
                 new ShuffleShortcutType(mContext).getShortcutInfo());
     }
 
-    public void updateContinueShortcut(){
+    public void updateContinueShortcut(MusicService service){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
-            mShortcutManger.updateShortcuts(Arrays.asList(new ContinuePlayShortcutType(mContext).getShortcutInfo()));
+            mShortcutManger.updateShortcuts(Arrays.asList(new ContinuePlayShortcutType(service).getShortcutInfo()));
     }
 }
