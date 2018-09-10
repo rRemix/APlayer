@@ -190,7 +190,7 @@ public abstract class ImageUriRequest<T> {
                     //保存bitmap
                     if (bitmap != null && (cacheDir.exists() || cacheDir.mkdirs())) {
                         FileOutputStream fileOutputStream = new FileOutputStream(original);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream);
                         fileOutputStream.flush();
                         fileOutputStream.close();
                         imageUrl = "file://" + original.getAbsolutePath();

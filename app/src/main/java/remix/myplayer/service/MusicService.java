@@ -723,7 +723,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     public void setPlay(boolean isPlay) {
         mIsPlay = isPlay;
-        sendLocalBroadcast(new Intent(PLAY_STATE_CHANGE));
+        mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_PLAY_STATE);
+//        sendLocalBroadcast(new Intent(PLAY_STATE_CHANGE));
     }
 
     /**
@@ -2032,7 +2033,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     musicService.handlePlayStateChange();
                     break;
                 case Constants.UPDATE_META_DATA:
-                    musicService.handlePlayStateChange();
+//                    musicService.handlePlayStateChange();
                     musicService.handleMetaChange();
                     break;
                 case Constants.UPDATE_FLOAT_LRC_CONTENT:
