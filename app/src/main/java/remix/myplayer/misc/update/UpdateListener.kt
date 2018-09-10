@@ -10,6 +10,7 @@ import remix.myplayer.theme.ThemeStore
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 
+
 class UpdateListener(val mContext: Context) : Listener {
 
     override fun onUpdateReturned(code: Int, message: String, release: Release?) {
