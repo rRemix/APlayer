@@ -189,7 +189,7 @@ public class ThemeStore {
 
     @ColorInt
     public static int getAccentColor(){
-        return ColorUtil.getColor(isDay() ? (THEME_COLOR != THEME_WHITE ? getMaterialPrimaryColorRes() : R.color.black) : R.color.purple_555393);
+        return ColorUtil.getColor(isDay() ? getMaterialPrimaryColorRes() : R.color.purple_555393);
     }
 
     @ColorInt

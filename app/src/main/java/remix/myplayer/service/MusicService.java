@@ -429,7 +429,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         IntentFilter noisyFilter = new IntentFilter();
         noisyFilter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         noisyFilter.addAction(Intent.ACTION_HEADSET_PLUG);
-        registerLocalReceiver(mHeadSetReceiver, noisyFilter);
+        registerReceiver(mHeadSetReceiver, noisyFilter);
 
         mWidgetReceiver = new WidgetReceiver();
         registerReceiver(mWidgetReceiver, new IntentFilter(ACTION_WIDGET_UPDATE));
@@ -577,7 +577,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         }
         mLoadFinished = false;
         mIsInitialized = false;
-        mShortcutManager.updateContinueShortcut();
+        mShortcutManager.updateContinueShortcut(this);
 
         mNotify.cancelPlayingNotify();
 
@@ -600,8 +600,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         mMediaSession.release();
 
         unregisterLocalReceiver(mControlRecevier);
-        unregisterLocalReceiver(mHeadSetReceiver);
         unregisterLocalReceiver(mMusicEventReceiver);
+        Util.unregisterReceiver(this,mHeadSetReceiver);
         Util.unregisterReceiver(this, mScreenReceiver);
         Util.unregisterReceiver(this, mWidgetReceiver);
 
@@ -1008,7 +1008,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         if (mFloatLrcView != null)
             mFloatLrcView.setPlayIcon(isPlaying());
         if (mShortcutManager != null)
-            mShortcutManager.updateContinueShortcut();
+            mShortcutManager.updateContinueShortcut(this);
         sendLocalBroadcast(new Intent(MusicService.PLAY_STATE_CHANGE));
     }
 
@@ -2032,6 +2032,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     musicService.handlePlayStateChange();
                     break;
                 case Constants.UPDATE_META_DATA:
+                    musicService.handlePlayStateChange();
                     musicService.handleMetaChange();
                     break;
                 case Constants.UPDATE_FLOAT_LRC_CONTENT:
