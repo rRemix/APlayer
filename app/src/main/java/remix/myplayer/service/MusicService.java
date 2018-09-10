@@ -311,6 +311,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     public static final String ACTION_TOGGLE_TIMER = APLAYER_PACKAGE_NAME + ".toggle_timer";
 
     private boolean mAlreadyUnInit;
+    private float mSpeed = 1.0f;
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
@@ -480,6 +481,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      */
     private void setUpMediaPlayer() {
         mMediaPlayer = new IjkMediaPlayer();
+
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
 
@@ -495,6 +497,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         mMediaPlayer.setOnPreparedListener(mp -> {
             LogUtil.d(TAG, "准备完成:" + mFirstPrepared);
             if (mFirstPrepared) {
+                setSpeed(mSpeed);
                 mFirstPrepared = false;
                 if (mLastProgress > 0) {
                     mMediaPlayer.seekTo(mLastProgress);
@@ -991,6 +994,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
 
     private void handleMetaChange() {
+        if(mCurrentSong == null)
+            return;
         updateAppwidget();
         if (mNeedShowFloatLrc) {
             mShowFloatLrc = true;
@@ -1005,6 +1010,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
 
     private void handlePlayStateChange() {
+        if(mCurrentSong == null)
+            return;
         //更新桌面歌词播放按钮
         if (mFloatLrcView != null)
             mFloatLrcView.setPlayIcon(isPlaying());
@@ -1501,7 +1508,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * @return
      */
     public Song getCurrentSong() {
-        return mCurrentSong;
+        return mCurrentSong != null ? mCurrentSong : Song.EMPTY_SONG;
     }
 
     public void setCurrentSong(Song song) {
@@ -1538,6 +1545,13 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             return mMediaPlayer.getDuration();
         }
         return 0;
+    }
+
+    public void setSpeed(float speed){
+        if(mMediaPlayer != null && mIsInitialized){
+            mSpeed = speed;
+            mMediaPlayer.setSpeed(mSpeed);
+        }
     }
 
     /**
@@ -1584,6 +1598,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         if (SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SHAKE, false)) {
             ShakeDetector.getInstance().beginListen();
         }
+        //播放倍速
+        mSpeed = Float.parseFloat(SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,"1.0"));
         restoreLastSong();
         mLoadFinished = true;
         mUpdateUIHandler.postDelayed(() -> sendLocalBroadcast(new Intent(META_CHANGE)), 400);

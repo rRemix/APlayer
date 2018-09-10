@@ -30,7 +30,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 歌词界面Fragment
  */
-public class LyricFragment extends BaseMusicFragment {
+public class LyricFragment extends BaseMusicFragment implements Runnable {
     private OnInflateFinishListener mOnFindListener;
     private Song mInfo;
     @BindView(R.id.lrc_view)
@@ -39,6 +39,7 @@ public class LyricFragment extends BaseMusicFragment {
     View mOffsetContainer;
 
     private Disposable mDisposable;
+    private static final int DELAY_HIDE = 5000;
 
     public void setOnInflateFinishListener(OnInflateFinishListener l){
         mOnFindListener = l;
@@ -120,33 +121,43 @@ public class LyricFragment extends BaseMusicFragment {
 
     @OnClick({R.id.offset_reduce, R.id.offset_add,R.id.offset_reset})
     void onClick(View view){
+        mOffsetContainer.removeCallbacks(this);
+        mOffsetContainer.postDelayed(this,DELAY_HIDE);
+
         int original = SPUtil.getValue(mContext,SPUtil.LYRIC_OFFSET_KEY.NAME,mInfo.getId() + "",0);
         switch (view.getId()){
             case R.id.offset_reset:
-                if(original != 0){
-                    original = 0;
-                    SPUtil.putValue(mContext,SPUtil.LYRIC_OFFSET_KEY.NAME,mInfo.getId() + "",0);
-                }
+                original = 0;
                 ToastUtil.show(mContext,R.string.lyric_offset_reset);
                 break;
             case R.id.offset_add:
                 original += 500;
-                SPUtil.putValue(mContext,SPUtil.LYRIC_OFFSET_KEY.NAME,mInfo.getId() + "",original);
                 break;
             case R.id.offset_reduce:
                 original -= 500;
-                SPUtil.putValue(mContext,SPUtil.LYRIC_OFFSET_KEY.NAME,mInfo.getId() + "",original);
                 break;
         }
-        if(original != 0){
+        SPUtil.putValue(mContext,SPUtil.LYRIC_OFFSET_KEY.NAME,mInfo.getId() + "",original);
+        if(original != 0 && Math.abs(original) <= 60000){//最大偏移60s
             ToastUtil.show(mContext,original > 0 ? R.string.lyric_advance_x_second : R.string.lyric_delay_x_second,
                     String.format(Locale.getDefault(),"%.1f",original / 1000f));
         }
+
         mLrcView.setOffset(original);
     }
 
     public void showLyricOffsetView(){
+        if(mLrcView.getLrcRows() == null || mLrcView.getLrcRows().isEmpty()){
+            ToastUtil.show(mContext,R.string.no_lrc);
+            return;
+        }
         mOffsetContainer.setVisibility(View.VISIBLE);
-        mOffsetContainer.postDelayed(() -> mOffsetContainer.setVisibility(View.GONE),3000);
+        mOffsetContainer.postDelayed(this,DELAY_HIDE);
     }
+
+    @Override
+    public void run() {
+        mOffsetContainer.setVisibility(View.GONE);
+    }
+
 }
