@@ -165,6 +165,8 @@ public class SPUtil {
         String ALBUM_COVER_DOWNLOAD_SOURCE = "album_cover_download_source";
         //播放界面底部显示
         String BOTTOM_OF_NOW_PLAYING_SCREEN = "bottom_of_now_playing_screen";
+        //倍速播放
+        String SPEED = "speed";
     }
 
     public interface LYRIC_OFFSET_KEY{

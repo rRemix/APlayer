@@ -36,6 +36,9 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
     public void onSuccess(String result) {
         LogUtil.i(TAG,"success: " + result);
+        if(result.equals("https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png")){
+            result = "";
+        }
         ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(result));
         if(mConfig.isResize()){
             imageRequestBuilder.setResizeOptions(ResizeOptions.forDimensions(mConfig.getWidth(),mConfig.getHeight()));

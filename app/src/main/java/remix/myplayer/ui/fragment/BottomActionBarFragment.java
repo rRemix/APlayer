@@ -182,6 +182,8 @@ public class BottomActionBarFragment extends BaseMusicFragment {
 
 
     public void startPlayerActivity() {
+        if(MusicServiceRemote.getCurrentSong().getId() < 0)
+            return;
         Intent intent = new Intent(mContext, PlayerActivity.class);
         Bundle bundle = new Bundle();
         intent.putExtras(bundle);

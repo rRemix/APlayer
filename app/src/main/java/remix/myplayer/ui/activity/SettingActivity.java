@@ -592,7 +592,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         final int oldChoice = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, DOWNLOAD_LASTFM);
         getBaseDialog(mContext)
                 .title(R.string.cover_download_source)
-                .positiveText(R.string.choose)
                 .items(new String[]{getString(R.string.lastfm), getString(R.string.netease)})
                 .itemsCallbackSingleChoice(oldChoice,
                         (dialog, view, which, text) -> {
@@ -613,7 +612,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         final String choice = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, mContext.getString(R.string.always));
         getBaseDialog(mContext)
                 .title(R.string.auto_download_album_artist_cover)
-                .positiveText(R.string.choose)
                 .items(new String[]{getString(R.string.always), getString(R.string.wifi_only), getString(R.string.never)})
                 .itemsCallbackSingleChoice(mContext.getString(R.string.wifi_only).equals(choice) ? 1 : mContext.getString(R.string.always).equals(choice) ? 0 : 2,
                         (dialog, view, which, text) -> {
@@ -704,7 +702,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
         getBaseDialog(mContext)
                 .title(R.string.notify_bg_color)
-                .positiveText(R.string.choose)
                 .items(new String[]{getString(R.string.use_system_color), getString(R.string.use_black_color)})
                 .itemsCallbackSingleChoice(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true) ? 0 : 1,
                         (dialog, view, which, text) -> {
@@ -724,7 +721,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         //0:APlayer锁屏 1:系统锁屏 2:关闭
         getBaseDialog(mContext)
                 .title(R.string.lockscreen_show)
-                .positiveText(R.string.choose)
                 .items(new String[]{getString(R.string.aplayer_lockscreen), getString(R.string.system_lockscreen), getString(R.string.close)})
                 .itemsCallbackSingleChoice(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN),
                         (dialog, view, which, text) -> {

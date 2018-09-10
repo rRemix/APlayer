@@ -357,4 +357,5 @@
     <string name="lyric_offset_reset">歌词已还原</string>
     <string name="lyric_advance_x_second">提前%1$s秒</string>
     <string name="lyric_delay_x_second">延后%1$s秒</string>
+    <string name="speed">播放倍速</string>
 </resources>

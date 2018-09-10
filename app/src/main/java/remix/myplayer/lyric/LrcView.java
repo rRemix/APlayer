@@ -274,6 +274,10 @@ public class LrcView extends View implements ILrcView{
         }
     }
 
+    public List<LrcRow> getLrcRows() {
+        return mLrcRows;
+    }
+
     private boolean hasLrc(){
         return mLrcRows != null && mLrcRows.size() > 0;
     }
