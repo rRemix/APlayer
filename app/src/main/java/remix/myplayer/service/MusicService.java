@@ -1056,7 +1056,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     if (mUpdateFloatLrcThread != null) {
                         mUpdateFloatLrcThread.quitByNotification();
                     }
-                    mUpdateUIHandler.postDelayed(() -> mNotify.cancelPlayingNotify(), 100);
+                    mUpdateUIHandler.postDelayed(() -> mNotify.cancelPlayingNotify(), 300);
                     break;
                 //播放选中的歌曲
                 case Command.PLAYSELECTEDSONG:
@@ -1224,6 +1224,12 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     }
                     final int time = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
                     SleepTimer.toggleTimer(time * 1000);
+                    break;
+                //耳机拔出
+                case Command.HEADSET_CHANGE:
+                    if(isPlaying()){
+                        pause(false);
+                    }
                     break;
                 default:
                     break;
