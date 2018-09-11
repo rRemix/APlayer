@@ -2,8 +2,10 @@ package remix.myplayer.ui.activity;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.Loader;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -12,11 +14,11 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,7 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
+import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.interfaces.LoaderIds;
@@ -64,7 +67,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     private int mId;
     private int mType;
     private String mArg;
-    private List<Song> mInfoList;
     private TagReceiver mTagEditReceiver;
 
     //歌曲数目与标题
@@ -76,7 +78,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     Toolbar mToolBar;
 
     private String Title;
-    private MaterialDialog mMDDialog;
+//    private MaterialDialog mMDDialog;
 
     //当前排序
     private String mSortOrder;
@@ -106,14 +108,15 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if (position < 0 || mInfoList == null || position >= mInfoList.size())
+                final List<Song> songs = mAdapter.getDatas();
+                if (position < 0 || songs == null || position >= songs.size())
                     return;
-                int songId = mInfoList.get(position).getId();
+                int songId = songs.get(position).getId();
                 if (!mMultiChoice.itemClick(position, songId, mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)) {
-                    if (mInfoList != null && mInfoList.size() == 0)
+                    if (songs.size() == 0)
                         return;
                     ArrayList<Integer> idList = new ArrayList<>();
-                    for (Song info : mInfoList) {
+                    for (Song info : songs) {
                         if (info != null && info.getId() > 0)
                             idList.add(info.getId());
                     }
@@ -134,7 +137,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
 
             @Override
             public void onItemLongClick(View view, int position) {
-                mMultiChoice.itemLongClick(position, mInfoList.get(position).getId(), TAG, mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
+                mMultiChoice.itemLongClick(position, mAdapter.getDatas().get(position).getId(), TAG, mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
             }
         });
 
@@ -161,18 +164,14 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         //初始化toolbar
         setUpToolbar(mToolBar, Title);
 
-        //加载歌曲列表
-
-        mMDDialog = new MaterialDialog.Builder(this)
-                .title(R.string.loading)
-                .titleColorAttr(R.attr.text_color_primary)
-                .content(R.string.please_wait)
-                .contentColorAttr(R.attr.text_color_primary)
-                .progress(true, 0)
-                .backgroundColorAttr(R.attr.background_color_3)
-                .progressIndeterminateStyle(false).build();
-
-
+//        mMDDialog = new MaterialDialog.Builder(this)
+//                .title(R.string.loading)
+//                .titleColorAttr(R.attr.text_color_primary)
+//                .content(R.string.please_wait)
+//                .contentColorAttr(R.attr.text_color_primary)
+//                .progress(true, 0)
+//                .backgroundColorAttr(R.attr.background_color_3)
+//                .progressIndeterminateStyle(false).build();
     }
 
     @Override
@@ -203,7 +202,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
                 //选择的是手动排序
                 if (sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)) {
                     startActivity(new Intent(mContext, CustomSortActivity.class)
-                            .putExtra("list", new ArrayList<>(mInfoList))
+                            .putExtra("list", new ArrayList<>(mAdapter.getDatas()))
                             .putExtra("id", mId)
                             .putExtra("name", mArg));
                 } else {
@@ -227,7 +226,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         }
         mSortOrder = sortOrder;
         if (update)
-            updateList(true);
+            onMediaStoreChanged();
 
     }
 
@@ -253,18 +252,16 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     }
 
     @Override
-    public void onMediaStoreChanged() {
-        updateList(true);
-    }
-
-    @Override
     public void onServiceConnected(@NotNull MusicService service) {
         super.onServiceConnected(service);
+        onMetaChanged();
+        onPlayStateChange();
     }
 
     @Override
     public void onPlayListChanged() {
-        updateList(true);
+        super.onPlayListChanged();
+        onMediaStoreChanged();
     }
 
     public void onTagEdit(Song newSong) {
@@ -278,8 +275,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
             mId = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
             Title = mType == Constants.ARTIST ? newSong.getArtist() : newSong.getAlbum();
             mToolBar.setTitle(Title);
-            if (mIsForeground)
-                updateList(true);
+            onMediaStoreChanged();
         }
     }
 
@@ -294,26 +290,22 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         switch (mType) {
             //专辑id
             case Constants.ALBUM:
-                mInfoList = MediaStoreUtil.getMP3InfoByArg(mId, Constants.ALBUM);
-                break;
+                return MediaStoreUtil.getMP3InfoByArg(mId, Constants.ALBUM);
             //歌手id
             case Constants.ARTIST:
-                mInfoList = MediaStoreUtil.getMP3InfoByArg(mId, Constants.ARTIST);
-                break;
+                return MediaStoreUtil.getMP3InfoByArg(mId, Constants.ARTIST);
             //文件夹名
             case Constants.FOLDER:
-                mInfoList = MediaStoreUtil.getMP3ListByFolderName(mArg);
-                break;
+                return MediaStoreUtil.getMP3ListByFolderName(mArg);
             //播放列表名
             case Constants.PLAYLIST:
                 /* 播放列表歌曲id列表 */
                 List<Integer> playListSongIDList = PlayListUtil.getIDList(mId);
                 if (playListSongIDList == null)
-                    return mInfoList;
-                mInfoList = PlayListUtil.getMP3ListByIds(playListSongIDList, mId);
-                break;
+                    return new ArrayList<>();
+                return PlayListUtil.getMP3ListByIds(playListSongIDList, mId);
         }
-        return mInfoList;
+        return new ArrayList<>();
     }
 
     @Override
@@ -327,18 +319,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     @Override
     protected void onResume() {
         super.onResume();
-        updateList(true);
-    }
-
-    private void updateList(boolean reset) {
-        if (mIsForeground) {
-            if (mHasPermission) {
-                new GetSongThread(reset).start();
-            } else {
-                mInfoList = null;
-                mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-            }
-        }
     }
 
     @Override
@@ -354,38 +334,48 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
             case Constants.CLEAR_MULTI:
                 mAdapter.notifyDataSetChanged();
                 break;
-            case Constants.UPDATE_ADAPTER:
-                mAdapter.setData(mInfoList);
-                mNum.setText(getString(R.string.song_count, mInfoList.size()));
-                break;
-            case START:
-                if (mMDDialog != null && !mMDDialog.isShowing()) {
-                    mMDDialog.show();
-                }
-                break;
-            case END:
-                if (mMDDialog != null && mMDDialog.isShowing()) {
-                    mMDDialog.dismiss();
-                }
-                break;
+//            case START:
+//                if (mMDDialog != null && !mMDDialog.isShowing()) {
+//                    mMDDialog.show();
+//                }
+//                break;
+//            case END:
+//                if (mMDDialog != null && mMDDialog.isShowing()) {
+//                    mMDDialog.dismiss();
+//                }
+//                break;
         }
     }
 
-    private class GetSongThread extends Thread {
-        //是否需要重新查询歌曲列表
-        private boolean mNeedReset;
+    @Override
+    public void onLoadFinished(Loader<List<Song>> loader, List<Song> data) {
+        super.onLoadFinished(loader, data);
+        mNum.setText(getString(R.string.song_count, data != null ? data.size() : 0));
+    }
 
-        GetSongThread(boolean needReset) {
-            this.mNeedReset = needReset;
+    @Override
+    protected Loader<List<Song>> getLoader() {
+        return new AsyncChildSongLoader(this);
+    }
+
+    private static class AsyncChildSongLoader extends AppWrappedAsyncTaskLoader<List<Song>> {
+        private final WeakReference<ChildHolderActivity> mRef;
+
+        private AsyncChildSongLoader(ChildHolderActivity childHolderActivity) {
+            super(childHolderActivity);
+            mRef = new WeakReference<>(childHolderActivity);
         }
 
         @Override
-        public void run() {
-            mRefreshHandler.sendEmptyMessage(START);
-            if (mNeedReset)
-                mInfoList = getMP3List();
-            mRefreshHandler.sendEmptyMessage(END);
-            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+        public List<Song> loadInBackground() {
+            return getChildSongs();
+        }
+
+        @NonNull
+        private List<Song> getChildSongs() {
+            ChildHolderActivity activity = mRef.get();
+            List<Song> songs = activity.getMP3List();
+            return songs != null ? songs : new ArrayList<>();
         }
     }
 

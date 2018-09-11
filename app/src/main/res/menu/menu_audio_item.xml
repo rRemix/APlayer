@@ -17,8 +17,8 @@
             android:id="@+id/menu_eq"/>
         <item android:id="@+id/menu_lyric"
             android:title="@string/lyric"/>
-        <!--<item android:id="@+id/menu_speed"-->
-            <!--android:title="@string/speed"/>-->
+        <item android:id="@+id/menu_speed"
+            android:title="@string/speed"/>
         <!--<item android:title="音量调节"-->
             <!--android:id="@+id/menu_vol"/>-->
         <item android:title="@string/delete"

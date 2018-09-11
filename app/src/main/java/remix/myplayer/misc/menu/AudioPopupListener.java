@@ -9,12 +9,15 @@ import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.Tag;
@@ -65,8 +68,8 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                         .items(getString(R.string.netease),
                                 getString(R.string.kugou),
                                 getString(R.string.select_lrc),
-                                getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc)
-                                /**,getString(R.string.change_offset)*/)
+                                getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc),
+                                getString(R.string.change_offset))
                         .itemsColorAttr(R.attr.text_color_primary)
                         .backgroundColorAttr(R.attr.background_color_3)
                         .itemsCallback((dialog, itemView, position, text) -> {
@@ -171,18 +174,18 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
 //                if(audioManager != null){
 //                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
 //                }
-//            case R.id.menu_speed:
-//                final List<String> speeds = Arrays.asList("0.5","0.75","1.0","1.25","1.5");
-//                final String originalSpeed = SPUtil.getValue(mActivity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,"1.0");
-//                getBaseDialog(mActivity)
-//                        .title(R.string.speed)
-//                        .items(speeds)
-//                        .itemsCallbackSingleChoice(speeds.indexOf(originalSpeed), (dialog, itemView, which, text) -> {
-//                            MusicServiceRemote.setSpeed(Float.parseFloat(text.toString()));
-//                            SPUtil.putValue(mActivity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,text.toString());
-//                            return true;
-//                        }).show();
-//                break;
+            case R.id.menu_speed:
+                final List<String> speeds = Arrays.asList("0.5","0.75","1.0","1.25","1.5");
+                final String originalSpeed = SPUtil.getValue(mActivity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,"1.0");
+                getBaseDialog(mActivity)
+                        .title(R.string.speed)
+                        .items(speeds)
+                        .itemsCallbackSingleChoice(speeds.indexOf(originalSpeed), (dialog, itemView, which, text) -> {
+                            MusicServiceRemote.setSpeed(Float.parseFloat(text.toString()));
+                            SPUtil.putValue(mActivity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,text.toString());
+                            return true;
+                        }).show();
+                break;
         }
         return true;
     }

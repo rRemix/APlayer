@@ -122,7 +122,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     /**
      * 是否正在设置mediapplayer的datasource
      */
-    private static boolean mIsInitialized = false;
+    private boolean mIsInitialized = false;
 
     /**
      * 数据是否加载完成
@@ -294,10 +294,15 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     protected boolean mHasPermission = false;
 
     public static final String APLAYER_PACKAGE_NAME = "remix.myplayer";
+    //媒体数据库变化
     public static final String MEDIA_STORE_CHANGE = APLAYER_PACKAGE_NAME + ".media_store.change";
+    //读写权限变化
     public static final String PERMISSION_CHANGE = APLAYER_PACKAGE_NAME + ".permission.change";
+    //播放列表变换
     public static final String PLAYLIST_CHANGE = APLAYER_PACKAGE_NAME + ".playlist.change";
+    //播放数据变化
     public static final String META_CHANGE = APLAYER_PACKAGE_NAME + ".meta.change";
+    //播放状态变化
     public static final String PLAY_STATE_CHANGE = APLAYER_PACKAGE_NAME + ".play_state.change";
 
     public static final String ACTION_APPWIDGET_OPERATE = APLAYER_PACKAGE_NAME + "appwidget.operate";

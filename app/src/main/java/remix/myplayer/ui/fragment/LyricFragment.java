@@ -67,10 +67,11 @@ public class LyricFragment extends BaseMusicFragment implements Runnable {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
+        mOffsetContainer.removeCallbacks(this);
         if(mDisposable != null){
             mDisposable.dispose();
         }
+        super.onDestroyView( );
     }
 
     public void updateLrc(Song song){

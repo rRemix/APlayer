@@ -13,6 +13,7 @@ public class TagReceiver extends BroadcastReceiver {
     public TagReceiver(OnTagEditListener listener){
         mListener = listener;
     }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Song newSong = intent.getParcelableExtra("newSong");
