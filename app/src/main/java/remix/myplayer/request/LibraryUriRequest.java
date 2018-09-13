@@ -11,6 +11,7 @@ import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.image.ImageInfo;
+import com.facebook.imagepipeline.image.QualityInfo;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import javax.annotation.Nullable;
@@ -59,7 +60,12 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
                     @Override
                     public void onFinalImageSet(String s, @Nullable ImageInfo imageInfo, @Nullable Animatable animatable) {
-
+                        if(imageInfo != null){
+                            int width = imageInfo.getWidth();
+                            int height = imageInfo.getHeight();
+                            QualityInfo qualityInfo = imageInfo.getQualityInfo();
+                            LogUtil.d("onFinalImageSet","Width: " + width + " Height: " + height );
+                        }
                     }
 
                     @Override

@@ -51,7 +51,6 @@ import static remix.myplayer.App.IS_GOOGLEPLAY;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_ALBUM;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_ARTIST;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_SONG;
-import static remix.myplayer.service.MusicService.copy;
 import static remix.myplayer.util.Util.isWifi;
 
 /**
@@ -312,11 +311,11 @@ public abstract class ImageUriRequest<T> {
                     dataSource.subscribe(new BaseBitmapDataSubscriber() {
                         @Override
                         protected void onNewResultImpl(Bitmap bitmap) {
-                            Bitmap result = copy(bitmap);
-                            if(result == null) {
-                                result = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_day);
+//                            Bitmap result = copy(bitmap);
+                            if(bitmap == null) {
+                                bitmap = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_day);
                             }
-                            e.onNext(result);
+                            e.onNext(bitmap);
                             e.onComplete();
                         }
 

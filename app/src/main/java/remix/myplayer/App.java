@@ -9,8 +9,13 @@ import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.facebook.imagepipeline.listener.RequestListener;
+import com.facebook.imagepipeline.listener.RequestLoggingListener;
 import com.squareup.leakcanary.LeakCanary;
 import com.tencent.bugly.crashreport.CrashReport;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import io.reactivex.plugins.RxJavaPlugins;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
@@ -79,8 +84,12 @@ public class App extends MultiDexApplication {
         DiskCache.init(this);
         MediaStoreUtil.setContext(this);
         PlayListUtil.setContext(this);
+        final Set<RequestListener> listeners = new HashSet<>();
+        listeners.add(new RequestLoggingListener());
         final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
+                .setResizeAndRotateEnabledForNetwork(true)
+                .setRequestListeners(listeners)
                 .setBitmapMemoryCacheParamsSupplier(() -> new MemoryCacheParams(cacheSize, Integer.MAX_VALUE, cacheSize, Integer.MAX_VALUE, 2 * ByteConstants.MB))
                 .setBitmapsConfig(Bitmap.Config.RGB_565)
                 .setDownsampleEnabled(true)
