@@ -51,6 +51,7 @@ import static remix.myplayer.App.IS_GOOGLEPLAY;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_ALBUM;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_ARTIST;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_SONG;
+import static remix.myplayer.service.MusicService.copy;
 import static remix.myplayer.util.Util.isWifi;
 
 /**
@@ -139,7 +140,8 @@ public abstract class ImageUriRequest<T> {
 
                     List<Song> songs = MediaStoreUtil.getSongs(selection, selectionValues);
                     if(songs.size() > 0){
-                        imageUrl = resolveEmbeddedPicture(songs.get(0));
+//                        imageUrl = resolveEmbeddedPicture(songs.get(0));
+                        imageUrl = "embedded://" + songs.get(0).getUrl();
                     }
                 } else {
                     Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getID());
@@ -310,11 +312,11 @@ public abstract class ImageUriRequest<T> {
                     dataSource.subscribe(new BaseBitmapDataSubscriber() {
                         @Override
                         protected void onNewResultImpl(Bitmap bitmap) {
-//                            Bitmap result = copy(bitmap);
-//                            if(bitmap == null) {
-//                                bitmap = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_day);
-//                            }
-                            e.onNext(bitmap);
+                            Bitmap result = copy(bitmap);
+                            if(result == null) {
+                                result = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_day);
+                            }
+                            e.onNext(result);
                             e.onComplete();
                         }
 

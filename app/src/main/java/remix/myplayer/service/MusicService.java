@@ -1734,7 +1734,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * @return
      */
     public static Bitmap copy(Bitmap bitmap) {
-        if (bitmap == null) {
+        if (bitmap == null || bitmap.isRecycled()) {
             return null;
         }
         Bitmap.Config config = bitmap.getConfig();

@@ -1,14 +1,19 @@
 package remix.myplayer.request;
 
 import android.annotation.SuppressLint;
+import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
@@ -46,6 +51,37 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(imageRequestBuilder.build())
                 .setOldController(mImage.getController())
+                .setControllerListener(new ControllerListener<ImageInfo>() {
+                    @Override
+                    public void onSubmit(String s, Object o) {
+
+                    }
+
+                    @Override
+                    public void onFinalImageSet(String s, @Nullable ImageInfo imageInfo, @Nullable Animatable animatable) {
+
+                    }
+
+                    @Override
+                    public void onIntermediateImageSet(String s, @Nullable ImageInfo imageInfo) {
+
+                    }
+
+                    @Override
+                    public void onIntermediateImageFailed(String s, Throwable throwable) {
+
+                    }
+
+                    @Override
+                    public void onFailure(String s, Throwable throwable) {
+
+                    }
+
+                    @Override
+                    public void onRelease(String s) {
+
+                    }
+                })
                 .build();
 
         mImage.setController(controller);
