@@ -115,7 +115,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     //上次选中的Fragment
     private int mPrevPosition = 1;
     //第一次启动的标志变量
-    private boolean mFistStart = true;
+    private boolean mFirstStart = true;
     //是否正在拖动进度条
     public boolean mIsDragSeekBarFromUser = false;
 
@@ -192,8 +192,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     private boolean mFromNotify = false;
     //是否从Activity启动
     private boolean mFromActivity = false;
-    //是否需要更新
-    private boolean mNeedUpdateUI = true;
 
     //动画图片信息
     private AnimationUrl mAnimUrl;
@@ -388,7 +386,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     @Override
     public void onResume() {
         super.onResume();
-//        if(mFistStart)
+//        if(mFirstStart)
 //            UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlaying());
 //        if (mNeedUpdateUI) {
 //            onMetaChanged();
@@ -713,6 +711,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         mProgressSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                LogUtil.d("歌词测试","onProgressChanged: " + progress);
                 mHandler.sendEmptyMessage(UPDATE_TIME_ONLY);
                 mCurrentTime = progress;
                 if (mLrcView != null)
@@ -722,6 +721,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 mIsDragSeekBarFromUser = true;
+                LogUtil.d("歌词测试","onStartTrackingTouch");
             }
 
             @Override
@@ -730,6 +730,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //                if(!mIsPlay){
 //                    seekBar.setProgress(0);
 //                }
+                LogUtil.d("歌词测试","onStopTrackingTouch");
                 MusicServiceRemote.setProgress(seekBar.getProgress());
                 mIsDragSeekBarFromUser = false;
             }
@@ -1000,13 +1001,11 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //            return;
 //        }
         //当操作不为播放或者暂停且正在运行时，更新所有控件
-        if ((Global.getOperation() != Command.TOGGLE || mNeedUpdateUI)) {
+        if ((Global.getOperation() != Command.TOGGLE || mFirstStart)) {
             //更新顶部信息
             updateTopStatus(mInfo);
             //更新歌词
-            if (!mFistStart) {
-                mLyricFragment.updateLrc(mInfo);
-            }
+            mHandler.postDelayed(() -> mLyricFragment.updateLrc(mInfo),500);
             //更新进度条
             int temp = MusicServiceRemote.getProgress();
             mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
@@ -1015,7 +1014,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
             //更新下一首歌曲
             mNextSong.setText(getString(R.string.next_song, MusicServiceRemote.getNextSong().getTitle()));
             updateBg();
-            requestCover(Global.getOperation() != Command.TOGGLE && !mFistStart);
+            requestCover(Global.getOperation() != Command.TOGGLE && !mFirstStart);
         }
     }
 
@@ -1163,7 +1162,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
     private void updateCover(boolean withAnimation) {
         mCoverFragment.updateCover(mInfo, mUri, withAnimation);
-        mFistStart = false;
+        mFirstStart = false;
     }
 
     /**

@@ -7,7 +7,7 @@
     android:paddingBottom="@dimen/d12_size">
 
     <remix.myplayer.lyric.LrcView
-        android:id="@+id/lrc_view"
+        android:id="@+id/lrcView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/d10_size"
@@ -19,7 +19,7 @@
         android:visibility="visible" />
 
     <LinearLayout
-        android:id="@+id/offset_container"
+        android:id="@+id/offsetContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical"
@@ -29,7 +29,7 @@
         android:visibility="gone">
 
         <LinearLayout
-            android:id="@+id/offset_reduce"
+            android:id="@+id/offsetReduce"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_common_borderless_ripple"
@@ -49,7 +49,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/offset_reset"
+            android:id="@+id/offsetReset"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -58,7 +58,7 @@
             android:background="@drawable/bg_common_borderless_ripple"/>
 
         <LinearLayout
-            android:id="@+id/offset_add"
+            android:id="@+id/offsetAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_common_borderless_ripple"
