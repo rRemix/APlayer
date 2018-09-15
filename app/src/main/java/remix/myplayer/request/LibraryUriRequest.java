@@ -1,13 +1,18 @@
 package remix.myplayer.request;
 
 import android.annotation.SuppressLint;
+import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.image.ImageInfo;
+import com.facebook.imagepipeline.image.QualityInfo;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import io.reactivex.disposables.Disposable;
@@ -36,6 +41,9 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
     public void onSuccess(String result) {
         LogUtil.i(TAG,"success: " + result);
+        if(result.equals("https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png")){
+            result = "";
+        }
         ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(result));
         if(mConfig.isResize()){
             imageRequestBuilder.setResizeOptions(ResizeOptions.forDimensions(mConfig.getWidth(),mConfig.getHeight()));
@@ -43,6 +51,42 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(imageRequestBuilder.build())
                 .setOldController(mImage.getController())
+                .setControllerListener(new ControllerListener<ImageInfo>() {
+                    @Override
+                    public void onSubmit(String s, Object o) {
+
+                    }
+
+                    @Override
+                    public void onFinalImageSet(String s, @Nullable ImageInfo imageInfo, @Nullable Animatable animatable) {
+                        if(imageInfo != null){
+                            int width = imageInfo.getWidth();
+                            int height = imageInfo.getHeight();
+                            QualityInfo qualityInfo = imageInfo.getQualityInfo();
+                            LogUtil.d("onFinalImageSet","Width: " + width + " Height: " + height );
+                        }
+                    }
+
+                    @Override
+                    public void onIntermediateImageSet(String s, @Nullable ImageInfo imageInfo) {
+
+                    }
+
+                    @Override
+                    public void onIntermediateImageFailed(String s, Throwable throwable) {
+
+                    }
+
+                    @Override
+                    public void onFailure(String s, Throwable throwable) {
+
+                    }
+
+                    @Override
+                    public void onRelease(String s) {
+
+                    }
+                })
                 .build();
 
         mImage.setController(controller);

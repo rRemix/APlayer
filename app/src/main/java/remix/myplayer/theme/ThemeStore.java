@@ -198,6 +198,11 @@ public class ThemeStore {
     }
 
     @ColorInt
+    public static int getNavigationBarColor(){
+        return isDay() ? getMaterialPrimaryDarkColor() : getMaterialPrimaryColor();
+    }
+
+    @ColorInt
     public static int getMaterialPrimaryDarkColor(){
         return ColorUtil.getColor(getMaterialPrimaryDarkColorRes());
     }

@@ -79,13 +79,6 @@ public class App extends MultiDexApplication {
         DiskCache.init(this);
         MediaStoreUtil.setContext(this);
         PlayListUtil.setContext(this);
-        final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
-        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-                .setBitmapMemoryCacheParamsSupplier(() -> new MemoryCacheParams(cacheSize, Integer.MAX_VALUE, cacheSize, Integer.MAX_VALUE, 2 * ByteConstants.MB))
-                .setBitmapsConfig(Bitmap.Config.RGB_565)
-                .setDownsampleEnabled(true)
-                .build();
-        Fresco.initialize(this, config);
     }
 
     /**
@@ -116,5 +109,14 @@ public class App extends MultiDexApplication {
 //
 //        });
         CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG);
+
+        //fresco
+        final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
+        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
+                .setBitmapMemoryCacheParamsSupplier(() -> new MemoryCacheParams(cacheSize, Integer.MAX_VALUE, cacheSize, Integer.MAX_VALUE, 2 * ByteConstants.MB))
+                .setBitmapsConfig(Bitmap.Config.RGB_565)
+                .setDownsampleEnabled(true)
+                .build();
+        Fresco.initialize(this, config);
     }
 }

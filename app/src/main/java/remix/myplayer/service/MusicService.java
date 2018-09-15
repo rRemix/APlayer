@@ -122,7 +122,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     /**
      * 是否正在设置mediapplayer的datasource
      */
-    private static boolean mIsInitialized = false;
+    private boolean mIsInitialized = false;
 
     /**
      * 数据是否加载完成
@@ -294,10 +294,15 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     protected boolean mHasPermission = false;
 
     public static final String APLAYER_PACKAGE_NAME = "remix.myplayer";
+    //媒体数据库变化
     public static final String MEDIA_STORE_CHANGE = APLAYER_PACKAGE_NAME + ".media_store.change";
+    //读写权限变化
     public static final String PERMISSION_CHANGE = APLAYER_PACKAGE_NAME + ".permission.change";
+    //播放列表变换
     public static final String PLAYLIST_CHANGE = APLAYER_PACKAGE_NAME + ".playlist.change";
+    //播放数据变化
     public static final String META_CHANGE = APLAYER_PACKAGE_NAME + ".meta.change";
+    //播放状态变化
     public static final String PLAY_STATE_CHANGE = APLAYER_PACKAGE_NAME + ".play_state.change";
 
     public static final String ACTION_APPWIDGET_OPERATE = APLAYER_PACKAGE_NAME + "appwidget.operate";
@@ -311,6 +316,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     public static final String ACTION_TOGGLE_TIMER = APLAYER_PACKAGE_NAME + ".toggle_timer";
 
     private boolean mAlreadyUnInit;
+    private float mSpeed = 1.0f;
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
@@ -429,7 +435,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         IntentFilter noisyFilter = new IntentFilter();
         noisyFilter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         noisyFilter.addAction(Intent.ACTION_HEADSET_PLUG);
-        registerLocalReceiver(mHeadSetReceiver, noisyFilter);
+        registerReceiver(mHeadSetReceiver, noisyFilter);
 
         mWidgetReceiver = new WidgetReceiver();
         registerReceiver(mWidgetReceiver, new IntentFilter(ACTION_WIDGET_UPDATE));
@@ -480,6 +486,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      */
     private void setUpMediaPlayer() {
         mMediaPlayer = new IjkMediaPlayer();
+
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
 
@@ -495,6 +502,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         mMediaPlayer.setOnPreparedListener(mp -> {
             LogUtil.d(TAG, "准备完成:" + mFirstPrepared);
             if (mFirstPrepared) {
+                setSpeed(mSpeed);
                 mFirstPrepared = false;
                 if (mLastProgress > 0) {
                     mMediaPlayer.seekTo(mLastProgress);
@@ -577,7 +585,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         }
         mLoadFinished = false;
         mIsInitialized = false;
-        mShortcutManager.updateContinueShortcut();
+        mShortcutManager.updateContinueShortcut(this);
 
         mNotify.cancelPlayingNotify();
 
@@ -600,8 +608,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         mMediaSession.release();
 
         unregisterLocalReceiver(mControlRecevier);
-        unregisterLocalReceiver(mHeadSetReceiver);
         unregisterLocalReceiver(mMusicEventReceiver);
+        Util.unregisterReceiver(this,mHeadSetReceiver);
         Util.unregisterReceiver(this, mScreenReceiver);
         Util.unregisterReceiver(this, mWidgetReceiver);
 
@@ -723,7 +731,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     public void setPlay(boolean isPlay) {
         mIsPlay = isPlay;
-        sendLocalBroadcast(new Intent(PLAY_STATE_CHANGE));
+        mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_PLAY_STATE);
+//        sendLocalBroadcast(new Intent(PLAY_STATE_CHANGE));
     }
 
     /**
@@ -990,6 +999,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
 
     private void handleMetaChange() {
+        if(mCurrentSong == null)
+            return;
         updateAppwidget();
         if (mNeedShowFloatLrc) {
             mShowFloatLrc = true;
@@ -1004,11 +1015,13 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
 
     private void handlePlayStateChange() {
+        if(mCurrentSong == null)
+            return;
         //更新桌面歌词播放按钮
         if (mFloatLrcView != null)
             mFloatLrcView.setPlayIcon(isPlaying());
         if (mShortcutManager != null)
-            mShortcutManager.updateContinueShortcut();
+            mShortcutManager.updateContinueShortcut(this);
         sendLocalBroadcast(new Intent(MusicService.PLAY_STATE_CHANGE));
     }
 
@@ -1043,7 +1056,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     if (mUpdateFloatLrcThread != null) {
                         mUpdateFloatLrcThread.quitByNotification();
                     }
-                    mUpdateUIHandler.postDelayed(() -> mNotify.cancelPlayingNotify(), 100);
+                    mUpdateUIHandler.postDelayed(() -> mNotify.cancelPlayingNotify(), 300);
                     break;
                 //播放选中的歌曲
                 case Command.PLAYSELECTEDSONG:
@@ -1211,6 +1224,12 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     }
                     final int time = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
                     SleepTimer.toggleTimer(time * 1000);
+                    break;
+                //耳机拔出
+                case Command.HEADSET_CHANGE:
+                    if(isPlaying()){
+                        pause(false);
+                    }
                     break;
                 default:
                     break;
@@ -1500,7 +1519,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * @return
      */
     public Song getCurrentSong() {
-        return mCurrentSong;
+        return mCurrentSong != null ? mCurrentSong : Song.EMPTY_SONG;
     }
 
     public void setCurrentSong(Song song) {
@@ -1537,6 +1556,13 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             return mMediaPlayer.getDuration();
         }
         return 0;
+    }
+
+    public void setSpeed(float speed){
+        if(mMediaPlayer != null && mIsInitialized){
+            mSpeed = speed;
+            mMediaPlayer.setSpeed(mSpeed);
+        }
     }
 
     /**
@@ -1583,6 +1609,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         if (SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SHAKE, false)) {
             ShakeDetector.getInstance().beginListen();
         }
+        //播放倍速
+        mSpeed = Float.parseFloat(SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,"1.0"));
         restoreLastSong();
         mLoadFinished = true;
         mUpdateUIHandler.postDelayed(() -> sendLocalBroadcast(new Intent(META_CHANGE)), 400);
@@ -1706,7 +1734,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * @return
      */
     public static Bitmap copy(Bitmap bitmap) {
-        if (bitmap == null) {
+        if (bitmap == null || bitmap.isRecycled()) {
             return null;
         }
         Bitmap.Config config = bitmap.getConfig();
@@ -2032,6 +2060,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     musicService.handlePlayStateChange();
                     break;
                 case Constants.UPDATE_META_DATA:
+//                    musicService.handlePlayStateChange();
                     musicService.handleMetaChange();
                     break;
                 case Constants.UPDATE_FLOAT_LRC_CONTENT:

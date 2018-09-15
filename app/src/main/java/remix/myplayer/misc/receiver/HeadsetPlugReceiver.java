@@ -35,14 +35,14 @@ public class HeadsetPlugReceiver extends BroadcastReceiver {
         }
 
         Global.setHeadsetOn(headsetOn);
-        Intent eqintent = new Intent(Constants.SOUNDEFFECT_ACTION);
-        eqintent.putExtra("IsHeadsetOn", Global.getHeadsetOn());
-        sendLocalBroadcast(eqintent);
+        Intent eqIntent = new Intent(Constants.SOUNDEFFECT_ACTION);
+        eqIntent.putExtra("IsHeadsetOn", Global.getHeadsetOn());
+        sendLocalBroadcast(eqIntent);
 
         if (!headsetOn /**&& MusicServiceRemote.isPlaying()*/) {
-            Intent ctlIntent = new Intent(MusicService.ACTION_CMD);
-            ctlIntent.putExtra("Control", Command.PAUSE);
-            sendLocalBroadcast(ctlIntent);
+            Intent cmdIntent = new Intent(MusicService.ACTION_CMD);
+            cmdIntent.putExtra("Control", Command.HEADSET_CHANGE);
+            sendLocalBroadcast(cmdIntent);
         }
         try {
             abortBroadcast();

@@ -139,7 +139,8 @@ public abstract class ImageUriRequest<T> {
 
                     List<Song> songs = MediaStoreUtil.getSongs(selection, selectionValues);
                     if(songs.size() > 0){
-                        imageUrl = resolveEmbeddedPicture(songs.get(0));
+//                        imageUrl = resolveEmbeddedPicture(songs.get(0));
+                        imageUrl = "embedded://" + songs.get(0).getUrl();
                     }
                 } else {
                     Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getID());
@@ -190,7 +191,7 @@ public abstract class ImageUriRequest<T> {
                     //保存bitmap
                     if (bitmap != null && (cacheDir.exists() || cacheDir.mkdirs())) {
                         FileOutputStream fileOutputStream = new FileOutputStream(original);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream);
                         fileOutputStream.flush();
                         fileOutputStream.close();
                         imageUrl = "file://" + original.getAbsolutePath();
@@ -311,9 +312,9 @@ public abstract class ImageUriRequest<T> {
                         @Override
                         protected void onNewResultImpl(Bitmap bitmap) {
 //                            Bitmap result = copy(bitmap);
-//                            if(bitmap == null) {
-//                                bitmap = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_day);
-//                            }
+                            if(bitmap == null) {
+                                bitmap = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_day);
+                            }
                             e.onNext(bitmap);
                             e.onComplete();
                         }

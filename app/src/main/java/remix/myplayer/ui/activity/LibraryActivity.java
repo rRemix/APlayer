@@ -26,6 +26,7 @@ public abstract class LibraryActivity<D,A extends BaseAdapter> extends MultiChoi
 
     @Override
     public void onMediaStoreChanged() {
+        super.onMediaStoreChanged();
         if(mHasPermission)
             getLoaderManager().restartLoader(getLoaderId(), null, this);
         else{

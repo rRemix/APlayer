@@ -96,6 +96,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
     }
 
     override fun onServiceConnected(service: MusicService) {
+        LogUtil.d(TAG, "onServiceConnected:" + this.javaClass.name)
         if (!mReceiverRegistered) {
             mMusicStateReceiver = MusicStateReceiver(this)
             val filter = IntentFilter()

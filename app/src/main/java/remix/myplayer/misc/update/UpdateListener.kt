@@ -10,6 +10,7 @@ import remix.myplayer.theme.ThemeStore
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 
+
 class UpdateListener(val mContext: Context) : Listener {
 
     override fun onUpdateReturned(code: Int, message: String, release: Release?) {
@@ -67,7 +68,7 @@ class UpdateListener(val mContext: Context) : Listener {
     }
 
     override fun onUpdateError(throwable: Throwable) {
-        ToastUtil.show(mContext, R.string.update_error, throwable)
+//        ToastUtil.show(mContext, R.string.update_error, throwable)
     }
 
     private fun isForce(release: Release?): Boolean {

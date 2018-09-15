@@ -80,42 +80,38 @@ public static final int *;
    public static final int *;
 }
 
-# fresco
--keep class android.support.v4.** { *; }
--keep interface android.support.v4.app.** { *; }
+#fresco
+# Keep our interfaces so they can be used by other ProGuard rules.
+# See http://sourceforge.net/p/proguard/bugs/466/
+-keep,allowobfuscation @interface com.facebook.common.internal.DoNotStrip
+-keep,allowobfuscation @interface com.facebook.soloader.DoNotOptimize
+
+# Do not strip any method/class that is annotated with @DoNotStrip
+-keep @com.facebook.common.internal.DoNotStrip class *
+-keepclassmembers class * {
+    @com.facebook.common.internal.DoNotStrip *;
+}
+
+# Do not strip any method/class that is annotated with @DoNotOptimize
+-keep @com.facebook.soloader.DoNotOptimize class *
+-keepclassmembers class * {
+    @com.facebook.soloader.DoNotOptimize *;
+}
+
+# Keep native methods
+-keepclassmembers class * {
+    native <methods>;
+}
+
 -dontwarn okio.**
--dontwarn com.squareup.wire.**
--dontwarn android.support.v4.**
--keep class okio.** {*;}
--keep class com.squareup.wire.** {*;}
 -dontwarn com.squareup.okhttp.**
 -dontwarn okhttp3.**
 -dontwarn javax.annotation.**
 -dontwarn com.android.volley.toolbox.**
--keep,allowobfuscation @interface com.facebook.common.internal.DoNotStrip
--keep @com.facebook.common.internal.DoNotStrip class *
--dontwarn com.android.volley.toolbox.**
 -dontwarn com.facebook.infer.**
--keepclassmembers class * {
-    native <methods>;
-}
--keepclassmembers class * {
-    @com.facebook.common.internal.DoNotStrip *;
-}
--keepclassmembers class * {
-    native <methods>;
-}
--keep class com.facebook.imagepipeline.animated.factory.AnimatedFactoryImpl {
-    public AnimatedFactoryImpl(com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory,com.facebook.imagepipeline.core.ExecutorSupplier);
-}
 
-# keep okhttp3、okio
--dontwarn javax.annotation.**
--dontwarn okhttp3.**
--keep class okhttp3.** { *;}
--keep interface okhttp3.** { *; }
--dontwarn okio.**
 
+#retrofit2
 -dontwarn retrofit2.**
 -keep class retrofit2.** { *; }
 

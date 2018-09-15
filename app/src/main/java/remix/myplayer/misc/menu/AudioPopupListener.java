@@ -4,23 +4,20 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.MenuItem;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.Tag;
@@ -40,6 +37,7 @@ import remix.myplayer.util.Util;
 import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
 import static remix.myplayer.helper.MusicServiceRemote.getCurrentSong;
 import static remix.myplayer.helper.MusicServiceRemote.getMediaPlayer;
+import static remix.myplayer.theme.Theme.getBaseDialog;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 /**
@@ -66,12 +64,12 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
             case R.id.menu_lyric:
                 final boolean alreadyIgnore = SPUtil.getValue(mActivity, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", SPUtil.LYRIC_KEY.LYRIC_DEFAULT) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
                 final LyricFragment lyricFragment = ((PlayerActivity) mActivity).getLyricFragment();
-                new MaterialDialog.Builder(mActivity)
+                getBaseDialog(mActivity)
                         .items(getString(R.string.netease),
                                 getString(R.string.kugou),
                                 getString(R.string.select_lrc),
-                                getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc)
-                                /**,getString(R.string.change_offset)*/)
+                                getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc),
+                                getString(R.string.change_offset))
                         .itemsColorAttr(R.attr.text_color_primary)
                         .backgroundColorAttr(R.attr.background_color_3)
                         .itemsCallback((dialog, itemView, position, text) -> {
@@ -88,14 +86,10 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                             .show();
                                     break;
                                 case 3: //忽略或者取消忽略
-                                    new MaterialDialog.Builder(mActivity)
-                                            .negativeText(R.string.cancel)
-                                            .negativeColorAttr(R.attr.text_color_primary)
-                                            .positiveText(R.string.confirm)
-                                            .positiveColorAttr(R.attr.text_color_primary)
+                                    getBaseDialog(mActivity)
                                             .title(!alreadyIgnore ? R.string.confirm_ignore_lrc : R.string.confirm_cancel_ignore_lrc)
-                                            .titleColorAttr(R.attr.text_color_primary)
-                                            .backgroundColorAttr(R.attr.background_color_3)
+                                            .negativeText(R.string.cancel)
+                                            .positiveText(R.string.confirm)
                                             .onPositive((dialog1, which) -> {
                                                 if (!alreadyIgnore) {//忽略
                                                     if (mInfo != null) {
@@ -149,7 +143,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                 startActivity(intentAdd);
                 break;
             case R.id.menu_delete:
-                new MaterialDialog.Builder(mActivity)
+                getBaseDialog(mActivity)
                         .content(R.string.confirm_delete_from_library)
                         .positiveText(R.string.confirm)
                         .negativeText(R.string.cancel)
@@ -173,10 +167,6 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                 }
                             }
                         })
-                        .backgroundColorAttr(R.attr.background_color_3)
-                        .positiveColorAttr(R.attr.text_color_primary)
-                        .negativeColorAttr(R.attr.text_color_primary)
-                        .contentColorAttr(R.attr.text_color_primary)
                         .show();
                 break;
 //            case R.id.menu_vol:
@@ -184,34 +174,20 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
 //                if(audioManager != null){
 //                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
 //                }
+            case R.id.menu_speed:
+                final List<String> speeds = Arrays.asList("0.5","0.75","1.0","1.25","1.5");
+                final String originalSpeed = SPUtil.getValue(mActivity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,"1.0");
+                getBaseDialog(mActivity)
+                        .title(R.string.speed)
+                        .items(speeds)
+                        .itemsCallbackSingleChoice(speeds.indexOf(originalSpeed), (dialog, itemView, which, text) -> {
+                            MusicServiceRemote.setSpeed(Float.parseFloat(text.toString()));
+                            SPUtil.putValue(mActivity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,text.toString());
+                            return true;
+                        }).show();
+                break;
         }
         return true;
     }
 
-    private class TextInputEditWatcher implements TextWatcher {
-        private TextInputLayout mInputLayout;
-        private String mError;
-
-        TextInputEditWatcher(TextInputLayout layout, String error) {
-            mError = error;
-            mInputLayout = layout;
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            if (s == null || TextUtils.isEmpty(s.toString())) {
-                mInputLayout.setError(mError);
-            } else {
-                mInputLayout.setError("");
-            }
-        }
-    }
 }

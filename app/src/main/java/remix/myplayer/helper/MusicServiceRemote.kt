@@ -142,4 +142,9 @@ object MusicServiceRemote {
     fun playNext(next: Boolean) {
         service?.playNextOrPrev(next)
     }
+
+    @JvmStatic
+    fun setSpeed(speed:Float){
+        service?.setSpeed(speed)
+    }
 }

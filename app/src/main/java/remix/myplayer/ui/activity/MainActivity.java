@@ -657,7 +657,6 @@ public class MainActivity extends MultiChoiceActivity {
     private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 108);
     @Override
     public void onMetaChanged() {
-
         super.onMetaChanged();
         mHeadText.setText(getString(R.string.play_now, MusicServiceRemote.getCurrentSong().getTitle()));
         new LibraryUriRequest(mHeadImg,

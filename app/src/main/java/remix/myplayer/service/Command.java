@@ -20,4 +20,5 @@ public interface Command {
     int PLAY_AT_BREAKPOINT = 15;
     int TOGGLE_TIMER = 16;
     int TOGGLE_FLOAT_LRC = 17;
+    int HEADSET_CHANGE = 18;
 }
