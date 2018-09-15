@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import butterknife.BindView
+import butterknife.ButterKnife
 import butterknife.OnClick
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
@@ -48,7 +49,7 @@ class LyricFragment : BaseMusicFragment(), Runnable {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater!!.inflate(R.layout.fragment_lrc, container, false)
-
+        mUnBinder = ButterKnife.bind(this, rootView)
 
         mOnFindListener?.onViewInflateFinish(mLrcView)
 
