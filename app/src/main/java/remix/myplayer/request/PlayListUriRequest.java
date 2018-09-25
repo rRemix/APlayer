@@ -1,7 +1,6 @@
 package remix.myplayer.request;
 
 import android.annotation.SuppressLint;
-import android.net.Uri;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -24,7 +23,7 @@ public class PlayListUriRequest extends LibraryUriRequest {
 
     @Override
     public void onError(String errMsg) {
-        mImage.setImageURI(Uri.EMPTY);
+//        mImage.setImageURI(Uri.EMPTY);
     }
 
     public Disposable loadImage(){

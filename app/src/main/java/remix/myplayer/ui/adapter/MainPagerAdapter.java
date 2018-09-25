@@ -31,7 +31,8 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
     private static final String TAG = "MainPagerAdapter";
     private final FragmentManager mFM;
     private List<Category> mCateGory = new ArrayList<>();
-    private Map<Integer,WeakReference<Fragment>> mFragmentMap = new HashMap<>();
+    private Map<Integer, WeakReference<Fragment>> mFragmentMap = new HashMap<>();
+
     public MainPagerAdapter(FragmentManager fm) {
         super(fm);
         mFM = fm;
@@ -39,15 +40,15 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public long getItemId(int position) {
-        if(position >= mCateGory.size())
+        if (position >= mCateGory.size())
             return super.getItemId(position);
         return mCateGory.get(position).getTag();
     }
 
     @Override
     public int getItemPosition(Object object) {
-        for(int i = 0 ; i < mCateGory.size();i++){
-            if(mCateGory.get(i).getClassName().equals(object.getClass().getName())){
+        for (int i = 0; i < mCateGory.size(); i++) {
+            if (mCateGory.get(i).getClassName().equals(object.getClass().getName())) {
                 return i;
             }
         }
@@ -67,21 +68,21 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
     public Object instantiateItem(ViewGroup container, int position) {
         final Fragment fragment = (Fragment) super.instantiateItem(container, position);
         final WeakReference<Fragment> weakReference = mFragmentMap.get(position);
-        if(weakReference != null){
+        if (weakReference != null) {
             weakReference.clear();
         }
-        mFragmentMap.put(position,new WeakReference<>(fragment));
+        mFragmentMap.put(position, new WeakReference<>(fragment));
         return fragment;
     }
 
     public Fragment getFragment(final int position) {
-        if(position >= mCateGory.size()){
+        if (position >= mCateGory.size()) {
             return new Fragment();
         }
 
         final Category category = mCateGory.get(position);
-        for(Fragment fragment : mFM.getFragments()){
-            if(fragment instanceof LibraryFragment && fragment.getClass().getName().equals(category.getClassName()))
+        for (Fragment fragment : mFM.getFragments()) {
+            if (fragment instanceof LibraryFragment && fragment.getClass().getName().equals(category.getClassName()))
                 return fragment;
         }
 
@@ -94,31 +95,34 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if(position >= mCateGory.size()){
-            LogUtil.d(TAG,"getItem异常: " + position);
+        if (position >= mCateGory.size()) {
+            LogUtil.d(TAG, "getItem异常: " + position);
             return new Fragment();
         }
-        LogUtil.d(TAG,"getItem --- position: " + position);
+        LogUtil.d(TAG, "getItem --- position: " + position);
 
         WeakReference<Fragment> weakReference = mFragmentMap.get(position);
-        if(weakReference != null && weakReference.get() != null){
+        if (weakReference != null && weakReference.get() != null) {
             return weakReference.get();
         }
 
         Category category = mCateGory.get(position);
-        return category.getTag() == TAG_SONG ? new SongFragment() :
+        Fragment fragment = category.getTag() == TAG_SONG ? new SongFragment() :
                 category.getTag() == Category.TAG_ALBUM ? new AlbumFragment() :
-                category.getTag() == Category.TAG_ARTIST ? new ArtistFragment() :
-                category.getTag() == Category.TAG_PLAYLIST ? new PlayListFragment() : new FolderFragment();
+                        category.getTag() == Category.TAG_ARTIST ? new ArtistFragment() :
+                                category.getTag() == Category.TAG_PLAYLIST ? new PlayListFragment() : new FolderFragment();
+        WeakReference<Fragment> newWeakReference = new WeakReference<>(fragment);
+        mFragmentMap.put(position,newWeakReference);
+        return fragment;
     }
 
-    public void setList(List<Category> categories){
+    public void setList(List<Category> categories) {
         mCateGory = categories;
         alignCache();
     }
 
     private void alignCache() {
-        if(mFragmentMap.size() == 0)
+        if (mFragmentMap.size() == 0)
             return;
         HashMap<String, WeakReference<Fragment>> mappings = new HashMap<>(mFragmentMap.size());
 
@@ -137,10 +141,10 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
                 mFragmentMap.remove(i);
             }
         }
-        LogUtil.d(TAG,"CacheMap: " + mFragmentMap);
+        LogUtil.d(TAG, "CacheMap: " + mFragmentMap);
     }
 
-    public List<Category> getList(){
+    public List<Category> getList() {
         return mCateGory;
     }
 

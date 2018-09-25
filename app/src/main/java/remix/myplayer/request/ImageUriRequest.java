@@ -58,6 +58,9 @@ import static remix.myplayer.util.Util.isWifi;
  */
 
 public abstract class ImageUriRequest<T> {
+    private static final String PREFIX_FILE = "file://";
+    private static final String PREFIX_EMBEDDED = "embedded://";
+
     public static final int BIG_IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 125);
     public static final int SMALL_IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 45);
     public static final int URL_PLAYLIST = 1000;
@@ -109,7 +112,7 @@ public abstract class ImageUriRequest<T> {
                 if (request.getSearchType() != URL_ALBUM) {
                     File customImage = ImageUriUtil.getCustomThumbIfExist(request.getID(), request.getSearchType());
                     if (customImage != null && customImage.exists()) {
-                        observer.onNext("file://" + customImage.getAbsolutePath());
+                        observer.onNext(PREFIX_FILE + customImage.getAbsolutePath());
                     }
                 }
                 observer.onComplete();
@@ -140,7 +143,7 @@ public abstract class ImageUriRequest<T> {
                     List<Song> songs = MediaStoreUtil.getSongs(selection, selectionValues);
                     if(songs.size() > 0){
 //                        imageUrl = resolveEmbeddedPicture(songs.get(0));
-                        imageUrl = "embedded://" + songs.get(0).getUrl();
+                        imageUrl = PREFIX_EMBEDDED + songs.get(0).getUrl();
                     }
                 } else {
                     Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getID());
@@ -152,7 +155,7 @@ public abstract class ImageUriRequest<T> {
             } else {//艺术家封面
                 File artistThumb = ImageUriUtil.getArtistThumbInMediaCache(request.getID());
                 if (artistThumb != null && artistThumb.exists()) {
-                    imageUrl = "file://" + artistThumb.getAbsolutePath();
+                    imageUrl = PREFIX_FILE + artistThumb.getAbsolutePath();
                 }
             }
             if (!TextUtils.isEmpty(imageUrl)) {
@@ -168,6 +171,7 @@ public abstract class ImageUriRequest<T> {
      * @param song
      * @return
      */
+    @Deprecated
     private String resolveEmbeddedPicture(Song song) throws IOException {
         if (song == null)
             return "";
@@ -181,7 +185,7 @@ public abstract class ImageUriRequest<T> {
             File cacheDir = DiskCache.getDiskCacheDir(App.getContext(), "embedded/");
             File original = new File(cacheDir, imageName);
             if (original.exists()) {
-                imageUrl = "file://" + original.getAbsolutePath();
+                imageUrl = PREFIX_FILE + original.getAbsolutePath();
             } else {
                 retriever = new MediaMetadataRetriever();
                 retriever.setDataSource(song.getUrl());
@@ -194,12 +198,12 @@ public abstract class ImageUriRequest<T> {
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream);
                         fileOutputStream.flush();
                         fileOutputStream.close();
-                        imageUrl = "file://" + original.getAbsolutePath();
+                        imageUrl = PREFIX_FILE + original.getAbsolutePath();
                     }
                 } else {
                     File cover = fallback(song);
                     if (cover != null && cover.exists())
-                        imageUrl = "file://" + cover.getAbsolutePath();
+                        imageUrl = PREFIX_FILE + cover.getAbsolutePath();
                 }
             }
         } finally {

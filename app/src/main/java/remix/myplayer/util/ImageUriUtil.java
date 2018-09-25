@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -65,20 +64,9 @@ public class ImageUriUtil {
      */
     public static boolean isAlbumThumbExistInMediaCache(Uri uri) {
         boolean exist = false;
-        InputStream stream = null;
-        try {
-            stream = App.getContext().getContentResolver().openInputStream(uri);
+        try (InputStream ignored = App.getContext().getContentResolver().openInputStream(uri)) {
             exist = true;
-        } catch (Exception e) {
-            exist = false;
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        } catch (Exception ignored) {
         }
         return exist;
     }
