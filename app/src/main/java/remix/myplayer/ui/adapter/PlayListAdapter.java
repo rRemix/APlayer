@@ -114,7 +114,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
         Disposable disposable = new PlayListUriRequest(holder.mImage,
                 new UriRequest(info.getId(),UriRequest.TYPE_NETEASE_SONG,  ImageUriRequest.URL_PLAYLIST),
-                new RequestConfig.Builder(imageSize,imageSize).build()).loadImage();
+                new RequestConfig.Builder(imageSize,imageSize).build()).load();
         holder.mImage.setTag(disposable);
         holder.mContainer.setOnClickListener(v -> {
             if(holder.getAdapterPosition() - 1 < 0){

@@ -1,6 +1,6 @@
 package remix.myplayer.request;
 
-import android.annotation.SuppressLint;
+import android.net.Uri;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -26,7 +26,8 @@ public class PlayListUriRequest extends LibraryUriRequest {
 //        mImage.setImageURI(Uri.EMPTY);
     }
 
-    public Disposable loadImage(){
+    @Override
+    public Disposable load(){
         return Observable.concat(
                 getCustomThumbObservable(mRequest),
                 Observable.fromIterable(PlayListUtil.getMP3ListByIds(PlayListUtil.getIDList(mRequest.getID()),mRequest.getID()))
@@ -37,7 +38,7 @@ public class PlayListUriRequest extends LibraryUriRequest {
                 .subscribeWith(new DisposableObserver<String>() {
                     @Override
                     protected void onStart() {
-
+                        mImage.setImageURI(Uri.EMPTY);
                     }
 
                     @Override
@@ -57,16 +58,4 @@ public class PlayListUriRequest extends LibraryUriRequest {
                 });
     }
 
-    @SuppressLint("CheckResult")
-    @Override
-    public void load() {
-        Observable.concat(
-                getCustomThumbObservable(mRequest),
-                Observable.fromIterable(PlayListUtil.getMP3ListByIds(PlayListUtil.getIDList(mRequest.getID()),mRequest.getID()))
-                        .concatMapDelayError(song -> getCoverObservable(getSearchRequestWithAlbumType(song))))
-        .firstOrError()
-        .toObservable()
-        .compose(RxUtil.applyScheduler())
-        .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
-    }
 }

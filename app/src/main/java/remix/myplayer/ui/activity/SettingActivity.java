@@ -258,10 +258,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 ThemeStore.isDay() ? ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.md_white_primary_dark) : ThemeStore.getMaterialPrimaryColor() : Color.TRANSPARENT);
         //初始化箭头颜色
         final int arrowColor = ThemeStore.getAccentColor();
-        ButterKnife.apply(new ImageView[]{findView(R.id.setting_eq_arrow),
-                        findView(R.id.setting_feedback_arrow),
-                        findView(R.id.setting_about_arrow),
-                        findView(R.id.setting_update_arrow)},
+        ButterKnife.apply(new ImageView[]{findViewById(R.id.setting_eq_arrow),
+                        findViewById(R.id.setting_feedback_arrow),
+                        findViewById(R.id.setting_about_arrow),
+                        findViewById(R.id.setting_update_arrow)},
                 (view, index) -> Theme.TintDrawable(view, view.getBackground(), arrowColor));
 
         //封面
@@ -269,7 +269,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         mAlbumCoverText.setText(mOriginalAlbumChoice);
 
         //根据系统版本决定是否显示通知栏样式切换
-        findView(R.id.setting_classic_notify_container).setVisibility(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? View.VISIBLE : View.GONE);
+        findViewById(R.id.setting_classic_notify_container).setVisibility(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? View.VISIBLE : View.GONE);
 
         //锁屏样式
         int lockScreen = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN);

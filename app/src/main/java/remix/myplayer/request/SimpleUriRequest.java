@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import io.reactivex.disposables.Disposable;
 import remix.myplayer.request.network.RxUtil;
 
 public abstract class SimpleUriRequest extends ImageUriRequest<Uri> {
@@ -15,8 +16,8 @@ public abstract class SimpleUriRequest extends ImageUriRequest<Uri> {
 
     @SuppressLint("CheckResult")
     @Override
-    public void load() {
-        getCoverObservable(mRequest)
+    public Disposable load() {
+        return getCoverObservable(mRequest)
                 .compose(RxUtil.applyScheduler())
                 .subscribe(s -> onSuccess(Uri.parse(s)),
                         throwable -> onError(throwable.toString()));

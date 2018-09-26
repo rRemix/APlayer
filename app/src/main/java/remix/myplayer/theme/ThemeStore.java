@@ -199,7 +199,7 @@ public class ThemeStore {
 
     @ColorInt
     public static int getNavigationBarColor(){
-        return isDay() ? getMaterialPrimaryDarkColor() : getMaterialPrimaryColor();
+        return getMaterialPrimaryColor();
     }
 
     @ColorInt

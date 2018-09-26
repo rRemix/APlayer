@@ -57,7 +57,7 @@ public class SongChooseActivity extends LibraryActivity<Song,SongChooseAdaper> {
         }
         mPlayListName = getIntent().getStringExtra("PlayListName");
 
-        TextView cancel = findView(R.id.cancel);
+        TextView cancel = findViewById(R.id.cancel);
         cancel.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
         mConfirm.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
         mAdapter = new SongChooseAdaper(this,R.layout.item_song_choose, isValid -> {

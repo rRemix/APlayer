@@ -15,7 +15,9 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import remix.myplayer.R;
 import remix.myplayer.misc.manager.ActivityManager;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.Util;
@@ -134,7 +136,9 @@ public class BaseActivity extends AppCompatActivity {
     protected void setNavigationBarColor() {
         //导航栏变色
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION, false)) {
-            getWindow().setNavigationBarColor(ThemeStore.getNavigationBarColor());
+            final int navigationColor = ThemeStore.getNavigationBarColor();
+            getWindow().setNavigationBarColor(navigationColor);
+            Theme.setLightNavigationbar(this,ColorUtil.isColorLight(navigationColor));
         }
     }
 
@@ -147,8 +151,9 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     public boolean isDestroyed() {
-        return Build.VERSION.SDK_INT >= 17 ? super.isDestroyed() : mIsDestroyed;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 ? super.isDestroyed() : mIsDestroyed;
     }
+
 
     @SuppressLint("CheckResult")
     @Override

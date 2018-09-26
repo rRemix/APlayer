@@ -30,6 +30,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import okhttp3.ResponseBody;
 import remix.myplayer.App;
@@ -47,7 +48,6 @@ import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 
-import static remix.myplayer.App.IS_GOOGLEPLAY;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_ALBUM;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_ARTIST;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_SONG;
@@ -96,7 +96,7 @@ public abstract class ImageUriRequest<T> {
 
     public abstract void onSuccess(@Nullable T result);
 
-    public abstract void load();
+    public abstract Disposable load();
 
     protected Observable<String> getCoverObservable(UriRequest request) {
         return Observable.concat(getCustomThumbObservable(request), getContentThumbObservable(request), getNetworkThumbObservable(request))
@@ -214,7 +214,7 @@ public abstract class ImageUriRequest<T> {
     }
 
     private Observable<String> getNetworkThumbObservable(UriRequest request) {
-        return IS_GOOGLEPLAY || DOWNLOAD_SOURCE == DOWNLOAD_LASTFM ? getLastFMNetworkThumbObservable(request) : getNeteaseNetworkThumbObservable(request);
+        return DOWNLOAD_SOURCE == DOWNLOAD_LASTFM ? getLastFMNetworkThumbObservable(request) : getNeteaseNetworkThumbObservable(request);
     }
 
     //lastFM

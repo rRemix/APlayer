@@ -70,7 +70,7 @@ public class SearchAdapter extends BaseAdapter<Song,SearchAdapter.SearchResHolde
         //封面
         Disposable disposable = new LibraryUriRequest(holder.mImage,
                 getSearchRequestWithAlbumType(song),
-                new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).loadImage();
+                new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
         holder.mImage.setTag(disposable);
 
         //设置按钮着色

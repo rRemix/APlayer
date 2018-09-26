@@ -26,6 +26,7 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
@@ -134,7 +135,7 @@ public class LockScreenActivity extends BaseMusicActivity {
         mView = getWindow().getDecorView();
         mView.setBackgroundColor(Color.TRANSPARENT);
 
-        findView(R.id.lockscreen_arrow_container).startAnimation(AnimationUtils.loadAnimation(this, R.anim.arrow_left_to_right));
+        findViewById(R.id.lockscreen_arrow_container).startAnimation(AnimationUtils.loadAnimation(this, R.anim.arrow_left_to_right));
 
     }
 
@@ -256,8 +257,8 @@ public class LockScreenActivity extends BaseMusicActivity {
             }
 
             @Override
-            public void load() {
-                mDisposable.add(getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(song))
+            public Disposable load() {
+                final Disposable disposable = getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(song))
                         .compose(RxUtil.applySchedulerToIO())
                         .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette>) e -> {
                             if (bitmap == null) {
@@ -268,7 +269,9 @@ public class LockScreenActivity extends BaseMusicActivity {
                         }))
                         .onErrorResumeNext(Observable.create(e -> processBitmap(e, DEFAULT_BITMAP)))
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::onSuccess, throwable -> onError(throwable.toString())));
+                        .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
+                mDisposable.add(disposable);
+                return disposable;
             }
         }.load();
     }

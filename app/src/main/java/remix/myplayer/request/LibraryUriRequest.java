@@ -1,6 +1,5 @@
 package remix.myplayer.request;
 
-import android.annotation.SuppressLint;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -18,7 +17,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.util.LogUtil;
-import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2017/12/4.
@@ -70,12 +68,12 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
                     @Override
                     public void onIntermediateImageFailed(String s, Throwable throwable) {
-                        Util.writeLogToExternalStorage("fresco", "onIntermediateImageFailed\nresult: " + result + "\nthrowable: " +throwable + "\n");
+//                        Util.writeLogToExternalStorage("fresco", "onIntermediateImageFailed\nresult: " + result + "\nthrowable: " +throwable + "\n");
                     }
 
                     @Override
                     public void onFailure(String s, Throwable throwable) {
-                        Util.writeLogToExternalStorage("fresco", "onFailure\nresult: " + result + "\nthrowable: " +throwable + "\n");
+//                        Util.writeLogToExternalStorage("fresco", "onFailure\nresult: " + result + "\nthrowable: " +throwable + "\n");
                     }
 
                     @Override
@@ -88,7 +86,8 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
         mImage.setController(controller);
     }
 
-    public Disposable loadImage() {
+    @Override
+    public Disposable load() {
         return getCoverObservable(mRequest)
                 .compose(RxUtil.applyScheduler())
                 .subscribeWith(new DisposableObserver<String>() {
@@ -112,33 +111,6 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
                     }
                 });
-    }
 
-    @SuppressLint("CheckResult")
-    @Override
-    public void load() {
-        getCoverObservable(mRequest)
-                .compose(RxUtil.applyScheduler())
-                .subscribeWith(new DisposableObserver<String>() {
-                    @Override
-                    protected void onStart() {
-                        mImage.setImageURI(Uri.EMPTY);
-                    }
-
-                    @Override
-                    public void onNext(String s) {
-                        onSuccess(s);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        LibraryUriRequest.this.onError(e.toString());
-                    }
-
-                    @Override
-                    public void onComplete() {
-                    }
-                });
-//                .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
     }
 }
