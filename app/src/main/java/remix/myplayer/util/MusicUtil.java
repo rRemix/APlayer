@@ -13,6 +13,8 @@ import android.provider.DocumentsContract;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.tencent.bugly.crashreport.CrashReport;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +26,9 @@ import remix.myplayer.service.MusicService;
 
 public class MusicUtil {
     private static final String TAG = MusicUtil.class.getSimpleName();
-    private MusicUtil(){}
+
+    private MusicUtil() {
+    }
 
     public static void playFromUri(Uri uri) {
         List<Integer> songs = null;
@@ -69,7 +73,7 @@ public class MusicUtil {
             arg.putInt("Control", Command.PLAYSELECTEDSONG);
             arg.putInt("Position", 0);
             intent.putExtras(arg);
-            MusicServiceRemote.setPlayQueue(songs,intent);
+            MusicServiceRemote.setPlayQueue(songs, intent);
         }
     }
 
@@ -93,6 +97,8 @@ public class MusicUtil {
                 final int column_index = cursor.getColumnIndex(column);
                 return cursor.getString(column_index);
             }
+        } catch (Exception e) {
+            CrashReport.postCatchedException(new Throwable("Uri: " + uri,e));
         } finally {
             if (cursor != null)
                 cursor.close();

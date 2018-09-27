@@ -114,7 +114,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         final int albumId = album.getAlbumID();
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
 
-        Disposable disposable = new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(album),new RequestConfig.Builder(imageSize,imageSize).build()).loadImage();
+        Disposable disposable = new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(album),new RequestConfig.Builder(imageSize,imageSize).build()).load();
         holder.mImage.setTag(disposable);
         if(holder instanceof AlbumListHolder){
             if(album.getCount() > 0){

@@ -1,6 +1,7 @@
 package remix.myplayer.theme;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
@@ -30,6 +31,8 @@ import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
+
+import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
 
 
 /**
@@ -445,5 +448,19 @@ public class Theme {
                 .backgroundColorAttr(R.attr.background_color_3)
                 .itemsColorAttr(R.attr.text_color_primary)
                 .theme(ThemeStore.getMDDialogTheme());
+    }
+
+    public static void setLightNavigationbar(Activity activity, boolean enabled) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            final View decorView = activity.getWindow().getDecorView();
+            int systemUiVisibility = decorView.getSystemUiVisibility();
+            if(enabled){
+                systemUiVisibility |= SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            } else {
+                systemUiVisibility &= ~SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            }
+            decorView.setSystemUiVisibility(systemUiVisibility);
+        }
+
     }
 }

@@ -18,7 +18,10 @@ import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.adapter.CustomSortAdapter
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
-import remix.myplayer.util.*
+import remix.myplayer.util.ColorUtil
+import remix.myplayer.util.PlayListUtil
+import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 import java.util.*
 
 class CustomSortActivity : ToolbarActivity() {
@@ -45,7 +48,6 @@ class CustomSortActivity : ToolbarActivity() {
         setUpToolbar(findViewById(R.id.toolbar), mPlayListName)
 
         mAdapter = CustomSortAdapter(mContext, R.layout.item_custom_sort)
-        mAdapter.setHasStableIds(true)
         mAdapter.setData(mInfoList)
         mAdapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemLongClick(view: View?, position: Int) {
@@ -65,7 +67,6 @@ class CustomSortActivity : ToolbarActivity() {
             }
 
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-                LogUtil.d("ChildHolderAdapter", "from: " + viewHolder.adapterPosition + " to: " + target.adapterPosition)
                 Collections.swap(mAdapter.datas, if (viewHolder.adapterPosition >= 0) viewHolder.adapterPosition else 0,
                         if (target.adapterPosition >= 0) target.adapterPosition else 0)
                 mAdapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
@@ -79,6 +80,7 @@ class CustomSortActivity : ToolbarActivity() {
 
         }).attachToRecyclerView(mRecyclerView)
 
+        mRecyclerView.setHasFixedSize(true)
         mRecyclerView.layoutManager = LinearLayoutManager(this)
         mRecyclerView.itemAnimator = DefaultItemAnimator()
         mRecyclerView.adapter = mAdapter

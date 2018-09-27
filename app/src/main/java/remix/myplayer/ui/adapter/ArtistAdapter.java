@@ -117,7 +117,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         }
         //设置封面
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
-        Disposable disposable = new LibraryUriRequest(holder.mImage,ImageUriUtil.getSearchRequest(artist),new RequestConfig.Builder(imageSize,imageSize).build()).loadImage();
+        Disposable disposable = new LibraryUriRequest(holder.mImage,ImageUriUtil.getSearchRequest(artist),new RequestConfig.Builder(imageSize,imageSize).build()).load();
         holder.mImage.setTag(disposable);
 
         //item点击效果

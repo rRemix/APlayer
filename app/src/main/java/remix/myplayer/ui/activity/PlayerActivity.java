@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.disposables.Disposable;
 import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.AnimationUrl;
@@ -97,6 +98,7 @@ import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
+import static android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
@@ -301,7 +303,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
                 StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true, this);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 StatusBarUtil.setTransparent(this);
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                int systemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
+                systemUiVisibility |= SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                getWindow().getDecorView().setSystemUiVisibility(systemUiVisibility);
             } else {
                 StatusBarUtil.setColorNoTranslucent(this, ColorUtil.getColor(R.color.statusbar_gray_color));
             }
@@ -656,9 +660,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
      */
     private void setUpGuide() {
         mDotList = new ArrayList<>();
-        mDotList.add(findView(R.id.guide_01));
-        mDotList.add(findView(R.id.guide_02));
-        mDotList.add(findView(R.id.guide_03));
+        mDotList.add(findViewById(R.id.guide_01));
+        mDotList.add(findViewById(R.id.guide_02));
+        mDotList.add(findViewById(R.id.guide_03));
         int width = DensityUtil.dip2px(this, 8);
         int height = DensityUtil.dip2px(this, 2);
         mHighLightIndicator = Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getAccentColor(), width, height);
@@ -1188,8 +1192,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
                 }
 
                 @Override
-                public void load() {
-                    getCoverObservable(getSearchRequestWithAlbumType(mInfo))
+                public Disposable load() {
+                    return getCoverObservable(getSearchRequestWithAlbumType(mInfo))
                             .compose(RxUtil.applyScheduler())
                             .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
                 }

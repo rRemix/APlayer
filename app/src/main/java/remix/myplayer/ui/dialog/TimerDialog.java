@@ -129,7 +129,7 @@ public class TimerDialog extends BaseDialogActivity {
 
         //初始化switch
         mSwitch = new SwitchCompat(new ContextThemeWrapper(this, ThemeStore.isDay() ? Theme.getTheme() : R.style.TimerDialogNightTheme));
-        ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
+        ((LinearLayout)findViewById(R.id.popup_timer_container)).addView(mSwitch);
 
         //读取保存的配置
         boolean hasDefault = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
@@ -166,7 +166,7 @@ public class TimerDialog extends BaseDialogActivity {
         mToggle.setText(SleepTimer.isTicking() ? R.string.cancel_timer : R.string.start_timer);
 
         //分钟 秒 背景框
-        ButterKnife.apply(new View[]{findView(R.id.timer_minute_container), findView(R.id.timer_second_container)},
+        ButterKnife.apply(new View[]{findViewById(R.id.timer_minute_container), findView(R.id.timer_second_container)},
                 (view, index) -> {
                     final Drawable drawable = Theme.getShape(
                             GradientDrawable.RECTANGLE,

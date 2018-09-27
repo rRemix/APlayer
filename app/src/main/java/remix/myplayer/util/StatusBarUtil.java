@@ -21,6 +21,10 @@ import remix.myplayer.R;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.widget.StatusBarView;
 
+import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+import static android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+
 /**
  * Created by Remix on 2016/7/28.
  */
@@ -47,9 +51,9 @@ public class StatusBarUtil {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
             return;
         //非miui 非魅族 非6.0以上 需要改变颜色
-        if(!Build.MANUFACTURER.equalsIgnoreCase("Meizu") && !Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") &&
-                Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-            if(ThemeStore.isLightTheme())
+        if (!Build.MANUFACTURER.equalsIgnoreCase("Meizu") && !Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") &&
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (ThemeStore.isLightTheme())
                 color = ColorUtil.getColor(R.color.statusbar_gray_color);
         }
 
@@ -63,8 +67,8 @@ public class StatusBarUtil {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static void setColorForLollipop(Activity activity, int color, int statusBarAlpha) {
-        if(Build.MANUFACTURER.equals("Meizu")){
-            MeizuStatusbar.setStatusBarColor(activity.getWindow(),calculateStatusColor(color, statusBarAlpha));
+        if (Build.MANUFACTURER.equals("Meizu")) {
+            MeizuStatusbar.setStatusBarColor(activity.getWindow(), calculateStatusColor(color, statusBarAlpha));
         } else {
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -86,31 +90,33 @@ public class StatusBarUtil {
         setRootView(activity);
     }
 
-    private static void setDarkModeIfNeed(Activity activity){
-        if(activity == null)
+    private static void setDarkModeIfNeed(Activity activity) {
+        if (activity == null)
             return;
-        if(ThemeStore.isLightTheme()){
+        if (ThemeStore.isLightTheme()) {
             //获得miui版本
             String miui = "";
             int miuiVersion = 0;
-            if(Build.MANUFACTURER.equals("Xiaomi")){
+            if (Build.MANUFACTURER.equals("Xiaomi")) {
                 try {
                     Class<?> c = Class.forName("android.os.SystemProperties");
-                    Method get = c.getMethod("get", String.class, String.class );
-                    miui = (String)(get.invoke(c, "ro.miui.ui.version.name", "unknown" ));
-                    if(!TextUtils.isEmpty(miui) && miui.length() >= 2 && TextUtils.isDigitsOnly(miui.substring(1,2))){
-                        miuiVersion = Integer.valueOf(miui.substring(1,2));
+                    Method get = c.getMethod("get", String.class, String.class);
+                    miui = (String) (get.invoke(c, "ro.miui.ui.version.name", "unknown"));
+                    if (!TextUtils.isEmpty(miui) && miui.length() >= 2 && TextUtils.isDigitsOnly(miui.substring(1, 2))) {
+                        miuiVersion = Integer.valueOf(miui.substring(1, 2));
                     }
-                }catch (Exception e){
-                    LogUtil.d("StatusBarUtil",e.toString());
+                } catch (Exception e) {
+                    LogUtil.d("StatusBarUtil", e.toString());
                 }
             }
-            if(Build.MANUFACTURER.equals("Meizu")){
-                MeizuStatusbar.setStatusBarDarkIcon(activity,true);
-            } else if (Build.MANUFACTURER.equals("Xiaomi") && miuiVersion >= 6 && miuiVersion < 9){
-                XiaomiStatusbar.setStatusBarDarkMode(true,activity);
-            }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            if (Build.MANUFACTURER.equals("Meizu")) {
+                MeizuStatusbar.setStatusBarDarkIcon(activity, true);
+            } else if (Build.MANUFACTURER.equals("Xiaomi") && miuiVersion >= 6 && miuiVersion < 9) {
+                XiaomiStatusbar.setStatusBarDarkMode(true, activity);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                int systemUiVisibility = activity.getWindow().getDecorView().getSystemUiVisibility();
+                systemUiVisibility |= SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                activity.getWindow().getDecorView().setSystemUiVisibility(systemUiVisibility);
             }
         }
     }
@@ -137,14 +143,16 @@ public class StatusBarUtil {
         Window window = activity.getWindow();
 
         //4.4 全透明状态栏
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
         //5.0 全透明实现
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            int systemUiVisibility = activity.getWindow().getDecorView().getSystemUiVisibility();
+            systemUiVisibility |= SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            systemUiVisibility |= SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            window.getDecorView().setSystemUiVisibility(systemUiVisibility);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.TRANSPARENT);
         }
@@ -186,9 +194,9 @@ public class StatusBarUtil {
             return;
         }
         //非miui 非魅族 非6.0以上 需要改变颜色
-        if(!Build.MANUFACTURER.equalsIgnoreCase("Meizu") && !Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") &&
-                Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-            if(ThemeStore.isLightTheme())
+        if (!Build.MANUFACTURER.equalsIgnoreCase("Meizu") && !Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") &&
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (ThemeStore.isLightTheme())
                 color = ColorUtil.getColor(R.color.statusbar_gray_color);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -211,7 +219,7 @@ public class StatusBarUtil {
         if (!(contentLayout instanceof LinearLayout) && contentLayout.getChildAt(1) != null) {
             contentLayout.getChildAt(1).setPadding(0, getStatusBarHeight(activity), 0, 0);
         }
-        
+
         // 设置属性
         ViewGroup drawer = (ViewGroup) drawerLayout.getChildAt(1);
         drawerLayout.setFitsSystemWindows(false);
@@ -220,8 +228,8 @@ public class StatusBarUtil {
         drawer.setFitsSystemWindows(false);
         // 侧滑添加statusbarView
         LinearLayout headerContainer = drawer.findViewById(R.id.header);
-        if(headerContainer != null){
-            headerContainer.addView(createStatusBarView(activity,color),0);
+        if (headerContainer != null) {
+            headerContainer.addView(createStatusBarView(activity, color), 0);
         }
         setDarkModeIfNeed(activity);
 

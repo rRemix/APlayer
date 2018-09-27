@@ -167,7 +167,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
 
         //封面
 //        new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
-        Disposable disposable = new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song), new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).loadImage();
+        Disposable disposable = new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song), new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
         holder.mImage.setTag(disposable);
 //        //是否为无损
 //        if(!TextUtils.isEmpty(song.getDisplayname())){
@@ -255,7 +255,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
     @Override
     public void onUpdateHighLight() {
         Song currentSong = MusicServiceRemote.getCurrentSong();
-        if ( mDatas != null && mDatas.indexOf(currentSong) >= 0) {
+        if (mDatas != null && mDatas.indexOf(currentSong) >= 0) {
             int index = mDatas.indexOf(currentSong) + 1;
 
             //播放的是同一首歌曲

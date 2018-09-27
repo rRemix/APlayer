@@ -27,7 +27,7 @@ class CustomSortAdapter (context: Context,layoutId: Int) : BaseAdapter<Song, Cus
         holder.mAlbum.text = song.album
         //封面
 
-        val disposable = LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song), RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).loadImage()
+        val disposable = LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song), RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load()
         holder.mImage.tag = disposable
     }
 

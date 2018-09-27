@@ -18,6 +18,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Parcelable;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
@@ -26,9 +27,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
@@ -51,18 +55,18 @@ public class Util {
     /**
      * 注册本地Receiver
      */
-    public static void registerLocalReceiver(BroadcastReceiver receiver, IntentFilter filter){
-        LocalBroadcastManager.getInstance(App.getContext()).registerReceiver(receiver,filter);
+    public static void registerLocalReceiver(BroadcastReceiver receiver, IntentFilter filter) {
+        LocalBroadcastManager.getInstance(App.getContext()).registerReceiver(receiver, filter);
     }
 
     /**
      * 注销本地Receiver
      */
-    public static void unregisterLocalReceiver(BroadcastReceiver receiver){
+    public static void unregisterLocalReceiver(BroadcastReceiver receiver) {
         LocalBroadcastManager.getInstance(App.getContext()).unregisterReceiver(receiver);
     }
 
-    public static void sendLocalBroadcast(Intent intent){
+    public static void sendLocalBroadcast(Intent intent) {
         LocalBroadcastManager.getInstance(App.getContext()).sendBroadcast(intent);
     }
 
@@ -282,7 +286,7 @@ public class Util {
      */
     public static boolean isNetWorkConnected() {
         ConnectivityManager connectivityManager = (ConnectivityManager) App.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(connectivityManager != null){
+        if (connectivityManager != null) {
             NetworkInfo netWorkInfo = connectivityManager.getActiveNetworkInfo();
             if (netWorkInfo != null)
                 return netWorkInfo.isAvailable() && netWorkInfo.isConnected();
@@ -314,14 +318,14 @@ public class Util {
 
     public static String processInfo(String origin, int type) {
         if (type == SONGTYPE) {
-            if (origin == null || origin.equals("") ) {
+            if (origin == null || origin.equals("")) {
                 return App.getContext().getString(R.string.unknown_song);
             } else {
 //                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
                 return origin;
             }
         } else {
-            if (origin == null || origin.equals("") ) {
+            if (origin == null || origin.equals("")) {
                 return App.getContext().getString(type == ARTISTTYPE ? R.string.unknown_artist : R.string.unknown_album);
             } else {
                 return origin;
@@ -561,6 +565,22 @@ public class Util {
         } else {
             intent.setDataAndType(Uri.fromFile(installFile), "application/vnd.android.package-archive");
             context.startActivity(intent);
+        }
+    }
+
+    public static void writeLogToExternalStorage(final String name, final String log) {
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            return;
+        }
+        final String path = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + App.getContext().getPackageName() + "/log/" + name;
+        File logFile = new File(path);
+        if (!logFile.getParentFile().exists() && !logFile.getParentFile().mkdirs()) {
+            return;
+        }
+        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(logFile, logFile.exists())))) {
+            pw.println(log);
+        } catch (IOException ignore) {
+
         }
     }
 }

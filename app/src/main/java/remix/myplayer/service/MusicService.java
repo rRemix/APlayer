@@ -32,6 +32,8 @@ import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.tencent.bugly.crashreport.CrashReport;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -113,7 +115,10 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * 播放队列id
      */
     private List<Integer> mPlayQueue = new ArrayList<>();
-
+    /**
+     * 已经生成过的随机数 用于随机播放模式
+     */
+    private List<Integer> mRandomQueue = new ArrayList<>();
     /**
      * 是否第一次准备完成
      */
@@ -176,7 +181,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     private Map<String, BaseAppwidget> mAppWidgets = new HashMap<>();
 
     /**
-     * AudiaoManager
+     * AudioManager
      */
     private AudioManager mAudioManager;
 
@@ -243,10 +248,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * 桌面歌词控件
      */
     private FloatLrcView mFloatLrcView;
-    /**
-     * 已经生成过的随机数 用于随机播放模式
-     */
-    private volatile List<Integer> mRandomList = new ArrayList<>();
+
     /**
      * service是否停止运行
      */
@@ -502,7 +504,6 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         mMediaPlayer.setOnPreparedListener(mp -> {
             LogUtil.d(TAG, "准备完成:" + mFirstPrepared);
             if (mFirstPrepared) {
-                setSpeed(mSpeed);
                 mFirstPrepared = false;
                 if (mLastProgress > 0) {
                     mMediaPlayer.seekTo(mLastProgress);
@@ -564,7 +565,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             mNextIndex = mCurrentIndex;
             updateNextSong();
         } else {
-            mNextIndex = mPlayModel != Constants.PLAY_SHUFFLE ? mPlayQueue.indexOf(mNextId) : mRandomList.indexOf(mNextId);
+            mNextIndex = mPlayModel != Constants.PLAY_SHUFFLE ? mPlayQueue.indexOf(mNextId) : mRandomQueue.indexOf(mNextId);
             mNextSong = MediaStoreUtil.getMP3InfoById(mNextId);
             if (mNextSong != null) {
                 return;
@@ -609,7 +610,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
         unregisterLocalReceiver(mControlRecevier);
         unregisterLocalReceiver(mMusicEventReceiver);
-        Util.unregisterReceiver(this,mHeadSetReceiver);
+        Util.unregisterReceiver(this, mHeadSetReceiver);
         Util.unregisterReceiver(this, mScreenReceiver);
         Util.unregisterReceiver(this, mWidgetReceiver);
 
@@ -693,6 +694,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             mPlayQueue.clear();
             mPlayQueue.addAll(newQueueList);
         }
+
         if (shuffle) {
             setPlayModel(Constants.PLAY_SHUFFLE);
             updateNextSong();
@@ -769,6 +771,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         if (Util.isIntentAvailable(this, i)) {
             openAudioEffectSession();
         }
+        //倍速播放
+        setSpeed(mSpeed);
         //更新所有界面
         update(Global.getOperation());
         mMediaPlayer.start();
@@ -818,7 +822,9 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * @param position 播放位置
      */
     @Override
-    public synchronized void playSelectSong(int position) {
+    public void playSelectSong(int position) {
+//        final List<Integer> playQueue = new ArrayList<>(mPlayQueue);
+//        final List<Integer> randomQueue = new ArrayList<>(mRandomQueue);
         if ((mCurrentIndex = position) == -1 || (mCurrentIndex >= mPlayQueue.size())) {
             ToastUtil.show(mService, R.string.illegal_arg);
             return;
@@ -829,14 +835,17 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         mNextIndex = mCurrentIndex;
         mNextId = mCurrentId;
 
-        //如果是随机播放 需要调整下RandomList
-        //保证正常播放队列和随机播放队列中当前歌曲的索引一致
-        int index = mRandomList.indexOf(mCurrentId);
-        if (mPlayModel == Constants.PLAY_SHUFFLE &&
-                index != mCurrentIndex &&
-                index < mRandomList.size() &&
-                mCurrentIndex < mRandomList.size()) {
-            Collections.swap(mRandomList, mCurrentIndex, index);
+        try {
+            //如果是随机播放 需要调整下RandomQueue
+            //保证正常播放队列和随机播放队列中当前歌曲的索引一致
+            int index = mRandomQueue.indexOf(mCurrentId);
+            if (mPlayModel == Constants.PLAY_SHUFFLE &&
+                    index != mCurrentIndex &&
+                    index > 0) {
+                Collections.swap(mRandomQueue, mCurrentIndex, index);
+            }
+        } catch (Exception e) {
+            CrashReport.postCatchedException(new Throwable("playSelectSong", e));
         }
 
         if (mCurrentSong == null) {
@@ -999,7 +1008,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
 
     private void handleMetaChange() {
-        if(mCurrentSong == null)
+        if (mCurrentSong == null)
             return;
         updateAppwidget();
         if (mNeedShowFloatLrc) {
@@ -1015,7 +1024,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
 
     private void handlePlayStateChange() {
-        if(mCurrentSong == null)
+        if (mCurrentSong == null)
             return;
         //更新桌面歌词播放按钮
         if (mFloatLrcView != null)
@@ -1177,11 +1186,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     }
                     //根据当前播放模式，添加到队列
                     if (mPlayModel == Constants.PLAY_SHUFFLE) {
-                        if (mRandomList.contains(nextSong.getId())) {
-                            mRandomList.remove(Integer.valueOf(nextSong.getId()));
-                            mRandomList.add(mCurrentIndex + 1 < mRandomList.size() ? mCurrentIndex + 1 : 0, nextSong.getId());
+                        if (mRandomQueue.contains(nextSong.getId())) {
+                            mRandomQueue.remove(Integer.valueOf(nextSong.getId()));
+                            mRandomQueue.add(mCurrentIndex + 1 < mRandomQueue.size() ? mCurrentIndex + 1 : 0, nextSong.getId());
                         } else {
-                            mRandomList.add(mRandomList.indexOf(mCurrentId) + 1, nextSong.getId());
+                            mRandomQueue.add(mRandomQueue.indexOf(mCurrentId) + 1, nextSong.getId());
                         }
                     } else {
                         if (mPlayQueue.contains(nextSong.getId())) {
@@ -1227,7 +1236,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     break;
                 //耳机拔出
                 case Command.HEADSET_CHANGE:
-                    if(isPlaying()){
+                    if (isPlaying()) {
                         pause(false);
                     }
                     break;
@@ -1247,7 +1256,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         return cmd == Command.PAUSE || cmd == Command.START || cmd == Command.TOGGLE;
     }
 
-    private boolean updateAllView(int cmd){
+    private boolean updateAllView(int cmd) {
         return cmd == Command.PLAYSELECTEDSONG || cmd == Command.PREV || cmd == Command.NEXT || cmd == Command.PLAY_TEMP;
     }
 
@@ -1263,6 +1272,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     /**
      * 更新
+     *
      * @param control
      */
     private void update(int control) {
@@ -1382,7 +1392,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      *
      * @param isNext 是否是播放下一首
      */
-    public synchronized void playNextOrPrev(boolean isNext) {
+    public void playNextOrPrev(boolean isNext) {
         if (mPlayQueue == null || mPlayQueue.size() == 0) {
             ToastUtil.show(mService, getString(R.string.list_is_empty));
             return;
@@ -1394,13 +1404,14 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             mCurrentIndex = mNextIndex;
             mCurrentSong = new Song(mNextSong);
         } else {
+            final List<Integer> queue = new ArrayList<>(mPlayModel == Constants.PLAY_SHUFFLE ?
+                    mRandomQueue : mPlayQueue);
             //如果点击上一首
             if ((--mCurrentIndex) < 0)
-                mCurrentIndex = mPlayQueue.size() - 1;
-            if (mCurrentIndex == -1 || (mCurrentIndex > mPlayQueue.size() - 1))
+                mCurrentIndex = queue.size() - 1;
+            if (mCurrentIndex == -1 || (mCurrentIndex > queue.size() - 1))
                 return;
-
-            mCurrentId = mPlayModel == Constants.PLAY_SHUFFLE ? mRandomList.get(mCurrentIndex) : mPlayQueue.get(mCurrentIndex);
+            mCurrentId = queue.get(mCurrentIndex);
 
             mCurrentSong = MediaStoreUtil.getMP3InfoById(mCurrentId);
             mNextIndex = mCurrentIndex;
@@ -1419,19 +1430,19 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     /**
      * 更新下一首歌曲
      */
-    public synchronized void updateNextSong() {
+    public void updateNextSong() {
         if (mPlayQueue == null || mPlayQueue.size() == 0) {
             ToastUtil.show(mService, R.string.list_is_empty);
             return;
         }
 
         if (mPlayModel == Constants.PLAY_SHUFFLE) {
-            if (mRandomList.size() == 0) {
+            if (mRandomQueue.size() == 0) {
                 makeShuffleList(mCurrentId);
             }
-            if ((++mNextIndex) >= mRandomList.size())
+            if ((++mNextIndex) >= mRandomQueue.size())
                 mNextIndex = 0;
-            mNextId = mRandomList.get(mNextIndex);
+            mNextId = mRandomQueue.get(mNextIndex);
         } else {
             if ((++mNextIndex) >= mPlayQueue.size())
                 mNextIndex = 0;
@@ -1466,7 +1477,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NEXT_SONG_ID, mNextId);
         SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, mCurrentId);
         if (mPlayModel == Constants.PLAY_SHUFFLE) {
-            mRandomList.clear();
+            mRandomQueue.clear();
             makeShuffleList(mCurrentId);
         }
     }
@@ -1477,21 +1488,21 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * @param current
      */
     public void makeShuffleList(int current) {
-        if (mRandomList == null)
-            mRandomList = new ArrayList<>();
-        mRandomList.clear();
-        mRandomList.addAll(mPlayQueue);
-        if (mRandomList.isEmpty())
+        if (mRandomQueue == null)
+            mRandomQueue = new ArrayList<>();
+        mRandomQueue.clear();
+        mRandomQueue.addAll(mPlayQueue);
+        if (mRandomQueue.isEmpty())
             return;
 //        if (current >= 0) {
-//            boolean removed = mRandomList.remove(Integer.valueOf(current));
-//            Collections.shuffle(mRandomList);
+//            boolean removed = mRandomQueue.remove(Integer.valueOf(current));
+//            Collections.shuffle(mRandomQueue);
 //            if(removed)
-//                mRandomList.add(0,current);
+//                mRandomQueue.add(0,current);
 //        } else {
-//            Collections.shuffle(mRandomList);
+//            Collections.shuffle(mRandomQueue);
 //        }
-        Collections.shuffle(mRandomList);
+        Collections.shuffle(mRandomQueue);
     }
 
     /**
@@ -1558,8 +1569,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         return 0;
     }
 
-    public void setSpeed(float speed){
-        if(mMediaPlayer != null && mIsInitialized){
+    public void setSpeed(float speed) {
+        if (mMediaPlayer != null && mIsInitialized) {
             mSpeed = speed;
             mMediaPlayer.setSpeed(mSpeed);
         }
@@ -1572,7 +1583,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         mPlaybackHandler.post(this::load);
     }
 
-    private synchronized void load() {
+    private void load() {
         final boolean isFirst = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, "First", true);
         SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, "First", false);
         //读取sd卡歌曲id
@@ -1610,7 +1621,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             ShakeDetector.getInstance().beginListen();
         }
         //播放倍速
-        mSpeed = Float.parseFloat(SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,"1.0"));
+        mSpeed = Float.parseFloat(SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED, "1.0"));
         restoreLastSong();
         mLoadFinished = true;
         mUpdateUIHandler.postDelayed(() -> sendLocalBroadcast(new Intent(META_CHANGE)), 400);
@@ -1689,6 +1700,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * 更新桌面歌词
      */
     private boolean mFirstUpdateLrc = true;
+
     private void updateFloatLrc(boolean force) {
         if (checkNoPermission()) { //没有权限
             return;

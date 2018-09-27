@@ -3,7 +3,6 @@ package remix.myplayer.ui.dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -25,8 +24,6 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
-import remix.myplayer.misc.handler.MsgHandler;
-import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
@@ -50,15 +47,12 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     private boolean mMove = false;
     private int mPos = -1;
 
-    private MsgHandler mHandler;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_playqueue);
         ButterKnife.bind(this);
 
-        mHandler = new MsgHandler(this);
         mAdapter = new PlayQueueAdapter(this, R.layout.item_playqueue);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
@@ -70,7 +64,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
                 intent.putExtras(arg);
                 Util.sendLocalBroadcast(intent);
 
-                mHandler.postDelayed(() -> mAdapter.notifyDataSetChanged(), 50);
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -131,13 +125,6 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         overridePendingTransition(0, R.anim.slide_bottom_out);
     }
 
-    //
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mHandler.remove();
-    }
-
     @Override
     public Loader<List<PlayListSong>> onCreateLoader(int id, Bundle args) {
         return new AsyncPlayQueueSongLoader(mContext);
@@ -160,18 +147,32 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
      * @param data
      */
     private void smoothScrollTo(List<PlayListSong> data, int currentId) {
-        new Thread() {
-            @Override
-            public void run() {
-                for (int i = 0; i < data.size(); i++) {
-                    if (data.get(i).AudioId == currentId) {
-                        mPos = i;
-                        Message msg = mHandler.obtainMessage(0);
-                        msg.sendToTarget();
-                    }
-                }
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).AudioId == currentId) {
+                mPos = i;
+                break;
             }
-        }.start();
+        }
+        final LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+        int firstItem = layoutManager.findFirstVisibleItemPosition();
+        int lastItem = layoutManager.findLastVisibleItemPosition();
+        //然后区分情况
+        if (mPos <= firstItem) {
+            //当要置顶的项在当前显示的第一个项的前面时
+            mRecyclerView.scrollToPosition(mPos);
+        } else if (mPos <= lastItem) {
+            //当要置顶的项已经在屏幕上显示时
+            int top = mRecyclerView.getChildAt(mPos - firstItem).getTop();
+            mRecyclerView.scrollBy(0, top);
+        } else {
+            //当要置顶的项在当前显示的最后一项的后面时
+            mRecyclerView.scrollToPosition(mPos);
+            //这里这个变量是用在RecyclerView滚动监听里面的
+            mMove = true;
+        }
+        if (mPos >= 0) {
+            mRecyclerView.getLayoutManager().scrollToPosition(mPos);
+        }
     }
 
     @Override
@@ -208,30 +209,6 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         @Override
         public List<PlayListSong> loadInBackground() {
             return PlayListUtil.getPlayListSong(Global.PlayQueueID);
-        }
-    }
-
-    @OnHandleMessage
-    public void handleInternal(Message msg) {
-        final LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-        int firstItem = layoutManager.findFirstVisibleItemPosition();
-        int lastItem = layoutManager.findLastVisibleItemPosition();
-        //然后区分情况
-        if (mPos <= firstItem) {
-            //当要置顶的项在当前显示的第一个项的前面时
-            mRecyclerView.scrollToPosition(mPos);
-        } else if (mPos <= lastItem) {
-            //当要置顶的项已经在屏幕上显示时
-            int top = mRecyclerView.getChildAt(mPos - firstItem).getTop();
-            mRecyclerView.scrollBy(0, top);
-        } else {
-            //当要置顶的项在当前显示的最后一项的后面时
-            mRecyclerView.scrollToPosition(mPos);
-            //这里这个变量是用在RecyclerView滚动监听里面的
-            mMove = true;
-        }
-        if (mPos >= 0) {
-            mRecyclerView.getLayoutManager().scrollToPosition(mPos);
         }
     }
 }
