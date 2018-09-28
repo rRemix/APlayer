@@ -36,6 +36,7 @@ import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -715,7 +716,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         mProgressSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                LogUtil.d("歌词测试","onProgressChanged: " + progress);
                 mHandler.sendEmptyMessage(UPDATE_TIME_ONLY);
                 mCurrentTime = progress;
                 if (mLrcView != null)
@@ -725,7 +725,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 mIsDragSeekBarFromUser = true;
-                LogUtil.d("歌词测试","onStartTrackingTouch");
             }
 
             @Override
@@ -734,7 +733,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //                if(!mIsPlay){
 //                    seekBar.setProgress(0);
 //                }
-                LogUtil.d("歌词测试","onStopTrackingTouch");
                 MusicServiceRemote.setProgress(seekBar.getProgress());
                 mIsDragSeekBarFromUser = false;
             }
@@ -1067,14 +1065,14 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         } else if (mBottomConfig == 3) {//关闭
             View volumeLayout = findViewById(R.id.layout_player_volume);
             volumeLayout.setVisibility(View.INVISIBLE);
-//            LinearLayout.LayoutParams volumelLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
-//            volumelLp.weight = 0;
-//            volumeLayout.setLayoutParams(volumelLp);
+            LinearLayout.LayoutParams volumelLp = (LinearLayout.LayoutParams) volumeLayout.getLayoutParams();
+            volumelLp.weight = 0;
+            volumeLayout.setLayoutParams(volumelLp);
 
-//            View controlLayout = findViewById(R.id.layout_player_control);
-//            LinearLayout.LayoutParams controlLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
-//            controlLp.weight = 2f;
-//            controlLayout.setLayoutParams(controlLp);
+            View controlLayout = findViewById(R.id.layout_player_control);
+            LinearLayout.LayoutParams controlLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
+            controlLp.weight = 2f;
+            controlLayout.setLayoutParams(controlLp);
         }
     }
 

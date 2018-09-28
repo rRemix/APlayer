@@ -58,6 +58,8 @@ import static remix.myplayer.util.Util.isWifi;
  */
 
 public abstract class ImageUriRequest<T> {
+    private static final String LASTFM_DEFAULT_COVER = "https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png";
+
     private static final String PREFIX_FILE = "file://";
     private static final String PREFIX_EMBEDDED = "embedded://";
 
@@ -141,7 +143,7 @@ public abstract class ImageUriRequest<T> {
                             new String[]{request.getTitle()};
 
                     List<Song> songs = MediaStoreUtil.getSongs(selection, selectionValues);
-                    if(songs.size() > 0){
+                    if (songs.size() > 0) {
 //                        imageUrl = resolveEmbeddedPicture(songs.get(0));
                         imageUrl = PREFIX_EMBEDDED + songs.get(0).getUrl();
                     }
@@ -255,6 +257,11 @@ public abstract class ImageUriRequest<T> {
             LastFmArtist lastFmArtist = new Gson().fromJson(bodyString, LastFmArtist.class);
             imageUrl = ImageUriUtil.getLargestArtistImageUrl(lastFmArtist.getArtist().getImage());
         }
+
+        //忽略LastFM的默认图
+        if (LASTFM_DEFAULT_COVER.equals(imageUrl))
+            imageUrl = "";
+
         if (!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))) {
             SPUtil.putValue(App.getContext(), SPUtil.COVER_KEY.NAME, request.getLastFMKey(), imageUrl);
         }
@@ -316,7 +323,7 @@ public abstract class ImageUriRequest<T> {
                         @Override
                         protected void onNewResultImpl(Bitmap bitmap) {
 //                            Bitmap result = copy(bitmap);
-                            if(bitmap == null) {
+                            if (bitmap == null) {
                                 bitmap = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_day);
                             }
                             e.onNext(bitmap);

@@ -199,6 +199,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         }
     }
 
+
     @Override
     public void saveMode() {
         SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,"AlbumModel",ListModel);

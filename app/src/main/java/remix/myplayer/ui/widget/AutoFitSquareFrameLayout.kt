@@ -7,7 +7,7 @@ import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import remix.myplayer.util.LogUtil
 
-class WidthFitSquareFrameLayout : FrameLayout {
+class AutoFitSquareFrameLayout : FrameLayout {
     constructor(context: Context) : super(context) {}
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {}
@@ -19,7 +19,7 @@ class WidthFitSquareFrameLayout : FrameLayout {
         val heightSize = View.MeasureSpec.getSize(heightMeasureSpec)
         val sizeMeasureSpec = View.MeasureSpec.makeMeasureSpec(Math.min(widthSize, heightSize), View.MeasureSpec.EXACTLY)
         super.onMeasure(sizeMeasureSpec, sizeMeasureSpec)
-        LogUtil.d("WidthFitSquareFrameLayout", "ratio: " + heightSize * 1f / widthSize)
+        LogUtil.d("AutoFitSquareFrameLayout", "ratio: " + heightSize * 1f / widthSize)
         //根据高宽比调整布局
         if (heightSize * 1f / widthSize > 1.2f) {
             val lp = layoutParams as RelativeLayout.LayoutParams

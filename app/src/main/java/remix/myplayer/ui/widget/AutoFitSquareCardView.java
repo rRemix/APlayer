@@ -9,17 +9,17 @@ import remix.myplayer.App;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
 
-public class WidthFitSquareCardView extends CardView {
+public class AutoFitSquareCardView extends CardView {
 
-    public WidthFitSquareCardView(Context context) {
+    public AutoFitSquareCardView(Context context) {
         super(context);
     }
 
-    public WidthFitSquareCardView(Context context, AttributeSet attributeSet) {
+    public AutoFitSquareCardView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
     }
 
-    public WidthFitSquareCardView(Context context, AttributeSet attributeSet, int i) {
+    public AutoFitSquareCardView(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
     }
 

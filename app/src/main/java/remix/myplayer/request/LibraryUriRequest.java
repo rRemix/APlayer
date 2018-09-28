@@ -25,7 +25,6 @@ import remix.myplayer.util.LogUtil;
 public class LibraryUriRequest extends ImageUriRequest<String> {
     private static final String TAG = LibraryUriRequest.class.getSimpleName();
     protected SimpleDraweeView mImage;
-    private static final String LASTFM_DEFAULT_COVER = "https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png";
 
     UriRequest mRequest;
 
@@ -42,9 +41,6 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
     public void onSuccess(String result) {
         LogUtil.i(TAG, "onSuccess: " + result);
-        if (LASTFM_DEFAULT_COVER.equals(result)) {
-            return;
-        }
         ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(result));
         if (mConfig.isResize()) {
             imageRequestBuilder.setResizeOptions(ResizeOptions.forDimensions(mConfig.getWidth(), mConfig.getHeight()));

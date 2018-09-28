@@ -122,4 +122,7 @@
     <dimen name="record_margin">34dp</dimen>
     <dimen name="layout_player_topbar_height">56dp</dimen>
 
+    <dimen name="item_grid_height">234dp</dimen>
+    <dimen name="item_grid_text_container_height">58dp</dimen>
+
 </resources>

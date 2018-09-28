@@ -23,7 +23,7 @@ import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.SortOrder;
 
-import static remix.myplayer.util.MediaStoreUtil.getMP3Info;
+import static remix.myplayer.util.MediaStoreUtil.getSongInfo;
 
 
 /**
@@ -448,7 +448,7 @@ public class PlayListUtil {
                     sortOrder.toString());
             if(cursor != null && cursor.getCount() > 0){
                 while (cursor.moveToNext()){
-                    Song temp = getMP3Info(cursor);
+                    Song temp = getSongInfo(cursor);
                     tempArray[isCustom ? idList.indexOf(temp.getId()) : cursor.getPosition()] = temp;
                 }
 
