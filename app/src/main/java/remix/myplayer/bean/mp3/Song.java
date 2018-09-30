@@ -17,7 +17,7 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
  * 歌曲信息
  */
 public class Song implements Cloneable, Parcelable {
-    public static Song EMPTY_SONG = new Song(-1,"","","",-1,"",-1,-1,"","",-1,"","",-1);
+    public static Song EMPTY_SONG = new Song(-1, "", "", "", -1, "", -1, -1, "", "", -1, "", "", -1);
 
     public int Id;
     public String Title;

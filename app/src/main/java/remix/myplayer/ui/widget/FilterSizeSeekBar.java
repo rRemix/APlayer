@@ -59,7 +59,7 @@ public class FilterSizeSeekBar extends View {
     /**
      * 已完成轨道的颜色
      */
-    private int  mProgressColor;
+    private int mProgressColor;
 
     /**
      * 已完成轨道的画笔
@@ -105,7 +105,7 @@ public class FilterSizeSeekBar extends View {
     /**
      * 所有小圆点的坐标
      */
-    private ArrayList<Integer> mDotPosition  = new ArrayList<>();
+    private ArrayList<Integer> mDotPosition = new ArrayList<>();
 
     /**
      * Thumb的高度与宽度
@@ -138,7 +138,8 @@ public class FilterSizeSeekBar extends View {
     /**
      * 扫描大小设置常量
      */
-    private String[] mTexts = new String[]{"0","300k","500K","800k","1MB","2MB"};
+    private String[] mTexts = new String[]{"0", "300k", "500K", "800k", "1MB", "2MB"};
+
     public FilterSizeSeekBar(Context context) {
         super(context);
         mContext = context;
@@ -160,46 +161,46 @@ public class FilterSizeSeekBar extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         //整个轨道
-        canvas.drawLine(mThumbWidth,mTrackCenterY,mTrackWidth + mThumbWidth,mTrackCenterY,mTrackPaint);
+        canvas.drawLine(mThumbWidth, mTrackCenterY, mTrackWidth + mThumbWidth, mTrackCenterY, mTrackPaint);
         //已完成轨道
-        canvas.drawLine(mThumbWidth,mTrackCenterY,mThumbCenterX,mTrackCenterY,mProgressPaint);
+        canvas.drawLine(mThumbWidth, mTrackCenterY, mThumbCenterX, mTrackCenterY, mProgressPaint);
         //小圆点与底部文字
-        for(int i = 0 ; i < mDotNum ;i++){
-            canvas.drawCircle(mDotPosition.get(i),mTrackCenterY,mDotWidth,mDotPaint);
-            canvas.drawText(mTexts[i],mDotPosition.get(i),mThumbHeight * 2,mTextPaint);
+        for (int i = 0; i < mDotNum; i++) {
+            canvas.drawCircle(mDotPosition.get(i), mTrackCenterY, mDotWidth, mDotPaint);
+            canvas.drawText(mTexts[i], mDotPosition.get(i), mThumbHeight * 2, mTextPaint);
         }
         //thumb
-        mThumbDrawable.setBounds(mThumbCenterX - mThumbWidth / 2,0,mThumbCenterX + mThumbWidth / 2,mThumbHeight);
+        mThumbDrawable.setBounds(mThumbCenterX - mThumbWidth / 2, 0, mThumbCenterX + mThumbWidth / 2, mThumbHeight);
         mThumbDrawable.draw(canvas);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        LogUtil.d(TAG,"EventX:" + event.getX());
-        LogUtil.d(TAG,"EventY:" + event.getY());
-        int eventX = (int)event.getX();
-        boolean isUp = event.getAction() == MotionEvent.ACTION_UP ;
+        LogUtil.d(TAG, "EventX:" + event.getX());
+        LogUtil.d(TAG, "EventY:" + event.getY());
+        int eventX = (int) event.getX();
+        boolean isUp = event.getAction() == MotionEvent.ACTION_UP;
 
         //设置thumb状态
         mThumbDrawable.setState(isUp ? mThumbNormal : mThumbPressed);
 
-        if(eventX > mDotPosition.get(mDotPosition.size() - 1) || eventX < mThumbWidth) {
+        if (eventX > mDotPosition.get(mDotPosition.size() - 1) || eventX < mThumbWidth) {
             invalidate();
             return true;
         }
 
-        if(isUp){
+        if (isUp) {
             //寻找与当前触摸点最近的值
             int temp = Integer.MAX_VALUE;
-            for(int i = 0 ; i < mDotPosition.size() ;i++){
-                if(Math.abs(mDotPosition.get(i) - eventX) < temp){
+            for (int i = 0; i < mDotPosition.size(); i++) {
+                if (Math.abs(mDotPosition.get(i) - eventX) < temp) {
                     mPositon = i;
                     temp = Math.abs(mDotPosition.get(i) - eventX);
                 }
             }
             mThumbCenterX = mDotPosition.get(mPositon);
-            if(mOnSeekBarChangeListener != null)
-                mOnSeekBarChangeListener.onProgressChanged(this,mPositon,true);
+            if (mOnSeekBarChangeListener != null)
+                mOnSeekBarChangeListener.onProgressChanged(this, mPositon, true);
         } else {
             mThumbCenterX = eventX;
         }
@@ -211,13 +212,13 @@ public class FilterSizeSeekBar extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if((mViewWidth = getMeasuredWidth()) > 0 && (mViewHeight = getMeasuredHeight()) > 0){
+        if ((mViewWidth = getMeasuredWidth()) > 0 && (mViewHeight = getMeasuredHeight()) > 0) {
             //计算轨道宽度 两个小圆点之间的距离
             mTrackWidth = mViewWidth - mThumbWidth * 2;
             mDotBetween = mTrackWidth / (mDotNum - 1);
             mDotPosition.clear();
             //设置所有小圆点的坐标
-            for(int i = 0 ; i < mDotNum ; i++){
+            for (int i = 0; i < mDotNum; i++) {
                 mDotPosition.add(mThumbWidth + mDotBetween * i);
             }
             mThumbCenterX = mDotPosition.get(mPositon);
@@ -225,15 +226,15 @@ public class FilterSizeSeekBar extends View {
         }
     }
 
-    private void init(AttributeSet attrs){
+    private void init(AttributeSet attrs) {
         mInit = false;
         TypedArray typedArray = mContext.obtainStyledAttributes(attrs, R.styleable.FilterSizeSeekBar);
         //初始化thumbdrawable及其状态
         Drawable thumb = Theme.getTinThumb(mContext);
         Drawable thumbPress = Theme.getTinThumb(mContext);
-        if(thumb == null)
+        if (thumb == null)
             thumb = getResources().getDrawable(R.drawable.bg_circleseekbar_thumb);
-        if(thumbPress == null)
+        if (thumbPress == null)
             thumbPress = getResources().getDrawable(R.drawable.bg_circleseekbar_thumb);
 
 
@@ -242,8 +243,8 @@ public class FilterSizeSeekBar extends View {
         mThumbPressed = new int[]{android.R.attr.state_focused, android.R.attr.state_pressed,
                 android.R.attr.state_selected, android.R.attr.state_checked};
         mThumbDrawable = new StateListDrawable();
-        mThumbDrawable.addState(mThumbNormal,thumb);
-        mThumbDrawable.addState(mThumbPressed,thumbPress);
+        mThumbDrawable.addState(mThumbNormal, thumb);
+        mThumbDrawable.addState(mThumbPressed, thumbPress);
 
 
         //计算thumb的大小
@@ -258,14 +259,14 @@ public class FilterSizeSeekBar extends View {
         mTextColor = ThemeStore.getTextColorPrimary();
 
         //小圆点数量与宽度
-        mDotNum = typedArray.getInteger(R.styleable.FilterSizeSeekBar_dotnum, DensityUtil.dip2px(mContext,3));
-        mDotWidth = (int)typedArray.getDimension(R.styleable.FilterSizeSeekBar_dotwidth,DensityUtil.dip2px(mContext,2));
+        mDotNum = typedArray.getInteger(R.styleable.FilterSizeSeekBar_dotnum, DensityUtil.dip2px(mContext, 3));
+        mDotWidth = (int) typedArray.getDimension(R.styleable.FilterSizeSeekBar_dotwidth, DensityUtil.dip2px(mContext, 2));
 
         //轨道高度
-        mTrackHeigh = (int)typedArray.getDimension(R.styleable.FilterSizeSeekBar_trackheight,DensityUtil.dip2px(mContext,2));
+        mTrackHeigh = (int) typedArray.getDimension(R.styleable.FilterSizeSeekBar_trackheight, DensityUtil.dip2px(mContext, 2));
 
         //小圆点画笔
-        mDotColor = ColorUtil.shiftColor(ThemeStore.getAccentColor(),0.8f);
+        mDotColor = ColorUtil.shiftColor(ThemeStore.getAccentColor(), 0.8f);
         mDotPaint = new Paint();
         mDotPaint.setAntiAlias(true);
         mDotPaint.setColor(mDotColor);
@@ -276,7 +277,7 @@ public class FilterSizeSeekBar extends View {
         mTextPaint.setAntiAlias(true);
         mTextPaint.setColor(mTextColor);
         mTextPaint.setStyle(Paint.Style.STROKE);
-        mTextPaint.setTextSize(DensityUtil.dip2px(getContext(),13));
+        mTextPaint.setTextSize(DensityUtil.dip2px(getContext(), 13));
         mTextPaint.setTextAlign(Paint.Align.CENTER);
 
         //整个轨道的画笔
@@ -301,25 +302,29 @@ public class FilterSizeSeekBar extends View {
     }
 
     public void setPosition(int position) {
-        if(position > mDotPosition.size())
+        if (position > mDotPosition.size())
             position = mDotPosition.size();
-        if(position < 0)
+        if (position < 0)
             position = 0;
         mPositon = position;
         mThumbCenterX = mDotPosition.get(mPositon);
         invalidate();
     }
+
     public interface OnSeekBarChangeListener {
         void onProgressChanged(FilterSizeSeekBar seekBar, int position, boolean fromUser);
+
         void onStartTrackingTouch(FilterSizeSeekBar seekBar);
+
         void onStopTrackingTouch(FilterSizeSeekBar seekBar);
     }
 
     public void setOnSeekBarChangeListener(OnSeekBarChangeListener l) {
         mOnSeekBarChangeListener = l;
     }
+
     //是否初始化完成
-    public boolean isInit(){
+    public boolean isInit() {
         return mInit;
     }
 

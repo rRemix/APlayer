@@ -97,9 +97,9 @@ public class TimerDialog extends BaseDialogActivity {
 
 
         //如果正在计时，设置seekbar的进度
-        if(SleepTimer.isTicking()) {
+        if (SleepTimer.isTicking()) {
             mTime = (int) (SleepTimer.getMillisUntilFinish() / 1000);
-            if(mTime > 0){
+            if (mTime > 0) {
                 mSeekbar.setProgress(mTime);
                 mSeekbar.setStart(true);
             }
@@ -116,12 +116,14 @@ public class TimerDialog extends BaseDialogActivity {
                     //取整数分钟
                     mTime = minute * 60;
                     mSaveTime = minute * 60;
-                    LogUtil.e("TimerDialog","设置时间: " + mSaveTime + "s");
+                    LogUtil.e("TimerDialog", "设置时间: " + mSaveTime + "s");
                 }
             }
+
             @Override
             public void onStartTrackingTouch(CircleSeekBar seekBar) {
             }
+
             @Override
             public void onStopTrackingTouch(CircleSeekBar seekBar) {
             }
@@ -129,17 +131,17 @@ public class TimerDialog extends BaseDialogActivity {
 
         //初始化switch
         mSwitch = new SwitchCompat(new ContextThemeWrapper(this, ThemeStore.isDay() ? Theme.getTheme() : R.style.TimerDialogNightTheme));
-        ((LinearLayout)findViewById(R.id.popup_timer_container)).addView(mSwitch);
+        ((LinearLayout) findViewById(R.id.popup_timer_container)).addView(mSwitch);
 
         //读取保存的配置
         boolean hasDefault = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
-        final int time = SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.TIMER_DURATION,-1);
+        final int time = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
 
         //默认选项
-        if(hasDefault && time > 0){
+        if (hasDefault && time > 0) {
             //如果有默认设置并且没有开始计时，直接开始计时
             //如果有默认设置但已经开始计时，打开该popupwindow,并更改switch外观
-            if(!SleepTimer.isTicking()) {
+            if (!SleepTimer.isTicking()) {
                 mTime = time;
                 toggle();
             }
@@ -148,15 +150,15 @@ public class TimerDialog extends BaseDialogActivity {
         mSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 if (mSaveTime > 0) {
-                    ToastUtil.show(TimerDialog.this,R.string.set_success);
+                    ToastUtil.show(TimerDialog.this, R.string.set_success);
                     SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, true);
-                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.TIMER_DURATION, mSaveTime);
+                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, mSaveTime);
                 } else {
-                    ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
+                    ToastUtil.show(TimerDialog.this, R.string.plz_set_correct_time);
                     mSwitch.setChecked(false);
                 }
             } else {
-                ToastUtil.show(TimerDialog.this,R.string.cancel_success);
+                ToastUtil.show(TimerDialog.this, R.string.cancel_success);
                 SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
                 SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
                 mSaveTime = -1;
@@ -171,21 +173,21 @@ public class TimerDialog extends BaseDialogActivity {
                     final Drawable drawable = Theme.getShape(
                             GradientDrawable.RECTANGLE,
                             Color.TRANSPARENT,
-                            DensityUtil.dip2px(mContext,1),
-                            DensityUtil.dip2px(mContext,1),
+                            DensityUtil.dip2px(mContext, 1),
+                            DensityUtil.dip2px(mContext, 1),
                             ColorUtil.getColor(R.color.gray_404040),
-                            0,0,1);
+                            0, 0, 1);
                     view.setBackground(drawable);
-        });
+                });
 
     }
 
     /**
      * 根据是否已经开始计时来取消或开始计时
      */
-    private void toggle(){
-        if(mTime <= 0 && !SleepTimer.isTicking()) {
-            ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
+    private void toggle() {
+        if (mTime <= 0 && !SleepTimer.isTicking()) {
+            ToastUtil.show(TimerDialog.this, R.string.plz_set_correct_time);
             return;
         }
 
@@ -197,9 +199,9 @@ public class TimerDialog extends BaseDialogActivity {
         finish();
     }
 
-    @OnClick({R.id.timer_info,R.id.timer_info_close,R.id.close_stop,R.id.close_toggle})
-    public void OnClick(View view){
-        switch (view.getId()){
+    @OnClick({R.id.timer_info, R.id.timer_info_close, R.id.close_stop, R.id.close_toggle})
+    public void OnClick(View view) {
+        switch (view.getId()) {
             case R.id.timer_info:
                 mContentContainer.setVisibility(View.INVISIBLE);
                 mInfoContainer.setVisibility(View.VISIBLE);
@@ -218,9 +220,9 @@ public class TimerDialog extends BaseDialogActivity {
     }
 
     @OnHandleMessage
-    public void handlerInternal(Message msg){
-        if(msg != null){
-            if(msg.getData() != null){
+    public void handlerInternal(Message msg) {
+        if (msg != null) {
+            if (msg.getData() != null) {
                 mMinute.setText(msg.getData().getString("Minute"));
                 mSecond.setText(msg.getData().getString("Second"));
             }
@@ -232,32 +234,32 @@ public class TimerDialog extends BaseDialogActivity {
     protected void onResume() {
         super.onResume();
 
-        if(SleepTimer.isTicking()) {
+        if (SleepTimer.isTicking()) {
             mUpdateTimer = new Timer();
             mUpdateTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    int min,sec,remain;
+                    int min, sec, remain;
                     remain = (int) SleepTimer.getMillisUntilFinish() / 1000;
                     min = remain / 60;
                     sec = remain % 60;
                     Message msg = new Message();
                     msg.arg1 = remain;
                     Bundle data = new Bundle();
-                    data.putString("Minute",min < 10 ? "0" + min : "" + min);
-                    data.putString("Second",sec < 10 ? "0" + sec : "" + sec);
-                    LogUtil.e("TimerDialog","Minute: " + min + " Second: " + sec);
+                    data.putString("Minute", min < 10 ? "0" + min : "" + min);
+                    data.putString("Second", sec < 10 ? "0" + sec : "" + sec);
+                    LogUtil.e("TimerDialog", "Minute: " + min + " Second: " + sec);
                     msg.setData(data);
                     mHandler.sendMessage(msg);
                 }
-            },0,1000);
+            }, 0, 1000);
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(mUpdateTimer != null){
+        if (mUpdateTimer != null) {
             mUpdateTimer.cancel();
             mUpdateTimer = null;
         }
@@ -267,7 +269,7 @@ public class TimerDialog extends BaseDialogActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        overridePendingTransition(android.R.anim.fade_in,0);
+        overridePendingTransition(android.R.anim.fade_in, 0);
     }
 
     @Override

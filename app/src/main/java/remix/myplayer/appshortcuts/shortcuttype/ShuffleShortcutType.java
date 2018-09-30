@@ -20,7 +20,7 @@ public class ShuffleShortcutType extends BaseShortcutType {
 
     @Override
     public ShortcutInfo getShortcutInfo() {
-        return new ShortcutInfo.Builder(mContext,ID_PREFIX + "shuffle")
+        return new ShortcutInfo.Builder(mContext, ID_PREFIX + "shuffle")
                 .setShortLabel(mContext.getString(R.string.model_random))
                 .setLongLabel(mContext.getString(R.string.model_random))
                 .setIcon(Icon.createWithResource(mContext, R.drawable.icon_appshortcut_shuffle))

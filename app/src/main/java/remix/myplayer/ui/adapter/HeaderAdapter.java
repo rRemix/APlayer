@@ -19,7 +19,7 @@ import remix.myplayer.util.Constants;
  * @Date 2017/1/17 16:36
  */
 
-public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extends BaseAdapter<M,BaseViewHolder> {
+public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extends BaseAdapter<M, BaseViewHolder> {
 
     static final int TYPE_HEADER = 0;
     static final int TYPE_NORMAL = 1;
@@ -29,17 +29,17 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
     int ListModel = 2;
 
     HeaderAdapter(Context context, int layoutId, MultiChoice multiChoice) {
-        super(context,layoutId);
+        super(context, layoutId);
         this.mMultiChoice = multiChoice;
     }
 
-    public void setModeChangeCallback(ModeChangeCallback modeChangeCallback){
+    public void setModeChangeCallback(ModeChangeCallback modeChangeCallback) {
         mModeChangeCallback = modeChangeCallback;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if(position == 0)
+        if (position == 0)
             return TYPE_HEADER;
         return ListModel;
     }
@@ -58,7 +58,7 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
-        if(manager instanceof GridLayoutManager) {
+        if (manager instanceof GridLayoutManager) {
             final GridLayoutManager gridManager = ((GridLayoutManager) manager);
             gridManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
@@ -71,22 +71,24 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
 
     /**
      * 列表模式切换
+     *
      * @param headerHolder
      * @param v
      */
-    void switchMode(AlbumAdapter.HeaderHolder headerHolder, View v){
+    void switchMode(AlbumAdapter.HeaderHolder headerHolder, View v) {
         int newModel = v.getId() == R.id.list_model ? Constants.LIST_MODEL : Constants.GRID_MODEL;
-        if(newModel == ListModel)
+        if (newModel == ListModel)
             return;
         ListModel = newModel;
         headerHolder.mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         headerHolder.mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         headerHolder.mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
         saveMode();
-        if(mModeChangeCallback != null){
+        if (mModeChangeCallback != null) {
             mModeChangeCallback.OnModeChange(ListModel);
         }
     }
 
-    protected void saveMode(){}
+    protected void saveMode() {
+    }
 }

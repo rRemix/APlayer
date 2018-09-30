@@ -98,7 +98,7 @@ public class MusicUtil {
                 return cursor.getString(column_index);
             }
         } catch (Exception e) {
-            CrashReport.postCatchedException(new Throwable("Uri: " + uri,e));
+            CrashReport.postCatchedException(new Throwable("Uri: " + uri, e));
         } finally {
             if (cursor != null)
                 cursor.close();

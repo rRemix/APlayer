@@ -22,6 +22,7 @@ import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.misc.handler.MsgHandler;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -40,30 +41,24 @@ public class MediaScanner {
 
     private ObservableEmitter<String> mScanEmitter;
 
-    public MediaScanner(Context context){
+    public MediaScanner(Context context) {
         mContext = context;
         mHandler = new MsgHandler(this);
 
-        mLoadingDialog = new MaterialDialog.Builder(mContext)
+        mLoadingDialog = Theme.getBaseDialog(context)
                 .cancelable(false)
                 .title(R.string.please_wait)
                 .content(R.string.scan_getting_files)
-                .backgroundColorRes(R.color.day_background_color_3)
-                .contentColorRes(R.color.day_textcolor_primary)
-                .titleColorRes(R.color.day_textcolor_primary)
-                .progress(true,100)
+                .progress(true, 100)
                 .build();
 
-        mProgressDialog = new MaterialDialog.Builder(mContext)
+        mProgressDialog = Theme.getBaseDialog(context)
                 .cancelable(false)
-                .backgroundColorRes(R.color.day_background_color_3)
-                .contentColorRes(R.color.day_textcolor_primary)
-                .titleColorRes(R.color.day_textcolor_primary)
-                .progress(false, mToScanCount,true)
+                .progress(false, mToScanCount, true)
                 .dismissListener(dialog -> {
                     mConnection.disconnect();
                     mHandler.remove();
-                    ToastUtil.show(mContext,mContext.getString(R.string.scanned_count,mToScanCount));
+                    ToastUtil.show(mContext, mContext.getString(R.string.scanned_count, mToScanCount));
                 })
                 .title(R.string.scanning).build();
 
@@ -71,39 +66,39 @@ public class MediaScanner {
             @Override
             public void onMediaScannerConnected() {
                 Observable.create((ObservableOnSubscribe<String>) e -> mScanEmitter = e)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(s -> {
-                    mProgressDialog.setProgress(++mAlreadyScannedCount);
-                    mProgressDialog.setContent(s);
-                    if (mAlreadyScannedCount == mToScanCount) {
-                        mProgressDialog.dismiss();
-                    }
-                }, throwable -> {
-                    mProgressDialog.dismiss();
-                    App.getContext().getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
-                    ToastUtil.show(mContext,R.string.scan_failed,throwable.toString());
-                });
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(s -> {
+                            mProgressDialog.setProgress(++mAlreadyScannedCount);
+                            mProgressDialog.setContent(s);
+                            if (mAlreadyScannedCount == mToScanCount) {
+                                mProgressDialog.dismiss();
+                            }
+                        }, throwable -> {
+                            mProgressDialog.dismiss();
+                            App.getContext().getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
+                            ToastUtil.show(mContext, R.string.scan_failed, throwable.toString());
+                        });
 
                 mLoadingDialog.show();
                 Observable.create((ObservableOnSubscribe<Integer>) e -> {
                     getFileCount(mFile);
                     e.onNext(mToScanFiles.size());
                 }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .flatMap(count -> {
-                    mLoadingDialog.dismiss();
-                    if(count == 0){
-                        return Observable.error(new Throwable(mContext.getString(R.string.no_audio_file)));
-                    }
-                    mToScanCount = count;
-                    mProgressDialog.setMaxProgress(mToScanCount);
-                    mProgressDialog.show();
-                    return Observable.fromIterable(mToScanFiles).observeOn(Schedulers.io());
-                })
-                .subscribe(file -> mConnection.scanFile(file.getAbsolutePath(), "audio/*"),
-                        throwable -> {
-                    mLoadingDialog.dismiss();
-                    ToastUtil.show(mContext,R.string.scan_failed,throwable.toString());
-                });
+                        .flatMap(count -> {
+                            mLoadingDialog.dismiss();
+                            if (count == 0) {
+                                return Observable.error(new Throwable(mContext.getString(R.string.no_audio_file)));
+                            }
+                            mToScanCount = count;
+                            mProgressDialog.setMaxProgress(mToScanCount);
+                            mProgressDialog.show();
+                            return Observable.fromIterable(mToScanFiles).observeOn(Schedulers.io());
+                        })
+                        .subscribe(file -> mConnection.scanFile(file.getAbsolutePath(), "audio/*"),
+                                throwable -> {
+                                    mLoadingDialog.dismiss();
+                                    ToastUtil.show(mContext, R.string.scan_failed, throwable.toString());
+                                });
             }
 
 
@@ -112,10 +107,10 @@ public class MediaScanner {
                 mScanEmitter.onNext(path);
             }
         };
-        mConnection = new MediaScannerConnection(mContext,mClient);
+        mConnection = new MediaScannerConnection(mContext, mClient);
     }
 
-    public void scanFiles(File dir,String mimeType){
+    public void scanFiles(File dir, String mimeType) {
         mFile = dir;
         mMimeType = mimeType;
         mConnection.connect();
@@ -125,26 +120,26 @@ public class MediaScanner {
     private int mToScanCount = 0;
     private int mAlreadyScannedCount = 0;
 
-    private void getFileCount(File file){
+    private void getFileCount(File file) {
 
-        if(file.isFile()){
+        if (file.isFile()) {
             String ext = getFileExtension(file.getName());
             String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
-            if(/**!TextUtils.isEmpty(ext) && SUPPORT_FORMAT.indexOf(ext) != -1*/!TextUtils.isEmpty(mime) && mime.startsWith("audio")){
+            if (/**!TextUtils.isEmpty(ext) && SUPPORT_FORMAT.indexOf(ext) != -1*/!TextUtils.isEmpty(mime) && mime.startsWith("audio")) {
                 mToScanFiles.add(file);
             }
         } else {
             File[] files = file.listFiles();
-            if(files == null)
+            if (files == null)
                 return;
-            for(File temp : files){
+            for (File temp : files) {
                 getFileCount(temp);
             }
         }
     }
 
 
-    private String getFileExtension(String fileName ) {
+    private String getFileExtension(String fileName) {
         int i = fileName.lastIndexOf('.');
         if (i > 0) {
             return fileName.substring(i + 1);
@@ -152,5 +147,5 @@ public class MediaScanner {
             return null;
     }
 
-    private static final List<String> SUPPORT_FORMAT = Arrays.asList("m4a","aac","flac","mp3","wav","ogg");
+    private static final List<String> SUPPORT_FORMAT = Arrays.asList("m4a", "aac", "flac", "mp3", "wav", "ogg");
 }

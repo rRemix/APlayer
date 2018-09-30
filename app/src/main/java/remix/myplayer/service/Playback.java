@@ -9,9 +9,14 @@ package remix.myplayer.service;
 
 public interface Playback {
     void playSelectSong(int position);
+
     void toggle();
+
     void playNext();
+
     void playPrevious();
+
     void play(boolean fadeIn);
+
     void pause(boolean updateMediasessionOnly);
 }

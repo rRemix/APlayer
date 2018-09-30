@@ -20,7 +20,7 @@ public class MyLoveShortcutType extends BaseShortcutType {
 
     @Override
     public ShortcutInfo getShortcutInfo() {
-        return new ShortcutInfo.Builder(mContext,ID_PREFIX + "my_love")
+        return new ShortcutInfo.Builder(mContext, ID_PREFIX + "my_love")
                 .setShortLabel(mContext.getString(R.string.my_favorite))
                 .setLongLabel(mContext.getString(R.string.my_favorite))
                 .setIcon(Icon.createWithResource(mContext, R.drawable.icon_appshortcut_my_love))

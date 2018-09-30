@@ -19,6 +19,7 @@ public class AboutActivity extends ToolbarActivity {
     Toolbar mToolBar;
     @BindView(R.id.about_text)
     TextView mVersion;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +30,7 @@ public class AboutActivity extends ToolbarActivity {
             PackageManager pm = App.getContext().getPackageManager();
             PackageInfo pi = pm.getPackageInfo(App.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
             mVersion.setText("v" + pi.versionName);
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
 
         }
 

@@ -1007,7 +1007,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
             //更新顶部信息
             updateTopStatus(mInfo);
             //更新歌词
-            mHandler.postDelayed(() -> mLyricFragment.updateLrc(mInfo),500);
+            mHandler.postDelayed(() -> mLyricFragment.updateLrc(mInfo), 500);
             //更新进度条
             int temp = MusicServiceRemote.getProgress();
             mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
@@ -1070,7 +1070,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
             volumeLayout.setLayoutParams(volumelLp);
 
             View controlLayout = findViewById(R.id.layout_player_control);
-            LinearLayout.LayoutParams controlLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
+            LinearLayout.LayoutParams controlLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0);
             controlLp.weight = 2f;
             controlLayout.setLayoutParams(controlLp);
         }

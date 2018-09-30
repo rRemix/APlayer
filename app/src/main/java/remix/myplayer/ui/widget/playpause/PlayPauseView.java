@@ -55,7 +55,7 @@ public class PlayPauseView extends FrameLayout {
 
     }
 
-//    @Override
+    //    @Override
 //    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 //        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 //        final int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
@@ -111,13 +111,13 @@ public class PlayPauseView extends FrameLayout {
         mDrawable.draw(canvas);
     }
 
-    public void setBackgroundColor(@ColorInt int color){
+    public void setBackgroundColor(@ColorInt int color) {
         mBackgroundColor = color;
         mPaint.setColor(color);
         invalidate();
     }
 
-    public void initState(boolean isPlay){
+    public void initState(boolean isPlay) {
         if (isPlay) {
             mDrawable.setPlay();
         } else {
@@ -125,19 +125,19 @@ public class PlayPauseView extends FrameLayout {
         }
     }
 
-    public void updateState(boolean isPlay,boolean withAnim){
+    public void updateState(boolean isPlay, boolean withAnim) {
         if (mDrawable.isPlay() != isPlay)
             return;
         toggle(withAnim);
     }
 
-    public void updateState(boolean isPlay){
-        updateState(isPlay,true);
+    public void updateState(boolean isPlay) {
+        updateState(isPlay, true);
     }
 
     public void toggle(boolean withAnim) {
-        if(withAnim){
-            if(mAnimator != null){
+        if (withAnim) {
+            if (mAnimator != null) {
                 mAnimator.cancel();
             }
             mAnimator = mDrawable.getPausePlayAnimator();

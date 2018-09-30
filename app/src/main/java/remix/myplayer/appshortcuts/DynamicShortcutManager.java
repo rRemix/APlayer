@@ -28,12 +28,12 @@ public class DynamicShortcutManager extends ContextWrapper {
     public DynamicShortcutManager(Context base) {
         super(base.getApplicationContext());
         mContext = base;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
             mShortcutManger = getSystemService(ShortcutManager.class);
     }
 
-    public void setUpShortcut(){
-        if(mShortcutManger.getDynamicShortcuts().size() == 0){
+    public void setUpShortcut() {
+        if (mShortcutManger.getDynamicShortcuts().size() == 0) {
             mShortcutManger.setDynamicShortcuts(getDefaultShortcut());
         }
     }
@@ -46,8 +46,8 @@ public class DynamicShortcutManager extends ContextWrapper {
                 new ShuffleShortcutType(mContext).getShortcutInfo());
     }
 
-    public void updateContinueShortcut(MusicService service){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
+    public void updateContinueShortcut(MusicService service) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
             mShortcutManger.updateShortcuts(Arrays.asList(new ContinuePlayShortcutType(service).getShortcutInfo()));
     }
 }

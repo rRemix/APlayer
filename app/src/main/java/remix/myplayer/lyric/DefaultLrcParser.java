@@ -29,17 +29,18 @@ import remix.myplayer.misc.cache.DiskLruCache;
 
 public class DefaultLrcParser implements ILrcParser {
     @Override
-    public void saveLrcRows(List<LrcRow> lrcRows, String cacheKey,String searchKey){
-        if(lrcRows == null || lrcRows.size() == 0)
+    public void saveLrcRows(List<LrcRow> lrcRows, String cacheKey, String searchKey) {
+        if (lrcRows == null || lrcRows.size() == 0)
             return;
         DiskLruCache.Editor editor;
         OutputStream lrcCacheStream = null;
         try {
             editor = DiskCache.getLrcDiskCache().edit(cacheKey);
-            if(editor == null)
+            if (editor == null)
                 return;
             lrcCacheStream = editor.newOutputStream(0);
-            lrcCacheStream.write(new Gson().toJson(lrcRows,new TypeToken<List<LrcRow>>(){}.getType()).getBytes());
+            lrcCacheStream.write(new Gson().toJson(lrcRows, new TypeToken<List<LrcRow>>() {
+            }.getType()).getBytes());
             lrcCacheStream.flush();
             editor.commit();
 
@@ -48,7 +49,7 @@ public class DefaultLrcParser implements ILrcParser {
             e.printStackTrace();
         } finally {
             try {
-                if(lrcCacheStream != null)
+                if (lrcCacheStream != null)
                     lrcCacheStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -56,20 +57,20 @@ public class DefaultLrcParser implements ILrcParser {
         }
 
         //保存歌词原始文件
-        if(TextUtils.isEmpty(searchKey) || !Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
+        if (TextUtils.isEmpty(searchKey) || !Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
             return;
-        File lyricDir = new File(Environment.getExternalStorageDirectory(),"Android/data/"
+        File lyricDir = new File(Environment.getExternalStorageDirectory(), "Android/data/"
                 + App.getContext().getPackageName() + "/lyric");
-        if(!lyricDir.exists() && !lyricDir.mkdirs())
+        if (!lyricDir.exists() && !lyricDir.mkdirs())
             return;
 
-        File lyricFile = new File(lyricDir,searchKey.replaceAll("/","") + ".lrc");
-        if(lyricFile.exists())
+        File lyricFile = new File(lyricDir, searchKey.replaceAll("/", "") + ".lrc");
+        if (lyricFile.exists())
             return;
         FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(lyricFile);
-            for(int i = 0 ; i < lrcRows.size();i++){
+            for (int i = 0; i < lrcRows.size(); i++) {
                 LrcRow lrcRow = lrcRows.get(i);
                 outputStream.write(("[" + lrcRow.getTimeStr() + "]" + lrcRow.getContent()
                         + (!TextUtils.isEmpty(lrcRow.getTranslate()) ? "\r\n" + lrcRow.getTranslate() + "\r\n" : "\r\n")).getBytes());
@@ -78,7 +79,7 @@ public class DefaultLrcParser implements ILrcParser {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if(outputStream != null) {
+            if (outputStream != null) {
                 try {
                     outputStream.close();
                 } catch (IOException e) {
@@ -89,8 +90,8 @@ public class DefaultLrcParser implements ILrcParser {
     }
 
     @Override
-    public List<LrcRow> getLrcRows(BufferedReader bufferedReader, boolean needCache, String cacheKey,String searchKey) {
-        if(bufferedReader == null)
+    public List<LrcRow> getLrcRows(BufferedReader bufferedReader, boolean needCache, String cacheKey, String searchKey) {
+        if (bufferedReader == null)
             return null;
         //解析歌词
         List<LrcRow> lrcRows = new ArrayList<>();
@@ -99,16 +100,16 @@ public class DefaultLrcParser implements ILrcParser {
         int offset = 0;
         try {
             while ((line = bufferedReader.readLine()) != null) {
-               if(!TextUtils.isEmpty(line)){
-                   allLine.add(line);
-                   //读取offset标签
-                   if(line.startsWith("[offset:") && line.endsWith("]")){
-                       String offsetInString = line.substring(line.lastIndexOf(":") + 1, line.length() - 1);
-                       if(!TextUtils.isEmpty(offsetInString) && TextUtils.isDigitsOnly(offsetInString)){
-                           offset = Integer.valueOf(offsetInString);
-                       }
-                   }
-               }
+                if (!TextUtils.isEmpty(line)) {
+                    allLine.add(line);
+                    //读取offset标签
+                    if (line.startsWith("[offset:") && line.endsWith("]")) {
+                        String offsetInString = line.substring(line.lastIndexOf(":") + 1, line.length() - 1);
+                        if (!TextUtils.isEmpty(offsetInString) && TextUtils.isDigitsOnly(offsetInString)) {
+                            offset = Integer.valueOf(offsetInString);
+                        }
+                    }
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -120,17 +121,17 @@ public class DefaultLrcParser implements ILrcParser {
             }
         }
 
-        if(allLine.size() == 0)
+        if (allLine.size() == 0)
             return null;
 
-        for(String temp: allLine){
+        for (String temp : allLine) {
             //解析每一行歌词
-            List<LrcRow> rows = LrcRow.createRows(temp,offset);
-            if(rows != null && rows.size() > 0)
+            List<LrcRow> rows = LrcRow.createRows(temp, offset);
+            if (rows != null && rows.size() > 0)
                 lrcRows.addAll(rows);
         }
 
-        if(lrcRows.size() == 0)
+        if (lrcRows.size() == 0)
             return null;
         //为歌词排序
         Collections.sort(lrcRows);
@@ -141,7 +142,7 @@ public class DefaultLrcParser implements ILrcParser {
         lrcRows.get(lrcRows.size() - 1).setTotalTime(5000);
 
         if (needCache) {
-            saveLrcRows(lrcRows,cacheKey,searchKey);
+            saveLrcRows(lrcRows, cacheKey, searchKey);
         }
 
         return lrcRows;

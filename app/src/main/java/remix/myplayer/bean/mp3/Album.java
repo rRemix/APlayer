@@ -11,7 +11,7 @@ public class Album {
     private String Artist;
     private int Count;
 
-    public Album(int albumID, String album, int artistId,String artist,int count) {
+    public Album(int albumID, String album, int artistId, String artist, int count) {
         AlbumID = albumID;
         Album = album;
         ArtistID = artistId;
@@ -23,7 +23,7 @@ public class Album {
         return Count;
     }
 
-    public void setCount(int count){
+    public void setCount(int count) {
         this.Count = count;
     }
 

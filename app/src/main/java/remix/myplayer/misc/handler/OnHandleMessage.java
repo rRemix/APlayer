@@ -12,5 +12,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface OnHandleMessage {
     int what() default 0;
+
     String action() default "";
 }

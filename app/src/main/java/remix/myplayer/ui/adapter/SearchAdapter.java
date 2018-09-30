@@ -39,24 +39,24 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 /**
  * 搜索结果的适配器
  */
-public class SearchAdapter extends BaseAdapter<Song,SearchAdapter.SearchResHolder> {
+public class SearchAdapter extends BaseAdapter<Song, SearchAdapter.SearchResHolder> {
 
     private final GradientDrawable mDefaultDrawable;
     private final GradientDrawable mSelectDrawable;
 
-    public SearchAdapter(Context context, int layoutId){
-        super(context,layoutId);
-        int size = DensityUtil.dip2px(mContext,60);
-        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
-        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getSelectColor(),size,size);
+    public SearchAdapter(Context context, int layoutId) {
+        super(context, layoutId);
+        int size = DensityUtil.dip2px(mContext, 60);
+        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL, Color.TRANSPARENT, size, size);
+        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL, ThemeStore.getSelectColor(), size, size);
     }
 
     @Override
     public void onViewRecycled(SearchAdapter.SearchResHolder holder) {
         super.onViewRecycled(holder);
-        if((holder).mImage.getTag() != null){
+        if ((holder).mImage.getTag() != null) {
             Disposable disposable = (Disposable) (holder).mImage.getTag();
-            if(!disposable.isDisposed())
+            if (!disposable.isDisposed())
                 disposable.dispose();
         }
         holder.mImage.setImageURI(Uri.EMPTY);
@@ -75,25 +75,25 @@ public class SearchAdapter extends BaseAdapter<Song,SearchAdapter.SearchResHolde
 
         //设置按钮着色
         int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-        Theme.TintDrawable(holder.mButton,R.drawable.icon_player_more,tintColor);
+        Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         //按钮点击效果
         holder.mButton.setBackground(Theme.getPressDrawable(
                 mDefaultDrawable,
                 mSelectDrawable,
                 ThemeStore.getRippleColor(),
-                null,null));
+                null, null));
 
         holder.mButton.setOnClickListener(v -> {
-            Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
-            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton, Gravity.END);
+            Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
+            final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton, Gravity.END);
             popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
-            popupMenu.setOnMenuItemClickListener(new SongPopupListener((AppCompatActivity) mContext,song,false,""));
+            popupMenu.setOnMenuItemClickListener(new SongPopupListener((AppCompatActivity) mContext, song, false, ""));
             popupMenu.show();
         });
 
-        if(mOnItemClickLitener != null && holder.mRooView != null){
-            holder.mRooView.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition()));
+        if (mOnItemClickLitener != null && holder.mRooView != null) {
+            holder.mRooView.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition()));
         }
     }
 
@@ -108,8 +108,9 @@ public class SearchAdapter extends BaseAdapter<Song,SearchAdapter.SearchResHolde
         TextView mOther;
         @BindView(R.id.search_button)
         ImageButton mButton;
-        SearchResHolder(View itemView){
-           super(itemView);
+
+        SearchResHolder(View itemView) {
+            super(itemView);
         }
     }
 }

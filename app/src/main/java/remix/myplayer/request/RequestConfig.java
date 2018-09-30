@@ -44,49 +44,49 @@ public class RequestConfig {
         this.mForceDownload = forceDownload;
     }
 
-    private RequestConfig(Builder builder){
+    private RequestConfig(Builder builder) {
         mWidth = builder.mWidth;
         mHeight = builder.mHeight;
         mResize = builder.mResize;
         mForceDownload = builder.mForceDownload;
     }
 
-    public static class Builder{
+    public static class Builder {
         private int mWidth;
         private int mHeight;
         private boolean mResize;
         private boolean mForceDownload;
 
-        public Builder(){
+        public Builder() {
             mResize = false;
         }
 
-        public Builder(@IntRange(from = 1,to = Integer.MAX_VALUE) int width, @IntRange(from = 1,to = Integer.MAX_VALUE)int height){
+        public Builder(@IntRange(from = 1, to = Integer.MAX_VALUE) int width, @IntRange(from = 1, to = Integer.MAX_VALUE) int height) {
             mWidth = width;
             mHeight = height;
             mResize = true;
         }
 
-        public RequestConfig build(){
+        public RequestConfig build() {
             return new RequestConfig(this);
         }
 
-        public Builder forceDownload(boolean forceDownload){
+        public Builder forceDownload(boolean forceDownload) {
             mForceDownload = forceDownload;
             return this;
         }
 
-        public Builder resize(boolean resize){
+        public Builder resize(boolean resize) {
             mResize = resize;
             return this;
         }
 
-        public Builder width(@IntRange(from = 1,to = Integer.MAX_VALUE)int width){
+        public Builder width(@IntRange(from = 1, to = Integer.MAX_VALUE) int width) {
             mWidth = width;
             return this;
         }
 
-        public Builder height(@IntRange(from = 1,to = Integer.MAX_VALUE)int height){
+        public Builder height(@IntRange(from = 1, to = Integer.MAX_VALUE) int height) {
             mHeight = height;
             return this;
         }

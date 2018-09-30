@@ -32,7 +32,7 @@
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:layout_marginTop="@dimen/d1_size"
         android:id="@+id/playlist_addto_list" />
 

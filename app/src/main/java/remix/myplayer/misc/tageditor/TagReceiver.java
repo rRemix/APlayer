@@ -10,14 +10,14 @@ import remix.myplayer.misc.interfaces.OnTagEditListener;
 public class TagReceiver extends BroadcastReceiver {
     private final OnTagEditListener mListener;
 
-    public TagReceiver(OnTagEditListener listener){
+    public TagReceiver(OnTagEditListener listener) {
         mListener = listener;
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Song newSong = intent.getParcelableExtra("newSong");
-        if(mListener != null)
+        if (mListener != null)
             mListener.onTagEdit(newSong);
     }
 }

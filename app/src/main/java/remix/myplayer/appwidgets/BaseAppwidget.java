@@ -147,18 +147,18 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(new ComponentName(context, getClass()), remoteViews);
     }
 
-    protected void updateRemoteViews(MusicService service,RemoteViews remoteViews, Song song) {
+    protected void updateRemoteViews(MusicService service, RemoteViews remoteViews, Song song) {
 //        int skin = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
 //        mSkin = skin == SKIN_TRANSPARENT ? AppWidgetSkin.TRANSPARENT : AppWidgetSkin.WHITE_1F;
 //        updateBackground(remoteViews);
         updateTitle(remoteViews, song);
         updateArtist(remoteViews, song);
 //        updateSkin(remoteViews);
-        updatePlayPause(service,remoteViews);
+        updatePlayPause(service, remoteViews);
         updateLove(remoteViews, song);
         updateModel(remoteViews);
         updateNextAndPrev(remoteViews);
-        updateProgress(service,remoteViews, song);
+        updateProgress(service, remoteViews, song);
         updateTimer(remoteViews);
     }
 
@@ -171,7 +171,7 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
 //        remoteViews.setImageViewBitmap(R.id.appwidget_skin,drawableToBitmap(skinDrawable));
 //    }
 
-    protected void updateProgress(MusicService service,RemoteViews remoteViews, Song song) {
+    protected void updateProgress(MusicService service, RemoteViews remoteViews, Song song) {
         //设置时间
         remoteViews.setTextColor(R.id.appwidget_progress, mSkin.getProgressColor());
         //进度
@@ -198,9 +198,9 @@ public abstract class BaseAppwidget extends AppWidgetProvider {
         remoteViews.setImageViewResource(R.id.appwidget_model, mSkin.getModeRes());
     }
 
-    protected void updatePlayPause(MusicService service,RemoteViews remoteViews) {
+    protected void updatePlayPause(MusicService service, RemoteViews remoteViews) {
         //播放暂停按钮
-        remoteViews.setImageViewResource(R.id.appwidget_toggle,service.isPlaying() ? mSkin.getPauseRes() : mSkin.getPlayRes());
+        remoteViews.setImageViewResource(R.id.appwidget_toggle, service.isPlaying() ? mSkin.getPauseRes() : mSkin.getPlayRes());
     }
 
     protected void updateTitle(RemoteViews remoteViews, Song song) {

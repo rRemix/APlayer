@@ -17,7 +17,7 @@ public class NLrcResponse implements Serializable {
     public LrcActualData tlyric;
     public TransUserData transUser;
 
-    public static class TransUserData implements Serializable{
+    public static class TransUserData implements Serializable {
         private static final long serialVersionUID = 6288902941579934143L;
         public int id;
         public int status;
@@ -27,7 +27,7 @@ public class NLrcResponse implements Serializable {
         public long uptime;
     }
 
-    public static class LrcActualData implements Serializable{
+    public static class LrcActualData implements Serializable {
         private static final long serialVersionUID = -1692673455916843725L;
         public int version;
         public String lyric;

@@ -20,7 +20,7 @@ public class LastAddedShortcutType extends BaseShortcutType {
 
     @Override
     public ShortcutInfo getShortcutInfo() {
-        return new ShortcutInfo.Builder(mContext,ID_PREFIX + "last_added")
+        return new ShortcutInfo.Builder(mContext, ID_PREFIX + "last_added")
                 .setShortLabel(mContext.getString(R.string.recently))
                 .setLongLabel(mContext.getString(R.string.recently))
                 .setIcon(Icon.createWithResource(mContext, R.drawable.icon_appshortcut_last_add))

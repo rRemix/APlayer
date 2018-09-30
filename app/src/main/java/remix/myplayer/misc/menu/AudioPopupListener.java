@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import remix.myplayer.App;
 import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
@@ -147,7 +148,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                         .content(R.string.confirm_delete_from_library)
                         .positiveText(R.string.confirm)
                         .negativeText(R.string.cancel)
-                        .checkBoxPromptRes(R.string.delete_source, false, null)
+                        .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
                         .onAny((dialog, which) -> {
                             if (which == POSITIVE) {
                                 if (MediaStoreUtil.delete(mInfo.getId(), Constants.SONG, dialog.isPromptCheckBoxChecked()) > 0) {
@@ -175,14 +176,14 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
 //                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
 //                }
             case R.id.menu_speed:
-                final List<String> speeds = Arrays.asList("0.5","0.75","1.0","1.25","1.5");
-                final String originalSpeed = SPUtil.getValue(mActivity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,"1.0");
+                final List<String> speeds = Arrays.asList("0.5", "0.75", "1.0", "1.25", "1.5");
+                final String originalSpeed = SPUtil.getValue(mActivity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED, "1.0");
                 getBaseDialog(mActivity)
                         .title(R.string.speed)
                         .items(speeds)
                         .itemsCallbackSingleChoice(speeds.indexOf(originalSpeed), (dialog, itemView, which, text) -> {
                             MusicServiceRemote.setSpeed(Float.parseFloat(text.toString()));
-                            SPUtil.putValue(mActivity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,text.toString());
+                            SPUtil.putValue(mActivity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED, text.toString());
                             return true;
                         }).show();
                 break;

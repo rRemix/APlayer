@@ -16,7 +16,7 @@ import java.io.IOException;
 public class DiskCache {
     private static DiskLruCache mLrcCache;
 
-    public static void init(Context context){
+    public static void init(Context context) {
         try {
             File lrcCacheDir = getDiskCacheDir(context, "lyric");
             if (!lrcCacheDir.exists())
@@ -29,7 +29,7 @@ public class DiskCache {
         }
     }
 
-    public static DiskLruCache getLrcDiskCache(){
+    public static DiskLruCache getLrcDiskCache() {
         return mLrcCache;
     }
 
@@ -38,7 +38,7 @@ public class DiskCache {
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
                 || !Environment.isExternalStorageRemovable()) {
             File file = context.getExternalCacheDir();
-            if(file != null)
+            if (file != null)
                 cachePath = file.getPath();
         } else {
             cachePath = context.getCacheDir().getPath();

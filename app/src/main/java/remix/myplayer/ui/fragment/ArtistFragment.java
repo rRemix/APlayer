@@ -32,7 +32,7 @@ import remix.myplayer.util.SPUtil;
 /**
  * 艺术家Fragment
  */
-public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
+public class ArtistFragment extends LibraryFragment<Artist, ArtistAdapter> {
     @BindView(R.id.artist_recycleview)
     FastScrollRecyclerView mRecyclerView;
 
@@ -51,7 +51,7 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
 
     @Override
     protected void initAdapter() {
-        mAdapter = new ArtistAdapter(mContext,R.layout.item_artist_recycle_grid,mMultiChoice);
+        mAdapter = new ArtistAdapter(mContext, R.layout.item_artist_recycle_grid, mMultiChoice);
         mAdapter.setModeChangeCallback(mode -> {
             mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
             mRecyclerView.setAdapter(mAdapter);
@@ -60,10 +60,10 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
             @Override
             public void onItemClick(View view, int position) {
                 int artistId = getArtistId(position);
-                if(getUserVisibleHint() && artistId > 0 &&
-                        !mMultiChoice.itemClick(position,artistId,TAG)){
+                if (getUserVisibleHint() && artistId > 0 &&
+                        !mMultiChoice.itemClick(position, artistId, TAG)) {
                     if (mAdapter.getDatas() != null) {
-                        Artist artist =  mAdapter.getDatas().get(position);
+                        Artist artist = mAdapter.getDatas().get(position);
                         int artistid = artist.getArtistID();
                         String title = artist.getArtist();
                         Intent intent = new Intent(mContext, ChildHolderActivity.class);
@@ -74,18 +74,19 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
                     }
                 }
             }
+
             @Override
             public void onItemLongClick(View view, int position) {
                 int artistId = getArtistId(position);
-                if(getUserVisibleHint() && artistId > 0)
-                    mMultiChoice.itemLongClick(position,artistId,TAG,Constants.ARTIST);
+                if (getUserVisibleHint() && artistId > 0)
+                    mMultiChoice.itemLongClick(position, artistId, TAG, Constants.ARTIST);
             }
         });
     }
 
     @Override
     protected void initView() {
-        int model = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,"ArtistModel",Constants.GRID_MODEL);
+        int model = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, "ArtistModel", Constants.GRID_MODEL);
         mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
@@ -93,9 +94,9 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
     }
 
 
-    private int getArtistId(int position){
+    private int getArtistId(int position) {
         int artistId = -1;
-        if(mAdapter.getDatas() != null){
+        if (mAdapter.getDatas() != null) {
             artistId = mAdapter.getDatas().get(position).getArtistID();
         }
         return artistId;
@@ -112,7 +113,7 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
     }
 
     @Override
-    public ArtistAdapter getAdapter(){
+    public ArtistAdapter getAdapter() {
         return mAdapter;
     }
 

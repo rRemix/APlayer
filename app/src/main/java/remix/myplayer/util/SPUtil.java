@@ -15,66 +15,67 @@ import java.util.Set;
  */
 public class SPUtil {
     public static SPUtil mInstance;
+
     public SPUtil() {
-        if(mInstance == null)
+        if (mInstance == null)
             mInstance = this;
     }
 
-    public static boolean putStringSet(Context context, String name, String key, Set<String> set){
-        if(set == null)
+    public static boolean putStringSet(Context context, String name, String key, Set<String> set) {
+        if (set == null)
             return false;
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
         editor.remove(key);
-        return editor.putStringSet(key,set).commit();
+        return editor.putStringSet(key, set).commit();
     }
 
-    public static Set<String> getStringSet(Context context, String name, String key){
-        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getStringSet(key,new HashSet<>());
+    public static Set<String> getStringSet(Context context, String name, String key) {
+        return context.getSharedPreferences(name, Context.MODE_PRIVATE).getStringSet(key, new HashSet<>());
     }
 
-    public static boolean putValue(Context context,String name,String key,int value) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
-        return editor.putInt(key,value).commit();
+    public static boolean putValue(Context context, String name, String key, int value) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
+        return editor.putInt(key, value).commit();
     }
 
-    public static boolean putValue(Context context,String name,String key,String value) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
-        return editor.putString(key,value).commit();
+    public static boolean putValue(Context context, String name, String key, String value) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
+        return editor.putString(key, value).commit();
     }
 
-    public static boolean putValue(Context context,String name,String key,boolean value) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
+    public static boolean putValue(Context context, String name, String key, boolean value) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
 
-        return editor.putBoolean(key,value).commit();
+        return editor.putBoolean(key, value).commit();
     }
 
-    public static boolean getValue(Context context,String name,String key,boolean dft) {
-        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getBoolean(key,dft);
+    public static boolean getValue(Context context, String name, String key, boolean dft) {
+        return context.getSharedPreferences(name, Context.MODE_PRIVATE).getBoolean(key, dft);
     }
 
-    public static int getValue(Context context,String name,String key,int dft) {
-        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getInt(key,dft);
+    public static int getValue(Context context, String name, String key, int dft) {
+        return context.getSharedPreferences(name, Context.MODE_PRIVATE).getInt(key, dft);
     }
 
-    public static String getValue(Context context,String name,String key,String dft) {
-        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getString(key,dft);
+    public static String getValue(Context context, String name, String key, String dft) {
+        return context.getSharedPreferences(name, Context.MODE_PRIVATE).getString(key, dft);
     }
 
-    public static void deleteValue(Context context,String name,String key) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
+    public static void deleteValue(Context context, String name, String key) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
         editor.remove(key).apply();
     }
 
-    public static void deleteFile(Context context,String name) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
+    public static void deleteFile(Context context, String name) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
         editor.clear().apply();
     }
 
-    public interface UPDATE_KEY{
+    public interface UPDATE_KEY {
         String NAME = "Update";
     }
 
-    public interface LYRIC_KEY{
+    public interface LYRIC_KEY {
         String NAME = "Lyric";
         int LYRIC_DEFAULT = 0;
         int LYRIC_IGNORE = 1;
@@ -83,7 +84,7 @@ public class SPUtil {
         int LYRIC_MANUAL = 4;
     }
 
-    public interface COVER_KEY{
+    public interface COVER_KEY {
         String NAME = "Cover";
     }
 
@@ -167,9 +168,11 @@ public class SPUtil {
         String BOTTOM_OF_NOW_PLAYING_SCREEN = "bottom_of_now_playing_screen";
         //倍速播放
         String SPEED = "speed";
+        //移除是否同时源文件
+        String DELETE_SOURCE = "delete_source";
     }
 
-    public interface LYRIC_OFFSET_KEY{
+    public interface LYRIC_OFFSET_KEY {
         String NAME = "LyricOffset";
     }
 }

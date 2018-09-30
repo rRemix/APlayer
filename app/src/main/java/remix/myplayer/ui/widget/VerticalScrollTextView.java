@@ -30,18 +30,18 @@ public class VerticalScrollTextView extends AppCompatTextView {
         super(context, attrs, defStyleAttr);
     }
 
-    public void setOrientation(int orientation){
-        if(orientation != HORIZONTAL && orientation != VERTICAL){
+    public void setOrientation(int orientation) {
+        if (orientation != HORIZONTAL && orientation != VERTICAL) {
             throw new IllegalArgumentException("Invalid orientation");
         }
         mOrientation = orientation;
     }
 
-    public void setTextWithAnimation(@StringRes int textRes){
+    public void setTextWithAnimation(@StringRes int textRes) {
         setTextWithAnimation(getResources().getString(textRes));
     }
 
-    public void setTextWithAnimation(CharSequence text){
+    public void setTextWithAnimation(CharSequence text) {
         setText(text);
     }
 }

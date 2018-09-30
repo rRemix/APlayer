@@ -101,11 +101,11 @@ public class ToastUtil {
 
     public static void show(Context context, CharSequence message) {
         if (isShow) {
-            if(Looper.myLooper() == Looper.getMainLooper()){
+            if (Looper.myLooper() == Looper.getMainLooper()) {
                 Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
                 toast.getView().setAlpha(0.8f);
                 toast.show();
-            }else{
+            } else {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
@@ -118,8 +118,8 @@ public class ToastUtil {
         }
     }
 
-    public static void show(Context context, @StringRes int resId, Object... formatArgs){
-        if(isShow) {
+    public static void show(Context context, @StringRes int resId, Object... formatArgs) {
+        if (isShow) {
             show(context, context.getString(resId, formatArgs));
         }
     }
@@ -129,7 +129,7 @@ public class ToastUtil {
      *
      * @param context
      */
-    public static void showLong(Context context,@StringRes int resId, Object... formatArgs) {
+    public static void showLong(Context context, @StringRes int resId, Object... formatArgs) {
         if (isShow)
             Toast.makeText(context, context.getString(resId, formatArgs), Toast.LENGTH_LONG).show();
     }

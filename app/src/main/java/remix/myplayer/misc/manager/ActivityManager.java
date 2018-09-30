@@ -15,16 +15,17 @@ import java.util.ArrayList;
 public class ActivityManager {
     private static ArrayList<Activity> mActivityList = new ArrayList<>();
 
-    public static void AddActivity(Activity activity){
+    public static void AddActivity(Activity activity) {
         mActivityList.add(activity);
     }
-    public static void RemoveActivity(Activity activity){
+
+    public static void RemoveActivity(Activity activity) {
         mActivityList.remove(activity);
     }
 
-    public static void FinishAll(){
-        for(Activity activity : mActivityList){
-            if(activity != null && !activity.isFinishing())
+    public static void FinishAll() {
+        for (Activity activity : mActivityList) {
+            if (activity != null && !activity.isFinishing())
                 activity.finish();
         }
     }

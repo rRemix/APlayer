@@ -32,7 +32,7 @@ import remix.myplayer.util.SPUtil;
 /**
  * 专辑Fragment
  */
-public class AlbumFragment extends LibraryFragment<Album,AlbumAdapter>{
+public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
     @BindView(R.id.album_recycleview)
     FastScrollRecyclerView mRecyclerView;
 
@@ -51,7 +51,7 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdapter>{
 
     @Override
     protected void initAdapter() {
-        mAdapter = new AlbumAdapter(mContext,R.layout.item_album_recycle_grid,mMultiChoice);
+        mAdapter = new AlbumAdapter(mContext, R.layout.item_album_recycle_grid, mMultiChoice);
         mAdapter.setModeChangeCallback(mode -> {
             mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
             mRecyclerView.setAdapter(mAdapter);
@@ -60,9 +60,9 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdapter>{
             @Override
             public void onItemClick(View view, int position) {
                 int albumId = getAlbumID(position);
-                if(getUserVisibleHint() && albumId > 0 &&
-                        !mMultiChoice.itemClick(position,albumId,TAG)){
-                    if(mAdapter.getDatas() != null){
+                if (getUserVisibleHint() && albumId > 0 &&
+                        !mMultiChoice.itemClick(position, albumId, TAG)) {
+                    if (mAdapter.getDatas() != null) {
                         Album album = mAdapter.getDatas().get(position);
                         int albumid = album.getAlbumID();
                         String title = album.getAlbum();
@@ -74,11 +74,12 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdapter>{
                     }
                 }
             }
+
             @Override
             public void onItemLongClick(View view, int position) {
                 int albumId = getAlbumID(position);
-                if(getUserVisibleHint() && albumId > 0){
-                    mMultiChoice.itemLongClick(position,albumId,TAG,Constants.ALBUM);
+                if (getUserVisibleHint() && albumId > 0) {
+                    mMultiChoice.itemLongClick(position, albumId, TAG, Constants.ALBUM);
                 }
             }
         });
@@ -86,16 +87,16 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdapter>{
 
     @Override
     protected void initView() {
-        int model = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,"AlbumModel",Constants.GRID_MODEL);
+        int model = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, "AlbumModel", Constants.GRID_MODEL);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(model == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
     }
 
-    private int getAlbumID(int position){
+    private int getAlbumID(int position) {
         int albumId = -1;
-        if(mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1){
+        if (mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1) {
             albumId = mAdapter.getDatas().get(position).getAlbumID();
         }
         return albumId;
@@ -103,7 +104,7 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdapter>{
 
 
     @Override
-    public AlbumAdapter getAdapter(){
+    public AlbumAdapter getAdapter() {
         return mAdapter;
     }
 

@@ -18,8 +18,9 @@ import remix.myplayer.util.MediaStoreUtil;
  * @Date 2016/8/22 16:12
  */
 @Deprecated
-public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
+public class AsynLoadImage extends AsyncTask<Object, Integer, String> {
     private final SimpleDraweeView mImage;
+
     public AsynLoadImage(SimpleDraweeView imageView) {
         mImage = imageView;
     }
@@ -30,13 +31,13 @@ public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
      */
     @Override
     protected String doInBackground(Object... params) {
-        return MediaStoreUtil.getImageUrl((Integer) params[0], (int)params[1]);
+        return MediaStoreUtil.getImageUrl((Integer) params[0], (int) params[1]);
     }
 
     @Override
     protected void onPostExecute(String url) {
-        if(mImage != null && !TextUtils.isEmpty(url)) {
-            if(mImage.getTag() != null && mImage.getTag().equals(url)){
+        if (mImage != null && !TextUtils.isEmpty(url)) {
+            if (mImage.getTag() != null && mImage.getTag().equals(url)) {
                 return;
             }
 

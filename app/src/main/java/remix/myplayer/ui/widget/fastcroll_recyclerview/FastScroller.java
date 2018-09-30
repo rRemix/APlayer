@@ -59,8 +59,10 @@ public class FastScroller extends LinearLayout {
     private static final int sScrollbarHideDelay = 1000;
     private static final int sTrackSnapRange = 5;
 
-    @ColorInt private int mBubbleColor;
-    @ColorInt private int mHandleColor;
+    @ColorInt
+    private int mBubbleColor;
+    @ColorInt
+    private int mHandleColor;
 
     private int mHeight;
     private boolean mHideScrollbar;
@@ -101,22 +103,22 @@ public class FastScroller extends LinearLayout {
 
             if (isEnabled()) {
                 switch (newState) {
-                case RecyclerView.SCROLL_STATE_DRAGGING:
-                    getHandler().removeCallbacks(mScrollbarHider);
-                    cancelAnimation(mScrollbarAnimator);
+                    case RecyclerView.SCROLL_STATE_DRAGGING:
+                        getHandler().removeCallbacks(mScrollbarHider);
+                        cancelAnimation(mScrollbarAnimator);
 
-                    if (!isViewVisible(mScrollbar)) {
-                        showScrollbar();
-                    }
+                        if (!isViewVisible(mScrollbar)) {
+                            showScrollbar();
+                        }
 
-                    break;
+                        break;
 
-                case RecyclerView.SCROLL_STATE_IDLE:
-                    if (mHideScrollbar && !mHandleView.isSelected()) {
-                        getHandler().postDelayed(mScrollbarHider, sScrollbarHideDelay);
-                    }
+                    case RecyclerView.SCROLL_STATE_IDLE:
+                        if (mHideScrollbar && !mHandleView.isSelected()) {
+                            getHandler().postDelayed(mScrollbarHider, sScrollbarHideDelay);
+                        }
 
-                    break;
+                        break;
                 }
             }
         }
@@ -222,7 +224,7 @@ public class FastScroller extends LinearLayout {
         @ColorInt int trackColor = color;
 
         if (mTrackImage == null) {
-            mTrackImage = DrawableCompat.wrap(ContextCompat.getDrawable(getContext(),R.drawable.fastscroll_track));
+            mTrackImage = DrawableCompat.wrap(ContextCompat.getDrawable(getContext(), R.drawable.fastscroll_track));
             mTrackImage.mutate();
         }
 
@@ -239,7 +241,7 @@ public class FastScroller extends LinearLayout {
         mHandleColor = color;
 
         if (mHandleImage == null) {
-            mHandleImage = DrawableCompat.wrap(ContextCompat.getDrawable(getContext(),R.drawable.fastscroll_handle));
+            mHandleImage = DrawableCompat.wrap(ContextCompat.getDrawable(getContext(), R.drawable.fastscroll_handle));
             mHandleImage.mutate();
         }
 
@@ -256,7 +258,7 @@ public class FastScroller extends LinearLayout {
         mBubbleColor = color;
 
         if (mBubbleImage == null) {
-            mBubbleImage = DrawableCompat.wrap(ContextCompat.getDrawable(getContext(),R.drawable.fastscroll_bubble));
+            mBubbleImage = DrawableCompat.wrap(ContextCompat.getDrawable(getContext(), R.drawable.fastscroll_bubble));
             mBubbleImage.mutate();
         }
 
@@ -297,50 +299,50 @@ public class FastScroller extends LinearLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
-        case MotionEvent.ACTION_DOWN:
-            if (event.getX() < mHandleView.getX() - ViewCompat.getPaddingStart(mHandleView)) {
-                return false;
-            }
+            case MotionEvent.ACTION_DOWN:
+                if (event.getX() < mHandleView.getX() - ViewCompat.getPaddingStart(mHandleView)) {
+                    return false;
+                }
 
-            setHandleSelected(true);
+                setHandleSelected(true);
 
-            getHandler().removeCallbacks(mScrollbarHider);
-            cancelAnimation(mScrollbarAnimator);
-            cancelAnimation(mBubbleAnimator);
+                getHandler().removeCallbacks(mScrollbarHider);
+                cancelAnimation(mScrollbarAnimator);
+                cancelAnimation(mBubbleAnimator);
 
-            if (!isViewVisible(mScrollbar)) {
-                showScrollbar();
-            }
+                if (!isViewVisible(mScrollbar)) {
+                    showScrollbar();
+                }
 
-            if (mSectionIndexer != null && !isViewVisible(mBubbleView)) {
-                showBubble();
-            }
+                if (mSectionIndexer != null && !isViewVisible(mBubbleView)) {
+                    showBubble();
+                }
 
-            if (mFastScrollStateChangeListener != null) {
-                mFastScrollStateChangeListener.onFastScrollStart();
-            }
-        case MotionEvent.ACTION_MOVE:
-            final float y = event.getY();
-            setViewPositions(y);
-            setRecyclerViewPosition(y);
-            return true;
-        case MotionEvent.ACTION_UP:
-        case MotionEvent.ACTION_CANCEL:
-            setHandleSelected(false);
+                if (mFastScrollStateChangeListener != null) {
+                    mFastScrollStateChangeListener.onFastScrollStart();
+                }
+            case MotionEvent.ACTION_MOVE:
+                final float y = event.getY();
+                setViewPositions(y);
+                setRecyclerViewPosition(y);
+                return true;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                setHandleSelected(false);
 
-            if (mHideScrollbar) {
-                getHandler().postDelayed(mScrollbarHider, sScrollbarHideDelay);
-            }
+                if (mHideScrollbar) {
+                    getHandler().postDelayed(mScrollbarHider, sScrollbarHideDelay);
+                }
 
-            if (isViewVisible(mBubbleView)) {
-                hideBubble();
-            }
+                if (isViewVisible(mBubbleView)) {
+                    hideBubble();
+                }
 
-            if (mFastScrollStateChangeListener != null) {
-                mFastScrollStateChangeListener.onFastScrollStop();
-            }
+                if (mFastScrollStateChangeListener != null) {
+                    mFastScrollStateChangeListener.onFastScrollStop();
+                }
 
-            return true;
+                return true;
         }
 
         return super.onTouchEvent(event);
@@ -496,7 +498,7 @@ public class FastScroller extends LinearLayout {
         boolean showTrack = false;
 
         if (attrs != null) {
-            TypedArray typedArray = context.obtainStyledAttributes(attrs,R.styleable.FastScrollRecyclerView, 0, 0);
+            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.FastScrollRecyclerView, 0, 0);
 
             if (typedArray != null) {
                 try {
@@ -523,8 +525,8 @@ public class FastScroller extends LinearLayout {
         setTrackVisible(showTrack);
     }
 
-    public void setBubbleTextSize(int size){
-        if(mBubbleView != null)
+    public void setBubbleTextSize(int size) {
+        if (mBubbleView != null)
             mBubbleView.setTextSize(size);
     }
 }

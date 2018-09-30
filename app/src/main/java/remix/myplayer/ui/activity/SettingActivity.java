@@ -22,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.gson.Gson;
@@ -359,19 +358,14 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 if (!alreadyExist) {
                     allPlayListsName.add(0, newPlaylistName + "(" + getString(R.string.new_create) + ")");
                 }
-                new MaterialDialog.Builder(this)
+                Theme.getBaseDialog(mContext)
                         .title(R.string.import_playlist_to)
-                        .titleColorAttr(R.attr.text_color_primary)
                         .items(allPlayListsName)
-                        .itemsColorAttr(R.attr.text_color_primary)
-                        .backgroundColorAttr(R.attr.background_color_3)
                         .itemsCallback((dialog1, itemView, position, text) -> {
                             final boolean chooseNew = position == 0 && text.toString().startsWith(newPlaylistName);
                             mDisposables.add(importM3UFile(file, chooseNew ? newPlaylistName : text.toString(), chooseNew));
                         })
-                        .theme(ThemeStore.getMDDialogTheme())
                         .positiveText(R.string.confirm)
-                        .positiveColorAttr(R.attr.text_color_primary)
                         .show();
                 break;
         }

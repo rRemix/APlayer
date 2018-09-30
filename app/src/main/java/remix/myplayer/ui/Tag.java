@@ -24,6 +24,7 @@ import remix.myplayer.misc.tageditor.TagEditor;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.ToastUtil;
@@ -86,13 +87,10 @@ public class Tag extends ContextWrapper {
     }
 
     public void detail() {
-        MaterialDialog detailDialog = new MaterialDialog.Builder(this)
+        MaterialDialog detailDialog = Theme.getBaseDialog(this)
                 .title(R.string.song_detail)
-                .titleColorAttr(R.attr.text_color_primary)
                 .customView(R.layout.dialog_song_detail, true)
                 .positiveText(R.string.confirm)
-                .positiveColorAttr(R.attr.text_color_primary)
-                .backgroundColorAttr(R.attr.background_color_3)
                 .build();
         detailDialog.show();
         mDetailRootView = detailDialog.getCustomView();
@@ -125,15 +123,11 @@ public class Tag extends ContextWrapper {
     }
 
     public void edit() {
-        MaterialDialog editDialog = new MaterialDialog.Builder(this)
+        MaterialDialog editDialog = Theme.getBaseDialog(this)
                 .title(R.string.song_edit)
-                .titleColorAttr(R.attr.text_color_primary)
                 .customView(R.layout.dialog_song_edit, true)
                 .negativeText(R.string.cancel)
-                .negativeColorAttr(R.attr.text_color_primary)
                 .positiveText(R.string.confirm)
-                .positiveColorAttr(R.attr.text_color_primary)
-                .backgroundColorAttr(R.attr.background_color_3)
                 .onPositive((dialog, which) -> {
                     String title, artist, album, genre, year, track;
                     title = mSongLayout != null ? mSongLayout.getEditText().getText().toString().trim() : "";

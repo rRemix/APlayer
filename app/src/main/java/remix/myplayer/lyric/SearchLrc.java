@@ -127,6 +127,7 @@ public class SearchLrc {
 
     /**
      * 网络或者本地歌词
+     *
      * @param type
      * @return
      */

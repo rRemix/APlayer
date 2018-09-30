@@ -12,13 +12,13 @@ public class NSongSearchResponse implements Serializable {
     public int code;
     public SearchActualData result;
 
-    public static class SearchActualData implements Serializable{
+    public static class SearchActualData implements Serializable {
         private static final long serialVersionUID = -8875856782646205962L;
         public int songCount;
         public List<SearchInnerData> songs;
     }
 
-    public static class SearchInnerData implements Serializable{
+    public static class SearchInnerData implements Serializable {
         private static final long serialVersionUID = 835870151533020922L;
         public String name;
         public int id;
@@ -42,7 +42,7 @@ public class NSongSearchResponse implements Serializable {
         public String ringtone;
     }
 
-    public static class SearchArtistData implements Serializable{
+    public static class SearchArtistData implements Serializable {
         private static final long serialVersionUID = -871165113774382844L;
         public String name;
         public int id;
@@ -57,7 +57,7 @@ public class NSongSearchResponse implements Serializable {
         public int musicSize;
     }
 
-    public static class SearchAlbumData implements Serializable{
+    public static class SearchAlbumData implements Serializable {
         private static final long serialVersionUID = -3427976565299765848L;
         public String name;
         public int id;

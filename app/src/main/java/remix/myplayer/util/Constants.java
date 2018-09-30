@@ -47,15 +47,13 @@ public class Constants {
     //更新已播放时间、未播放时间
     public final static int UPDATE_TIME_ONLY = 0x011;
     //更新桌面部件
-    public final static int UPDATE_APPWIDGET=  0x100;
+    public final static int UPDATE_APPWIDGET = 0x100;
     //更新播放信息
     public final static int UPDATE_UI = 0x101;
     //更新正在播放歌曲
     public final static int UPDATE_META_DATA = 0x102;
     //更新播放状态
     public final static int UPDATE_PLAY_STATE = 0x103;
-
-
 
 
     //更新桌面歌词内容

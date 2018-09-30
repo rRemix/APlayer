@@ -99,19 +99,19 @@ public class ColumnView extends View {
     /**
      * 更新动画
      */
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
 //            Log.d(TAG,"action:" + msg.what);
 //            Log.d(TAG,"info:" + msg.obj.toString());
 //            Log.d(TAG,"isplay:" + MusicService.isPlaying());
-            for(int i = 0 ; i < mObjectAnimList.size(); i++){
+            for (int i = 0; i < mObjectAnimList.size(); i++) {
                 int from = mHeightList.get(i);
-                int to = msg.what == STARTANIM ? new Random().nextInt(mRawHeight) : (int)(mRawHeight * 0.1);
+                int to = msg.what == STARTANIM ? new Random().nextInt(mRawHeight) : (int) (mRawHeight * 0.1);
                 mObjectAnimList.get(i).setInterpolator(new AccelerateDecelerateInterpolator());
                 mObjectAnimList.get(i).
                         setDuration(300).
-                        ofInt(ColumnView.this,"Height" + (i + 1),from,to).
+                        ofInt(ColumnView.this, "Height" + (i + 1), from, to).
                         start();
 
             }
@@ -119,7 +119,7 @@ public class ColumnView extends View {
     };
 
     public ColumnView(Context context, AttributeSet attrs) {
-        super(context,attrs);
+        super(context, attrs);
         init(attrs);
     }
 
@@ -131,11 +131,11 @@ public class ColumnView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if(mColWidth > 0 && mSpaceWidth > 0) {
-            for(int i  = 0 ; i < mColNum ; i++){
+        if (mColWidth > 0 && mSpaceWidth > 0) {
+            for (int i = 0; i < mColNum; i++) {
                 int left = i * (mSpaceWidth + mColWidth);
                 int right = (i + 1) * mColWidth + i * mSpaceWidth;
-                canvas.drawRect(new Rect(left,mRawHeight - mHeightList.get(i),right,mRawHeight),mPaint);
+                canvas.drawRect(new Rect(left, mRawHeight - mHeightList.get(i), right, mRawHeight), mPaint);
             }
         }
     }
@@ -143,43 +143,43 @@ public class ColumnView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if(getMeasuredHeight() > 0 && getMeasuredWidth() > 0){
+        if (getMeasuredHeight() > 0 && getMeasuredWidth() > 0) {
             mRawHeight = getMeasuredHeight();
             mRawWdith = getMeasuredWidth();
             mSpaceWidth = (mRawWdith - mColWidth * mColNum) / (mColNum - 1);
-            if(mSpaceWidth < 0 || mColWidth < 0){
-                mColWidth = (int)(mRawWdith * 0.6 / mColNum);
-                mSpaceWidth = (int)(mRawWdith * 0.4 / (mColNum - 1));
+            if (mSpaceWidth < 0 || mColWidth < 0) {
+                mColWidth = (int) (mRawWdith * 0.6 / mColNum);
+                mSpaceWidth = (int) (mRawWdith * 0.4 / (mColNum - 1));
             }
-            int temp = (int)(mRawHeight * 0.02);
+            int temp = (int) (mRawHeight * 0.02);
             mHeight1 = temp;
             mHeight2 = temp;
             mHeight3 = temp;
             mHeight4 = temp;
             mHeightList.clear();
             mObjectAnimList.clear();
-            for(int i = 0 ; i < mColNum ; i++){
+            for (int i = 0; i < mColNum; i++) {
                 mHeightList.add(temp);
                 mObjectAnimList.add(new ObjectAnimator());
             }
         }
     }
 
-    private void init(AttributeSet attrs){
+    private void init(AttributeSet attrs) {
         TypedArray t = getContext().obtainStyledAttributes(attrs, R.styleable.ColumnView);
 //        mColumnColor = t.getColor(R.styleable.ColumnView_columncolor,0xffCD0000);
         mColumnColor = ThemeStore.getAccentColor();
-        mColWidth = (int)t.getDimension(R.styleable.ColumnView_columnwidth,80);
-        mColNum = t.getInteger(R.styleable.ColumnView_columnnum,4);
+        mColWidth = (int) t.getDimension(R.styleable.ColumnView_columnwidth, 80);
+        mColNum = t.getInteger(R.styleable.ColumnView_columnnum, 4);
         mHeightList = new ArrayList<>(mColNum);
-        if(mPaint == null){
+        if (mPaint == null) {
             mPaint = new Paint();
             mPaint.setColor(mColumnColor);
         }
         t.recycle();
     }
 
-    public  void setColumnColor(@ColorInt  int color){
+    public void setColumnColor(@ColorInt int color) {
         mColumnColor = color;
         invalidate();
     }
@@ -190,7 +190,7 @@ public class ColumnView extends View {
 
     public void setHeight1(int mHeight1) {
         this.mHeight1 = mHeight1;
-        mHeightList.set(0,mHeight1);
+        mHeightList.set(0, mHeight1);
         invalidate();
     }
 
@@ -200,7 +200,7 @@ public class ColumnView extends View {
 
     public void setHeight2(int mHeight2) {
         this.mHeight2 = mHeight2;
-        mHeightList.set(1,mHeight2);
+        mHeightList.set(1, mHeight2);
         invalidate();
     }
 
@@ -210,7 +210,7 @@ public class ColumnView extends View {
 
     public void setHeight3(int mHeight3) {
         this.mHeight3 = mHeight3;
-        mHeightList.set(2,mHeight3);
+        mHeightList.set(2, mHeight3);
         invalidate();
     }
 
@@ -220,16 +220,16 @@ public class ColumnView extends View {
 
     public void setHeight4(int mHeight4) {
         this.mHeight4 = mHeight4;
-        mHeightList.set(3,mHeight4);
+        mHeightList.set(3, mHeight4);
         invalidate();
     }
 
-    public int getRawHeight(){
+    public int getRawHeight() {
         return mRawHeight;
     }
 
     //开始动画
-    public void startAnim(){
+    public void startAnim() {
         mIsRun = true;
         mTimer = new Timer();
         mTimer.schedule(new TimerTask() {
@@ -240,13 +240,13 @@ public class ColumnView extends View {
 //                msg.obj = (Song) MusicService.getCurrentSong();
                 mHandler.sendMessage(msg);
             }
-        },50,300);
+        }, 50, 300);
     }
 
     //停止动画
-    public void stopAnim(){
+    public void stopAnim() {
         mIsRun = false;
-        if(mTimer != null){
+        if (mTimer != null) {
             mTimer.cancel();
             mTimer = null;
         }
@@ -263,7 +263,7 @@ public class ColumnView extends View {
     }
 
     //当前动画是否正在播放
-    public boolean getStatus(){
+    public boolean getStatus() {
         return mIsRun;
     }
 

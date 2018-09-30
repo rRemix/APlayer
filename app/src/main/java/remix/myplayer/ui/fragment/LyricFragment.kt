@@ -73,7 +73,7 @@ class LyricFragment : BaseMusicFragment(), Runnable {
     }
 
     private fun getLrc(manualPath: String, clearCache: Boolean) {
-        if(!isVisible)
+        if (!isVisible)
             return
         if (mInfo == null) {
             mLrcView.setText(getStringSafely(R.string.no_lrc))

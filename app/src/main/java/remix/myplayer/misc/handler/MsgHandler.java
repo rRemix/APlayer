@@ -31,8 +31,8 @@ public class MsgHandler extends Handler {
         this(Looper.getMainLooper(), from, clazz);
     }
 
-    public MsgHandler(Object from){
-        this(from,from.getClass());
+    public MsgHandler(Object from) {
+        this(from, from.getClass());
     }
 
     @Override
@@ -42,11 +42,11 @@ public class MsgHandler extends Handler {
         try {
             mMethod.invoke(mRef.get(), msg);
         } catch (Exception e) {
-            ToastUtil.show(App.getContext(),"调用Method失败:" + e.toString());
+            ToastUtil.show(App.getContext(), "调用Method失败:" + e.toString());
         }
     }
 
-    public void remove(){
+    public void remove() {
         removeCallbacksAndMessages(null);
     }
 }

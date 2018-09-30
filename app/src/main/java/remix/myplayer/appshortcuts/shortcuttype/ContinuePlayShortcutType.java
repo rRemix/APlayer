@@ -30,10 +30,10 @@ public class ContinuePlayShortcutType extends BaseShortcutType {
                 .build();
     }
 
-    private boolean isPlaying(){
-        if(mContext instanceof MusicService){
+    private boolean isPlaying() {
+        if (mContext instanceof MusicService) {
             return ((MusicService) mContext).isPlaying();
-        }else{
+        } else {
             return MusicServiceRemote.isPlaying();
         }
     }

@@ -38,9 +38,11 @@ public class SearchToolBar extends Toolbar {
     public SearchToolBar(Context context) {
         super(context);
     }
+
     public SearchToolBar(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
+
     public SearchToolBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
@@ -51,25 +53,25 @@ public class SearchToolBar extends Toolbar {
         mUnBinder.unbind();
     }
 
-    @OnTextChanged(value = R.id.search_input,callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void afterExplainChanged(Editable s){
+    @OnTextChanged(value = R.id.search_input, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void afterExplainChanged(Editable s) {
         //EditText不为空时显示尾部的删除按钮
-        if(s != null){
-            if(s.toString().equals("")){
-                if(mSearchListener != null) {
+        if (s != null) {
+            if (s.toString().equals("")) {
+                if (mSearchListener != null) {
                     mSearchListener.onClear();
                     mButtonClear.setVisibility(INVISIBLE);
                 }
-            }else {
+            } else {
                 if (mSearchListener != null) {
-                    mSearchListener.onSearch(s.toString(),false);
+                    mSearchListener.onSearch(s.toString(), false);
                     mButtonClear.setVisibility(VISIBLE);
                 }
             }
         }
     }
 
-    private void init(){
+    private void init() {
         //设置EditText光标与下划线颜色
         mUnBinder = ButterKnife.bind(this);
         mEditText.getBackground().setColorFilter(
@@ -78,7 +80,7 @@ public class SearchToolBar extends Toolbar {
         mEditText.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
         mEditText.setHintTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor : R.color.search_hint_text_color));
         mEditText.setOnEditorActionListener((v, actionId, event) -> {
-            if(actionId == EditorInfo.IME_ACTION_SEARCH){
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 afterExplainChanged(v.getEditableText());
                 return true;
             }
@@ -87,7 +89,7 @@ public class SearchToolBar extends Toolbar {
         mButtonClear.setOnClickListener(v -> {
             mEditText.setText("");
             mButtonClear.setVisibility(INVISIBLE);
-            if(mSearchListener != null)
+            if (mSearchListener != null)
                 mSearchListener.onClear();
         });
 
@@ -99,12 +101,15 @@ public class SearchToolBar extends Toolbar {
         init();
     }
 
-    public void addSearchListener(SearchListener listener){
+    public void addSearchListener(SearchListener listener) {
         mSearchListener = listener;
     }
-    public interface SearchListener{
+
+    public interface SearchListener {
         void onSearch(String key, boolean isclick);
+
         void onClear();
+
         void onBack();
     }
 }

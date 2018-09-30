@@ -236,16 +236,10 @@ public class MainActivity extends MultiChoiceActivity {
             case R.id.add:
                 if (mMultiChoice.isShow())
                     return;
-                new MaterialDialog.Builder(mContext)
+                Theme.getBaseDialog(mContext)
                         .title(R.string.new_playlist)
-                        .titleColorAttr(R.attr.text_color_primary)
                         .positiveText(R.string.create)
-                        .positiveColorAttr(R.attr.text_color_primary)
                         .negativeText(R.string.cancel)
-                        .negativeColorAttr(R.attr.text_color_primary)
-                        .buttonRippleColorAttr(R.attr.ripple_color)
-                        .backgroundColorAttr(R.attr.background_color_3)
-                        .contentColorAttr(R.attr.text_color_primary)
                         .inputRange(1, 15)
                         .input("", getString(R.string.local_list) + Global.PlayList.size(), (dialog, input) -> {
                             int newPlayListId;
@@ -655,6 +649,7 @@ public class MainActivity extends MultiChoiceActivity {
     }
 
     private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 108);
+
     @Override
     public void onMetaChanged() {
         super.onMetaChanged();
@@ -762,15 +757,12 @@ public class MainActivity extends MultiChoiceActivity {
 
     private void showForceDialog() {
         dismissForceDialog();
-        mForceDialog = new MaterialDialog.Builder(this)
+        mForceDialog = Theme.getBaseDialog(mContext)
                 .canceledOnTouchOutside(false)
                 .cancelable(false)
                 .title(R.string.updating)
-                .titleColorAttr(R.attr.text_color_primary)
                 .content(R.string.please_wait)
-                .contentColorAttr(R.attr.text_color_primary)
                 .progress(true, 0)
-                .backgroundColorAttr(R.attr.background_color_3)
                 .progressIndeterminateStyle(false).build();
         mForceDialog.show();
     }

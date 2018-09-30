@@ -34,7 +34,7 @@ import remix.myplayer.util.ToastUtil;
  * @Date 2016/10/21 09:34
  */
 
-public class SongChooseActivity extends LibraryActivity<Song,SongChooseAdaper> {
+public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> {
     public static final String TAG = SongChooseActivity.class.getSimpleName();
 
     private int mPlayListID;
@@ -50,8 +50,8 @@ public class SongChooseActivity extends LibraryActivity<Song,SongChooseAdaper> {
         setContentView(R.layout.activity_song_choose);
         ButterKnife.bind(this);
 
-        mPlayListID = getIntent().getIntExtra("PlayListID",-1);
-        if(mPlayListID <= 0){
+        mPlayListID = getIntent().getIntExtra("PlayListID", -1);
+        if (mPlayListID <= 0) {
             ToastUtil.show(this, R.string.add_error, Toast.LENGTH_SHORT);
             return;
         }
@@ -60,7 +60,7 @@ public class SongChooseActivity extends LibraryActivity<Song,SongChooseAdaper> {
         TextView cancel = findViewById(R.id.cancel);
         cancel.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
         mConfirm.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-        mAdapter = new SongChooseAdaper(this,R.layout.item_song_choose, isValid -> {
+        mAdapter = new SongChooseAdaper(this, R.layout.item_song_choose, isValid -> {
             mConfirm.setAlpha(isValid ? 1.0f : 0.6f);
             mConfirm.setClickable(isValid);
         });
@@ -72,19 +72,19 @@ public class SongChooseActivity extends LibraryActivity<Song,SongChooseAdaper> {
 
     }
 
-    @OnClick({R.id.confirm,R.id.cancel})
-    public void onClick(View v){
-        switch (v.getId()){
+    @OnClick({R.id.confirm, R.id.cancel})
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.cancel:
                 finish();
                 break;
             case R.id.confirm:
-                if(mAdapter.getCheckedSong() == null || mAdapter.getCheckedSong().size() == 0){
-                    ToastUtil.show(this,R.string.choose_no_song);
+                if (mAdapter.getCheckedSong() == null || mAdapter.getCheckedSong().size() == 0) {
+                    ToastUtil.show(this, R.string.choose_no_song);
                     return;
                 }
-                final int num = PlayListUtil.addMultiSongs(mAdapter.getCheckedSong(),mPlayListName,mPlayListID);
-                ToastUtil.show(this,getString(R.string.add_song_playlist_success, num,mPlayListName));
+                final int num = PlayListUtil.addMultiSongs(mAdapter.getCheckedSong(), mPlayListName, mPlayListID);
+                ToastUtil.show(this, getString(R.string.add_song_playlist_success, num, mPlayListName));
                 finish();
         }
     }

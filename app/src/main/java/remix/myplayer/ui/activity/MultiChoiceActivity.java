@@ -12,8 +12,6 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-
 import butterknife.BindView;
 import remix.myplayer.App;
 import remix.myplayer.R;
@@ -36,7 +34,7 @@ import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
  * @Date 2016/9/29 10:37
  */
 @SuppressLint("Registered")
-public abstract class MultiChoiceActivity extends ToolbarActivity{
+public abstract class MultiChoiceActivity extends ToolbarActivity {
     @Nullable
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
@@ -45,7 +43,8 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
     ViewGroup mMultiToolBar;
     protected MultiChoice mMultiChoice = null;
     private TipPopupwindow mTipPopupWindow;
-    public MultiChoice getMultiChoice(){
+
+    public MultiChoice getMultiChoice() {
         return mMultiChoice;
     }
 
@@ -62,38 +61,33 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
     }
 
     protected void setUpClick() {
-        View[] views = new View[]{findViewById(R.id.multi_delete),findViewById(R.id.multi_playlist),findViewById(R.id.multi_playqueue)};
-        for(View view : views){
-            if(view != null)
+        View[] views = new View[]{findViewById(R.id.multi_delete), findViewById(R.id.multi_playlist), findViewById(R.id.multi_playqueue)};
+        for (View view : views) {
+            if (view != null)
                 view.setOnClickListener(view1 -> {
-                    switch (view1.getId()){
+                    switch (view1.getId()) {
                         case R.id.multi_delete:
                             String title = MultiChoice.TYPE == Constants.PLAYLIST ? getString(R.string.confirm_delete_playlist) : MultiChoice.TYPE == Constants.PLAYLISTSONG ?
                                     getString(R.string.confirm_delete_from_playlist) : getString(R.string.confirm_delete_from_library);
-                            new MaterialDialog.Builder(mContext)
+                            Theme.getBaseDialog(mContext)
                                     .content(title)
-                                    .buttonRippleColor(ThemeStore.getRippleColor())
                                     .positiveText(R.string.confirm)
                                     .negativeText(R.string.cancel)
-                                    .checkBoxPromptRes(R.string.delete_source, false, null)
+                                    .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
                                     .onAny((dialog, which) -> {
-                                        if(which == POSITIVE){
-                                            if(mMultiChoice != null)
+                                        if (which == POSITIVE) {
+                                            if (mMultiChoice != null)
                                                 mMultiChoice.OnDelete(dialog.isPromptCheckBoxChecked());
                                         }
                                     })
-                                    .backgroundColorAttr(R.attr.background_color_3)
-                                    .positiveColorAttr(R.attr.text_color_primary)
-                                    .negativeColorAttr(R.attr.text_color_primary)
-                                    .contentColorAttr(R.attr.text_color_primary)
                                     .show();
                             break;
                         case R.id.multi_playqueue:
-                            if(mMultiChoice != null)
+                            if (mMultiChoice != null)
                                 mMultiChoice.OnAddToPlayQueue();
                             break;
                         case R.id.multi_playlist:
-                            if(mMultiChoice != null)
+                            if (mMultiChoice != null)
                                 mMultiChoice.OnAddToPlayList();
                             break;
                     }
@@ -115,19 +109,19 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
             mToolBar.setVisibility(multiShow ? View.GONE : View.VISIBLE);
             mMultiToolBar.setVisibility(multiShow ? View.VISIBLE : View.GONE);
             //清空
-            if(!mMultiChoice.isShow()){
+            if (!mMultiChoice.isShow()) {
                 mMultiChoice.clear();
             }
             //只有主界面显示分割线
             mMultiToolBar.findViewById(R.id.multi_divider).setVisibility(MultiChoiceActivity.this instanceof MainActivity ? View.VISIBLE : View.GONE);
             //第一次长按操作显示提示框
-            if(SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,"IsFirstMulti",true)){
-                SPUtil.putValue(App.getContext(),SPUtil.SETTING_KEY.NAME,"IsFirstMulti",false);
-                if(mTipPopupWindow == null){
+            if (SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "IsFirstMulti", true)) {
+                SPUtil.putValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "IsFirstMulti", false);
+                if (mTipPopupWindow == null) {
                     mTipPopupWindow = new TipPopupwindow(this);
                     mTipPopupWindow.setOnDismissListener(() -> mTipPopupWindow = null);
                 }
-                if(!mTipPopupWindow.isShowing() && multiShow){
+                if (!mTipPopupWindow.isShowing() && multiShow) {
                     mTipPopupWindow.show(new View(this));
                 }
             }
@@ -136,15 +130,15 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.action_search){
+        if (item.getItemId() == R.id.action_search) {
             startActivity(new Intent(mContext, SearchActivity.class));
             return true;
-        } else if(item.getItemId() == R.id.action_timer){
+        } else if (item.getItemId() == R.id.action_timer) {
             startActivity(new Intent(mContext, TimerDialog.class));
             return true;
         } else {
             String sortOrder = null;
-            switch (item.getItemId()){
+            switch (item.getItemId()) {
                 case R.id.action_sort_order_title:
                     sortOrder = SortOrder.SongSortOrder.SONG_A_Z;
                     item.setChecked(true);
@@ -205,7 +199,7 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
                     item.setChecked(true);
                     break;
             }
-            if(!TextUtils.isEmpty(sortOrder))
+            if (!TextUtils.isEmpty(sortOrder))
                 saveSortOrder(sortOrder);
         }
         return true;
@@ -214,14 +208,14 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(getMenuLayoutId(),menu);
+        getMenuInflater().inflate(getMenuLayoutId(), menu);
         tintMenuIcon(menu);
         return true;
     }
 
     protected void setUpMenuItem(Menu menu, String sortOrder) {
         SubMenu subMenu = menu.findItem(R.id.action_sort_order).getSubMenu();
-        switch (sortOrder){
+        switch (sortOrder) {
             case SortOrder.SongSortOrder.SONG_A_Z:
                 subMenu.findItem(R.id.action_sort_order_title).setChecked(true);
                 break;
@@ -270,28 +264,29 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
         }
     }
 
-    protected void tintMenuIcon(Menu menu){
+    protected void tintMenuIcon(Menu menu) {
         //主题颜色
         int themeColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white);
-        for(int i = 0 ; i < menu.size();i++){
+        for (int i = 0; i < menu.size(); i++) {
             MenuItem menuItem = menu.getItem(i);
-            if(menuItem.getIcon() != null)
-                menuItem.setIcon(Theme.TintDrawable(menuItem.getIcon(),themeColor));
+            if (menuItem.getIcon() != null)
+                menuItem.setIcon(Theme.TintDrawable(menuItem.getIcon(), themeColor));
         }
     }
 
-    public void onMultiBackPress(){
+    public void onMultiBackPress() {
         mMultiChoice.updateOptionMenu(false);
-        if(mTipPopupWindow != null && mTipPopupWindow.isShowing()){
+        if (mTipPopupWindow != null && mTipPopupWindow.isShowing()) {
             mTipPopupWindow.dismiss();
             mTipPopupWindow = null;
         }
     }
 
-    protected int getMenuLayoutId(){
+    protected int getMenuLayoutId() {
         return R.menu.menu_main_simple;
     }
-    protected void saveSortOrder(String sortOrder){
+
+    protected void saveSortOrder(String sortOrder) {
 
     }
 }

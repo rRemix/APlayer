@@ -124,7 +124,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         } catch (Exception e) {
             Log.e(TAG, "dump crash info failed");
         } finally {
-            if(pw != null){
+            if (pw != null) {
                 pw.close();
             }
         }

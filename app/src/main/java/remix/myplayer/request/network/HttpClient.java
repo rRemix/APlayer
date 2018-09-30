@@ -24,27 +24,27 @@ public class HttpClient implements HttpHelper {
     private ApiService mLastfmApi;
     private ApiService mGithubApi;
 
-    public static HttpClient getInstance(){
+    public static HttpClient getInstance() {
         return SingletonHolder.mInstance;
     }
 
-    public static ApiService getNeteaseApiservice(){
+    public static ApiService getNeteaseApiservice() {
         return getInstance().mNeteaseApi;
     }
 
-    public static ApiService getKuGouApiservice(){
+    public static ApiService getKuGouApiservice() {
         return getInstance().mKuGouApi;
     }
 
-    public static ApiService getLastFMApiservice(){
+    public static ApiService getLastFMApiservice() {
         return getInstance().mLastfmApi;
     }
 
-    public static ApiService getGithubApiservice(){
+    public static ApiService getGithubApiservice() {
         return getInstance().mGithubApi;
     }
 
-    private HttpClient(){
+    private HttpClient() {
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
 
         OkHttpClient okHttpClient = OkHttpHelper.getOkHttpClient();
@@ -142,25 +142,25 @@ public class HttpClient implements HttpHelper {
 
     @Override
     public Observable<ResponseBody> getNeteaseSearch(String key, int offset, int limit, int type) {
-        return mNeteaseApi.getNeteaseSearch(key,offset,limit,type);
+        return mNeteaseApi.getNeteaseSearch(key, offset, limit, type);
     }
 
     @Override
     public Observable<ResponseBody> getNeteaseLyric(int song_id) {
-        return mNeteaseApi.getNeteaseLyric("pc",song_id,-1,-1,-1);
+        return mNeteaseApi.getNeteaseLyric("pc", song_id, -1, -1, -1);
     }
 
     @Override
     public Observable<ResponseBody> getKuGouSearch(String keyword, long duration, String hash) {
-        return mKuGouApi.getKuGouSearch(1,"yes","pc",keyword,duration,"");
+        return mKuGouApi.getKuGouSearch(1, "yes", "pc", keyword, duration, "");
     }
 
     @Override
-    public Observable<ResponseBody> getKuGouLyric(int id,String accessKey) {
-        return mKuGouApi.getKuGouLyric(1,"pc","lrc","utf8",id,accessKey);
+    public Observable<ResponseBody> getKuGouLyric(int id, String accessKey) {
+        return mKuGouApi.getKuGouLyric(1, "pc", "lrc", "utf8", id, accessKey);
     }
 
-    private static class SingletonHolder{
+    private static class SingletonHolder {
         static HttpClient mInstance = new HttpClient();
     }
 }

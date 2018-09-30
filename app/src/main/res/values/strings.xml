@@ -358,4 +358,5 @@
     <string name="lyric_advance_x_second">%1$s s advanced</string>
     <string name="lyric_delay_x_second">%1$s s delayed</string>
     <string name="speed">Play speed</string>
+    <string name="whether_change_theme">Currently in night mode, whether to switch theme colors?</string>
 </resources>

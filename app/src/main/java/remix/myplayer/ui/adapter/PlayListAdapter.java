@@ -51,32 +51,32 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 /**
  * 播放列表的适配器
  */
-public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> implements FastScroller.SectionIndexer{
+public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> implements FastScroller.SectionIndexer {
     private MultiChoice mMultiChoice;
 
-    public PlayListAdapter(Context context,int layoutId,MultiChoice multiChoice) {
-        super(context,layoutId,multiChoice);
-        ListModel =  SPUtil.getValue(context,SPUtil.SETTING_KEY.NAME,"PlayListModel",Constants.GRID_MODEL);
+    public PlayListAdapter(Context context, int layoutId, MultiChoice multiChoice) {
+        super(context, layoutId, multiChoice);
+        ListModel = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "PlayListModel", Constants.GRID_MODEL);
         this.mMultiChoice = multiChoice;
     }
 
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if(viewType == TYPE_HEADER){
-            return new AlbumAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2,parent,false));
+        if (viewType == TYPE_HEADER) {
+            return new AlbumAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2, parent, false));
         }
         return viewType == Constants.LIST_MODEL ?
-                new PlayListListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_list,parent,false)) :
-                new PlayListGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_grid,parent,false));
+                new PlayListListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_list, parent, false)) :
+                new PlayListGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_grid, parent, false));
     }
 
     @Override
     public void onViewRecycled(BaseViewHolder holder) {
         super.onViewRecycled(holder);
-        if(holder instanceof PlayListHolder){
-            if(((PlayListHolder) holder).mImage.getTag() != null){
+        if (holder instanceof PlayListHolder) {
+            if (((PlayListHolder) holder).mImage.getTag() != null) {
                 Disposable disposable = (Disposable) ((PlayListHolder) holder).mImage.getTag();
-                if(!disposable.isDisposed())
+                if (!disposable.isDisposed())
                     disposable.dispose();
             }
             ((PlayListHolder) holder).mImage.setImageURI(Uri.EMPTY);
@@ -87,9 +87,9 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
     @SuppressLint("RestrictedApi")
     @Override
     protected void convert(BaseViewHolder baseHolder, final PlayList info, int position) {
-        if(position == 0){
+        if (position == 0) {
             final AlbumAdapter.HeaderHolder headerHolder = (AlbumAdapter.HeaderHolder) baseHolder;
-            if(mDatas == null || mDatas.size() == 0){
+            if (mDatas == null || mDatas.size() == 0) {
                 headerHolder.mRoot.setVisibility(View.GONE);
                 return;
             }
@@ -97,39 +97,39 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
             headerHolder.mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
             headerHolder.mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
             headerHolder.mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-            headerHolder.mGridModelBtn.setOnClickListener(v -> switchMode(headerHolder,v));
-            headerHolder.mListModelBtn.setOnClickListener(v -> switchMode(headerHolder,v));
+            headerHolder.mGridModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
+            headerHolder.mListModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
             return;
         }
 
-        if(!(baseHolder instanceof PlayListHolder)){
+        if (!(baseHolder instanceof PlayListHolder)) {
             return;
         }
         final PlayListHolder holder = (PlayListHolder) baseHolder;
-        if(info == null)
+        if (info == null)
             return;
         holder.mName.setText(info.Name);
-        holder.mOther.setText(mContext.getString(R.string.song_count,info.Count));
+        holder.mOther.setText(mContext.getString(R.string.song_count, info.Count));
         //设置专辑封面
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
         Disposable disposable = new PlayListUriRequest(holder.mImage,
-                new UriRequest(info.getId(),UriRequest.TYPE_NETEASE_SONG,  ImageUriRequest.URL_PLAYLIST),
-                new RequestConfig.Builder(imageSize,imageSize).build()).load();
+                new UriRequest(info.getId(), UriRequest.TYPE_NETEASE_SONG, ImageUriRequest.URL_PLAYLIST),
+                new RequestConfig.Builder(imageSize, imageSize).build()).load();
         holder.mImage.setTag(disposable);
         holder.mContainer.setOnClickListener(v -> {
-            if(holder.getAdapterPosition() - 1 < 0){
-                ToastUtil.show(mContext,R.string.illegal_arg);
+            if (holder.getAdapterPosition() - 1 < 0) {
+                ToastUtil.show(mContext, R.string.illegal_arg);
                 return;
             }
-            mOnItemClickLitener.onItemClick(holder.mContainer,holder.getAdapterPosition() - 1);
+            mOnItemClickLitener.onItemClick(holder.mContainer, holder.getAdapterPosition() - 1);
         });
         //多选菜单
         holder.mContainer.setOnLongClickListener(v -> {
-            if(holder.getAdapterPosition() - 1 < 0){
-                ToastUtil.show(mContext,R.string.illegal_arg);
+            if (holder.getAdapterPosition() - 1 < 0) {
+                ToastUtil.show(mContext, R.string.illegal_arg);
                 return true;
             }
-            mOnItemClickLitener.onItemLongClick(holder.mContainer,holder.getAdapterPosition() - 1);
+            mOnItemClickLitener.onItemLongClick(holder.mContainer, holder.getAdapterPosition() - 1);
             return true;
         });
 
@@ -138,16 +138,16 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
                 ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
 
         holder.mButton.setOnClickListener(v -> {
-            if(mMultiChoice.isShow())
+            if (mMultiChoice.isShow())
                 return;
-            Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
-            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
+            Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
+            final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton);
             popupMenu.getMenuInflater().inflate(R.menu.menu_playlist_item, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext, info._Id, Constants.PLAYLIST, info.Name));
             popupMenu.show();
         });
         //点击效果
-        int size = DensityUtil.dip2px(mContext,45);
+        int size = DensityUtil.dip2px(mContext, 45);
         Drawable defaultDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
         Drawable selectDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
         holder.mButton.setBackground(Theme.getPressDrawable(
@@ -162,19 +162,19 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
                 Theme.getPressAndSelectedStateListRippleDrawable(ListModel, mContext));
 
         //是否处于选中状态
-        if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&
-                mMultiChoice.getSelectPos().contains(position - 1)){
+        if (MultiChoice.TAG.equals(PlayListFragment.TAG) &&
+                mMultiChoice.getSelectPos().contains(position - 1)) {
             holder.mContainer.setSelected(true);
         } else {
             holder.mContainer.setSelected(false);
         }
 
         //设置padding
-        if(ListModel == 2 && holder.mRoot != null){
-            if(position % 2 == 1){
-                holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4));
+        if (ListModel == 2 && holder.mRoot != null) {
+            if (position % 2 == 1) {
+                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4));
             } else {
-                holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4));
+                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4));
             }
         }
     }
@@ -182,11 +182,11 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
     @Override
     public String getSectionText(int position) {
-        if(position == 0)
+        if (position == 0)
             return "";
-        if(mDatas != null && position - 1 < mDatas.size()){
+        if (mDatas != null && position - 1 < mDatas.size()) {
             String title = mDatas.get(position - 1).Name;
-            return !TextUtils.isEmpty(title) ? (Pinyin.toPinyin(title.charAt(0))).toUpperCase().substring(0,1)  : "";
+            return !TextUtils.isEmpty(title) ? (Pinyin.toPinyin(title.charAt(0))).toUpperCase().substring(0, 1) : "";
         }
         return "";
     }
@@ -206,6 +206,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         @BindView(R.id.item_root)
         @Nullable
         View mRoot;
+
         PlayListHolder(View itemView) {
             super(itemView);
         }
@@ -213,17 +214,17 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
     @Override
     protected void saveMode() {
-        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME,"PlayListModel",ListModel);
+        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, "PlayListModel", ListModel);
     }
 
-    static class PlayListListHolder extends PlayListHolder{
+    static class PlayListListHolder extends PlayListHolder {
         PlayListListHolder(View itemView) {
             super(itemView);
         }
     }
 
-    static class PlayListGridHolder extends PlayListHolder{
-       PlayListGridHolder(View itemView) {
+    static class PlayListGridHolder extends PlayListHolder {
+        PlayListGridHolder(View itemView) {
             super(itemView);
         }
     }

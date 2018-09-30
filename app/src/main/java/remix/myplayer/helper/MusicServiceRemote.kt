@@ -144,7 +144,7 @@ object MusicServiceRemote {
     }
 
     @JvmStatic
-    fun setSpeed(speed:Float){
+    fun setSpeed(speed: Float) {
         service?.setSpeed(speed)
     }
 }

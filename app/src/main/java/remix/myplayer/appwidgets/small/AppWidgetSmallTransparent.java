@@ -37,7 +37,7 @@ public class AppWidgetSmallTransparent extends BaseAppwidget {
         final RemoteViews remoteViews = new RemoteViews(service.getPackageName(), R.layout.app_widget_small_transparent);
         buildAction(service, remoteViews);
         mSkin = AppWidgetSkin.TRANSPARENT;
-        updateRemoteViews(service,remoteViews, song);
+        updateRemoteViews(service, remoteViews, song);
         //设置封面
         updateCover(service, remoteViews, appWidgetIds, reloadCover);
     }

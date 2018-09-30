@@ -18,7 +18,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 public class PlayListUriRequest extends LibraryUriRequest {
     public PlayListUriRequest(SimpleDraweeView image, UriRequest request, RequestConfig config) {
-        super(image,request,config);
+        super(image, request, config);
     }
 
     @Override
@@ -27,10 +27,10 @@ public class PlayListUriRequest extends LibraryUriRequest {
     }
 
     @Override
-    public Disposable load(){
+    public Disposable load() {
         return Observable.concat(
                 getCustomThumbObservable(mRequest),
-                Observable.fromIterable(PlayListUtil.getMP3ListByIds(PlayListUtil.getIDList(mRequest.getID()),mRequest.getID()))
+                Observable.fromIterable(PlayListUtil.getMP3ListByIds(PlayListUtil.getIDList(mRequest.getID()), mRequest.getID()))
                         .concatMapDelayError(song -> getCoverObservable(getSearchRequestWithAlbumType(song))))
                 .firstOrError()
                 .toObservable()

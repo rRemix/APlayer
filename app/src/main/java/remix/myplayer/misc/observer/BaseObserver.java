@@ -38,6 +38,7 @@ public abstract class BaseObserver extends ContentObserver {
     }
 
     abstract void onAccept(Uri uri);
+
     abstract boolean onFilter(Uri uri);
 
     @Override
@@ -47,7 +48,7 @@ public abstract class BaseObserver extends ContentObserver {
 
     @Override
     public void onChange(boolean selfChange, Uri uri) {
-        if(!selfChange){
+        if (!selfChange) {
             mEmitter.onNext(uri);
         }
     }

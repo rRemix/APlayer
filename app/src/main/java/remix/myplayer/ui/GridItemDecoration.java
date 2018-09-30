@@ -14,10 +14,11 @@ import android.view.View;
  * @Author Xiaoborui
  * @Date 2016/10/8 14:33
  */
-public class GridItemDecoration extends RecyclerView.ItemDecoration{
+public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private Paint mPaint;
     private Context mContext;
-    public GridItemDecoration(Context context, int width, @ColorInt int color){
+
+    public GridItemDecoration(Context context, int width, @ColorInt int color) {
         mContext = context;
         mPaint = new Paint();
         mPaint.setColor(color);
@@ -25,7 +26,8 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration{
         mPaint.setStrokeWidth(width);
         mPaint.setStyle(Paint.Style.STROKE);
     }
-    public GridItemDecoration(){
+
+    public GridItemDecoration() {
 
     }
 

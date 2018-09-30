@@ -22,14 +22,14 @@ public class AppShortcutActivity extends BaseMusicActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int type = getIntent() != null ? getIntent().getIntExtra(KEY_SHORTCUT_TYPE,-1) : -1;
+        int type = getIntent() != null ? getIntent().getIntExtra(KEY_SHORTCUT_TYPE, -1) : -1;
         startService(type);
         finish();
     }
 
-    private void startService(int type){
+    private void startService(int type) {
         Intent intent = new Intent(this, MusicService.class);
-        switch (type){
+        switch (type) {
             case SHORTCUT_TYPE_LAST_ADDED:
                 intent.setAction(MusicService.ACTION_SHORTCUT_LASTADDED);
                 break;

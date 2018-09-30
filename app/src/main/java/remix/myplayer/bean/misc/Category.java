@@ -16,7 +16,7 @@ import remix.myplayer.ui.fragment.SongFragment;
  * Created by Remix on 2018/1/10.
  */
 
-public class Category implements Serializable{
+public class Category implements Serializable {
     private static final long serialVersionUID = -6799150022891213071L;
     private String mTitle;
     private String mClassName;
@@ -27,12 +27,12 @@ public class Category implements Serializable{
         this.mTitle = title;
         mTag = App.getContext().getString(R.string.tab_song).equals(mTitle) ? TAG_SONG :
                 App.getContext().getString(R.string.tab_album).equals(mTitle) ? TAG_ALBUM :
-                App.getContext().getString(R.string.tab_artist).equals(mTitle) ? TAG_ARTIST :
-                App.getContext().getString(R.string.tab_playlist).equals(mTitle) ? TAG_PLAYLIST : TAG_FOLDER;
+                        App.getContext().getString(R.string.tab_artist).equals(mTitle) ? TAG_ARTIST :
+                                App.getContext().getString(R.string.tab_playlist).equals(mTitle) ? TAG_PLAYLIST : TAG_FOLDER;
         mClassName = mTag == TAG_SONG ? SongFragment.class.getName() :
                 mTag == TAG_ALBUM ? AlbumFragment.class.getName() :
-                mTag == TAG_ARTIST ? ArtistFragment.class.getName() :
-                mTag == TAG_PLAYLIST ? PlayListFragment.class.getName() : FolderFragment.class.getName();
+                        mTag == TAG_ARTIST ? ArtistFragment.class.getName() :
+                                mTag == TAG_PLAYLIST ? PlayListFragment.class.getName() : FolderFragment.class.getName();
         mOrder = mTag;
     }
 
@@ -48,17 +48,17 @@ public class Category implements Serializable{
         this.mTag = tag;
     }
 
-    public String getTitle(){
+    public String getTitle() {
         return mTitle;
     }
 
-    public int getOrder(){
+    public int getOrder() {
         return mOrder;
     }
 
     @Override
     public boolean equals(Object o) {
-        return this == o || !(o == null || getClass() != o.getClass()) && mTitle.equals(((Category)o).getTitle());
+        return this == o || !(o == null || getClass() != o.getClass()) && mTitle.equals(((Category) o).getTitle());
     }
 
     @Override
@@ -77,8 +77,8 @@ public class Category implements Serializable{
     public static final int TAG_FOLDER = 4;
 
     public static final List<String> ALL_LIBRARY_STRING = Arrays.asList(App.getContext().getResources().getString(R.string.tab_song),
-            App.getContext().getResources().getString(R.string.tab_album),App.getContext().getResources().getString(R.string.tab_artist),
-            App.getContext().getResources().getString(R.string.tab_playlist),App.getContext().getResources().getString(R.string.tab_folder));
+            App.getContext().getResources().getString(R.string.tab_album), App.getContext().getResources().getString(R.string.tab_artist),
+            App.getContext().getResources().getString(R.string.tab_playlist), App.getContext().getResources().getString(R.string.tab_folder));
     public static final List<Category> DEFAULT_LIBRARY = Arrays.asList(
             new Category(App.getContext().getString(R.string.tab_song)),
             new Category(App.getContext().getString(R.string.tab_album)),

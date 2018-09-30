@@ -21,22 +21,23 @@ import remix.myplayer.util.StatusBarUtil;
 
 public class TipPopupwindow extends PopupWindow {
     private int mYOffset = 0;
-    public TipPopupwindow(final Context context){
-        if(context == null)
+
+    public TipPopupwindow(final Context context) {
+        if (context == null)
             return;
 
-        setContentView(LayoutInflater.from(context).inflate(R.layout.popup_multi_tip,null));
+        setContentView(LayoutInflater.from(context).inflate(R.layout.popup_multi_tip, null));
         setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
         setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         setBackgroundDrawable(new BitmapDrawable());
         setFocusable(false);
         setOutsideTouchable(true);
 
-        mYOffset = StatusBarUtil.getStatusBarHeight(context) + DensityUtil.dip2px(context,48);
+        mYOffset = StatusBarUtil.getStatusBarHeight(context) + DensityUtil.dip2px(context, 48);
     }
 
-    public void show(View parent){
-        showAsDropDown(parent,0, mYOffset);
+    public void show(View parent) {
+        showAsDropDown(parent, 0, mYOffset);
         //两秒钟后关闭
         new Handler().postDelayed(new Runnable() {
             @Override

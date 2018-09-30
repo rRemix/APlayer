@@ -20,7 +20,7 @@ import remix.myplayer.ui.adapter.holder.BaseViewHolder;
  * @Author Xiaoborui
  * @Date 2016/10/19 11:31
  */
-public abstract class BaseAdapter<D,T extends BaseViewHolder> extends RecyclerView.Adapter<T> {
+public abstract class BaseAdapter<D, T extends BaseViewHolder> extends RecyclerView.Adapter<T> {
     protected Context mContext;
     protected OnItemClickListener mOnItemClickLitener;
     List<D> mDatas;
@@ -28,32 +28,32 @@ public abstract class BaseAdapter<D,T extends BaseViewHolder> extends RecyclerVi
     private Constructor mConstructor;
 
 
-    public BaseAdapter(Context context,int layoutId){
+    public BaseAdapter(Context context, int layoutId) {
         this.mContext = context;
         this.mLayoutId = layoutId;
         try {
             this.mConstructor = getGenericClass().getDeclaredConstructor(View.class);
             this.mConstructor.setAccessible(true);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalArgumentException(e.toString());
         }
     }
 
-    public void setData(List<D> datas){
+    public void setData(List<D> datas) {
         mDatas = datas;
         notifyDataSetChanged();
     }
 
-    public List<D> getDatas(){
+    public List<D> getDatas() {
         return mDatas;
     }
 
     @Override
-    public void onBindViewHolder(T holder, int position){
-        convert(holder,getItem(position),position);
+    public void onBindViewHolder(T holder, int position) {
+        convert(holder, getItem(position), position);
     }
 
-    protected D getItem(int position){
+    protected D getItem(int position) {
         return mDatas.get(position);
     }
 
@@ -64,7 +64,7 @@ public abstract class BaseAdapter<D,T extends BaseViewHolder> extends RecyclerVi
     public T onCreateViewHolder(ViewGroup parent, int viewType) {
         try {
             View itemView = LayoutInflater.from(mContext).inflate(mLayoutId, parent, false);
-            return (T)mConstructor.newInstance(itemView);
+            return (T) mConstructor.newInstance(itemView);
         } catch (Exception e) {
             throw new IllegalArgumentException(e.toString());
         }

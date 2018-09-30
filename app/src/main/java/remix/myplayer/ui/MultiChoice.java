@@ -6,8 +6,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +17,6 @@ import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.misc.interfaces.OnMultiItemClickListener;
 import remix.myplayer.misc.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.adapter.AlbumAdapter;
 import remix.myplayer.ui.adapter.ArtistAdapter;
@@ -36,6 +33,8 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
+
+import static remix.myplayer.theme.Theme.getBaseDialog;
 
 /**
  * @ClassName MultiChoice
@@ -169,50 +168,41 @@ public class MultiChoice implements OnMultiItemClickListener {
         for (int i = 0; i < playListInfoList.size(); i++) {
             playlistNameList.add(playListInfoList.get(i).Name);
         }
-        new MaterialDialog.Builder(mContext)
+
+        getBaseDialog(mContext)
                 .title(R.string.add_to_playlist)
-                .titleColorAttr(R.attr.text_color_primary)
-                .buttonRippleColorAttr(R.attr.ripple_color)
-                .theme(ThemeStore.getMDDialogTheme())
                 .items(playlistNameList)
-                .itemsColorAttr(R.attr.text_color_primary)
                 .itemsCallback((dialog, view, which, text) -> {
                     final int num = PlayListUtil.addMultiSongs(idList, playListInfoList.get(which).Name, playListInfoList.get(which)._Id);
                     ToastUtil.show(mContext, mContext.getString(R.string.add_song_playlist_success, num, playListInfoList.get(which).Name));
                     updateOptionMenu(false);
                 })
                 .neutralText(R.string.create_playlist)
-                .neutralColorAttr(R.attr.text_color_primary)
-                .onNeutral((dialog, which) -> new MaterialDialog.Builder(mContext)
-                        .title(R.string.new_playlist)
-                        .titleColorAttr(R.attr.text_color_primary)
-                        .buttonRippleColorAttr(R.attr.ripple_color)
-                        .positiveText(R.string.create)
-                        .positiveColorAttr(R.attr.text_color_primary)
-                        .negativeText(R.string.cancel)
-                        .negativeColorAttr(R.attr.text_color_primary)
-                        .backgroundColorAttr(R.attr.background_color_3)
-                        .content(R.string.input_playlist_name)
-                        .contentColorAttr(R.attr.text_color_primary)
-                        .inputRange(1, 15)
-                        .input("", mContext.getString(R.string.local_list) + Global.PlayList.size(), (dialog1, input) -> {
-                            if (!TextUtils.isEmpty(input)) {
-                                final int num;
-                                int newPlayListId = PlayListUtil.addPlayList(input.toString());
-                                ToastUtil.show(mContext, newPlayListId > 0 ?
-                                                R.string.add_playlist_success :
-                                                newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_already_exist,
-                                        Toast.LENGTH_SHORT);
-                                if (newPlayListId < 0) {
-                                    return;
-                                }
-                                num = PlayListUtil.addMultiSongs(idList, input.toString(), newPlayListId);
-                                ToastUtil.show(mContext, mContext.getString(R.string.add_song_playlist_success, num, input.toString()));
-                                updateOptionMenu(false);
-                            }
-                        })
-                        .show())
-                .backgroundColorAttr(R.attr.background_color_3).build().show();
+                .onNeutral((dialog, which) ->
+                        getBaseDialog(mContext)
+                                .title(R.string.new_playlist)
+                                .positiveText(R.string.create)
+                                .negativeText(R.string.cancel)
+                                .content(R.string.input_playlist_name)
+                                .inputRange(1, 15)
+                                .input("", mContext.getString(R.string.local_list) + Global.PlayList.size(), (dialog1, input) -> {
+                                    if (!TextUtils.isEmpty(input)) {
+                                        final int num;
+                                        int newPlayListId = PlayListUtil.addPlayList(input.toString());
+                                        ToastUtil.show(mContext, newPlayListId > 0 ?
+                                                        R.string.add_playlist_success :
+                                                        newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_already_exist,
+                                                Toast.LENGTH_SHORT);
+                                        if (newPlayListId < 0) {
+                                            return;
+                                        }
+                                        num = PlayListUtil.addMultiSongs(idList, input.toString(), newPlayListId);
+                                        ToastUtil.show(mContext, mContext.getString(R.string.add_song_playlist_success, num, input.toString()));
+                                        updateOptionMenu(false);
+                                    }
+                                })
+                                .show())
+                .build().show();
     }
 
     @Override

@@ -45,107 +45,113 @@ public class Theme {
     /**
      * thumb加深色边框并着色
      */
-    public static GradientDrawable getTinThumb(Context context){
+    public static GradientDrawable getTinThumb(Context context) {
         GradientDrawable thumbDrawable = (GradientDrawable) context.getResources().getDrawable(R.drawable.bg_circleseekbar_thumb);
-        thumbDrawable.setStroke(DensityUtil.dip2px(context,1),ColorUtil.shiftColor(ThemeStore.getAccentColor(),0.8f));
+        thumbDrawable.setStroke(DensityUtil.dip2px(context, 1), ColorUtil.shiftColor(ThemeStore.getAccentColor(), 0.8f));
         thumbDrawable.setColor(ThemeStore.getAccentColor());
         return thumbDrawable;
     }
 
-    public static Drawable TintDrawable(@DrawableRes int DrawRes,@ColorInt int color){
-        return TintDrawable(App.getContext().getResources().getDrawable(DrawRes),color,1.0f);
+    public static Drawable TintDrawable(@DrawableRes int DrawRes, @ColorInt int color) {
+        return TintDrawable(App.getContext().getResources().getDrawable(DrawRes), color, 1.0f);
     }
 
     /**
      * 为drawable着色
+     *
      * @param oriDrawable
      * @param color
      * @return
      */
-    public static Drawable TintDrawable(Drawable oriDrawable, @ColorInt int color,@FloatRange(from=0.0D, to=1.0D) float alpha){
+    public static Drawable TintDrawable(Drawable oriDrawable, @ColorInt int color, @FloatRange(from = 0.0D, to = 1.0D) float alpha) {
 
         final Drawable wrappedDrawable = DrawableCompat.wrap(oriDrawable.mutate());
-        DrawableCompat.setTintList(wrappedDrawable,ColorStateList.valueOf(ColorUtil.adjustAlpha(color,alpha)));
+        DrawableCompat.setTintList(wrappedDrawable, ColorStateList.valueOf(ColorUtil.adjustAlpha(color, alpha)));
         return wrappedDrawable;
     }
 
-    public static Drawable TintListDrawable(Drawable oriDrawable,@ColorInt int color){
+    public static Drawable TintListDrawable(Drawable oriDrawable, @ColorInt int color) {
         final Drawable wrappedDrawable = DrawableCompat.wrap(oriDrawable.mutate());
-        DrawableCompat.setTint(oriDrawable,color);
+        DrawableCompat.setTint(oriDrawable, color);
         return wrappedDrawable;
     }
 
     /**
      * 为drawable着色
+     *
      * @param oriDrawable
      * @param color
      * @return
      */
-    public static Drawable TintDrawable(Drawable oriDrawable, @ColorInt int color){
-        return TintDrawable(oriDrawable,color,1.0f);
+    public static Drawable TintDrawable(Drawable oriDrawable, @ColorInt int color) {
+        return TintDrawable(oriDrawable, color, 1.0f);
     }
 
     /**
      * 为drawale着色
+     *
      * @param view
      * @param color
      */
-    public static void TintDrawable(View view,Drawable drawable,@ColorInt int color){
-        if(view instanceof ImageView){
-            ((ImageView)view).setImageDrawable(TintDrawable(drawable,color));
+    public static void TintDrawable(View view, Drawable drawable, @ColorInt int color) {
+        if (view instanceof ImageView) {
+            ((ImageView) view).setImageDrawable(TintDrawable(drawable, color));
         } else {
-            view.setBackground(TintDrawable(drawable,color));
+            view.setBackground(TintDrawable(drawable, color));
         }
     }
 
     /**
      * 着色v背景
+     *
      * @param view
      * @param res
      * @param color
      */
-    public static void TintDrawable(View view, @DrawableRes int res,@ColorInt int color){
-        if(view instanceof ImageView){
-            ((ImageView)view).setImageDrawable(TintDrawable(App.getContext().getResources().getDrawable(res),color));
+    public static void TintDrawable(View view, @DrawableRes int res, @ColorInt int color) {
+        if (view instanceof ImageView) {
+            ((ImageView) view).setImageDrawable(TintDrawable(App.getContext().getResources().getDrawable(res), color));
         } else {
-            view.setBackground(TintDrawable(App.getContext().getResources().getDrawable(res),color));
+            view.setBackground(TintDrawable(App.getContext().getResources().getDrawable(res), color));
         }
     }
 
     /**
      * * 根据当前主题生成背景色为md_color_material的圆角矩形
+     *
      * @param alpha
      * @param corner
      * @param stroke
      * @return
      */
-    public static GradientDrawable getMDCorner(@FloatRange(from=0.0D, to=1.0D) float alpha, float corner, int stroke){
-        return getCorner(alpha,corner,stroke,ThemeStore.getMaterialPrimaryColor());
+    public static GradientDrawable getMDCorner(@FloatRange(from = 0.0D, to = 1.0D) float alpha, float corner, int stroke) {
+        return getCorner(alpha, corner, stroke, ThemeStore.getMaterialPrimaryColor());
     }
 
     /**
      * 根据当前主题生成背景色为md_color_material的圆角矩形
+     *
      * @param corner
      * @return
      */
-    public static GradientDrawable getMDCorner(float corner){
-        return getMDCorner(1.0f,corner,0);
+    public static GradientDrawable getMDCorner(float corner) {
+        return getMDCorner(1.0f, corner, 0);
     }
 
     /**
      * 获得圆角矩形背景
+     *
      * @param alpha
      * @param corner
      * @param stroke
      * @param color
      * @return
      */
-    public static GradientDrawable getCorner(@FloatRange(from=0.0D, to=1.0D)float alpha, float corner, int stroke, @ColorInt int color){
-        return getShape(GradientDrawable.RECTANGLE,color,corner,stroke,color,0,0,alpha);
+    public static GradientDrawable getCorner(@FloatRange(from = 0.0D, to = 1.0D) float alpha, float corner, int stroke, @ColorInt int color) {
+        return getShape(GradientDrawable.RECTANGLE, color, corner, stroke, color, 0, 0, alpha);
     }
 
     /**
-     *
      * @param shape
      * @param corner
      * @param color
@@ -155,49 +161,50 @@ public class Theme {
      * @param height
      * @return
      */
-    public static GradientDrawable getShape(int shape,@ColorInt int color,float corner,int strokeSize,@ColorInt int strokeColor,int width,int height,@FloatRange(from=0.0D, to=1.0D)float alpha){
+    public static GradientDrawable getShape(int shape, @ColorInt int color, float corner, int strokeSize, @ColorInt int strokeColor, int width, int height, @FloatRange(from = 0.0D, to = 1.0D) float alpha) {
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(ColorUtil.adjustAlpha(color,alpha));
+        bg.setColor(ColorUtil.adjustAlpha(color, alpha));
         bg.setShape(shape);
-        if(corner > 0)
+        if (corner > 0)
             bg.setCornerRadius(corner);
-        if(strokeSize > 0)
-            bg.setStroke(strokeSize,strokeColor);
+        if (strokeSize > 0)
+            bg.setStroke(strokeSize, strokeColor);
 
-        if(width > 0 && height > 0)
-            bg.setSize(width,height);
+        if (width > 0 && height > 0)
+            bg.setSize(width, height);
 
         return bg;
     }
 
     /**
      * 生成圆形或者矩形背景
+     *
      * @param shape
      * @param color
      * @param width
      * @param height
      * @return
      */
-    public static GradientDrawable getShape(int shape,@ColorInt int color,int width,int height){
-        return getShape(shape,color,0,0,color,width,height,1);
+    public static GradientDrawable getShape(int shape, @ColorInt int color, int width, int height) {
+        return getShape(shape, color, 0, 0, color, width, height, 1);
     }
 
     /**
      * 生成圆形或者矩形背景
+     *
      * @param shape
      * @param color
      * @return
      */
-    public static GradientDrawable getShape(int shape,@ColorInt int color){
-        return getShape(shape,color,0,0,color,0,0,1);
+    public static GradientDrawable getShape(int shape, @ColorInt int color) {
+        return getShape(shape, color, 0, 0, color, 0, 0, 1);
     }
 
     /**
-     *
      * @param ignoreNight
      * @return
      */
-    public static int getTheme(boolean ignoreNight){
+    public static int getTheme(boolean ignoreNight) {
         if (!ignoreNight && ThemeStore.THEME_MODE == ThemeStore.NIGHT) {
             return R.style.NightTheme;
         }
@@ -222,30 +229,32 @@ public class Theme {
                 return R.style.DayTheme_Blue;
             case ThemeStore.THEME_PINK:
                 return R.style.DayTheme_Pink;
-            default:return -1;
+            default:
+                return -1;
         }
     }
 
     /**
-     *
      * @return
      */
     @StyleRes
     public static int getTheme() {
-       return getTheme(false);
+        return getTheme(false);
     }
 
     /**
      * 根据当前主题获得popupmenu风格
+     *
      * @return
      */
     @StyleRes
-    public static int getPopupMenuStyle(){
+    public static int getPopupMenuStyle() {
         return ThemeStore.isDay() ? R.style.PopupMenuDayStyle : R.style.PopupMenuNightStyle;
     }
 
     /**
      * 为seekbar着色
+     *
      * @param seekBar
      * @param color
      */
@@ -277,6 +286,7 @@ public class Theme {
 
     /**
      * 修改edittext光标颜色
+     *
      * @param editText
      * @param color
      */
@@ -302,9 +312,9 @@ public class Theme {
             }
             final Field drawableField = drawableFieldClass.getDeclaredField("mCursorDrawable");
             drawableField.setAccessible(true);
-            drawableField.set(drawableFieldOwner, new Drawable[] {drawable, drawable});
+            drawableField.set(drawableFieldOwner, new Drawable[]{drawable, drawable});
 
-            if(underline){
+            if (underline) {
                 editText.getBackground().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             }
         } catch (Exception ignored) {
@@ -313,6 +323,7 @@ public class Theme {
 
     /**
      * 修改edittext光标与下划线颜色
+     *
      * @param context
      * @param id
      * @return
@@ -326,33 +337,32 @@ public class Theme {
     }
 
     /**
-     *
      * @param context
      * @param resId
      * @return
      */
-    public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context,@DrawableRes int resId){
-        return getPressAndSelectedStateListDrawalbe(context,resId,ThemeStore.getMaterialPrimaryColor());
+    public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context, @DrawableRes int resId) {
+        return getPressAndSelectedStateListDrawalbe(context, resId, ThemeStore.getMaterialPrimaryColor());
     }
 
     /**
-     *
      * @param context
      * @param resId
      * @param color
      * @return
      */
-    public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context,@DrawableRes int resId,@ColorInt int color){
+    public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context, @DrawableRes int resId, @ColorInt int color) {
         StateListDrawable stateListDrawable = new StateListDrawable();
         stateListDrawable.addState(new int[]{android.R.attr.state_selected}, TintDrawable(context.getResources().getDrawable(resId), color));
         stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, TintDrawable(context.getResources().getDrawable(resId), color));
-        stateListDrawable.addState(new int[]{}, getDrawable(context,resId));
+        stateListDrawable.addState(new int[]{}, getDrawable(context, resId));
 
         return stateListDrawable;
     }
 
     /**
      * 按下与选中触摸效果
+     *
      * @param context
      * @param selectDrawable
      * @param defaultDrawable
@@ -361,17 +371,17 @@ public class Theme {
     public static StateListDrawable getPressAndSelectedStateListRippleDrawable(Context context,
                                                                                Drawable selectDrawable,
                                                                                Drawable defaultDrawable,
-                                                                               @ColorInt int rippleColor){
+                                                                               @ColorInt int rippleColor) {
         StateListDrawable stateListDrawable = new StateListDrawable();
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            RippleDrawable rippleDrawable = new RippleDrawable(ColorStateList.valueOf(rippleColor), defaultDrawable,null);
-            stateListDrawable.addState(new int[]{android.R.attr.state_selected},selectDrawable);
+            RippleDrawable rippleDrawable = new RippleDrawable(ColorStateList.valueOf(rippleColor), defaultDrawable, null);
+            stateListDrawable.addState(new int[]{android.R.attr.state_selected}, selectDrawable);
             stateListDrawable.addState(new int[]{}, rippleDrawable);
             return stateListDrawable;
         } else {
-            stateListDrawable.addState(new int[]{android.R.attr.state_selected},selectDrawable);
-            stateListDrawable.addState(new int[]{android.R.attr.state_pressed},selectDrawable);
+            stateListDrawable.addState(new int[]{android.R.attr.state_selected}, selectDrawable);
+            stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, selectDrawable);
             stateListDrawable.addState(new int[]{}, defaultDrawable);
             return stateListDrawable;
         }
@@ -379,6 +389,7 @@ public class Theme {
 
     /**
      * 按下与选中触摸效果
+     *
      * @param context
      * @param selectDrawable
      * @param defaultDrawable
@@ -386,37 +397,36 @@ public class Theme {
      */
     public static StateListDrawable getPressAndSelectedStateListRippleDrawable(Context context,
                                                                                Drawable selectDrawable,
-                                                                               Drawable defaultDrawable){
-        return getPressAndSelectedStateListRippleDrawable(context,selectDrawable,defaultDrawable,ThemeStore.getRippleColor());
+                                                                               Drawable defaultDrawable) {
+        return getPressAndSelectedStateListRippleDrawable(context, selectDrawable, defaultDrawable, ThemeStore.getRippleColor());
     }
 
     /**
-     *
      * @param context
      * @return
      */
-    public static StateListDrawable getPressAndSelectedStateListRippleDrawable(int model,Context context){
+    public static StateListDrawable getPressAndSelectedStateListRippleDrawable(int model, Context context) {
         int defaultColor = ThemeStore.getBackgroundColorMain();
 
         return getPressAndSelectedStateListRippleDrawable(context,
-                model == Constants.GRID_MODEL ? getCorner(1, DensityUtil.dip2px(context,2),0,ThemeStore.getSelectColor()) : getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor()),
-                model == Constants.GRID_MODEL ? getCorner(1, DensityUtil.dip2px(context,2),0,defaultColor) : getShape(GradientDrawable.RECTANGLE,defaultColor));
+                model == Constants.GRID_MODEL ? getCorner(1, DensityUtil.dip2px(context, 2), 0, ThemeStore.getSelectColor()) : getShape(GradientDrawable.RECTANGLE, ThemeStore.getSelectColor()),
+                model == Constants.GRID_MODEL ? getCorner(1, DensityUtil.dip2px(context, 2), 0, defaultColor) : getShape(GradientDrawable.RECTANGLE, defaultColor));
     }
 
     /**
-     *
      * @param color
      * @param contentDrawable
      * @param maskDrawable
      * @return
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static RippleDrawable getRippleDrawable(@ColorInt int color, Drawable contentDrawable, Drawable maskDrawable){
-        return new RippleDrawable(ColorStateList.valueOf(color),contentDrawable,maskDrawable);
+    public static RippleDrawable getRippleDrawable(@ColorInt int color, Drawable contentDrawable, Drawable maskDrawable) {
+        return new RippleDrawable(ColorStateList.valueOf(color), contentDrawable, maskDrawable);
     }
 
     /**
      * 按下触摸效果
+     *
      * @param defaultDrawable
      * @param effectDrawable
      * @param rippleColor
@@ -424,20 +434,20 @@ public class Theme {
      * @param maskDrawable
      * @return
      */
-    public static Drawable getPressDrawable(Drawable defaultDrawable,Drawable effectDrawable,@ColorInt int rippleColor,Drawable contentDrawable,Drawable maskDrawable){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            return  new RippleDrawable(ColorStateList.valueOf(rippleColor),
+    public static Drawable getPressDrawable(Drawable defaultDrawable, Drawable effectDrawable, @ColorInt int rippleColor, Drawable contentDrawable, Drawable maskDrawable) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return new RippleDrawable(ColorStateList.valueOf(rippleColor),
                     contentDrawable,
                     maskDrawable);
         } else {
             StateListDrawable stateListDrawable = new StateListDrawable();
-            stateListDrawable.addState(new int[]{android.R.attr.state_pressed},effectDrawable);
+            stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, effectDrawable);
             stateListDrawable.addState(new int[]{}, defaultDrawable);
             return stateListDrawable;
         }
     }
 
-    public static MaterialDialog.Builder getBaseDialog(Context context){
+    public static MaterialDialog.Builder getBaseDialog(Context context) {
         return new MaterialDialog.Builder(context)
                 .contentColorAttr(R.attr.text_color_primary)
                 .titleColorAttr(R.attr.text_color_primary)
@@ -451,10 +461,10 @@ public class Theme {
     }
 
     public static void setLightNavigationbar(Activity activity, boolean enabled) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             final View decorView = activity.getWindow().getDecorView();
             int systemUiVisibility = decorView.getSystemUiVisibility();
-            if(enabled){
+            if (enabled) {
                 systemUiVisibility |= SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
             } else {
                 systemUiVisibility &= ~SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;

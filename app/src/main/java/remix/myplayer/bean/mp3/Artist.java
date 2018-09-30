@@ -9,7 +9,7 @@ public class Artist {
     private String Artist;
     private int Count;
 
-    public Artist(int artistID, String artist,int count) {
+    public Artist(int artistID, String artist, int count) {
         ArtistID = artistID;
         Artist = artist;
         Count = count;
@@ -19,7 +19,7 @@ public class Artist {
         return Count;
     }
 
-    public void setCount(int count){
+    public void setCount(int count) {
         this.Count = count;
     }
 

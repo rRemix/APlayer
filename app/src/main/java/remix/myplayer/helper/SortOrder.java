@@ -13,7 +13,8 @@ import static remix.myplayer.helper.SortOrder.SongSortOrder.SONG_ARTIST_Z_A;
  */
 
 public final class SortOrder {
-    private SortOrder(){}
+    private SortOrder() {
+    }
 
     public interface SongSortOrder {
         String SONG_A_Z = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;

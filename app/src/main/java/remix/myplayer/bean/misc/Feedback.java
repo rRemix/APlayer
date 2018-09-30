@@ -4,7 +4,7 @@ package remix.myplayer.bean.misc;
  * Created by Remix on 2016/12/1.
  */
 
-public class Feedback  {
+public class Feedback {
     public String Content;
     public String AppVersion;
     public String AppVersionCode;
@@ -16,7 +16,7 @@ public class Feedback  {
     public String Display;
     public String Contact;
 
-    public Feedback(String content,String contact, String appVersion, String appVersionCode,String display, String cpuABI, String deviceManufacturer, String deviceModel, String releaseVersion, String sdkVersion) {
+    public Feedback(String content, String contact, String appVersion, String appVersionCode, String display, String cpuABI, String deviceManufacturer, String deviceModel, String releaseVersion, String sdkVersion) {
         super();
         Content = content;
         Contact = contact;
@@ -30,7 +30,8 @@ public class Feedback  {
         SdkVersion = sdkVersion;
     }
 
-    public Feedback(){}
+    public Feedback() {
+    }
 
     @Override
     public String toString() {

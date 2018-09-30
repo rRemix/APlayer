@@ -27,6 +27,7 @@ public class ScanActivity extends ToolbarActivity {
     FilterSizeSeekBar mFilterSizeSeekbar;
     private int mPosition;
     public static ArrayList<Integer> mSizeList = new ArrayList<>();
+
     //几种扫描大小
     static {
         mSizeList.add(0);
@@ -34,7 +35,8 @@ public class ScanActivity extends ToolbarActivity {
         mSizeList.add(ByteConstants.MB);
         mSizeList.add(2 * ByteConstants.KB);
     }
-    private Handler mHandler = new Handler(){
+
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             mFilterSizeSeekbar.setPosition(msg.arg1);
@@ -46,39 +48,41 @@ public class ScanActivity extends ToolbarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
         ButterKnife.bind(this);
-        setUpToolbar(mToolBar,getString(R.string.back));
+        setUpToolbar(mToolBar, getString(R.string.back));
         initSeekbar();
     }
 
     private void initSeekbar() {
         //获得之前设置的大小对应的索引
-        for (int i = 0 ; i < mSizeList.size() ;i++){
+        for (int i = 0; i < mSizeList.size(); i++) {
             mPosition = i;
-            if(mSizeList.get(i) == Constants.SCAN_SIZE)
+            if (mSizeList.get(i) == Constants.SCAN_SIZE)
                 break;
         }
         mFilterSizeSeekbar.setOnSeekBarChangeListener(new FilterSizeSeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(FilterSizeSeekBar seekBar, int position, boolean fromUser) {
                 int size = mSizeList.get(position);
-                if(size >= 0) {
+                if (size >= 0) {
                     //纪录下设置的大小
                     SPUtil.putValue(ScanActivity.this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE, size);
                     Constants.SCAN_SIZE = size;
                 }
             }
+
             @Override
             public void onStartTrackingTouch(FilterSizeSeekBar seekBar) {
 
             }
+
             @Override
             public void onStopTrackingTouch(FilterSizeSeekBar seekBar) {
             }
         });
-        new Thread(){
+        new Thread() {
             @Override
-            public void run(){
-                while (!mFilterSizeSeekbar.isInit()){
+            public void run() {
+                while (!mFilterSizeSeekbar.isInit()) {
                 }
                 Message msg = new Message();
                 msg.arg1 = mPosition;

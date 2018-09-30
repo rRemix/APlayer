@@ -47,23 +47,24 @@ public class FeedBackActivity extends ToolbarActivity {
     Button mSubmit;
 
     Feedback mFeedBack = new Feedback();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback);
         ButterKnife.bind(this);
-        setUpToolbar(mToolBar,getString(R.string.back));
+        setUpToolbar(mToolBar, getString(R.string.back));
 
-        mSubmit.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0,ThemeStore.getAccentColor()));
-        mContent.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0, ColorUtil.getColor(R.color.gray_e2e2e2)));
-        Theme.setTint(mContact,ThemeStore.getMaterialPrimaryColor(),false);
+        mSubmit.setBackground(Theme.getCorner(1.0f, DensityUtil.dip2px(this, 2), 0, ThemeStore.getAccentColor()));
+        mContent.setBackground(Theme.getCorner(1.0f, DensityUtil.dip2px(this, 2), 0, ColorUtil.getColor(R.color.gray_e2e2e2)));
+        Theme.setTint(mContact, ThemeStore.getMaterialPrimaryColor(), false);
     }
 
     @OnClick(R.id.feedback_submit)
-    public void onClick(View v){
+    public void onClick(View v) {
         try {
-            if(TextUtils.isEmpty(mContent.getText())){
-                ToastUtil.show(this,getString(R.string.input_feedback_content));
+            if (TextUtils.isEmpty(mContent.getText())) {
+                ToastUtil.show(this, getString(R.string.input_feedback_content));
                 return;
             }
             PackageManager pm = getPackageManager();
@@ -81,19 +82,19 @@ public class FeedBackActivity extends ToolbarActivity {
             );
             commitByEmail();
         } catch (PackageManager.NameNotFoundException e) {
-            ToastUtil.show(this,R.string.send_error);
+            ToastUtil.show(this, R.string.send_error);
         }
     }
 
-    private void commitByEmail(){
+    private void commitByEmail() {
         Intent data = new Intent(Intent.ACTION_SENDTO);
         data.setData(Uri.parse(!IS_GOOGLEPLAY ? "mailto:568920427@qq.com" : "mailto:rRemix.me@gmail.com"));
         data.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback));
         data.putExtra(Intent.EXTRA_TEXT, mContent.getText().toString() + "\n\n\n" + mFeedBack);
-        if(Util.isIntentAvailable(this,data)){
-            startActivityForResult(data,0);
-        }else{
-            ToastUtil.show(this,R.string.send_error);
+        if (Util.isIntentAvailable(this, data)) {
+            startActivityForResult(data, 0);
+        } else {
+            ToastUtil.show(this, R.string.send_error);
         }
 
     }
@@ -101,7 +102,7 @@ public class FeedBackActivity extends ToolbarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        ToastUtil.show(this,requestCode == Activity.RESULT_OK ? R.string.send_success : R.string.send_error);
+        ToastUtil.show(this, requestCode == Activity.RESULT_OK ? R.string.send_success : R.string.send_error);
         finish();
     }
 }

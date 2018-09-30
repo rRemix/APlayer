@@ -63,7 +63,7 @@ public abstract class ImageUriRequest<T> {
     private static final String PREFIX_FILE = "file://";
     private static final String PREFIX_EMBEDDED = "embedded://";
 
-    public static final int BIG_IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 125);
+    public static final int BIG_IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 170);
     public static final int SMALL_IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 45);
     public static final int URL_PLAYLIST = 1000;
     public static final int URL_ALBUM = 10;

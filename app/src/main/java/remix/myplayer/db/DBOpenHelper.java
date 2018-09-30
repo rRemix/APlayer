@@ -59,8 +59,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                     "end";
 
 
-    public DBOpenHelper(Context context){
-        this(context, DBNAME, null, VERSION, dbObj -> LogUtil.d("DBError","error occur"));
+    public DBOpenHelper(Context context) {
+        this(context, DBNAME, null, VERSION, dbObj -> LogUtil.d("DBError", "error occur"));
     }
 
     private DBOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
@@ -78,7 +78,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if(newVersion == 2){
+        if (newVersion == 2) {
             db.execSQL("alter table play_list add date integer");
         }
     }

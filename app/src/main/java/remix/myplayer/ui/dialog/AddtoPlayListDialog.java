@@ -18,8 +18,6 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-
 import java.util.List;
 
 import butterknife.BindView;
@@ -29,7 +27,7 @@ import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
-import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.adapter.AddtoPlayListAdapter;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
@@ -66,8 +64,8 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
         ButterKnife.bind(this);
 
         mList = (List<Integer>) getIntent().getExtras().getSerializable("list");
-        if(mList == null){
-            ToastUtil.show(mContext,R.string.add_song_playlist_error);
+        if (mList == null) {
+            ToastUtil.show(mContext, R.string.add_song_playlist_error);
             finish();
         }
 
@@ -75,10 +73,10 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(view != null ) {
-                    ToastUtil.show(mContext,R.string.add_song_playlist_success,PlayListUtil.addMultiSongs(mList,getPlayListName(position)),getPlayListName(position));
+                if (view != null) {
+                    ToastUtil.show(mContext, R.string.add_song_playlist_success, PlayListUtil.addMultiSongs(mList, getPlayListName(position)), getPlayListName(position));
                 } else {
-                    ToastUtil.show(AddtoPlayListDialog.this,R.string.add_song_playlist_error,Toast.LENGTH_SHORT);
+                    ToastUtil.show(AddtoPlayListDialog.this, R.string.add_song_playlist_error, Toast.LENGTH_SHORT);
                 }
                 finish();
             }
@@ -100,23 +98,22 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.height = 300 * metrics.densityDpi / 160;
         lp.width = metrics.widthPixels;
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
     }
 
-    private int getPlayListId(int position){
+    private int getPlayListId(int position) {
         int playListId = -1;
-        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
+        if (mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)) {
             playListId = mCursor.getInt(mCursor.getColumnIndex(PlayLists.PlayListColumns._ID));
         }
         return playListId;
     }
 
-    private String getPlayListName(int position){
+    private String getPlayListName(int position) {
         String playlistName = "";
-        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
+        if (mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)) {
             playlistName = mCursor.getString(mCursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
         }
         return playlistName;
@@ -124,20 +121,14 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
 
     @OnClick({R.id.playlist_addto_new})
     public void onClick(View v) {
-        if(v.getId() == R.id.playlist_addto_new){
-            new MaterialDialog.Builder(this)
+        if (v.getId() == R.id.playlist_addto_new) {
+            Theme.getBaseDialog(mContext)
                     .title(R.string.new_playlist)
-                    .titleColorAttr(R.attr.text_color_primary)
-                    .buttonRippleColor(ThemeStore.getRippleColor())
                     .positiveText(R.string.create)
-                    .positiveColorAttr(R.attr.text_color_primary)
                     .negativeText(R.string.cancel)
-                    .negativeColorAttr(R.attr.text_color_primary)
-                    .backgroundColorAttr(R.attr.background_color_3)
-                    .contentColorAttr(R.attr.text_color_primary)
-                    .inputRange(1,15)
+                    .inputRange(1, 15)
                     .input("", "本地歌单" + Global.PlayList.size(), (dialog, input) -> {
-                        if(!TextUtils.isEmpty(input)){
+                        if (!TextUtils.isEmpty(input)) {
                             int newPlayListId = -1;
                             try {
                                 newPlayListId = PlayListUtil.addPlayList(input.toString());
@@ -145,14 +136,14 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                                                 R.string.add_playlist_success :
                                                 newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_already_exist,
                                         Toast.LENGTH_SHORT);
-                                if(newPlayListId < 0){
+                                if (newPlayListId < 0) {
                                     return;
                                 }
-                                if(mAddAfterCreate){
-                                    ToastUtil.show(mContext,R.string.add_song_playlist_success,input.toString(), PlayListUtil.addMultiSongs(mList,input.toString(),newPlayListId));
+                                if (mAddAfterCreate) {
+                                    ToastUtil.show(mContext, R.string.add_song_playlist_success, input.toString(), PlayListUtil.addMultiSongs(mList, input.toString(), newPlayListId));
                                 }
-                            }catch (Exception e){
-                                LogUtil.d("AddtoPlayList",e.toString());
+                            } catch (Exception e) {
+                                LogUtil.d("AddtoPlayList", e.toString());
                             }
                         }
                     })
@@ -162,14 +153,14 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
         }
     }
 
-    public AddtoPlayListAdapter getAdaper(){
+    public AddtoPlayListAdapter getAdaper() {
         return mAdapter;
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        overridePendingTransition(R.anim.slide_bottom_in,0);
+        overridePendingTransition(R.anim.slide_bottom_in, 0);
     }
 
     @Override
@@ -180,31 +171,31 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this,PlayLists.CONTENT_URI,null,
-                PlayLists.PlayListColumns.NAME + "!= ?",new String[]{Constants.PLAY_QUEUE},null);
+        return new CursorLoader(this, PlayLists.CONTENT_URI, null,
+                PlayLists.PlayListColumns.NAME + "!= ?", new String[]{Constants.PLAY_QUEUE}, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data == null)
+        if (data == null)
             return;
         mCursor = data;
         mPlayListIdIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns._ID);
         mPlayListNameIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.NAME);
-        if(mAdapter != null)
+        if (mAdapter != null)
             mAdapter.setCursor(mCursor);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        if(mAdapter != null)
+        if (mAdapter != null)
             mAdapter.setCursor(null);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(mCursor != null)
+        if (mCursor != null)
             mCursor.close();
     }
 }

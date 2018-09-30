@@ -32,7 +32,9 @@ public class LastFmAlbum {
             this.image = image;
         }
 
-        public Wiki getWiki() { return wiki; }
+        public Wiki getWiki() {
+            return wiki;
+        }
 
         public void setWiki(Wiki wiki) {
             this.wiki = wiki;

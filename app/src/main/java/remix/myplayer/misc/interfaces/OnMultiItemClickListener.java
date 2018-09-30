@@ -8,6 +8,8 @@ package remix.myplayer.misc.interfaces;
  */
 public interface OnMultiItemClickListener {
     void OnAddToPlayQueue();
+
     void OnAddToPlayList();
+
     void OnDelete(boolean deleteSource);
 }

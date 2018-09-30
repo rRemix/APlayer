@@ -11,7 +11,10 @@ public class PlayList {
     public String Name;
     public int Count;
     public int Date;
-    public PlayList(){}
+
+    public PlayList() {
+    }
+
     public PlayList(String name, int count) {
         Name = name;
         Count = count;

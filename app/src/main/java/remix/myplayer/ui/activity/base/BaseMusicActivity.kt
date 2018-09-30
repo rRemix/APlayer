@@ -164,7 +164,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
                 val action = intent.action
                 val msg = it.obtainMessage(action.hashCode())
                 msg.obj = action
-                msg.arg1 = if(intent.getBooleanExtra("permission", false)) 1 else 0
+                msg.arg1 = if (intent.getBooleanExtra("permission", false)) 1 else 0
                 it.removeMessages(msg.what)
                 it.sendMessageDelayed(msg, 200)
             }

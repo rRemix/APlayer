@@ -67,9 +67,9 @@ public class App extends MultiDexApplication {
         });
 
         //兼容性
-        if(SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME,"CategoryReset",true)){
-            SPUtil.putValue(this,SPUtil.SETTING_KEY.NAME,"CategoryReset",false);
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,"");
+        if (SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, "CategoryReset", true)) {
+            SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, "CategoryReset", false);
+            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, "");
         }
     }
 

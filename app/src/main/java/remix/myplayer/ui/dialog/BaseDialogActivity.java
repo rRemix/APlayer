@@ -13,8 +13,8 @@ import remix.myplayer.ui.activity.base.BaseMusicActivity;
 
 
 public abstract class BaseDialogActivity extends BaseMusicActivity {
-    protected <T extends View> T findView(int id){
-        return (T)findViewById(id);
+    protected <T extends View> T findView(int id) {
+        return (T) findViewById(id);
     }
 
     @Override

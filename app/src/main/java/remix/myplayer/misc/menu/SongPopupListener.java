@@ -6,23 +6,24 @@ import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.soundcloud.android.crop.Crop;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.Tag;
 import remix.myplayer.ui.dialog.AddtoPlayListDialog;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
@@ -45,20 +46,20 @@ public class SongPopupListener
         mPlayListName = playListName;
         mSong = song;
         mActivity = activity;
-        mTag = new Tag(activity,mSong);
+        mTag = new Tag(activity, mSong);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menu_next:
                 Intent intent = new Intent(MusicService.ACTION_CMD);
                 intent.putExtra("Control", Command.ADD_TO_NEXT_SONG);
-                intent.putExtra("song",mSong);
+                intent.putExtra("song", mSong);
                 Util.sendLocalBroadcast(intent);
                 break;
             case R.id.menu_add_to_playlist:
-                Intent intentAdd = new Intent(mActivity,AddtoPlayListDialog.class);
+                Intent intentAdd = new Intent(mActivity, AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
                 ardAdd.putSerializable("list", new ArrayList<>(Collections.singletonList(mSong.getId())));
                 intentAdd.putExtras(ardAdd);
@@ -74,14 +75,14 @@ public class SongPopupListener
                 mTag.edit();
                 break;
             case R.id.menu_album_thumb:
-                CustomThumb thumbBean = new CustomThumb(mSong.getAlbumId(),Constants.ALBUM,mSong.getAlbum());
+                CustomThumb thumbBean = new CustomThumb(mSong.getAlbumId(), Constants.ALBUM, mSong.getAlbum());
                 Intent thumbIntent = mActivity.getIntent();
-                thumbIntent.putExtra("thumb",thumbBean);
+                thumbIntent.putExtra("thumb", thumbBean);
                 mActivity.setIntent(thumbIntent);
                 Crop.pickImage(mActivity, Crop.REQUEST_PICK);
                 break;
             case R.id.menu_ring:
-                MediaStoreUtil.setRing(mActivity,mSong.getId());
+                MediaStoreUtil.setRing(mActivity, mSong.getId());
                 break;
             case R.id.menu_share:
                 mActivity.startActivity(
@@ -89,29 +90,23 @@ public class SongPopupListener
                 break;
             case R.id.menu_delete:
                 try {
-                    String title = mActivity.getString(R.string.confirm_delete_from_playlist_or_library,mIsDeletePlayList ? mPlayListName : "曲库");
-                    new MaterialDialog.Builder(mActivity)
+                    String title = mActivity.getString(R.string.confirm_delete_from_playlist_or_library, mIsDeletePlayList ? mPlayListName : "曲库");
+                    Theme.getBaseDialog(mActivity)
                             .content(title)
-                            .buttonRippleColor(ThemeStore.getRippleColor())
                             .positiveText(R.string.confirm)
                             .negativeText(R.string.cancel)
-                            .checkBoxPromptRes(R.string.delete_source, false, null)
+                            .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
                             .onAny((dialog, which) -> {
-                                if(which == POSITIVE){
+                                if (which == POSITIVE) {
                                     boolean deleteSuccess = !mIsDeletePlayList ?
-                                            MediaStoreUtil.delete(mSong.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0 :
-                                            PlayListUtil.deleteSong(mSong.getId(),mPlayListName);
+                                            MediaStoreUtil.delete(mSong.getId(), Constants.SONG, dialog.isPromptCheckBoxChecked()) > 0 :
+                                            PlayListUtil.deleteSong(mSong.getId(), mPlayListName);
 
-                                    ToastUtil.show(mActivity,deleteSuccess ? R.string.delete_success : R.string.delete_error);
+                                    ToastUtil.show(mActivity, deleteSuccess ? R.string.delete_success : R.string.delete_error);
                                 }
                             })
-                            .backgroundColorAttr(R.attr.background_color_3)
-                            .positiveColorAttr(R.attr.text_color_primary)
-                            .negativeColorAttr(R.attr.text_color_primary)
-                            .contentColorAttr(R.attr.text_color_primary)
-                            .theme(ThemeStore.getMDDialogTheme())
                             .show();
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;

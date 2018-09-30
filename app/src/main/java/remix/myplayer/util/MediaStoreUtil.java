@@ -926,6 +926,8 @@ public class MediaStoreUtil {
      * @return
      */
     public static int delete(List<Song> songs, boolean deleteSource) {
+        //保存是否删除源文件
+        SPUtil.putValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, deleteSource);
         if (songs == null || songs.size() == 0)
             return 0;
 

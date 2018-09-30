@@ -17,13 +17,13 @@ public abstract class BaseShortcutType {
     Context mContext;
 
 
-    BaseShortcutType(Context context){
+    BaseShortcutType(Context context) {
         mContext = context;
     }
 
-    Intent getIntent(int type){
+    Intent getIntent(int type) {
         Intent intent = new Intent(mContext, AppShortcutActivity.class);
-        intent.putExtra(AppShortcutActivity.KEY_SHORTCUT_TYPE,type);
+        intent.putExtra(AppShortcutActivity.KEY_SHORTCUT_TYPE, type);
         intent.setAction(Intent.ACTION_VIEW);
         return intent;
     }

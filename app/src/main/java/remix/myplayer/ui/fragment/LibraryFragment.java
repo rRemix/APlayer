@@ -21,14 +21,14 @@ import remix.myplayer.ui.fragment.base.BaseMusicFragment;
  * Created by Remix on 2016/12/23.
  */
 
-public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseMusicFragment implements MusicEventCallback,LoaderManager.LoaderCallbacks<List<D>>{
+public abstract class LibraryFragment<D, A extends BaseAdapter> extends BaseMusicFragment implements MusicEventCallback, LoaderManager.LoaderCallbacks<List<D>> {
     protected A mAdapter;
     protected MultiChoice mMultiChoice;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if(mHasPermission){
+        if (mHasPermission) {
             getLoaderManager().initLoader(getLoaderId(), null, this);
         }
     }
@@ -37,15 +37,15 @@ public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseMusic
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(getLayoutID(),container,false);
-        mUnBinder = ButterKnife.bind(this,rootView);
+        final View rootView = inflater.inflate(getLayoutID(), container, false);
+        mUnBinder = ButterKnife.bind(this, rootView);
 
-        if(mContext instanceof MultiChoiceActivity){
-            mMultiChoice = ((MultiChoiceActivity)mContext).getMultiChoice();
+        if (mContext instanceof MultiChoiceActivity) {
+            mMultiChoice = ((MultiChoiceActivity) mContext).getMultiChoice();
         }
         initAdapter();
         initView();
-        if(mMultiChoice != null && mMultiChoice.getAdapter() == null){
+        if (mMultiChoice != null && mMultiChoice.getAdapter() == null) {
             mMultiChoice.setAdapter(mAdapter);
         }
 
@@ -54,30 +54,32 @@ public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseMusic
 
 
     protected abstract int getLayoutID();
+
     protected abstract void initAdapter();
+
     protected abstract void initView();
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(mAdapter != null){
+        if (mAdapter != null) {
             mAdapter.setData(null);
         }
     }
 
     @Override
     public void onMediaStoreChanged() {
-        if(mHasPermission)
+        if (mHasPermission)
             getLoaderManager().restartLoader(getLoaderId(), null, this);
-        else{
-            if(mAdapter != null)
+        else {
+            if (mAdapter != null)
                 mAdapter.setData(null);
         }
     }
 
     @Override
     public void onPermissionChanged(boolean has) {
-        if(has != mHasPermission){
+        if (has != mHasPermission) {
             mHasPermission = has;
             onMediaStoreChanged();
         }
@@ -100,11 +102,12 @@ public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseMusic
 
     @Override
     public void onLoaderReset(Loader<List<D>> loader) {
-        if(mAdapter != null)
+        if (mAdapter != null)
             mAdapter.setData(null);
     }
 
     protected abstract Loader<List<D>> getLoader();
+
     protected abstract int getLoaderId();
 
 }

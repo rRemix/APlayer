@@ -34,7 +34,7 @@ import remix.myplayer.util.MediaStoreUtil;
 /**
  * 全部歌曲的Fragment
  */
-public class SongFragment extends LibraryFragment<Song,SongAdapter> {
+public class SongFragment extends LibraryFragment<Song, SongAdapter> {
     @BindView(R.id.recyclerview)
     FastScrollRecyclerView mRecyclerView;
 
@@ -53,12 +53,12 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
 
     @Override
     protected void initAdapter() {
-        mAdapter = new SongAdapter(mContext,R.layout.item_song_recycle,mMultiChoice, SongAdapter.ALLSONG,mRecyclerView);
+        mAdapter = new SongAdapter(mContext, R.layout.item_song_recycle, mMultiChoice, SongAdapter.ALLSONG, mRecyclerView);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 int id = getSongID(position);
-                if(id > 0 && !mMultiChoice.itemClick(position,id,TAG)){
+                if (id > 0 && !mMultiChoice.itemClick(position, id, TAG)) {
                     Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Command.PLAYSELECTEDSONG);
@@ -67,11 +67,12 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
                     MusicServiceRemote.setAllSongAsPlayQueue(intent);
                 }
             }
+
             @Override
             public void onItemLongClick(View view, int position) {
                 int id = getSongID(position);
-                if(getUserVisibleHint() && id > 0)
-                    mMultiChoice.itemLongClick(position,id,TAG,Constants.SONG);
+                if (getUserVisibleHint() && id > 0)
+                    mMultiChoice.itemLongClick(position, id, TAG, Constants.SONG);
             }
         });
 
@@ -88,19 +89,19 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
     /**
      * 重新排序后需要重置全部歌曲列表
      */
-    private synchronized void setAllSongList(){
-        if(mAdapter == null || mAdapter.getDatas() == null)
+    private synchronized void setAllSongList() {
+        if (mAdapter == null || mAdapter.getDatas() == null)
             return;
         List<Integer> allSong = new ArrayList<>();
-        for(Song song : mAdapter.getDatas()){
+        for (Song song : mAdapter.getDatas()) {
             allSong.add(song.getId());
         }
         MusicServiceRemote.setAllSong(allSong);
     }
 
-    private int getSongID(int position){
+    private int getSongID(int position) {
         int id = -1;
-        if(mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1){
+        if (mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1) {
             id = mAdapter.getDatas().get(position).getId();
         }
         return id;
@@ -119,7 +120,7 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
     @Override
     public void onLoadFinished(Loader<List<Song>> loader, List<Song> data) {
         super.onLoadFinished(loader, data);
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 setAllSongList();
@@ -128,7 +129,7 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
     }
 
     @Override
-    public SongAdapter getAdapter(){
+    public SongAdapter getAdapter() {
         return mAdapter;
     }
 

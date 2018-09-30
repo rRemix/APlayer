@@ -112,7 +112,7 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
                         category.getTag() == Category.TAG_ARTIST ? new ArtistFragment() :
                                 category.getTag() == Category.TAG_PLAYLIST ? new PlayListFragment() : new FolderFragment();
         WeakReference<Fragment> newWeakReference = new WeakReference<>(fragment);
-        mFragmentMap.put(position,newWeakReference);
+        mFragmentMap.put(position, newWeakReference);
         return fragment;
     }
 
