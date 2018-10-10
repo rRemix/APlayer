@@ -38,7 +38,6 @@ import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
-import remix.myplayer.App;
 import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.Category;
@@ -59,6 +58,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.FolderChooserDialog;
+import remix.myplayer.ui.dialog.LyricPriorityDialog;
 import remix.myplayer.ui.dialog.ThemeDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -96,8 +96,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     SwitchCompat mNaviSwitch;
     @BindView(R.id.setting_shake_switch)
     SwitchCompat mShakeSwitch;
-    @BindView(R.id.setting_lrc_priority_switch)
-    SwitchCompat mLrcPrioritySwitch;
     @BindView(R.id.setting_lrc_float_switch)
     SwitchCompat mFloatLrcSwitch;
     @BindView(R.id.setting_lrc_float_tip)
@@ -158,10 +156,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
 
         //导航栏是否变色 是否启用摇一摇切歌
-        final String[] keyWord = new String[]{SPUtil.SETTING_KEY.COLOR_NAVIGATION, SPUtil.SETTING_KEY.SHAKE, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,
-                SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, SPUtil.SETTING_KEY.IMMERSIVE_MODE,
+        final String[] keyWord = new String[]{SPUtil.SETTING_KEY.COLOR_NAVIGATION, SPUtil.SETTING_KEY.SHAKE,
+                SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,
+                SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, SPUtil.SETTING_KEY.IMMERSIVE_MODE,
                 SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE};
-        ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch, mLrcPrioritySwitch, mFloatLrcSwitch,
+        ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch, mFloatLrcSwitch,
                 mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch, mBreakpointSwitch, mIgnoreMediastoreSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
@@ -186,10 +185,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     ShakeDetector.getInstance().beginListen();
                                 else
                                     ShakeDetector.getInstance().stopListen();
-                                break;
-                            //设置歌词搜索优先级
-                            case R.id.setting_lrc_priority_switch:
-                                SPUtil.putValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST, isChecked);
                                 break;
                             //桌面歌词
                             case R.id.setting_lrc_float_switch:
@@ -391,11 +386,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         switch (v.getId()) {
             //文件过滤
             case R.id.setting_filter_container:
-                configureFilterSize();
+                configFilterSize();
                 break;
             //曲库
             case R.id.setting_library_category_container:
-                configureLibraryCategory();
+                configLibraryCategory();
                 break;
             //桌面歌词
             case R.id.setting_lrc_float_container:
@@ -414,7 +409,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //歌词搜索优先级
             case R.id.setting_lrc_priority_container:
-                mLrcPrioritySwitch.setChecked(!mLrcPrioritySwitch.isChecked());
+                configLyricPriority();
                 break;
             //屏幕常亮
             case R.id.setting_screen_container:
@@ -430,7 +425,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //锁屏显示
             case R.id.setting_lockscreen_container:
-                configureLockScreen();
+                configLockScreen();
 
                 break;
             //导航栏变色
@@ -451,7 +446,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //通知栏底色
             case R.id.setting_notify_color_container:
-                configureNotifyBackgroundColor();
+                configNotifyBackgroundColor();
                 break;
             //音效设置
             case R.id.setting_eq_container:
@@ -481,11 +476,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //专辑与艺术家封面自动下载
             case R.id.setting_album_cover_container:
-                configureCoverDownload();
+                configCoverDownload();
                 break;
             //封面下载源
             case R.id.setting_cover_source_container:
-                configureCoverDownloadSource();
+                configCoverDownloadSource();
                 break;
             //沉浸式状态栏
             case R.id.setting_immersive_container:
@@ -513,6 +508,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
         }
     }
+
 
     /**
      * 播放列表导出
@@ -580,9 +576,16 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     }
 
     /**
+     * 歌词搜索优先级
+     */
+    private void configLyricPriority() {
+        LyricPriorityDialog.newInstance().show(getSupportFragmentManager(), "configLyricPriority");
+    }
+
+    /**
      * 配置封面下载源
      */
-    private void configureCoverDownloadSource() {
+    private void configCoverDownloadSource() {
         final int oldChoice = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, DOWNLOAD_LASTFM);
         getBaseDialog(mContext)
                 .title(R.string.cover_download_source)
@@ -602,7 +605,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     /**
      * 配置封面是否下载
      */
-    private void configureCoverDownload() {
+    private void configCoverDownload() {
         final String choice = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, mContext.getString(R.string.always));
         getBaseDialog(mContext)
                 .title(R.string.auto_download_album_artist_cover)
@@ -689,7 +692,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     /**
      * 配置通知栏底色
      */
-    private void configureNotifyBackgroundColor() {
+    private void configNotifyBackgroundColor() {
         if (!SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, false)) {
             ToastUtil.show(mContext, R.string.notify_bg_color_warnning);
             return;
@@ -711,7 +714,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     /**
      * 配置锁屏界面
      */
-    private void configureLockScreen() {
+    private void configLockScreen() {
         //0:APlayer锁屏 1:系统锁屏 2:关闭
         getBaseDialog(mContext)
                 .title(R.string.lockscreen_show)
@@ -731,7 +734,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     /**
      * 配置曲库目录
      */
-    private void configureLibraryCategory() {
+    private void configLibraryCategory() {
         String categoryJson = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, "");
 
         List<Category> oldCategories = new Gson().fromJson(categoryJson, new TypeToken<List<Category>>() {
@@ -770,7 +773,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     /**
      * 配置过滤大小
      */
-    private void configureFilterSize() {
+    private void configFilterSize() {
         //读取以前设置
         int position = 0;
         for (int i = 0; i < mScanSize.length; i++) {

@@ -47,6 +47,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import remix.myplayer.util.LogUtil;
+
 /**
  * *****************************************************************************
  * Taken from the JB source code, can be found in:
@@ -326,6 +328,7 @@ public final class DiskLruCache implements Closeable {
                         IO_BUFFER_SIZE);
                 return cache;
             } catch (IOException journalIsCorrupt) {
+                LogUtil.d("DiskLruCache", "DiskLruCache " + directory + " is corrupt: " + journalIsCorrupt.getMessage() + ", removing");
 //                System.logW("DiskLruCache " + directory + " is corrupt: "
 //                        + journalIsCorrupt.getMessage() + ", removing");
                 cache.delete();

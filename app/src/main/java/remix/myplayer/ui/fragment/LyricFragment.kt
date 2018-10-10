@@ -85,11 +85,11 @@ class LyricFragment : BaseMusicFragment(), Runnable {
             mLrcView.setOffset(0)
         }
         val id = mInfo?.id
-        mDisposable = SearchLrc(mInfo).getLyric(manualPath, clearCache)
+        mDisposable = SearchLrc(mInfo!!).getLyric(manualPath, clearCache)
                 .doOnSubscribe { mLrcView.setText(getStringSafely(R.string.searching)) }
                 .subscribe(Consumer {
                     if (id == mInfo?.id) {
-                        if (it == null || it.size == 0) {
+                        if (it == null || it.isEmpty()) {
                             mLrcView.setText(getStringSafely(R.string.no_lrc))
                             return@Consumer
                         }

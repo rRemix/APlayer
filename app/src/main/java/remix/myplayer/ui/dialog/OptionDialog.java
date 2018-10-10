@@ -104,9 +104,9 @@ public class OptionDialog extends BaseDialogActivity {
         ((ImageView) findViewById(R.id.popup_share_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_share), tintColor));
         ((ImageView) findViewById(R.id.popup_delete_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_delete), tintColor));
 
-        ButterKnife.apply(new TextView[]{findViewById(R.id.popup_add_text), findView(R.id.popup_ring_text),
-                        findViewById(R.id.popup_share_text), findView(R.id.popup_delete_text)},
-                (ButterKnife.Action<TextView>) (textView, index) -> textView.setTextColor(tintColor));
+        ButterKnife.apply(new TextView[]{findViewById(R.id.popup_add_text), findViewById(R.id.popup_ring_text),
+                        findViewById(R.id.popup_share_text), findViewById(R.id.popup_delete_text)},
+                (textView, index) -> textView.setTextColor(tintColor));
     }
 
     @OnClick({R.id.popup_add, R.id.popup_share, R.id.popup_delete, R.id.popup_ring})

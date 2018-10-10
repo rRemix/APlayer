@@ -8,7 +8,6 @@ import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -37,9 +36,6 @@ public class BaseActivity extends AppCompatActivity {
     protected boolean mHasPermission;
     public static final String[] EXTERNAL_STORAGE_PERMISSIONIS = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-    protected <T extends View> T findView(int id) {
-        return (T) findViewById(id);
-    }
 
     /**
      * 设置主题

@@ -1215,7 +1215,9 @@ public class MediaStoreUtil {
                         Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
                         intent.setData(Uri.parse("package:" + mContext.getPackageName()));
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mContext.startActivity(intent);
+                        if (Util.isIntentAvailable(mContext, intent)) {
+                            mContext.startActivity(intent);
+                        }
                     }
                 }
             }

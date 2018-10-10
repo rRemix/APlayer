@@ -37,7 +37,7 @@ public class LyricUtil {
                     searchFile(displayName, songName, artistName, file);
                 } else {
                     if (isRightLrc(file, displayName, songName, artistName)) {
-                        SearchLrc.LOCAL_LYRIC_PATH = file.getAbsolutePath();
+                        SearchLrc.setLOCAL_LYRIC_PATH(file.getAbsolutePath());
                     }
                 }
             }

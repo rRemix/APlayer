@@ -168,7 +168,7 @@ public class TimerDialog extends BaseDialogActivity {
         mToggle.setText(SleepTimer.isTicking() ? R.string.cancel_timer : R.string.start_timer);
 
         //分钟 秒 背景框
-        ButterKnife.apply(new View[]{findViewById(R.id.timer_minute_container), findView(R.id.timer_second_container)},
+        ButterKnife.apply(new View[]{findViewById(R.id.timer_minute_container), findViewById(R.id.timer_second_container)},
                 (view, index) -> {
                     final Drawable drawable = Theme.getShape(
                             GradientDrawable.RECTANGLE,
