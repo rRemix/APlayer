@@ -167,7 +167,7 @@ public class MediaStoreUtil {
                     null,
                     MediaStore.Audio.Media.DATE_ADDED + " >= " + (today.getTimeInMillis() / 1000 - (3600 * 24 * 7)) + " and " + MediaStoreUtil.getBaseSelection(),
                     null,
-                    MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                    MediaStore.Audio.Media.DATE_ADDED);
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     songs.add(MediaStoreUtil.getSongInfo(cursor));

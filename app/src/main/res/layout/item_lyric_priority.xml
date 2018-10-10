@@ -10,6 +10,6 @@
         android:gravity="left|center_vertical"
         android:paddingLeft="24dp"
         android:textColor="?attr/text_color_primary"
-        android:background="?attr/selectableItemBackground" />
+        android:background="?attr/background_common" />
 
 </FrameLayout>
