@@ -26,7 +26,7 @@ class AppWidgetSmallTransparent : BaseAppwidget() {
         pushUpdate(context, appWidgetIds, remoteViews)
     }
 
-    override fun updateWidget(service: MusicService, appWidgetIds: IntArray, reloadCover: Boolean) {
+    override fun updateWidget(service: MusicService, appWidgetIds: IntArray?, reloadCover: Boolean) {
         val song = service.currentSong
         if (!hasInstances(service))
             return

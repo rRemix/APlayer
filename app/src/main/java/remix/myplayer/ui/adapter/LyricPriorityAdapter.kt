@@ -18,6 +18,9 @@ class LyricPriorityAdapter(context: Context?, layoutId: Int) : BaseAdapter<Lyric
 
     override fun convert(holder: LyricPriorityHolder?, d: LyricPriority?, position: Int) {
         holder?.view?.item_title?.text = d?.desc
+        holder?.view?.setOnClickListener {
+
+        }
     }
 
     class LyricPriorityHolder(val view: View) : BaseViewHolder(view)

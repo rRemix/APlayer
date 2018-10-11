@@ -33,7 +33,7 @@ class AppWidgetSmall : BaseAppwidget() {
         pushUpdate(context, appWidgetIds, remoteViews)
     }
 
-    override fun updateWidget(service: MusicService, appWidgetIds: IntArray, reloadCover: Boolean) {
+    override fun updateWidget(service: MusicService, appWidgetIds: IntArray?, reloadCover: Boolean) {
         val song = service.currentSong
         if (song == null || !hasInstances(service))
             return

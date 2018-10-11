@@ -63,17 +63,22 @@ abstract class BaseAppwidget : AppWidgetProvider() {
         return appIds != null && appIds.isNotEmpty()
     }
 
-    protected fun updateCover(service: MusicService, remoteViews: RemoteViews, appWidgetIds: IntArray, reloadCover: Boolean) {
+    protected fun updateCover(service: MusicService, remoteViews: RemoteViews, appWidgetIds: IntArray?, reloadCover: Boolean) {
         val song = service.currentSong ?: return
         //设置封面
         if (!reloadCover) {
-            if (mBitmap != null && !mBitmap!!.isRecycled) {
-                LogUtil.d(TAG, "复用Bitmap: " + mBitmap!!)
-                remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap)
-            } else {
-                LogUtil.d(TAG, "Bitmap复用失败: " + mBitmap!!)
-                remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
+            mBitmap.let {
+                it != null && !it.isRecycled
+            }.let {
+                if (it) {
+                    LogUtil.d(TAG, "复用Bitmap: " + mBitmap!!)
+                    remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap)
+                } else {
+                    LogUtil.d(TAG, "Bitmap复用失败: " + mBitmap!!)
+                    remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
+                }
             }
+
             pushUpdate(service, appWidgetIds, remoteViews)
         } else {
             val size = if (this.javaClass.simpleName.contains("Big")) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
@@ -205,7 +210,7 @@ abstract class BaseAppwidget : AppWidgetProvider() {
         remoteViews.setImageViewResource(R.id.appwidget_clickable, mSkin.background)
     }
 
-    abstract fun updateWidget(service: MusicService, appWidgetIds: IntArray, reloadCover: Boolean)
+    abstract fun updateWidget(service: MusicService, appWidgetIds: IntArray?, reloadCover: Boolean)
 
     companion object {
         val SKIN_WHITE_1F = 1//白色不带透明
