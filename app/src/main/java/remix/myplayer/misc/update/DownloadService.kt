@@ -15,11 +15,9 @@ import remix.myplayer.bean.github.Release
 import remix.myplayer.request.network.OkHttpHelper
 import remix.myplayer.util.LogUtil
 import remix.myplayer.util.ToastUtil
-import remix.myplayer.util.Util
 import remix.myplayer.util.Util.sendLocalBroadcast
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
@@ -55,31 +53,29 @@ class DownloadService : IntentService("DownloadService") {
         if (intent == null || !intent.hasExtra(EXTRA_RESPONSE)) {
             return
         }
-        val release: Release = intent.getParcelableExtra(EXTRA_RESPONSE) as Release
-        var inStream: InputStream? = null
-        var outStream: FileOutputStream? = null
 
         try {
-            val downloadUrl = release.assets[0].browser_download_url
+            val release: Release = intent.getParcelableExtra(EXTRA_RESPONSE) as Release
+            val asset = release.assets ?: arrayListOf()
+            val downloadUrl = asset[0].browser_download_url
             val downloadDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
                     ?: throw RuntimeException("下载目录不存在")
             if (!downloadDir.exists() && !downloadDir.mkdirs()) {
                 throw RuntimeException("下载目录创建失败")
             }
             val downloadFile = File(downloadDir, release.name + ".apk")
-            //已经下载完成
-            if (downloadFile.exists()) {
-                if (downloadFile.length() == release.assets[0].size) {
+
+            if (downloadFile.exists()) { //已经下载完成
+                if (downloadFile.length() == asset[0].size) {
                     sendCompleteBroadcast(downloadFile.absolutePath)
                     return
-                } else {
-                    //删除原来的文件并重新创建
+                } else { //删除原来的文件并重新创建
                     if (!downloadFile.delete()) {
                         throw RuntimeException("Can't delete old file")
                     }
                 }
             }
-            postNotification(release.assets[0].size, 0)
+            postNotification(asset[0].size, 0)
             if (isForce(release)) {
                 sendLocalBroadcast(Intent(ACTION_SHOW_DIALOG))
             }
@@ -90,32 +86,33 @@ class DownloadService : IntentService("DownloadService") {
             conn.connectTimeout = TIME_OUT
             conn.readTimeout = TIME_OUT
             conn.connect()
-            inStream = conn.getInputStream()
-            val fileSize = conn.contentLength//根据响应获取文件大小
-            if (fileSize <= 0) throw RuntimeException("Can't get size of file")
-            if (inStream == null) throw RuntimeException("Can't get InputStream")
-            outStream = FileOutputStream(downloadFile)
-            val buf = ByteArray(1024)
-            var downloadSize = 0L
-            do {
-                //循环读取
-                val numRead = inStream.read(buf)
-                if (numRead == -1) {
-                    break
+
+            conn.getInputStream()?.use { input ->
+                FileOutputStream(downloadFile).use { output ->
+                    val fileSize = conn.contentLength//根据响应获取文件大小
+                    if (fileSize <= 0) throw RuntimeException("Can't get size of file")
+                    val buf = ByteArray(1024)
+                    var downloadSize = 0L
+                    do {
+                        //循环读取
+                        val numRead = input.read(buf)
+                        if (numRead == -1) {
+                            break
+                        }
+                        output.write(buf, 0, numRead)
+                        downloadSize += numRead
+                        postNotification(asset[0].size, downloadSize)
+                        //更新进度条
+                    } while (true)
+                    output.flush()
                 }
-                outStream.write(buf, 0, numRead)
-                downloadSize += numRead
-                postNotification(release.assets[0].size, downloadSize)
-                //更新进度条
-            } while (true)
-            outStream.flush()
+            }
+
             sendCompleteBroadcast(downloadFile.absolutePath)
         } catch (ex: Exception) {
             ToastUtil.show(this, R.string.update_error, ex.message)
         } finally {
             sendLocalBroadcast(Intent(ACTION_DISMISS_DIALOG))
-            Util.closeStream(inStream)
-            Util.closeStream(outStream)
         }
         mNotificationManager.cancel(UPDATE_NOTIFICATION_ID)
     }
@@ -169,7 +166,7 @@ class DownloadService : IntentService("DownloadService") {
         const val EXTRA_PATH = "file_path"
         private const val TAG = "DownloadService"
         private const val UPDATE_NOTIFICATION_CHANNEL_ID = "update_notification"
-        private const val UPDATE_NOTIFICATION_ID = 10
-        private const val TIME_OUT = 5000
+        private const val UPDATE_NOTIFICATION_ID = 3
+        private const val TIME_OUT = 30000
     }
 }

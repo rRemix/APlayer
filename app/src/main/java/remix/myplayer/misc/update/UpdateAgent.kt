@@ -1,5 +1,6 @@
 package remix.myplayer.misc.update
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Environment
@@ -22,6 +23,7 @@ object UpdateAgent {
     @JvmStatic
     var forceCheck = false
 
+    @SuppressLint("CheckResult")
     @JvmStatic
     fun check(context: Context) {
         if (listener == null)
@@ -33,7 +35,8 @@ object UpdateAgent {
                 }
                 .subscribe({
                     val release = it
-                    if (release == null || release.assets == null || release.assets.size == 0) {
+
+                    if (release.assets == null || release.assets!!.size == 0) {
                         listener?.onUpdateReturned(UpdateStatus.No, context.getString(R.string.no_update), null)
                         return@subscribe
                     }
@@ -54,12 +57,12 @@ object UpdateAgent {
                         return@subscribe
                     }
                     //路径不合法
-                    if (release.assets[0].size < 0) {
+                    if (release.assets!![0].size < 0) {
                         listener?.onUpdateReturned(UpdateStatus.ErrorSizeFormat, "Size为空", release)
                         return@subscribe
                     }
                     //文件大小不合法
-                    if (TextUtils.isEmpty(release.assets[0].browser_download_url)) {
+                    if (TextUtils.isEmpty(release.assets!![0].browser_download_url)) {
                         listener?.onUpdateReturned(UpdateStatus.ErrorSizeFormat, "下载地址为空", release)
                         return@subscribe
                     }
@@ -84,9 +87,12 @@ object UpdateAgent {
 
     fun getOnlineVersionCode(release: Release): Int {
         //Release-v1.3.5.2-80
-        val numberAndCode = release.name.split("-")
-        if (numberAndCode.size < 2)
-            return 0
-        return numberAndCode[2].toInt()
+        release.name?.run {
+            val numberAndCode = this.split("-")
+            if (numberAndCode.size < 2)
+                return 0
+            return numberAndCode[2].toInt()
+        }
+        return 0
     }
 }

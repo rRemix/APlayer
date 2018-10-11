@@ -32,7 +32,7 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 95
+        versionCode 90
         versionName "1.4.0-dev"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
@@ -96,6 +96,10 @@ android {
         cmake {
             path "CMakeLists.txt"
         }
+    }
+
+    androidExtensions {
+        experimental = true
     }
 
     productFlavors {
