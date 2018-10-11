@@ -25,11 +25,13 @@ class DefaultLrcParser : ILrcParser {
             return
 
         //缓存
-        DiskCache.getLrcDiskCache().edit(cacheKey).apply {
-            newOutputStream(0).use { outStream ->
-                outStream.write(Gson().toJson(lrcRows, object : TypeToken<List<LrcRow>>() {}.type).toByteArray())
-            }
-        }.commit()
+        DiskCache.getLrcDiskCache().apply {
+            edit(cacheKey).apply {
+                newOutputStream(0).use { outStream ->
+                    outStream.write(Gson().toJson(lrcRows, object : TypeToken<List<LrcRow>>() {}.type).toByteArray())
+                }
+            }.commit()
+        }.flush()
 
         //保存歌词原始文件
         if (TextUtils.isEmpty(searchKey) || Environment.MEDIA_MOUNTED != Environment.getExternalStorageState())
