@@ -89,6 +89,7 @@ class DownloadService : IntentService("DownloadService") {
 
             conn.getInputStream()?.use { input ->
                 FileOutputStream(downloadFile).use { output ->
+                    //todo 测试
                     val fileSize = conn.contentLength//根据响应获取文件大小
                     if (fileSize <= 0) throw RuntimeException("Can't get size of file")
                     val buf = ByteArray(1024)

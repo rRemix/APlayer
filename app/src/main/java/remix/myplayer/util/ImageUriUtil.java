@@ -14,8 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import remix.myplayer.App;
-import remix.myplayer.bean.lastfm.LastFmAlbum;
-import remix.myplayer.bean.lastfm.LastFmArtist;
+import remix.myplayer.bean.lastfm.Image;
 import remix.myplayer.bean.mp3.Album;
 import remix.myplayer.bean.mp3.Artist;
 import remix.myplayer.bean.mp3.Song;
@@ -184,9 +183,9 @@ public class ImageUriUtil {
         SMALL, MEDIUM, LARGE, EXTRALARGE, MEGA, UNKNOWN
     }
 
-    public static String getLargestAlbumImageUrl(List<LastFmAlbum.Album.Image> images) {
-        HashMap imageUrls = new HashMap();
-        for (LastFmAlbum.Album.Image image : images) {
+    public static String getLargestAlbumImageUrl(List<Image> images) {
+        HashMap<ImageSize, String> imageUrls = new HashMap<>();
+        for (Image image : images) {
             ImageSize size = null;
             final String attribute = image.getSize();
             if (attribute == null) {
@@ -205,9 +204,9 @@ public class ImageUriUtil {
         return getLargestImageUrl(imageUrls);
     }
 
-    public static String getLargestArtistImageUrl(List<LastFmArtist.Artist.Image> images) {
+    public static String getLargestArtistImageUrl(List<Image> images) {
         Map<ImageSize, String> imageUrls = new HashMap<>();
-        for (LastFmArtist.Artist.Image image : images) {
+        for (Image image : images) {
             ImageSize size = null;
             final String attribute = image.getSize();
             if (attribute == null) {

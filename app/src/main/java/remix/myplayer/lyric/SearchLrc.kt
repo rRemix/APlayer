@@ -159,6 +159,7 @@ class SearchLrc(private val mSong: Song) {
                     it.readLine().run {
                         e.onNext(Gson().fromJson(this, object : TypeToken<List<LrcRow>>() {}.type))
                         LogUtil.d(TAG, "CacheLyric")
+                        ToastUtil.show(App.getContext(), "CacheLyric")
                     }
                 }
             }
@@ -379,11 +380,13 @@ class SearchLrc(private val mSong: Song) {
         return HttpClient.getKuGouApiservice().getKuGouSearch(1, "yes", "pc", mSearchKey, mSong.duration, "")
                 .flatMap { body ->
                     val searchResponse = Gson().fromJson(body.string(), KSearchResponse::class.java)
-                    HttpClient.getKuGouApiservice().getKuGouLyric(1, "pc", "lrc", "utf8", searchResponse.candidates[0].id,
+                    HttpClient.getKuGouApiservice().getKuGouLyric(1, "pc", "lrc", "utf8",
+                            searchResponse.candidates[0].id,
                             searchResponse.candidates[0].accesskey)
                             .map { lrcBody ->
                                 val lrcResponse = Gson().fromJson(lrcBody.string(), KLrcResponse::class.java)
                                 LogUtil.d(TAG, "KugouLyric")
+                                ToastUtil.show(App.getContext(), "KugouLyric")
                                 mLrcParser.getLrcRows(getBufferReader(Base64.decode(lrcResponse.content, Base64.DEFAULT)), true, mCacheKey, mSearchKey)
                             }
                 }
