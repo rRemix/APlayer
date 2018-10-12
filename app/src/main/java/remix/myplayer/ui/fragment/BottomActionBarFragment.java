@@ -134,7 +134,7 @@ public class BottomActionBarFragment extends BaseMusicFragment {
         updatePlayStatus();
     }
 
-    public void updatePlayStatus(){
+    public void updatePlayStatus() {
         //设置按钮着色
         if (mPlayButton == null)
             return;
@@ -152,7 +152,7 @@ public class BottomActionBarFragment extends BaseMusicFragment {
     //更新界面
     public void updateSong() {
         final Song song = MusicServiceRemote.getCurrentSong();
-        LogUtil.d("BottomBar","CurrentSong: " + song);
+        LogUtil.d("BottomBar", "CurrentSong: " + song);
         //歌曲名 艺术家
         if (mTitle != null)
             mTitle.setText(song.getTitle());
@@ -182,7 +182,7 @@ public class BottomActionBarFragment extends BaseMusicFragment {
 
 
     public void startPlayerActivity() {
-        if(MusicServiceRemote.getCurrentSong().getId() < 0)
+        if (MusicServiceRemote.getCurrentSong().getId() < 0)
             return;
         Intent intent = new Intent(mContext, PlayerActivity.class);
         Bundle bundle = new Bundle();

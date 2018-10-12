@@ -15,13 +15,13 @@ import remix.myplayer.util.ColorUtil;
  */
 @SuppressLint("Registered")
 public class ToolbarActivity extends BaseMusicActivity {
-    protected void setUpToolbar(Toolbar toolbar, String title){
+    protected void setUpToolbar(Toolbar toolbar, String title) {
         toolbar.setTitle(title);
 
         setSupportActionBar(toolbar);
         //主题颜色
         int themeColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white);
-        toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.common_btn_back,themeColor));
+        toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.common_btn_back, themeColor));
         toolbar.setTitleTextColor(themeColor);
 
         toolbar.setNavigationOnClickListener(v -> onClickNavigation());
@@ -41,7 +41,7 @@ public class ToolbarActivity extends BaseMusicActivity {
 //        });
     }
 
-    protected void onClickNavigation(){
+    protected void onClickNavigation() {
         finish();
     }
 

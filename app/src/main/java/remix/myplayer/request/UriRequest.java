@@ -20,15 +20,16 @@ public class UriRequest implements Serializable {
     private String mAlbumName = "";
     private String mArtistName = "";
 
-    public UriRequest(){}
+    public UriRequest() {
+    }
 
-    public UriRequest(int id, int searchType,int neteaseType) {
+    public UriRequest(int id, int searchType, int neteaseType) {
         this.mSearchType = searchType;
         this.mId = id;
         this.mNeteaseType = neteaseType;
     }
 
-    public UriRequest(int id, int searchType,int neteaseType ,String albumName, String artistName) {
+    public UriRequest(int id, int searchType, int neteaseType, String albumName, String artistName) {
         this.mId = id;
         this.mSearchType = searchType;
         this.mNeteaseType = neteaseType;
@@ -36,14 +37,14 @@ public class UriRequest implements Serializable {
         this.mArtistName = artistName;
     }
 
-    public UriRequest(int id, int searchType,int neteaseType, String artistName) {
+    public UriRequest(int id, int searchType, int neteaseType, String artistName) {
         this.mId = id;
         this.mSearchType = searchType;
         this.mNeteaseType = neteaseType;
         this.mArtistName = artistName;
     }
 
-    public UriRequest(int id, int searchType,int neteaseType, String title, String albumName, String artistName) {
+    public UriRequest(int id, int searchType, int neteaseType, String title, String albumName, String artistName) {
         this.mId = id;
         this.mSearchType = searchType;
         this.mNeteaseType = neteaseType;
@@ -52,34 +53,34 @@ public class UriRequest implements Serializable {
         this.mArtistName = artistName;
     }
 
-    public String getNeteaseCacheKey(){
+    public String getNeteaseCacheKey() {
         return mSearchType + "-" + mId;
     }
 
-    public String getNeteaseSearchKey(){
+    public String getNeteaseSearchKey() {
         boolean isTitleAvailable = !ImageUriUtil.isSongNameUnknownOrEmpty(mTitle);
         boolean isAlbumAvailable = !ImageUriUtil.isAlbumNameUnknownOrEmpty(mAlbumName);
         boolean isArtistAvailable = !ImageUriUtil.isArtistNameUnknownOrEmpty(mArtistName);
-        if(mSearchType == ImageUriRequest.URL_ALBUM){
+        if (mSearchType == ImageUriRequest.URL_ALBUM) {
             //歌曲名合法
-            if(isTitleAvailable){
+            if (isTitleAvailable) {
                 //艺术家合法
-                if(isArtistAvailable){
+                if (isArtistAvailable) {
                     return mTitle + "-" + mArtistName;
                 }
                 //专辑名合法
-                if(isAlbumAvailable){
+                if (isAlbumAvailable) {
                     return mTitle + "-" + mAlbumName;
                 }
             }
             //根据专辑名字查询
-            if(isAlbumAvailable && isArtistAvailable){
+            if (isAlbumAvailable && isArtistAvailable) {
                 return mArtistName + "-" + mAlbumName;
             }
 //            if(isAlbumAvailable)
 //                return mAlbumName;
-        }else if(mSearchType == ImageUriRequest.URL_ARTIST){
-            if(isArtistAvailable)
+        } else if (mSearchType == ImageUriRequest.URL_ARTIST) {
+            if (isArtistAvailable)
                 return mArtistName;
         }
         return "";

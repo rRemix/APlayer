@@ -15,6 +15,7 @@ import org.jetbrains.anko.uiThread
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.misc.interfaces.OnItemClickListener
+import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.adapter.CustomSortAdapter
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
@@ -89,13 +90,10 @@ class CustomSortActivity : ToolbarActivity() {
         else
             ThemeStore.getTextColorPrimary())
 
-        mMDDialog = MaterialDialog.Builder(this)
+        mMDDialog = Theme.getBaseDialog(mContext)
                 .title(R.string.saveing)
-                .titleColorAttr(R.attr.text_color_primary)
                 .content(R.string.please_wait)
-                .contentColorAttr(R.attr.text_color_primary)
                 .progress(true, 0)
-                .backgroundColorAttr(R.attr.background_color_3)
                 .progressIndeterminateStyle(false).build()
     }
 

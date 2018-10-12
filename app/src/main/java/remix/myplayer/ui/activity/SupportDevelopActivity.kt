@@ -34,6 +34,7 @@ import remix.myplayer.bean.misc.PurchaseBean
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.request.network.RxUtil
+import remix.myplayer.theme.Theme
 import remix.myplayer.ui.adapter.PurchaseAdapter
 import remix.myplayer.util.AlipayUtil
 import remix.myplayer.util.ToastUtil
@@ -143,17 +144,12 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
                                 })
                     }
                     1 -> {
-                        MaterialDialog.Builder(mContext)
+                        Theme.getBaseDialog(mContext)
                                 .title(R.string.support_develop)
-                                .titleColorAttr(R.attr.text_color_primary)
                                 .positiveText(R.string.jump_alipay_account)
                                 .negativeText(R.string.cancel)
                                 .content(R.string.donate_tip)
                                 .onPositive { _, _ -> AlipayUtil.startAlipayClient(mContext as Activity) }
-                                .backgroundColorAttr(R.attr.background_color_3)
-                                .positiveColorAttr(R.attr.text_color_primary)
-                                .negativeColorAttr(R.attr.text_color_primary)
-                                .contentColorAttr(R.attr.text_color_primary)
                                 .show()
                     }
                     2 -> {
@@ -171,14 +167,11 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
         mRecyclerView.layoutManager = GridLayoutManager(mContext, 2)
         mRecyclerView.adapter = mAdapter
 
-        mLoading = MaterialDialog.Builder(this)
+        mLoading = Theme.getBaseDialog(mContext)
                 .title(R.string.loading)
-                .titleColorAttr(R.attr.text_color_primary)
                 .content(R.string.please_wait)
-                .contentColorAttr(R.attr.text_color_primary)
                 .canceledOnTouchOutside(false)
                 .progress(true, 0)
-                .backgroundColorAttr(R.attr.background_color_3)
                 .progressIndeterminateStyle(false).build()
 
         mBillingProcessor = BillingProcessor(this, BuildConfig.GOOGLE_PLAY_LICENSE_KEY, this)

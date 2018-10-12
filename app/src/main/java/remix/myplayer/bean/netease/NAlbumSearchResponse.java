@@ -12,7 +12,7 @@ public class NAlbumSearchResponse implements Serializable {
     public ResultBean result;
     public int code;
 
-    public static class ResultBean implements Serializable{
+    public static class ResultBean implements Serializable {
         private static final long serialVersionUID = -966951494042024200L;
         public int albumCount;
         public List<AlbumsBean> albums;

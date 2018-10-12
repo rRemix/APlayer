@@ -70,7 +70,7 @@ public class CircleSeekBar extends AbsSeekBar {
     /**
      * 最大计时值
      */
-    private int mProgressMax ;
+    private int mProgressMax;
 
     /**
      * 当前进度
@@ -120,13 +120,13 @@ public class CircleSeekBar extends AbsSeekBar {
     private boolean mStart = false;
 
     public CircleSeekBar(Context context) {
-        this(context,null,0);
+        this(context, null, 0);
         mContext = context;
         init();
     }
 
     public CircleSeekBar(Context context, AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
         mContext = context;
         mAttrs = attrs;
         init();
@@ -137,22 +137,22 @@ public class CircleSeekBar extends AbsSeekBar {
         mContext = context;
         mAttrs = attrs;
         init();
-        
+
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         //阴影
-        canvas.drawCircle(mCenterX,mCenterY,mRadius,mShadowCirclePaint);
+        canvas.drawCircle(mCenterX, mCenterY, mRadius, mShadowCirclePaint);
         //背景圆圈
         canvas.drawCircle(mCenterX, mCenterY, mRadius, mCirclePaint);
         //圆弧
         canvas.drawArc(mRectF, -90, (float) Math.toDegrees(mRad), false, mArcPaint);
 
-        mThumbDrawable.setBounds((int)(mCenterX + mOffsetX - mThumbWidth / 2),
-                (int)(mCenterY + mOffsetY - mThumbHeight / 2),
-                (int)(mCenterX + mOffsetX + mThumbWidth / 2),
-                (int)(mCenterY + mOffsetY + mThumbHeight / 2));
+        mThumbDrawable.setBounds((int) (mCenterX + mOffsetX - mThumbWidth / 2),
+                (int) (mCenterY + mOffsetY - mThumbHeight / 2),
+                (int) (mCenterX + mOffsetX + mThumbWidth / 2),
+                (int) (mCenterY + mOffsetY + mThumbHeight / 2));
 
         mThumbDrawable.draw(canvas);
     }
@@ -161,8 +161,8 @@ public class CircleSeekBar extends AbsSeekBar {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         //没有开始计时，更新界面
-        if(!mStart)
-            seekTo(event.getX(),event.getY(),event.getAction() == MotionEvent.ACTION_UP);
+        if (!mStart)
+            seekTo(event.getX(), event.getY(), event.getAction() == MotionEvent.ACTION_UP);
         return true;
     }
 
@@ -170,24 +170,25 @@ public class CircleSeekBar extends AbsSeekBar {
 
     /**
      * 根据触摸位置计算偏移大小并更新界面
+     *
      * @param eventX
      * @param eventY
-     * @param isUp 是否抬起，用于更新thumb状态
+     * @param isUp   是否抬起，用于更新thumb状态
      */
-    private void seekTo(float eventX,float eventY,boolean isUp) {
-        if(isPointOnThumb(eventX,eventY) && !isUp){
+    private void seekTo(float eventX, float eventY, boolean isUp) {
+        if (isPointOnThumb(eventX, eventY) && !isUp) {
             mRad = Math.atan2(eventY - mCenterY, eventX - mCenterX);
             //转换角度，以12点方向为0度
-            if(mRad > -0.5 * Math.PI && mRad < Math.PI)
+            if (mRad > -0.5 * Math.PI && mRad < Math.PI)
                 mRad += 0.5 * Math.PI;
             else
                 mRad = 2.5 * Math.PI + mRad;
             setThumbPosition(mRad);
             //设置当前进度
-            mProgress = (int)(Math.toDegrees(mRad) / 360.0 * mProgressMax);
+            mProgress = (int) (Math.toDegrees(mRad) / 360.0 * mProgressMax);
             //设置thumb状态
-            if(mOnSeekBarChangeListener != null)
-                mOnSeekBarChangeListener.onProgressChanged(this,mProgress,true);
+            if (mOnSeekBarChangeListener != null)
+                mOnSeekBarChangeListener.onProgressChanged(this, mProgress, true);
         }
         mThumbDrawable.setState(isUp ? mThumbNormal : mThumbPressed);
         invalidate();
@@ -196,6 +197,7 @@ public class CircleSeekBar extends AbsSeekBar {
 
     /**
      * 根据弧度计算偏移量
+     *
      * @param radian 滑过的弧度
      */
     private void setThumbPosition(double radian) {
@@ -208,7 +210,7 @@ public class CircleSeekBar extends AbsSeekBar {
         boolean result = false;
         double distance = Math.sqrt(Math.pow(eventX - mCenterX, 2)
                 + Math.pow(eventY - mCenterY, 2));
-        if (distance > mRadius - mThumbSize / 2 ){
+        if (distance > mRadius - mThumbSize / 2) {
             result = true;
         }
         return result;
@@ -223,8 +225,8 @@ public class CircleSeekBar extends AbsSeekBar {
         //轨道颜色 宽度 最大值
         mProgressColor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color,
                 ThemeStore.getAccentColor());
-        mProgressWidth = (int)typedArray.getDimension(R.styleable.CircleSeekBar_progress_width,14);
-        mProgressMax = typedArray.getInteger(R.styleable.CircleSeekBar_progress_max,600);
+        mProgressWidth = (int) typedArray.getDimension(R.styleable.CircleSeekBar_progress_width, 14);
+        mProgressMax = typedArray.getInteger(R.styleable.CircleSeekBar_progress_max, 600);
         typedArray.recycle();
 
         //圆圈画笔
@@ -247,26 +249,26 @@ public class CircleSeekBar extends AbsSeekBar {
         mShadowCirclePaint.setStyle(Paint.Style.STROKE);
         mShadowCirclePaint.setColor(ColorUtil.getColor(R.color.gray_b7b7b7));
         mShadowCirclePaint.setStrokeWidth(mProgressWidth);
-        mShadowCirclePaint.setShadowLayer(DensityUtil.dip2px(mContext,2.5f),0,0,ColorUtil.getColor(R.color.gray_b7b7b7));
+        mShadowCirclePaint.setShadowLayer(DensityUtil.dip2px(mContext, 2.5f), 0, 0, ColorUtil.getColor(R.color.gray_b7b7b7));
 
         setLayerType(LAYER_TYPE_SOFTWARE, mShadowCirclePaint);
 
 
         mThumbWidth = mThumbDrawable.getIntrinsicWidth();
         mThumbHeight = mThumbDrawable.getIntrinsicHeight();
-        mThumbSize =  Math.sqrt(mThumbHeight * mThumbHeight + mThumbWidth * mThumbWidth);
+        mThumbSize = Math.sqrt(mThumbHeight * mThumbHeight + mThumbWidth * mThumbWidth);
 
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mCenterX = getWidth() /  2;
+        mCenterX = getWidth() / 2;
         mCenterY = getHeight() / 2;
         mRadius = mCenterX > mCenterY ? mCenterY : mCenterX - mThumbWidth / 2;
 
-        if(mRadius > 0) {
-            mRectF = new RectF( mCenterX - mRadius,
+        if (mRadius > 0) {
+            mRectF = new RectF(mCenterX - mRadius,
                     mCenterY - mRadius,
                     mCenterX + mRadius,
                     mCenterY + mRadius);
@@ -291,15 +293,16 @@ public class CircleSeekBar extends AbsSeekBar {
 
     /**
      * 设置进度，并根据进度值，计算划过角度，再计算偏移距离
+     *
      * @param progress
      */
     public void setProgress(int progress) {
-        if(progress >= mProgressMax)
+        if (progress >= mProgressMax)
             progress = mProgressMax;
-        if(progress <= 0)
+        if (progress <= 0)
             progress = 0;
         mProgress = progress;
-        mRad = Math.toRadians(progress * 360.0 / mProgressMax );
+        mRad = Math.toRadians(progress * 360.0 / mProgressMax);
         setThumbPosition(mRad);
         invalidate();
     }
@@ -307,7 +310,9 @@ public class CircleSeekBar extends AbsSeekBar {
 
     public interface OnSeekBarChangeListener {
         void onProgressChanged(CircleSeekBar seekBar, long progress, boolean fromUser);
+
         void onStartTrackingTouch(CircleSeekBar seekBar);
+
         void onStopTrackingTouch(CircleSeekBar seekBar);
     }
 

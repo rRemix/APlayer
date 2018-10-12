@@ -15,7 +15,7 @@ public class KSearchResponse implements Serializable {
     public String keyword;
     public List<SearchActualData> candidates;
 
-    public static class SearchActualData implements Serializable{
+    public static class SearchActualData implements Serializable {
         private static final long serialVersionUID = -2720016148055276583L;
         public String soundname;
         public int krctype;

@@ -22,9 +22,11 @@ import remix.myplayer.util.LogUtil;
  * Created by taeja on 16-4-13.
  */
 public class EQSeekBar extends View {
-    public interface OnSeekBarChangeListener{
+    public interface OnSeekBarChangeListener {
         void onProgressChanged(EQSeekBar seekBar, int position, boolean fromUser);
+
         void onStartTrackingTouch(EQSeekBar seekBar);
+
         void onStopTrackingTouch(EQSeekBar seekBar);
     }
 
@@ -36,7 +38,6 @@ public class EQSeekBar extends View {
      */
     private int mViewWidth;
     private int mViewHeight;
-
 
 
     /**
@@ -97,7 +98,7 @@ public class EQSeekBar extends View {
     /**
      * 非使能状态下已完成轨道颜色
      */
-    private int  mProgressColor;
+    private int mProgressColor;
 
     /**
      * 已完成轨道的画笔
@@ -123,7 +124,7 @@ public class EQSeekBar extends View {
     /**
      * 所有小圆点的坐标
      */
-    private ArrayList<Integer> mDotPosition  = new ArrayList<>();
+    private ArrayList<Integer> mDotPosition = new ArrayList<>();
 
     /**
      * Thumb的高度与宽度
@@ -156,7 +157,6 @@ public class EQSeekBar extends View {
 
     /**
      * 底部提示文字
-     *
      */
     private String mFreText = "100";
 
@@ -192,27 +192,27 @@ public class EQSeekBar extends View {
 
     public EQSeekBar(Context context) {
         super(context);
-        init(context,null);
+        init(context, null);
 
     }
 
     public EQSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context,attrs);
+        init(context, attrs);
     }
 
     public EQSeekBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context,attrs);
+        init(context, attrs);
     }
 
-    private void init(Context context,AttributeSet attributeSet){
+    private void init(Context context, AttributeSet attributeSet) {
         mInit = false;
         mContext = context;
-        TypedArray typedArray = mContext.obtainStyledAttributes(attributeSet,R.styleable.EQSeekBar);
+        TypedArray typedArray = mContext.obtainStyledAttributes(attributeSet, R.styleable.EQSeekBar);
         //初始化thumbdrawable及其状态
         mThumbDrawable = Theme.getTinThumb(mContext);
-        if(mThumbDrawable == null)
+        if (mThumbDrawable == null)
             mThumbDrawable = getResources().getDrawable(R.drawable.bg_circleseekbar_thumb);
 
         //计算thumb的大小
@@ -239,13 +239,13 @@ public class EQSeekBar extends View {
                 ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_nonenable_text_color : R.color.night_nonenable_text_color));
 
         //间隔点数量
-        mDotNum = typedArray.getInteger(R.styleable.EQSeekBar_eqdotnum,31);
+        mDotNum = typedArray.getInteger(R.styleable.EQSeekBar_eqdotnum, 31);
 
         //轨道宽度
-        mTrackWidth = (int)typedArray.getDimension(R.styleable.EQSeekBar_eqtrackwidth, DensityUtil.dip2px(mContext,3));
+        mTrackWidth = (int) typedArray.getDimension(R.styleable.EQSeekBar_eqtrackwidth, DensityUtil.dip2px(mContext, 3));
 
         //顶部提示文字画笔
-        mFreTextSize = DensityUtil.dip2px(getContext(),13);
+        mFreTextSize = DensityUtil.dip2px(getContext(), 13);
         mFreTextPaint = new Paint();
         mFreTextPaint.setAntiAlias(true);
         mFreTextPaint.setColor(mEnable ? mEnableTextColor : mTextColor);
@@ -254,7 +254,7 @@ public class EQSeekBar extends View {
         mFreTextPaint.setTextAlign(Paint.Align.CENTER);
 
         //底部提示文字画笔
-        mTipTextSize = DensityUtil.dip2px(getContext(),14);
+        mTipTextSize = DensityUtil.dip2px(getContext(), 14);
         mTipTextPaint = new Paint();
         mTipTextPaint.setAntiAlias(true);
         mTipTextPaint.setColor(mEnable ? mEnableTextColor : mTextColor);
@@ -280,93 +280,93 @@ public class EQSeekBar extends View {
     }
 
 
-    public void setFreText(String freText){
+    public void setFreText(String freText) {
         mFreText = freText;
     }
 
-    private int getMaxTextSize(){
+    private int getMaxTextSize() {
         return mTipTextSize > mFreTextSize ? mTipTextSize : mFreTextSize;
     }
 
     @Override
     protected synchronized void onDraw(Canvas canvas) {
         //整个轨道
-        canvas.drawLine(mViewWidth / 2 , mThumbWidth * 2, mViewWidth / 2, mThumbWidth * 2 + mTrackHeigh, mTrackPaint);
+        canvas.drawLine(mViewWidth / 2, mThumbWidth * 2, mViewWidth / 2, mThumbWidth * 2 + mTrackHeigh, mTrackPaint);
         //已完成轨道
         canvas.drawLine(mViewWidth / 2, mThumbWidth * 2, mViewWidth / 2, mThumbCenterY, mProgressPaint);
 
 //      //顶部与底部文字
         int y = mThumbWidth > getMaxTextSize() ? mThumbWidth : getMaxTextSize();
-        canvas.drawText(mDBText,mViewWidth / 2, y ,mFreTextPaint);
+        canvas.drawText(mDBText, mViewWidth / 2, y, mFreTextPaint);
         canvas.drawText(mFreText, mViewWidth / 2, y + mTrackHeigh + mThumbWidth * 2.5f, mTipTextPaint);
 
         //thumb
         mThumbDrawable.setBounds((mViewWidth - mThumbWidth) / 2,
-                                mThumbCenterY - mThumbWidth / 2,
-                                (mViewWidth - mThumbWidth) / 2 + mThumbWidth ,
-                                mThumbCenterY + mThumbWidth / 2);
+                mThumbCenterY - mThumbWidth / 2,
+                (mViewWidth - mThumbWidth) / 2 + mThumbWidth,
+                mThumbCenterY + mThumbWidth / 2);
         mThumbDrawable.draw(canvas);
     }
 
-    private void seekTo(int eventY,boolean isUp){
-        if(!mCanDrag)
+    private void seekTo(int eventY, boolean isUp) {
+        if (!mCanDrag)
             return;
 
         //设置thumb状态
         mThumbDrawable.setState(isUp ? mThumbNormal : mThumbPressed);
-        if(eventY > mDotPosition.get(mDotPosition.size() - 1) || eventY < mDotPosition.get(0)){
+        if (eventY > mDotPosition.get(mDotPosition.size() - 1) || eventY < mDotPosition.get(0)) {
             invalidate();
             return;
         }
 
         float temp = Integer.MAX_VALUE;
-        for(int i = 0 ; i < mDotPosition.size() ;i++){
-            if(Math.abs(mDotPosition.get(i) - eventY) < temp){
+        for (int i = 0; i < mDotPosition.size(); i++) {
+            if (Math.abs(mDotPosition.get(i) - eventY) < temp) {
                 mPositon = i;
                 temp = Math.abs(mDotPosition.get(i) - eventY);
             }
         }
         //寻找与当前触摸点最近的值
-        if(isUp){
+        if (isUp) {
             mThumbCenterY = Math.round(mDotPosition.get(mPositon));
         } else {
             mThumbCenterY = eventY;
         }
 
         //计算progress
-        mProgress = (int)(1.0 *  (eventY - mThumbHeight) / mTrackHeigh * mMax);
+        mProgress = (int) (1.0 * (eventY - mThumbHeight) / mTrackHeigh * mMax);
 
-        if(mOnSeekBarChangeListener != null)
-            mOnSeekBarChangeListener.onProgressChanged(this,mPositon,true);
+        if (mOnSeekBarChangeListener != null)
+            mOnSeekBarChangeListener.onProgressChanged(this, mPositon, true);
 
         //确定DB值
         mDB = 15 - mPositon;
 
-        if(mDB > 0)
+        if (mDB > 0)
             mDBText = "+" + mDB;
-        else if(mDB < 0)
+        else if (mDB < 0)
             mDBText = mDB + "";
         else
             mDBText = "0";
 
-        LogUtil.d(TAG,"DB: " + mDB);
+        LogUtil.d(TAG, "DB: " + mDB);
 
         invalidate();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        LogUtil.d(TAG,"EventY:" + event.getY());
-        int eventY = (int)event.getY();
-        seekTo(eventY,event.getAction() == MotionEvent.ACTION_UP);
+        LogUtil.d(TAG, "EventY:" + event.getY());
+        int eventY = (int) event.getY();
+        seekTo(eventY, event.getAction() == MotionEvent.ACTION_UP);
         return true;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec,heightMeasureSpec);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        if((mViewWidth = getMeasuredWidth()) > 0 && (mViewHeight = getMeasuredHeight()) > 0){
+        if ((mViewWidth = getMeasuredWidth()) > 0 && (mViewHeight = getMeasuredHeight()) > 0) {
             int paddingtop = getPaddingTop();
             int paddingbottom = getPaddingBottom();
             mTrackHeigh = mViewHeight - paddingtop - paddingbottom - mThumbWidth * 4;
@@ -374,7 +374,7 @@ public class EQSeekBar extends View {
             mDotBetween = Math.round(mTrackHeigh * 1.0f / (mDotNum - 1));
             mDotPosition.clear();
             //设置所有小圆点的坐标
-            for(int i = 0 ; i < mDotNum ; i++){
+            for (int i = 0; i < mDotNum; i++) {
                 mDotPosition.add(mThumbWidth * 2 + mDotBetween * i);
             }
             mThumbCenterY = Math.round(mDotPosition.get(mPositon));
@@ -383,27 +383,28 @@ public class EQSeekBar extends View {
         }
     }
 
-    public void setOnSeekBarChangeListener(OnSeekBarChangeListener l){
+    public void setOnSeekBarChangeListener(OnSeekBarChangeListener l) {
         mOnSeekBarChangeListener = l;
     }
 
 
-    public void setMax(int max){
+    public void setMax(int max) {
         mMax = max;
     }
-    public int getMax(){
+
+    public int getMax() {
         return mMax;
     }
 
-    public void setProgress(int progress){
-        if(progress > mMax)
+    public void setProgress(int progress) {
+        if (progress > mMax)
             progress = mMax;
-        if(progress < 0)
+        if (progress < 0)
             progress = 0;
         mProgress = progress;
-        int eventY = (int)((1.0 * mProgress / mMax) * mTrackHeigh + mThumbHeight * 2);
-        if(mInit)
-            seekTo(eventY,true);
+        int eventY = (int) ((1.0 * mProgress / mMax) * mTrackHeigh + mThumbHeight * 2);
+        if (mInit)
+            seekTo(eventY, true);
         //mThumbCenterY
 //        int temp = Integer.MAX_VALUE;
 //        for(int i = 0 ; i < mDotPosition.size() ;i++){
@@ -413,29 +414,30 @@ public class EQSeekBar extends View {
 //            }
 //        }
     }
-    public int getProgress(){
+
+    public int getProgress() {
         return mProgress;
     }
 
-    public void setDrag(boolean canDrag){
+    public void setDrag(boolean canDrag) {
         mCanDrag = canDrag;
     }
 
-    public boolean canDrag(){
+    public boolean canDrag() {
         return mCanDrag;
     }
 
-    public void setProgressColor(int color){
+    public void setProgressColor(int color) {
         mProgressColor = color;
-        if(mProgressPaint != null) {
+        if (mProgressPaint != null) {
             mProgressPaint.setColor(mProgressColor);
             invalidate();
         }
     }
 
-    public void setTrackColor(int color){
+    public void setTrackColor(int color) {
         mEnableTrackColor = color;
-        if(mTrackPaint != null) {
+        if (mTrackPaint != null) {
             mTrackPaint.setColor(color);
             invalidate();
         }
@@ -452,7 +454,7 @@ public class EQSeekBar extends View {
     }
 
     //是否初始化完成
-    public boolean isInit(){
+    public boolean isInit() {
         return mInit;
     }
 }

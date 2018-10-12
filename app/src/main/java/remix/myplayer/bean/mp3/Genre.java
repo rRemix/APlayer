@@ -9,11 +9,14 @@ package remix.myplayer.bean.mp3;
 public class Genre {
     public int GenreID;
     public String GenreName = "";
-    public Genre(int id,String name){
+
+    public Genre(int id, String name) {
         GenreID = id;
         GenreName = name;
     }
-    public Genre(){}
+
+    public Genre() {
+    }
 
     @Override
     public String toString() {

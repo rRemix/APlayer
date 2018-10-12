@@ -12,14 +12,16 @@ import io.reactivex.schedulers.Schedulers;
 
 public class RxUtil {
     private static final String TAG = "APlayerNetwork";
-    private RxUtil(){}
 
-    public static <T> ObservableTransformer<T,T> applyScheduler(){
+    private RxUtil() {
+    }
+
+    public static <T> ObservableTransformer<T, T> applyScheduler() {
         return upstream -> upstream.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public static <T> ObservableTransformer<T,T> applySchedulerToIO(){
+    public static <T> ObservableTransformer<T, T> applySchedulerToIO() {
         return upstream -> upstream.subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io());
     }

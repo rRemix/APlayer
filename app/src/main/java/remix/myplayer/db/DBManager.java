@@ -16,10 +16,10 @@ public class DBManager {
     private static DBOpenHelper mOpenHelper;
     private SQLiteDatabase mDateBase;
 
-    public static void initialInstance(DBOpenHelper helper){
-        if(mInstance == null){
-            synchronized (DBManager.class){
-                if(mInstance == null){
+    public static void initialInstance(DBOpenHelper helper) {
+        if (mInstance == null) {
+            synchronized (DBManager.class) {
+                if (mInstance == null) {
                     mInstance = new DBManager();
                     mOpenHelper = helper;
                 }
@@ -35,22 +35,22 @@ public class DBManager {
         return mInstance;
     }
 
-    public synchronized SQLiteDatabase openDataBase(){
+    public synchronized SQLiteDatabase openDataBase() {
 //        int ret = mOpenCounter.incrementAndGet();
 //        if(ret == 1)
-        if(mDateBase == null)
+        if (mDateBase == null)
             mDateBase = mOpenHelper.getWritableDatabase();
         return mDateBase;
     }
 
-    public synchronized void closeDataBase(){
+    public synchronized void closeDataBase() {
 //        if(mOpenCounter.decrementAndGet() == 0 && mDateBase != null && mDateBase.isOpen()){
 //            mDateBase.close();
 //        }
     }
 
-    public synchronized void closeIfNeed(){
-        if(mDateBase != null && mDateBase.isOpen()){
+    public synchronized void closeIfNeed() {
+        if (mDateBase != null && mDateBase.isOpen()) {
             mDateBase.close();
         }
     }

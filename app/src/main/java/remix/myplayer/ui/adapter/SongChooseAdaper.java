@@ -29,16 +29,16 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * @Date 2016/10/21 10:02
  */
 
-public class SongChooseAdaper extends BaseAdapter<Song,SongChooseAdaper.SongChooseHolder> {
+public class SongChooseAdaper extends BaseAdapter<Song, SongChooseAdaper.SongChooseHolder> {
     private OnSongChooseListener mCheckListener;
     private ArrayList<Integer> mCheckSongIdList = new ArrayList<>();
 
-    public SongChooseAdaper(Context context,int layoutID,OnSongChooseListener l) {
-        super(context,layoutID);
+    public SongChooseAdaper(Context context, int layoutID, OnSongChooseListener l) {
+        super(context, layoutID);
         mCheckListener = l;
     }
 
-    public ArrayList<Integer> getCheckedSong(){
+    public ArrayList<Integer> getCheckedSong() {
         return mCheckSongIdList;
     }
 
@@ -64,16 +64,16 @@ public class SongChooseAdaper extends BaseAdapter<Song,SongChooseAdaper.SongChoo
         holder.mCheck.setOnCheckedChangeListener(null);
         holder.mCheck.setChecked(mCheckSongIdList != null && mCheckSongIdList.contains(audioId));
         holder.mCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(isChecked && !mCheckSongIdList.contains(audioId)){
+            if (isChecked && !mCheckSongIdList.contains(audioId)) {
                 mCheckSongIdList.add(audioId);
-            } else if (!isChecked){
+            } else if (!isChecked) {
                 mCheckSongIdList.remove(Integer.valueOf(audioId));
             }
             mCheckListener.OnSongChoose(mCheckSongIdList != null && mCheckSongIdList.size() > 0);
         });
     }
 
-    static class SongChooseHolder extends BaseViewHolder{
+    static class SongChooseHolder extends BaseViewHolder {
         @BindView(R.id.checkbox)
         AppCompatCheckBox mCheck;
         @BindView(R.id.item_img)
@@ -84,6 +84,7 @@ public class SongChooseAdaper extends BaseAdapter<Song,SongChooseAdaper.SongChoo
         TextView mArtist;
         @BindView(R.id.item_root)
         RelativeLayout mRoot;
+
         SongChooseHolder(View itemView) {
             super(itemView);
         }

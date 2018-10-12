@@ -21,19 +21,21 @@ public interface ApiService {
 //    @Headers("Cookie: appver=1.5.0.75771")
     Observable<ResponseBody> getNeteaseSearch(@Query("s") String key, @Query("offset") int offset,
                                               @Query("limit") int limit, @Query("type") int type);
+
     @GET("song/lyric")
 //    @Headers("Cookie: appver=1.5.0.75771")
-    Observable<ResponseBody> getNeteaseLyric(@Query("os") String os,@Query("id") int id,@Query("lv") int lv,@Query("kv") int kv,@Query("tv") int tv);
+    Observable<ResponseBody> getNeteaseLyric(@Query("os") String os, @Query("id") int id, @Query("lv") int lv, @Query("kv") int kv, @Query("tv") int tv);
 
     @GET("search")
-    Observable<ResponseBody> getKuGouSearch(@Query("ver") int ver,@Query("man") String man,@Query("client") String client,
-                                            @Query("keyword") String keyword,@Query("duration") long duration,@Query("hash") String hash);
+    Observable<ResponseBody> getKuGouSearch(@Query("ver") int ver, @Query("man") String man, @Query("client") String client,
+                                            @Query("keyword") String keyword, @Query("duration") long duration, @Query("hash") String hash);
 
     @GET("download")
-    Observable<ResponseBody> getKuGouLyric(@Query("ver") int ver,@Query("client") String client,@Query("fmt") String fmt,@Query("charset") String charSet,
-                                            @Query("id") int id,@Query("accesskey") String accessKey);
+    Observable<ResponseBody> getKuGouLyric(@Query("ver") int ver, @Query("client") String client, @Query("fmt") String fmt, @Query("charset") String charSet,
+                                           @Query("id") int id, @Query("accesskey") String accessKey);
 
     String BASE_QUERY_PARAMETERS = "?format=json&autocorrect=1&api_key=" + BuildConfig.LASTFM_API_KEY;
+
     @GET(BASE_QUERY_PARAMETERS + "&method=album.getinfo")
     Observable<ResponseBody> getAlbumInfo(@Query("album") String albumName, @Query("artist") String artistName, @Nullable @Query("lang") String language);
 

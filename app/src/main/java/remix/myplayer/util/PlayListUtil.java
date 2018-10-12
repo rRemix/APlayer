@@ -23,7 +23,7 @@ import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.SortOrder;
 
-import static remix.myplayer.util.MediaStoreUtil.getMP3Info;
+import static remix.myplayer.util.MediaStoreUtil.getSongInfo;
 
 
 /**
@@ -35,188 +35,201 @@ import static remix.myplayer.util.MediaStoreUtil.getMP3Info;
 public class PlayListUtil {
     private static final String TAG = "PlayListUtil";
     private static Context mContext;
-    private PlayListUtil(){}
-    public static void setContext(Context context){
+
+    private PlayListUtil() {
+    }
+
+    public static void setContext(Context context) {
         mContext = context;
     }
 
     /**
      * 新增播放列表
+     *
      * @param playListName
      * @return 新增的播放列表id -1:播放列表名字为空 -2:该播放列表已经存在
      */
     public static int addPlayList(String playListName) {
-        if(TextUtils.isEmpty(playListName))
+        if (TextUtils.isEmpty(playListName))
             return -1;
-        for(PlayList info : Global.PlayList){
-            if(info.Name.equals(playListName))
+        for (PlayList info : Global.PlayList) {
+            if (info.Name.equals(playListName))
                 return -2;
         }
         ContentValues cv = new ContentValues();
         cv.put(PlayLists.PlayListColumns.COUNT, 0);
         cv.put(PlayLists.PlayListColumns.NAME, playListName);
-        cv.put(PlayLists.PlayListColumns.DATE,System.currentTimeMillis());
+        cv.put(PlayLists.PlayListColumns.DATE, System.currentTimeMillis());
         Uri uri = mContext.getContentResolver().insert(PlayLists.CONTENT_URI, cv);
         return uri != null ? (int) ContentUris.parseId(uri) : -1;
     }
 
     /**
      * 删除一个播放列表
+     *
      * @param id
      * @return
      */
-    public static boolean deletePlayList(int id){
-        return id > 0 && mContext.getContentResolver().delete(PlayLists.CONTENT_URI, PlayLists.PlayListColumns._ID + "=?",new String[]{id + ""}) > 0;
+    public static boolean deletePlayList(int id) {
+        return id > 0 && mContext.getContentResolver().delete(PlayLists.CONTENT_URI, PlayLists.PlayListColumns._ID + "=?", new String[]{id + ""}) > 0;
     }
 
     /**
      * 删除多个播放列表
+     *
      * @param IdList
      * @return
      */
-    public static int deleteMultiPlayList(List<Integer> IdList){
-        if(IdList == null || IdList.size() == 0)
+    public static int deleteMultiPlayList(List<Integer> IdList) {
+        if (IdList == null || IdList.size() == 0)
             return 0;
         StringBuilder where = new StringBuilder();
         String[] whereArgs = new String[IdList.size()];
-        for(int i = 0 ; i < IdList.size() ;i++){
+        for (int i = 0; i < IdList.size(); i++) {
             whereArgs[i] = IdList.get(i) + "";
             where.append(PlayLists.PlayListColumns._ID + "=?");
-            if(i != IdList.size() - 1){
+            if (i != IdList.size() - 1) {
                 where.append(" or ");
             }
         }
-        return mContext.getContentResolver().delete(PlayLists.CONTENT_URI, where.toString(),whereArgs);
+        return mContext.getContentResolver().delete(PlayLists.CONTENT_URI, where.toString(), whereArgs);
     }
 
     /**
      * 添加一首歌曲
+     *
      * @param info
      * @return 新增歌曲的id
      */
-    public static int addSong(PlayListSong info){
-        if(getIDList(info.PlayListID).contains(info.AudioId))
+    public static int addSong(PlayListSong info) {
+        if (getIDList(info.PlayListID).contains(info.AudioId))
             return 0;
         ContentValues cv = new ContentValues();
-        cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID,info.AudioId);
+        cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID, info.AudioId);
 
-        cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID,info.PlayListID);
-        cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME,info.PlayListName);
+        cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID, info.PlayListID);
+        cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME, info.PlayListName);
         Uri uri = mContext.getContentResolver().insert(PlayListSongs.CONTENT_URI, cv);
         return uri != null ? (int) ContentUris.parseId(uri) : -1;
     }
 
     /**
      * 添加多首歌曲
+     *
      * @param infos
      * @return
      */
-    public static int addMultiSongs(List<PlayListSong> infos){
-        if(infos == null || infos.size() == 0 )
+    public static int addMultiSongs(List<PlayListSong> infos) {
+        if (infos == null || infos.size() == 0)
             return 0;
         //不重复添加
         List<Integer> rawIDList = getIDList(infos.get(0).PlayListID);
-        for(int i = 0 ; i < rawIDList.size() ;i++){
-            for(int j = infos.size() - 1; j >= 0; j--){
-                if(rawIDList.get(i) == infos.get(j).AudioId)
+        for (int i = 0; i < rawIDList.size(); i++) {
+            for (int j = infos.size() - 1; j >= 0; j--) {
+                if (rawIDList.get(i) == infos.get(j).AudioId)
                     infos.remove(j);
             }
         }
 
         ContentValues[] values = new ContentValues[infos.size()];
-        for(int i = 0 ; i < infos.size() ;i++){
+        for (int i = 0; i < infos.size(); i++) {
             ContentValues cv = new ContentValues();
             PlayListSong info = infos.get(i);
-            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME,info.PlayListName);
-            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID,info.PlayListID);
-            cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID,info.AudioId);
+            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME, info.PlayListName);
+            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID, info.PlayListID);
+            cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID, info.AudioId);
             values[i] = cv;
         }
-        return mContext.getContentResolver().bulkInsert(PlayListSongs.CONTENT_URI,values);
+        return mContext.getContentResolver().bulkInsert(PlayListSongs.CONTENT_URI, values);
     }
 
     /**
      * 添加多首歌曲
+     *
      * @param IDList
      * @return
      */
-    public static int addMultiSongs(List<Integer> IDList,String playListName){
-        return addMultiSongs(IDList,playListName,getPlayListID(playListName));
+    public static int addMultiSongs(List<Integer> IDList, String playListName) {
+        return addMultiSongs(IDList, playListName, getPlayListID(playListName));
     }
 
     /**
      * 添加多首歌曲
+     *
      * @param IDList
      * @return
      */
-    public static int addMultiSongs(List<Integer> IDList,String playListName,int playListId){
-        if(IDList == null || IDList.size() == 0 )
+    public static int addMultiSongs(List<Integer> IDList, String playListName, int playListId) {
+        if (IDList == null || IDList.size() == 0)
             return 0;
         //不重复添加
         List<Integer> rawIDList = getIDList(playListName);
-        for(int i = 0 ; i < rawIDList.size() ;i++){
-            for(int j = IDList.size() - 1; j >= 0; j--){
-                if(rawIDList.get(i).equals(IDList.get(j)))
+        for (int i = 0; i < rawIDList.size(); i++) {
+            for (int j = IDList.size() - 1; j >= 0; j--) {
+                if (rawIDList.get(i).equals(IDList.get(j)))
                     IDList.remove(j);
             }
         }
         ContentValues[] values = new ContentValues[IDList.size()];
-        for(int i = 0 ; i < IDList.size() ;i++){
+        for (int i = 0; i < IDList.size(); i++) {
             ContentValues cv = new ContentValues();
-            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME,playListName);
-            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID,playListId);
-            cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID,IDList.get(i));
+            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME, playListName);
+            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID, playListId);
+            cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID, IDList.get(i));
             values[i] = cv;
         }
-        return mContext.getContentResolver().bulkInsert(PlayListSongs.CONTENT_URI,values);
+        return mContext.getContentResolver().bulkInsert(PlayListSongs.CONTENT_URI, values);
     }
 
     /**
      * 删除一首歌曲
+     *
      * @param audioId
      * @param playListId
      * @return
      */
-    public static boolean deleteSong(int audioId,int playListId){
+    public static boolean deleteSong(int audioId, int playListId) {
         return audioId > 0 &&
                 mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,
                         PlayListSongs.PlayListSongColumns.AUDIO_ID + "=?" + " and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?",
-                        new String[]{audioId + "",playListId + ""}) > 0;
+                        new String[]{audioId + "", playListId + ""}) > 0;
     }
 
     /**
      * 删除一首歌曲
+     *
      * @param audioId
      * @param playListName
      * @return
      */
-    public static boolean deleteSong(int audioId,String playListName){
+    public static boolean deleteSong(int audioId, String playListName) {
         return audioId > 0 && !TextUtils.isEmpty(playListName) &&
                 mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,
                         PlayListSongs.PlayListSongColumns.AUDIO_ID + "=?" + " and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?",
-                        new String[]{audioId + "",playListName}) > 0;
+                        new String[]{audioId + "", playListName}) > 0;
     }
 
     /**
      * 删除表下所有数据
      */
-    public static int clearTable(String tablename){
-        return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI, PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?",new String[]{tablename});
+    public static int clearTable(String tablename) {
+        return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI, PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?", new String[]{tablename});
     }
 
     /**
      * 删除多首歌曲
+     *
      * @param audioIdList
      * @param playlistId
      * @return
      */
-    public static int deleteMultiSongs(List<Integer> audioIdList,int playlistId){
+    public static int deleteMultiSongs(List<Integer> audioIdList, int playlistId) {
         try {
-            if(audioIdList == null || audioIdList.size() == 0)
+            if (audioIdList == null || audioIdList.size() == 0)
                 return 0;
             StringBuilder where = new StringBuilder();
             String[] whereArgs = new String[audioIdList.size() + 1];
-            for(int i = 0 ; i < audioIdList.size() + 1;i++) {
+            for (int i = 0; i < audioIdList.size() + 1; i++) {
                 if (i != audioIdList.size()) {
                     if (i == 0) {
                         where.append("(");
@@ -226,13 +239,13 @@ public class PlayListUtil {
                         where.append(" or ");
                     }
                     whereArgs[i] = audioIdList.get(i) + "";
-                }else {
+                } else {
                     where.append(") and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?");
                     whereArgs[i] = playlistId + "";
                 }
             }
-            return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI, where.toString(),whereArgs);
-        } catch (Exception e){
+            return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI, where.toString(), whereArgs);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return 0;
@@ -241,20 +254,21 @@ public class PlayListUtil {
 
     /**
      * 根据播放列表id获得对应的名字
+     *
      * @param playListId
      * @return
      */
-    public static String getPlayListName(int playListId){
+    public static String getPlayListName(int playListId) {
         Cursor cursor = null;
         try {
-            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,new String[]{PlayLists.PlayListColumns.NAME},
-                    PlayLists.PlayListColumns._ID + "=?",new String[]{playListId + ""},null,null);
-            if(cursor != null && cursor.getCount() > 0 && cursor.moveToFirst())
+            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI, new String[]{PlayLists.PlayListColumns.NAME},
+                    PlayLists.PlayListColumns._ID + "=?", new String[]{playListId + ""}, null, null);
+            if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst())
                 return cursor.getString(cursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(cursor != null && !cursor.isClosed())
+            if (cursor != null && !cursor.isClosed())
                 cursor.close();
         }
         return "";
@@ -262,20 +276,21 @@ public class PlayListUtil {
 
     /**
      * 根据播放列表名获得播放列表id
+     *
      * @param playListName
      * @return
      */
-    public static int getPlayListID(String playListName){
+    public static int getPlayListID(String playListName) {
         Cursor cursor = null;
         try {
-            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,new String[]{PlayLists.PlayListColumns._ID},
-                    PlayLists.PlayListColumns.NAME + "=?",new String[]{playListName},null,null);
-            if(cursor != null && cursor.getCount() > 0 && cursor.moveToFirst())
+            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI, new String[]{PlayLists.PlayListColumns._ID},
+                    PlayLists.PlayListColumns.NAME + "=?", new String[]{playListName}, null, null);
+            if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst())
                 return cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(cursor != null && !cursor.isClosed())
+            if (cursor != null && !cursor.isClosed())
                 cursor.close();
         }
         return -1;
@@ -283,20 +298,21 @@ public class PlayListUtil {
 
     /**
      * 返回系统中除播放队列所有播放列表
+     *
      * @return
      */
-    public static List<PlayList> getAllPlayListInfo(){
+    public static List<PlayList> getAllPlayListInfo() {
         ArrayList<PlayList> playList = new ArrayList<>();
         Cursor cursor = null;
         try {
-            String sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER, SortOrder.PlayListSortOrder.PLAYLIST_DATE);
-            LogUtil.d("QueryPlayList","SortOrder: " + sortOrder);
-            cursor = DBManager.getInstance().openDataBase().rawQuery("select * from play_list where name != '" + Constants.PLAY_QUEUE + "' order by " + sortOrder,null);
+            String sortOrder = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER, SortOrder.PlayListSortOrder.PLAYLIST_DATE);
+            LogUtil.d("QueryPlayList", "SortOrder: " + sortOrder);
+            cursor = DBManager.getInstance().openDataBase().rawQuery("select * from play_list where name != '" + Constants.PLAY_QUEUE + "' order by " + sortOrder, null);
 //            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,null,PlayLists.PlayListColumns.NAME + "!= ?",
 //                    new String[]{Constants.PLAY_QUEUE},
 //                    sortOrder);
-            if(cursor != null && cursor.getCount() > 0){
-                while (cursor.moveToNext()){
+            if (cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
                     PlayList info = new PlayList();
                     info._Id = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
                     info.Count = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
@@ -305,34 +321,34 @@ public class PlayListUtil {
                     playList.add(info);
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(cursor != null && !cursor.isClosed())
+            if (cursor != null && !cursor.isClosed())
                 cursor.close();
             DBManager.getInstance().closeDataBase();
         }
-        LogUtil.d("QueryPlayList",playList + "");
+        LogUtil.d("QueryPlayList", playList + "");
         return playList;
     }
 
-    public static List<PlayListSong> getPlayListSong(int playlistId){
+    public static List<PlayListSong> getPlayListSong(int playlistId) {
         List<PlayListSong> playListSongs = new ArrayList<>();
         Cursor cursor = null;
         try {
-            cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
-                    PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?",new String[]{playlistId + ""},null);
-            if(cursor != null && cursor.getCount() > 0){
-                while (cursor.moveToNext()){
+            cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI, new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
+                    PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?", new String[]{playlistId + ""}, null);
+            if (cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
                     PlayListSong song = new PlayListSong();
                     song.AudioId = cursor.getInt(cursor.getColumnIndex(PlayListSongs.PlayListSongColumns.AUDIO_ID));
                     playListSongs.add(song);
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(cursor != null && !cursor.isClosed())
+            if (cursor != null && !cursor.isClosed())
                 cursor.close();
         }
         return playListSongs;
@@ -340,24 +356,25 @@ public class PlayListUtil {
 
     /**
      * 根据播放列表名获得歌曲id列表
+     *
      * @param playlistName
      * @return
      */
-    public static List<Integer> getIDList(String playlistName){
+    public static List<Integer> getIDList(String playlistName) {
         ArrayList<Integer> IDList = new ArrayList<>();
         Cursor cursor = null;
         try {
-            cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
-                    PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?",new String[]{playlistName},null,null);
-            if(cursor != null && cursor.getCount() > 0){
-                while (cursor.moveToNext()){
+            cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI, new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
+                    PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?", new String[]{playlistName}, null, null);
+            if (cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
                     IDList.add(cursor.getInt(cursor.getColumnIndex(PlayListSongs.PlayListSongColumns.AUDIO_ID)));
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(cursor != null && !cursor.isClosed()){
+            if (cursor != null && !cursor.isClosed()) {
                 cursor.close();
             }
         }
@@ -366,24 +383,25 @@ public class PlayListUtil {
 
     /**
      * 根据播放列表id获得歌曲id列表
+     *
      * @param playlistId
      * @return
      */
-    public static List<Integer> getIDList(int playlistId){
+    public static List<Integer> getIDList(int playlistId) {
         ArrayList<Integer> IDList = new ArrayList<>();
         Cursor cursor = null;
         try {
-            cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
-                    PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?",new String[]{playlistId + ""},null,null);
-            if(cursor != null && cursor.getCount() > 0){
-                while (cursor.moveToNext()){
+            cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI, new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
+                    PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?", new String[]{playlistId + ""}, null, null);
+            if (cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
                     IDList.add(cursor.getInt(cursor.getColumnIndex(PlayListSongs.PlayListSongColumns.AUDIO_ID)));
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(cursor != null && !cursor.isClosed()){
+            if (cursor != null && !cursor.isClosed()) {
                 cursor.close();
             }
         }
@@ -391,18 +409,17 @@ public class PlayListUtil {
     }
 
     /**
-     *
      * @param cursor
      * @return
      */
-    public static PlayList getPlayListInfo(Cursor cursor){
+    public static PlayList getPlayListInfo(Cursor cursor) {
         PlayList info = new PlayList();
         try {
             info.Count = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
             info._Id = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
             info.Name = cursor.getString(cursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
             info.Date = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return info;
@@ -410,17 +427,18 @@ public class PlayListUtil {
 
     /**
      * 根据多个歌曲id返回多个歌曲详细信息
-     * @param idList 歌曲id列表
+     *
+     * @param idList     歌曲id列表
      * @param playlistId 播放列表id
      * @return 对应所有歌曲信息列表
      */
     public static List<Song> getMP3ListByIds(List<Integer> idList, int playlistId) {
-        if(idList == null || idList.size() == 0)
+        if (idList == null || idList.size() == 0)
             return new ArrayList<>();
 
         StringBuilder selection = new StringBuilder(127);
         selection.append(MediaStore.Audio.Media._ID + " in (");
-        StringBuilder sortOrder = new StringBuilder(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,SortOrder.PlayListSongSortOrder.SONG_A_Z));
+        StringBuilder sortOrder = new StringBuilder(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, SortOrder.PlayListSongSortOrder.SONG_A_Z));
 //        //自定义排序 sqlite不支持find_in_set
 //        if(sortOrder.toString().equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)){
 //            sortOrder.delete(0,sortOrder.length());
@@ -430,11 +448,11 @@ public class PlayListUtil {
 //            }
 //        }
         boolean isCustom = sortOrder.toString().equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM);
-        if(isCustom){
-            sortOrder.delete(0,sortOrder.length());
+        if (isCustom) {
+            sortOrder.delete(0, sortOrder.length());
         }
-        for(int i = 0 ; i < idList.size();i++){
-            selection.append(idList.get(i)).append( i == idList.size() - 1 ? ") " : ",");
+        for (int i = 0; i < idList.size(); i++) {
+            selection.append(idList.get(i)).append(i == idList.size() - 1 ? ") " : ",");
         }
         Cursor cursor = null;
         List<Song> songList = new ArrayList<>(idList.size());
@@ -446,35 +464,35 @@ public class PlayListUtil {
                     selection.toString(),
                     null,
                     sortOrder.toString());
-            if(cursor != null && cursor.getCount() > 0){
-                while (cursor.moveToNext()){
-                    Song temp = getMP3Info(cursor);
+            if (cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    Song temp = getSongInfo(cursor);
                     tempArray[isCustom ? idList.indexOf(temp.getId()) : cursor.getPosition()] = temp;
                 }
 
                 //找到不存在的歌曲
-                for(Song temp : tempArray){
-                    if(temp != null)
+                for (Song temp : tempArray) {
+                    if (temp != null)
                         songList.add(temp);
                 }
 
                 //有不存在的歌曲 从播放列表移除
-                if(songList.size() < idList.size()){
+                if (songList.size() < idList.size()) {
                     List<Integer> deleteId = new ArrayList<>();
-                    for(Integer id : idList){
+                    for (Integer id : idList) {
                         Song deleteSong = new Song(id);
-                        if(!songList.contains(deleteSong)){
+                        if (!songList.contains(deleteSong)) {
                             deleteId.add(id);
                         }
                     }
                     //从播放列表移除
-                    PlayListUtil.deleteMultiSongs(deleteId,playlistId);
+                    PlayListUtil.deleteMultiSongs(deleteId, playlistId);
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(cursor != null && !cursor.isClosed()){
+            if (cursor != null && !cursor.isClosed()) {
                 cursor.close();
             }
         }
@@ -496,17 +514,18 @@ public class PlayListUtil {
 
     /**
      * 获得所有移除歌曲的id
+     *
      * @return
      */
-    public static String getDeleteID(){
-        Set<String> deleteId = SPUtil.getStringSet(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
-        if(deleteId == null || deleteId.size() == 0)
+    public static String getDeleteID() {
+        Set<String> deleteId = SPUtil.getStringSet(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG);
+        if (deleteId == null || deleteId.size() == 0)
             return "";
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(" and ");
         int i = 0;
         for (String id : deleteId) {
-            stringBuilder.append(PlayListSongs.PlayListSongColumns.AUDIO_ID + " != ").append(id).append(i != deleteId.size() - 1 ?  " and " : " ");
+            stringBuilder.append(PlayListSongs.PlayListSongColumns.AUDIO_ID + " != ").append(id).append(i != deleteId.size() - 1 ? " and " : " ");
             i++;
         }
         return stringBuilder.toString();
@@ -518,54 +537,55 @@ public class PlayListUtil {
     public static final int EXIST = 1;
     public static final int NONEXIST = 2;
     public static final int ERROR = 3;
-    public static int isLove(int audioId){
+
+    public static int isLove(int audioId) {
         Cursor cursor = null;
         try {
-            cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI,null, PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=" + Global.MyLoveID ,null,null);
-            if(cursor != null && cursor.getCount() > 0){
-                while (cursor.moveToNext()){
+            cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI, null, PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=" + Global.MyLoveID, null, null);
+            if (cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
                     int id = cursor.getInt(cursor.getColumnIndex(PlayListSongs.PlayListSongColumns.AUDIO_ID));
-                    if(id == audioId){
+                    if (id == audioId) {
                         return EXIST;
                     }
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             return ERROR;
         } finally {
-            if(cursor != null && !cursor.isClosed())
+            if (cursor != null && !cursor.isClosed())
                 cursor.close();
         }
         return NONEXIST;
     }
 
-    public static Map<String,List<Integer>> getPlaylistFromMediaStore(){
-        final Map<String,List<Integer>> map = new HashMap<>();
+    public static Map<String, List<Integer>> getPlaylistFromMediaStore() {
+        final Map<String, List<Integer>> map = new HashMap<>();
         Cursor playlistCursor = null;
         Cursor songCursor = null;
         try {
             playlistCursor = mContext.getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                    null,null,null,null);
-            if(playlistCursor == null || playlistCursor.getCount() == 0)
+                    null, null, null, null);
+            if (playlistCursor == null || playlistCursor.getCount() == 0)
                 return map;
-            while (playlistCursor.moveToNext()){
+            while (playlistCursor.moveToNext()) {
                 List<Integer> helperList = new ArrayList<>();
-                songCursor = mContext.getContentResolver().query(MediaStore.Audio.Playlists.Members.getContentUri("external",playlistCursor.getInt(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists.Members._ID))),
-                        null,null,null,null);
-                if(songCursor != null){
-                    while (songCursor.moveToNext()){
+                songCursor = mContext.getContentResolver().query(MediaStore.Audio.Playlists.Members.getContentUri("external", playlistCursor.getInt(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists.Members._ID))),
+                        null, null, null, null);
+                if (songCursor != null) {
+                    while (songCursor.moveToNext()) {
                         helperList.add(songCursor.getInt(songCursor.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID)));
                     }
                 }
-                map.put(playlistCursor.getString(playlistCursor.getColumnIndex(MediaStore.Audio.PlaylistsColumns.NAME)),helperList);
+                map.put(playlistCursor.getString(playlistCursor.getColumnIndex(MediaStore.Audio.PlaylistsColumns.NAME)), helperList);
                 songCursor = null;
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(playlistCursor != null && !playlistCursor.isClosed())
+            if (playlistCursor != null && !playlistCursor.isClosed())
                 playlistCursor.close();
-            if(songCursor != null && !songCursor.isClosed())
+            if (songCursor != null && !songCursor.isClosed())
                 songCursor.close();
         }
         return map;
@@ -573,16 +593,17 @@ public class PlayListUtil {
 
     /**
      * 重命名播放列表
+     *
      * @param playlistId
      * @param playlistName
      */
     public static boolean rename(int playlistId, String playlistName) {
         ContentValues values = new ContentValues();
-        values.put(PlayLists.PlayListColumns.NAME,playlistName);
+        values.put(PlayLists.PlayListColumns.NAME, playlistName);
         try {
             return mContext.getContentResolver().update(PlayLists.CONTENT_URI,
-                    values,PlayLists.PlayListColumns._ID + "=" + playlistId,null) > 0;
-        }catch (Exception e){
+                    values, PlayLists.PlayListColumns._ID + "=" + playlistId, null) > 0;
+        } catch (Exception e) {
             return false;
         }
 

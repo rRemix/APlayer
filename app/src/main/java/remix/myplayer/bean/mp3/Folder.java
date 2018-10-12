@@ -4,7 +4,7 @@ package remix.myplayer.bean.mp3;
  * Created by Remix on 2018/1/9.
  */
 
-public class Folder{
+public class Folder {
     private String Name;
     private int Count;
     private String Path;

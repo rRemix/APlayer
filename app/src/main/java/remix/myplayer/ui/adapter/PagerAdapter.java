@@ -18,20 +18,22 @@ import java.util.List;
 
 public class PagerAdapter extends FragmentPagerAdapter {
     private List<Fragment> mFragmentList = new ArrayList<>();
+
     public PagerAdapter(FragmentManager fm) {
         super(fm);
     }
+
     private List<String> mTitles = new ArrayList<>();
 
     public void addFragment(Fragment fragment) {
         mFragmentList.add(fragment);
     }
 
-    public void setTitles(List<String> titles){
+    public void setTitles(List<String> titles) {
         mTitles = titles;
     }
 
-    public void addTitle(String title){
+    public void addTitle(String title) {
         mTitles.add(title);
     }
 

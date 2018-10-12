@@ -32,19 +32,19 @@ public class ListItemDecoration extends RecyclerView.ItemDecoration {
         mContext = context;
         mContentDrawable = (GradientDrawable) mContext.getResources().getDrawable(R.drawable.bg_divider_day);
         mContentDrawable.setColor(ThemeStore.getDividerColor());
-        mDivider = new InsetDrawable(mContentDrawable, DensityUtil.dip2px(context,4),0,0,0);
+        mDivider = new InsetDrawable(mContentDrawable, DensityUtil.dip2px(context, 4), 0, 0, 0);
         setOrientation(orientation);
     }
 
-    public ListItemDecoration(Context context,int orientation,int insetLeft){
+    public ListItemDecoration(Context context, int orientation, int insetLeft) {
         mContext = context;
         mContentDrawable = (GradientDrawable) mContext.getResources().getDrawable(R.drawable.bg_divider_day).mutate();
         mContentDrawable.setColor(ThemeStore.getDividerColor());
-        mDivider = new InsetDrawable(mContentDrawable,insetLeft,0,0,0);
+        mDivider = new InsetDrawable(mContentDrawable, insetLeft, 0, 0, 0);
         setOrientation(orientation);
     }
 
-    public void setDividerColor(@ColorInt int color){
+    public void setDividerColor(@ColorInt int color) {
         mContentDrawable.setColor(color);
     }
 

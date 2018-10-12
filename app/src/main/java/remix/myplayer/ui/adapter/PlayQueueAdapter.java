@@ -63,7 +63,7 @@ public class PlayQueueAdapter extends BaseAdapter<PlayListSong, PlayQueueAdapter
         //删除按钮
         holder.mDelete.setOnClickListener(v -> {
             if (PlayListUtil.deleteSong(audioId, Global.PlayQueueID)) {
-                if(MusicServiceRemote.getCurrentSong().getId() == audioId){
+                if (MusicServiceRemote.getCurrentSong().getId() == audioId) {
                     Util.sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.NEXT));
                 }
             }

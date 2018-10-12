@@ -7,8 +7,9 @@ import android.util.AttributeSet;
 /**
  * Created by taeja on 16-1-25.
  */
-public class AudioViewPager extends ViewPager{
+public class AudioViewPager extends ViewPager {
     boolean mIntercept = false;
+
     public AudioViewPager(Context context) {
         super(context);
     }

@@ -80,7 +80,7 @@ public abstract class UpdateLyricThread extends Thread {
             return null;
         LyricRowWrapper wrapper = new LyricRowWrapper();
         wrapper.setStatus(mStatus);
-        LogUtil.d(TAG,"Reference: " + mReference);
+        LogUtil.d(TAG, "Reference: " + mReference);
         if (mStatus == Status.SEARCHING) {
             return wrapper;
         }

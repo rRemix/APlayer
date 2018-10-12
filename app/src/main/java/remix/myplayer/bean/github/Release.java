@@ -17,7 +17,7 @@ public class Release implements Parcelable {
     private String target_commitish;
     private String name;
     private boolean draft;
-//    private AuthorBean author;
+    //    private AuthorBean author;
     private boolean prerelease;
     private String created_at;
     private String published_at;
@@ -168,7 +168,7 @@ public class Release implements Parcelable {
         private String node_id;
         private String name;
         private String label;
-//        private UploaderBean uploader;
+        //        private UploaderBean uploader;
         private String content_type;
         private String state;
         private long size;

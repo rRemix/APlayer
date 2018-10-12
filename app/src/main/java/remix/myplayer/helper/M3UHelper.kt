@@ -119,13 +119,13 @@ object M3UHelper {
                 source.onComplete()
             }
         }
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe({
-            ToastUtil.show(App.getContext(), R.string.export_success)
-        }, {
-            ToastUtil.show(App.getContext(), R.string.export_fail, it.toString())
-        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    ToastUtil.show(App.getContext(), R.string.export_success)
+                }, {
+                    ToastUtil.show(App.getContext(), R.string.export_fail, it.toString())
+                })
     }
 }
 

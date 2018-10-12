@@ -18,10 +18,10 @@ import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 /**
  * Created by Remix on 2018/3/15.
  */
-class CustomSortAdapter (context: Context,layoutId: Int) : BaseAdapter<Song, CustomSortAdapter.CustomSortHolder>(context,layoutId){
+class CustomSortAdapter(context: Context, layoutId: Int) : BaseAdapter<Song, CustomSortAdapter.CustomSortHolder>(context, layoutId) {
 
     override fun convert(holder: CustomSortHolder?, song: Song?, position: Int) {
-        if(song == null || holder == null)
+        if (song == null || holder == null)
             return
         holder.mTitle.text = song.Title
         holder.mAlbum.text = song.album

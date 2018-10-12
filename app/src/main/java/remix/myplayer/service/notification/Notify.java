@@ -34,24 +34,24 @@ public abstract class Notify {
     static final String PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification";
     private static final int PLAYING_NOTIFICATION_ID = 1;
 
-//    Notification mNotification;
+    //    Notification mNotification;
     boolean mIsStop;
 
-    Notify(MusicService context){
+    Notify(MusicService context) {
         mService = context;
         init();
     }
 
     private void init() {
         mNotificationManager = (NotificationManager) mService.getSystemService(Context.NOTIFICATION_SERVICE);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void createNotificationChannel(){
-        NotificationChannel playingNotificationChannel = new NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID,mService.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW);
+    private void createNotificationChannel() {
+        NotificationChannel playingNotificationChannel = new NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID, mService.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW);
         playingNotificationChannel.setShowBadge(false);
         playingNotificationChannel.enableLights(false);
         playingNotificationChannel.enableVibration(false);
@@ -65,18 +65,18 @@ public abstract class Notify {
         final int newNotifyMode;
         if (mService.isPlaying()) {
             newNotifyMode = NOTIFY_MODE_FOREGROUND;
-        } else{
+        } else {
             newNotifyMode = NOTIFY_MODE_BACKGROUND;
         }
 
         if (mNotifyMode != newNotifyMode && newNotifyMode == NOTIFY_MODE_BACKGROUND) {
 //            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-                mService.stopForeground(false);
+            mService.stopForeground(false);
         }
         if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
-            LogUtil.d("ServiceLifeCycle","启动前台服务");
+            LogUtil.d("ServiceLifeCycle", "启动前台服务");
             mService.startForeground(PLAYING_NOTIFICATION_ID, notification);
-        } else  {
+        } else {
             mNotificationManager.notify(PLAYING_NOTIFICATION_ID, notification);
         }
 
@@ -87,7 +87,7 @@ public abstract class Notify {
     /**
      * 取消通知栏
      */
-    public void cancelPlayingNotify(){
+    public void cancelPlayingNotify() {
         mService.stopForeground(true);
         mNotificationManager.cancel(PLAYING_NOTIFICATION_ID);
         mIsStop = true;
@@ -95,8 +95,8 @@ public abstract class Notify {
     }
 
 
-    PendingIntent getContentIntent(){
-        Intent result = new Intent(mService,PlayerActivity.class);
+    PendingIntent getContentIntent() {
+        Intent result = new Intent(mService, PlayerActivity.class);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mService);
         stackBuilder.addParentStack(PlayerActivity.class);
@@ -112,17 +112,17 @@ public abstract class Notify {
 
     PendingIntent buildPendingIntent(Context context, int operation) {
         Intent intent = new Intent(MusicService.ACTION_CMD);
-        intent.putExtra("Control",operation);
-        intent.setComponent(new ComponentName(context,MusicService.class));
-        intent.putExtra("FromNotify",true);
+        intent.putExtra("Control", operation);
+        intent.setComponent(new ComponentName(context, MusicService.class));
+        intent.putExtra("FromNotify", true);
 
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        }else{
-            if(operation != Command.TOGGLE_FLOAT_LRC && operation != Command.CLOSE_NOTIFY){
+        } else {
+            if (operation != Command.TOGGLE_FLOAT_LRC && operation != Command.CLOSE_NOTIFY) {
                 return PendingIntent.getForegroundService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            }else{
-                PendingIntent.getService(context,operation,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+            } else {
+                PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             }
         }
 

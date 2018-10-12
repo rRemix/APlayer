@@ -9,6 +9,7 @@ import remix.myplayer.request.network.RxUtil;
 
 public abstract class SimpleUriRequest extends ImageUriRequest<Uri> {
     private UriRequest mRequest;
+
     public SimpleUriRequest(@NonNull UriRequest request) {
         super();
         mRequest = request;

@@ -34,7 +34,7 @@ import remix.myplayer.util.MediaStoreUtil;
 /**
  * 文件夹Fragment
  */
-public class FolderFragment extends LibraryFragment<Folder,FolderAdapter>  {
+public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
     @BindView(R.id.folder_recyclerview)
     RecyclerView mRecyclerView;
 
@@ -47,17 +47,17 @@ public class FolderFragment extends LibraryFragment<Folder,FolderAdapter>  {
 
     @Override
     protected void initAdapter() {
-        mAdapter = new FolderAdapter(mContext,R.layout.item_folder_recycle,mMultiChoice);
+        mAdapter = new FolderAdapter(mContext, R.layout.item_folder_recycle, mMultiChoice);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 String path = mAdapter.getDatas().get(position).getPath();
-                if(getUserVisibleHint() && !TextUtils.isEmpty(path) &&
-                        !mMultiChoice.itemClick(position,position,TAG)){
+                if (getUserVisibleHint() && !TextUtils.isEmpty(path) &&
+                        !mMultiChoice.itemClick(position, position, TAG)) {
                     Intent intent = new Intent(mContext, ChildHolderActivity.class);
                     intent.putExtra("Id", position);
                     intent.putExtra("Type", Constants.FOLDER);
-                    intent.putExtra("Title",path);
+                    intent.putExtra("Title", path);
                     startActivity(intent);
                 }
             }
@@ -65,8 +65,8 @@ public class FolderFragment extends LibraryFragment<Folder,FolderAdapter>  {
             @Override
             public void onItemLongClick(View view, int position) {
                 String path = mAdapter.getDatas().get(position).getPath();
-                if(getUserVisibleHint() && !TextUtils.isEmpty(path))
-                    mMultiChoice.itemLongClick(position,position,TAG,Constants.FOLDER);
+                if (getUserVisibleHint() && !TextUtils.isEmpty(path))
+                    mMultiChoice.itemLongClick(position, position, TAG, Constants.FOLDER);
             }
         });
     }
@@ -76,7 +76,7 @@ public class FolderFragment extends LibraryFragment<Folder,FolderAdapter>  {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        if(mContext instanceof MultiChoiceActivity){
+        if (mContext instanceof MultiChoiceActivity) {
             mMultiChoice = ((MultiChoiceActivity) mContext).getMultiChoice();
         }
         mRecyclerView.setAdapter(mAdapter);
@@ -112,7 +112,7 @@ public class FolderFragment extends LibraryFragment<Folder,FolderAdapter>  {
         public List<Folder> loadInBackground() {
             List<Folder> folderList = new ArrayList<>();
             Global.FolderMap = MediaStoreUtil.getFolder();
-            if(Global.FolderMap == null || Global.FolderMap.size() < 0)
+            if (Global.FolderMap == null || Global.FolderMap.size() < 0)
                 return folderList;
 
             for (String path : Global.FolderMap.keySet()) {

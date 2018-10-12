@@ -39,8 +39,8 @@ public class BottomBarBehavior extends CoordinatorLayout.Behavior<View> {
         TypedArray ta = context.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
         int actionBarSize = ta.getDimensionPixelSize(0, 0);
         ta.recycle();
-        if(actionBarSize > 0){
-            int bottomBarSize = DensityUtil.dip2px(context,72);
+        if (actionBarSize > 0) {
+            int bottomBarSize = DensityUtil.dip2px(context, 72);
             child.setTranslationY(top * bottomBarSize / actionBarSize);
             return true;
         } else {

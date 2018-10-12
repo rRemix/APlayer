@@ -28,7 +28,7 @@ public class PagerButton extends Button {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         //ACTION_MOVE事件继续向上传递,否则ViewPager无法滑动
-        if(event.getAction() == MotionEvent.ACTION_MOVE)
+        if (event.getAction() == MotionEvent.ACTION_MOVE)
             return true;
         return super.onTouchEvent(event);
     }

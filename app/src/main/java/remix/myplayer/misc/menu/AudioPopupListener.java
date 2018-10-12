@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import remix.myplayer.App;
 import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
@@ -67,6 +68,8 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                 getBaseDialog(mActivity)
                         .items(getString(R.string.netease),
                                 getString(R.string.kugou),
+                                getString(R.string.local),
+                                getString(R.string.embedded_lyric),
                                 getString(R.string.select_lrc),
                                 getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc),
                                 getString(R.string.change_offset))
@@ -74,18 +77,20 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                         .backgroundColorAttr(R.attr.background_color_3)
                         .itemsCallback((dialog, itemView, position, text) -> {
                             switch (position) {
-                                case 0: //网易 酷狗
-                                case 1:
-                                    SPUtil.putValue(mActivity, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
+                                case 0: //网易
+                                case 1://酷狗
+                                case 2://本地
+                                case 3://内嵌
+                                    SPUtil.putValue(mActivity, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", position + 2);
                                     lyricFragment.updateLrc(mInfo, true);
                                     sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                     break;
-                                case 2: //手动选择歌词
+                                case 4: //手动选择歌词
                                     new FileChooserDialog.Builder(mActivity)
                                             .extensionsFilter(".lrc")
                                             .show();
                                     break;
-                                case 3: //忽略或者取消忽略
+                                case 5: //忽略或者取消忽略
                                     getBaseDialog(mActivity)
                                             .title(!alreadyIgnore ? R.string.confirm_ignore_lrc : R.string.confirm_cancel_ignore_lrc)
                                             .negativeText(R.string.cancel)
@@ -104,7 +109,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                             })
                                             .show();
                                     break;
-                                case 4://歌词时间轴调整
+                                case 6://歌词时间轴调整
                                     ((PlayerActivity) mActivity).showLyricOffsetView();
                                     break;
                             }
@@ -147,7 +152,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                         .content(R.string.confirm_delete_from_library)
                         .positiveText(R.string.confirm)
                         .negativeText(R.string.cancel)
-                        .checkBoxPromptRes(R.string.delete_source, false, null)
+                        .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
                         .onAny((dialog, which) -> {
                             if (which == POSITIVE) {
                                 if (MediaStoreUtil.delete(mInfo.getId(), Constants.SONG, dialog.isPromptCheckBoxChecked()) > 0) {
@@ -175,14 +180,14 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
 //                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
 //                }
             case R.id.menu_speed:
-                final List<String> speeds = Arrays.asList("0.5","0.75","1.0","1.25","1.5");
-                final String originalSpeed = SPUtil.getValue(mActivity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,"1.0");
+                final List<String> speeds = Arrays.asList("0.5", "0.75", "1.0", "1.25", "1.5");
+                final String originalSpeed = SPUtil.getValue(mActivity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED, "1.0");
                 getBaseDialog(mActivity)
                         .title(R.string.speed)
                         .items(speeds)
                         .itemsCallbackSingleChoice(speeds.indexOf(originalSpeed), (dialog, itemView, which, text) -> {
                             MusicServiceRemote.setSpeed(Float.parseFloat(text.toString()));
-                            SPUtil.putValue(mActivity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.SPEED,text.toString());
+                            SPUtil.putValue(mActivity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED, text.toString());
                             return true;
                         }).show();
                 break;

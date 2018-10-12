@@ -180,7 +180,7 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
                     Set<String> blackList = SPUtil.getStringSet(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG);
                     while (cursor.moveToNext()) {
                         if (!blackList.contains(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))))
-                            songs.add(MediaStoreUtil.getMP3Info(cursor));
+                            songs.add(MediaStoreUtil.getSongInfo(cursor));
                     }
                 }
             } finally {

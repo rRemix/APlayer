@@ -18,6 +18,7 @@ import remix.myplayer.util.Util;
  */
 public abstract class AsynLoadSongNum extends AsyncTask<Integer, Integer, Integer> {
     private final int mType;
+
     public AsynLoadSongNum(int type) {
         mType = type;
     }
@@ -31,10 +32,10 @@ public abstract class AsynLoadSongNum extends AsyncTask<Integer, Integer, Intege
             cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{MediaStore.Audio.Media._ID},
                     MediaStoreUtil.getBaseSelection()
-                    + " and " + (isAlbum ? MediaStore.Audio.Media.ALBUM_ID  : MediaStore.Audio.Media.ARTIST_ID)+ "=" + params[0],
-                    null,null);
+                            + " and " + (isAlbum ? MediaStore.Audio.Media.ALBUM_ID : MediaStore.Audio.Media.ARTIST_ID) + "=" + params[0],
+                    null, null);
             return cursor != null ? cursor.getCount() : 0;
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             Util.closeCursor(cursor);

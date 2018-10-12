@@ -22,13 +22,21 @@ import remix.myplayer.lyric.bean.LrcRow;
 public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     private static final int DELAY_MAX = 100;
 
-    /** 当前x坐标*/
+    /**
+     * 当前x坐标
+     */
     private float mCurTextXForHighLightLrc;
-    /** 当前的歌词*/
+    /**
+     * 当前的歌词
+     */
     private LrcRow mCurLrcRow;
-    /** 当前歌词的字符串所占的控件*/
+    /**
+     * 当前歌词的字符串所占的控件
+     */
     private Rect mTextRect = new Rect();
-    /** 垂直便宜*/
+    /**
+     * 垂直便宜
+     */
     private int mOffsetY;
     /***
      * 监听属性动画的数值值的改变
@@ -43,10 +51,11 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     };
 
     public FloatTextView(Context context) {
-        this(context,null);
+        this(context, null);
     }
+
     public FloatTextView(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
     }
 
     public FloatTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -57,21 +66,25 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     private void init() {
     }
 
-    /**控制歌词水平滚动的属性动画***/
+    /**
+     * 控制歌词水平滚动的属性动画
+     ***/
     private ValueAnimator mAnimator;
+
     /**
      * 开始水平滚动歌词
-     * @param endX 歌词第一个字的最终的x坐标
+     *
+     * @param endX     歌词第一个字的最终的x坐标
      * @param duration 滚动的持续时间
      */
-    private void startScrollLrc(float endX,long duration){
-        if(mAnimator == null){
-            mAnimator = ValueAnimator.ofFloat(0,endX);
+    private void startScrollLrc(float endX, long duration) {
+        if (mAnimator == null) {
+            mAnimator = ValueAnimator.ofFloat(0, endX);
             mAnimator.addUpdateListener(mUpdateListener);
-        }else{
+        } else {
             mCurTextXForHighLightLrc = 0;
             mAnimator.cancel();
-            mAnimator.setFloatValues(0,endX);
+            mAnimator.setFloatValues(0, endX);
         }
         mAnimator.setDuration(duration);
         long delay = (long) (duration * 0.1);
@@ -87,7 +100,7 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if(mCurLrcRow == null)
+        if (mCurLrcRow == null)
             return;
         canvas.drawText(mCurLrcRow.getContent(),
                 mCurTextXForHighLightLrc,
@@ -95,24 +108,24 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
                 getPaint());
     }
 
-    public void setLrcRow(@NonNull LrcRow lrcRow){
-        if(lrcRow.getTime() != 0 && mCurLrcRow != null && mCurLrcRow.getTime() == lrcRow.getTime())
+    public void setLrcRow(@NonNull LrcRow lrcRow) {
+        if (lrcRow.getTime() != 0 && mCurLrcRow != null && mCurLrcRow.getTime() == lrcRow.getTime())
             return;
         mCurLrcRow = lrcRow;
         stopAnimation();
 //        setText(mCurLrcRow.getContent());
 
         TextPaint paint = getPaint();
-        if(paint == null)
+        if (paint == null)
             return;
         String text = mCurLrcRow.getContent();
-        paint.getTextBounds(text,0,text.length(),mTextRect);
+        paint.getTextBounds(text, 0, text.length(), mTextRect);
         float textWidth = mTextRect.width();
         mOffsetY = (int) ((mTextRect.bottom + mTextRect.top - paint.getFontMetrics().bottom - paint.getFontMetrics().top) / 2);
-        if(textWidth > getWidth()){
+        if (textWidth > getWidth()) {
             //如果歌词宽度大于view的宽，则需要动态设置歌词的起始x坐标，以实现水平滚动
             startScrollLrc(getWidth() - textWidth, (long) (mCurLrcRow.getTotalTime() * 0.85));
-        }else{
+        } else {
             //如果歌词宽度小于view的宽，则让歌词居中显示
             mCurTextXForHighLightLrc = (getWidth() - textWidth) / 2;
             invalidate();
@@ -121,7 +134,7 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     }
 
     public void stopAnimation() {
-        if(mAnimator != null && mAnimator.isRunning()){
+        if (mAnimator != null && mAnimator.isRunning()) {
             mAnimator.cancel();
         }
         invalidate();

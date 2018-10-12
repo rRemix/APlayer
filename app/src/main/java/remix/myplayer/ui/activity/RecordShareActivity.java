@@ -56,7 +56,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * 将分享内容与专辑封面进行处理用于分享
  */
 public class RecordShareActivity extends BaseMusicActivity {
-    private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),268);
+    private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 268);
 
     @BindView(R.id.recordshare_image)
     SimpleDraweeView mImage;
@@ -92,8 +92,8 @@ public class RecordShareActivity extends BaseMusicActivity {
     private MsgHandler mHandler;
 
     @OnHandleMessage
-    public void handleMessage(Message msg){
-        switch (msg.what){
+    public void handleMessage(Message msg) {
+        switch (msg.what) {
             //开始处理
             case START:
                 showLoading();
@@ -104,8 +104,8 @@ public class RecordShareActivity extends BaseMusicActivity {
                 break;
             //处理完成
             case COMPLETE:
-                if(mFile != null)
-                    ToastUtil.show(mContext,R.string.screenshot_save_at,mFile.getAbsoluteFile(), Toast.LENGTH_LONG);
+                if (mFile != null)
+                    ToastUtil.show(mContext, R.string.screenshot_save_at, mFile.getAbsoluteFile(), Toast.LENGTH_LONG);
                 break;
             //处理错误
             case ERROR:
@@ -132,29 +132,26 @@ public class RecordShareActivity extends BaseMusicActivity {
         mContainer.setDrawingCacheEnabled(true);
 
         mInfo = getIntent().getExtras().getParcelable("Song");
-        if(mInfo == null)
+        if (mInfo == null)
             return;
 
         new LibraryUriRequest(mImage,
                 getSearchRequestWithAlbumType(mInfo),
-                new RequestConfig.Builder(IMAGE_SIZE,IMAGE_SIZE).build()).load();
+                new RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load();
 
         //设置歌曲名与分享内容
         String content = getIntent().getExtras().getString("Content");
         mContent.setText(TextUtils.isEmpty(content) ? "" : content);
         mSong.setText(String.format("《%s》", mInfo.getTitle()));
         //背景
-        mBackground1.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0, DensityUtil.dip2px(this,2), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
-        mBackground2.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
-        mImageBackground.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.white_f6f6f5),0,0,1));
+        mBackground1.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 2), ColorUtil.getColor(R.color.black_2a2a2a), 0, 0, 1));
+        mBackground2.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 1), ColorUtil.getColor(R.color.black_2a2a2a), 0, 0, 1));
+        mImageBackground.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 1), ColorUtil.getColor(R.color.white_f6f6f5), 0, 0, 1));
 
-        mProgressDialog = new MaterialDialog.Builder(this)
+        mProgressDialog = Theme.getBaseDialog(mContext)
                 .title(R.string.please_wait)
-                .titleColorRes(R.color.day_textcolor_primary)
                 .content(R.string.processing_picture)
-                .contentColorRes(R.color.day_textcolor_primary)
                 .progress(true, 0)
-                .backgroundColorRes(R.color.day_background_color_3)
                 .progressIndeterminateStyle(false).build();
 
         mHandler = new MsgHandler(this);
@@ -166,13 +163,13 @@ public class RecordShareActivity extends BaseMusicActivity {
         mHandler.remove();
     }
 
-    public static Bitmap getBg(){
+    public static Bitmap getBg() {
         return mBackgroudCache;
     }
 
-    @OnClick({R.id.recordshare_cancel,R.id.recordshare_share})
-    public void onClick(View v){
-        switch (v.getId()){
+    @OnClick({R.id.recordshare_cancel, R.id.recordshare_share})
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.recordshare_cancel:
                 finish();
                 break;
@@ -185,13 +182,14 @@ public class RecordShareActivity extends BaseMusicActivity {
     /**
      * 将图片保存到本地
      */
-    private class ProcessThread extends Thread{
+    private class ProcessThread extends Thread {
         FileOutputStream mFileOutputStream = null;
+
         @SuppressLint("SimpleDateFormat")
         @Override
         public void run() {
             //开始处理,显示进度条
-            if(!mHasPermission){
+            if (!mHasPermission) {
                 Message errMsg = mHandler.obtainMessage(ERROR);
                 errMsg.obj = mContext.getString(R.string.plz_give_access_external_storage_permission);
                 mHandler.sendMessage(errMsg);
@@ -203,8 +201,8 @@ public class RecordShareActivity extends BaseMusicActivity {
             mFile = null;
             try {
                 //将截屏内容保存到文件
-                File shareDir = DiskCache.getDiskCacheDir(mContext,"share");
-                if(!shareDir.exists()){
+                File shareDir = DiskCache.getDiskCacheDir(mContext, "share");
+                if (!shareDir.exists()) {
                     shareDir.mkdirs();
                 }
                 mFile = new File(String.format("%s/%s.png", DiskCache.getDiskCacheDir(mContext, "share"), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()))));
@@ -233,7 +231,7 @@ public class RecordShareActivity extends BaseMusicActivity {
                 errMsg.obj = e.toString();
                 mHandler.sendMessage(errMsg);
             } finally {
-                if(mFileOutputStream != null)
+                if (mFileOutputStream != null)
                     try {
                         mFileOutputStream.close();
                     } catch (IOException e) {
@@ -243,15 +241,15 @@ public class RecordShareActivity extends BaseMusicActivity {
         }
     }
 
-    private void showLoading(){
-        if(mProgressDialog != null && !mProgressDialog.isShowing())
+    private void showLoading() {
+        if (mProgressDialog != null && !mProgressDialog.isShowing())
             mProgressDialog.show();
     }
 
-    private void dismissLoading(String error){
-        if(!TextUtils.isEmpty(error))
-            ToastUtil.show(mContext,error);
-        if(mProgressDialog != null)
+    private void dismissLoading(String error) {
+        if (!TextUtils.isEmpty(error))
+            ToastUtil.show(mContext, error);
+        if (mProgressDialog != null)
             mProgressDialog.dismiss();
     }
 
@@ -263,7 +261,7 @@ public class RecordShareActivity extends BaseMusicActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        setResult(Activity.RESULT_OK,data);
+        setResult(Activity.RESULT_OK, data);
         finish();
     }
 }

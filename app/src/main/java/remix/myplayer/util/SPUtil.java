@@ -3,8 +3,15 @@ package remix.myplayer.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import remix.myplayer.bean.misc.LyricPriority;
 
 /**
  * Created by taeja on 16-1-15.
@@ -15,75 +22,85 @@ import java.util.Set;
  */
 public class SPUtil {
     public static SPUtil mInstance;
+
     public SPUtil() {
-        if(mInstance == null)
+        if (mInstance == null)
             mInstance = this;
     }
 
-    public static boolean putStringSet(Context context, String name, String key, Set<String> set){
-        if(set == null)
+    public static boolean putStringSet(Context context, String name, String key, Set<String> set) {
+        if (set == null)
             return false;
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
         editor.remove(key);
-        return editor.putStringSet(key,set).commit();
+        return editor.putStringSet(key, set).commit();
     }
 
-    public static Set<String> getStringSet(Context context, String name, String key){
-        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getStringSet(key,new HashSet<>());
+    public static Set<String> getStringSet(Context context, String name, String key) {
+        return context.getSharedPreferences(name, Context.MODE_PRIVATE).getStringSet(key, new HashSet<>());
     }
 
-    public static boolean putValue(Context context,String name,String key,int value) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
-        return editor.putInt(key,value).commit();
+    public static boolean putValue(Context context, String name, String key, int value) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
+        return editor.putInt(key, value).commit();
     }
 
-    public static boolean putValue(Context context,String name,String key,String value) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
-        return editor.putString(key,value).commit();
+    public static boolean putValue(Context context, String name, String key, String value) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
+        return editor.putString(key, value).commit();
     }
 
-    public static boolean putValue(Context context,String name,String key,boolean value) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
+    public static boolean putValue(Context context, String name, String key, boolean value) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
 
-        return editor.putBoolean(key,value).commit();
+        return editor.putBoolean(key, value).commit();
     }
 
-    public static boolean getValue(Context context,String name,String key,boolean dft) {
-        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getBoolean(key,dft);
+    public static boolean getValue(Context context, String name, Object key, boolean dft) {
+        return context.getSharedPreferences(name, Context.MODE_PRIVATE).getBoolean(key.toString(), dft);
     }
 
-    public static int getValue(Context context,String name,String key,int dft) {
-        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getInt(key,dft);
+    public static int getValue(Context context, String name, Object key, int dft) {
+        return context.getSharedPreferences(name, Context.MODE_PRIVATE).getInt(key.toString(), dft);
     }
 
-    public static String getValue(Context context,String name,String key,String dft) {
-        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getString(key,dft);
+    public static String getValue(Context context, String name, Object key, String dft) {
+        return context.getSharedPreferences(name, Context.MODE_PRIVATE).getString(key.toString(), dft);
     }
 
-    public static void deleteValue(Context context,String name,String key) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
+    public static void deleteValue(Context context, String name, String key) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
         editor.remove(key).apply();
     }
 
-    public static void deleteFile(Context context,String name) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
+    public static void deleteFile(Context context, String name) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit();
         editor.clear().apply();
     }
 
-    public interface UPDATE_KEY{
+    public interface UPDATE_KEY {
         String NAME = "Update";
     }
 
-    public interface LYRIC_KEY{
+    public interface LYRIC_KEY {
         String NAME = "Lyric";
-        int LYRIC_DEFAULT = 0;
-        int LYRIC_IGNORE = 1;
-        int LYRIC_NETEASE = 2;
-        int LYRIC_KUGOU = 3;
-        int LYRIC_MANUAL = 4;
+        //歌词搜索优先级
+        String PRIORITY_LYRIC = "priority_lyric";
+        String DEFAULT_PRIORITY = new Gson().toJson(Arrays.asList(LyricPriority.NETEASE, LyricPriority.KUGOU, LyricPriority.LOCAL, LyricPriority.EMBEDED),
+                new TypeToken<List<LyricPriority>>() {
+                }.getType());
+
+        int LYRIC_DEFAULT = LyricPriority.DEF.getPriority();
+        int LYRIC_IGNORE = LyricPriority.IGNORE.getPriority();
+        int LYRIC_NETEASE = LyricPriority.NETEASE.getPriority();
+        int LYRIC_KUGOU = LyricPriority.KUGOU.getPriority();
+        int LYRIC_LOCAL = LyricPriority.LOCAL.getPriority();
+        int LYRIC_EMBEDDED = LyricPriority.EMBEDED.getPriority();
+        int LYRIC_MANUAL = LyricPriority.MANUAL.getPriority();
+
     }
 
-    public interface COVER_KEY{
+    public interface COVER_KEY {
         String NAME = "Cover";
     }
 
@@ -153,7 +170,7 @@ public class SPUtil {
         String NOTIFY_SYSTEM_COLOR = "notify_system_color";
         //断点播放
         String PLAY_AT_BREAKPOINT = "play_at_breakpoint";
-        //是否忽略内嵌封面
+        //是否忽略媒体缓存
         String IGNORE_MEDIA_STORE = "ignore_media_store";
         //桌面部件样式
         String APP_WIDGET_SKIN = "app_widget_transparent";
@@ -167,9 +184,11 @@ public class SPUtil {
         String BOTTOM_OF_NOW_PLAYING_SCREEN = "bottom_of_now_playing_screen";
         //倍速播放
         String SPEED = "speed";
+        //移除是否同时源文件
+        String DELETE_SOURCE = "delete_source";
     }
 
-    public interface LYRIC_OFFSET_KEY{
+    public interface LYRIC_OFFSET_KEY {
         String NAME = "LyricOffset";
     }
 }

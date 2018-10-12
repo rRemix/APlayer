@@ -3,65 +3,65 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_root"
     android:layout_width="match_parent"
-    android:layout_height="214dp"
-    android:paddingBottom="@dimen/d8_size"
-    android:paddingLeft="@dimen/d6_size"
-    android:paddingRight="@dimen/d6_size">
+    android:layout_height="wrap_content"
+    android:padding="3dp">
+
     <RelativeLayout
         android:id="@+id/item_container"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/d204_size"
+        android:layout_height="wrap_content"
         android:background="?attr/background_grid">
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:layout_width="@dimen/d123_size"
-            android:layout_height="@dimen/d123_size"
-            android:id="@+id/item_simpleiview"
-            android:layout_alignParentTop="true"
-            fresco:fadeDuration="@integer/FadeDuration"
-            fresco:actualImageScaleType="centerCrop"
-            fresco:placeholderImage="?attr/default_artist"
-            fresco:placeholderImageScaleType="centerCrop"
-            fresco:failureImage="?attr/default_artist"
-            fresco:failureImageScaleType="centerCrop"
-            fresco:roundedCornerRadius="@dimen/d2_size"
-            android:layout_marginTop="@dimen/d18_size"
-            android:layout_marginRight="@dimen/d24_size"
-            android:layout_marginLeft="@dimen/d24_size"
-            android:layout_marginBottom="@dimen/d18_size"
-            android:layout_centerHorizontal="true"/>
 
-        <View
-            android:id="@+id/divider"
+        <remix.myplayer.ui.widget.WidthFitSquareLayout
+            android:id="@+id/item_simpleiview_container"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/d1_size"
-            android:background="?attr/background_grid_color"
-            android:layout_below="@id/item_simpleiview"
-            android:layout_marginLeft="@dimen/d4_size"
-            android:layout_marginRight="@dimen/d4_size"/>
+            android:layout_height="match_parent">
 
-        <ImageButton
-            android:layout_width="@dimen/d48_size"
-            android:layout_height="match_parent"
-            android:id="@+id/item_button"
-            android:src="@drawable/icon_player_more"
-            android:background="@color/transparent"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/divider"/>
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/item_simpleiview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                fresco:actualImageScaleType="centerCrop"
+                fresco:fadeDuration="@integer/FadeDuration"
+                fresco:failureImage="?attr/default_artist"
+                fresco:failureImageScaleType="centerCrop"
+                fresco:placeholderImage="?attr/default_artist"
+                fresco:placeholderImageScaleType="centerCrop"
+                fresco:roundedCornerRadius="@dimen/d2_size" />
+        </remix.myplayer.ui.widget.WidthFitSquareLayout>
 
-        <TextView
-            android:layout_toLeftOf="@id/item_button"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/d48_size"
-            android:id="@+id/item_text1"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s14_size"
-            android:layout_marginLeft="@dimen/d8_size"
-            android:layout_marginRight="@dimen/d8_size"
-            android:gravity="center_vertical|left"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/divider"/>
+            android:layout_height="@dimen/item_grid_text_container_height"
+            android:layout_below="@+id/item_simpleiview_container">
+            <ImageButton
+                android:id="@+id/item_button"
+                android:layout_width="@dimen/d48_size"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@color/transparent"
+                android:src="@drawable/icon_player_more" />
+
+            <TextView
+                android:id="@+id/item_text1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/d10_size"
+                android:layout_marginRight="@dimen/d10_size"
+                android:layout_toLeftOf="@id/item_button"
+                android:ellipsize="end"
+                android:gravity="center_vertical|left"
+                android:maxLines="1"
+                android:textColor="?attr/text_color_primary"
+                android:textSize="@dimen/s16_size" />
+
+        </RelativeLayout>
+
+
+
+
     </RelativeLayout>
 
 </FrameLayout>

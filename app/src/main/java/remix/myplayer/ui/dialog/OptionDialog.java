@@ -11,12 +11,12 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.request.LibraryUriRequest;
@@ -28,6 +28,7 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
@@ -103,9 +104,9 @@ public class OptionDialog extends BaseDialogActivity {
         ((ImageView) findViewById(R.id.popup_share_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_share), tintColor));
         ((ImageView) findViewById(R.id.popup_delete_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_delete), tintColor));
 
-        ButterKnife.apply(new TextView[]{findViewById(R.id.popup_add_text), findView(R.id.popup_ring_text),
-                        findViewById(R.id.popup_share_text), findView(R.id.popup_delete_text)},
-                (ButterKnife.Action<TextView>) (textView, index) -> textView.setTextColor(tintColor));
+        ButterKnife.apply(new TextView[]{findViewById(R.id.popup_add_text), findViewById(R.id.popup_ring_text),
+                        findViewById(R.id.popup_share_text), findViewById(R.id.popup_delete_text)},
+                (textView, index) -> textView.setTextColor(tintColor));
     }
 
     @OnClick({R.id.popup_add, R.id.popup_share, R.id.popup_delete, R.id.popup_ring})
@@ -135,12 +136,11 @@ public class OptionDialog extends BaseDialogActivity {
             case R.id.popup_delete:
                 try {
                     String title = getString(R.string.confirm_delete_from_playlist_or_library, mIsDeletePlayList ? mPlayListName : "曲库");
-                    new MaterialDialog.Builder(OptionDialog.this)
+                    Theme.getBaseDialog(mContext)
                             .content(title)
-                            .buttonRippleColor(ThemeStore.getRippleColor())
                             .positiveText(R.string.confirm)
                             .negativeText(R.string.cancel)
-                            .checkBoxPromptRes(R.string.delete_source, false, null)
+                            .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
                             .onAny((dialog, which) -> {
                                 if (which == POSITIVE) {
                                     boolean deleteSuccess = !mIsDeletePlayList ?
@@ -151,11 +151,6 @@ public class OptionDialog extends BaseDialogActivity {
                                     finish();
                                 }
                             })
-                            .backgroundColorAttr(R.attr.background_color_3)
-                            .positiveColorAttr(R.attr.text_color_primary)
-                            .negativeColorAttr(R.attr.text_color_primary)
-                            .contentColorAttr(R.attr.text_color_primary)
-                            .theme(ThemeStore.getMDDialogTheme())
                             .show();
                 } catch (Exception e) {
                     e.printStackTrace();

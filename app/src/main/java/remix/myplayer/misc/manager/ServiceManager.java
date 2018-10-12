@@ -15,16 +15,17 @@ import java.util.ArrayList;
 public class ServiceManager {
     private static ArrayList<Service> mServiceList = new ArrayList<>();
 
-    public static void AddService(Service service){
+    public static void AddService(Service service) {
         mServiceList.add(service);
     }
-    public static void RemoveService(Service service){
+
+    public static void RemoveService(Service service) {
         mServiceList.remove(service);
     }
 
-    public static void StopAll(){
-        for(Service service : mServiceList){
-            if(service != null)
+    public static void StopAll() {
+        for (Service service : mServiceList) {
+            if (service != null)
                 service.stopSelf();
         }
     }

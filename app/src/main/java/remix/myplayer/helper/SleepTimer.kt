@@ -9,7 +9,7 @@ import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.util.Constants
 import remix.myplayer.util.ToastUtil
 
-class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer(millisInFuture, countDownInterval){
+class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer(millisInFuture, countDownInterval) {
     override fun onFinish() {
         App.getContext().sendBroadcast(Intent(Constants.EXIT)
                 .setComponent(ComponentName(App.getContext(), ExitReceiver::class.java)))
@@ -28,7 +28,7 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer
         var instance: SleepTimer? = null
 
         @JvmStatic
-        fun isTicking():Boolean{
+        fun isTicking(): Boolean {
             return millisUntilFinish > 0
         }
 

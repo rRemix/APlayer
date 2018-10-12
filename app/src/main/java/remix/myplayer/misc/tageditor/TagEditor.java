@@ -30,14 +30,14 @@ public class TagEditor {
     private final String mPath;
     private final AudioHeader mAudioHeader;
 
-    public TagEditor(String path){
+    public TagEditor(String path) {
         mPath = path;
         mAudioFile = getAudioFile();
         mAudioHeader = mAudioFile.getAudioHeader();
     }
 
     @NotNull
-    public AudioFile getAudioFile(){
+    public AudioFile getAudioFile() {
         try {
             return AudioFileIO.read(new File(mPath));
         } catch (Exception e) {
@@ -46,83 +46,83 @@ public class TagEditor {
         return new AudioFile();
     }
 
-    public String getFormat(){
+    public String getFormat() {
         return mAudioHeader != null ? mAudioHeader.getFormat() : "";
     }
 
-    public String getBitrate(){
+    public String getBitrate() {
         return mAudioHeader != null ? mAudioHeader.getBitRate() : "";
     }
 
-    public String getSamplingRate(){
+    public String getSamplingRate() {
         return mAudioHeader != null ? mAudioHeader.getSampleRate() : "";
     }
 
     @Nullable
-    public String getFiledValue(FieldKey field){
-        if(mAudioFile == null)
+    public String getFiledValue(FieldKey field) {
+        if (mAudioFile == null)
             return "";
         try {
             return mAudioFile.getTagOrCreateAndSetDefault().getFirst(field);
-        }catch (Exception e){
+        } catch (Exception e) {
             return "";
         }
     }
 
     @Nullable
-    public String getFiledValue(String path,String field){
-        if(mAudioFile == null)
+    public String getFiledValue(String path, String field) {
+        if (mAudioFile == null)
             return "";
         try {
             return mAudioFile.getTagOrCreateAndSetDefault().getFirst(field);
-        }catch (Exception e){
+        } catch (Exception e) {
             return "";
         }
     }
 
     @Nullable
-    public String getSongTitle(){
+    public String getSongTitle() {
         return getFiledValue(FieldKey.TITLE);
     }
 
     @Nullable
-    public String getAlbumTitle(){
+    public String getAlbumTitle() {
         return getFiledValue(FieldKey.ALBUM);
     }
 
     @Nullable
-    public String getArtistName(){
+    public String getArtistName() {
         return getFiledValue(FieldKey.ARTIST);
     }
 
     @Nullable
-    public String getAlbumArtistName(){
+    public String getAlbumArtistName() {
         return getFiledValue(FieldKey.ALBUM_ARTIST);
     }
 
     @Nullable
-    public String getGenreName(){
+    public String getGenreName() {
         return getFiledValue(FieldKey.GENRE);
     }
 
     @Nullable
-    public String getSongYear(){
+    public String getSongYear() {
         return getFiledValue(FieldKey.YEAR);
     }
 
     @Nullable
-    public String getTrackNumber(){
+    public String getTrackNumber() {
         return getFiledValue(FieldKey.TRACK);
     }
 
     @Nullable
-    public String getLyric(){
+    public String getLyric() {
         return getFiledValue(FieldKey.LYRICS);
     }
 
     @Nullable
-    public Bitmap getAlbumArt(){
-        if(mAudioFile == null)
+    public Bitmap getAlbumArt() {
+        if (mAudioFile == null)
             return null;
         try {
             Artwork artworkTag = mAudioFile.getTagOrCreateAndSetDefault().getFirstArtwork();
@@ -130,7 +130,7 @@ public class TagEditor {
                 byte[] artworkBinaryData = artworkTag.getBinaryData();
                 return BitmapFactory.decodeByteArray(artworkBinaryData, 0, artworkBinaryData.length);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -138,17 +138,17 @@ public class TagEditor {
 
     public Observable<Song> save(Song song, String title, String album, String artist, String year, String genre, String trackNumber, String lyric) {
         return Observable.create(e -> {
-            if(mAudioFile == null){
+            if (mAudioFile == null) {
                 throw new IllegalArgumentException("AudioFile is null");
             }
 
             Map<FieldKey, String> fieldKeyValueMap = new EnumMap<>(FieldKey.class);
-            fieldKeyValueMap.put(FieldKey.ALBUM,album);
-            fieldKeyValueMap.put(FieldKey.TITLE,title);
-            fieldKeyValueMap.put(FieldKey.YEAR,year);
-            fieldKeyValueMap.put(FieldKey.GENRE,genre);
-            fieldKeyValueMap.put(FieldKey.ARTIST,artist);
-            fieldKeyValueMap.put(FieldKey.TRACK,trackNumber);
+            fieldKeyValueMap.put(FieldKey.ALBUM, album);
+            fieldKeyValueMap.put(FieldKey.TITLE, title);
+            fieldKeyValueMap.put(FieldKey.YEAR, year);
+            fieldKeyValueMap.put(FieldKey.GENRE, genre);
+            fieldKeyValueMap.put(FieldKey.ARTIST, artist);
+            fieldKeyValueMap.put(FieldKey.TRACK, trackNumber);
 //            fieldKeyValueMap.put(FieldKey.LYRICS,lyric);
 
             Tag tag = mAudioFile.getTagOrCreateAndSetDefault();
@@ -173,7 +173,7 @@ public class TagEditor {
                     new String[]{song.getUrl()},
                     null,
                     (path, uri) -> {
-                        App.getContext().getContentResolver().notifyChange(uri,null);
+                        App.getContext().getContentResolver().notifyChange(uri, null);
                         e.onNext(MediaStoreUtil.getMP3InfoById(song.getId()));
                         e.onComplete();
                     });

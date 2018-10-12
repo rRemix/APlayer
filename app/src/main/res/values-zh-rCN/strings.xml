@@ -136,8 +136,8 @@
     <string name="lrc_scan">歌词扫描路径</string>
     <string name="lockscreen_show">锁屏设置</string>
     <string name="manual_scan">手动扫描</string>
-    <string name="lrc_priority">歌词搜索</string>
-    <string name="lrc_priorty_tip">是否优先搜索在线歌词</string>
+    <string name="lrc_priority">搜索顺序</string>
+    <string name="lrc_priorty_tip">配置搜索时各个数据源顺序</string>
     <string name="navigation_color">导航栏变色</string>
     <string name="navigation_is_show">导航栏是否跟随主题色变化</string>
     <string name="shake">摇一摇</string>
@@ -358,4 +358,8 @@
     <string name="lyric_advance_x_second">提前%1$s秒</string>
     <string name="lyric_delay_x_second">延后%1$s秒</string>
     <string name="speed">播放倍速</string>
+    <string name="whether_change_theme">当前为夜间模式，是否切换主题颜色?</string>
+    <string name="embedded_lyric">内嵌</string>
+    <string name="default_lyric_priority">默认</string>
+    <string name="local">本地</string>
 </resources>

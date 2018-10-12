@@ -22,16 +22,17 @@ public class Global {
     /**
      * 文件夹名与对应的所有歌曲id
      */
-    public static Map<String,List<Integer>> FolderMap = new TreeMap<>(String::compareToIgnoreCase);
+    public static Map<String, List<Integer>> FolderMap = new TreeMap<>(String::compareToIgnoreCase);
     /**
      * 播放列表
      */
     public static List<PlayList> PlayList = new ArrayList<>();
 
-    public static void setOperation(int operation){
+    public static void setOperation(int operation) {
         Operation = operation;
     }
-    public static int getOperation(){
+
+    public static int getOperation() {
         return Operation;
     }
 
@@ -39,10 +40,12 @@ public class Global {
      * 耳机是否插入
      */
     private static boolean IsHeadsetOn = false;
-    public static void setHeadsetOn(boolean headsetOn){
+
+    public static void setHeadsetOn(boolean headsetOn) {
         IsHeadsetOn = headsetOn;
     }
-    public static boolean getHeadsetOn(){
+
+    public static boolean getHeadsetOn() {
         return IsHeadsetOn;
     }
 
@@ -50,16 +53,22 @@ public class Global {
      * 通知栏是否显示
      */
     private static boolean NotifyShowing = false;
-    public static void setNotifyShowing(boolean isshow){
+
+    public static void setNotifyShowing(boolean isshow) {
         NotifyShowing = isshow;
     }
-    public static boolean isNotifyShowing(){
+
+    public static boolean isNotifyShowing() {
         return NotifyShowing;
     }
 
-    /** 播放队列id */
+    /**
+     * 播放队列id
+     */
     public static int PlayQueueID = 0;
-    /** 我的收藏id */
+    /**
+     * 我的收藏id
+     */
     public static int MyLoveID = 0;
 
 }

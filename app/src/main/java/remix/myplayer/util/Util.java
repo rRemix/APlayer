@@ -238,7 +238,7 @@ public class Util {
      */
     public static String getTime(long duration) {
         int minute = (int) duration / 1000 / 60;
-        int second = ((int) duration - minute * 60000) / 1000;
+        int second = (int) Math.ceil((duration - minute * 60000) / 1000f);
         //如果分钟数小于10
         if (minute < 10) {
             if (second < 10)

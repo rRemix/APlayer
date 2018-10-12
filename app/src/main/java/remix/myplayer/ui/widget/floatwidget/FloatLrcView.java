@@ -430,7 +430,7 @@ public class FloatLrcView extends RelativeLayout {
             Intent intent = new Intent(MusicService.ACTION_CMD);
             intent.putExtra("Control", Command.UNLOCK_DESKTOP_LYRIC);
             intent.setComponent(new ComponentName(mContext, MusicService.class));
-            return PendingIntent.getService(mContext,  Command.UNLOCK_DESKTOP_LYRIC, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            return PendingIntent.getService(mContext, Command.UNLOCK_DESKTOP_LYRIC, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
     }
 }

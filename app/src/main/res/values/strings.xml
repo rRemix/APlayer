@@ -136,8 +136,8 @@
     <string name="lrc_scan">Scanning-path</string>
     <string name="lockscreen_show">LockScreen</string>
     <string name="manual_scan">Manual scan</string>
-    <string name="lrc_priority">Lyric search</string>
-    <string name="lrc_priorty_tip">Online first</string>
+    <string name="lrc_priority">Priority of lyric search</string>
+    <string name="lrc_priorty_tip">Config priority of lyric search</string>
     <string name="navigation_color">Colored navigation bar</string>
     <string name="navigation_is_show">Whether colored navigation bar</string>
     <string name="shake">Shake</string>
@@ -358,4 +358,8 @@
     <string name="lyric_advance_x_second">%1$s s advanced</string>
     <string name="lyric_delay_x_second">%1$s s delayed</string>
     <string name="speed">Play speed</string>
+    <string name="whether_change_theme">Currently in night mode, whether to switch theme colors?</string>
+    <string name="embedded_lyric">Embedded</string>
+    <string name="default_lyric_priority">默认</string>
+    <string name="local">Local</string>
 </resources>

@@ -145,7 +145,7 @@ public class MediaStoreUtil {
                     SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z));
             if (cursor != null) {
                 while (cursor.moveToNext()) {
-                    songs.add(getMP3Info(cursor));
+                    songs.add(getSongInfo(cursor));
                 }
             }
         } catch (Exception e) {
@@ -167,10 +167,10 @@ public class MediaStoreUtil {
                     null,
                     MediaStore.Audio.Media.DATE_ADDED + " >= " + (today.getTimeInMillis() / 1000 - (3600 * 24 * 7)) + " and " + MediaStoreUtil.getBaseSelection(),
                     null,
-                    MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                    MediaStore.Audio.Media.DATE_ADDED);
             if (cursor != null) {
                 while (cursor.moveToNext()) {
-                    songs.add(MediaStoreUtil.getMP3Info(cursor));
+                    songs.add(MediaStoreUtil.getSongInfo(cursor));
                 }
             }
         } finally {
@@ -305,7 +305,8 @@ public class MediaStoreUtil {
 
     /**
      * 根据歌手或者专辑id获取所有歌曲
-     * @param id 歌手id 专辑id
+     *
+     * @param id   歌手id 专辑id
      * @param type 1:专辑  2:歌手
      * @return 对应所有歌曲的id
      */
@@ -316,26 +317,26 @@ public class MediaStoreUtil {
         try {
             if (type == Constants.ALBUM) {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                         MediaStore.Audio.Media.ALBUM_ID + "=" + id + " and " + MediaStoreUtil.getBaseSelection(),
+                        MediaStore.Audio.Media.ALBUM_ID + "=" + id + " and " + MediaStoreUtil.getBaseSelection(),
                         null,
-                        SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
+                        SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
             }
             if (type == Constants.ARTIST) {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
                         MediaStore.Audio.Media.ARTIST_ID + "=" + id + " and " + MediaStoreUtil.getBaseSelection(),
                         null,
-                        SPUtil.getValue(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
+                        SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
             }
 
-            if(cursor != null && cursor.getCount() > 0) {
+            if (cursor != null && cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
-                    songs.add(getMP3Info(cursor));
+                    songs.add(getSongInfo(cursor));
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(cursor != null && !cursor.isClosed())
+            if (cursor != null && !cursor.isClosed())
                 cursor.close();
         }
         return songs;
@@ -559,32 +560,13 @@ public class MediaStoreUtil {
      * @param cursor 记录集
      * @return 拼装后的歌曲信息
      */
-    public static Song getMP3Info(Cursor cursor) {
+    public static Song getSongInfo(Cursor cursor) {
         if (cursor == null || cursor.getColumnCount() <= 0)
             return null;
 
         long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
         final String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
         final int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-//        if (duration > 0){
-//            IjkMediaPlayer ijkMediaPlayer = new IjkMediaPlayer();
-//            try {
-//                ijkMediaPlayer.setDataSource(data);
-//                ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
-//                ijkMediaPlayer.prepareAsync();
-//                Thread.sleep(20);
-//                duration = ijkMediaPlayer.getDuration();
-//                if(duration > 0){
-//                    ContentValues contentValues = new ContentValues();
-//                    contentValues.put(MediaStore.Audio.Media.DURATION,duration);
-//                    int updateCount = mContext.getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-//                            contentValues, MediaStore.Audio.Media._ID + "=?",new String[]{id + ""});
-//                    LogUtil.d("UpdateDuration","UpdateCount: " + updateCount);
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
         return new Song(
                 id,
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
@@ -627,7 +609,7 @@ public class MediaStoreUtil {
                     SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
             if (cursor != null && cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
-                    list.add(getMP3Info(cursor));
+                    list.add(getSongInfo(cursor));
                 }
             }
         } finally {
@@ -665,7 +647,7 @@ public class MediaStoreUtil {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, where.toString(), arg, null, null);
             if (cursor != null) {
                 while (cursor.moveToNext()) {
-                    list.add(getMP3Info(cursor));
+                    list.add(getSongInfo(cursor));
                 }
                 //如果本地删除了某些歌曲 添加一些空的歌曲信息，保证点击播放列表前后歌曲数目一致
                 if (cursor.getCount() < idList.size()) {
@@ -704,7 +686,7 @@ public class MediaStoreUtil {
             if (cursor.getCount() > 0 && cursor.moveToFirst()) {
                 cursor.moveToFirst();
             }
-            song = getMP3Info(cursor);
+            song = getSongInfo(cursor);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -734,7 +716,7 @@ public class MediaStoreUtil {
             if (cursor.getCount() > 0 && cursor.moveToFirst()) {
                 cursor.moveToFirst();
             }
-            song = getMP3Info(cursor);
+            song = getSongInfo(cursor);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -925,7 +907,7 @@ public class MediaStoreUtil {
                     where, arg, null);
             if (cursor != null && cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
-                    songs.add(getMP3Info(cursor));
+                    songs.add(getSongInfo(cursor));
                 }
             }
         } finally {
@@ -944,6 +926,8 @@ public class MediaStoreUtil {
      * @return
      */
     public static int delete(List<Song> songs, boolean deleteSource) {
+        //保存是否删除源文件
+        SPUtil.putValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, deleteSource);
         if (songs == null || songs.size() == 0)
             return 0;
 
@@ -1231,7 +1215,9 @@ public class MediaStoreUtil {
                         Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
                         intent.setData(Uri.parse("package:" + mContext.getPackageName()));
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mContext.startActivity(intent);
+                        if (Util.isIntentAvailable(mContext, intent)) {
+                            mContext.startActivity(intent);
+                        }
                     }
                 }
             }
@@ -1260,7 +1246,7 @@ public class MediaStoreUtil {
         try {
             if (cursor != null && cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
-                    songs.add(getMP3Info(cursor));
+                    songs.add(getSongInfo(cursor));
                 }
             }
         } finally {

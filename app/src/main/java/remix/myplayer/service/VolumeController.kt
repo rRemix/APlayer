@@ -24,21 +24,21 @@ class VolumeController(musicService: MusicService) {
                 val volume = 1f - millisUntilFinished * 1.0f / DURATION_IN_MS
                 try {
                     mediaPlayer?.setVolume(volume, volume)
-                }catch (e: IllegalStateException){
-                    LogUtil.d("VolumeController",e.toString())
+                } catch (e: IllegalStateException) {
+                    LogUtil.d("VolumeController", e.toString())
                 }
             }
         }.start()
     }
     private val mFadeOutRunnable: Runnable = Runnable {
         val mediaPlayer = mRef.get()?.mediaPlayer
-        object : CountDownTimer(DURATION_IN_MS,DURATION_IN_MS / 10){
+        object : CountDownTimer(DURATION_IN_MS, DURATION_IN_MS / 10) {
             override fun onTick(millisUntilFinished: Long) {
                 val volume = millisUntilFinished * 1.0f / DURATION_IN_MS
                 try {
                     mediaPlayer?.setVolume(volume, volume)
-                }catch (e: IllegalStateException){
-                    LogUtil.d("VolumeController",e.toString())
+                } catch (e: IllegalStateException) {
+                    LogUtil.d("VolumeController", e.toString())
                 }
             }
 
@@ -46,31 +46,31 @@ class VolumeController(musicService: MusicService) {
                 directTo(0f)
                 try {
                     mediaPlayer?.pause()
-                }catch (e: IllegalStateException){
-                    LogUtil.d("VolumeController",e.toString())
+                } catch (e: IllegalStateException) {
+                    LogUtil.d("VolumeController", e.toString())
                 }
             }
 
         }.start()
     }
 
-    fun directTo(@FloatRange(from = 0.0, to = 1.0) toVolume: Float){
-        directTo(toVolume,toVolume)
+    fun directTo(@FloatRange(from = 0.0, to = 1.0) toVolume: Float) {
+        directTo(toVolume, toVolume)
     }
 
-    private fun directTo(@FloatRange(from = 0.0, to = 1.0) leftVolume: Float, @FloatRange(from = 0.0, to = 1.0) rightVolume: Float){
+    private fun directTo(@FloatRange(from = 0.0, to = 1.0) leftVolume: Float, @FloatRange(from = 0.0, to = 1.0) rightVolume: Float) {
         val mediaPlayer = mRef.get()?.mediaPlayer
         try {
             mediaPlayer?.setVolume(leftVolume, rightVolume)
-        }catch (e: IllegalStateException){
-            LogUtil.d("VolumeController",e.toString())
+        } catch (e: IllegalStateException) {
+            LogUtil.d("VolumeController", e.toString())
         }
     }
 
     /**
      * 淡入
      */
-    fun fadeIn(){
+    fun fadeIn() {
         mHandler.removeCallbacks(mFadeInRunnable)
         mHandler.removeCallbacks(mFadeOutRunnable)
         mHandler.post(mFadeInRunnable)
@@ -79,7 +79,7 @@ class VolumeController(musicService: MusicService) {
     /**
      * 淡出
      */
-    fun fadeOut(){
+    fun fadeOut() {
         mHandler.removeCallbacks(mFadeInRunnable)
         mHandler.removeCallbacks(mFadeOutRunnable)
         mHandler.post(mFadeOutRunnable)

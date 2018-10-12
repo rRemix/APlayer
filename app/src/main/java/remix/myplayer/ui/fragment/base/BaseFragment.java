@@ -40,11 +40,11 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if(mUnBinder != null)
+        if (mUnBinder != null)
             mUnBinder.unbind();
     }
 
-    public RecyclerView.Adapter getAdapter(){
+    public RecyclerView.Adapter getAdapter() {
         return null;
     }
 
@@ -56,18 +56,18 @@ public abstract class BaseFragment extends Fragment {
         super.onPause();
     }
 
-    protected String getStringSafely(@StringRes int res){
-        if(isAdded())
+    protected String getStringSafely(@StringRes int res) {
+        if (isAdded())
             return getString(res);
         else
             return App.getContext().getString(res);
     }
 
-    protected String getStringSafely(@StringRes int res,Object... args){
-        if(isAdded())
-            return getString(res,args);
+    protected String getStringSafely(@StringRes int res, Object... args) {
+        if (isAdded())
+            return getString(res, args);
         else
-            return App.getContext().getString(res,args);
+            return App.getContext().getString(res, args);
     }
 
 }

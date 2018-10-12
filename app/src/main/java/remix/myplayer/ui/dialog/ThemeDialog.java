@@ -11,14 +11,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.ColorChoose;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 
@@ -31,14 +30,14 @@ import remix.myplayer.util.ColorUtil;
 public class ThemeDialog extends BaseDialogActivity {
     @BindView(R.id.color_container)
     LinearLayout mColorContainer;
-    private final int[] mColors = new int[]{R.color.md_blue_primary,R.color.md_red_primary,R.color.md_brown_primary,R.color.md_navy_primary,
-            R.color.md_green_primary,R.color.md_yellow_primary,R.color.md_purple_primary,R.color.md_indigo_primary,R.color.md_plum_primary,
-            R.color.md_pink_primary,R.color.md_white_primary_dark};
-    private final String[] mColorTexts = new String[]{"默认","韓紅色","灰汁色","青碧色","常盤色","藤黄色",
-                                                        "桔梗色","竜膽色","红梅色","哔哩粉","银白色"};
-    private final int[] mThemeColors = new int[]{ThemeStore.THEME_BLUE,ThemeStore.THEME_RED,ThemeStore.THEME_BROWN,ThemeStore.THEME_NAVY,
-            ThemeStore.THEME_GREEN,ThemeStore.THEME_YELLOW,ThemeStore.THEME_PURPLE,ThemeStore.THEME_INDIGO,ThemeStore.THEME_PLUM,
-            ThemeStore.THEME_PINK,ThemeStore.THEME_WHITE};
+    private final int[] mColors = new int[]{R.color.md_blue_primary, R.color.md_red_primary, R.color.md_brown_primary, R.color.md_navy_primary,
+            R.color.md_green_primary, R.color.md_yellow_primary, R.color.md_purple_primary, R.color.md_indigo_primary, R.color.md_plum_primary,
+            R.color.md_pink_primary, R.color.md_white_primary_dark};
+    private final String[] mColorTexts = new String[]{"默认", "韓紅色", "灰汁色", "青碧色", "常盤色", "藤黄色",
+            "桔梗色", "竜膽色", "红梅色", "哔哩粉", "银白色"};
+    private final int[] mThemeColors = new int[]{ThemeStore.THEME_BLUE, ThemeStore.THEME_RED, ThemeStore.THEME_BROWN, ThemeStore.THEME_NAVY,
+            ThemeStore.THEME_GREEN, ThemeStore.THEME_YELLOW, ThemeStore.THEME_PURPLE, ThemeStore.THEME_INDIGO, ThemeStore.THEME_PLUM,
+            ThemeStore.THEME_PINK, ThemeStore.THEME_WHITE};
 
     private ArrayList<ColorChoose> mColorInfoList = new ArrayList<>();
 
@@ -49,16 +48,16 @@ public class ThemeDialog extends BaseDialogActivity {
         setContentView(R.layout.dialog_color_choose);
         ButterKnife.bind(this);
 
-        for(int i = 0; i < mColors.length ; i++){
-            addColor(mColors[i],mColorTexts[i],mThemeColors[i]);
+        for (int i = 0; i < mColors.length; i++) {
+            addColor(mColors[i], mColorTexts[i], mThemeColors[i]);
         }
     }
 
     /**
      * 添加颜色
      */
-    private void addColor(@ColorRes int mdColor, String colorText,int themeColor) {
-        View colorItem = LayoutInflater.from(this).inflate(R.layout.item_color_choose,null);
+    private void addColor(@ColorRes int mdColor, String colorText, int themeColor) {
+        View colorItem = LayoutInflater.from(this).inflate(R.layout.item_color_choose, null);
         ImageView src = colorItem.findViewById(R.id.color_choose_item_src);
         GradientDrawable drawable = (GradientDrawable) src.getDrawable();
         drawable.setColor(ColorUtil.getColor(mdColor));
@@ -72,37 +71,36 @@ public class ThemeDialog extends BaseDialogActivity {
 
         colorItem.setOnClickListener(new ColorListener(themeColor));
         mColorContainer.addView(colorItem);
-        mColorInfoList.add(new ColorChoose(themeColor,colorText,check));
+        mColorInfoList.add(new ColorChoose(themeColor, colorText, check));
     }
 
     /**
      * 判断是否是选中的颜色
+     *
      * @param color
      * @return
      */
-    private boolean isColorChoose(int color){
+    private boolean isColorChoose(int color) {
         return color == ThemeStore.THEME_COLOR;
     }
 
 
-    class ColorListener implements View.OnClickListener{
+    class ColorListener implements View.OnClickListener {
         private int mThemeColor;
-        public ColorListener(int themeColor){
+
+        ColorListener(int themeColor) {
             mThemeColor = themeColor;
         }
+
         @Override
         public void onClick(View v) {
 
-            if(!ThemeStore.isDay()){
-                new MaterialDialog.Builder(ThemeDialog.this)
-                        .content("当前为夜间模式，是否切换主题颜色?")
+            if (!ThemeStore.isDay()) {
+                Theme.getBaseDialog(mContext)
+                        .content(R.string.whether_change_theme)
                         .buttonRippleColor(ThemeStore.getRippleColor())
-                        .backgroundColorAttr(R.attr.background_color_3)
-                        .positiveColorAttr(R.attr.text_color_primary)
-                        .negativeColorAttr(R.attr.text_color_primary)
-                        .contentColorAttr(R.attr.text_color_primary)
-                        .positiveText("是")
-                        .negativeText("否")
+                        .positiveText(R.string.confirm)
+                        .negativeText(R.string.cancel)
                         .onPositive((dialog, which) -> changeThemeColor(true))
                         .onNegative((dialog, which) -> {
 
@@ -115,9 +113,9 @@ public class ThemeDialog extends BaseDialogActivity {
 
         private void changeThemeColor(boolean isFromNight) {
             Intent intent = new Intent();
-            intent.putExtra("needRecreate",true);
-            intent.putExtra("fromColorChoose",isFromNight);
-            setResult(Activity.RESULT_OK,intent);
+            intent.putExtra("needRecreate", true);
+            intent.putExtra("fromColorChoose", isFromNight);
+            setResult(Activity.RESULT_OK, intent);
             ThemeStore.THEME_MODE = ThemeStore.DAY;
             ThemeStore.THEME_COLOR = mThemeColor;
             ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
@@ -131,7 +129,7 @@ public class ThemeDialog extends BaseDialogActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        overridePendingTransition(android.R.anim.fade_in,0);
+        overridePendingTransition(android.R.anim.fade_in, 0);
     }
 
     @Override

@@ -41,7 +41,7 @@ class BottomActionBar @JvmOverloads constructor(context: Context, attrs: Attribu
     private var mGestureDetector: GestureDetector
 
     init {
-        View.inflate(context, R.layout.bottom_actionbar,this)
+        View.inflate(context, R.layout.bottom_actionbar, this)
         //设置整个背景着色
         Theme.TintDrawable(bottom_action_bar,
                 R.drawable.commom_playercontrols_bg,
@@ -124,8 +124,8 @@ class BottomActionBar @JvmOverloads constructor(context: Context, attrs: Attribu
                         .makeSceneTransitionAnimation(activity, bottom_action_bar_cover, "image")
                 ActivityCompat.startActivity(context, intent, options.toBundle())
             }
-        }catch (e : ClassCastException){
-             ToastUtil.show(context, "跳转失败: $e")
+        } catch (e: ClassCastException) {
+            ToastUtil.show(context, "跳转失败: $e")
         }
 
     }

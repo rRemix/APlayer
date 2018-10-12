@@ -31,9 +31,9 @@ public class ExitReceiver extends BroadcastReceiver {
         //关闭所有activity
         ActivityManager.FinishAll();
         new Handler().postDelayed(() -> {
-            LogUtil.d("ServiceLifeCycle","关闭App");
+            LogUtil.d("ServiceLifeCycle", "关闭App");
             System.exit(0);
-        },1000);
+        }, 1000);
 //        System.exit(0);
     }
 }
