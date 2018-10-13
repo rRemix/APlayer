@@ -71,10 +71,10 @@ abstract class BaseAppwidget : AppWidgetProvider() {
                 it != null && !it.isRecycled
             }.let {
                 if (it) {
-                    LogUtil.d(TAG, "复用Bitmap: " + mBitmap!!)
+                    LogUtil.d(TAG, "复用Bitmap: $mBitmap")
                     remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap)
                 } else {
-                    LogUtil.d(TAG, "Bitmap复用失败: " + mBitmap!!)
+                    LogUtil.d(TAG, "Bitmap复用失败: $mBitmap")
                     remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
                 }
             }
@@ -93,12 +93,12 @@ abstract class BaseAppwidget : AppWidgetProvider() {
                 override fun onSuccess(result: Bitmap?) {
                     try {
                         if (result != mBitmap && mBitmap != null) {
-                            LogUtil.d(TAG, "onSuccess --- 回收Bitmap: " + mBitmap!!)
+                            LogUtil.d(TAG, "onSuccess --- 回收Bitmap: $mBitmap")
                             mBitmap = null
                         }
                         //                        mBitmap = MusicService.copy(result);
                         mBitmap = result
-                        LogUtil.d(TAG, "onSuccess --- 获取Bitmap: " + mBitmap!!)
+                        LogUtil.d(TAG, "onSuccess --- 获取Bitmap: $mBitmap")
                         if (mBitmap != null) {
                             remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap)
                         } else {
