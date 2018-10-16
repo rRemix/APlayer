@@ -534,20 +534,19 @@ public class Util {
         }
     }
 
-    public static void closeStream(Closeable closeable) {
+    public static void closeSafely(Closeable closeable) {
         if (closeable != null) {
+            if (closeable instanceof Cursor && ((Cursor) closeable).isClosed()) {
+                return;
+            }
             try {
                 closeable.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public static void closeCursor(Cursor cursor) {
-        if (cursor != null && !cursor.isClosed())
-            cursor.close();
-    }
 
     public static void installApk(Context context, String path) {
         if (path == null) {
@@ -569,6 +568,9 @@ public class Util {
     }
 
     public static void writeLogToExternalStorage(final String name, final String log) {
+//        if(!SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.WRITE_LOG_TO_STORAGE,false)){
+//            return;
+//        }
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             return;
         }

@@ -607,7 +607,7 @@ public class MainActivity extends MultiChoiceActivity {
                                 ImagePipeline imagePipeline = Fresco.getImagePipeline();
                                 imagePipeline.evictFromCache(uri);
                                 imagePipeline.evictFromDiskCache(uri);
-                            }, throwable -> ToastUtil.show(mContext, R.string.tag_save_error, throwable.toString()));
+                            }, throwable -> ToastUtil.show(mContext, R.string.save_error, throwable.toString()));
                 }
                 break;
             case REQUEST_INSTALL_PACKAGES:

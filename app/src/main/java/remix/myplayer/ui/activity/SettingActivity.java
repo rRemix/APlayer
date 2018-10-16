@@ -324,7 +324,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 mLrcPath.setText(getString(R.string.lrc_tip, SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")));
                 break;
             case "Scan":
-                new MediaScanner(mContext).scanFiles(folder, "audio/*");
+                new MediaScanner(mContext).scanFiles(folder);
+                mNeedRefreshAdapter = true;
                 break;
             case "ExportPlayList":
                 if (TextUtils.isEmpty(playListName)) {

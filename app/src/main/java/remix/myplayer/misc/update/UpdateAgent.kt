@@ -1,5 +1,6 @@
 package remix.myplayer.misc.update
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Environment
@@ -22,6 +23,7 @@ object UpdateAgent {
     @JvmStatic
     var forceCheck = false
 
+    @SuppressLint("CheckResult")
     @JvmStatic
     fun check(context: Context) {
         if (listener == null)

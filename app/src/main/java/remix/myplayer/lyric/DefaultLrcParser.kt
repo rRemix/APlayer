@@ -27,7 +27,7 @@ class DefaultLrcParser : ILrcParser {
         //缓存
         DiskCache.getLrcDiskCache().apply {
             edit(cacheKey).apply {
-                newOutputStream(0).use { outStream ->
+                newOutputStream(0)?.use { outStream ->
                     outStream.write(Gson().toJson(lrcRows, object : TypeToken<List<LrcRow>>() {}.type).toByteArray())
                 }
             }.commit()

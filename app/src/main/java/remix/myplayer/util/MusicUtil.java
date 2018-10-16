@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -33,12 +34,30 @@ public class MusicUtil {
     public static void playFromUri(Uri uri) {
         List<Integer> songs = null;
         if (uri.getScheme() != null && uri.getAuthority() != null) {
-            if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {//content://xxx
+            if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
                 String songId = null;
-                if (uri.getAuthority().equals("com.android.providers.media.documents")) {
-                    songId = getSongIdFromMediaProvider(uri);
-                } else if (uri.getAuthority().equals("media")) {
-                    songId = uri.getLastPathSegment();
+                switch (uri.getAuthority()) {
+                    case "com.android.providers.media.documents":
+                        songId = getSongIdFromMediaProvider(uri);
+                        break;
+                    case "com.android.browser.fileprovider":
+                        String fileProviderPath = uri.getPath();
+                        if (fileProviderPath != null && !TextUtils.isEmpty(fileProviderPath)) {
+                            songs = new ArrayList<>();
+                            if (fileProviderPath.startsWith("///")) {
+                                fileProviderPath = fileProviderPath.substring(2, fileProviderPath.length());
+                            }
+                            songs.add(MediaStoreUtil.getSongIdByUrl(fileProviderPath));
+                        }
+                        break;
+                    case "media":
+                        songId = uri.getLastPathSegment();
+                        break;
+                    default:
+                        String displayName = uri.getLastPathSegment();
+                        if (!TextUtils.isEmpty(displayName))
+                            songs = MediaStoreUtil.getSongIds(MediaStore.Audio.Media.DISPLAY_NAME + "=?", new String[]{displayName}, null);
+                        break;
                 }
                 if (songId != null && TextUtils.isDigitsOnly(songId)) {
                     songs = new ArrayList<>();
@@ -46,6 +65,7 @@ public class MusicUtil {
                 }
             }
         }
+
         if (songs == null) {
             File songFile = null;
             if (uri.getAuthority() != null && uri.getAuthority().equals("com.android.externalstorage.documents")) {
@@ -67,6 +87,8 @@ public class MusicUtil {
                 }
             }
         }
+
+
         if (songs != null && !songs.isEmpty()) {
             Intent intent = new Intent(MusicService.ACTION_CMD);
             Bundle arg = new Bundle();
@@ -74,6 +96,8 @@ public class MusicUtil {
             arg.putInt("Position", 0);
             intent.putExtras(arg);
             MusicServiceRemote.setPlayQueue(songs, intent);
+        } else {
+            CrashReport.postCatchedException(new Throwable("Unknown Uri: " + uri));
         }
     }
 
@@ -84,24 +108,19 @@ public class MusicUtil {
 
     @Nullable
     private static String getFilePathFromUri(Context context, Uri uri) {
-        Cursor cursor = null;
         final String column = "_data";
         final String[] projection = {
                 column
         };
 
-        try {
-            cursor = context.getContentResolver().query(uri, projection, null, null,
-                    null);
+        try (Cursor cursor = context.getContentResolver().query(uri, projection, null, null,
+                null)) {
             if (cursor != null && cursor.moveToFirst()) {
                 final int column_index = cursor.getColumnIndex(column);
                 return cursor.getString(column_index);
             }
         } catch (Exception e) {
-            CrashReport.postCatchedException(new Throwable("Uri: " + uri, e));
-        } finally {
-            if (cursor != null)
-                cursor.close();
+            LogUtil.d(TAG, e.toString());
         }
         return null;
     }

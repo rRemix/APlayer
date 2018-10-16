@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.support.annotation.DrawableRes
 import android.widget.RemoteViews
+import com.tencent.bugly.crashreport.CrashReport
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.appwidgets.AppWidgetSkin.WHITE_1F
@@ -59,8 +60,13 @@ abstract class BaseAppwidget : AppWidgetProvider() {
     }
 
     protected fun hasInstances(context: Context): Boolean {
-        val appIds = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, javaClass))
-        return appIds != null && appIds.isNotEmpty()
+        try {
+            val appIds = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, javaClass))
+            return appIds != null && appIds.isNotEmpty()
+        } catch (e: Exception) {
+            CrashReport.postCatchedException(Throwable("hasInstances: $e"))
+        }
+        return false
     }
 
     protected fun updateCover(service: MusicService, remoteViews: RemoteViews, appWidgetIds: IntArray?, reloadCover: Boolean) {

@@ -88,7 +88,7 @@
     <string name="song_not_empty">歌曲名不能为空</string>
     <string name="save_success">保存成功</string>
     <string name="save_error">保存失败</string>
-    <string name="tag_save_error">保存失败: %s</string>
+    <string name="save_error_arg">保存失败: %s</string>
     <string name="arg_illegal">参数不合法: %d</string>
     <string name="send_success">发送成功 感谢您的反馈!</string>
     <string name="send_error">发送失败 请重试!</string>
@@ -230,7 +230,7 @@
     <string name="scan_failed">扫描失败:%s</string>
     <string name="scanning">正在扫描</string>
     <string name="scanned_count">共扫描%d首歌曲</string>
-    <string name="scan_getting_files">正在获取目录下所有文件</string>
+    <string name="scaning">正在扫描</string>
     <string name="no_audio_file">无音频文件</string>
     <string name="manual_scan_tip">请确保扫描目录下没有.nomedia的隐藏文件</string>
     <string name="playing_notification">正在播放通知</string>

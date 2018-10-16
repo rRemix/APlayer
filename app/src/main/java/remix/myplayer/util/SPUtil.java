@@ -186,6 +186,8 @@ public class SPUtil {
         String SPEED = "speed";
         //移除是否同时源文件
         String DELETE_SOURCE = "delete_source";
+        //是否保存日志文件到sd卡
+        String WRITE_LOG_TO_STORAGE = "write_log_to_storage";
     }
 
     public interface LYRIC_OFFSET_KEY {

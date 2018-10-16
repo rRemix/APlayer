@@ -114,8 +114,8 @@ class DownloadService : IntentService("DownloadService") {
             ToastUtil.show(this, R.string.update_error, ex.message)
         } finally {
             sendLocalBroadcast(Intent(ACTION_DISMISS_DIALOG))
-            Util.closeStream(inStream)
-            Util.closeStream(outStream)
+            Util.closeSafely(inStream)
+            Util.closeSafely(outStream)
         }
         mNotificationManager.cancel(UPDATE_NOTIFICATION_ID)
     }
