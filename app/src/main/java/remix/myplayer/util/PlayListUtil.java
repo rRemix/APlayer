@@ -156,26 +156,27 @@ public class PlayListUtil {
     /**
      * 添加多首歌曲
      *
-     * @param IDList
+     * @param ids
      * @return
      */
-    public static int addMultiSongs(List<Integer> IDList, String playListName, int playListId) {
-        if (IDList == null || IDList.size() == 0)
+    public static int addMultiSongs(List<Integer> ids, String playListName, int playListId) {
+        if (ids == null || ids.size() == 0)
             return 0;
+        List<Integer> newList = new ArrayList<>(ids);
         //不重复添加
         List<Integer> rawIDList = getIDList(playListName);
         for (int i = 0; i < rawIDList.size(); i++) {
-            for (int j = IDList.size() - 1; j >= 0; j--) {
-                if (rawIDList.get(i).equals(IDList.get(j)))
-                    IDList.remove(j);
+            for (int j = newList.size() - 1; j >= 0; j--) {
+                if (rawIDList.get(i).equals(newList.get(j)))
+                    newList.remove(j);
             }
         }
-        ContentValues[] values = new ContentValues[IDList.size()];
-        for (int i = 0; i < IDList.size(); i++) {
+        ContentValues[] values = new ContentValues[newList.size()];
+        for (int i = 0; i < newList.size(); i++) {
             ContentValues cv = new ContentValues();
             cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME, playListName);
             cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID, playListId);
-            cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID, IDList.get(i));
+            cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID, newList.get(i));
             values[i] = cv;
         }
         return mContext.getContentResolver().bulkInsert(PlayListSongs.CONTENT_URI, values);

@@ -13,7 +13,6 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.facebook.common.util.ByteConstants;
 
@@ -34,6 +33,7 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Album;
 import remix.myplayer.bean.mp3.Artist;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
 
 import static remix.myplayer.util.Util.hasStoragePermissions;
@@ -122,52 +122,18 @@ public class MediaStoreUtil {
     }
 
     public static List<Song> getAllSong() {
-        if (!hasStoragePermissions())
-            return new ArrayList<>();
-        ArrayList<Song> songs = new ArrayList<>();
-        Cursor cursor = null;
+        return getSongs(null,
+                null,
+                SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z));
 
-        try {
-            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    null,
-                    getBaseSelection(),
-                    null,
-                    SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z));
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    songs.add(getSongInfo(cursor));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null && !cursor.isClosed())
-                cursor.close();
-        }
-        return songs;
     }
 
     public static List<Song> getLastAddedSong() {
-        Cursor cursor = null;
-        List<Song> songs = new ArrayList<>();
-        try {
-            Calendar today = Calendar.getInstance();
-            today.setTime(new Date());
-            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    null,
-                    MediaStore.Audio.Media.DATE_ADDED + " >= " + (today.getTimeInMillis() / 1000 - (3600 * 24 * 7)) + " and " + MediaStoreUtil.getBaseSelection(),
-                    null,
-                    MediaStore.Audio.Media.DATE_ADDED);
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    songs.add(MediaStoreUtil.getSongInfo(cursor));
-                }
-            }
-        } finally {
-            if (cursor != null && !cursor.isClosed())
-                cursor.close();
-        }
-        return songs;
+        Calendar today = Calendar.getInstance();
+        today.setTime(new Date());
+        return getSongs(MediaStore.Audio.Media.DATE_ADDED + " >= ?",
+                new String[]{String.valueOf((today.getTimeInMillis() / 1000 - (3600 * 24 * 7)))},
+                MediaStore.Audio.Media.DATE_ADDED);
     }
 
     /**
@@ -175,31 +141,11 @@ public class MediaStoreUtil {
      *
      * @return
      */
-    public static ArrayList<Integer> getAllSongsId() {
-        ArrayList<Integer> allSongList = new ArrayList<>();
-        ContentResolver resolver = mContext.getContentResolver();
-        Cursor cursor = null;
-
-        try {
-            cursor = resolver.query(
-                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    null,
-                    MediaStoreUtil.getBaseSelection(),
-                    null,
-                    SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z));
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    allSongList.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null && !cursor.isClosed())
-                cursor.close();
-        }
-
-        return allSongList;
+    public static List<Integer> getAllSongsId() {
+        return getSongIds(
+                null,
+                null,
+                SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z));
     }
 
     /**
@@ -497,7 +443,11 @@ public class MediaStoreUtil {
             deleteId.add(temp.getId() + "");
         }
         SPUtil.putStringSet(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG, deleteId);
+        //从播放队列和全部歌曲移除
+        MusicServiceRemote.deleteFromPlayQueue(songs);
+        //刷新界面
         mContext.getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
+
         //删除源文件
         if (deleteSource)
             deleteSource(songs);
@@ -708,8 +658,6 @@ public class MediaStoreUtil {
      * @return
      */
     public static int getSongIdByUrl(String url) {
-        if (TextUtils.isEmpty(url) || !hasStoragePermissions())
-            return -1;
         return getSongId(MediaStore.Audio.Media.DATA + " = ?", new String[]{url});
     }
 
@@ -777,17 +725,20 @@ public class MediaStoreUtil {
     }
 
     public static List<Integer> getSongIds(@Nullable String selection, String[] selectionValues, String sortOrder) {
-        List<Integer> songs = new ArrayList<>();
+        if (!hasStoragePermissions())
+            return new ArrayList<>();
+
+        List<Integer> ids = new ArrayList<>();
         try (Cursor cursor = makeSongCursor(selection, selectionValues, sortOrder)) {
             if (cursor != null && cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
-                    songs.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+                    ids.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
                 }
             }
         } catch (Exception ignore) {
 
         }
-        return songs;
+        return ids;
     }
 
     public static Song getSong(@Nullable String selection, String[] selectionValues) {
@@ -796,6 +747,9 @@ public class MediaStoreUtil {
     }
 
     public static List<Song> getSongs(@Nullable String selection, String[] selectionValues, final String sortOrder) {
+        if (!hasStoragePermissions())
+            return new ArrayList<>();
+
         List<Song> songs = new ArrayList<>();
 
         try (Cursor cursor = makeSongCursor(selection, selectionValues, sortOrder)) {

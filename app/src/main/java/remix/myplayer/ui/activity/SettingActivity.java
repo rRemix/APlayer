@@ -382,7 +382,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_screen_container, R.id.setting_scan_container, R.id.setting_classic_notify_container,
             R.id.setting_album_cover_container, R.id.setting_library_category_container, R.id.setting_immersive_container,
             R.id.setting_import_playlist_container, R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container,
-            R.id.setting_cover_source_container, R.id.setting_player_bottom_container})
+            R.id.setting_cover_source_container, R.id.setting_player_bottom_container, R.id.setting_restore_delete_container})
     public void onClick(View v) {
         switch (v.getId()) {
             //文件过滤
@@ -507,7 +507,20 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             case R.id.setting_player_bottom_container:
                 changeBottomOfPlayingScreen();
                 break;
+            //恢复移除的歌曲
+            case R.id.setting_restore_delete_container:
+                restoreDeleteSong();
+                break;
         }
+    }
+
+    /**
+     * 恢复移除的歌曲
+     */
+    private void restoreDeleteSong() {
+        SPUtil.deleteValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG);
+        getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
+        ToastUtil.show(mContext, R.string.alread_restore_songs);
     }
 
 

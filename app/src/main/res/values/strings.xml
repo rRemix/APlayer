@@ -362,4 +362,7 @@
     <string name="embedded_lyric">Embedded</string>
     <string name="default_lyric_priority">默认</string>
     <string name="local">Local</string>
+    <string name="restore_songs">Restore songs</string>
+    <string name="restore_songs_tip">Restore songs removed from the library</string>
+    <string name="alread_restore_songs">Removed songs have been restored</string>
 </resources>
