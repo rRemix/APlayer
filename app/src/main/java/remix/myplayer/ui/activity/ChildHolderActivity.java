@@ -296,7 +296,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
                 return MediaStoreUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST);
             //文件夹名
             case Constants.FOLDER:
-                return MediaStoreUtil.getMP3ListByFolderName(mArg);
+                return MediaStoreUtil.getMP3ListByParentId(mId);
             //播放列表名
             case Constants.PLAYLIST:
                 /* 播放列表歌曲id列表 */

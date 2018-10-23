@@ -11,11 +11,9 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Folder;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
@@ -51,11 +49,12 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                String path = mAdapter.getDatas().get(position).getPath();
+                Folder folder = mAdapter.getDatas().get(position);
+                String path = folder.getPath();
                 if (getUserVisibleHint() && !TextUtils.isEmpty(path) &&
-                        !mMultiChoice.itemClick(position, position, TAG)) {
+                        !mMultiChoice.itemClick(position, folder.getParentId(), TAG)) {
                     Intent intent = new Intent(mContext, ChildHolderActivity.class);
-                    intent.putExtra("Id", position);
+                    intent.putExtra("Id", folder.getParentId());
                     intent.putExtra("Type", Constants.FOLDER);
                     intent.putExtra("Title", path);
                     startActivity(intent);
@@ -64,9 +63,10 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
 
             @Override
             public void onItemLongClick(View view, int position) {
+                Folder folder = mAdapter.getDatas().get(position);
                 String path = mAdapter.getDatas().get(position).getPath();
                 if (getUserVisibleHint() && !TextUtils.isEmpty(path))
-                    mMultiChoice.itemLongClick(position, position, TAG, Constants.FOLDER);
+                    mMultiChoice.itemLongClick(position, folder.getParentId(), TAG, Constants.FOLDER);
             }
         });
     }
@@ -110,18 +110,7 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
 
         @Override
         public List<Folder> loadInBackground() {
-            List<Folder> folderList = new ArrayList<>();
-            Global.FolderMap = MediaStoreUtil.getFolder();
-            if (Global.FolderMap == null || Global.FolderMap.size() < 0)
-                return folderList;
-
-            for (String path : Global.FolderMap.keySet()) {
-                String folderName = path.substring(path.lastIndexOf("/") + 1, path.length());
-                int count = Global.FolderMap.get(path).size();
-                folderList.add(new Folder(folderName, count, path));
-            }
-
-            return folderList;
+            return MediaStoreUtil.getFolder();
         }
     }
 }

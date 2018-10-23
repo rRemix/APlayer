@@ -1677,6 +1677,10 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             mShowFloatLrc = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
         }
 
+        if (mPlayQueue == null || mPlayQueue.isEmpty()) {
+            setPlayQueue(mAllSong);
+        }
+
         //摇一摇
         if (SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SHAKE, false)) {
             ShakeDetector.getInstance().beginListen();
@@ -1745,8 +1749,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             List<Integer> ids = new ArrayList<>();
             for (Song song : deleteSongs) {
                 ids.add(song.getId());
+                PlayListUtil.deleteSong(song.getId(), Global.PlayQueueID);
             }
-            PlayListUtil.deleteMultiSongs(ids, Global.PlayQueueID);
             mPlayQueue.removeAll(ids);
         }
     }

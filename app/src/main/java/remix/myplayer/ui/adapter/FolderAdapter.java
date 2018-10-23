@@ -79,7 +79,7 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
                 final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton);
                 popupMenu.getMenuInflater().inflate(R.menu.menu_folder_item, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
-                        holder.getAdapterPosition(),
+                        folder.getParentId(),
                         Constants.FOLDER,
                         folder.getPath()));
                 popupMenu.setGravity(Gravity.END);
