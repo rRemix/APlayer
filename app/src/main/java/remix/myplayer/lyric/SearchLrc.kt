@@ -349,7 +349,7 @@ class SearchLrc(private val mSong: Song) {
                             .map {
                                 val lrcResponse = Gson().fromJson(it.string(), NLrcResponse::class.java)
                                 val combine = mLrcParser.getLrcRows(getBufferReader(lrcResponse.lrc.lyric.toByteArray()), false, mCacheKey, mSearchKey)
-                                if (isCN && lrcResponse.tlyric != null && lrcResponse.tlyric.lyric.isNullOrEmpty()) {
+                                if (isCN && lrcResponse.tlyric != null && lrcResponse.tlyric.lyric.isNotEmpty()) {
                                     val translate = mLrcParser.getLrcRows(getBufferReader(lrcResponse.tlyric.lyric.toByteArray()), false, mCacheKey, mSearchKey)
                                     if (translate != null && translate.size > 0) {
                                         for (i in translate.indices) {

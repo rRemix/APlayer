@@ -4,6 +4,7 @@ import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.ControllerListener;
@@ -40,6 +41,9 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
     }
 
     public void onSuccess(String result) {
+        if (TextUtils.isEmpty(result)) {
+            onError("Empty Result");
+        }
         LogUtil.i(TAG, "onSuccess: " + result);
         ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(result));
         if (mConfig.isResize()) {
@@ -64,12 +68,12 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
                     @Override
                     public void onIntermediateImageFailed(String s, Throwable throwable) {
-//                        Util.writeLogToExternalStorage("fresco", "onIntermediateImageFailed\nresult: " + result + "\nthrowable: " +throwable + "\n");
+                        LogUtil.d(TAG, "onIntermediateImageFailed: " + throwable);
                     }
 
                     @Override
                     public void onFailure(String s, Throwable throwable) {
-//                        Util.writeLogToExternalStorage("fresco", "onFailure\nresult: " + result + "\nthrowable: " +throwable + "\n");
+                        LogUtil.d(TAG, "onFailure: " + throwable);
                     }
 
                     @Override

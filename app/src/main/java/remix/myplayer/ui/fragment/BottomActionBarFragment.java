@@ -101,7 +101,7 @@ public class BottomActionBarFragment extends BaseMusicFragment {
         mBottomActionBar.setOnTouchListener((v, event) -> mGestureDetector.onTouchEvent(event));
 
         //播放按钮
-        CtrlButtonListener listener = new CtrlButtonListener(getContext());
+        CtrlButtonListener listener = new CtrlButtonListener(App.getContext());
         mPlayButton.setOnClickListener(listener);
         mPlayNext.setOnClickListener(listener);
 

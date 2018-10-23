@@ -12,6 +12,7 @@ import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.adapter.LyricPriorityAdapter
 import remix.myplayer.util.SPUtil
+import remix.myplayer.util.ToastUtil
 import java.util.*
 
 class LyricPriorityDialog : android.support.v4.app.DialogFragment() {
@@ -54,11 +55,16 @@ class LyricPriorityDialog : android.support.v4.app.DialogFragment() {
                 .positiveText(R.string.confirm)
                 .negativeText(R.string.cancel)
                 .onPositive { dialog, which ->
-                    SPUtil.deleteFile(App.getContext(), SPUtil.LYRIC_KEY.NAME)
-                    SPUtil.putValue(activity, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC,
-                            Gson().toJson(adapter.datas))
-                    DiskCache.getLrcDiskCache().delete()
-                    DiskCache.init(App.getContext())
+                    try {
+                        DiskCache.getLrcDiskCache().delete()
+                        DiskCache.init(App.getContext())
+                        SPUtil.deleteFile(App.getContext(), SPUtil.LYRIC_KEY.NAME)
+                        SPUtil.putValue(activity, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC,
+                                Gson().toJson(adapter.datas))
+                    } catch (e: Exception) {
+                        ToastUtil.show(context, R.string.save_error_arg, e.message)
+                    }
+
                 }
                 .onNegative { dialog, which ->
                     dismiss()

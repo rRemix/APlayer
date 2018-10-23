@@ -1,7 +1,9 @@
 package remix.myplayer.service;
 
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -28,7 +30,6 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
@@ -69,6 +70,7 @@ import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
+import remix.myplayer.misc.receiver.MediaButtonReceiver;
 import remix.myplayer.request.RemoteUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.notification.Notify;
@@ -295,6 +297,9 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     protected boolean mHasPermission = false;
 
+    private boolean mAlreadyUnInit;
+    private float mSpeed = 1.0f;
+
     public static final String APLAYER_PACKAGE_NAME = "remix.myplayer";
     //媒体数据库变化
     public static final String MEDIA_STORE_CHANGE = APLAYER_PACKAGE_NAME + ".media_store.change";
@@ -317,8 +322,13 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     public static final String ACTION_WIDGET_UPDATE = APLAYER_PACKAGE_NAME + ".widget_update";
     public static final String ACTION_TOGGLE_TIMER = APLAYER_PACKAGE_NAME + ".toggle_timer";
 
-    private boolean mAlreadyUnInit;
-    private float mSpeed = 1.0f;
+    private static final long MEDIA_SESSION_ACTIONS = PlaybackStateCompat.ACTION_PLAY
+            | PlaybackStateCompat.ACTION_PAUSE
+            | PlaybackStateCompat.ACTION_PLAY_PAUSE
+            | PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+            | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+            | PlaybackStateCompat.ACTION_STOP
+            | PlaybackStateCompat.ACTION_SEEK_TO;
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
@@ -474,12 +484,57 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * 初始化mediasession
      */
     private void setUpMediaSession() {
-        //初始化MediaSession 用于监听线控操作
-        mMediaSession = new MediaSessionCompat(getApplicationContext(), "APlayer");
-        mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
-                | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        mMediaSession.setCallback(new SessionCallBack());
-        mMediaSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
+        ComponentName mediaButtonReceiverComponentName = new ComponentName(getApplicationContext(), MediaButtonReceiver.class);
+
+        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        mediaButtonIntent.setComponent(mediaButtonReceiverComponentName);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, mediaButtonIntent, 0);
+
+        mMediaSession = new MediaSessionCompat(getApplicationContext(), "APlayer", mediaButtonReceiverComponentName, pendingIntent);
+        mMediaSession.setCallback(new MediaSessionCompat.Callback() {
+            @Override
+            public boolean onMediaButtonEvent(Intent event) {
+                return MediaButtonReceiver.handleMediaButtonIntent(MusicService.this, event);
+            }
+
+//            @Override
+//            public void onSkipToNext() {
+//                LogUtil.d(MediaButtonReceiver.TAG, "onSkipToNext");
+//                playNext();
+//            }
+//
+//            @Override
+//            public void onSkipToPrevious() {
+//                LogUtil.d(MediaButtonReceiver.TAG, "onSkipToPrevious");
+//                playPrevious();
+//            }
+//
+//            @Override
+//            public void onPlay() {
+//                LogUtil.d(MediaButtonReceiver.TAG, "onPlay");
+//                play(true);
+//            }
+//
+//            @Override
+//            public void onPause() {
+//                LogUtil.d(MediaButtonReceiver.TAG, "onPause");
+//                pause(false);
+//            }
+//
+//            @Override
+//            public void onStop() {
+//                stopSelf();
+//            }
+//
+//            @Override
+//            public void onSeekTo(long pos) {
+//                setProgress(pos);
+//            }
+        });
+
+        mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS | MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
+        mMediaSession.setMediaButtonReceiver(pendingIntent);
         mMediaSession.setActive(true);
     }
 
@@ -522,7 +577,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 setUpMediaPlayer();
                 ToastUtil.show(mService, R.string.mediaplayer_error, what, extra);
                 return true;
-            } catch (Exception e) {
+            } catch (Exception ignored) {
 
             }
             return false;
@@ -1016,11 +1071,15 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             mNeedShowFloatLrc = false;
         }
         updateFloatLrc(false);
-        //更新通知栏
-        if (mNotify != null)
-            mNotify.updateForPlaying();
+        updateNotification();
+
         updateMediaSession(Global.Operation);
         sendLocalBroadcast(new Intent(MusicService.META_CHANGE));
+    }
+
+    private void updateNotification() {
+        if (mNotify != null)
+            mNotify.updateForPlaying();
     }
 
     private void handlePlayStateChange() {
@@ -1041,6 +1100,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     public class ControlReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            LogUtil.d(TAG, "ControlReceiver: " + intent);
             if (intent == null || intent.getExtras() == null)
                 return;
             int control = intent.getIntExtra("Control", -1);
@@ -1167,7 +1227,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                         mNotify = new NotifyImpl24(MusicService.this);
                     }
                     if (Global.isNotifyShowing())
-                        mNotify.updateForPlaying();
+                        updateNotification();
                     break;
                 //解锁通知栏
                 case Command.UNLOCK_DESKTOP_LYRIC:
@@ -1298,9 +1358,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     private void updateMediaSession(int control) {
         mMediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
                 .setState(mIsPlay ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED,
-                        getProgress(), 1.0f)
-                .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE |
-                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).build());
+                        mCurrentIndex, mSpeed)
+                .setActions(MEDIA_SESSION_ACTIONS).build());
 
         if (mCurrentSong == null)
             return;
@@ -1314,9 +1373,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, mCurrentSong.getArtist())
                 .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, mCurrentSong.getDisplayname())
                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mCurrentSong.getDuration())
-                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, mPlayQueue != null ? mPlayQueue.size() : 0)
-                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, mCurrentIndex)
+                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, mCurrentIndex + 1)
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mCurrentSong.getTitle());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, mPlayQueue.size());
+        }
 
         if (updatePlayStateOnly(control)) {
             mMediaSession.setMetadata(builder.build());
@@ -1519,7 +1580,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      *
      * @param current
      */
-    public void setProgress(int current) {
+    public void setProgress(long current) {
         if (mMediaPlayer != null && mIsInitialized)
             mMediaPlayer.seekTo(current);
     }
@@ -1676,6 +1737,17 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             item = MediaStoreUtil.getMP3InfoById(id);
             SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, id);
             setUpDataSource(item, 0);
+        }
+    }
+
+    public void deleteSongFromPlayQueue(List<Song> deleteSongs) {
+        if (deleteSongs != null && deleteSongs.size() > 0) {
+            List<Integer> ids = new ArrayList<>();
+            for (Song song : deleteSongs) {
+                ids.add(song.getId());
+            }
+            PlayListUtil.deleteMultiSongs(ids, Global.PlayQueueID);
+            mPlayQueue.removeAll(ids);
         }
     }
 
@@ -1986,59 +2058,6 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         }
     }
 
-    /**
-     * 记录在一秒中线控按下的次数
-     */
-    private class SessionCallBack extends MediaSessionCompat.Callback {
-        private HeadSetRunnable mHeadsetRunnable;
-        private int mHeadSetHookCount = 0;
-
-        @Override
-        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
-            if (mediaButtonEvent == null)
-                return true;
-            KeyEvent event = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-            if (event == null)
-                return true;
-
-            boolean isActionUp = (event.getAction() == KeyEvent.ACTION_UP);
-            if (!isActionUp) {
-                return true;
-            }
-
-            Intent intent = new Intent(ACTION_CMD);
-            int keyCode = event.getKeyCode();
-            if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ||
-                    keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ||
-                    keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
-                intent.putExtra("Control",
-                        keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY ?
-                                Command.TOGGLE :
-                                keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Command.NEXT : Command.PREV);
-                sendLocalBroadcast(intent);
-                return true;
-            }
-            //如果是第一次按下，开启一条线程去判断用户操作
-            if (mHeadSetHookCount == 0) {
-                if (mHeadsetRunnable == null)
-                    mHeadsetRunnable = new HeadSetRunnable();
-                mUpdateUIHandler.postDelayed(mHeadsetRunnable, 800);
-            }
-            if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK)
-                mHeadSetHookCount++;
-            return true;
-        }
-
-        private class HeadSetRunnable implements Runnable {
-            @Override
-            public void run() {
-                Intent intent = new Intent(ACTION_CMD);
-                intent.putExtra("Control", mHeadSetHookCount == 1 ? Command.TOGGLE : mHeadSetHookCount == 2 ? Command.NEXT : Command.PREV);
-                sendLocalBroadcast(intent);
-                mHeadSetHookCount = 0;
-            }
-        }
-    }
 
     private static class PlaybackHandler extends Handler {
         private final WeakReference<MusicService> mRef;

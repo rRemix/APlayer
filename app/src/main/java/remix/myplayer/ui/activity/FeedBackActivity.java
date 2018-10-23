@@ -1,6 +1,5 @@
 package remix.myplayer.ui.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -48,6 +47,7 @@ public class FeedBackActivity extends ToolbarActivity {
 
     Feedback mFeedBack = new Feedback();
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,17 +92,10 @@ public class FeedBackActivity extends ToolbarActivity {
         data.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback));
         data.putExtra(Intent.EXTRA_TEXT, mContent.getText().toString() + "\n\n\n" + mFeedBack);
         if (Util.isIntentAvailable(this, data)) {
-            startActivityForResult(data, 0);
+            startActivity(data);
         } else {
             ToastUtil.show(this, R.string.send_error);
         }
 
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        ToastUtil.show(this, requestCode == Activity.RESULT_OK ? R.string.send_success : R.string.send_error);
-        finish();
     }
 }

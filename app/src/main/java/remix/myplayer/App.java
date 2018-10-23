@@ -62,7 +62,7 @@ public class App extends MultiDexApplication {
 
         //处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
         RxJavaPlugins.setErrorHandler(throwable -> {
-            LogUtil.e(throwable);
+            LogUtil.e("RxError", throwable);
             CrashReport.postCatchedException(throwable);
         });
 

@@ -524,7 +524,7 @@ public class MainActivity extends MultiChoiceActivity {
                     return;
                 if (data.getBooleanExtra("needRecreate", false)) { //设置后需要重启activity
                     mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
-                } else if (data.getBooleanExtra("needRefreshAdapter", false)) { //清除缓存后刷新adapter
+                } else if (data.getBooleanExtra("needRefreshAdapter", false)) { //刷新adapter
                     mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                 } else if (data.getBooleanExtra("needRefreshLibrary", false)) { //刷新Library
                     List<Category> categories = (List<Category>) data.getSerializableExtra("Category");
@@ -607,7 +607,7 @@ public class MainActivity extends MultiChoiceActivity {
                                 ImagePipeline imagePipeline = Fresco.getImagePipeline();
                                 imagePipeline.evictFromCache(uri);
                                 imagePipeline.evictFromDiskCache(uri);
-                            }, throwable -> ToastUtil.show(mContext, R.string.tag_save_error, throwable.toString()));
+                            }, throwable -> ToastUtil.show(mContext, R.string.save_error, throwable.toString()));
                 }
                 break;
             case REQUEST_INSTALL_PACKAGES:

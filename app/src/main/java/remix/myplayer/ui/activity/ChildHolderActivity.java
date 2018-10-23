@@ -290,10 +290,10 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         switch (mType) {
             //专辑id
             case Constants.ALBUM:
-                return MediaStoreUtil.getMP3InfoByArg(mId, Constants.ALBUM);
+                return MediaStoreUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ALBUM);
             //歌手id
             case Constants.ARTIST:
-                return MediaStoreUtil.getMP3InfoByArg(mId, Constants.ARTIST);
+                return MediaStoreUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST);
             //文件夹名
             case Constants.FOLDER:
                 return MediaStoreUtil.getMP3ListByFolderName(mArg);

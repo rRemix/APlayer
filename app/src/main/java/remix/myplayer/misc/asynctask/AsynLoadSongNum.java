@@ -38,7 +38,7 @@ public abstract class AsynLoadSongNum extends AsyncTask<Integer, Integer, Intege
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            Util.closeCursor(cursor);
+            Util.closeSafely(cursor);
         }
         return 0;
     }
