@@ -82,9 +82,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
 
     //当前排序
     private String mSortOrder;
-    //更新
-    private static final int START = 0;
-    private static final int END = 1;
     private MsgHandler mRefreshHandler;
 
     @Override
@@ -296,7 +293,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
                 return MediaStoreUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST);
             //文件夹名
             case Constants.FOLDER:
-                return MediaStoreUtil.getMP3ListByParentId(mId);
+                return MediaStoreUtil.getSongsByParentId(mId);
             //播放列表名
             case Constants.PLAYLIST:
                 /* 播放列表歌曲id列表 */

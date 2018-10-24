@@ -48,12 +48,12 @@ public class MultiChoice implements OnMultiItemClickListener {
     /**
      * 当前正在操作的activity或者fragment
      */
-    public static String TAG = "";
+    private String mTag = "";
 
     /**
      * 多选的操作类型，包括专辑、艺术家、播放列表、普通歌曲、播放列表下的歌曲
      */
-    public static int TYPE = -1;
+    private int mType = -1;
 
     /**
      * 多选菜单是否正在显示
@@ -88,6 +88,22 @@ public class MultiChoice implements OnMultiItemClickListener {
     public MultiChoice() {
     }
 
+    public String getTag() {
+        return mTag;
+    }
+
+    public void setTag(String tag) {
+        this.mTag = tag;
+    }
+
+    public int getType() {
+        return mType;
+    }
+
+    public void setType(int type) {
+        this.mType = type;
+    }
+
     public boolean isShow() {
         return mIsShow;
     }
@@ -112,7 +128,7 @@ public class MultiChoice implements OnMultiItemClickListener {
     public void OnAddToPlayQueue() {
         int num;
         ArrayList<Integer> idList = new ArrayList<>();
-        switch (TYPE) {
+        switch (mType) {
             case Constants.SONG:
             case Constants.PLAYLISTSONG:
                 for (Object arg : mSelectedArg) {
@@ -125,9 +141,9 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.FOLDER:
             case Constants.PLAYLIST:
                 for (Object arg : mSelectedArg) {
-                    List<Integer> tempList = MediaStoreUtil.getSongIdList(arg, TYPE);
+                    List<Integer> tempList = MediaStoreUtil.getSongIdList(arg, mType);
                     if (tempList != null && tempList.size() > 0)
-                        idList.addAll(MediaStoreUtil.getSongIdList(arg, TYPE));
+                        idList.addAll(MediaStoreUtil.getSongIdList(arg, mType));
                 }
                 break;
         }
@@ -140,7 +156,7 @@ public class MultiChoice implements OnMultiItemClickListener {
     @Override
     public void OnAddToPlayList() {
         final ArrayList<Integer> idList = new ArrayList<>();
-        switch (TYPE) {
+        switch (mType) {
             case Constants.SONG:
             case Constants.PLAYLISTSONG:
                 for (Object arg : mSelectedArg) {
@@ -153,9 +169,9 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.FOLDER:
             case Constants.PLAYLIST:
                 for (Object arg : mSelectedArg) {
-                    List<Integer> tempList = MediaStoreUtil.getSongIdList(arg, TYPE);
+                    List<Integer> tempList = MediaStoreUtil.getSongIdList(arg, mType);
                     if (tempList != null && tempList.size() > 0)
-                        idList.addAll(MediaStoreUtil.getSongIdList(arg, TYPE));
+                        idList.addAll(MediaStoreUtil.getSongIdList(arg, mType));
                 }
                 break;
         }
@@ -209,7 +225,7 @@ public class MultiChoice implements OnMultiItemClickListener {
     public void OnDelete(boolean deleteSource) {
         int num = 0;
         ArrayList<Integer> idList = new ArrayList<>();
-        switch (TYPE) {
+        switch (mType) {
             case Constants.PLAYLIST:
                 for (Object arg : mSelectedArg) {
                     if (arg instanceof Integer) {
@@ -236,7 +252,7 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.ARTIST:
             case Constants.FOLDER:
                 for (Object arg : mSelectedArg) {
-                    num += MediaStoreUtil.delete((Integer) arg, TYPE, deleteSource);
+                    num += MediaStoreUtil.delete((Integer) arg, mType, deleteSource);
                 }
                 break;
         }
@@ -259,7 +275,7 @@ public class MultiChoice implements OnMultiItemClickListener {
      * @return
      */
     public boolean itemClick(int position, Object arg, String tag) {
-        if (mIsShow && TAG.equals(tag)) {
+        if (mIsShow && mTag.equals(tag)) {
             mIsShow = true;
 //            removeOrAddView(view);
             removeOrAddPosition(position);
@@ -279,10 +295,10 @@ public class MultiChoice implements OnMultiItemClickListener {
      */
     public void itemLongClick(int position, Object arg, String newTag, int type) {
         //当前没有处于多选状态
-        if (!mIsShow && TAG.equals("")) {
+        if (!mIsShow && mTag.equals("")) {
             Util.vibrate(mContext, 150);
-            TAG = newTag;
-            TYPE = type;
+            mTag = newTag;
+            mType = type;
             mIsShow = true;
             if (mUpdateOptionMenuListener != null)
                 mUpdateOptionMenuListener.onUpdate(true);
@@ -360,8 +376,8 @@ public class MultiChoice implements OnMultiItemClickListener {
 //        mSelectedViews.clear();
         mSelectedPosition.clear();
         mSelectedArg.clear();
-        TAG = "";
-        TYPE = -1;
+        mTag = "";
+        mType = -1;
     }
 
 //    /**

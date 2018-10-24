@@ -67,7 +67,7 @@ public abstract class MultiChoiceActivity extends ToolbarActivity {
                 view.setOnClickListener(view1 -> {
                     switch (view1.getId()) {
                         case R.id.multi_delete:
-                            String title = MultiChoice.TYPE == Constants.PLAYLIST ? getString(R.string.confirm_delete_playlist) : MultiChoice.TYPE == Constants.PLAYLISTSONG ?
+                            String title = mMultiChoice.getType() == Constants.PLAYLIST ? getString(R.string.confirm_delete_playlist) : mMultiChoice.getType() == Constants.PLAYLISTSONG ?
                                     getString(R.string.confirm_delete_from_playlist) : getString(R.string.confirm_delete_from_library);
                             Theme.getBaseDialog(mContext)
                                     .content(title)

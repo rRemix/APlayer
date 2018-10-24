@@ -176,7 +176,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         });
 
         //是否处于选中状态
-        if (MultiChoice.TAG.equals(AlbumFragment.TAG) &&
+        if (mMultiChoice.getTag().equals(AlbumFragment.TAG) &&
                 mMultiChoice.getSelectPos().contains(position - 1)) {
             holder.mContainer.setSelected(true);
         } else {

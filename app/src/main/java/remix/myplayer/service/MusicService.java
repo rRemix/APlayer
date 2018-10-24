@@ -66,6 +66,7 @@ import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.helper.SleepTimer;
 import remix.myplayer.lyric.UpdateLyricThread;
 import remix.myplayer.lyric.bean.LyricRowWrapper;
+import remix.myplayer.misc.exception.MusicServiceException;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
@@ -900,7 +901,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 Collections.swap(mRandomQueue, mCurrentIndex, index);
             }
         } catch (Exception e) {
-            CrashReport.postCatchedException(new Throwable("playSelectSong", e));
+            CrashReport.postCatchedException(new MusicServiceException("playSelectSong", e));
         }
 
         if (mCurrentSong == null) {
@@ -1175,7 +1176,6 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                         open = !SPUtil.getValue(mService,
                                 SPUtil.SETTING_KEY.NAME,
                                 SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
-                        SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, open);
                     }
                     if (open && !FloatWindowManager.getInstance().checkPermission(mService)) {
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
@@ -1187,6 +1187,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                         ToastUtil.show(mService, R.string.plz_give_float_permission);
                         break;
                     }
+                    SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, open);
                     if (mShowFloatLrc != open) {
                         mShowFloatLrc = open;
                         ToastUtil.show(mService, mShowFloatLrc ? R.string.opened_float_lrc : R.string.closed_float_lrc);

@@ -34,7 +34,6 @@ import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.Command;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -46,6 +45,7 @@ import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.ToastUtil;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
@@ -113,9 +113,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
             }
 
             headerHolder.mShuffle.setOnClickListener(v -> {
-                Intent intent = new Intent(MusicService.ACTION_CMD);
-                intent.putExtra("Control", Command.NEXT);
-                intent.putExtra("shuffle", true);
+                Intent intent = MusicUtil.makeControlIntent(Command.NEXT, true);
                 if (mType == ALLSONG) {
                     List<Integer> allSong = MusicServiceRemote.getAllSong();
                     if (allSong == null || allSong.isEmpty()) {
@@ -222,14 +220,14 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
         });
 
         if (mType == ALLSONG) {
-            if (MultiChoice.TAG.equals(SongFragment.TAG) &&
+            if (mMultiChoice.getTag().equals(SongFragment.TAG) &&
                     mMultiChoice.getSelectPos().contains(position - 1)) {
                 holder.mContainer.setSelected(true);
             } else {
                 holder.mContainer.setSelected(false);
             }
         } else {
-            if (MultiChoice.TAG.equals(RecentlyActivity.TAG) &&
+            if (mMultiChoice.getTag().equals(RecentlyActivity.TAG) &&
                     mMultiChoice.getSelectPos().contains(position - 1)) {
                 holder.mContainer.setSelected(true);
             } else {

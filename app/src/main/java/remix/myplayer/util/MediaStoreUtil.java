@@ -18,8 +18,8 @@ import com.facebook.common.util.ByteConstants;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -164,7 +164,7 @@ public class MediaStoreUtil {
                     final String parentPath = data.substring(0, data.lastIndexOf("/"));
 
                     if (!folderMap.containsKey(parentId)) {
-                        folderMap.put(parentId, new ArrayList<>(Arrays.asList(parentPath)));
+                        folderMap.put(parentId, new ArrayList<>(Collections.singletonList(parentPath)));
                     } else {
                         folderMap.get(parentId).add(parentPath);
                     }
@@ -262,7 +262,7 @@ public class MediaStoreUtil {
      *
      * @return
      */
-    public static List<Song> getMP3ListByParentId(int parentId) {
+    public static List<Song> getSongsByParentId(int parentId) {
         List<Integer> ids = getSongIdsByParentId(parentId);
 
         if (ids.size() == 0)

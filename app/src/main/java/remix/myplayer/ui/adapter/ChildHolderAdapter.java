@@ -196,7 +196,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
             });
         }
 
-        if (MultiChoice.TAG.equals(ChildHolderActivity.TAG) &&
+        if (mMultiChoice.getTag().equals(ChildHolderActivity.TAG) &&
                 mMultiChoice.getSelectPos().contains(position - 1)) {
             LogUtil.d("ChildHolderAdapter", "选中:" + position);
             holder.mContainer.setSelected(true);

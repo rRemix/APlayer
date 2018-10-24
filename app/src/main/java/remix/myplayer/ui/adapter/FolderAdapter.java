@@ -95,7 +95,7 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
             });
         }
 
-        if (MultiChoice.TAG.equals(FolderFragment.TAG) &&
+        if (mMultiChoice.getTag().equals(FolderFragment.TAG) &&
                 mMultiChoice.getSelectPos().contains(position)) {
             holder.mContainer.setSelected(true);
         } else {

@@ -171,7 +171,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         });
 
         //是否处于选中状态
-        if (MultiChoice.TAG.equals(ArtistFragment.TAG) &&
+        if (mMultiChoice.getTag().equals(ArtistFragment.TAG) &&
                 mMultiChoice.getSelectPos().contains(position - 1)) {
             holder.mContainer.setSelected(true);
         } else {

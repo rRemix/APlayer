@@ -18,6 +18,7 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.appwidgets.AppWidgetSkin.WHITE_1F
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.misc.exception.MusicServiceException
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
 import remix.myplayer.service.Command
@@ -64,7 +65,7 @@ abstract class BaseAppwidget : AppWidgetProvider() {
             val appIds = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, javaClass))
             return appIds != null && appIds.isNotEmpty()
         } catch (e: Exception) {
-            CrashReport.postCatchedException(Throwable("hasInstances: $e"))
+            CrashReport.postCatchedException(MusicServiceException("hasInstance", e))
         }
         return false
     }
@@ -73,18 +74,13 @@ abstract class BaseAppwidget : AppWidgetProvider() {
         val song = service.currentSong ?: return
         //设置封面
         if (!reloadCover) {
-            mBitmap.let {
-                it != null && !it.isRecycled
-            }.let {
-                if (it) {
-                    LogUtil.d(TAG, "复用Bitmap: $mBitmap")
-                    remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap)
-                } else {
-                    LogUtil.d(TAG, "Bitmap复用失败: $mBitmap")
-                    remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
-                }
+            if (mBitmap != null && !mBitmap!!.isRecycled) {
+                LogUtil.d(TAG, "复用Bitmap: $mBitmap")
+                remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap)
+            } else {
+                LogUtil.d(TAG, "Bitmap复用失败: $mBitmap")
+                remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
             }
-
             pushUpdate(service, appWidgetIds, remoteViews)
         } else {
             val size = if (this.javaClass.simpleName.contains("Big")) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM

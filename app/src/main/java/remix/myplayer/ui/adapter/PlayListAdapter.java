@@ -162,7 +162,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
                 Theme.getPressAndSelectedStateListRippleDrawable(ListModel, mContext));
 
         //是否处于选中状态
-        if (MultiChoice.TAG.equals(PlayListFragment.TAG) &&
+        if (mMultiChoice.getTag().equals(PlayListFragment.TAG) &&
                 mMultiChoice.getSelectPos().contains(position - 1)) {
             holder.mContainer.setSelected(true);
         } else {

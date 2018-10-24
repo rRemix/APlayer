@@ -14,8 +14,6 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.tencent.bugly.crashreport.CrashReport;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +95,8 @@ public class MusicUtil {
             intent.putExtras(arg);
             MusicServiceRemote.setPlayQueue(songs, intent);
         } else {
-            CrashReport.postCatchedException(new Throwable("Unknown Uri: " + uri));
+            Util.writeLogToExternalStorage("exception", "Unknown Uri: " + uri);
+//            CrashReport.postCatchedException(new Throwable("Unknown Uri: " + uri));
         }
     }
 
@@ -123,5 +122,13 @@ public class MusicUtil {
             LogUtil.d(TAG, e.toString());
         }
         return null;
+    }
+
+    public static Intent makeControlIntent(int cmd, boolean shuffle) {
+        return new Intent(MusicService.ACTION_CMD).putExtra("Control", cmd).putExtra("shuffle", shuffle);
+    }
+
+    public static Intent makeControlIntent(int cmd) {
+        return makeControlIntent(cmd, false);
     }
 }
