@@ -11,7 +11,7 @@ import remix.myplayer.App
 import remix.myplayer.Global
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.*
-import remix.myplayer.getSongIds
+import remix.myplayer.misc.getSongIds
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
@@ -30,6 +30,8 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
     var isActive: Boolean = false
     var adapter: RecyclerView.Adapter<*>? = null
     private var popup: MultiPopupWindow? = null
+    var extra: Int = 0
+
 
     private fun getSongs(): List<Song> {
         val ids = getSongIds()
@@ -88,7 +90,12 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
                 .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
                 .onAny { dialog, which ->
                     if (which == DialogAction.POSITIVE) {
-                        ToastUtil.show(activity, activity.getString(R.string.delete_multi_song, MediaStoreUtil.delete(getSongs(), dialog.isPromptCheckBoxChecked)))
+                        val num = if (type != Constants.PLAYLISTSONG || dialog.isPromptCheckBoxChecked) {
+                            MediaStoreUtil.delete(getSongs(), dialog.isPromptCheckBoxChecked)
+                        } else {
+                            PlayListUtil.deleteMultiSongs(getSongIds(), extra)
+                        }
+                        ToastUtil.show(activity, activity.getString(R.string.delete_multi_song, num))
                         close()
                     }
                 }
@@ -229,10 +236,6 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
 
     fun isPositionCheck(pos: Int): Boolean {
         return checkPos.contains(pos)
-    }
-
-    fun setExtra(extra: Int) {
-
     }
 
     override fun onClick(v: View?) {

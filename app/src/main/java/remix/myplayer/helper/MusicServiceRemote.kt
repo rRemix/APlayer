@@ -149,7 +149,7 @@ object MusicServiceRemote {
     }
 
     @JvmStatic
-    fun deleteFromPlayQueue(songs: List<Song>) {
-        service?.deleteSongFromPlayQueue(songs)
+    fun deleteFromService(songs: List<Song>) {
+        service?.deleteSongFromService(songs)
     }
 }

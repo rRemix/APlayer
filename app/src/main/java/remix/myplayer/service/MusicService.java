@@ -1745,13 +1745,13 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         }
     }
 
-    public void deleteSongFromPlayQueue(List<Song> deleteSongs) {
+    public void deleteSongFromService(List<Song> deleteSongs) {
         if (deleteSongs != null && deleteSongs.size() > 0) {
             List<Integer> ids = new ArrayList<>();
             for (Song song : deleteSongs) {
                 ids.add(song.getId());
-                PlayListUtil.deleteSong(song.getId(), Global.PlayQueueID);
             }
+            mAllSong.removeAll(ids);
             mPlayQueue.removeAll(ids);
         }
     }

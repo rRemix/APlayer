@@ -30,6 +30,7 @@ import remix.myplayer.util.Util;
  * @Author Xiaoborui
  * @Date 2016/9/20 16:12
  */
+@Deprecated
 public class MultiChoice implements OnMultiItemClickListener {
     private Context mContext;
 

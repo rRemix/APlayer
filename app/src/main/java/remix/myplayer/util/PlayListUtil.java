@@ -185,6 +185,25 @@ public class PlayListUtil {
     /**
      * 删除一首歌曲
      *
+     * @param songs
+     * @return
+     */
+    public static int deleteSongs(List<Song> songs) {
+        StringBuilder selectionBuilder = new StringBuilder(128);
+        String[] selectionArgs = new String[songs.size()];
+        int i = 0;
+        for (Song song : songs) {
+            selectionBuilder.append(PlayListSongs.PlayListSongColumns.AUDIO_ID + " = ?").append(i != songs.size() - 1 ? " or " : " ");
+            selectionArgs[i] = song.getId() + "";
+            i++;
+        }
+        return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,
+                selectionBuilder.toString(), selectionArgs);
+    }
+
+    /**
+     * 删除一首歌曲
+     *
      * @param audioId
      * @param playListId
      * @return

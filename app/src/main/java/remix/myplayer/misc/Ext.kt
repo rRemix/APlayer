@@ -1,4 +1,4 @@
-package remix.myplayer
+package remix.myplayer.misc
 
 import android.provider.MediaStore
 import remix.myplayer.bean.mp3.Album

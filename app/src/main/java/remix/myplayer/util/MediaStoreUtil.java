@@ -380,7 +380,8 @@ public class MediaStoreUtil {
         }
         SPUtil.putStringSet(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG, deleteId);
         //从播放队列和全部歌曲移除
-        MusicServiceRemote.deleteFromPlayQueue(songs);
+        MusicServiceRemote.deleteFromService(songs);
+        PlayListUtil.deleteSongs(songs);
         //刷新界面
         mContext.getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
 
@@ -404,29 +405,6 @@ public class MediaStoreUtil {
             Util.deleteFileSafely(new File(song.getUrl()));
         }
     }
-
-    /**
-     * 根据参数获得id列表
-     *
-     * @param id   专辑id 艺术家id parentId 播放列表id
-     * @param type
-     * @return
-     */
-    public static List<Integer> getSongIdList(int id, int type) {
-
-        switch (type) {
-            case Constants.ALBUM:
-            case Constants.ARTIST: //专辑或者艺术家
-                return getSongIds((type == Constants.ALBUM ? MediaStore.Audio.Media.ALBUM_ID : MediaStore.Audio.Media.ARTIST_ID) + "=" + id, null);
-            case Constants.PLAYLIST: //播放列表
-                return PlayListUtil.getSongIds(id);
-            case Constants.FOLDER: //文件夹
-                return getSongIdsByParentId(id);
-            default:
-                return Collections.emptyList();
-        }
-    }
-
 
     /**
      * 过滤移出的歌曲以及铃声等
