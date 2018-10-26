@@ -28,8 +28,9 @@ import java.io.IOException;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
-import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import okhttp3.ResponseBody;
@@ -106,20 +107,22 @@ public abstract class ImageUriRequest<T> {
                 .toObservable();
     }
 
+
     Observable<String> getCustomThumbObservable(UriRequest request) {
-        return new Observable<String>() {
+        return Observable.create(new ObservableOnSubscribe<String>() {
             @Override
-            protected void subscribeActual(Observer<? super String> observer) {
+            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+
                 //是否设置过自定义封面
                 if (request.getSearchType() != URL_ALBUM) {
                     File customImage = ImageUriUtil.getCustomThumbIfExist(request.getID(), request.getSearchType());
                     if (customImage != null && customImage.exists()) {
-                        observer.onNext(PREFIX_FILE + customImage.getAbsolutePath());
+                        emitter.onNext(PREFIX_FILE + customImage.getAbsolutePath());
                     }
                 }
-                observer.onComplete();
+                emitter.onComplete();
             }
-        };
+        });
     }
 
     /**
@@ -221,16 +224,16 @@ public abstract class ImageUriRequest<T> {
 
     //lastFM
     private Observable<String> getLastFMNetworkThumbObservable(UriRequest request) {
-        return Observable.concat(new Observable<String>() {
+        return Observable.concat(Observable.create(new ObservableOnSubscribe<String>() {
             @Override
-            protected void subscribeActual(Observer<? super String> observer) {
+            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
                 String imageUrl = SPUtil.getValue(App.getContext(), SPUtil.COVER_KEY.NAME, request.getLastFMKey(), "");
                 if (!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))) {
-                    observer.onNext(imageUrl);
+                    emitter.onNext(imageUrl);
                 }
-                observer.onComplete();
+                emitter.onComplete();
             }
-        }, Observable.just(isAutoDownloadCover() && !TextUtils.isEmpty(request.getLastFMKey()))
+        }), Observable.just(isAutoDownloadCover() && !TextUtils.isEmpty(request.getLastFMKey()))
                 .filter(aBoolean -> aBoolean)
                 .flatMap(new Function<Boolean, ObservableSource<String>>() {
                     private Observable<ResponseBody> getObservable(UriRequest request) {
@@ -270,16 +273,16 @@ public abstract class ImageUriRequest<T> {
 
     //网易
     private Observable<String> getNeteaseNetworkThumbObservable(UriRequest request) {
-        return Observable.concat(new Observable<String>() {
+        return Observable.concat(Observable.create(new ObservableOnSubscribe<String>() {
             @Override
-            protected void subscribeActual(Observer<? super String> observer) {
+            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
                 String imageUrl = SPUtil.getValue(App.getContext(), SPUtil.COVER_KEY.NAME, request.getNeteaseCacheKey(), "");
                 if (!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))) {
-                    observer.onNext(imageUrl);
+                    emitter.onNext(imageUrl);
                 }
-                observer.onComplete();
+                emitter.onComplete();
             }
-        }, Observable.just(isAutoDownloadCover() && !TextUtils.isEmpty(request.getNeteaseSearchKey()))
+        }), Observable.just(isAutoDownloadCover() && !TextUtils.isEmpty(request.getNeteaseSearchKey()))
                 .filter(aBoolean -> aBoolean)
                 .flatMap(aBoolean -> HttpClient.getNeteaseApiservice()
                         .getNeteaseSearch(request.getNeteaseSearchKey(), 0, 1, request.getNeteaseType())
@@ -309,6 +312,7 @@ public abstract class ImageUriRequest<T> {
         }
         return imageUrl;
     }
+
 
     protected Observable<Bitmap> getThumbBitmapObservable(UriRequest request) {
         return getCoverObservable(request)

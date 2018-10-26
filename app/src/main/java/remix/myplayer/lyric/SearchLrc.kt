@@ -379,7 +379,8 @@ class SearchLrc(private val mSong: Song) {
         return HttpClient.getKuGouApiservice().getKuGouSearch(1, "yes", "pc", mSearchKey, mSong.duration, "")
                 .flatMap { body ->
                     val searchResponse = Gson().fromJson(body.string(), KSearchResponse::class.java)
-                    HttpClient.getKuGouApiservice().getKuGouLyric(1, "pc", "lrc", "utf8", searchResponse.candidates[0].id,
+                    HttpClient.getKuGouApiservice().getKuGouLyric(1, "pc", "lrc", "utf8",
+                            searchResponse.candidates[0].id,
                             searchResponse.candidates[0].accesskey)
                             .map { lrcBody ->
                                 val lrcResponse = Gson().fromJson(lrcBody.string(), KLrcResponse::class.java)

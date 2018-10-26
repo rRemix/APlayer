@@ -7,7 +7,7 @@ import android.view.View;
 
 import remix.myplayer.R;
 import remix.myplayer.misc.interfaces.ModeChangeCallback;
-import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -23,14 +23,14 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
 
     static final int TYPE_HEADER = 0;
     static final int TYPE_NORMAL = 1;
-    protected MultiChoice mMultiChoice;
+    protected MultipleChoice mChoice;
     private ModeChangeCallback mModeChangeCallback;
     //当前列表模式 1:列表 2:网格
     int ListModel = 2;
 
-    HeaderAdapter(Context context, int layoutId, MultiChoice multiChoice) {
+    HeaderAdapter(Context context, int layoutId, MultipleChoice multiChoice) {
         super(context, layoutId);
-        this.mMultiChoice = multiChoice;
+        this.mChoice = multiChoice;
     }
 
     public void setModeChangeCallback(ModeChangeCallback modeChangeCallback) {

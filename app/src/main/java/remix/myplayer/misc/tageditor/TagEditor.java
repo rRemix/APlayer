@@ -174,7 +174,7 @@ public class TagEditor {
                     null,
                     (path, uri) -> {
                         App.getContext().getContentResolver().notifyChange(uri, null);
-                        e.onNext(MediaStoreUtil.getMP3InfoById(song.getId()));
+                        e.onNext(MediaStoreUtil.getSongById(song.getId()));
                         e.onComplete();
                     });
 

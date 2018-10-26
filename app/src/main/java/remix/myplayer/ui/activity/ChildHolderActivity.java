@@ -39,6 +39,7 @@ import remix.myplayer.request.UriRequest;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.ChildHolderAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.ColorUtil;
@@ -82,9 +83,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
 
     //当前排序
     private String mSortOrder;
-    //更新
-    private static final int START = 0;
-    private static final int END = 1;
     private MsgHandler mRefreshHandler;
 
     @Override
@@ -102,17 +100,17 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         mType = getIntent().getIntExtra("Type", -1);
         mArg = getIntent().getStringExtra("Title");
 
-        mAdapter = new ChildHolderAdapter(this, R.layout.item_child_holder, mType, mArg, mMultiChoice, mRecyclerView);
-        mMultiChoice.setAdapter(mAdapter);
-        mMultiChoice.setExtra(mId);
+        mChoice = new MultipleChoice<>(this, mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
+
+        mAdapter = new ChildHolderAdapter(this, R.layout.item_child_holder, mType, mArg, mChoice, mRecyclerView);
+        mChoice.setAdapter(mAdapter);
+        mChoice.setExtra(mId);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                final List<Song> songs = mAdapter.getDatas();
-                if (position < 0 || songs == null || position >= songs.size())
-                    return;
-                int songId = songs.get(position).getId();
-                if (!mMultiChoice.itemClick(position, songId, mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)) {
+                final Song song = mAdapter.getDatas().get(position);
+                if (!mChoice.click(position, song)) {
+                    final List<Song> songs = mAdapter.getDatas();
                     if (songs.size() == 0)
                         return;
                     ArrayList<Integer> idList = new ArrayList<>();
@@ -127,17 +125,12 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
                     MusicServiceRemote.setPlayQueue(idList, intent);
-
-//                    startActivity(new Intent(mContext,CustomSortActivity.class)
-//                            .putExtra("list",new ArrayList<>(mInfoList))
-//                            .putExtra("name",mArg)
-//                            .putExtra("id",mId);
                 }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                mMultiChoice.itemLongClick(position, mAdapter.getDatas().get(position).getId(), TAG, mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
+                mChoice.longClick(position, mAdapter.getDatas().get(position));
             }
         });
 
@@ -175,7 +168,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         super.onCreateOptionsMenu(menu);
         if (mType == Constants.PLAYLIST) {
             mSortOrder = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, SortOrder.PlayListSongSortOrder.SONG_A_Z);
@@ -230,8 +223,9 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
 
     }
 
+
     @Override
-    protected int getMenuLayoutId() {
+    public int getMenuLayoutId() {
         return mType == Constants.PLAYLIST ? R.menu.menu_child_for_playlist :
                 mType == Constants.ALBUM ? R.menu.menu_child_for_album :
                         mType == Constants.ARTIST ? R.menu.menu_child_for_artist : R.menu.menu_child_for_folder;
@@ -242,14 +236,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         return LoaderIds.CHILDHOLDER_ACTIVITY;
     }
 
-    @Override
-    public void onBackPressed() {
-        if (mMultiChoice.isShow()) {
-            onMultiBackPress();
-        } else {
-            finish();
-        }
-    }
 
     @Override
     public void onServiceConnected(@NotNull MusicService service) {
@@ -290,17 +276,17 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         switch (mType) {
             //专辑id
             case Constants.ALBUM:
-                return MediaStoreUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ALBUM);
+                return MediaStoreUtil.getSongsByArtistIdOrAlbumId(mId, Constants.ALBUM);
             //歌手id
             case Constants.ARTIST:
-                return MediaStoreUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST);
+                return MediaStoreUtil.getSongsByArtistIdOrAlbumId(mId, Constants.ARTIST);
             //文件夹名
             case Constants.FOLDER:
-                return MediaStoreUtil.getMP3ListByFolderName(mArg);
+                return MediaStoreUtil.getSongsByParentId(mId);
             //播放列表名
             case Constants.PLAYLIST:
                 /* 播放列表歌曲id列表 */
-                List<Integer> playListSongIDList = PlayListUtil.getIDList(mId);
+                List<Integer> playListSongIDList = PlayListUtil.getSongIds(mId);
                 if (playListSongIDList == null)
                     return new ArrayList<>();
                 return PlayListUtil.getMP3ListByIds(playListSongIDList, mId);
@@ -311,9 +297,9 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     @Override
     protected void onPause() {
         super.onPause();
-        if (mMultiChoice.isShow()) {
-            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI, 500);
-        }
+//        if (mChoice.isActive()) {
+//            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI, 500);
+//        }
     }
 
     @Override

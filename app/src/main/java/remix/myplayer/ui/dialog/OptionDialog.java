@@ -42,6 +42,7 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 /**
  * 歌曲的选项对话框
  */
+@Deprecated
 public class OptionDialog extends BaseDialogActivity {
     //添加 设置铃声 分享 删除按钮
     @BindView(R.id.popup_add)

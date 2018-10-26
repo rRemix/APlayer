@@ -156,16 +156,12 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                         .onAny((dialog, which) -> {
                             if (which == POSITIVE) {
                                 if (MediaStoreUtil.delete(mInfo.getId(), Constants.SONG, dialog.isPromptCheckBoxChecked()) > 0) {
-                                    if (PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)) {
-                                        ToastUtil.show(mActivity, getString(R.string.delete_success));
-                                        //移除的是正在播放的歌曲
-                                        if (getCurrentSong() == null)
-                                            return;
-                                        if (mInfo.getId() == getCurrentSong().getId()) {
-                                            Intent intent = new Intent(MusicService.ACTION_CMD);
-                                            intent.putExtra("Control", Command.NEXT);
-                                            Util.sendLocalBroadcast(intent);
-                                        }
+                                    ToastUtil.show(mActivity, getString(R.string.delete_success));
+                                    //移除的是正在播放的歌曲
+                                    if (mInfo.getId() == getCurrentSong().getId()) {
+                                        Intent intent = new Intent(MusicService.ACTION_CMD);
+                                        intent.putExtra("Control", Command.NEXT);
+                                        Util.sendLocalBroadcast(intent);
                                     }
                                 } else {
                                     ToastUtil.show(mActivity, getString(R.string.delete_error));

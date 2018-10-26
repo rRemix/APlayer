@@ -19,9 +19,8 @@ import remix.myplayer.bean.mp3.Folder;
 import remix.myplayer.misc.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -30,14 +29,14 @@ import remix.myplayer.util.DensityUtil;
  * Created by taeja on 16-6-23.
  */
 public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolder> {
-    private MultiChoice mMultiChoice;
     private Drawable mDefaultDrawable;
     private Drawable mSelectDrawable;
+    private MultipleChoice<Folder> mChoice;
 
-    public FolderAdapter(Context context, int layoutId, MultiChoice multiChoice) {
+    public FolderAdapter(Context context, int layoutId, MultipleChoice<Folder> multiChoice) {
         super(context, layoutId);
-        this.mMultiChoice = multiChoice;
         int size = DensityUtil.dip2px(mContext, 45);
+        mChoice = multiChoice;
         mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL, Color.TRANSPARENT, size, size);
         mSelectDrawable = Theme.getShape(GradientDrawable.OVAL, ThemeStore.getSelectColor(), size, size);
     }
@@ -79,7 +78,7 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
                 final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton);
                 popupMenu.getMenuInflater().inflate(R.menu.menu_folder_item, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
-                        holder.getAdapterPosition(),
+                        folder.getParentId(),
                         Constants.FOLDER,
                         folder.getPath()));
                 popupMenu.setGravity(Gravity.END);
@@ -95,12 +94,8 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
             });
         }
 
-        if (MultiChoice.TAG.equals(FolderFragment.TAG) &&
-                mMultiChoice.getSelectPos().contains(position)) {
-            holder.mContainer.setSelected(true);
-        } else {
-            holder.mContainer.setSelected(false);
-        }
+        holder.mContainer.setSelected(mChoice.isPositionCheck(position));
+
     }
 
 //    @Override

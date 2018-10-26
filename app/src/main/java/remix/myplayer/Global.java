@@ -6,8 +6,6 @@ package remix.myplayer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import remix.myplayer.bean.mp3.PlayList;
 
@@ -22,7 +20,7 @@ public class Global {
     /**
      * 文件夹名与对应的所有歌曲id
      */
-    public static Map<String, List<Integer>> FolderMap = new TreeMap<>(String::compareToIgnoreCase);
+//    public static Map<String, List<Integer>> FolderMap = new TreeMap<>(String::compareToIgnoreCase);
     /**
      * 播放列表
      */

@@ -104,7 +104,7 @@ object M3UHelper {
     @JvmStatic
     fun exportPlayListToFile(playlistName: String, file: File): Disposable? {
         return Single.fromCallable {
-            getMP3ListByIds(getIDList(playlistName), getPlayListID(playlistName))
+            getMP3ListByIds(getSongIds(playlistName), getPlayListID(playlistName))
         }.flatMapCompletable { songs ->
             CompletableSource { source ->
                 val bw = BufferedWriter(FileWriter(file))

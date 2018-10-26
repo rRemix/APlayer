@@ -28,7 +28,7 @@ class UpdateListener(val mContext: Context) : Listener {
                             mContext.startService(Intent(mContext, DownloadService::class.java)
                                     .putExtra(EXTRA_RESPONSE, release))
                         }
-                        .content(release.body)
+                        .content(release.body ?: "")
 
                 if (!isForce(release)) {
                     builder.negativeText(R.string.cancel)

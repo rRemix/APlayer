@@ -35,9 +35,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import remix.myplayer.App;
 import remix.myplayer.R;
@@ -333,20 +331,20 @@ public class Util {
         }
     }
 
-    /**
-     * @param map
-     * @param position
-     * @return
-     */
-    public static <T extends Object> String getMapkeyByPosition(Map<String, List<T>> map, int position) {
-        if (map == null || map.size() == 0 || position < 0)
-            return "";
-        Iterator it = map.keySet().iterator();
-        String key = "";
-        for (int i = 0; i <= position; i++)
-            key = it.next().toString();
-        return key;
-    }
+//    /**
+//     * @param map
+//     * @param position
+//     * @return
+//     */
+//    public static <T extends Object> String getMapkeyByPosition(Map<String, List<T>> map, int position) {
+//        if (map == null || map.size() == 0 || position < 0)
+//            return "";
+//        Iterator it = map.keySet().iterator();
+//        String key = "";
+//        for (int i = 0; i <= position; i++)
+//            key = it.next().toString();
+//        return key;
+//    }
 
 
     /**
