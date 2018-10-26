@@ -33,9 +33,8 @@ import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -55,7 +54,7 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
  * 艺术家界面的适配器
  */
 public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> implements FastScroller.SectionIndexer {
-    public ArtistAdapter(Context context, int layoutId, MultiChoice multiChoice) {
+    public ArtistAdapter(Context context, int layoutId, MultipleChoice multiChoice) {
         super(context, layoutId, multiChoice);
         ListModel = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "ArtistModel", Constants.GRID_MODEL);
     }
@@ -157,7 +156,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
                 null));
 
         holder.mButton.setOnClickListener(v -> {
-            if (mMultiChoice.isShow())
+            if (mChoice.isActive())
                 return;
             Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton);
@@ -171,12 +170,8 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         });
 
         //是否处于选中状态
-        if (mMultiChoice.getTag().equals(ArtistFragment.TAG) &&
-                mMultiChoice.getSelectPos().contains(position - 1)) {
-            holder.mContainer.setSelected(true);
-        } else {
-            holder.mContainer.setSelected(false);
-        }
+        holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
+
 
         //设置padding
         if (ListModel == 2 && holder.mRoot != null) {

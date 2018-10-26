@@ -159,7 +159,6 @@ class SearchLrc(private val mSong: Song) {
                     it.readLine().run {
                         e.onNext(Gson().fromJson(this, object : TypeToken<List<LrcRow>>() {}.type))
                         LogUtil.d(TAG, "CacheLyric")
-                        ToastUtil.show(App.getContext(), "CacheLyric")
                     }
                 }
             }
@@ -386,7 +385,6 @@ class SearchLrc(private val mSong: Song) {
                             .map { lrcBody ->
                                 val lrcResponse = Gson().fromJson(lrcBody.string(), KLrcResponse::class.java)
                                 LogUtil.d(TAG, "KugouLyric")
-                                ToastUtil.show(App.getContext(), "KugouLyric")
                                 mLrcParser.getLrcRows(getBufferReader(Base64.decode(lrcResponse.content, Base64.DEFAULT)), true, mCacheKey, mSearchKey)
                             }
                 }

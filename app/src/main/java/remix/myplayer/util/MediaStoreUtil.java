@@ -189,7 +189,6 @@ public class MediaStoreUtil {
     }
 
 
-
     /**
      * 根据歌手或者专辑id获取所有歌曲
      *
@@ -197,7 +196,7 @@ public class MediaStoreUtil {
      * @param type 1:专辑  2:歌手
      * @return 对应所有歌曲的id
      */
-    public static List<Song> getMP3InfoByArtistIdOrAlbumId(int id, int type) {
+    public static List<Song> getSongsByArtistIdOrAlbumId(int id, int type) {
         String selection = null;
         String sortOrder = null;
         String[] selectionValues = null;
@@ -282,7 +281,7 @@ public class MediaStoreUtil {
      * @param albumId 歌曲id
      * @return 对应歌曲信息
      */
-    public static Song getMP3InfoByAlbumId(int albumId) {
+    public static Song getSongByAlbumId(int albumId) {
         return getSong(MediaStore.Audio.Media.ALBUM_ID + "=?", new String[]{albumId + ""});
     }
 
@@ -292,7 +291,7 @@ public class MediaStoreUtil {
      * @param id 歌曲id
      * @return 对应歌曲信息
      */
-    public static Song getMP3InfoById(int id) {
+    public static Song getSongById(int id) {
         return getSong(MediaStore.Audio.Media._ID + "=?", new String[]{id + ""});
     }
 
@@ -318,7 +317,7 @@ public class MediaStoreUtil {
     /**
      * 删除歌曲
      *
-     * @param data 删除参数 包括歌曲路径、专辑id、艺术家id、播放列表id、parentId
+     * @param data 删除参数 包括歌曲id、专辑id、艺术家id、播放列表id、parentId
      * @param type 删除类型 包括单个歌曲、专辑、艺术家、文件夹、播放列表
      * @return 是否歌曲数量
      */
@@ -409,46 +408,23 @@ public class MediaStoreUtil {
     /**
      * 根据参数获得id列表
      *
-     * @param arg  专辑id 艺术家id parentId 播放列表id
+     * @param id   专辑id 艺术家id parentId 播放列表id
      * @param type
      * @return
      */
-    public static List<Integer> getSongIdList(Object arg, int type) {
-        Cursor cursor = null;
-        ContentResolver resolver = mContext.getContentResolver();
-        List<Integer> ids = new ArrayList<>();
-        //专辑或者艺术家
-        if (type == Constants.ALBUM || type == Constants.ARTIST) {
-            try {
-                cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        new String[]{MediaStore.Audio.Media._ID},
-                        (type == Constants.ALBUM ? MediaStore.Audio.Media.ALBUM_ID : MediaStore.Audio.Media.ARTIST_ID) + "=" + arg + " and " + MediaStoreUtil.getBaseSelection(),
-                        null, null);
-                if (cursor != null) {
-                    while (cursor.moveToNext()) {
-                        ids.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
-                    }
-                }
+    public static List<Integer> getSongIdList(int id, int type) {
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (cursor != null && !cursor.isClosed()) {
-                    cursor.close();
-                }
-            }
+        switch (type) {
+            case Constants.ALBUM:
+            case Constants.ARTIST: //专辑或者艺术家
+                return getSongIds((type == Constants.ALBUM ? MediaStore.Audio.Media.ALBUM_ID : MediaStore.Audio.Media.ARTIST_ID) + "=" + id, null);
+            case Constants.PLAYLIST: //播放列表
+                return PlayListUtil.getSongIds(id);
+            case Constants.FOLDER: //文件夹
+                return getSongIdsByParentId(id);
+            default:
+                return Collections.emptyList();
         }
-
-        //文件夹
-        if (type == Constants.FOLDER) {
-            ids = getSongIdsByParentId((Integer) arg);
-        }
-        //播放列表
-        if (type == Constants.PLAYLIST) {
-            ids = PlayListUtil.getIDList((Integer) arg);
-        }
-
-        return ids;
     }
 
 

@@ -4,10 +4,8 @@ package remix.myplayer.bean.mp3
  * Created by Remix on 2018/1/9.
  */
 
-data class Folder(val name: String?, val count: Int, val path: String?, val parentId: Int?) {
-    constructor(name: String?, count: Int, path: String?) : this(name, count, path, -1) {
+data class Folder(val name: String?, val count: Int, val path: String?, val parentId: Int) {
 
-    }
 
     override fun equals(other: Any?): Boolean {
         return when (other) {

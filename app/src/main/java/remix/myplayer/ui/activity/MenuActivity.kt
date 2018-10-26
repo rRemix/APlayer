@@ -2,28 +2,15 @@ package remix.myplayer.ui.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Bundle
-import android.support.annotation.Nullable
-import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import butterknife.BindView
-import com.afollestad.materialdialogs.DialogAction.POSITIVE
-import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.dialog.TimerDialog
-import remix.myplayer.ui.multiple.Controller
-import remix.myplayer.ui.multiple.MultipleChoice
-import remix.myplayer.ui.widget.TipPopupwindow
 import remix.myplayer.util.ColorUtil
-import remix.myplayer.util.Constants
-import remix.myplayer.util.SPUtil
 
 /**
  * @ClassName
@@ -32,91 +19,10 @@ import remix.myplayer.util.SPUtil
  * @Date 2016/9/29 10:37
  */
 @SuppressLint("Registered")
-abstract class MultiChoiceActivity : ToolbarActivity() {
-
-//    var choice: MultipleChoice<*>? = null
-//    private var tipPopupWindow: TipPopupwindow? = null
-
-
+abstract class MenuActivity : ToolbarActivity() {
     open fun getMenuLayoutId(): Int {
         return R.menu.menu_main_simple
     }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        setUpClick()
-    }
-
-    protected open fun setUpClick() {
-//        val views = arrayOf(findViewById(R.id.multi_delete), findViewById(R.id.multi_playlist), findViewById<View>(R.id.multi_playqueue))
-//        for (view in views) {
-//            view?.setOnClickListener { view1 ->
-//                when (view1.id) {
-//                    R.id.multi_delete -> {
-//                        val title = if (choice?.type == Constants.PLAYLIST)
-//                            getString(R.string.confirm_delete_playlist)
-//                        else if (choice?.type == Constants.PLAYLISTSONG)
-//                            getString(R.string.confirm_delete_from_playlist)
-//                        else
-//                            getString(R.string.confirm_delete_from_library)
-//                        Theme.getBaseDialog(mContext)
-//                                .content(title)
-//                                .positiveText(R.string.confirm)
-//                                .negativeText(R.string.cancel)
-//                                .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
-//                                .onAny { dialog, which ->
-//                                    if (which == POSITIVE) {
-//                                        choice?.delete(dialog.isPromptCheckBoxChecked)
-//                                    }
-//                                }
-//                                .show()
-//                    }
-//                    R.id.multi_playqueue ->
-//                        choice?.addToPlayQueue()
-//                    R.id.multi_playlist ->
-//                        choice?.addToPlayList()
-//                }
-//            }
-//        }
-        //        ButterKnife.apply(new View[]{findViewById(R.id.multi_delete),findViewById(R.id.multi_playlist),findViewById(R.id.multi_playqueue)}, new ButterKnife.Action<View>() {
-        //            @Override
-        //            public void apply(@NonNull View view, int index) {
-        //                if(view != null)
-        //                    view.setOnClickListener(MultiChoiceActivity.this);
-        //            }
-        //        });
-    }
-
-
-//    protected open fun setUpMultiChoice() {
-//        multiChoice = MultiChoice(this)
-//        multiChoice!!.setOnUpdateOptionMenuListener { multiShow ->
-//            multiChoice!!.setShowing(multiShow)
-//            toolbar!!.visibility = if (multiShow) View.GONE else View.VISIBLE
-//            multiToolbar!!.visibility = if (multiShow) View.VISIBLE else View.GONE
-//            //清空
-//            if (!multiChoice!!.isShow) {
-//                multiChoice!!.clear()
-//            }
-//            //只有主界面显示分割线
-//            multiToolbar!!.findViewById<View>(R.id.multi_divider).visibility = if (this@MultiChoiceActivity is MainActivity) View.VISIBLE else View.GONE
-//            //第一次长按操作显示提示框
-//            if (SPUtil.getValue(App.getActivity(), SPUtil.SETTING_KEY.NAME, "IsFirstMulti", true)) {
-//                SPUtil.putValue(App.getActivity(), SPUtil.SETTING_KEY.NAME, "IsFirstMulti", false)
-//                if (tipPopupWindow == null) {
-//                    tipPopupWindow = TipPopupwindow(this)
-//                    tipPopupWindow!!.setOnDismissListener { tipPopupWindow = null }
-//                }
-//                if (!tipPopupWindow!!.isShowing && multiShow) {
-//                    tipPopupWindow!!.show(View(this))
-//                }
-//            }
-//        }
-//    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.action_search) {
@@ -224,7 +130,7 @@ abstract class MultiChoiceActivity : ToolbarActivity() {
         }
     }
 
-    protected fun tintMenuIcon(menu: Menu) {
+    private fun tintMenuIcon(menu: Menu) {
         //主题颜色
         val themeColor = ColorUtil.getColor(if (ThemeStore.isLightTheme()) R.color.black else R.color.white)
         for (i in 0 until menu.size()) {

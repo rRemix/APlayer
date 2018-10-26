@@ -36,10 +36,8 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.Command;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.activity.RecentlyActivity;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.ui.widget.ColumnView;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
@@ -59,7 +57,6 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * Created by Remix on 2016/4/11.
  */
 public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements FastScroller.SectionIndexer, OnUpdateHighLightListener {
-    protected MultiChoice mMultiChoice;
     private int mType;
     public static final int ALLSONG = 0;
     public static final int RECENTLY = 1;
@@ -69,9 +66,9 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
     private final RecyclerView mRecyclerView;
     private int mLastIndex = 1;
 
-    public SongAdapter(Context context, int layoutId, MultiChoice multiChoice, int type, RecyclerView recyclerView) {
+    public SongAdapter(Context context, int layoutId, MultipleChoice multiChoice, int type, RecyclerView recyclerView) {
         super(context, layoutId, multiChoice);
-        mMultiChoice = multiChoice;
+        mChoice = multiChoice;
         mType = type;
         mRecyclerView = recyclerView;
         int size = DensityUtil.dip2px(mContext, 60);
@@ -194,7 +191,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
                 null, null));
 
         holder.mButton.setOnClickListener(v -> {
-            if (mMultiChoice.isShow())
+            if (mChoice.isActive())
                 return;
             Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton, Gravity.END);
@@ -219,21 +216,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
             return true;
         });
 
-        if (mType == ALLSONG) {
-            if (mMultiChoice.getTag().equals(SongFragment.TAG) &&
-                    mMultiChoice.getSelectPos().contains(position - 1)) {
-                holder.mContainer.setSelected(true);
-            } else {
-                holder.mContainer.setSelected(false);
-            }
-        } else {
-            if (mMultiChoice.getTag().equals(RecentlyActivity.TAG) &&
-                    mMultiChoice.getSelectPos().contains(position - 1)) {
-                holder.mContainer.setSelected(true);
-            } else {
-                holder.mContainer.setSelected(false);
-            }
-        }
+        holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
     }
 
     @Override

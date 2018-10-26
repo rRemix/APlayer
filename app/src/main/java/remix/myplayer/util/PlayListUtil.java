@@ -102,7 +102,7 @@ public class PlayListUtil {
      * @return 新增歌曲的id
      */
     public static int addSong(PlayListSong info) {
-        if (getIDList(info.PlayListID).contains(info.AudioId))
+        if (getSongIds(info.PlayListID).contains(info.AudioId))
             return 0;
         ContentValues cv = new ContentValues();
         cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID, info.AudioId);
@@ -123,7 +123,7 @@ public class PlayListUtil {
         if (infos == null || infos.size() == 0)
             return 0;
         //不重复添加
-        List<Integer> rawIDList = getIDList(infos.get(0).PlayListID);
+        List<Integer> rawIDList = getSongIds(infos.get(0).PlayListID);
         for (int i = 0; i < rawIDList.size(); i++) {
             for (int j = infos.size() - 1; j >= 0; j--) {
                 if (rawIDList.get(i) == infos.get(j).AudioId)
@@ -164,7 +164,7 @@ public class PlayListUtil {
             return 0;
         List<Integer> newList = new ArrayList<>(ids);
         //不重复添加
-        List<Integer> rawIDList = getIDList(playListName);
+        List<Integer> rawIDList = getSongIds(playListName);
         for (int i = 0; i < rawIDList.size(); i++) {
             for (int j = newList.size() - 1; j >= 0; j--) {
                 if (rawIDList.get(i).equals(newList.get(j)))
@@ -361,7 +361,7 @@ public class PlayListUtil {
      * @param playlistName
      * @return
      */
-    public static List<Integer> getIDList(String playlistName) {
+    public static List<Integer> getSongIds(String playlistName) {
         ArrayList<Integer> IDList = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -388,7 +388,7 @@ public class PlayListUtil {
      * @param playlistId
      * @return
      */
-    public static List<Integer> getIDList(int playlistId) {
+    public static List<Integer> getSongIds(int playlistId) {
         ArrayList<Integer> IDList = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -499,7 +499,7 @@ public class PlayListUtil {
         }
 
 //        for(Integer id : idList){
-//            Song temp = MediaStoreUtil.getMP3InfoById(id);
+//            Song temp = MediaStoreUtil.getSongById(id);
 //            if(temp != null && temp.getID() == id){
 //                songList.add(temp);
 //            } else {

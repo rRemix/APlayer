@@ -34,9 +34,8 @@ import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -58,8 +57,8 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
  */
 public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implements FastScroller.SectionIndexer {
 
-    public AlbumAdapter(Context context, int layoutId, MultiChoice multiChoice) {
-        super(context, layoutId, multiChoice);
+    public AlbumAdapter(Context context, int layoutId, MultipleChoice multipleChoice) {
+        super(context, layoutId, multipleChoice);
         ListModel = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "AlbumModel", Constants.GRID_MODEL);
     }
 
@@ -163,7 +162,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
                 null));
 
         holder.mButton.setOnClickListener(v -> {
-            if (mMultiChoice.isShow())
+            if (mChoice.isActive())
                 return;
             Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton, Gravity.END);
@@ -176,12 +175,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         });
 
         //是否处于选中状态
-        if (mMultiChoice.getTag().equals(AlbumFragment.TAG) &&
-                mMultiChoice.getSelectPos().contains(position - 1)) {
-            holder.mContainer.setSelected(true);
-        } else {
-            holder.mContainer.setSelected(false);
-        }
+        holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
 
         //半圆着色
         if (ListModel == Constants.GRID_MODEL) {

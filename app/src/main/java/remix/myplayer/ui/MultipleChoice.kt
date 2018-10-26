@@ -1,4 +1,4 @@
-package remix.myplayer.ui.multiple
+package remix.myplayer.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -133,7 +133,8 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
                                     ToastUtil.show(activity, when {
                                         newPlayListId > 0 -> R.string.add_playlist_success
                                         newPlayListId == -1 -> R.string.add_playlist_error
-                                        else -> R.string.playlist_already_exist }, Toast.LENGTH_SHORT)
+                                        else -> R.string.playlist_already_exist
+                                    }, Toast.LENGTH_SHORT)
                                     if (newPlayListId < 0) {
                                         return@input
                                     }
@@ -203,20 +204,15 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
 
 
     fun open() {
-//        val contentView = activity.window.decorView.findViewById<ViewGroup>(android.R.id.content)
-//        val popupView = LayoutInflater.from(activity).inflate(R.layout.toolbar_multi,contentView,false)
-//        popupView.bringToFront()
-//        contentView.addView(popupView,0)
-
         popup = MultiPopupWindow(activity)
         popup?.show(View(activity))
-        if(SPUtil.getValue(activity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.FIRST_SHOW_MULTI,true)){
-            SPUtil.putValue(activity,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.FIRST_SHOW_MULTI,false)
+        if (SPUtil.getValue(activity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FIRST_SHOW_MULTI, true)) {
+            SPUtil.putValue(activity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FIRST_SHOW_MULTI, false)
             val tipPopup = TipPopupwindow(activity)
             tipPopup.show(activity.window.decorView)
         }
         //MainActivity显示分割线
-        popup?.contentView?.findViewById<View>(R.id.multi_divider)?.visibility = if(activity is MainActivity) View.VISIBLE else View.GONE
+        popup?.contentView?.findViewById<View>(R.id.multi_divider)?.visibility = if (activity is MainActivity) View.VISIBLE else View.GONE
         popup?.contentView?.findViewById<View>(R.id.multi_playqueue)?.setOnClickListener(this)
         popup?.contentView?.findViewById<View>(R.id.multi_delete)?.setOnClickListener(this)
         popup?.contentView?.findViewById<View>(R.id.multi_playlist)?.setOnClickListener(this)

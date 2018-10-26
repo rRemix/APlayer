@@ -32,15 +32,13 @@ import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.activity.ChildHolderActivity;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.widget.ColumnView;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -50,18 +48,17 @@ import remix.myplayer.util.ToastUtil;
 public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> implements FastScroller.SectionIndexer, OnUpdateHighLightListener {
     private int mType;
     private String mArg;
-    private MultiChoice mMultiChoice;
+
     private Drawable mDefaultDrawable;
     private Drawable mSelectDrawable;
     private RecyclerView mRecyclerView;
     private int mLastIndex;
 
-    public ChildHolderAdapter(Context context, int layoutId, int type, String arg, MultiChoice multiChoice, RecyclerView recyclerView) {
+    public ChildHolderAdapter(Context context, int layoutId, int type, String arg, MultipleChoice multiChoice, RecyclerView recyclerView) {
         super(context, layoutId, multiChoice);
         this.mContext = context;
         this.mType = type;
         this.mArg = arg;
-        this.mMultiChoice = multiChoice;
         this.mRecyclerView = recyclerView;
         int size = DensityUtil.dip2px(mContext, 60);
         mDefaultDrawable = Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
@@ -156,7 +153,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
                         null, null));
 
                 holder.mButton.setOnClickListener(v -> {
-                    if (mMultiChoice.isShow())
+                    if (mChoice.isActive())
                         return;
                     Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
                     final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton, Gravity.END);
@@ -196,13 +193,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
             });
         }
 
-        if (mMultiChoice.getTag().equals(ChildHolderActivity.TAG) &&
-                mMultiChoice.getSelectPos().contains(position - 1)) {
-            LogUtil.d("ChildHolderAdapter", "选中:" + position);
-            holder.mContainer.setSelected(true);
-        } else {
-            holder.mContainer.setSelected(false);
-        }
+        holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
     }
 
     @Override

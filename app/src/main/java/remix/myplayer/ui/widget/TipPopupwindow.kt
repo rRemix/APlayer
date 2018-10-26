@@ -1,14 +1,12 @@
 package remix.myplayer.ui.widget
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.drawable.BitmapDrawable
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
-
 import remix.myplayer.R
 import remix.myplayer.util.StatusBarUtil
 
@@ -23,8 +21,6 @@ class TipPopupwindow(context: Context?) : PopupWindow() {
     private var mYOffset = 0
 
     init {
-        if (context == null)
-            return
 
         contentView = LayoutInflater.from(context).inflate(R.layout.popup_multi_tip, null)
         width = ViewGroup.LayoutParams.MATCH_PARENT

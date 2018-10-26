@@ -4,14 +4,17 @@ import android.os.Bundle;
 
 import java.util.List;
 
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.BaseAdapter;
+import remix.myplayer.util.Constants;
 
 /**
  * Created by Remix on 2017/10/20.
  */
 
-public abstract class LibraryActivity<D, A extends BaseAdapter> extends MultiChoiceActivity implements android.app.LoaderManager.LoaderCallbacks<List<D>> {
+public abstract class LibraryActivity<D, A extends BaseAdapter> extends MenuActivity implements android.app.LoaderManager.LoaderCallbacks<List<D>> {
     protected A mAdapter;
+    protected MultipleChoice<D> mChoice = new MultipleChoice<>(this, Constants.SONG);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,4 +72,12 @@ public abstract class LibraryActivity<D, A extends BaseAdapter> extends MultiCho
         return null;
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mChoice.isActive()) {
+            mChoice.close();
+        } else {
+            finish();
+        }
+    }
 }

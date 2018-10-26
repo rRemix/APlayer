@@ -20,7 +20,6 @@ import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.ui.activity.ChildHolderActivity;
-import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.ui.adapter.FolderAdapter;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -45,14 +44,14 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
 
     @Override
     protected void initAdapter() {
-        mAdapter = new FolderAdapter(mContext, R.layout.item_folder_recycle, mMultiChoice);
+        mAdapter = new FolderAdapter(mContext, R.layout.item_folder_recycle, mChoice);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 Folder folder = mAdapter.getDatas().get(position);
                 String path = folder.getPath();
                 if (getUserVisibleHint() && !TextUtils.isEmpty(path) &&
-                        !mMultiChoice.itemClick(position, folder.getParentId(), TAG)) {
+                        !mChoice.click(position, folder)) {
                     Intent intent = new Intent(mContext, ChildHolderActivity.class);
                     intent.putExtra("Id", folder.getParentId());
                     intent.putExtra("Type", Constants.FOLDER);
@@ -66,7 +65,7 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
                 Folder folder = mAdapter.getDatas().get(position);
                 String path = mAdapter.getDatas().get(position).getPath();
                 if (getUserVisibleHint() && !TextUtils.isEmpty(path))
-                    mMultiChoice.itemLongClick(position, folder.getParentId(), TAG, Constants.FOLDER);
+                    mChoice.longClick(position, folder);
             }
         });
     }
@@ -76,9 +75,6 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        if (mContext instanceof MultiChoiceActivity) {
-            mMultiChoice = ((MultiChoiceActivity) mContext).getMultiChoice();
-        }
         mRecyclerView.setAdapter(mAdapter);
     }
 

@@ -41,7 +41,7 @@ public class PlayQueueAdapter extends BaseAdapter<PlayListSong, PlayQueueAdapter
     @Override
     protected void convert(final PlayQueueHolder holder, PlayListSong playListSong, int position) {
         final int audioId = playListSong.AudioId;
-        final Song item = MediaStoreUtil.getMP3InfoById(audioId);
+        final Song item = MediaStoreUtil.getSongById(audioId);
         if (item == null) {
             //歌曲已经失效
             holder.mSong.setText(mContext.getString(R.string.song_lose_effect));

@@ -20,7 +20,6 @@
                 android:background="?attr/material_color_primary"
                 android:id="@+id/appbar">
                 <include layout="@layout/toolbar"/>
-                <include layout="@layout/toolbar_multi"/>
                 <android.support.design.widget.TabLayout
                     android:id="@+id/tabs"
                     android:layout_width="match_parent"

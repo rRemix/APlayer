@@ -622,7 +622,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             updateNextSong();
         } else {
             mNextIndex = mPlayModel != Constants.PLAY_SHUFFLE ? mPlayQueue.indexOf(mNextId) : mRandomQueue.indexOf(mNextId);
-            mNextSong = MediaStoreUtil.getMP3InfoById(mNextId);
+            mNextSong = MediaStoreUtil.getSongById(mNextId);
             if (mNextSong != null) {
                 return;
             }
@@ -886,7 +886,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             return;
         }
         mCurrentId = mPlayQueue.get(mCurrentIndex);
-        mCurrentSong = MediaStoreUtil.getMP3InfoById(mCurrentId);
+        mCurrentSong = MediaStoreUtil.getSongById(mCurrentId);
 
         mNextIndex = mCurrentIndex;
         mNextId = mCurrentId;
@@ -1019,7 +1019,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 mControlRecevier.onReceive(this, shuffleIntent);
                 break;
             case ACTION_SHORTCUT_MYLOVE:
-                List<Integer> myLoveIds = PlayListUtil.getIDList(Global.MyLoveID);
+                List<Integer> myLoveIds = PlayListUtil.getSongIds(Global.MyLoveID);
                 if (myLoveIds == null || myLoveIds.size() == 0) {
                     ToastUtil.show(mService, R.string.list_is_empty);
                     return;
@@ -1114,7 +1114,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 if (mPlayQueue == null || mPlayQueue.size() == 0) {
                     //列表为空，尝试读取
                     Global.PlayQueueID = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, "PlayQueueID", -1);
-                    mPlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
+                    mPlayQueue = PlayListUtil.getSongIds(Global.PlayQueueID);
                 }
             }
 
@@ -1475,7 +1475,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 return;
             mCurrentId = queue.get(mCurrentIndex);
 
-            mCurrentSong = MediaStoreUtil.getMP3InfoById(mCurrentId);
+            mCurrentSong = MediaStoreUtil.getSongById(mCurrentId);
             mNextIndex = mCurrentIndex;
             mNextId = mCurrentId;
         }
@@ -1510,7 +1510,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 mNextIndex = 0;
             mNextId = mPlayQueue.get(mNextIndex);
         }
-        mNextSong = MediaStoreUtil.getMP3InfoById(mNextId);
+        mNextSong = MediaStoreUtil.getSongById(mNextId);
     }
 
     public IMediaPlayer getMediaPlayer() {
@@ -1673,7 +1673,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             mPlayModel = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL, Constants.PLAY_LOOP);
             Global.PlayQueueID = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, "PlayQueueID", -1);
             Global.MyLoveID = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, "MyLoveID", -1);
-            mPlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
+            mPlayQueue = PlayListUtil.getSongIds(Global.PlayQueueID);
             Global.PlayList = PlayListUtil.getAllPlayListInfo();
             mShowFloatLrc = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
         }
@@ -1727,7 +1727,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS, 0) :
                 0;
         //上次退出时保存的正在播放的歌曲未失效
-        if (isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
+        if (isLastSongExist && (item = MediaStoreUtil.getSongById(lastId)) != null) {
             setUpDataSource(item, pos);
         } else {
             mLastProgress = 0;
@@ -1739,7 +1739,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 if (id != lastId)
                     break;
             }
-            item = MediaStoreUtil.getMP3InfoById(id);
+            item = MediaStoreUtil.getSongById(id);
             SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, id);
             setUpDataSource(item, 0);
         }
@@ -1755,6 +1755,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             mPlayQueue.removeAll(ids);
         }
     }
+
 
     /**
      * 释放电源锁

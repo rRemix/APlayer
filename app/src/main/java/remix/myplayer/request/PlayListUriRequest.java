@@ -30,7 +30,7 @@ public class PlayListUriRequest extends LibraryUriRequest {
     public Disposable load() {
         return Observable.concat(
                 getCustomThumbObservable(mRequest),
-                Observable.fromIterable(PlayListUtil.getMP3ListByIds(PlayListUtil.getIDList(mRequest.getID()), mRequest.getID()))
+                Observable.fromIterable(PlayListUtil.getMP3ListByIds(PlayListUtil.getSongIds(mRequest.getID()), mRequest.getID()))
                         .concatMapDelayError(song -> getCoverObservable(getSearchRequestWithAlbumType(song))))
                 .firstOrError()
                 .toObservable()
