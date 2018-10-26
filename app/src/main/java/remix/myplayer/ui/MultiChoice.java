@@ -233,7 +233,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                             continue;
                         idList.add((Integer) arg);
                         //保存删除前，选中的播放列表下一共有多少歌曲
-                        List<Integer> selectIDList = PlayListUtil.getIDList((Integer) arg);
+                        List<Integer> selectIDList = PlayListUtil.getSongIds((Integer) arg);
                         if (selectIDList != null)
                             num += selectIDList.size();
                     }

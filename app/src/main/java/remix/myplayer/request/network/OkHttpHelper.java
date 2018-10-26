@@ -14,7 +14,7 @@ import okhttp3.OkHttpClient;
 import remix.myplayer.misc.cache.DiskCache;
 
 public class OkHttpHelper {
-    private static final int TIMEOUT = 10000;
+    private static final int TIMEOUT = 30000;
 
     private static OkHttpClient sOkHttpClient;
     private static SSLSocketFactory sSSLSocketFactory;

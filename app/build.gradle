@@ -98,6 +98,10 @@ android {
         }
     }
 
+    androidExtensions {
+        experimental = true
+    }
+
     productFlavors {
 //        tencent{}
 //        alibaba{}

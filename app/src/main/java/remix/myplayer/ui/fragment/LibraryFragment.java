@@ -1,113 +1,100 @@
-package remix.myplayer.ui.fragment;
+package remix.myplayer.ui.fragment
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.os.Bundle
+import android.support.v4.app.LoaderManager
+import android.support.v4.content.Loader
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 
-import java.util.List;
-
-import butterknife.ButterKnife;
-import remix.myplayer.helper.MusicEventCallback;
-import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.activity.MultiChoiceActivity;
-import remix.myplayer.ui.adapter.BaseAdapter;
-import remix.myplayer.ui.fragment.base.BaseMusicFragment;
+import butterknife.ButterKnife
+import remix.myplayer.helper.MusicEventCallback
+import remix.myplayer.ui.adapter.BaseAdapter
+import remix.myplayer.ui.fragment.base.BaseMusicFragment
+import remix.myplayer.ui.multiple.Controller
+import remix.myplayer.ui.multiple.MultipleChoice
+import remix.myplayer.util.Constants
 
 /**
  * Created by Remix on 2016/12/23.
  */
 
-public abstract class LibraryFragment<D, A extends BaseAdapter> extends BaseMusicFragment implements MusicEventCallback, LoaderManager.LoaderCallbacks<List<D>> {
-    protected A mAdapter;
-    protected MultiChoice mMultiChoice;
+abstract class LibraryFragment<D, A : BaseAdapter<*, *>> : BaseMusicFragment(), MusicEventCallback, LoaderManager.LoaderCallbacks<List<D>> {
+    protected var mAdapter: A? = null
+    protected var mChoice: MultipleChoice<D>
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    val choice: MultipleChoice<*>
+        get() = mChoice
+
+
+    protected abstract val layoutID: Int
+
+    protected abstract val loader: Loader<List<D>>
+
+    protected abstract val loaderId: Int
+
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         if (mHasPermission) {
-            getLoaderManager().initLoader(getLoaderId(), null, this);
+            loaderManager.initLoader(loaderId, null, this)
         }
     }
 
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val rootView = inflater!!.inflate(layoutID, container, false)
+        mUnBinder = ButterKnife.bind(this, rootView)
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(getLayoutID(), container, false);
-        mUnBinder = ButterKnife.bind(this, rootView);
 
-        if (mContext instanceof MultiChoiceActivity) {
-            mMultiChoice = ((MultiChoiceActivity) mContext).getMultiChoice();
-        }
-        initAdapter();
-        initView();
-        if (mMultiChoice != null && mMultiChoice.getAdapter() == null) {
-            mMultiChoice.setAdapter(mAdapter);
-        }
+        mChoice = MultipleChoice(activity, Constants.ALBUM)
+        initAdapter()
+        initView()
 
-        return rootView;
+        mChoice.adapter = mAdapter
+        return rootView
     }
 
+    protected abstract fun initAdapter()
 
-    protected abstract int getLayoutID();
+    protected abstract fun initView()
 
-    protected abstract void initAdapter();
-
-    protected abstract void initView();
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    override fun onDestroy() {
+        super.onDestroy()
         if (mAdapter != null) {
-            mAdapter.setData(null);
+            mAdapter!!.setData(null)
         }
     }
 
-    @Override
-    public void onMediaStoreChanged() {
+    override fun onMediaStoreChanged() {
         if (mHasPermission)
-            getLoaderManager().restartLoader(getLoaderId(), null, this);
+            loaderManager.restartLoader(loaderId, null, this)
         else {
             if (mAdapter != null)
-                mAdapter.setData(null);
+                mAdapter!!.setData(null)
         }
     }
 
-    @Override
-    public void onPermissionChanged(boolean has) {
+    override fun onPermissionChanged(has: Boolean) {
         if (has != mHasPermission) {
-            mHasPermission = has;
-            onMediaStoreChanged();
+            mHasPermission = has
+            onMediaStoreChanged()
         }
     }
 
-    @Override
-    public void onPlayListChanged() {
+    override fun onPlayListChanged() {
 
     }
 
-    @Override
-    public Loader<List<D>> onCreateLoader(int id, Bundle args) {
-        return getLoader();
+    override fun onCreateLoader(id: Int, args: Bundle): Loader<List<D>> {
+        return loader
     }
 
-    @Override
-    public void onLoadFinished(Loader<List<D>> loader, List<D> data) {
-        mAdapter.setData(data);
+    override fun onLoadFinished(loader: Loader<List<D>>, data: List<D>) {
+        mAdapter!!.setData(data)
     }
 
-    @Override
-    public void onLoaderReset(Loader<List<D>> loader) {
+    override fun onLoaderReset(loader: Loader<List<D>>) {
         if (mAdapter != null)
-            mAdapter.setData(null);
+            mAdapter!!.setData(null)
     }
-
-    protected abstract Loader<List<D>> getLoader();
-
-    protected abstract int getLoaderId();
 
 }
