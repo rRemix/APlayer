@@ -62,6 +62,7 @@ import remix.myplayer.ui.dialog.LyricPriorityDialog;
 import remix.myplayer.ui.dialog.ThemeDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -792,7 +793,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         int position = 0;
         for (int i = 0; i < mScanSize.length; i++) {
             position = i;
-            if (mScanSize[i] == Constants.SCAN_SIZE)
+            if (mScanSize[i] == MediaStoreUtil.SCAN_SIZE)
                 break;
         }
         getBaseDialog(mContext)
@@ -800,7 +801,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 .items(new String[]{"0K", "500K", "1MB", "2MB"})
                 .itemsCallbackSingleChoice(position, (dialog, itemView, which, text) -> {
                     SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE, mScanSize[which]);
-                    Constants.SCAN_SIZE = mScanSize[which];
+                    MediaStoreUtil.SCAN_SIZE = mScanSize[which];
                     getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
                     return true;
                 }).show();

@@ -68,6 +68,10 @@ public class Util {
         LocalBroadcastManager.getInstance(App.getContext()).sendBroadcast(intent);
     }
 
+    public static void sendCMDLocalBroadcast(int cmd) {
+        LocalBroadcastManager.getInstance(App.getContext()).sendBroadcast(MusicUtil.makeCmdIntent(cmd));
+    }
+
     /**
      * 注销Receiver
      */

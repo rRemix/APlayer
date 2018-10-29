@@ -6,11 +6,12 @@ import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
-import com.afollestad.materialdialogs.DialogAction
+import com.tencent.bugly.crashreport.CrashReport
 import remix.myplayer.App
 import remix.myplayer.Global
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.*
+import remix.myplayer.misc.exception.MultipChoiceException
 import remix.myplayer.misc.getSongIds
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme
@@ -32,14 +33,12 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
     private var popup: MultiPopupWindow? = null
     var extra: Int = 0
 
-
-    private fun getSongs(): List<Song> {
-        val ids = getSongIds()
+    private fun getSongs(ids: List<Int>): List<Song> {
         val songs = ArrayList<Song>()
         ids.forEach {
             songs.add(MediaStoreUtil.getSongById(it))
         }
-        return songs
+        return MediaStoreUtil.getSongsByIds(ids)
     }
 
     private fun getSongIds(): List<Int> {
@@ -88,16 +87,37 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
                 .positiveText(R.string.confirm)
                 .negativeText(R.string.cancel)
                 .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
-                .onAny { dialog, which ->
-                    if (which == DialogAction.POSITIVE) {
-                        val num = if (type != Constants.PLAYLISTSONG || dialog.isPromptCheckBoxChecked) {
-                            MediaStoreUtil.delete(getSongs(), dialog.isPromptCheckBoxChecked)
-                        } else {
-                            PlayListUtil.deleteMultiSongs(getSongIds(), extra)
+                .onPositive { dialog, which ->
+                    try {
+                        val ids = getSongIds()
+                        val num = when (type) {
+                            Constants.PLAYLIST -> { //删除播放列表
+                                if (dialog.isPromptCheckBoxChecked) {
+                                    MediaStoreUtil.delete(getSongs(ids), true)
+                                }
+                                checkParam.forEach { PlayListUtil.deletePlayList((it as PlayList)._Id) }
+                                ids.size
+                            }
+                            Constants.PLAYLISTSONG -> { //删除播放列表内歌曲
+                                if (dialog.isPromptCheckBoxChecked) {
+                                    MediaStoreUtil.delete(getSongs(ids), true)
+                                } else {
+                                    PlayListUtil.deleteMultiSongs(ids, extra)
+                                }
+                            }
+                            else -> {
+                                MediaStoreUtil.delete(getSongs(ids), dialog.isPromptCheckBoxChecked)
+                            }
                         }
                         ToastUtil.show(activity, activity.getString(R.string.delete_multi_song, num))
+
+                    } catch (e: Exception) {
+                        ToastUtil.show(activity, activity.getString(R.string.delete_error))
+                        CrashReport.postCatchedException(MultipChoiceException(e, this.toString()))
+                    } finally {
                         close()
                     }
+
                 }
                 .show()
     }
@@ -254,6 +274,11 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
             }
         }
     }
+
+    override fun toString(): String {
+        return "MultipleChoice(activity=$activity, type=$type, checkPos=$checkPos, checkParam=$checkParam, isActive=$isActive, adapter=$adapter, popup=$popup, extra=$extra)"
+    }
+
 
     companion object {
         @JvmStatic

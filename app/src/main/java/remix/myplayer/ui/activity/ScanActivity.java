@@ -14,7 +14,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.widget.FilterSizeSeekBar;
-import remix.myplayer.util.Constants;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 
 /**
@@ -56,7 +56,7 @@ public class ScanActivity extends ToolbarActivity {
         //获得之前设置的大小对应的索引
         for (int i = 0; i < mSizeList.size(); i++) {
             mPosition = i;
-            if (mSizeList.get(i) == Constants.SCAN_SIZE)
+            if (mSizeList.get(i) == MediaStoreUtil.SCAN_SIZE)
                 break;
         }
         mFilterSizeSeekbar.setOnSeekBarChangeListener(new FilterSizeSeekBar.OnSeekBarChangeListener() {
@@ -66,7 +66,7 @@ public class ScanActivity extends ToolbarActivity {
                 if (size >= 0) {
                     //纪录下设置的大小
                     SPUtil.putValue(ScanActivity.this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE, size);
-                    Constants.SCAN_SIZE = size;
+                    MediaStoreUtil.SCAN_SIZE = size;
                 }
             }
 

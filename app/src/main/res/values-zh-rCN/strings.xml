@@ -365,4 +365,5 @@
     <string name="restore_songs">歌曲恢复</string>
     <string name="restore_songs_tip">恢复从曲库移除的歌曲</string>
     <string name="alread_restore_songs">已经恢复被移除的歌曲</string>
+    <string name="speed_range_tip">输入范围为0.5-1.5</string>
 </resources>

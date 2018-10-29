@@ -1,5 +1,6 @@
 package remix.myplayer.util;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -47,6 +48,9 @@ import static remix.myplayer.util.Util.hasStoragePermissions;
  */
 public class MediaStoreUtil {
     private static final String TAG = "MediaStoreUtil";
+    //扫描文件默认大小设置
+    public static int SCAN_SIZE;
+    @SuppressLint("StaticFieldLeak")
     private static Context mContext;
 
     private MediaStoreUtil() {
@@ -60,7 +64,7 @@ public class MediaStoreUtil {
     }
 
     static {
-        Constants.SCAN_SIZE = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE, ByteConstants.KB * 500);
+        SCAN_SIZE = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE, ByteConstants.KB * 500);
     }
 
     public static List<Artist> getAllArtist() {
@@ -148,7 +152,7 @@ public class MediaStoreUtil {
                 SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z));
     }
 
-    public static List<Folder> getFolder() {
+    public static List<Folder> getAllFolder() {
         List<Folder> folders = new ArrayList<>();
         if (!hasStoragePermissions()) {
             return folders;
@@ -182,7 +186,7 @@ public class MediaStoreUtil {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Util.writeLogToExternalStorage("folder", "folderSize: " + folderMap.size() + " \nfolderMap: " + folderMap + "\nException: " + e);
         }
 
         return folders;
@@ -295,6 +299,18 @@ public class MediaStoreUtil {
         return getSong(MediaStore.Audio.Media._ID + "=?", new String[]{id + ""});
     }
 
+
+    public static List<Song> getSongsByIds(List<Integer> ids) {
+        List<Song> songs = new ArrayList<>();
+        if (ids == null || ids.isEmpty())
+            return songs;
+        for (Integer id : ids) {
+            songs.add(getSongById(id));
+        }
+        return songs;
+    }
+
+
     public static void insertAlbumArt(@NonNull Context context, int albumId, String path) {
         ContentResolver contentResolver = context.getContentResolver();
 
@@ -402,6 +418,8 @@ public class MediaStoreUtil {
         if (songs == null || songs.size() == 0)
             return;
         for (Song song : songs) {
+            mContext.getContentResolver().delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    MediaStore.Audio.Media._ID + "=?", new String[]{song.getId() + ""});
             Util.deleteFileSafely(new File(song.getUrl()));
         }
     }
@@ -426,9 +444,9 @@ public class MediaStoreUtil {
 
         Set<String> deleteId = SPUtil.getStringSet(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG);
         if (deleteId == null || deleteId.size() == 0)
-            return MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE;
+            return MediaStore.Audio.Media.SIZE + ">" + SCAN_SIZE;
         StringBuilder blacklist = new StringBuilder();
-        blacklist.append(MediaStore.Audio.Media.SIZE + ">").append(Constants.SCAN_SIZE);
+        blacklist.append(MediaStore.Audio.Media.SIZE + ">").append(SCAN_SIZE);
         blacklist.append(" and ");
         int i = 0;
         for (String id : deleteId) {

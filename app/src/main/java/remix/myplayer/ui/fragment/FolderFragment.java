@@ -106,7 +106,7 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
 
         @Override
         public List<Folder> loadInBackground() {
-            return MediaStoreUtil.getFolder();
+            return MediaStoreUtil.getAllFolder();
         }
     }
 }
