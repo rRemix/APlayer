@@ -499,39 +499,39 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 return MediaButtonReceiver.handleMediaButtonIntent(MusicService.this, event);
             }
 
-//            @Override
-//            public void onSkipToNext() {
-//                LogUtil.d(MediaButtonReceiver.TAG, "onSkipToNext");
-//                playNext();
-//            }
-//
-//            @Override
-//            public void onSkipToPrevious() {
-//                LogUtil.d(MediaButtonReceiver.TAG, "onSkipToPrevious");
-//                playPrevious();
-//            }
-//
-//            @Override
-//            public void onPlay() {
-//                LogUtil.d(MediaButtonReceiver.TAG, "onPlay");
-//                play(true);
-//            }
-//
-//            @Override
-//            public void onPause() {
-//                LogUtil.d(MediaButtonReceiver.TAG, "onPause");
-//                pause(false);
-//            }
-//
-//            @Override
-//            public void onStop() {
-//                stopSelf();
-//            }
-//
-//            @Override
-//            public void onSeekTo(long pos) {
-//                setProgress(pos);
-//            }
+            @Override
+            public void onSkipToNext() {
+                LogUtil.d(MediaButtonReceiver.TAG, "onSkipToNext");
+                playNext();
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                LogUtil.d(MediaButtonReceiver.TAG, "onSkipToPrevious");
+                playPrevious();
+            }
+
+            @Override
+            public void onPlay() {
+                LogUtil.d(MediaButtonReceiver.TAG, "onPlay");
+                play(true);
+            }
+
+            @Override
+            public void onPause() {
+                LogUtil.d(MediaButtonReceiver.TAG, "onPause");
+                pause(false);
+            }
+
+            @Override
+            public void onStop() {
+                stopSelf();
+            }
+
+            @Override
+            public void onSeekTo(long pos) {
+                setProgress(pos);
+            }
         });
 
         mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS | MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
@@ -1182,7 +1182,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                             Intent permissionIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                             permissionIntent.setData(Uri.parse("package:" + getPackageName()));
                             permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(permissionIntent);
+                            if (Util.isIntentAvailable(mService, permissionIntent))
+                                startActivity(permissionIntent);
                         }
                         ToastUtil.show(mService, R.string.plz_give_float_permission);
                         break;
@@ -1357,16 +1358,15 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
      * @param control
      */
     private void updateMediaSession(int control) {
-        mMediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
-                .setState(mIsPlay ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED,
-                        mCurrentIndex, mSpeed)
-                .setActions(MEDIA_SESSION_ACTIONS).build());
-
-        if (mCurrentSong == null)
+        if (mCurrentSong == null) {
+            mMediaSession.setMetadata(null);
             return;
+        }
         boolean isSmartisan = Build.MANUFACTURER.equalsIgnoreCase("smartisan");
-        if ((!isSmartisan && SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN))
+        if ((!isSmartisan && SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN)) {
+            mMediaSession.setMetadata(null);
             return;
+        }
 
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, mCurrentSong.getAlbum())
@@ -1401,6 +1401,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 }
             }.load();
         }
+
+        mMediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
+                .setState(mIsPlay ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED,
+                        mCurrentIndex, mSpeed)
+                .setActions(MEDIA_SESSION_ACTIONS).build());
     }
 
     /**

@@ -160,7 +160,7 @@ public class MediaStoreUtil {
         Map<Integer, List<String>> folderMap = new LinkedHashMap<>();
 
         try (Cursor cursor = mContext.getContentResolver().query(MediaStore.Files.getContentUri("external"),
-                null, getBaseSelection() + " and media_type = 2 and is_music = 1", null, null)) {
+                null, getBaseSelection() + " and media_type = 2", null, null)) {
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     final String data = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));

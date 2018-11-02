@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import butterknife.BindView;
 import io.reactivex.disposables.Disposable;
@@ -56,7 +57,7 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> implements FastScroller.SectionIndexer {
     public ArtistAdapter(Context context, int layoutId, MultipleChoice multiChoice) {
         super(context, layoutId, multiChoice);
-        ListModel = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "ArtistModel", Constants.GRID_MODEL);
+        listModel = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "ArtistModel", Constants.GRID_MODEL);
     }
 
     @Override
@@ -82,9 +83,9 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         }
     }
 
-    @SuppressLint("RestrictedApi")
+    @SuppressLint({"RestrictedApi", "CheckResult"})
     @Override
-    protected void convert(BaseViewHolder baseHolder, Artist artist, final int position) {
+    protected void convert(final BaseViewHolder baseHolder, final Artist artist, final int position) {
         if (position == 0) {
             final AlbumAdapter.HeaderHolder headerHolder = (AlbumAdapter.HeaderHolder) baseHolder;
             if (mDatas == null || mDatas.size() == 0) {
@@ -92,9 +93,9 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
                 return;
             }
             //设置图标
-            headerHolder.mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
-            headerHolder.mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-            headerHolder.mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mDivider.setVisibility(listModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
+            headerHolder.mListModelBtn.setColorFilter(listModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mGridModelBtn.setColorFilter(listModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
             headerHolder.mGridModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
             headerHolder.mListModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
             return;
@@ -111,17 +112,21 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
             if (artist.getCount() > 0) {
                 holder.mText2.setText(mContext.getString(R.string.song_count_1, artist.getCount()));
             } else {
-                new ArtistSongCountLoader(Constants.ARTIST, holder, artist).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, artistId);
+                try {
+                    new ArtistSongCountLoader(Constants.ARTIST, holder, artist).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, artistId);
+                } catch (Exception e) {
+                    CrashReport.postCatchedException(e);
+                }
             }
         }
         //设置封面
-        final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
+        final int imageSize = listModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
         Disposable disposable = new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(artist), new RequestConfig.Builder(imageSize, imageSize).build()).load();
         holder.mImage.setTag(disposable);
 
         //item点击效果
         holder.mContainer.setBackground(
-                Theme.getPressAndSelectedStateListRippleDrawable(ListModel, mContext));
+                Theme.getPressAndSelectedStateListRippleDrawable(listModel, mContext));
 
         holder.mContainer.setOnClickListener(v -> {
             if (holder.getAdapterPosition() - 1 < 0) {
@@ -146,8 +151,8 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
         //按钮点击效果
         int size = DensityUtil.dip2px(mContext, 45);
-        Drawable defaultDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-        Drawable selectDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
+        Drawable defaultDrawable = Theme.getShape(listModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+        Drawable selectDrawable = Theme.getShape(listModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
         holder.mButton.setBackground(Theme.getPressDrawable(
                 defaultDrawable,
                 selectDrawable,
@@ -174,7 +179,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
 
         //设置padding
-        if (ListModel == 2 && holder.mRoot != null) {
+        if (listModel == 2 && holder.mRoot != null) {
             if (position % 2 == 1) {
                 holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4));
             } else {
@@ -186,7 +191,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
     @Override
     public void saveMode() {
-        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, "ArtistModel", ListModel);
+        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, "ArtistModel", listModel);
     }
 
 //    @NonNull

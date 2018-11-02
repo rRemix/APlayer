@@ -10,8 +10,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import remix.myplayer.lyric.SearchLrc;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LyricUtil {
     private static final String TAG = "LyricUtil";
@@ -20,13 +20,19 @@ public class LyricUtil {
     }
 
 
+    public static String searchLyric(String displayName, String songName, String artistName, File searchPath) {
+        List<String> paths = new ArrayList<>();
+        searchLyricInternal(paths, displayName, songName, artistName, searchPath);
+        return paths.size() > 0 ? paths.get(0) : "";
+    }
+
     /**
      * 查找歌曲的lrc文件
      *
      * @param songName
      * @param searchPath
      */
-    public static void searchFile(String displayName, String songName, String artistName, File searchPath) {
+    private static void searchLyricInternal(List<String> result, String displayName, String songName, String artistName, File searchPath) {
         //判断SD卡是否存在
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File[] files = searchPath.listFiles();
@@ -34,10 +40,11 @@ public class LyricUtil {
                 return;
             for (File file : files) {
                 if (file.isDirectory() && file.canRead()) {
-                    searchFile(displayName, songName, artistName, file);
+                    searchLyricInternal(result, displayName, songName, artistName, file);
                 } else {
                     if (isRightLrc(file, displayName, songName, artistName)) {
-                        SearchLrc.setLOCAL_LYRIC_PATH(file.getAbsolutePath());
+                        result.add(file.getAbsolutePath());
+                        return;
                     }
                 }
             }
