@@ -18,7 +18,7 @@ import remix.myplayer.util.StatusBarUtil
  */
 
 class TipPopupwindow(context: Context?) : PopupWindow() {
-    private var mYOffset = 0
+    private var yOffset = 0
 
     init {
 
@@ -32,11 +32,11 @@ class TipPopupwindow(context: Context?) : PopupWindow() {
         val ta = context!!.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
         val actionBarSize = ta.getDimensionPixelSize(0, 0)
         ta.recycle()
-        mYOffset = StatusBarUtil.getStatusBarHeight(context) + actionBarSize
+        yOffset = StatusBarUtil.getStatusBarHeight(context) + actionBarSize
     }
 
     fun show(parent: View) {
-        showAsDropDown(parent, 0, mYOffset)
+        showAsDropDown(parent, 0, yOffset)
         //两秒钟后关闭
         Handler().postDelayed({ dismiss() }, 2000)
     }

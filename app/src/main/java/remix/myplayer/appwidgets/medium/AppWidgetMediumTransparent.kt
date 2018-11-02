@@ -36,7 +36,7 @@ class AppWidgetMediumTransparent : BaseAppwidget() {
             return
         val remoteViews = RemoteViews(service.packageName, R.layout.app_widget_medium_transparent)
         buildAction(service, remoteViews)
-        mSkin = AppWidgetSkin.TRANSPARENT
+        skin = AppWidgetSkin.TRANSPARENT
         updateRemoteViews(service, remoteViews, song)
         //设置时间
         val currentTime = service.progress.toLong()

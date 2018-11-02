@@ -16,6 +16,7 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.theme.Theme
 import remix.myplayer.util.LogUtil
+import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.ToastUtil
 import java.io.File
 import java.util.*
@@ -24,28 +25,28 @@ import java.util.*
  * Created by Remix on 2017/11/20.
  */
 
-class MediaScanner(private val mContext: Context) {
+class MediaScanner(private val context: Context) {
 
-    lateinit var mConnection: MediaScannerConnection
-    private var mDir: File? = null
-    private var mSubscription: Subscription? = null
-    private val mToScanFiles = ArrayList<File>()
+    lateinit var connection: MediaScannerConnection
+    private var dir: File? = null
+    private var subscription: Subscription? = null
+    private val toScanFiles = ArrayList<File>()
 
     init {
-        val loadingDialog = Theme.getBaseDialog(mContext)
+        val loadingDialog = Theme.getBaseDialog(context)
                 .cancelable(false)
                 .title(R.string.please_wait)
                 .content(R.string.scaning)
                 .progress(true, 0)
                 .progressIndeterminateStyle(false)
-                .dismissListener { dialog -> mConnection.disconnect() }
+                .dismissListener { dialog -> connection.disconnect() }
                 .build()
 
         val client = object : MediaScannerConnection.MediaScannerConnectionClient {
             override fun onMediaScannerConnected() {
                 Flowable.create(FlowableOnSubscribe<File> { emitter ->
-                    getFileCount(mDir!!)
-                    for (file in mToScanFiles) {
+                    getFileCount(dir!!)
+                    for (file in toScanFiles) {
                         emitter.onNext(file)
                     }
                     emitter.onComplete()
@@ -56,26 +57,26 @@ class MediaScanner(private val mContext: Context) {
                             override fun onSubscribe(s: Subscription) {
                                 LogUtil.d(TAG, "onSubscribe")
                                 loadingDialog.show()
-                                mSubscription = s
-                                mSubscription?.request(1)
+                                subscription = s
+                                subscription?.request(1)
                             }
 
                             override fun onNext(file: File) {
                                 LogUtil.d(TAG, "onNext: $file")
                                 loadingDialog.setContent(file.absolutePath)
-                                mConnection.scanFile(file.absolutePath, "audio/*")
+                                connection.scanFile(file.absolutePath, "audio/*")
                             }
 
                             override fun onError(throwable: Throwable) {
                                 LogUtil.d(TAG, "onError: $throwable")
                                 loadingDialog.dismiss()
-                                ToastUtil.show(mContext, R.string.scan_failed, throwable.toString())
+                                ToastUtil.show(context, R.string.scan_failed, throwable.toString())
                             }
 
                             override fun onComplete() {
                                 LogUtil.d(TAG, "onComplete")
                                 loadingDialog.dismiss()
-                                ToastUtil.show(mContext, mContext.getString(R.string.scanned_count, mToScanFiles.size))
+                                ToastUtil.show(context, context.getString(R.string.scanned_count, toScanFiles.size))
                                 App.getContext().contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
                             }
                         })
@@ -83,24 +84,24 @@ class MediaScanner(private val mContext: Context) {
 
 
             override fun onScanCompleted(path: String, uri: Uri) {
-                mSubscription?.request(1)
+                subscription?.request(1)
                 LogUtil.d(TAG, "onScanCompleted --- path: $path uri: $uri")
             }
         }
 
-        mConnection = MediaScannerConnection(mContext, client)
+        connection = MediaScannerConnection(context, client)
     }
 
     fun scanFiles(dir: File) {
         checkNotNull(dir)
-        mDir = dir
-        mConnection.connect()
+        this.dir = dir
+        connection.connect()
     }
 
     private fun getFileCount(file: File) {
-        if (file.isFile) {
+        if (file.isFile && file.length() >= MediaStoreUtil.SCAN_SIZE) {
             if (isAudioFile(file))
-                mToScanFiles.add(file)
+                toScanFiles.add(file)
         } else {
             val files = file.listFiles() ?: return
             for (temp in files) {

@@ -110,7 +110,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
             }
 
             headerHolder.mShuffle.setOnClickListener(v -> {
-                Intent intent = MusicUtil.makeControlIntent(Command.NEXT, true);
+                Intent intent = MusicUtil.makeCmdIntent(Command.NEXT, true);
                 if (mType == ALLSONG) {
                     List<Integer> allSong = MusicServiceRemote.getAllSong();
                     if (allSong == null || allSong.isEmpty()) {

@@ -124,11 +124,11 @@ public class MusicUtil {
         return null;
     }
 
-    public static Intent makeControlIntent(int cmd, boolean shuffle) {
+    public static Intent makeCmdIntent(int cmd, boolean shuffle) {
         return new Intent(MusicService.ACTION_CMD).putExtra("Control", cmd).putExtra("shuffle", shuffle);
     }
 
-    public static Intent makeControlIntent(int cmd) {
-        return makeControlIntent(cmd, false);
+    public static Intent makeCmdIntent(int cmd) {
+        return makeCmdIntent(cmd, false);
     }
 }

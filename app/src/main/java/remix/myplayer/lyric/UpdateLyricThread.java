@@ -11,6 +11,7 @@ import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.lyric.bean.LyricRowWrapper;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.SPUtil;
 
 public abstract class UpdateLyricThread extends Thread {
     private final String TAG = getClass().getSimpleName();
@@ -24,6 +25,7 @@ public abstract class UpdateLyricThread extends Thread {
     private WeakReference<MusicService> mReference;
     private Song mSong;
     private Status mStatus = Status.SEARCHING;
+    private int mOffset = 0;
 
     public UpdateLyricThread(MusicService service) {
         mReference = new WeakReference<>(service);
@@ -42,6 +44,7 @@ public abstract class UpdateLyricThread extends Thread {
                 .subscribe(lrcRows -> {
                     if (id == mSong.getId()) {
                         mStatus = Status.NORMAL;
+                        mOffset = SPUtil.getValue(App.getContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, id + "", 0);
                         mLrcRows = lrcRows;
                     }
                 }, throwable -> {
@@ -90,7 +93,7 @@ public abstract class UpdateLyricThread extends Thread {
             return wrapper;
         }
         final Song song = service.getCurrentSong();
-        final int progress = service.getProgress();
+        final int progress = service.getProgress() + mOffset;
         LogUtil.d("DesktopLrc", "当前歌词 -- Progress: " + service.getProgress());
         for (int i = mLrcRows.size() - 1; i >= 0; i--) {
             LrcRow lrcRow = mLrcRows.get(i);
@@ -115,6 +118,7 @@ public abstract class UpdateLyricThread extends Thread {
         }
         return wrapper;
     }
+
 
     public enum Status {
         NO, SEARCHING, ERROR, NORMAL

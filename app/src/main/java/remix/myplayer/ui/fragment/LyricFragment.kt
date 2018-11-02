@@ -110,22 +110,25 @@ class LyricFragment : BaseMusicFragment(), Runnable {
         mOffsetContainer.removeCallbacks(this)
         mOffsetContainer.postDelayed(this, DELAY_HIDE.toLong())
 
-        var original = SPUtil.getValue(mContext, SPUtil.LYRIC_OFFSET_KEY.NAME, mInfo?.id.toString() + "", 0)
+        val originalOffset = SPUtil.getValue(mContext, SPUtil.LYRIC_OFFSET_KEY.NAME, mInfo?.id.toString() + "", 0)
+        var newOffset = originalOffset
         when (view.id) {
             R.id.offsetReset -> {
-                original = 0
+                newOffset = 0
                 ToastUtil.show(mContext, R.string.lyric_offset_reset)
             }
-            R.id.offsetAdd -> original += 500
-            R.id.offsetReduce -> original -= 500
+            R.id.offsetAdd -> newOffset += 500
+            R.id.offsetReduce -> newOffset -= 500
         }
-        SPUtil.putValue(mContext, SPUtil.LYRIC_OFFSET_KEY.NAME, mInfo?.id.toString() + "", original)
-        if (original != 0 && Math.abs(original) <= 60000) {//最大偏移60s
-            ToastUtil.show(mContext, if (original > 0) R.string.lyric_advance_x_second else R.string.lyric_delay_x_second,
-                    String.format(Locale.getDefault(), "%.1f", original / 1000f))
+        if (originalOffset != newOffset) {
+            SPUtil.putValue(mContext, SPUtil.LYRIC_OFFSET_KEY.NAME, mInfo?.id.toString() + "", newOffset)
+            if (newOffset != 0 && Math.abs(newOffset) <= 60000) {//最大偏移60s
+                ToastUtil.show(mContext, if (newOffset > 0) R.string.lyric_advance_x_second else R.string.lyric_delay_x_second,
+                        String.format(Locale.getDefault(), "%.1f", newOffset / 1000f))
+            }
+            mLrcView.setOffset(newOffset)
         }
 
-        mLrcView.setOffset(original)
     }
 
     fun showLyricOffsetView() {

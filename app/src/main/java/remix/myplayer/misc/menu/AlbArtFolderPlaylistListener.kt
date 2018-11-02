@@ -19,8 +19,7 @@ import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.util.*
-import remix.myplayer.util.MediaStoreUtil.getSongIds
-import remix.myplayer.util.MediaStoreUtil.getSongIdsByParentId
+import remix.myplayer.util.MediaStoreUtil.*
 import java.util.*
 
 /**
@@ -90,6 +89,9 @@ class AlbArtFolderPlaylistListener(private val context: Context, //专辑id 艺�
                                 if (type != Constants.PLAYLIST) {
                                     ToastUtil.show(context, if (MediaStoreUtil.delete(id, type, dialog.isPromptCheckBoxChecked) > 0) R.string.delete_success else R.string.delete_error)
                                 } else {
+                                    if (dialog.isPromptCheckBoxChecked) {
+                                        MediaStoreUtil.delete(getSongsByIds(ids), true)
+                                    }
                                     ToastUtil.show(context, if (PlayListUtil.deletePlayList(id)) R.string.delete_success else R.string.delete_error)
                                 }
                             }

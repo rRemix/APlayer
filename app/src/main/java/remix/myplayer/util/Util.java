@@ -68,6 +68,10 @@ public class Util {
         LocalBroadcastManager.getInstance(App.getContext()).sendBroadcast(intent);
     }
 
+    public static void sendCMDLocalBroadcast(int cmd) {
+        LocalBroadcastManager.getInstance(App.getContext()).sendBroadcast(MusicUtil.makeCmdIntent(cmd));
+    }
+
     /**
      * 注销Receiver
      */
@@ -122,8 +126,13 @@ public class Util {
     public static void vibrate(final Context context, final long milliseconds) {
         if (context == null)
             return;
-        Vibrator vibrator = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
-        vibrator.vibrate(milliseconds);
+        try {
+            Vibrator vibrator = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
+            vibrator.vibrate(milliseconds);
+        } catch (Exception ignore) {
+
+        }
+
     }
 
     /**
@@ -236,7 +245,7 @@ public class Util {
      */
     public static String getTime(long duration) {
         int minute = (int) duration / 1000 / 60;
-        int second = (int) Math.ceil((duration - minute * 60000) / 1000f);
+        int second = (int) (duration / 1000) % 60;
         //如果分钟数小于10
         if (minute < 10) {
             if (second < 10)
