@@ -21,8 +21,10 @@ class MediaButtonReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {
 
-        if (handleMediaButtonIntent(context, intent))
+        if (handleMediaButtonIntent(context, intent)) {
+            LogUtil.d(TAG, "onReceive")
             abortBroadcast()
+        }
     }
 
     companion object {
@@ -39,7 +41,7 @@ class MediaButtonReceiver : BroadcastReceiver() {
             //过滤按下事件
             val isActionUp = event.action == KeyEvent.ACTION_UP
             if (!isActionUp) {
-                return false
+                return true
             }
 
             val keyCode = event.keyCode

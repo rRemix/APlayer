@@ -52,7 +52,7 @@ class CustomSortActivity : ToolbarActivity() {
         mAdapter.setData(mInfoList)
         mAdapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemLongClick(view: View?, position: Int) {
-                Util.vibrate(mContext, 150)
+                Util.vibrate(mContext, 100)
             }
 
             override fun onItemClick(view: View?, position: Int) {

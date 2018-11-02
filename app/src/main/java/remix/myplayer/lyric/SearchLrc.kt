@@ -1,6 +1,5 @@
 package remix.myplayer.lyric
 
-import android.database.Cursor
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Base64
@@ -32,25 +31,27 @@ import java.util.*
 /**
  * 根据歌曲名和歌手名 搜索歌词并解析成固定格式
  */
-class SearchLrc(private val mSong: Song) {
-    private val mLrcParser: ILrcParser
-    private var mDisplayName: String? = null
-    private var mCacheKey: String? = null
-    private var mSearchKey: String? = null
+class SearchLrc(private val song: Song) {
+    private val lrcParser: ILrcParser
+    private var displayName: String? = null
+    private var cacheKey: String? = null
+    private var searchKey: String? = null
+    private var localLyricPath: String = ""
+
 
     init {
         try {
-            if (!TextUtils.isEmpty(mSong.displayname)) {
-                val temp = mSong.displayname
-                mDisplayName = if (temp.indexOf('.') > 0) temp.substring(0, temp.lastIndexOf('.')) else temp
+            if (!TextUtils.isEmpty(song.displayname)) {
+                val temp = song.displayname
+                displayName = if (temp.indexOf('.') > 0) temp.substring(0, temp.lastIndexOf('.')) else temp
             }
-            mSearchKey = getLyricSearchKey(mSong)
+            searchKey = getLyricSearchKey(song)
         } catch (e: Exception) {
             LogUtil.d(TAG, e.toString())
-            mDisplayName = mSong.title
+            displayName = song.title
         }
 
-        mLrcParser = DefaultLrcParser()
+        lrcParser = DefaultLrcParser()
     }
 
     /**
@@ -59,7 +60,7 @@ class SearchLrc(private val mSong: Song) {
      * @return 歌词
      */
     fun getLyric(manualPath: String, clearCache: Boolean): Observable<List<LrcRow>> {
-        val type = SPUtil.getValue(App.getContext(), SPUtil.LYRIC_KEY.NAME, mSong.id, SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
+        val type = SPUtil.getValue(App.getContext(), SPUtil.LYRIC_KEY.NAME, song.id, SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
 
         val observable = when (type) {
             SPUtil.LYRIC_KEY.LYRIC_IGNORE -> {
@@ -106,14 +107,14 @@ class SearchLrc(private val mSong: Song) {
                 .firstOrError()
                 .toObservable()
                 .doOnSubscribe { disposable ->
-                    LOCAL_LYRIC_PATH = ""
-                    mCacheKey = Util.hashKeyForDisk(mSong.id.toString() + "-" +
-                            (if (!TextUtils.isEmpty(mSong.artist)) mSong.artist else "") + "-" +
-                            if (!TextUtils.isEmpty(mSong.title)) mSong.title else "")
-                    LogUtil.d(TAG, "CacheKey: $mCacheKey SearchKey: $mSearchKey")
+                    localLyricPath = ""
+                    cacheKey = Util.hashKeyForDisk(song.id.toString() + "-" +
+                            (if (!TextUtils.isEmpty(song.artist)) song.artist else "") + "-" +
+                            if (!TextUtils.isEmpty(song.title)) song.title else "")
+                    LogUtil.d(TAG, "CacheKey: $cacheKey SearchKey: $searchKey")
                     if (clearCache) {
                         LogUtil.d(TAG, "clearCache")
-                        DiskCache.getLrcDiskCache().remove(mCacheKey)
+                        DiskCache.getLrcDiskCache().remove(cacheKey)
                     }
                 }.compose(RxUtil.applyScheduler())
         else
@@ -140,9 +141,9 @@ class SearchLrc(private val mSong: Song) {
      */
     private fun getEmbeddedObservable(): Observable<List<LrcRow>> {
         return Observable.create { e ->
-            val lyric = TagEditor(mSong.url).lyric
+            val lyric = TagEditor(song.url).lyric
             if (!lyric.isNullOrEmpty()) {
-                e.onNext(mLrcParser.getLrcRows(getBufferReader(lyric!!.toByteArray(UTF_8)), true, mCacheKey, mSearchKey))
+                e.onNext(lrcParser.getLrcRows(getBufferReader(lyric!!.toByteArray(UTF_8)), true, cacheKey, searchKey))
                 LogUtil.d(TAG, "EmbeddedLyric")
             }
             e.onComplete()
@@ -154,7 +155,7 @@ class SearchLrc(private val mSong: Song) {
      */
     private fun getCacheObservable(): Observable<List<LrcRow>> {
         return Observable.create { e ->
-            DiskCache.getLrcDiskCache().get(mCacheKey)?.run {
+            DiskCache.getLrcDiskCache().get(cacheKey)?.run {
                 BufferedReader(InputStreamReader(getInputStream(0))).use {
                     it.readLine().run {
                         e.onNext(Gson().fromJson(this, object : TypeToken<List<LrcRow>>() {}.type))
@@ -166,53 +167,8 @@ class SearchLrc(private val mSong: Song) {
         }
     }
 
-
     private val isCN: Boolean
         get() = "zh".equals(Locale.getDefault().language, ignoreCase = true)
-
-    /**
-     * 搜索本地所有歌词文件
-     * 查找本地目录
-     * 已设置歌词路径
-     * 没有设置歌词路径 搜索所有歌词文件
-     *
-     * @return
-     */
-    private val localLrcPath: String
-        get() {
-            val searchPath = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")
-            if (!TextUtils.isEmpty(searchPath)) {
-                LyricUtil.searchFile(mDisplayName, mSong.title, mSong.artist, File(searchPath))
-                if (!TextUtils.isEmpty(SearchLrc.LOCAL_LYRIC_PATH)) {
-                    return SearchLrc.LOCAL_LYRIC_PATH
-                }
-            } else {
-                var filesCursor: Cursor? = null
-                try {
-                    filesCursor = App.getContext().contentResolver.query(MediaStore.Files.getContentUri("external"), null,
-                            MediaStore.Files.FileColumns.DATA + " like ? or " +
-                                    MediaStore.Files.FileColumns.DATA + " like ? or " +
-                                    MediaStore.Files.FileColumns.DATA + " like ? ",
-                            arrayOf("%lyric%", "%Lyric%", "%.lrc%"), null)
-                    if (filesCursor == null || filesCursor.count <= 0)
-                        return ""
-                    while (filesCursor.moveToNext()) {
-                        val file = File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)))
-                        if (file.exists() && file.isFile && file.canRead()) {
-                            if (LyricUtil.isRightLrc(file, mDisplayName, mSong.title, mSong.artist)) {
-                                return file.absolutePath
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    if (filesCursor != null && !filesCursor.isClosed)
-                        filesCursor.close()
-                }
-            }
-            return ""
-        }
 
     /**
      * 搜索本地所有歌词文件
@@ -222,9 +178,9 @@ class SearchLrc(private val mSong: Song) {
             val results = ArrayList<String>()
             val searchPath = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")
             if (!TextUtils.isEmpty(searchPath)) {//已设置歌词搜索路径
-                LyricUtil.searchFile(mDisplayName, mSong.title, mSong.artist, File(searchPath))
-                if (!TextUtils.isEmpty(LOCAL_LYRIC_PATH))
-                    results.add(SearchLrc.LOCAL_LYRIC_PATH)
+                localLyricPath = LyricUtil.searchLyric(displayName, song.title, song.artist, File(searchPath))
+                if (!TextUtils.isEmpty(localLyricPath))
+                    results.add(localLyricPath)
                 return results
             } else {//没有设置歌词路径 搜索所有歌词文件
                 App.getContext().contentResolver.query(MediaStore.Files.getContentUri("external"), null,
@@ -236,7 +192,7 @@ class SearchLrc(private val mSong: Song) {
                             while (filesCursor.moveToNext()) {
                                 val file = File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)))
                                 if (file.exists() && file.isFile && file.canRead()) {
-                                    if (LyricUtil.isRightLrc(file, mDisplayName, mSong.title, mSong.artist)) {
+                                    if (LyricUtil.isRightLrc(file, displayName, song.title, song.artist)) {
                                         results.add(file.absolutePath)
                                     }
                                 }
@@ -269,7 +225,7 @@ class SearchLrc(private val mSong: Song) {
             //手动设置的歌词
             if (!TextUtils.isEmpty(manualPath)) {
                 LogUtil.d(TAG, "ManualLyric")
-                e.onNext(mLrcParser.getLrcRows(getBufferReader(manualPath), true, mCacheKey, mSearchKey))
+                e.onNext(lrcParser.getLrcRows(getBufferReader(manualPath), true, cacheKey, searchKey))
             }
             e.onComplete()
         }
@@ -298,11 +254,11 @@ class SearchLrc(private val mSong: Song) {
                     }
                     LogUtil.d(TAG, "LocalLyric")
                     if (translatePath == null) {
-                        e.onNext(mLrcParser.getLrcRows(getBufferReader(localPath), true, mCacheKey, mSearchKey))
+                        e.onNext(lrcParser.getLrcRows(getBufferReader(localPath), true, cacheKey, searchKey))
                     } else {
                         //合并歌词
-                        val source = mLrcParser.getLrcRows(getBufferReader(localPath), false, mCacheKey, mSearchKey)
-                        val translate = mLrcParser.getLrcRows(getBufferReader(translatePath), false, mCacheKey, mSearchKey)
+                        val source = lrcParser.getLrcRows(getBufferReader(localPath), false, cacheKey, searchKey)
+                        val translate = lrcParser.getLrcRows(getBufferReader(translatePath), false, cacheKey, searchKey)
                         if (translate != null && translate.size > 0) {
                             //                                    int j = 0;
                             //                                    for (int i = 0; i < source.size(); ) {
@@ -324,13 +280,13 @@ class SearchLrc(private val mSong: Song) {
                                     }
                                 }
                             }
-                            mLrcParser.saveLrcRows(source, mCacheKey, mSearchKey)
+                            lrcParser.saveLrcRows(source, cacheKey, searchKey)
                             e.onNext(source)
                         }
                     }
                 } else {
                     val localPath = localPaths[0]
-                    e.onNext(mLrcParser.getLrcRows(getBufferReader(localPath), true, mCacheKey, mSearchKey))
+                    e.onNext(lrcParser.getLrcRows(getBufferReader(localPath), true, cacheKey, searchKey))
                 }
             }
             e.onComplete()
@@ -342,15 +298,15 @@ class SearchLrc(private val mSong: Song) {
      */
     private fun getNeteaseObservable(): Observable<List<LrcRow>> {
         return HttpClient.getNeteaseApiservice()
-                .getNeteaseSearch(mSearchKey, 0, 1, 1)
+                .getNeteaseSearch(searchKey, 0, 1, 1)
                 .flatMap { it ->
                     HttpClient.getInstance()
-                            .getNeteaseLyric(Gson().fromJson(it.string(), NSongSearchResponse::class.java).result.songs.get(0).id)
+                            .getNeteaseLyric(Gson().fromJson(it.string(), NSongSearchResponse::class.java).result.songs[0].id)
                             .map {
                                 val lrcResponse = Gson().fromJson(it.string(), NLrcResponse::class.java)
-                                val combine = mLrcParser.getLrcRows(getBufferReader(lrcResponse.lrc.lyric.toByteArray()), false, mCacheKey, mSearchKey)
-                                if (isCN && lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)) {
-                                    val translate = mLrcParser.getLrcRows(getBufferReader(lrcResponse.tlyric.lyric.toByteArray()), false, mCacheKey, mSearchKey)
+                                val combine = lrcParser.getLrcRows(getBufferReader(lrcResponse.lrc.lyric.toByteArray()), false, cacheKey, searchKey)
+                                if (isCN && lrcResponse.tlyric != null && !lrcResponse.tlyric.lyric.isNullOrEmpty()) {
+                                    val translate = lrcParser.getLrcRows(getBufferReader(lrcResponse.tlyric.lyric.toByteArray()), false, cacheKey, searchKey)
                                     if (translate != null && translate.size > 0) {
                                         for (i in translate.indices) {
                                             for (j in combine.indices) {
@@ -363,7 +319,7 @@ class SearchLrc(private val mSong: Song) {
                                     }
                                 }
                                 LogUtil.d(TAG, "NeteaseLyric")
-                                mLrcParser.saveLrcRows(combine, mCacheKey, mSearchKey)
+                                lrcParser.saveLrcRows(combine, cacheKey, searchKey)
                                 combine
                             }
                 }.onErrorResumeNext(Function {
@@ -376,7 +332,7 @@ class SearchLrc(private val mSong: Song) {
      */
     private fun getKuGouObservable(): Observable<List<LrcRow>> {
         //酷狗歌词
-        return HttpClient.getKuGouApiservice().getKuGouSearch(1, "yes", "pc", mSearchKey, mSong.duration, "")
+        return HttpClient.getKuGouApiservice().getKuGouSearch(1, "yes", "pc", searchKey, song.duration, "")
                 .flatMap { body ->
                     val searchResponse = Gson().fromJson(body.string(), KSearchResponse::class.java)
                     HttpClient.getKuGouApiservice().getKuGouLyric(1, "pc", "lrc", "utf8",
@@ -385,9 +341,12 @@ class SearchLrc(private val mSong: Song) {
                             .map { lrcBody ->
                                 val lrcResponse = Gson().fromJson(lrcBody.string(), KLrcResponse::class.java)
                                 LogUtil.d(TAG, "KugouLyric")
-                                mLrcParser.getLrcRows(getBufferReader(Base64.decode(lrcResponse.content, Base64.DEFAULT)), true, mCacheKey, mSearchKey)
+                                lrcParser.getLrcRows(getBufferReader(Base64.decode(lrcResponse.content, Base64.DEFAULT)), true, cacheKey, searchKey)
                             }
                 }
+                .onErrorResumeNext(Function {
+                    Observable.empty()
+                })
     }
 
     /**
@@ -396,10 +355,11 @@ class SearchLrc(private val mSong: Song) {
      * @param type
      * @return
      */
+    @Deprecated("")
     private fun getNetworkObservable(type: Int): Observable<List<LrcRow>> {
         var newType = type
 
-        if (TextUtils.isEmpty(mSearchKey)) {
+        if (TextUtils.isEmpty(searchKey)) {
             return Observable.error(Throwable("no available key"))
         }
         if (newType == SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
@@ -452,9 +412,6 @@ class SearchLrc(private val mSong: Song) {
 
     companion object {
         private const val TAG = "SearchLrc"
-
-        @JvmStatic
-        lateinit var LOCAL_LYRIC_PATH: String
 
         private val UTF_8 = Charset.forName("UTF-8")
     }

@@ -193,7 +193,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
             open()
             isActive = true
             isActiveSomeWhere = true
-            Util.vibrate(App.getContext(), 150)
+            Util.vibrate(App.getContext(), 100)
         }
 
         changeData(pos, data)
