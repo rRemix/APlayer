@@ -1404,7 +1404,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
         mMediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
                 .setState(mIsPlay ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED,
-                        mCurrentIndex, mSpeed)
+                        getProgress(), mSpeed)
                 .setActions(MEDIA_SESSION_ACTIONS).build());
     }
 

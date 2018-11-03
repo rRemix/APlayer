@@ -158,10 +158,7 @@ public abstract class ImageUriRequest<T> {
                 }
 
             } else {//艺术家封面
-                File artistThumb = ImageUriUtil.getArtistThumbInMediaCache(request.getID());
-                if (artistThumb != null && artistThumb.exists()) {
-                    imageUrl = PREFIX_FILE + artistThumb.getAbsolutePath();
-                }
+                imageUrl = ImageUriUtil.getArtistArt(request.getID());
             }
             if (!TextUtils.isEmpty(imageUrl)) {
                 observer.onNext(imageUrl);
