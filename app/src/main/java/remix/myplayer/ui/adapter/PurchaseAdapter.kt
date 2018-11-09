@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.TextView
 import butterknife.BindView
 import com.facebook.drawee.view.SimpleDraweeView
+import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.misc.PurchaseBean
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
@@ -19,16 +20,22 @@ class PurchaseAdapter(context: Context, layoutId: Int) : BaseAdapter<PurchaseBea
         if (holder == null || bean == null)
             return
         holder.mTitle.text = bean.title.replace("(APlayer)", "")
-        when (position) {
-            0, 1, 2 -> {
-                holder.mLogo.setActualImageResource(LOGOS_DONATE[position])
-                holder.mPrice.text = ""
-            }
-            3, 4, 5, 6, 7 -> {
-                holder.mLogo.setActualImageResource(LOGOS_OTHERS[position - 3])
-                holder.mPrice.text = bean.price
+        if(App.IS_GOOGLEPLAY){
+            holder.mLogo.setActualImageResource(LOGOS_OTHERS[position])
+            holder.mPrice.text = bean.price
+        } else{
+            when (position) {
+                0, 1, 2 -> {
+                    holder.mLogo.setActualImageResource(LOGOS_DONATE[position])
+                    holder.mPrice.text = ""
+                }
+                3, 4, 5, 6, 7 -> {
+                    holder.mLogo.setActualImageResource(LOGOS_OTHERS[position - 3])
+                    holder.mPrice.text = bean.price
+                }
             }
         }
+
         holder.mRoot.setOnClickListener {
             mOnItemClickLitener.onItemClick(it, position)
         }
