@@ -199,7 +199,7 @@ public class MainActivity extends MenuActivity {
     }
 
     @Override
-    protected void setStatusBar() {
+    protected void setStatusBarColor() {
         StatusBarUtil.setColorNoTranslucentForDrawerLayout(this,
                 findViewById(R.id.drawer_layout),
                 ThemeStore.getStatusBarColor());

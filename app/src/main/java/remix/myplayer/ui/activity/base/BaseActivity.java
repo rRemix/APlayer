@@ -116,13 +116,18 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
-        setStatusBar();
+        setStatusBarColor();
+        setStatusBarMode();
+    }
+
+    protected void setStatusBarMode() {
+        StatusBarUtil.setStatusBarModeAuto(this);
     }
 
     /**
      * 设置状态栏颜色
      */
-    protected void setStatusBar() {
+    protected void setStatusBarColor() {
         StatusBarUtil.setColorNoTranslucent(this, ThemeStore.getStatusBarColor());
     }
 
@@ -134,7 +139,7 @@ public class BaseActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION, false)) {
             final int navigationColor = ThemeStore.getNavigationBarColor();
             getWindow().setNavigationBarColor(navigationColor);
-            Theme.setLightNavigationbar(this, ColorUtil.isColorLight(navigationColor));
+            Theme.setLightNavigationbarAuto(this, ColorUtil.isColorLight(navigationColor));
         }
     }
 

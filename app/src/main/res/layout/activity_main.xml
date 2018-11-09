@@ -52,8 +52,7 @@
                 android:id="@+id/bottom_actionbar_new"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/item_height"
-                android:layout_gravity="bottom"
-                app:layout_behavior="remix.myplayer.ui.BottomBarBehavior"/>
+                android:layout_gravity="bottom" />
         </android.support.design.widget.CoordinatorLayout>
 
     </LinearLayout>

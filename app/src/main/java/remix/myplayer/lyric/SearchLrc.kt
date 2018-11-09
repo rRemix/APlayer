@@ -176,32 +176,71 @@ class SearchLrc(private val song: Song) {
     private val allLocalLrcPath: List<String>
         get() {
             val results = ArrayList<String>()
-            val searchPath = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")
-            if (!TextUtils.isEmpty(searchPath)) {//已设置歌词搜索路径
-                localLyricPath = LyricUtil.searchLyric(displayName, song.title, song.artist, File(searchPath))
-                if (!TextUtils.isEmpty(localLyricPath))
-                    results.add(localLyricPath)
-                return results
-            } else {//没有设置歌词路径 搜索所有歌词文件
-                App.getContext().contentResolver.query(MediaStore.Files.getContentUri("external"), null,
-                        MediaStore.Files.FileColumns.DATA + " like ? or " +
-                                MediaStore.Files.FileColumns.DATA + " like ? or " +
-                                MediaStore.Files.FileColumns.DATA + " like ? ",
-                        arrayOf("%lyric%", "%Lyric%", "%.lrc"), null)
-                        .use { filesCursor ->
-                            while (filesCursor.moveToNext()) {
-                                val file = File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)))
-                                if (file.exists() && file.isFile && file.canRead()) {
-                                    if (LyricUtil.isRightLrc(file, displayName, song.title, song.artist)) {
-                                        results.add(file.absolutePath)
-                                    }
-                                }
+//            val searchPath = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")
+            //没有设置歌词路径 搜索所有可能的歌词文件
+            App.getContext().contentResolver.query(MediaStore.Files.getContentUri("external"), null,
+                    MediaStore.Files.FileColumns.DATA + " like ? or " +
+                            MediaStore.Files.FileColumns.DATA + " like ? or " +
+                            MediaStore.Files.FileColumns.DATA + " like ? or " +
+                            MediaStore.Files.FileColumns.DATA + " like ? ",
+                    getLocalSearchKey(),
+                    null)
+                    .use { filesCursor ->
+                        while (filesCursor.moveToNext()) {
+                            val file = File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)))
+                            LogUtil.d(TAG, "file: " + file.absolutePath)
+                            if (file.exists() && file.isFile && file.canRead()) {
+                                //非翻译文件只保留一个
+                                if (results.isEmpty() || (results.size >= 1 && file.absolutePath.contains("translate")))
+                                    results.add(file.absolutePath)
                             }
-                            return results
+                            if (results.size == 2)
+                                break
                         }
-            }
+                        return results
+                    }
+//            if (!TextUtils.isEmpty(searchPath)) {//已设置歌词搜索路径
+//                localLyricPath = LyricUtil.searchLyric(displayName, song.title, song.artist, File(searchPath))
+//                if (!TextUtils.isEmpty(localLyricPath))
+//                    results.add(localLyricPath)
+//                return results
+//            } else {
+//                //没有设置歌词路径 搜索所有可能的歌词文件
+//                App.getContext().contentResolver.query(MediaStore.Files.getContentUri("external"), null,
+//                        MediaStore.Files.FileColumns.DATA + " like ? or " +
+//                                MediaStore.Files.FileColumns.DATA + " like ? or " +
+//                                MediaStore.Files.FileColumns.DATA + " like ? or " +
+//                                MediaStore.Files.FileColumns.DATA + " like ? ",
+//                        getLocalSearchKey(),
+//                        null)
+//                        .use { filesCursor ->
+//                            while (filesCursor.moveToNext()) {
+//                                val file = File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)))
+//                                LogUtil.d(TAG,"file: " + file.absolutePath)
+//                                if (file.exists() && file.isFile && file.canRead()) {
+//                                    results.add(file.absolutePath)
+//                                }
+//                            }
+//                            return results
+//                        }
+//            }
 
         }
+
+    /**
+     * @param searchPath 设置的本地歌词搜索路径
+     * 本地歌词搜索的关键字
+     * displayName.lrc
+     * title.lrc
+     * artist-title.lrc
+     * aritst-displayName.lrc
+     */
+    private fun getLocalSearchKey(searchPath: String? = null): Array<String> {
+        return arrayOf("%$displayName%$SUFFIX_LYRIC",
+                "%" + song.title + "%" + SUFFIX_LYRIC,
+                "%" + song.Artist + "%" + song.Title + "%" + SUFFIX_LYRIC,
+                "%" + song.Artist + "%" + displayName + "%" + SUFFIX_LYRIC)
+    }
 
     /**
      * 网络或者本地歌词
@@ -241,53 +280,42 @@ class SearchLrc(private val song: Song) {
     private fun getLocalObservable(): Observable<List<LrcRow>> {
         return Observable.create { e ->
             val localPaths = ArrayList<String>(allLocalLrcPath)
-            if (localPaths.isNotEmpty()) {
-                if (localPaths.size > 1 && isCN) {
-                    localPaths.sortWith(Comparator { o1, o2 -> o2.compareTo(o1) })
-                    val localPath = localPaths[0]
-                    var translatePath: String? = null
-                    for (path in localPaths) {
-                        if (path.contains("translate") && path != localPath) {
-                            translatePath = path
-                            break
-                        }
-                    }
-                    LogUtil.d(TAG, "LocalLyric")
-                    if (translatePath == null) {
-                        e.onNext(lrcParser.getLrcRows(getBufferReader(localPath), true, cacheKey, searchKey))
+            if (localPaths.isEmpty()) {
+                e.onComplete()
+                return@create
+            }
+            if (localPaths.size > 1 && isCN) {
+                var localPath = ""
+                var translatePath: String? = null
+                for (path in localPaths) {
+                    if (path.contains("translate") && path != localPath) {
+                        translatePath = path
                     } else {
-                        //合并歌词
-                        val source = lrcParser.getLrcRows(getBufferReader(localPath), false, cacheKey, searchKey)
-                        val translate = lrcParser.getLrcRows(getBufferReader(translatePath), false, cacheKey, searchKey)
-                        if (translate != null && translate.size > 0) {
-                            //                                    int j = 0;
-                            //                                    for (int i = 0; i < source.size(); ) {
-                            //                                        boolean match = Math.abs(translate.get(j).getTime() - source.get(i).getTime()) < 1000;
-                            //                                        if (match) {
-                            //                                            source.get(i).setTranslate(translate.get(j).getContent());
-                            //                                            i++;
-                            //                                        } else if(translate.get(j).getTime() > source.get(i).getTime()){
-                            //                                            i++;
-                            //                                        } else {
-                            //                                            j++;
-                            //                                        }
-                            //                                    }
-                            for (i in translate.indices) {
-                                for (j in source.indices) {
-                                    if (isTranslateCanUse(translate[i].content) && translate[i].time == source[j].time) {
-                                        source[j].translate = translate[i].content
-                                        break
-                                    }
+                        localPath = path
+                    }
+                }
+                LogUtil.d(TAG, "LocalLyric")
+                if (translatePath == null) {
+                    e.onNext(lrcParser.getLrcRows(getBufferReader(localPath), true, cacheKey, searchKey))
+                } else {
+                    //合并歌词
+                    val source = lrcParser.getLrcRows(getBufferReader(localPath), false, cacheKey, searchKey)
+                    val translate = lrcParser.getLrcRows(getBufferReader(translatePath), false, cacheKey, searchKey)
+                    if (translate != null && translate.size > 0) {
+                        for (i in translate.indices) {
+                            for (j in source.indices) {
+                                if (isTranslateCanUse(translate[i].content) && translate[i].time == source[j].time) {
+                                    source[j].translate = translate[i].content
+                                    break
                                 }
                             }
-                            lrcParser.saveLrcRows(source, cacheKey, searchKey)
-                            e.onNext(source)
                         }
+                        lrcParser.saveLrcRows(source, cacheKey, searchKey)
+                        e.onNext(source)
                     }
-                } else {
-                    val localPath = localPaths[0]
-                    e.onNext(lrcParser.getLrcRows(getBufferReader(localPath), true, cacheKey, searchKey))
                 }
+            } else {
+                e.onNext(lrcParser.getLrcRows(getBufferReader(localPaths[0]), true, cacheKey, searchKey))
             }
             e.onComplete()
         }
@@ -412,7 +440,7 @@ class SearchLrc(private val song: Song) {
 
     companion object {
         private const val TAG = "SearchLrc"
-
+        private const val SUFFIX_LYRIC = ".lrc"
         private val UTF_8 = Charset.forName("UTF-8")
     }
 }

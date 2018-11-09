@@ -5,11 +5,9 @@ import android.text.TextUtils;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +59,8 @@ public class LyricUtil {
      * @return
      */
     public static boolean isRightLrc(File file, String displayName, String title, String artist) {
-        BufferedReader br = null;
+        //todo优化判断
+//        BufferedReader br = null;
         try {
             if (file == null || !file.canRead() || !file.isFile())
                 return false;
@@ -85,34 +84,34 @@ public class LyricUtil {
                 return true;
             }
             //读取前五行歌词内容进行判断
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(file), getCharset(file.getAbsolutePath())));
-            boolean hasArtist = false;
-            boolean hasTitle = false;
-            for (int i = 0; i < 5; i++) {
-                String lrcLine;
-                if ((lrcLine = br.readLine()) == null)
-                    break;
-                if (lrcLine.contains("ar") && lrcLine.equalsIgnoreCase(artist)) {
-                    hasArtist = true;
-                    continue;
-                }
-                if (lrcLine.contains("ti") && lrcLine.equalsIgnoreCase(title)) {
-                    hasTitle = true;
-                }
-            }
-            if (hasArtist && hasTitle) {
-                return true;
-            }
+//            br = new BufferedReader(new InputStreamReader(new FileInputStream(file), getCharset(file.getAbsolutePath())));
+//            boolean hasArtist = false;
+//            boolean hasTitle = false;
+//            for (int i = 0; i < 5; i++) {
+//                String lrcLine;
+//                if ((lrcLine = br.readLine()) == null)
+//                    break;
+//                if (lrcLine.contains("ar") && lrcLine.equalsIgnoreCase(artist)) {
+//                    hasArtist = true;
+//                    continue;
+//                }
+//                if (lrcLine.contains("ti") && lrcLine.equalsIgnoreCase(title)) {
+//                    hasTitle = true;
+//                }
+//            }
+//            if (hasArtist && hasTitle) {
+//                return true;
+//            }
         } catch (Exception e) {
 
         } finally {
-            try {
-                if (br != null) {
-                    br.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                if (br != null) {
+//                    br.close();
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
         return false;
     }
