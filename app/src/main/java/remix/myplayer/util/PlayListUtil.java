@@ -102,7 +102,7 @@ public class PlayListUtil {
      * @return 新增歌曲的id
      */
     public static int addSong(PlayListSong info) {
-        if (getIDList(info.PlayListID).contains(info.AudioId))
+        if (getSongIds(info.PlayListID).contains(info.AudioId))
             return 0;
         ContentValues cv = new ContentValues();
         cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID, info.AudioId);
@@ -123,7 +123,7 @@ public class PlayListUtil {
         if (infos == null || infos.size() == 0)
             return 0;
         //不重复添加
-        List<Integer> rawIDList = getIDList(infos.get(0).PlayListID);
+        List<Integer> rawIDList = getSongIds(infos.get(0).PlayListID);
         for (int i = 0; i < rawIDList.size(); i++) {
             for (int j = infos.size() - 1; j >= 0; j--) {
                 if (rawIDList.get(i) == infos.get(j).AudioId)
@@ -156,29 +156,49 @@ public class PlayListUtil {
     /**
      * 添加多首歌曲
      *
-     * @param IDList
+     * @param ids
      * @return
      */
-    public static int addMultiSongs(List<Integer> IDList, String playListName, int playListId) {
-        if (IDList == null || IDList.size() == 0)
+    public static int addMultiSongs(List<Integer> ids, String playListName, int playListId) {
+        if (ids == null || ids.size() == 0)
             return 0;
+        List<Integer> newList = new ArrayList<>(ids);
         //不重复添加
-        List<Integer> rawIDList = getIDList(playListName);
+        List<Integer> rawIDList = getSongIds(playListName);
         for (int i = 0; i < rawIDList.size(); i++) {
-            for (int j = IDList.size() - 1; j >= 0; j--) {
-                if (rawIDList.get(i).equals(IDList.get(j)))
-                    IDList.remove(j);
+            for (int j = newList.size() - 1; j >= 0; j--) {
+                if (rawIDList.get(i).equals(newList.get(j)))
+                    newList.remove(j);
             }
         }
-        ContentValues[] values = new ContentValues[IDList.size()];
-        for (int i = 0; i < IDList.size(); i++) {
+        ContentValues[] values = new ContentValues[newList.size()];
+        for (int i = 0; i < newList.size(); i++) {
             ContentValues cv = new ContentValues();
             cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME, playListName);
             cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID, playListId);
-            cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID, IDList.get(i));
+            cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID, newList.get(i));
             values[i] = cv;
         }
         return mContext.getContentResolver().bulkInsert(PlayListSongs.CONTENT_URI, values);
+    }
+
+    /**
+     * 删除一首歌曲
+     *
+     * @param songs
+     * @return
+     */
+    public static int deleteSongs(List<Song> songs) {
+        StringBuilder selectionBuilder = new StringBuilder(128);
+        String[] selectionArgs = new String[songs.size()];
+        int i = 0;
+        for (Song song : songs) {
+            selectionBuilder.append(PlayListSongs.PlayListSongColumns.AUDIO_ID + " = ?").append(i != songs.size() - 1 ? " or " : " ");
+            selectionArgs[i] = song.getId() + "";
+            i++;
+        }
+        return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,
+                selectionBuilder.toString(), selectionArgs);
     }
 
     /**
@@ -360,7 +380,7 @@ public class PlayListUtil {
      * @param playlistName
      * @return
      */
-    public static List<Integer> getIDList(String playlistName) {
+    public static List<Integer> getSongIds(String playlistName) {
         ArrayList<Integer> IDList = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -387,7 +407,7 @@ public class PlayListUtil {
      * @param playlistId
      * @return
      */
-    public static List<Integer> getIDList(int playlistId) {
+    public static List<Integer> getSongIds(int playlistId) {
         ArrayList<Integer> IDList = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -498,7 +518,7 @@ public class PlayListUtil {
         }
 
 //        for(Integer id : idList){
-//            Song temp = MediaStoreUtil.getMP3InfoById(id);
+//            Song temp = MediaStoreUtil.getSongById(id);
 //            if(temp != null && temp.getID() == id){
 //                songList.add(temp);
 //            } else {

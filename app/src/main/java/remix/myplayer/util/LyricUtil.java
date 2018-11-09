@@ -5,13 +5,11 @@ import android.text.TextUtils;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-
-import remix.myplayer.lyric.SearchLrc;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LyricUtil {
     private static final String TAG = "LyricUtil";
@@ -20,13 +18,19 @@ public class LyricUtil {
     }
 
 
+    public static String searchLyric(String displayName, String songName, String artistName, File searchPath) {
+        List<String> paths = new ArrayList<>();
+        searchLyricInternal(paths, displayName, songName, artistName, searchPath);
+        return paths.size() > 0 ? paths.get(0) : "";
+    }
+
     /**
      * 查找歌曲的lrc文件
      *
      * @param songName
      * @param searchPath
      */
-    public static void searchFile(String displayName, String songName, String artistName, File searchPath) {
+    private static void searchLyricInternal(List<String> result, String displayName, String songName, String artistName, File searchPath) {
         //判断SD卡是否存在
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File[] files = searchPath.listFiles();
@@ -34,10 +38,11 @@ public class LyricUtil {
                 return;
             for (File file : files) {
                 if (file.isDirectory() && file.canRead()) {
-                    searchFile(displayName, songName, artistName, file);
+                    searchLyricInternal(result, displayName, songName, artistName, file);
                 } else {
                     if (isRightLrc(file, displayName, songName, artistName)) {
-                        SearchLrc.setLOCAL_LYRIC_PATH(file.getAbsolutePath());
+                        result.add(file.getAbsolutePath());
+                        return;
                     }
                 }
             }
@@ -54,7 +59,8 @@ public class LyricUtil {
      * @return
      */
     public static boolean isRightLrc(File file, String displayName, String title, String artist) {
-        BufferedReader br = null;
+        //todo优化判断
+//        BufferedReader br = null;
         try {
             if (file == null || !file.canRead() || !file.isFile())
                 return false;
@@ -78,34 +84,34 @@ public class LyricUtil {
                 return true;
             }
             //读取前五行歌词内容进行判断
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(file), getCharset(file.getAbsolutePath())));
-            boolean hasArtist = false;
-            boolean hasTitle = false;
-            for (int i = 0; i < 5; i++) {
-                String lrcLine;
-                if ((lrcLine = br.readLine()) == null)
-                    break;
-                if (lrcLine.contains("ar") && lrcLine.equalsIgnoreCase(artist)) {
-                    hasArtist = true;
-                    continue;
-                }
-                if (lrcLine.contains("ti") && lrcLine.equalsIgnoreCase(title)) {
-                    hasTitle = true;
-                }
-            }
-            if (hasArtist && hasTitle) {
-                return true;
-            }
+//            br = new BufferedReader(new InputStreamReader(new FileInputStream(file), getCharset(file.getAbsolutePath())));
+//            boolean hasArtist = false;
+//            boolean hasTitle = false;
+//            for (int i = 0; i < 5; i++) {
+//                String lrcLine;
+//                if ((lrcLine = br.readLine()) == null)
+//                    break;
+//                if (lrcLine.contains("ar") && lrcLine.equalsIgnoreCase(artist)) {
+//                    hasArtist = true;
+//                    continue;
+//                }
+//                if (lrcLine.contains("ti") && lrcLine.equalsIgnoreCase(title)) {
+//                    hasTitle = true;
+//                }
+//            }
+//            if (hasArtist && hasTitle) {
+//                return true;
+//            }
         } catch (Exception e) {
 
         } finally {
-            try {
-                if (br != null) {
-                    br.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                if (br != null) {
+//                    br.close();
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
         return false;
     }

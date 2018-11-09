@@ -57,13 +57,13 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
 
         mHandler = new MsgHandler(this);
 
-        mAdapter = new SongAdapter(this, R.layout.item_song_recycle, mMultiChoice, SongAdapter.RECENTLY, mRecyclerView);
-        mMultiChoice.setAdapter(mAdapter);
+        mAdapter = new SongAdapter(this, R.layout.item_song_recycle, mChoice, SongAdapter.RECENTLY, mRecyclerView);
+        mChoice.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                int id = getSongId(position);
-                if (id > 0 && !mMultiChoice.itemClick(position, id, TAG)) {
+                final Song song = mAdapter.getDatas().get(position);
+                if (song != null && !mChoice.click(position, song)) {
                     Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Command.PLAYSELECTEDSONG);
@@ -75,9 +75,7 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
 
             @Override
             public void onItemLongClick(View view, int position) {
-                int id = getSongId(position);
-                if (id > 0)
-                    mMultiChoice.itemLongClick(position, id, TAG, Constants.SONG);
+                mChoice.longClick(position, mAdapter.getDatas().get(position));
             }
         });
 
@@ -85,7 +83,7 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
 
-        setUpToolbar(mToolBar, getString(R.string.recently));
+        setUpToolbar(findViewById(R.id.toolbar), getString(R.string.recently));
     }
 
     /**
@@ -102,14 +100,6 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
         return id;
     }
 
-    @Override
-    public void onBackPressed() {
-        if (mMultiChoice.isShow()) {
-            onMultiBackPress();
-        } else {
-            finish();
-        }
-    }
 
 
     @Override
@@ -131,17 +121,11 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mMultiChoice.isShow()) {
-            mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mMultiChoice.isShow()) {
-            mHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI, 500);
-        }
     }
 
     @OnHandleMessage

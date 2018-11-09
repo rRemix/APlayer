@@ -115,7 +115,7 @@ public class RecordShareActivity extends BaseMusicActivity {
     }
 
     @Override
-    protected void setStatusBar() {
+    protected void setStatusBarColor() {
         StatusBarUtil.setTransparent(this);
     }
 

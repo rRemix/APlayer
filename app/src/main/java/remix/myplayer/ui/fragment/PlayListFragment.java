@@ -43,7 +43,7 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
 
     @Override
     protected void initAdapter() {
-        mAdapter = new PlayListAdapter(mContext, R.layout.item_playlist_recycle_grid, mMultiChoice);
+        mAdapter = new PlayListAdapter(mContext, R.layout.item_playlist_recycle_grid, mChoice);
         mAdapter.setModeChangeCallback(mode -> {
             mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
             mRecyclerView.setAdapter(mAdapter);
@@ -51,8 +51,9 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                final PlayList playList = getAdapter().getDatas().get(position);
                 String name = getPlayListName(position);
-                if (!TextUtils.isEmpty(name) && !mMultiChoice.itemClick(position, getPlayListId(position), TAG)) {
+                if (!TextUtils.isEmpty(name) && getUserVisibleHint() && !mChoice.click(position, playList)) {
                     if (getPlayListSongCount(position) == 0) {
                         ToastUtil.show(mContext, getStringSafely(R.string.list_is_empty));
                         return;
@@ -68,9 +69,8 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
 
             @Override
             public void onItemLongClick(View view, int position) {
-                String name = getPlayListName(position);
-                if (!TextUtils.isEmpty(name))
-                    mMultiChoice.itemLongClick(position, getPlayListId(position), TAG, Constants.PLAYLIST);
+                if (getUserVisibleHint())
+                    mChoice.longClick(position, mAdapter.getDatas().get(position));
             }
         });
     }

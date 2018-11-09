@@ -31,9 +31,8 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.UriRequest;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -52,12 +51,11 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
  * 播放列表的适配器
  */
 public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> implements FastScroller.SectionIndexer {
-    private MultiChoice mMultiChoice;
 
-    public PlayListAdapter(Context context, int layoutId, MultiChoice multiChoice) {
+    public PlayListAdapter(Context context, int layoutId, MultipleChoice multiChoice) {
         super(context, layoutId, multiChoice);
-        ListModel = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "PlayListModel", Constants.GRID_MODEL);
-        this.mMultiChoice = multiChoice;
+        listModel = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "PlayListModel", Constants.GRID_MODEL);
+
     }
 
     @Override
@@ -94,9 +92,9 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
                 return;
             }
             //设置图标
-            headerHolder.mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
-            headerHolder.mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-            headerHolder.mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mDivider.setVisibility(listModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
+            headerHolder.mListModelBtn.setColorFilter(listModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mGridModelBtn.setColorFilter(listModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
             headerHolder.mGridModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
             headerHolder.mListModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
             return;
@@ -111,7 +109,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         holder.mName.setText(info.Name);
         holder.mOther.setText(mContext.getString(R.string.song_count, info.Count));
         //设置专辑封面
-        final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
+        final int imageSize = listModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
         Disposable disposable = new PlayListUriRequest(holder.mImage,
                 new UriRequest(info.getId(), UriRequest.TYPE_NETEASE_SONG, ImageUriRequest.URL_PLAYLIST),
                 new RequestConfig.Builder(imageSize, imageSize).build()).load();
@@ -138,7 +136,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
                 ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
 
         holder.mButton.setOnClickListener(v -> {
-            if (mMultiChoice.isShow())
+            if (mChoice.isActive())
                 return;
             Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton);
@@ -148,8 +146,8 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         });
         //点击效果
         int size = DensityUtil.dip2px(mContext, 45);
-        Drawable defaultDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-        Drawable selectDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
+        Drawable defaultDrawable = Theme.getShape(listModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+        Drawable selectDrawable = Theme.getShape(listModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
         holder.mButton.setBackground(Theme.getPressDrawable(
                 defaultDrawable,
                 selectDrawable,
@@ -159,18 +157,13 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
         //背景点击效果
         holder.mContainer.setBackground(
-                Theme.getPressAndSelectedStateListRippleDrawable(ListModel, mContext));
+                Theme.getPressAndSelectedStateListRippleDrawable(listModel, mContext));
 
         //是否处于选中状态
-        if (MultiChoice.TAG.equals(PlayListFragment.TAG) &&
-                mMultiChoice.getSelectPos().contains(position - 1)) {
-            holder.mContainer.setSelected(true);
-        } else {
-            holder.mContainer.setSelected(false);
-        }
+        holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
 
         //设置padding
-        if (ListModel == 2 && holder.mRoot != null) {
+        if (listModel == 2 && holder.mRoot != null) {
             if (position % 2 == 1) {
                 holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4));
             } else {
@@ -214,7 +207,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
     @Override
     protected void saveMode() {
-        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, "PlayListModel", ListModel);
+        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, "PlayListModel", listModel);
     }
 
     static class PlayListListHolder extends PlayListHolder {
@@ -240,7 +233,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 //        @Override
 //        protected String doInBackground(Integer... params) {
 //            int playListId = params[0];
-//            ArrayList<Integer> list = PlayListUtil.getIDList(playListId);
+//            ArrayList<Integer> list = PlayListUtil.getSongIds(playListId);
 //            String url = null;
 //            File imgFile =  new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + Util.hashKeyForDisk(Integer.valueOf(playListId) * 255 + ""));
 //            if(imgFile != null && imgFile.exists())
@@ -248,7 +241,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 //
 //            if(list != null && list.size() > 0) {
 //                for(Integer id : list){
-//                    Song item = MediaStoreUtil.getMP3InfoById(id);
+//                    Song item = MediaStoreUtil.getSongById(id);
 //                    if(item == null)
 //                        return "";
 //                    url = MediaStoreUtil.getImageUrl(item.getAlbumId() + "",Constants.URL_ALBUM);

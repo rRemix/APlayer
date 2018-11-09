@@ -87,6 +87,7 @@ import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.DrawerAdapter;
 import remix.myplayer.ui.adapter.MainPagerAdapter;
 import remix.myplayer.ui.fragment.AlbumFragment;
@@ -120,7 +121,7 @@ import static remix.myplayer.util.Util.unregisterLocalReceiver;
 /**
  *
  */
-public class MainActivity extends MultiChoiceActivity {
+public class MainActivity extends MenuActivity {
     private final static String TAG = "MainActivity";
     @BindView(R.id.tabs)
     TabLayout mTablayout;
@@ -157,17 +158,11 @@ public class MainActivity extends MultiChoiceActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mMultiChoice.isShow()) {
-            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mMultiChoice.isShow()) {
-            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI, 500);
-        }
     }
 
     @Override
@@ -191,7 +186,7 @@ public class MainActivity extends MultiChoiceActivity {
         registerLocalReceiver(mReceiver, intentFilter);
 
         //初始化控件
-        setUpToolbar(mToolBar);
+        setUpToolbar(findViewById(R.id.toolbar));
         setUpPager();
         setUpTab();
         //初始化测滑菜单
@@ -204,7 +199,7 @@ public class MainActivity extends MultiChoiceActivity {
     }
 
     @Override
-    protected void setStatusBar() {
+    protected void setStatusBarColor() {
         StatusBarUtil.setColorNoTranslucentForDrawerLayout(this,
                 findViewById(R.id.drawer_layout),
                 ThemeStore.getStatusBarColor());
@@ -217,11 +212,11 @@ public class MainActivity extends MultiChoiceActivity {
      */
     protected void setUpToolbar(Toolbar toolbar) {
         super.setUpToolbar(toolbar, "");
-        if (mToolBar != null) {
-            mToolBar.setTitle("");
+        if (toolbar != null) {
+            toolbar.setTitle("");
             int themeColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white);
             toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.actionbar_menu, themeColor));
-            mToolBar.setNavigationOnClickListener(v -> mDrawerLayout.openDrawer(mNavigationView));
+            toolbar.setNavigationOnClickListener(v -> mDrawerLayout.openDrawer(mNavigationView));
         }
     }
 
@@ -230,12 +225,13 @@ public class MainActivity extends MultiChoiceActivity {
      *
      * @param v
      */
-    @OnClick({R.id.add, R.id.multi_close})
+    @OnClick({R.id.add})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.add:
-                if (mMultiChoice.isShow())
+                if (MultipleChoice.isActiveSomeWhere()) {
                     return;
+                }
                 Theme.getBaseDialog(mContext)
                         .title(R.string.new_playlist)
                         .positiveText(R.string.create)
@@ -264,14 +260,11 @@ public class MainActivity extends MultiChoiceActivity {
                         })
                         .show();
                 break;
-            case R.id.multi_close:
-                mMultiToolBar.setVisibility(View.GONE);
-                mToolBar.setVisibility(View.VISIBLE);
-                if (mMultiChoice.isShow()) {
-                    mMultiChoice.updateOptionMenu(false);
-                    mMultiChoice.clear();
-                }
-                break;
+//            case R.id.multi_close:
+//                getMultiToolbar().setVisibility(View.GONE);
+//                getToolbar().setVisibility(View.VISIBLE);
+//                getChoice().clearCheck();
+//                break;
         }
     }
 
@@ -309,7 +302,7 @@ public class MainActivity extends MultiChoiceActivity {
                 LogUtil.d("MenuParse", "LayoutID: " + mMenuLayoutId);
                 mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(position);
                 LogUtil.d("MenuParse", "CurrentFragment: " + mCurrentFragment);
-                mMultiChoice.setAdapter(mCurrentFragment.getAdapter());
+
                 invalidateOptionsMenu();
             }
 
@@ -355,7 +348,7 @@ public class MainActivity extends MultiChoiceActivity {
 
 
     @Override
-    protected int getMenuLayoutId() {
+    public int getMenuLayoutId() {
         return mMenuLayoutId;
     }
 
@@ -524,7 +517,7 @@ public class MainActivity extends MultiChoiceActivity {
                     return;
                 if (data.getBooleanExtra("needRecreate", false)) { //设置后需要重启activity
                     mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
-                } else if (data.getBooleanExtra("needRefreshAdapter", false)) { //清除缓存后刷新adapter
+                } else if (data.getBooleanExtra("needRefreshAdapter", false)) { //刷新adapter
                     mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                 } else if (data.getBooleanExtra("needRefreshLibrary", false)) { //刷新Library
                     List<Category> categories = (List<Category>) data.getSerializableExtra("Category");
@@ -535,7 +528,6 @@ public class MainActivity extends MultiChoiceActivity {
                         mViewPager.setOffscreenPageLimit(categories.size() - 1);
                         mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(mViewPager.getCurrentItem()).getTag());
                         mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(mViewPager.getCurrentItem());
-                        mMultiChoice.setAdapter(mCurrentFragment.getAdapter());
                         invalidateOptionsMenu();
                     }
                 }
@@ -585,7 +577,7 @@ public class MainActivity extends MultiChoiceActivity {
                             saveArtwork(thumbBean.getId(), new File(path));
                         }
                         if (thumbBean.getType() == Constants.ALBUM) {
-                            new SimpleUriRequest(getSearchRequestWithAlbumType(MediaStoreUtil.getMP3InfoByAlbumId(thumbBean.getId()))) {
+                            new SimpleUriRequest(getSearchRequestWithAlbumType(MediaStoreUtil.getSongByAlbumId(thumbBean.getId()))) {
                                 @Override
                                 public void onError(String errMsg) {
                                     emitter.onError(new Throwable(errMsg));
@@ -607,7 +599,7 @@ public class MainActivity extends MultiChoiceActivity {
                                 ImagePipeline imagePipeline = Fresco.getImagePipeline();
                                 imagePipeline.evictFromCache(uri);
                                 imagePipeline.evictFromDiskCache(uri);
-                            }, throwable -> ToastUtil.show(mContext, R.string.tag_save_error, throwable.toString()));
+                            }, throwable -> ToastUtil.show(mContext, R.string.save_error, throwable.toString()));
                 }
                 break;
             case REQUEST_INSTALL_PACKAGES:
@@ -621,7 +613,7 @@ public class MainActivity extends MultiChoiceActivity {
     }
 
     private void saveArtwork(int albumId, File artFile) throws TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException, IOException, CannotWriteException {
-        Song song = MediaStoreUtil.getMP3InfoByAlbumId(albumId);
+        Song song = MediaStoreUtil.getSongByAlbumId(albumId);
         if (song == null)
             return;
         AudioFile audioFile = AudioFileIO.read(new File(song.getUrl()));
@@ -637,10 +629,21 @@ public class MainActivity extends MultiChoiceActivity {
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
             mDrawerLayout.closeDrawer(mNavigationView);
-        } else if (mMultiChoice.isShow()) {
-            onMultiBackPress();
         } else {
-            super.onBackPressed();
+            boolean closed = false;
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                if (fragment instanceof LibraryFragment) {
+                    MultipleChoice choice = ((LibraryFragment) fragment).getChoice();
+                    if (choice.isActive()) {
+                        closed = true;
+                        choice.close();
+                        break;
+                    }
+                }
+            }
+            if (!closed) {
+                super.onBackPressed();
+            }
 //            Intent intent = new Intent();
 //            intent.setAction(Intent.ACTION_MAIN);
 //            intent.addCategory(Intent.CATEGORY_HOME);
@@ -724,7 +727,7 @@ public class MainActivity extends MultiChoiceActivity {
     /**
      * 判断安卓版本，请求安装权限或者直接安装
      *
-     * @param context
+     * @param activity
      * @param path
      */
     private String mInstallPath;

@@ -129,8 +129,8 @@ object MusicServiceRemote {
     }
 
     @JvmStatic
-    fun setProgress(progress: Int) {
-        service?.progress = progress
+    fun setProgress(progress: Long) {
+        service?.setProgress(progress)
     }
 
     @JvmStatic
@@ -146,5 +146,10 @@ object MusicServiceRemote {
     @JvmStatic
     fun setSpeed(speed: Float) {
         service?.setSpeed(speed)
+    }
+
+    @JvmStatic
+    fun deleteFromService(songs: List<Song>) {
+        service?.deleteSongFromService(songs)
     }
 }

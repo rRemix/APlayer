@@ -4,14 +4,15 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import remix.myplayer.App;
 import remix.myplayer.Global;
@@ -156,16 +157,12 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                         .onAny((dialog, which) -> {
                             if (which == POSITIVE) {
                                 if (MediaStoreUtil.delete(mInfo.getId(), Constants.SONG, dialog.isPromptCheckBoxChecked()) > 0) {
-                                    if (PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)) {
-                                        ToastUtil.show(mActivity, getString(R.string.delete_success));
-                                        //移除的是正在播放的歌曲
-                                        if (getCurrentSong() == null)
-                                            return;
-                                        if (mInfo.getId() == getCurrentSong().getId()) {
-                                            Intent intent = new Intent(MusicService.ACTION_CMD);
-                                            intent.putExtra("Control", Command.NEXT);
-                                            Util.sendLocalBroadcast(intent);
-                                        }
+                                    ToastUtil.show(mActivity, getString(R.string.delete_success));
+                                    //移除的是正在播放的歌曲
+                                    if (mInfo.getId() == getCurrentSong().getId()) {
+                                        Intent intent = new Intent(MusicService.ACTION_CMD);
+                                        intent.putExtra("Control", Command.NEXT);
+                                        Util.sendLocalBroadcast(intent);
                                     }
                                 } else {
                                     ToastUtil.show(mActivity, getString(R.string.delete_error));
@@ -180,16 +177,28 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
 //                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
 //                }
             case R.id.menu_speed:
-                final List<String> speeds = Arrays.asList("0.5", "0.75", "1.0", "1.25", "1.5");
-                final String originalSpeed = SPUtil.getValue(mActivity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED, "1.0");
                 getBaseDialog(mActivity)
                         .title(R.string.speed)
-                        .items(speeds)
-                        .itemsCallbackSingleChoice(speeds.indexOf(originalSpeed), (dialog, itemView, which, text) -> {
-                            MusicServiceRemote.setSpeed(Float.parseFloat(text.toString()));
-                            SPUtil.putValue(mActivity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED, text.toString());
-                            return true;
-                        }).show();
+                        .input(SPUtil.getValue(mActivity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED, "1.0"), "", new MaterialDialog.InputCallback() {
+                            @Override
+                            public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                                float speed = 0;
+                                try {
+                                    speed = Float.parseFloat(input.toString());
+                                } catch (Exception ignored) {
+
+                                }
+                                if (speed > 1.5f || speed < 0.5f) {
+                                    ToastUtil.show(App.getContext(), R.string.speed_range_tip);
+                                    return;
+                                }
+                                MusicServiceRemote.setSpeed(speed);
+                                SPUtil.putValue(mActivity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED, input.toString());
+                            }
+                        })
+                        .inputRange(1, 3)
+//                        .inputType(InputType.TYPE_NUMBER_FLAG_DECIMAL)
+                        .show();
                 break;
         }
         return true;

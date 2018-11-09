@@ -86,8 +86,6 @@ public class LockScreenActivity extends BaseMusicActivity {
     @BindView(R.id.lockscreen_background)
     ImageView mImageBackground;
 
-    //DecorView, 跟随手指滑动
-    private View mView;
     //高斯模糊后的bitmap
     private Bitmap mNewBitMap;
     //高斯模糊之前的bitmap
@@ -105,12 +103,13 @@ public class LockScreenActivity extends BaseMusicActivity {
     }
 
     @Override
-    protected void setStatusBar() {
+    protected void setStatusBarColor() {
         StatusBarUtil.setTransparent(this);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LogUtil.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lockscreen);
         ButterKnife.bind(this);
@@ -125,15 +124,14 @@ public class LockScreenActivity extends BaseMusicActivity {
         attr.flags |= WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
 
         //初始化按钮
-        CtrlButtonListener listener = new CtrlButtonListener(this);
+        CtrlButtonListener listener = new CtrlButtonListener(getApplicationContext());
         mPrevButton.setOnClickListener(listener);
         mNextButton.setOnClickListener(listener);
         mPlayButton.setOnClickListener(listener);
 
         //初始化控件
         mImageBackground.setAlpha(0.75f);
-        mView = getWindow().getDecorView();
-        mView.setBackgroundColor(Color.TRANSPARENT);
+        getWindow().getDecorView().setBackgroundColor(Color.TRANSPARENT);
 
         findViewById(R.id.lockscreen_arrow_container).startAnimation(AnimationUtils.loadAnimation(this, R.anim.arrow_left_to_right));
 
@@ -144,10 +142,10 @@ public class LockScreenActivity extends BaseMusicActivity {
     private float mScrollX2;
     //一次移动的距离
     private float mDistance;
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mView == null)
+        View decorView = getWindow().getDecorView();
+        if (decorView == null)
             return true;
         int action = event.getAction();
         switch (action) {
@@ -159,18 +157,18 @@ public class LockScreenActivity extends BaseMusicActivity {
                 mDistance = mScrollX2 - mScrollX1;
                 mScrollX1 = mScrollX2;
                 //如果往右或者是往左没有超过最左边,移动View
-                if (mDistance > 0 || ((mView.getScrollX() + (-mDistance)) < 0)) {
-                    mView.scrollBy((int) -mDistance, 0);
+                if (mDistance > 0 || ((decorView.getScrollX() + (-mDistance)) < 0)) {
+                    decorView.scrollBy((int) -mDistance, 0);
                 }
                 LogUtil.d(TAG, "distance:" + mDistance + "\r\n");
                 break;
             case MotionEvent.ACTION_UP:
                 //判断当前位置是否超过整个屏幕宽度的0.25
                 //超过则finish;没有则移动回初始状态
-                if (-mView.getScrollX() > mWidth * 0.25)
+                if (-decorView.getScrollX() > mWidth * 0.25)
                     finish();
                 else
-                    mView.scrollTo(0, 0);
+                    decorView.scrollTo(0, 0);
                 mDistance = mScrollX1 = 0;
                 break;
         }
@@ -196,6 +194,7 @@ public class LockScreenActivity extends BaseMusicActivity {
 
     @Override
     protected void onDestroy() {
+        LogUtil.d(TAG, "onDestroy");
         super.onDestroy();
         if (mUpdateLyricThread != null) {
             mUpdateLyricThread.interrupt();

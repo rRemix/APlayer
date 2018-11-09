@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import butterknife.BindView;
 import io.reactivex.disposables.Disposable;
@@ -34,9 +35,8 @@ import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -58,9 +58,9 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
  */
 public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implements FastScroller.SectionIndexer {
 
-    public AlbumAdapter(Context context, int layoutId, MultiChoice multiChoice) {
-        super(context, layoutId, multiChoice);
-        ListModel = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "AlbumModel", Constants.GRID_MODEL);
+    public AlbumAdapter(Context context, int layoutId, MultipleChoice multipleChoice) {
+        super(context, layoutId, multipleChoice);
+        listModel = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "AlbumModel", Constants.GRID_MODEL);
     }
 
     @Override
@@ -96,9 +96,9 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
                 return;
             }
             //设置图标
-            headerHolder.mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
-            headerHolder.mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-            headerHolder.mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mDivider.setVisibility(listModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
+            headerHolder.mListModelBtn.setColorFilter(listModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mGridModelBtn.setColorFilter(listModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
             headerHolder.mGridModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
             headerHolder.mListModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
             return;
@@ -112,7 +112,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
 
         //设置封面
         final int albumId = album.getAlbumID();
-        final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
+        final int imageSize = listModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
 
         Disposable disposable = new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(album), new RequestConfig.Builder(imageSize, imageSize).build()).load();
         holder.mImage.setTag(disposable);
@@ -120,7 +120,11 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
             if (album.getCount() > 0) {
                 holder.mText2.setText(mContext.getString(R.string.song_count_2, album.getArtist(), album.getCount()));
             } else {
-                new AlbumSongCountLoader(Constants.ALBUM, holder, album).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, album.getAlbumID());
+                try {
+                    new AlbumSongCountLoader(Constants.ALBUM, holder, album).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, album.getAlbumID());
+                } catch (Exception e) {
+                    CrashReport.postCatchedException(e);
+                }
             }
         } else {
             holder.mText2.setText(album.getArtist());
@@ -128,7 +132,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
 
         //背景点击效果
         holder.mContainer.setBackground(
-                Theme.getPressAndSelectedStateListRippleDrawable(ListModel, mContext));
+                Theme.getPressAndSelectedStateListRippleDrawable(listModel, mContext));
 
         holder.mContainer.setOnClickListener(v -> {
             if (holder.getAdapterPosition() - 1 < 0) {
@@ -153,8 +157,8 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
 
         //点击效果
         int size = DensityUtil.dip2px(mContext, 45);
-        Drawable defaultDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-        Drawable selectDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
+        Drawable defaultDrawable = Theme.getShape(listModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+        Drawable selectDrawable = Theme.getShape(listModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
         holder.mButton.setBackground(Theme.getPressDrawable(
                 defaultDrawable,
                 selectDrawable,
@@ -163,7 +167,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
                 null));
 
         holder.mButton.setOnClickListener(v -> {
-            if (mMultiChoice.isShow())
+            if (mChoice.isActive())
                 return;
             Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton, Gravity.END);
@@ -176,21 +180,16 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         });
 
         //是否处于选中状态
-        if (MultiChoice.TAG.equals(AlbumFragment.TAG) &&
-                mMultiChoice.getSelectPos().contains(position - 1)) {
-            holder.mContainer.setSelected(true);
-        } else {
-            holder.mContainer.setSelected(false);
-        }
+        holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
 
         //半圆着色
-        if (ListModel == Constants.GRID_MODEL) {
+        if (listModel == Constants.GRID_MODEL) {
             Theme.TintDrawable(holder.mHalfCircle, R.drawable.icon_half_circular_left,
                     ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.night_background_color_main));
         }
 
         //设置padding
-        if (ListModel == 2 && holder.mRoot != null) {
+        if (listModel == 2 && holder.mRoot != null) {
             if (position % 2 == 1) {
                 holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4));
             } else {
@@ -202,7 +201,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
 
     @Override
     public void saveMode() {
-        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, "AlbumModel", ListModel);
+        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, "AlbumModel", listModel);
     }
 
     @Override

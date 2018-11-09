@@ -20,7 +20,6 @@
                 android:background="?attr/material_color_primary"
                 android:id="@+id/appbar">
                 <include layout="@layout/toolbar"/>
-                <include layout="@layout/toolbar_multi"/>
                 <android.support.design.widget.TabLayout
                     android:id="@+id/tabs"
                     android:layout_width="match_parent"
@@ -53,8 +52,7 @@
                 android:id="@+id/bottom_actionbar_new"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/item_height"
-                android:layout_gravity="bottom"
-                app:layout_behavior="remix.myplayer.ui.BottomBarBehavior"/>
+                android:layout_gravity="bottom" />
         </android.support.design.widget.CoordinatorLayout>
 
     </LinearLayout>

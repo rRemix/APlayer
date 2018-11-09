@@ -51,7 +51,7 @@ public class ArtistFragment extends LibraryFragment<Artist, ArtistAdapter> {
 
     @Override
     protected void initAdapter() {
-        mAdapter = new ArtistAdapter(mContext, R.layout.item_artist_recycle_grid, mMultiChoice);
+        mAdapter = new ArtistAdapter(mContext, R.layout.item_artist_recycle_grid, mChoice);
         mAdapter.setModeChangeCallback(mode -> {
             mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
             mRecyclerView.setAdapter(mAdapter);
@@ -59,11 +59,10 @@ public class ArtistFragment extends LibraryFragment<Artist, ArtistAdapter> {
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                int artistId = getArtistId(position);
-                if (getUserVisibleHint() && artistId > 0 &&
-                        !mMultiChoice.itemClick(position, artistId, TAG)) {
+                final Artist artist = mAdapter.getDatas().get(position);
+                if (getUserVisibleHint() && artist != null &&
+                        !mChoice.click(position, artist)) {
                     if (mAdapter.getDatas() != null) {
-                        Artist artist = mAdapter.getDatas().get(position);
                         int artistid = artist.getArtistID();
                         String title = artist.getArtist();
                         Intent intent = new Intent(mContext, ChildHolderActivity.class);
@@ -77,9 +76,8 @@ public class ArtistFragment extends LibraryFragment<Artist, ArtistAdapter> {
 
             @Override
             public void onItemLongClick(View view, int position) {
-                int artistId = getArtistId(position);
-                if (getUserVisibleHint() && artistId > 0)
-                    mMultiChoice.itemLongClick(position, artistId, TAG, Constants.ARTIST);
+                if (getUserVisibleHint())
+                    mChoice.longClick(position, mAdapter.getDatas().get(position));
             }
         });
     }
@@ -91,15 +89,6 @@ public class ArtistFragment extends LibraryFragment<Artist, ArtistAdapter> {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
-    }
-
-
-    private int getArtistId(int position) {
-        int artistId = -1;
-        if (mAdapter.getDatas() != null) {
-            artistId = mAdapter.getDatas().get(position).getArtistID();
-        }
-        return artistId;
     }
 
     @Override

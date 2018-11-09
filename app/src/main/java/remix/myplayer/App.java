@@ -17,6 +17,7 @@ import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.misc.cache.DiskCache;
+import remix.myplayer.misc.exception.RxException;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.CrashHandler;
 import remix.myplayer.util.LogUtil;
@@ -62,8 +63,8 @@ public class App extends MultiDexApplication {
 
         //处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
         RxJavaPlugins.setErrorHandler(throwable -> {
-            LogUtil.e(throwable);
-            CrashReport.postCatchedException(throwable);
+            LogUtil.e("RxError", throwable);
+            CrashReport.postCatchedException(new RxException(throwable));
         });
 
         //兼容性

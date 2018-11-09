@@ -34,18 +34,16 @@ import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.Command;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.activity.RecentlyActivity;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.ui.widget.ColumnView;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.ToastUtil;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
@@ -59,7 +57,6 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * Created by Remix on 2016/4/11.
  */
 public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements FastScroller.SectionIndexer, OnUpdateHighLightListener {
-    protected MultiChoice mMultiChoice;
     private int mType;
     public static final int ALLSONG = 0;
     public static final int RECENTLY = 1;
@@ -69,9 +66,9 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
     private final RecyclerView mRecyclerView;
     private int mLastIndex = 1;
 
-    public SongAdapter(Context context, int layoutId, MultiChoice multiChoice, int type, RecyclerView recyclerView) {
+    public SongAdapter(Context context, int layoutId, MultipleChoice multiChoice, int type, RecyclerView recyclerView) {
         super(context, layoutId, multiChoice);
-        mMultiChoice = multiChoice;
+        mChoice = multiChoice;
         mType = type;
         mRecyclerView = recyclerView;
         int size = DensityUtil.dip2px(mContext, 60);
@@ -113,9 +110,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
             }
 
             headerHolder.mShuffle.setOnClickListener(v -> {
-                Intent intent = new Intent(MusicService.ACTION_CMD);
-                intent.putExtra("Control", Command.NEXT);
-                intent.putExtra("shuffle", true);
+                Intent intent = MusicUtil.makeCmdIntent(Command.NEXT, true);
                 if (mType == ALLSONG) {
                     List<Integer> allSong = MusicServiceRemote.getAllSong();
                     if (allSong == null || allSong.isEmpty()) {
@@ -196,7 +191,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
                 null, null));
 
         holder.mButton.setOnClickListener(v -> {
-            if (mMultiChoice.isShow())
+            if (mChoice.isActive())
                 return;
             Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton, Gravity.END);
@@ -221,21 +216,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
             return true;
         });
 
-        if (mType == ALLSONG) {
-            if (MultiChoice.TAG.equals(SongFragment.TAG) &&
-                    mMultiChoice.getSelectPos().contains(position - 1)) {
-                holder.mContainer.setSelected(true);
-            } else {
-                holder.mContainer.setSelected(false);
-            }
-        } else {
-            if (MultiChoice.TAG.equals(RecentlyActivity.TAG) &&
-                    mMultiChoice.getSelectPos().contains(position - 1)) {
-                holder.mContainer.setSelected(true);
-            } else {
-                holder.mContainer.setSelected(false);
-            }
-        }
+        holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
     }
 
     @Override

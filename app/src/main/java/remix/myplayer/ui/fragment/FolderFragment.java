@@ -11,18 +11,15 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Folder;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.ui.activity.ChildHolderActivity;
-import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.ui.adapter.FolderAdapter;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -47,15 +44,16 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
 
     @Override
     protected void initAdapter() {
-        mAdapter = new FolderAdapter(mContext, R.layout.item_folder_recycle, mMultiChoice);
+        mAdapter = new FolderAdapter(mContext, R.layout.item_folder_recycle, mChoice);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                String path = mAdapter.getDatas().get(position).getPath();
+                Folder folder = mAdapter.getDatas().get(position);
+                String path = folder.getPath();
                 if (getUserVisibleHint() && !TextUtils.isEmpty(path) &&
-                        !mMultiChoice.itemClick(position, position, TAG)) {
+                        !mChoice.click(position, folder)) {
                     Intent intent = new Intent(mContext, ChildHolderActivity.class);
-                    intent.putExtra("Id", position);
+                    intent.putExtra("Id", folder.getParentId());
                     intent.putExtra("Type", Constants.FOLDER);
                     intent.putExtra("Title", path);
                     startActivity(intent);
@@ -64,9 +62,10 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
 
             @Override
             public void onItemLongClick(View view, int position) {
+                Folder folder = mAdapter.getDatas().get(position);
                 String path = mAdapter.getDatas().get(position).getPath();
                 if (getUserVisibleHint() && !TextUtils.isEmpty(path))
-                    mMultiChoice.itemLongClick(position, position, TAG, Constants.FOLDER);
+                    mChoice.longClick(position, folder);
             }
         });
     }
@@ -76,9 +75,6 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        if (mContext instanceof MultiChoiceActivity) {
-            mMultiChoice = ((MultiChoiceActivity) mContext).getMultiChoice();
-        }
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -110,18 +106,7 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
 
         @Override
         public List<Folder> loadInBackground() {
-            List<Folder> folderList = new ArrayList<>();
-            Global.FolderMap = MediaStoreUtil.getFolder();
-            if (Global.FolderMap == null || Global.FolderMap.size() < 0)
-                return folderList;
-
-            for (String path : Global.FolderMap.keySet()) {
-                String folderName = path.substring(path.lastIndexOf("/") + 1, path.length());
-                int count = Global.FolderMap.get(path).size();
-                folderList.add(new Folder(folderName, count, path));
-            }
-
-            return folderList;
+            return MediaStoreUtil.getAllFolder();
         }
     }
 }

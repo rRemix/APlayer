@@ -88,7 +88,7 @@
     <string name="song_not_empty">The name of the song cannot be empty</string>
     <string name="save_success">Save Success</string>
     <string name="save_error">Save failed</string>
-    <string name="tag_save_error">Save failed: %s</string>
+    <string name="save_error_arg">Save failed: %s</string>
     <string name="arg_illegal">Parameter illegal: %d</string>
     <string name="send_success">Sent successfully.Thanks to your feedback!</string>
     <string name="send_error">Sent failed.Please try again!</string>
@@ -230,7 +230,7 @@
     <string name="scan_failed">Scan failed:%s</string>
     <string name="scanning">Scanning</string>
     <string name="scanned_count">%d songs were scanned</string>
-    <string name="scan_getting_files">Getting all the files in the directory</string>
+    <string name="scaning">Scanning</string>
     <string name="no_audio_file">No audio file</string>
     <string name="manual_scan_tip">Please make sure that the scan directory without .nomedia file(Hidden file)</string>
     <string name="playing_notification">Now playing notify</string>
@@ -362,4 +362,8 @@
     <string name="embedded_lyric">Embedded</string>
     <string name="default_lyric_priority">默认</string>
     <string name="local">Local</string>
+    <string name="restore_songs">Restore songs</string>
+    <string name="restore_songs_tip">Restore songs removed from the library</string>
+    <string name="alread_restore_songs">Removed songs have been restored</string>
+    <string name="speed_range_tip">The range is 0.5 to 1.5</string>
 </resources>

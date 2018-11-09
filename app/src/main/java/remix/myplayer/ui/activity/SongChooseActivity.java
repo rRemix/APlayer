@@ -98,9 +98,6 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> 
     protected void setUpToolbar(Toolbar toolbar, String title) {
     }
 
-    @Override
-    protected void setUpMultiChoice() {
-    }
 
     @Override
     protected Loader<List<Song>> getLoader() {

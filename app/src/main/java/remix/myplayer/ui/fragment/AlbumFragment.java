@@ -51,7 +51,7 @@ public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
 
     @Override
     protected void initAdapter() {
-        mAdapter = new AlbumAdapter(mContext, R.layout.item_album_recycle_grid, mMultiChoice);
+        mAdapter = new AlbumAdapter(mContext, R.layout.item_album_recycle_grid, mChoice);
         mAdapter.setModeChangeCallback(mode -> {
             mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
             mRecyclerView.setAdapter(mAdapter);
@@ -59,28 +59,22 @@ public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                int albumId = getAlbumID(position);
-                if (getUserVisibleHint() && albumId > 0 &&
-                        !mMultiChoice.itemClick(position, albumId, TAG)) {
-                    if (mAdapter.getDatas() != null) {
-                        Album album = mAdapter.getDatas().get(position);
-                        int albumid = album.getAlbumID();
-                        String title = album.getAlbum();
-                        Intent intent = new Intent(mContext, ChildHolderActivity.class);
-                        intent.putExtra("Id", albumid);
-                        intent.putExtra("Title", title);
-                        intent.putExtra("Type", Constants.ALBUM);
-                        startActivity(intent);
-                    }
+                Album album = mAdapter.getDatas().get(position);
+                if (getUserVisibleHint() && !mChoice.click(position, album)) {
+                    int albumId = album.getAlbumID();
+                    String title = album.getAlbum();
+                    Intent intent = new Intent(mContext, ChildHolderActivity.class);
+                    intent.putExtra("Id", albumId);
+                    intent.putExtra("Title", title);
+                    intent.putExtra("Type", Constants.ALBUM);
+                    startActivity(intent);
                 }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                int albumId = getAlbumID(position);
-                if (getUserVisibleHint() && albumId > 0) {
-                    mMultiChoice.itemLongClick(position, albumId, TAG, Constants.ALBUM);
-                }
+                if (getUserVisibleHint())
+                    mChoice.longClick(position, mAdapter.getDatas().get(position));
             }
         });
     }
@@ -92,14 +86,6 @@ public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
         mRecyclerView.setLayoutManager(model == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
-    }
-
-    private int getAlbumID(int position) {
-        int albumId = -1;
-        if (mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1) {
-            albumId = mAdapter.getDatas().get(position).getAlbumID();
-        }
-        return albumId;
     }
 
 

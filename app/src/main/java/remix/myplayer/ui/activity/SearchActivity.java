@@ -131,14 +131,6 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
     }
 
     @Override
-    protected void setUpMultiChoice() {
-    }
-
-    @Override
-    protected void setUpClick() {
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return false;
     }

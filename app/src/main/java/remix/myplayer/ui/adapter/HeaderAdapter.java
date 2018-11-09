@@ -7,7 +7,7 @@ import android.view.View;
 
 import remix.myplayer.R;
 import remix.myplayer.misc.interfaces.ModeChangeCallback;
-import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -23,14 +23,14 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
 
     static final int TYPE_HEADER = 0;
     static final int TYPE_NORMAL = 1;
-    protected MultiChoice mMultiChoice;
+    protected MultipleChoice mChoice;
     private ModeChangeCallback mModeChangeCallback;
     //当前列表模式 1:列表 2:网格
-    int ListModel = 2;
+    int listModel = 2;
 
-    HeaderAdapter(Context context, int layoutId, MultiChoice multiChoice) {
+    HeaderAdapter(Context context, int layoutId, MultipleChoice multiChoice) {
         super(context, layoutId);
-        this.mMultiChoice = multiChoice;
+        this.mChoice = multiChoice;
     }
 
     public void setModeChangeCallback(ModeChangeCallback modeChangeCallback) {
@@ -41,7 +41,7 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
     public int getItemViewType(int position) {
         if (position == 0)
             return TYPE_HEADER;
-        return ListModel;
+        return listModel;
     }
 
     @Override
@@ -77,15 +77,15 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
      */
     void switchMode(AlbumAdapter.HeaderHolder headerHolder, View v) {
         int newModel = v.getId() == R.id.list_model ? Constants.LIST_MODEL : Constants.GRID_MODEL;
-        if (newModel == ListModel)
+        if (newModel == listModel)
             return;
-        ListModel = newModel;
-        headerHolder.mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-        headerHolder.mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-        headerHolder.mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
+        listModel = newModel;
+        headerHolder.mListModelBtn.setColorFilter(listModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+        headerHolder.mGridModelBtn.setColorFilter(listModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+        headerHolder.mDivider.setVisibility(listModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
         saveMode();
         if (mModeChangeCallback != null) {
-            mModeChangeCallback.OnModeChange(ListModel);
+            mModeChangeCallback.OnModeChange(listModel);
         }
     }
 

@@ -12,10 +12,10 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import remix.myplayer.helper.MusicEventCallback;
-import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.activity.MultiChoiceActivity;
+import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.BaseAdapter;
 import remix.myplayer.ui.fragment.base.BaseMusicFragment;
+import remix.myplayer.util.Constants;
 
 /**
  * Created by Remix on 2016/12/23.
@@ -23,7 +23,7 @@ import remix.myplayer.ui.fragment.base.BaseMusicFragment;
 
 public abstract class LibraryFragment<D, A extends BaseAdapter> extends BaseMusicFragment implements MusicEventCallback, LoaderManager.LoaderCallbacks<List<D>> {
     protected A mAdapter;
-    protected MultiChoice mMultiChoice;
+    protected MultipleChoice<D> mChoice;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -33,6 +33,9 @@ public abstract class LibraryFragment<D, A extends BaseAdapter> extends BaseMusi
         }
     }
 
+    public MultipleChoice getChoice() {
+        return mChoice;
+    }
 
     @Nullable
     @Override
@@ -40,15 +43,16 @@ public abstract class LibraryFragment<D, A extends BaseAdapter> extends BaseMusi
         final View rootView = inflater.inflate(getLayoutID(), container, false);
         mUnBinder = ButterKnife.bind(this, rootView);
 
-        if (mContext instanceof MultiChoiceActivity) {
-            mMultiChoice = ((MultiChoiceActivity) mContext).getMultiChoice();
-        }
+        int type = this instanceof SongFragment ? Constants.SONG :
+                this instanceof AlbumFragment ? Constants.ALBUM :
+                        this instanceof ArtistFragment ? Constants.ARTIST :
+                                this instanceof PlayListFragment ? Constants.PLAYLIST :
+                                        Constants.FOLDER;
+        mChoice = new MultipleChoice<>(getActivity(), type);
         initAdapter();
         initView();
-        if (mMultiChoice != null && mMultiChoice.getAdapter() == null) {
-            mMultiChoice.setAdapter(mAdapter);
-        }
 
+        mChoice.setAdapter(mAdapter);
         return rootView;
     }
 

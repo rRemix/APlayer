@@ -460,7 +460,7 @@ public class Theme {
                 .theme(ThemeStore.getMDDialogTheme());
     }
 
-    public static void setLightNavigationbar(Activity activity, boolean enabled) {
+    public static void setLightNavigationbarAuto(Activity activity, boolean enabled) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             final View decorView = activity.getWindow().getDecorView();
             int systemUiVisibility = decorView.getSystemUiVisibility();

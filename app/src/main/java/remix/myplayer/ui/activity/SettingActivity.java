@@ -62,6 +62,7 @@ import remix.myplayer.ui.dialog.LyricPriorityDialog;
 import remix.myplayer.ui.dialog.ThemeDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -88,8 +89,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     Toolbar mToolbar;
     @BindView(R.id.setting_color_src)
     ImageView mColorSrc;
-    @BindView(R.id.setting_lrc_path)
-    TextView mLrcPath;
     @BindView(R.id.setting_clear_text)
     TextView mCache;
     @BindView(R.id.setting_navaigation_switch)
@@ -240,10 +239,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             }
         });
 
-        //歌词搜索路径
-        if (!SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "").equals("")) {
-            mLrcPath.setText(getString(R.string.lrc_tip, SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")));
-        }
+//        //歌词搜索路径
+//        if (!SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "").equals("")) {
+//            mLrcPath.setText(getString(R.string.lrc_tip, SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")));
+//        }
         //桌面歌词
         mFloatLrcTip.setText(mFloatLrcSwitch.isChecked() ? R.string.opened_float_lrc : R.string.closed_float_lrc);
 
@@ -318,13 +317,14 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
 
         switch (tag) {
-            case "Lrc":
-                boolean success = SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, folder.getAbsolutePath());
-                ToastUtil.show(this, success ? R.string.setting_success : R.string.setting_error, Toast.LENGTH_SHORT);
-                mLrcPath.setText(getString(R.string.lrc_tip, SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")));
-                break;
+//            case "Lrc":
+//                boolean success = SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, folder.getAbsolutePath());
+//                ToastUtil.show(this, success ? R.string.setting_success : R.string.setting_error, Toast.LENGTH_SHORT);
+//                mLrcPath.setText(getString(R.string.lrc_tip, SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")));
+//                break;
             case "Scan":
-                new MediaScanner(mContext).scanFiles(folder, "audio/*");
+                new MediaScanner(mContext).scanFiles(folder);
+                mNeedRefreshAdapter = true;
                 break;
             case "ExportPlayList":
                 if (TextUtils.isEmpty(playListName)) {
@@ -377,11 +377,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_feedback_container, R.id.setting_about_container, R.id.setting_update_container,
             R.id.setting_lockscreen_container, R.id.setting_lrc_priority_container, R.id.setting_lrc_float_container,
             R.id.setting_navigation_container, R.id.setting_shake_container, R.id.setting_eq_container,
-            R.id.setting_lrc_path_container, R.id.setting_clear_container, R.id.setting_breakpoint_container,
+            R.id.setting_clear_container, R.id.setting_breakpoint_container,
             R.id.setting_screen_container, R.id.setting_scan_container, R.id.setting_classic_notify_container,
             R.id.setting_album_cover_container, R.id.setting_library_category_container, R.id.setting_immersive_container,
             R.id.setting_import_playlist_container, R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container,
-            R.id.setting_cover_source_container, R.id.setting_player_bottom_container})
+            R.id.setting_cover_source_container, R.id.setting_player_bottom_container, R.id.setting_restore_delete_container})
     public void onClick(View v) {
         switch (v.getId()) {
             //文件过滤
@@ -399,14 +399,14 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 //                }
                 mFloatLrcSwitch.setChecked(!mFloatLrcSwitch.isChecked());
                 break;
-            //歌词扫描路径
-            case R.id.setting_lrc_path_container:
-                new FolderChooserDialog.Builder(this)
-                        .chooseButton(R.string.choose_folder)
-                        .allowNewFolder(false, R.string.new_folder)
-                        .tag("Lrc")
-                        .show();
-                break;
+//            //歌词扫描路径
+//            case R.id.setting_lrc_path_container:
+//                new FolderChooserDialog.Builder(this)
+//                        .chooseButton(R.string.choose_folder)
+//                        .allowNewFolder(false, R.string.new_folder)
+//                        .tag("Lrc")
+//                        .show();
+//                break;
             //歌词搜索优先级
             case R.id.setting_lrc_priority_container:
                 configLyricPriority();
@@ -506,7 +506,20 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             case R.id.setting_player_bottom_container:
                 changeBottomOfPlayingScreen();
                 break;
+            //恢复移除的歌曲
+            case R.id.setting_restore_delete_container:
+                restoreDeleteSong();
+                break;
         }
+    }
+
+    /**
+     * 恢复移除的歌曲
+     */
+    private void restoreDeleteSong() {
+        SPUtil.deleteValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG);
+        getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
+        ToastUtil.show(mContext, R.string.alread_restore_songs);
     }
 
 
@@ -778,7 +791,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         int position = 0;
         for (int i = 0; i < mScanSize.length; i++) {
             position = i;
-            if (mScanSize[i] == Constants.SCAN_SIZE)
+            if (mScanSize[i] == MediaStoreUtil.SCAN_SIZE)
                 break;
         }
         getBaseDialog(mContext)
@@ -786,7 +799,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 .items(new String[]{"0K", "500K", "1MB", "2MB"})
                 .itemsCallbackSingleChoice(position, (dialog, itemView, which, text) -> {
                     SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE, mScanSize[which]);
-                    Constants.SCAN_SIZE = mScanSize[which];
+                    MediaStoreUtil.SCAN_SIZE = mScanSize[which];
                     getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
                     return true;
                 }).show();
@@ -818,7 +831,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         if (msg.what == CLEAR_FINISH) {
             ToastUtil.show(mContext, getString(R.string.clear_success));
             mCache.setText(R.string.zero_size);
-            mLrcPath.setText(R.string.default_lrc_path);
         }
     }
 

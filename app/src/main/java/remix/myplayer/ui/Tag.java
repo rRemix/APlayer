@@ -149,7 +149,7 @@ public class Tag extends ContextWrapper {
                                         .putExtra("newSong", song));
                                 setCurrentSong(song);
                                 ToastUtil.show(this, R.string.save_success);
-                            }, throwable -> ToastUtil.show(this, R.string.tag_save_error, throwable.toString()));
+                            }, throwable -> ToastUtil.show(this, R.string.save_error_arg, throwable.toString()));
                 }).build();
         editDialog.show();
 

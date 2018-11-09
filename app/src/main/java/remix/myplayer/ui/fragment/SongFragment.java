@@ -24,7 +24,6 @@ import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.adapter.SongAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -53,12 +52,12 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
 
     @Override
     protected void initAdapter() {
-        mAdapter = new SongAdapter(mContext, R.layout.item_song_recycle, mMultiChoice, SongAdapter.ALLSONG, mRecyclerView);
+        mAdapter = new SongAdapter(mContext, R.layout.item_song_recycle, mChoice, SongAdapter.ALLSONG, mRecyclerView);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                int id = getSongID(position);
-                if (id > 0 && !mMultiChoice.itemClick(position, id, TAG)) {
+                final Song song = mAdapter.getDatas().get(position);
+                if (getUserVisibleHint() && !mChoice.click(position, song)) {
                     Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Command.PLAYSELECTEDSONG);
@@ -70,9 +69,8 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
 
             @Override
             public void onItemLongClick(View view, int position) {
-                int id = getSongID(position);
-                if (getUserVisibleHint() && id > 0)
-                    mMultiChoice.itemLongClick(position, id, TAG, Constants.SONG);
+                if (getUserVisibleHint())
+                    mChoice.longClick(position, mAdapter.getDatas().get(position));
             }
         });
 
@@ -99,13 +97,6 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
         MusicServiceRemote.setAllSong(allSong);
     }
 
-    private int getSongID(int position) {
-        int id = -1;
-        if (mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1) {
-            id = mAdapter.getDatas().get(position).getId();
-        }
-        return id;
-    }
 
     @Override
     protected Loader<List<Song>> getLoader() {

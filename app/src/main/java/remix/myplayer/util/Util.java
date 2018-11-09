@@ -35,9 +35,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import remix.myplayer.App;
 import remix.myplayer.R;
@@ -68,6 +66,10 @@ public class Util {
 
     public static void sendLocalBroadcast(Intent intent) {
         LocalBroadcastManager.getInstance(App.getContext()).sendBroadcast(intent);
+    }
+
+    public static void sendCMDLocalBroadcast(int cmd) {
+        LocalBroadcastManager.getInstance(App.getContext()).sendBroadcast(MusicUtil.makeCmdIntent(cmd));
     }
 
     /**
@@ -124,8 +126,13 @@ public class Util {
     public static void vibrate(final Context context, final long milliseconds) {
         if (context == null)
             return;
-        Vibrator vibrator = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
-        vibrator.vibrate(milliseconds);
+        try {
+            Vibrator vibrator = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
+            vibrator.vibrate(milliseconds);
+        } catch (Exception ignore) {
+
+        }
+
     }
 
     /**
@@ -238,7 +245,7 @@ public class Util {
      */
     public static String getTime(long duration) {
         int minute = (int) duration / 1000 / 60;
-        int second = (int) Math.ceil((duration - minute * 60000) / 1000f);
+        int second = (int) (duration / 1000) % 60;
         //如果分钟数小于10
         if (minute < 10) {
             if (second < 10)
@@ -333,20 +340,20 @@ public class Util {
         }
     }
 
-    /**
-     * @param map
-     * @param position
-     * @return
-     */
-    public static <T extends Object> String getMapkeyByPosition(Map<String, List<T>> map, int position) {
-        if (map == null || map.size() == 0 || position < 0)
-            return "";
-        Iterator it = map.keySet().iterator();
-        String key = "";
-        for (int i = 0; i <= position; i++)
-            key = it.next().toString();
-        return key;
-    }
+//    /**
+//     * @param map
+//     * @param position
+//     * @return
+//     */
+//    public static <T extends Object> String getMapkeyByPosition(Map<String, List<T>> map, int position) {
+//        if (map == null || map.size() == 0 || position < 0)
+//            return "";
+//        Iterator it = map.keySet().iterator();
+//        String key = "";
+//        for (int i = 0; i <= position; i++)
+//            key = it.next().toString();
+//        return key;
+//    }
 
 
     /**
@@ -534,20 +541,19 @@ public class Util {
         }
     }
 
-    public static void closeStream(Closeable closeable) {
+    public static void closeSafely(Closeable closeable) {
         if (closeable != null) {
+            if (closeable instanceof Cursor && ((Cursor) closeable).isClosed()) {
+                return;
+            }
             try {
                 closeable.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public static void closeCursor(Cursor cursor) {
-        if (cursor != null && !cursor.isClosed())
-            cursor.close();
-    }
 
     public static void installApk(Context context, String path) {
         if (path == null) {
@@ -569,6 +575,9 @@ public class Util {
     }
 
     public static void writeLogToExternalStorage(final String name, final String log) {
+//        if(!SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.WRITE_LOG_TO_STORAGE,false)){
+//            return;
+//        }
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             return;
         }
@@ -579,6 +588,25 @@ public class Util {
         }
         try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(logFile, logFile.exists())))) {
             pw.println(log);
+        } catch (IOException ignore) {
+
+        }
+    }
+
+    public static void writeLogToExternalStorage(final String name, final Throwable throwable) {
+//        if(!SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.WRITE_LOG_TO_STORAGE,false)){
+//            return;
+//        }
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            return;
+        }
+        final String path = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + App.getContext().getPackageName() + "/log/" + name;
+        File logFile = new File(path);
+        if (!logFile.getParentFile().exists() && !logFile.getParentFile().mkdirs()) {
+            return;
+        }
+        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(logFile, logFile.exists())))) {
+            throwable.printStackTrace(pw);
         } catch (IOException ignore) {
 
         }
