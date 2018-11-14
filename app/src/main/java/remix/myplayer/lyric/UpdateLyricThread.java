@@ -3,7 +3,7 @@ package remix.myplayer.lyric;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
@@ -21,7 +21,7 @@ public abstract class UpdateLyricThread extends Thread {
     public static final int LRC_INTERVAL = 400;
 
     private volatile List<LrcRow> mLrcRows;
-    private final CompositeDisposable mDisposable = new CompositeDisposable();
+    private Disposable mDisposable;
     private WeakReference<MusicService> mReference;
     private Song mSong;
     private Status mStatus = Status.SEARCHING;
@@ -39,7 +39,9 @@ public abstract class UpdateLyricThread extends Thread {
             return;
         }
         final int id = mSong.getId();
-        mDisposable.add(new SearchLrc(mSong).getLyric()
+        if (mDisposable != null && !mDisposable.isDisposed())
+            mDisposable.dispose();
+        mDisposable = new SearchLrc(mSong).getLyric()
                 .doOnSubscribe(disposable -> mStatus = Status.SEARCHING)
                 .subscribe(lrcRows -> {
                     if (id == mSong.getId()) {
@@ -53,7 +55,7 @@ public abstract class UpdateLyricThread extends Thread {
                         mStatus = Status.ERROR;
                         mLrcRows = null;
                     }
-                }));
+                });
     }
 
     public void setSongAndGetLyricRows(Song song) {
@@ -73,7 +75,8 @@ public abstract class UpdateLyricThread extends Thread {
     public void interrupt() {
         super.interrupt();
         LogUtil.d(TAG, "interrupt");
-        mDisposable.dispose();
+        if (mDisposable != null && !mDisposable.isDisposed())
+            mDisposable.dispose();
         mReference = null;
     }
 
@@ -95,6 +98,8 @@ public abstract class UpdateLyricThread extends Thread {
         final Song song = service.getCurrentSong();
         final int progress = service.getProgress() + mOffset;
         LogUtil.d("DesktopLrc", "当前歌词 -- Progress: " + service.getProgress());
+        if (mLrcRows == null || mLrcRows.isEmpty())
+            return wrapper;
         for (int i = mLrcRows.size() - 1; i >= 0; i--) {
             LrcRow lrcRow = mLrcRows.get(i);
             int interval = progress - lrcRow.getTime();
