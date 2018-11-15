@@ -43,6 +43,7 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
     public void onSuccess(String result) {
         if (TextUtils.isEmpty(result)) {
             onError("Empty Result");
+            return;
         }
         LogUtil.i(TAG, "onSuccess: " + result);
         ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(result));

@@ -11,6 +11,10 @@ public class Album {
     private String Artist;
     private int Count;
 
+    public Album(int albumID){
+        AlbumID = albumID;
+    }
+
     public Album(int albumID, String album, int artistId, String artist, int count) {
         AlbumID = albumID;
         Album = album;

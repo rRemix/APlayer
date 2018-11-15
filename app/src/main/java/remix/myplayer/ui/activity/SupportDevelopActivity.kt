@@ -28,6 +28,7 @@ import io.reactivex.functions.Consumer
 import io.reactivex.functions.Function
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
+import remix.myplayer.App
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.bean.misc.PurchaseBean
@@ -66,9 +67,11 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
         mAdapter = PurchaseAdapter(mContext, R.layout.item_support)
 
         val beans = ArrayList<PurchaseBean>()
-        beans.add(PurchaseBean("wechat", "icon_wechat_donate", getString(R.string.wechat), ""))
-        beans.add(PurchaseBean("alipay", "icon_alipay_donate", getString(R.string.alipay), ""))
-        beans.add(PurchaseBean("paypal", "icon_paypal_donate", getString(R.string.paypal), ""))
+        if(!App.IS_GOOGLEPLAY){
+            beans.add(PurchaseBean("wechat", "icon_wechat_donate", getString(R.string.wechat), ""))
+            beans.add(PurchaseBean("alipay", "icon_alipay_donate", getString(R.string.alipay), ""))
+            beans.add(PurchaseBean("paypal", "icon_paypal_donate", getString(R.string.paypal), ""))
+        }
 
         mAdapter.setData(beans)
         mAdapter.setOnItemClickListener(object : OnItemClickListener {
@@ -76,91 +79,96 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
             }
 
             override fun onItemClick(view: View?, position: Int) {
-                when (position) {
-                    0 -> {
-                        var outputStream: OutputStream? = null
-                        var cursor: Cursor? = null
-                        //保存微信图片
-                        Observable.just(BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode))
-                                .flatMap(Function<Bitmap, ObservableSource<File>> {
-                                    return@Function ObservableSource<File> {
-                                        val weChatBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode)
-                                        if (weChatBitmap == null || weChatBitmap.isRecycled) {
-                                            it.onError(Throwable("Invalid Bitmap"))
-                                            return@ObservableSource
-                                        }
-                                        val dir = DiskCache.getDiskCacheDir(mContext, "qrCode")
-                                        if (!dir.exists())
-                                            dir.mkdirs()
-                                        val qrCodeFile = File(dir, "qrCode.png")
+                if(App.IS_GOOGLEPLAY){
+                    mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position])
+                } else{
+                    when (position) {
+                        0 -> {
+                            var outputStream: OutputStream? = null
+                            var cursor: Cursor? = null
+                            //保存微信图片
+                            Observable.just(BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode))
+                                    .flatMap(Function<Bitmap, ObservableSource<File>> {
+                                        return@Function ObservableSource<File> {
+                                            val weChatBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode)
+                                            if (weChatBitmap == null || weChatBitmap.isRecycled) {
+                                                it.onError(Throwable("Invalid Bitmap"))
+                                                return@ObservableSource
+                                            }
+                                            val dir = DiskCache.getDiskCacheDir(mContext, "qrCode")
+                                            if (!dir.exists())
+                                                dir.mkdirs()
+                                            val qrCodeFile = File(dir, "qrCode.png")
 
-                                        //删除旧文件
-                                        cursor = contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                                                null, MediaStore.Images.Media.DATA + "=?", arrayOf(qrCodeFile.absolutePath), null)
-                                        if (cursor != null && cursor!!.count > 0) {
-                                            contentResolver.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.DATA + "=?", arrayOf(qrCodeFile.absolutePath))
-                                        }
-                                        if (qrCodeFile.exists()) {
-                                            qrCodeFile.delete()
-                                        }
-                                        qrCodeFile.createNewFile()
+                                            //删除旧文件
+                                            cursor = contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                                    null, MediaStore.Images.Media.DATA + "=?", arrayOf(qrCodeFile.absolutePath), null)
+                                            if (cursor != null && cursor!!.count > 0) {
+                                                contentResolver.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.DATA + "=?", arrayOf(qrCodeFile.absolutePath))
+                                            }
+                                            if (qrCodeFile.exists()) {
+                                                qrCodeFile.delete()
+                                            }
+                                            qrCodeFile.createNewFile()
 
-                                        // 保存到系统MediaStore
-                                        val values = ContentValues()
-                                        values.put(MediaStore.Images.ImageColumns.DATA, qrCodeFile.absolutePath)
-                                        values.put(MediaStore.Images.ImageColumns.TITLE, "qrCode")
-                                        values.put(MediaStore.Images.ImageColumns.DISPLAY_NAME, "qrCode")
-                                        values.put(MediaStore.Images.ImageColumns.DATE_TAKEN, System.currentTimeMillis())
-                                        values.put(MediaStore.Images.ImageColumns.DATE_ADDED, System.currentTimeMillis() / 1000)
-                                        values.put(MediaStore.Images.ImageColumns.DATE_MODIFIED, System.currentTimeMillis() / 1000)
-                                        values.put(MediaStore.Images.ImageColumns.MIME_TYPE, "image/png")
-                                        values.put(MediaStore.Images.ImageColumns.WIDTH, weChatBitmap.width)
-                                        values.put(MediaStore.Images.ImageColumns.HEIGHT, weChatBitmap.height)
-                                        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                                                values)
-                                        if (uri == null) {
-                                            it.onError(Throwable("Uri Empty"))
-                                            return@ObservableSource
+                                            // 保存到系统MediaStore
+                                            val values = ContentValues()
+                                            values.put(MediaStore.Images.ImageColumns.DATA, qrCodeFile.absolutePath)
+                                            values.put(MediaStore.Images.ImageColumns.TITLE, "qrCode")
+                                            values.put(MediaStore.Images.ImageColumns.DISPLAY_NAME, "qrCode")
+                                            values.put(MediaStore.Images.ImageColumns.DATE_TAKEN, System.currentTimeMillis())
+                                            values.put(MediaStore.Images.ImageColumns.DATE_ADDED, System.currentTimeMillis() / 1000)
+                                            values.put(MediaStore.Images.ImageColumns.DATE_MODIFIED, System.currentTimeMillis() / 1000)
+                                            values.put(MediaStore.Images.ImageColumns.MIME_TYPE, "image/png")
+                                            values.put(MediaStore.Images.ImageColumns.WIDTH, weChatBitmap.width)
+                                            values.put(MediaStore.Images.ImageColumns.HEIGHT, weChatBitmap.height)
+                                            val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                                    values)
+                                            if (uri == null) {
+                                                it.onError(Throwable("Uri Empty"))
+                                                return@ObservableSource
+                                            }
+                                            outputStream = contentResolver.openOutputStream(uri)
+                                            weChatBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                                            values.clear()
+                                            values.put(MediaStore.Images.ImageColumns.SIZE, qrCodeFile.length())
+                                            contentResolver.update(uri, values, null, null)
+                                            weChatBitmap.recycle()
+                                            it.onNext(qrCodeFile)
+                                            it.onComplete()
                                         }
-                                        outputStream = contentResolver.openOutputStream(uri)
-                                        weChatBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                                        values.clear()
-                                        values.put(MediaStore.Images.ImageColumns.SIZE, qrCodeFile.length())
-                                        contentResolver.update(uri, values, null, null)
-                                        weChatBitmap.recycle()
-                                        it.onNext(qrCodeFile)
-                                        it.onComplete()
+                                    })
+                                    .compose(RxUtil.applyScheduler())
+                                    .doFinally {
+                                        cursor?.close()
+                                        outputStream?.close()
                                     }
-                                })
-                                .compose(RxUtil.applyScheduler())
-                                .doFinally {
-                                    cursor?.close()
-                                    outputStream?.close()
-                                }
-                                .subscribe({
-                                    ToastUtil.showLong(mContext, R.string.save_wechat_qrcode_success, it.absolutePath)
-                                }, {
-                                    ToastUtil.show(mContext, R.string.save_error)
-                                })
-                    }
-                    1 -> {
-                        Theme.getBaseDialog(mContext)
-                                .title(R.string.support_develop)
-                                .positiveText(R.string.jump_alipay_account)
-                                .negativeText(R.string.cancel)
-                                .content(R.string.donate_tip)
-                                .onPositive { _, _ -> AlipayUtil.startAlipayClient(mContext as Activity) }
-                                .show()
-                    }
-                    2 -> {
-                        val intent = Intent("android.intent.action.VIEW")
-                        intent.data = Uri.parse("https://www.paypal.me/rRemix")
-                        startActivity(intent)
-                    }
-                    3, 4, 5, 6, 7 -> {
-                        mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position - 3])
+                                    .subscribe({
+                                        ToastUtil.showLong(mContext, R.string.save_wechat_qrcode_success, it.absolutePath)
+                                    }, {
+                                        ToastUtil.show(mContext, R.string.save_error)
+                                    })
+                        }
+                        1 -> {
+                            Theme.getBaseDialog(mContext)
+                                    .title(R.string.support_develop)
+                                    .positiveText(R.string.jump_alipay_account)
+                                    .negativeText(R.string.cancel)
+                                    .content(R.string.donate_tip)
+                                    .onPositive { _, _ -> AlipayUtil.startAlipayClient(mContext as Activity) }
+                                    .show()
+                        }
+                        2 -> {
+                            val intent = Intent("android.intent.action.VIEW")
+                            intent.data = Uri.parse("https://www.paypal.me/rRemix")
+                            startActivity(intent)
+                        }
+                        else -> {
+                            mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position - 3])
+                        }
                     }
                 }
+
             }
         })
 

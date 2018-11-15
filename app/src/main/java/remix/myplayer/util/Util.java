@@ -592,4 +592,23 @@ public class Util {
 
         }
     }
+
+    public static void writeLogToExternalStorage(final String name, final Throwable throwable) {
+//        if(!SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.WRITE_LOG_TO_STORAGE,false)){
+//            return;
+//        }
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            return;
+        }
+        final String path = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + App.getContext().getPackageName() + "/log/" + name;
+        File logFile = new File(path);
+        if (!logFile.getParentFile().exists() && !logFile.getParentFile().mkdirs()) {
+            return;
+        }
+        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(logFile, logFile.exists())))) {
+            throwable.printStackTrace(pw);
+        } catch (IOException ignore) {
+
+        }
+    }
 }

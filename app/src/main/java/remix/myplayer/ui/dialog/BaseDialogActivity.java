@@ -23,7 +23,7 @@ public abstract class BaseDialogActivity extends BaseMusicActivity {
     }
 
     @Override
-    protected void setStatusBar() {
+    protected void setStatusBarColor() {
     }
 
     @Override

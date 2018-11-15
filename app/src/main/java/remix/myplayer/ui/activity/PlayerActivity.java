@@ -53,7 +53,6 @@ import com.facebook.rebound.SpringSystem;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -99,7 +98,6 @@ import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
-import static android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
@@ -279,40 +277,24 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     }
 
     @Override
-    protected void setStatusBar() {
-        if (ThemeStore.isDay()) {
-            //获得miui版本
-            String miui = "";
-            int miuiVersion = 0;
-            if (Build.MANUFACTURER.equalsIgnoreCase("Xiaomi")) {
-                try {
-                    Class<?> c = Class.forName("android.os.SystemProperties");
-                    Method get = c.getMethod("get", String.class, String.class);
-                    miui = (String) (get.invoke(c, "ro.miui.ui.version.name", "unknown"));
-                    if (!TextUtils.isEmpty(miui) && miui.length() >= 2 && TextUtils.isDigitsOnly(miui.substring(1, miui.length()))) {
-                        miuiVersion = Integer.valueOf(miui.substring(1, miui.length()));
-                    }
-                } catch (Exception e) {
-                    LogUtil.d(TAG, e.toString());
-                }
-            }
-            if (Build.MANUFACTURER.equalsIgnoreCase("Meizu")) {
-                StatusBarUtil.setTransparent(this);
-                StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this, true);
-            } else if (Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") && miuiVersion >= 6 && miuiVersion < 9) {
-                StatusBarUtil.setTransparent(this);
-                StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true, this);
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                StatusBarUtil.setTransparent(this);
-                int systemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
-                systemUiVisibility |= SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-                getWindow().getDecorView().setSystemUiVisibility(systemUiVisibility);
-            } else {
-                StatusBarUtil.setColorNoTranslucent(this, ColorUtil.getColor(R.color.statusbar_gray_color));
-            }
-        } else {
-            StatusBarUtil.setTransparent(this);
+    protected void setNavigationBarColor() {
+        super.setNavigationBarColor();
+        //导航栏变色
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION, false)) {
+            final int navigationColor = ThemeStore.isDay() ? ThemeStore.getNavigationBarColor() : ColorUtil.getColor(R.color.night_background_color_main);
+            getWindow().setNavigationBarColor(navigationColor);
+            Theme.setLightNavigationbarAuto(this, ColorUtil.isColorLight(navigationColor));
         }
+    }
+
+    @Override
+    protected void setStatusBarMode() {
+        StatusBarUtil.setStatusBarMode(this, ThemeStore.getBackgroundColorMain());
+    }
+
+    @Override
+    protected void setStatusBarColor() {
+        StatusBarUtil.setColorNoTranslucent(this, ThemeStore.getBackgroundColorMain());
     }
 
     @SuppressLint("ClickableViewAccessibility")

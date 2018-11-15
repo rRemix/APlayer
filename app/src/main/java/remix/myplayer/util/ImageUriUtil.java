@@ -1,5 +1,6 @@
 package remix.myplayer.util;
 
+import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -8,6 +9,7 @@ import android.text.TextUtils;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -37,10 +39,8 @@ public class ImageUriUtil {
      * 获得某歌手在本地数据库的封面
      */
     public static File getArtistThumbInMediaCache(int artistId) {
-        Cursor cursor = null;
-        try {
-            cursor = App.getContext().getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.Albums.ALBUM_ART},
-                    MediaStore.Audio.Media.ARTIST_ID + "=?", new String[]{artistId + ""}, null);
+        try (Cursor cursor = App.getContext().getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.Albums.ALBUM_ART},
+                MediaStore.Audio.Media.ARTIST_ID + "=?", new String[]{artistId + ""}, null)) {
             if (cursor != null && cursor.moveToFirst()) {
                 String imagePath = cursor.getString(0);
                 if (!TextUtils.isEmpty(imagePath))
@@ -48,9 +48,6 @@ public class ImageUriUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (cursor != null)
-                cursor.close();
         }
         return null;
     }
@@ -245,5 +242,30 @@ public class ImageUriUtil {
             return imageUrls.get(ImageSize.UNKNOWN);
         }
         return null;
+    }
+
+
+    public static String getArtistArt(int artistId){
+        try (Cursor cursor = App.getContext().getContentResolver().query(
+                MediaStore.Audio.Artists.Albums.getContentUri("external",artistId),
+                null,
+                null,null,null)) {
+            if(cursor != null && cursor.getCount() > 0){
+                List<Album> albums = new ArrayList<>();
+                String[] names = cursor.getColumnNames();
+                while (cursor.moveToNext()){
+                    albums.add(new Album(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Albums._ID))));
+                }
+                for(Album album : albums){
+                    Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), album.getAlbumID());
+                    if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
+                        return uri.toString();
+                    }
+                }
+            }
+        } catch (Exception e){
+            LogUtil.e(e);
+        }
+        return "";
     }
 }

@@ -398,12 +398,13 @@ public class MediaStoreUtil {
         //从播放队列和全部歌曲移除
         MusicServiceRemote.deleteFromService(songs);
         PlayListUtil.deleteSongs(songs);
-        //刷新界面
-        mContext.getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
 
         //删除源文件
         if (deleteSource)
             deleteSource(songs);
+
+        //刷新界面
+        mContext.getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
 
         return songs.size();
     }
