@@ -37,7 +37,12 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
 
+import static remix.myplayer.util.Util.TYPE_ALBUM;
+import static remix.myplayer.util.Util.TYPE_ARTIST;
+import static remix.myplayer.util.Util.TYPE_DISPLAYNAME;
+import static remix.myplayer.util.Util.TYPE_SONG;
 import static remix.myplayer.util.Util.hasStoragePermissions;
+import static remix.myplayer.util.Util.processInfo;
 
 /**
  * Created by taeja on 16-2-17.
@@ -112,9 +117,9 @@ public class MediaStoreUtil {
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     albums.add(new Album(cursor.getInt(0),
-                            Util.processInfo(cursor.getString(1), Util.ALBUMTYPE),
+                            processInfo(cursor.getString(1), TYPE_ALBUM),
                             cursor.getInt(2),
-                            Util.processInfo(cursor.getString(3), Util.ARTISTTYPE),
+                            processInfo(cursor.getString(3), TYPE_ARTIST),
                             0));
                 }
             }
@@ -232,11 +237,11 @@ public class MediaStoreUtil {
         final int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
         return new Song(
                 id,
-                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
-                Util.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)), Util.SONGTYPE),
-                Util.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)), Util.ALBUMTYPE),
+                processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)), TYPE_DISPLAYNAME),
+                processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)), TYPE_SONG),
+                processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)), TYPE_ALBUM),
                 cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
-                Util.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)), Util.ARTISTTYPE),
+                processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)), TYPE_ARTIST),
                 cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID)),
                 duration,
                 Util.getTime(duration),

@@ -45,7 +45,7 @@ public class SongChooseAdaper extends BaseAdapter<Song, SongChooseAdaper.SongCho
     @Override
     protected void convert(final SongChooseHolder holder, Song song, int position) {
         //歌曲名
-        holder.mSong.setText(song.getTitle());
+        holder.mSong.setText(song.getShowName());
         //艺术家
         holder.mArtist.setText(song.getArtist());
         //封面

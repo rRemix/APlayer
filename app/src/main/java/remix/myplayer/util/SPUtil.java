@@ -190,6 +190,8 @@ public class SPUtil {
         String WRITE_LOG_TO_STORAGE = "write_log_to_storage";
         //是否第一次显示多选
         String FIRST_SHOW_MULTI = "first_show_multi";
+        //列表歌曲名是否取代为文件夹名
+        String SHOW_DISPLAYNAME = "show_displayname";
     }
 
     public interface LYRIC_OFFSET_KEY {

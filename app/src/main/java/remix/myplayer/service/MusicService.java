@@ -191,7 +191,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     /**
      * 播放控制的Receiver
      */
-    private ControlReceiver mControlRecevier;
+    private ControlReceiver mControlReceiver;
 
     /**
      * 事件
@@ -441,8 +441,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         eventFilter.addAction(PLAYLIST_CHANGE);
         registerLocalReceiver(mMusicEventReceiver, eventFilter);
 
-        mControlRecevier = new ControlReceiver();
-        registerLocalReceiver(mControlRecevier, new IntentFilter(ACTION_CMD));
+        mControlReceiver = new ControlReceiver();
+        registerLocalReceiver(mControlReceiver, new IntentFilter(ACTION_CMD));
 
         mHeadSetReceiver = new HeadsetPlugReceiver();
         IntentFilter noisyFilter = new IntentFilter();
@@ -664,7 +664,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         mMediaSession.setActive(false);
         mMediaSession.release();
 
-        unregisterLocalReceiver(mControlRecevier);
+        unregisterLocalReceiver(mControlReceiver);
         unregisterLocalReceiver(mMusicEventReceiver);
         Util.unregisterReceiver(this, mHeadSetReceiver);
         Util.unregisterReceiver(this, mScreenReceiver);
@@ -755,7 +755,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             setPlayModel(Constants.PLAY_SHUFFLE);
             updateNextSong();
         }
-        mControlRecevier.onReceive(this, intent);
+        mControlReceiver.onReceive(this, intent);
 
         if (equals) {
             return;
@@ -865,6 +865,9 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         if (updateMediaSessionOnly)
             updateMediaSession(Global.Operation);
         else {
+            if (!isPlaying()) { //如果当前已经暂停了 就不重复操作了 避免已经关闭了通知栏又再次显示
+                return;
+            }
             setPlay(false);
             update(Global.Operation);
             mVolumeController.fadeOut();
@@ -1002,13 +1005,13 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     updateAppwidget();
                 } else {
                     appwidgetIntent.putExtra("Control", control);
-                    mControlRecevier.onReceive(this, appwidgetIntent);
+                    mControlReceiver.onReceive(this, appwidgetIntent);
                 }
                 break;
             case ACTION_SHORTCUT_CONTINUE_PLAY:
                 Intent continueIntent = new Intent(ACTION_CMD);
                 continueIntent.putExtra("Control", Command.TOGGLE);
-                mControlRecevier.onReceive(this, continueIntent);
+                mControlReceiver.onReceive(this, continueIntent);
                 break;
             case ACTION_SHORTCUT_SHUFFLE:
                 if (mPlayModel != Constants.PLAY_SHUFFLE) {
@@ -1016,7 +1019,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 }
                 Intent shuffleIntent = new Intent(ACTION_CMD);
                 shuffleIntent.putExtra("Control", Command.NEXT);
-                mControlRecevier.onReceive(this, shuffleIntent);
+                mControlReceiver.onReceive(this, shuffleIntent);
                 break;
             case ACTION_SHORTCUT_MYLOVE:
                 List<Integer> myLoveIds = PlayListUtil.getSongIds(Global.MyLoveID);
@@ -1046,7 +1049,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 break;
             default:
                 if (action.equalsIgnoreCase(ACTION_CMD))
-                    mControlRecevier.onReceive(this, commandIntent);
+                    mControlReceiver.onReceive(this, commandIntent);
         }
     }
 
@@ -1121,7 +1124,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             switch (control) {
                 //关闭通知栏
                 case Command.CLOSE_NOTIFY:
-                    Global.setNotifyShowing(false);
+                    Notify.setNotifyShowing(false);
+                    if (mNotify instanceof NotifyImpl24) { //仅仅只是设置标志位
+                        return;
+                    }
+                    Notify.setNotifyShowing(false);
                     pause(false);
                     if (mUpdateFloatLrcThread != null) {
                         mUpdateFloatLrcThread.quitByNotification();
@@ -1221,14 +1228,13 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     break;
                 //切换通知栏样式
                 case Command.TOGGLE_NOTIFY:
-                    mNotify.cancelPlayingNotify();
                     boolean classic = intent.getBooleanExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, false);
                     if (classic) {
                         mNotify = new NotifyImpl(MusicService.this);
                     } else {
                         mNotify = new NotifyImpl24(MusicService.this);
                     }
-                    if (Global.isNotifyShowing())
+                    if (Notify.isNotifyShowing())
                         updateNotification();
                     break;
                 //解锁通知栏
@@ -2065,7 +2071,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             }
             //通知更新ui
 //            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
-            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
+//            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
         }
     }
 

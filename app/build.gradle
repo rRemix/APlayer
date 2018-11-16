@@ -32,8 +32,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 102
-        versionName "1.4.3.2-dev"
+        versionCode 103
+        versionName "1.4.3.3-dev"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
@@ -81,7 +81,7 @@ android {
             minifyEnabled true
             debuggable false
             zipAlignEnabled true
-            shrinkResources false
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             android.applicationVariants.all { variant ->

@@ -115,6 +115,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     SwitchCompat mBreakpointSwitch;
     @BindView(R.id.setting_ignore_mediastore_switch)
     SwitchCompat mIgnoreMediastoreSwitch;
+    @BindView(R.id.setting_displayname_switch)
+    SwitchCompat mShowDisplaynameSwitch;
 
     private static final int REQUEST_THEME_COLOR = 0x10;
     private static final int REQUEST_EQ = 0x100;
@@ -154,13 +156,14 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
         }
 
-        //导航栏是否变色 是否启用摇一摇切歌
         final String[] keyWord = new String[]{SPUtil.SETTING_KEY.COLOR_NAVIGATION, SPUtil.SETTING_KEY.SHAKE,
                 SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,
                 SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, SPUtil.SETTING_KEY.IMMERSIVE_MODE,
-                SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE};
+                SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE,
+                SPUtil.SETTING_KEY.SHOW_DISPLAYNAME};
         ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch, mFloatLrcSwitch,
-                mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch, mBreakpointSwitch, mIgnoreMediastoreSwitch}, new ButterKnife.Action<SwitchCompat>() {
+                mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch, mBreakpointSwitch,
+                mIgnoreMediastoreSwitch, mShowDisplaynameSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
                 view.setChecked(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, keyWord[index], false));
@@ -217,7 +220,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //沉浸式状态栏
                             case R.id.setting_immersive_switch:
-                                ThemeStore.IMMERSIVE_MODE = view.isChecked();
+                                ThemeStore.IMMERSIVE_MODE = isChecked;
                                 mNeedRecreate = true;
                                 mHandler.sendEmptyMessage(RECREATE);
                                 break;
@@ -229,7 +232,12 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //忽略内嵌
                             case R.id.setting_ignore_mediastore_switch:
-                                ImageUriRequest.IGNORE_MEDIA_STORE = true;
+                                ImageUriRequest.IGNORE_MEDIA_STORE = isChecked;
+                                mNeedRefreshAdapter = true;
+                                break;
+                            //文件名
+                            case R.id.setting_displayname_switch:
+                                Global.SHOW_DISPLAYNAME = isChecked;
                                 mNeedRefreshAdapter = true;
                                 break;
                         }
@@ -282,7 +290,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         if (IS_GOOGLEPLAY) {
             findViewById(R.id.setting_update_container).setVisibility(View.GONE);
-            findViewById(R.id.setting_cover_source_container).setVisibility(View.GONE);
         }
     }
 
@@ -377,11 +384,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_feedback_container, R.id.setting_about_container, R.id.setting_update_container,
             R.id.setting_lockscreen_container, R.id.setting_lrc_priority_container, R.id.setting_lrc_float_container,
             R.id.setting_navigation_container, R.id.setting_shake_container, R.id.setting_eq_container,
-            R.id.setting_clear_container, R.id.setting_breakpoint_container,
-            R.id.setting_screen_container, R.id.setting_scan_container, R.id.setting_classic_notify_container,
-            R.id.setting_album_cover_container, R.id.setting_library_category_container, R.id.setting_immersive_container,
-            R.id.setting_import_playlist_container, R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container,
-            R.id.setting_cover_source_container, R.id.setting_player_bottom_container, R.id.setting_restore_delete_container})
+            R.id.setting_clear_container, R.id.setting_breakpoint_container, R.id.setting_screen_container,
+            R.id.setting_scan_container, R.id.setting_classic_notify_container, R.id.setting_album_cover_container,
+            R.id.setting_library_category_container, R.id.setting_immersive_container, R.id.setting_import_playlist_container,
+            R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container, R.id.setting_cover_source_container,
+            R.id.setting_player_bottom_container, R.id.setting_restore_delete_container, R.id.setting_displayname_container})
     public void onClick(View v) {
         switch (v.getId()) {
             //文件过滤
@@ -509,6 +516,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //恢复移除的歌曲
             case R.id.setting_restore_delete_container:
                 restoreDeleteSong();
+                break;
+            //文件名
+            case R.id.setting_displayname_container:
+                mShowDisplaynameSwitch.setChecked(!mShowDisplaynameSwitch.isChecked());
                 break;
         }
     }

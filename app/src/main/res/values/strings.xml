@@ -366,4 +366,6 @@
     <string name="restore_songs_tip">Restore songs removed from the library</string>
     <string name="alread_restore_songs">Removed songs have been restored</string>
     <string name="speed_range_tip">The range is 0.5 to 1.5</string>
+    <string name="show_displayname">Display filename</string>
+    <string name="show_displayname_tip">Replace the title with the filename in the song list</string>
 </resources>

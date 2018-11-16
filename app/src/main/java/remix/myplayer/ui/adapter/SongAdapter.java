@@ -171,7 +171,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
 //        }
 
         //设置歌曲名
-        holder.mName.setText(song.getTitle());
+        holder.mName.setText(song.getShowName());
 
         //艺术家与专辑
         holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
