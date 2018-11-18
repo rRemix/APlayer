@@ -22,10 +22,15 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer
     companion object {
         /** 定时关闭剩余时间 */
         @JvmStatic
-        var millisUntilFinish: Long = 0
+        private var millisUntilFinish: Long = 0
 
         @JvmStatic
-        var instance: SleepTimer? = null
+        fun getMillisUntilFinish(): Long {
+            return millisUntilFinish
+        }
+
+        @JvmStatic
+        private var instance: SleepTimer? = null
 
         @JvmStatic
         fun isTicking(): Boolean {
@@ -57,5 +62,7 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer
             }
             ToastUtil.show(context, if (!start) context.getString(R.string.cancel_timer) else context.getString(R.string.will_stop_at_x, Math.ceil((duration / 1000 / 60).toDouble()).toInt()))
         }
+
+
     }
 }

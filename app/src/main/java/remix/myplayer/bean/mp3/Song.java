@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 
 import remix.myplayer.App;
+import remix.myplayer.Global;
 import remix.myplayer.util.LogUtil;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
@@ -243,6 +244,9 @@ public class Song implements Cloneable, Parcelable {
         Size = size;
     }
 
+    public String getShowName() {
+        return !Global.SHOW_DISPLAYNAME ? Title : Displayname;
+    }
 
     @Override
     public int describeContents() {

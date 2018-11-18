@@ -67,13 +67,9 @@ public class StatusBarUtil {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static void setColorForLollipop(Activity activity, int color, int statusBarAlpha) {
-        if (Build.MANUFACTURER.equals("Meizu")) {
-            MeizuStatusbar.setStatusBarColor(activity.getWindow(), calculateStatusColor(color, statusBarAlpha));
-        } else {
-            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            activity.getWindow().setStatusBarColor(calculateStatusColor(color, statusBarAlpha));
-        }
+        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        activity.getWindow().setStatusBarColor(calculateStatusColor(color, statusBarAlpha));
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)

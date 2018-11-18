@@ -316,24 +316,31 @@ public class Util {
      * 处理歌曲名、歌手名或者专辑名
      *
      * @param origin 原始数据
-     * @param type 处理类型 0:歌曲名 1:歌手名 2:专辑名
+     * @param type 处理类型 0:歌曲名 1:歌手名 2:专辑名 3:文件名
      * @return
      */
-    public static final int SONGTYPE = 0;
-    public static final int ARTISTTYPE = 1;
-    public static final int ALBUMTYPE = 2;
+    public static final int TYPE_SONG = 0;
+    public static final int TYPE_ARTIST = 1;
+    public static final int TYPE_ALBUM = 2;
+    public static final int TYPE_DISPLAYNAME = 3;
 
     public static String processInfo(String origin, int type) {
-        if (type == SONGTYPE) {
+        if (type == TYPE_SONG) {
             if (origin == null || origin.equals("")) {
                 return App.getContext().getString(R.string.unknown_song);
             } else {
 //                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
                 return origin;
             }
+        } else if (type == TYPE_DISPLAYNAME) {
+            if (origin == null || origin.equals("")) {
+                return App.getContext().getString(R.string.unknown_song);
+            } else {
+                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
+            }
         } else {
             if (origin == null || origin.equals("")) {
-                return App.getContext().getString(type == ARTISTTYPE ? R.string.unknown_artist : R.string.unknown_album);
+                return App.getContext().getString(type == TYPE_ARTIST ? R.string.unknown_artist : R.string.unknown_album);
             } else {
                 return origin;
             }

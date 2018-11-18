@@ -15,13 +15,14 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.Global;
 import remix.myplayer.R;
-import remix.myplayer.bean.mp3.PlayListSong;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
@@ -39,7 +40,7 @@ import remix.myplayer.util.Util;
 /**
  * 正在播放列表Dialog
  */
-public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager.LoaderCallbacks<List<PlayListSong>> {
+public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager.LoaderCallbacks<List<Song>> {
     @BindView(R.id.bottom_actionbar_play_list)
     RecyclerView mRecyclerView;
     private PlayQueueAdapter mAdapter;
@@ -126,12 +127,12 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     }
 
     @Override
-    public Loader<List<PlayListSong>> onCreateLoader(int id, Bundle args) {
+    public Loader<List<Song>> onCreateLoader(int id, Bundle args) {
         return new AsyncPlayQueueSongLoader(mContext);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<PlayListSong>> loader, final List<PlayListSong> data) {
+    public void onLoadFinished(Loader<List<Song>> loader, final List<Song> data) {
         if (data == null)
             return;
         mAdapter.setData(data);
@@ -146,9 +147,9 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
      *
      * @param data
      */
-    private void smoothScrollTo(List<PlayListSong> data, int currentId) {
+    private void smoothScrollTo(List<Song> data, int currentId) {
         for (int i = 0; i < data.size(); i++) {
-            if (data.get(i).AudioId == currentId) {
+            if (data.get(i).getId() == currentId) {
                 mPos = i;
                 break;
             }
@@ -176,7 +177,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     }
 
     @Override
-    public void onLoaderReset(Loader<List<PlayListSong>> loader) {
+    public void onLoaderReset(Loader<List<Song>> loader) {
         if (mAdapter != null)
             mAdapter.setData(null);
     }
@@ -201,14 +202,18 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         onMediaStoreChanged();
     }
 
-    private static class AsyncPlayQueueSongLoader extends WrappedAsyncTaskLoader<List<PlayListSong>> {
+    private static class AsyncPlayQueueSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
         private AsyncPlayQueueSongLoader(Context context) {
             super(context);
         }
 
         @Override
-        public List<PlayListSong> loadInBackground() {
-            return PlayListUtil.getPlayListSong(Global.PlayQueueID);
+        public List<Song> loadInBackground() {
+
+            List<Integer> ids = PlayListUtil.getSongIds(Global.PlayQueueID);
+            if (ids == null || ids.isEmpty())
+                return new ArrayList<>();
+            return PlayListUtil.getMP3ListByIds(ids, Global.PlayQueueID);
         }
     }
 }

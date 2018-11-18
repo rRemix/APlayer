@@ -138,7 +138,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
 //            }
 
             //设置标题
-            holder.mTitle.setText(song.getTitle());
+            holder.mTitle.setText(song.getShowName());
 
             if (holder.mButton != null) {
                 //设置按钮着色

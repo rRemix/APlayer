@@ -64,12 +64,12 @@ class DefaultLrcParser : ILrcParser {
     }
 
     override fun getLrcRows(bufferedReader: BufferedReader?, needCache: Boolean, cacheKey: String, searchKey: String): List<LrcRow>? {
-        if (bufferedReader == null)
-            return null
         //解析歌词
         val lrcRows = ArrayList<LrcRow>()
         val allLine = ArrayList<String>()
         var offset = 0
+        if (bufferedReader == null)
+            return lrcRows
         bufferedReader.useLines { allLines ->
             allLines.forEach { eachLine ->
                 allLine.add(eachLine)
@@ -84,7 +84,7 @@ class DefaultLrcParser : ILrcParser {
         }
 
         if (allLine.size == 0)
-            return null
+            return lrcRows
 
         for (temp in allLine) {
             //解析每一行歌词
@@ -94,7 +94,7 @@ class DefaultLrcParser : ILrcParser {
         }
 
         if (lrcRows.size == 0)
-            return null
+            return lrcRows
         //为歌词排序
         lrcRows.sort()
         //每行歌词的时间

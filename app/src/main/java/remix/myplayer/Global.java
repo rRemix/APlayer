@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import remix.myplayer.bean.mp3.PlayList;
+import remix.myplayer.util.SPUtil;
 
 /**
  * 一些全局变量
@@ -17,10 +18,6 @@ public class Global {
      * 操作类型
      */
     public static int Operation = -1;
-    /**
-     * 文件夹名与对应的所有歌曲id
-     */
-//    public static Map<String, List<Integer>> FolderMap = new TreeMap<>(String::compareToIgnoreCase);
     /**
      * 播放列表
      */
@@ -48,19 +45,6 @@ public class Global {
     }
 
     /**
-     * 通知栏是否显示
-     */
-    private static boolean NotifyShowing = false;
-
-    public static void setNotifyShowing(boolean isshow) {
-        NotifyShowing = isshow;
-    }
-
-    public static boolean isNotifyShowing() {
-        return NotifyShowing;
-    }
-
-    /**
      * 播放队列id
      */
     public static int PlayQueueID = 0;
@@ -69,4 +53,8 @@ public class Global {
      */
     public static int MyLoveID = 0;
 
+    /**
+     * 所有列表是否显示文件名
+     */
+    public static boolean SHOW_DISPLAYNAME = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SHOW_DISPLAYNAME, false);
 }
