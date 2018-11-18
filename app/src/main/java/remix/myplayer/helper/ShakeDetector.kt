@@ -10,7 +10,6 @@ import android.os.Looper
 import remix.myplayer.App
 import remix.myplayer.service.Command
 import remix.myplayer.util.LogUtil
-import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util.sendCMDLocalBroadcast
 
 /**
@@ -80,8 +79,6 @@ class ShakeDetector private constructor() : SensorEventListener, Runnable {
         lastY = y
         lastZ = z
 
-        val cost = System.currentTimeMillis() - currentTime
-        ToastUtil.show(App.getContext(), "Cost: $cost")
     }
 
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
