@@ -22,12 +22,15 @@ import remix.myplayer.ui.Tag;
 import remix.myplayer.ui.dialog.AddtoPlayListDialog;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
 import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
+import static remix.myplayer.service.MusicService.EXTRA_SONG;
+import static remix.myplayer.ui.dialog.AddtoPlayListDialog.EXTRA_SONG_LIST;
 
 /**
  * Created by Remix on 2018/3/5.
@@ -53,15 +56,13 @@ public class SongPopupListener
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_next:
-                Intent intent = new Intent(MusicService.ACTION_CMD);
-                intent.putExtra("Control", Command.ADD_TO_NEXT_SONG);
-                intent.putExtra("song", mSong);
-                Util.sendLocalBroadcast(intent);
+                Util.sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.ADD_TO_NEXT_SONG)
+                        .putExtra(EXTRA_SONG, mSong));
                 break;
             case R.id.menu_add_to_playlist:
                 Intent intentAdd = new Intent(mActivity, AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
-                ardAdd.putSerializable("list", new ArrayList<>(Collections.singletonList(mSong.getId())));
+                ardAdd.putSerializable(EXTRA_SONG_LIST, new ArrayList<>(Collections.singletonList(mSong.getId())));
                 intentAdd.putExtras(ardAdd);
                 mActivity.startActivity(intentAdd);
                 break;

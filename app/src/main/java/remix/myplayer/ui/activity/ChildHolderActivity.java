@@ -26,7 +26,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.handler.MsgHandler;
@@ -49,7 +48,10 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 
+import static remix.myplayer.helper.MusicServiceRemote.setPlayQueue;
+import static remix.myplayer.service.MusicService.EXTRA_POSITION;
 import static remix.myplayer.util.Constants.TAG_EDIT;
+import static remix.myplayer.util.MusicUtil.makeCmdIntent;
 import static remix.myplayer.util.Util.registerLocalReceiver;
 import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
@@ -119,12 +121,8 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
                             idList.add(info.getId());
                     }
                     //设置正在播放列表
-                    Intent intent = new Intent(MusicService.ACTION_CMD);
-                    Bundle arg = new Bundle();
-                    arg.putInt("Control", Command.PLAYSELECTEDSONG);
-                    arg.putInt("Position", position);
-                    intent.putExtras(arg);
-                    MusicServiceRemote.setPlayQueue(idList, intent);
+                    setPlayQueue(idList, makeCmdIntent(Command.PLAYSELECTEDSONG)
+                            .putExtra(EXTRA_POSITION, position));
                 }
             }
 

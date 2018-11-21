@@ -16,7 +16,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Folder;
-import remix.myplayer.misc.menu.AlbArtFolderPlaylistListener;
+import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
@@ -77,7 +77,7 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
                 Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
                 final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton);
                 popupMenu.getMenuInflater().inflate(R.menu.menu_folder_item, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
+                popupMenu.setOnMenuItemClickListener(new LibraryListener(mContext,
                         folder.getParentId(),
                         Constants.FOLDER,
                         folder.getPath()));

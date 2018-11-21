@@ -2,7 +2,6 @@ package remix.myplayer.ui.fragment;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
@@ -21,10 +20,13 @@ import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.adapter.SongAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.MediaStoreUtil;
+
+import static remix.myplayer.helper.MusicServiceRemote.setAllSongAsPlayQueue;
+import static remix.myplayer.service.MusicService.EXTRA_POSITION;
+import static remix.myplayer.util.MusicUtil.makeCmdIntent;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -58,12 +60,8 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
             public void onItemClick(View view, int position) {
                 final Song song = mAdapter.getDatas().get(position);
                 if (getUserVisibleHint() && !mChoice.click(position, song)) {
-                    Intent intent = new Intent(MusicService.ACTION_CMD);
-                    Bundle arg = new Bundle();
-                    arg.putInt("Control", Command.PLAYSELECTEDSONG);
-                    arg.putInt("Position", position);
-                    intent.putExtras(arg);
-                    MusicServiceRemote.setAllSongAsPlayQueue(intent);
+                    setAllSongAsPlayQueue(makeCmdIntent(Command.PLAYSELECTEDSONG)
+                            .putExtra(EXTRA_POSITION, position));
                 }
             }
 

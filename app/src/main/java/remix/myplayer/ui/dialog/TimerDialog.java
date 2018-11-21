@@ -44,6 +44,8 @@ import remix.myplayer.util.ToastUtil;
  * 定时关闭界面
  */
 public class TimerDialog extends BaseDialogActivity {
+    private static final String EXTRA_MINUTE = "Minute";
+    private static final String EXTRA_SECOND = "Second";
     //提示信息
     @BindView(R.id.timer_info_container)
     View mInfoContainer;
@@ -223,8 +225,8 @@ public class TimerDialog extends BaseDialogActivity {
     public void handlerInternal(Message msg) {
         if (msg != null) {
             if (msg.getData() != null) {
-                mMinute.setText(msg.getData().getString("Minute"));
-                mSecond.setText(msg.getData().getString("Second"));
+                mMinute.setText(msg.getData().getString(EXTRA_MINUTE));
+                mSecond.setText(msg.getData().getString(EXTRA_SECOND));
             }
             mSeekbar.setProgress(msg.arg1);
         }
@@ -246,8 +248,8 @@ public class TimerDialog extends BaseDialogActivity {
                     Message msg = new Message();
                     msg.arg1 = remain;
                     Bundle data = new Bundle();
-                    data.putString("Minute", min < 10 ? "0" + min : "" + min);
-                    data.putString("Second", sec < 10 ? "0" + sec : "" + sec);
+                    data.putString(EXTRA_MINUTE, min < 10 ? "0" + min : "" + min);
+                    data.putString(EXTRA_SECOND, sec < 10 ? "0" + sec : "" + sec);
                     LogUtil.e("TimerDialog", "Minute: " + min + " Second: " + sec);
                     msg.setData(data);
                     mHandler.sendMessage(msg);

@@ -1,7 +1,6 @@
 package remix.myplayer.ui.dialog;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -27,11 +26,13 @@ import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.adapter.PlayQueueAdapter;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.Util;
+
+import static remix.myplayer.service.MusicService.EXTRA_POSITION;
+import static remix.myplayer.util.MusicUtil.makeCmdIntent;
+import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -58,12 +59,8 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent intent = new Intent(MusicService.ACTION_CMD);
-                Bundle arg = new Bundle();
-                arg.putInt("Control", Command.PLAYSELECTEDSONG);
-                arg.putInt("Position", position);
-                intent.putExtras(arg);
-                Util.sendLocalBroadcast(intent);
+                sendLocalBroadcast(makeCmdIntent(Command.PLAYSELECTEDSONG)
+                        .putExtra(EXTRA_POSITION, position));
 
                 mAdapter.notifyDataSetChanged();
             }

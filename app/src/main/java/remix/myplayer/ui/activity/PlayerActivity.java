@@ -113,6 +113,11 @@ import static remix.myplayer.util.Util.unregisterLocalReceiver;
  */
 public class PlayerActivity extends BaseMusicActivity implements FileChooserDialog.FileCallback, OnTagEditListener {
     private static final String TAG = "PlayerActivity";
+    public static final String EXTRA_FROM_NOTIFY = "FromNotify";
+    public static final String EXTRA_FROM_ACTIVITY = "FromActivity";
+    public static final String EXTRA_ANIM_URL = "AnimUrl";
+    public static final String EXTRA_RECT = "Rect";
+
     //上次选中的Fragment
     private int mPrevPosition = 1;
     //第一次启动的标志变量
@@ -300,8 +305,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mFromNotify = getIntent().getBooleanExtra("Notify", false);
-        mFromActivity = getIntent().getBooleanExtra("FromActivity", false);
+        mFromNotify = getIntent().getBooleanExtra(EXTRA_FROM_NOTIFY, false);
+        mFromActivity = getIntent().getBooleanExtra(EXTRA_FROM_ACTIVITY, false);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
@@ -312,7 +317,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         registerLocalReceiver(mTagReceiver, new IntentFilter(Constants.TAG_EDIT));
 
         mInfo = MusicServiceRemote.getCurrentSong();
-        mAnimUrl = getIntent().getParcelableExtra("AnimUrl");
+        mAnimUrl = getIntent().getParcelableExtra(EXTRA_ANIM_URL);
         mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
         setUpBottom();
@@ -341,8 +346,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         }
 
         //恢复位置信息
-        if (savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null) {
-            mOriginRect = savedInstanceState.getParcelable("Rect");
+        if (savedInstanceState != null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
+            mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
         }
     }
 
@@ -395,14 +400,14 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("Rect", mOriginRect);
+        outState.putParcelable(EXTRA_RECT, mOriginRect);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if (mOriginRect == null && savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null)
-            mOriginRect = savedInstanceState.getParcelable("Rect");
+        if (mOriginRect == null && savedInstanceState != null && savedInstanceState.getParcelable(EXTRA_RECT) != null)
+            mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
     }
 
     @Override
@@ -831,7 +836,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
             if (mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
                 //获取传入的界面信息
-                mOriginRect = getIntent().getParcelableExtra("Rect");
+                mOriginRect = getIntent().getParcelableExtra(EXTRA_RECT);
             }
 
             if (mOriginRect == null) {

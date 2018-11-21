@@ -23,6 +23,7 @@ import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.MusicService.EXTRA_CONTROl
 import remix.myplayer.ui.activity.MainActivity
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
@@ -47,7 +48,7 @@ abstract class BaseAppwidget : AppWidgetProvider() {
 
     private fun buildServicePendingIntent(context: Context, componentName: ComponentName, cmd: Int): PendingIntent {
         val intent = Intent(MusicService.ACTION_APPWIDGET_OPERATE)
-        intent.putExtra("Control", cmd)
+        intent.putExtra(EXTRA_CONTROl, cmd)
         intent.component = componentName
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isAllowForForegroundService(cmd)) {
             PendingIntent.getForegroundService(context, cmd, intent, PendingIntent.FLAG_UPDATE_CURRENT)

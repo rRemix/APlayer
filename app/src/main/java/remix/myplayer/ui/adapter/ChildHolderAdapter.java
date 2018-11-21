@@ -2,7 +2,6 @@ package remix.myplayer.ui.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -29,7 +28,6 @@ import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.service.Command;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
@@ -40,6 +38,9 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ToastUtil;
+
+import static remix.myplayer.helper.MusicServiceRemote.setPlayQueue;
+import static remix.myplayer.util.MusicUtil.makeCmdIntent;
 
 /**
  * Created by taeja on 16-6-24.
@@ -83,18 +84,15 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
             }
             //显示当前排序方式
             headerHolder.mShuffle.setOnClickListener(v -> {
-                Intent intent = new Intent(MusicService.ACTION_CMD);
-                intent.putExtra("Control", Command.NEXT);
-                intent.putExtra("shuffle", true);
                 //设置正在播放列表
-                ArrayList<Integer> IDList = new ArrayList<>();
+                ArrayList<Integer> ids = new ArrayList<>();
                 for (Song info : mDatas)
-                    IDList.add(info.getId());
-                if (IDList.size() == 0) {
+                    ids.add(info.getId());
+                if (ids.size() == 0) {
                     ToastUtil.show(mContext, R.string.no_song);
                     return;
                 }
-                MusicServiceRemote.setPlayQueue(IDList, intent);
+                setPlayQueue(ids, makeCmdIntent(Command.NEXT, true));
             });
             return;
         }

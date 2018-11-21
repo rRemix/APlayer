@@ -37,9 +37,12 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.FloatColorAdapter;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
+
+import static remix.myplayer.service.MusicService.EXTRA_FLOAT_LYRIC;
 
 
 /**
@@ -277,10 +280,7 @@ public class FloatLrcView extends RelativeLayout {
             //关闭桌面歌词
             case R.id.widget_close:
                 SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
-                Intent closeIntent = new Intent(MusicService.ACTION_CMD);
-                closeIntent.putExtra("FloatLrc", false);
-                closeIntent.putExtra("Control", Command.TOGGLE_FLOAT_LRC);
-                Util.sendLocalBroadcast(closeIntent);
+                Util.sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.TOGGLE_FLOAT_LRC).putExtra(EXTRA_FLOAT_LYRIC, false));
                 break;
             //锁定
             case R.id.widget_lock:

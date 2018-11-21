@@ -36,6 +36,8 @@ import remix.myplayer.util.ToastUtil;
 
 public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> {
     public static final String TAG = SongChooseActivity.class.getSimpleName();
+    public static final String EXTRA_NAME = "PlayListName";
+    public static final String EXTRA_ID = "PlayListID";
 
     private int mPlayListID;
     private String mPlayListName;
@@ -50,12 +52,12 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> 
         setContentView(R.layout.activity_song_choose);
         ButterKnife.bind(this);
 
-        mPlayListID = getIntent().getIntExtra("PlayListID", -1);
+        mPlayListID = getIntent().getIntExtra(EXTRA_ID, -1);
         if (mPlayListID <= 0) {
             ToastUtil.show(this, R.string.add_error, Toast.LENGTH_SHORT);
             return;
         }
-        mPlayListName = getIntent().getStringExtra("PlayListName");
+        mPlayListName = getIntent().getStringExtra(EXTRA_NAME);
 
         TextView cancel = findViewById(R.id.cancel);
         cancel.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));

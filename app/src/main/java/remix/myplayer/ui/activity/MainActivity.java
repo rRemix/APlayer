@@ -113,6 +113,8 @@ import static remix.myplayer.bean.misc.Category.DEFAULT_LIBRARY;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DISMISS_DIALOG;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DOWNLOAD_COMPLETE;
 import static remix.myplayer.misc.update.DownloadService.ACTION_SHOW_DIALOG;
+import static remix.myplayer.ui.activity.SongChooseActivity.EXTRA_ID;
+import static remix.myplayer.ui.activity.SongChooseActivity.EXTRA_NAME;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.Util.installApk;
 import static remix.myplayer.util.Util.registerLocalReceiver;
@@ -123,6 +125,12 @@ import static remix.myplayer.util.Util.unregisterLocalReceiver;
  */
 public class MainActivity extends MenuActivity {
     private final static String TAG = "MainActivity";
+    public static final String EXTRA_RECREATE = "needRecreate";
+    public static final String EXTRA_REFRESH_ADAPTER = "needRefreshAdapter";
+    public static final String EXTRA_REFRESH_LIBRARY = "needRefreshLibrary";
+    public static final String EXTRA_CATEGORY = "Category";
+
+
     @BindView(R.id.tabs)
     TabLayout mTablayout;
     @BindView(R.id.ViewPager)
@@ -249,8 +257,8 @@ public class MainActivity extends MenuActivity {
                                     if (newPlayListId > 0) {
                                         //跳转到添加歌曲界面
                                         Intent intent = new Intent(mContext, SongChooseActivity.class);
-                                        intent.putExtra("PlayListID", newPlayListId);
-                                        intent.putExtra("PlayListName", input.toString());
+                                        intent.putExtra(EXTRA_ID, newPlayListId);
+                                        intent.putExtra(EXTRA_NAME, input.toString());
                                         startActivity(intent);
                                     }
                                 }
@@ -515,12 +523,12 @@ public class MainActivity extends MenuActivity {
             case REQUEST_SETTING:
                 if (data == null)
                     return;
-                if (data.getBooleanExtra("needRecreate", false)) { //设置后需要重启activity
+                if (data.getBooleanExtra(EXTRA_RECREATE, false)) { //设置后需要重启activity
                     mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
-                } else if (data.getBooleanExtra("needRefreshAdapter", false)) { //刷新adapter
+                } else if (data.getBooleanExtra(EXTRA_REFRESH_ADAPTER, false)) { //刷新adapter
                     mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-                } else if (data.getBooleanExtra("needRefreshLibrary", false)) { //刷新Library
-                    List<Category> categories = (List<Category>) data.getSerializableExtra("Category");
+                } else if (data.getBooleanExtra(EXTRA_REFRESH_LIBRARY, false)) { //刷新Library
+                    List<Category> categories = (List<Category>) data.getSerializableExtra(EXTRA_CATEGORY);
                     LogUtil.d("MainPagerAdapter", "更新过后: " + categories);
                     if (categories != null && categories.size() > 0) {
                         mPagerAdapter.setList(categories);

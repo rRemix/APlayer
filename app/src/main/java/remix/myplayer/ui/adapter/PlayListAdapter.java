@@ -24,7 +24,7 @@ import butterknife.BindView;
 import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayList;
-import remix.myplayer.misc.menu.AlbArtFolderPlaylistListener;
+import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.PlayListUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -141,7 +141,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
             Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton);
             popupMenu.getMenuInflater().inflate(R.menu.menu_playlist_item, popupMenu.getMenu());
-            popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext, info._Id, Constants.PLAYLIST, info.Name));
+            popupMenu.setOnMenuItemClickListener(new LibraryListener(mContext, info._Id, Constants.PLAYLIST, info.Name));
             popupMenu.show();
         });
         //点击效果

@@ -14,7 +14,9 @@ import android.support.v4.app.TaskStackBuilder
 import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.MusicService.EXTRA_CONTROl
 import remix.myplayer.ui.activity.PlayerActivity
+import remix.myplayer.ui.activity.PlayerActivity.EXTRA_FROM_NOTIFY
 import remix.myplayer.util.LogUtil
 
 /**
@@ -38,8 +40,8 @@ abstract class Notify internal constructor(internal var service: MusicService) {
             stackBuilder.addParentStack(PlayerActivity::class.java)
             stackBuilder.addNextIntent(result)
 
-            stackBuilder.editIntentAt(1).putExtra("Notify", true)
-            stackBuilder.editIntentAt(0).putExtra("Notify", true)
+            stackBuilder.editIntentAt(1).putExtra(EXTRA_FROM_NOTIFY, true)
+            stackBuilder.editIntentAt(0).putExtra(EXTRA_FROM_NOTIFY, true)
             return stackBuilder.getPendingIntent(
                     0,
                     PendingIntent.FLAG_UPDATE_CURRENT
@@ -64,7 +66,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
         playingNotificationChannel.enableLights(false)
         playingNotificationChannel.enableVibration(false)
         playingNotificationChannel.description = service.getString(R.string.playing_notification_description)
-        notificationManager!!.createNotificationChannel(playingNotificationChannel)
+        notificationManager?.createNotificationChannel(playingNotificationChannel)
     }
 
     abstract fun updateForPlaying()
@@ -85,7 +87,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
             LogUtil.d("ServiceLifeCycle", "启动前台服务")
             service.startForeground(PLAYING_NOTIFICATION_ID, notification)
         } else {
-            notificationManager!!.notify(PLAYING_NOTIFICATION_ID, notification)
+            notificationManager?.notify(PLAYING_NOTIFICATION_ID, notification)
         }
 
         notifyMode = newNotifyMode
@@ -97,7 +99,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
      */
     fun cancelPlayingNotify() {
         service.stopForeground(true)
-        notificationManager!!.cancel(PLAYING_NOTIFICATION_ID)
+        notificationManager?.cancel(PLAYING_NOTIFICATION_ID)
         isStop = true
         isNotifyShowing = false
         //        notifyMode = NOTIFY_MODE_NONE;
@@ -105,9 +107,9 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
     internal fun buildPendingIntent(context: Context, operation: Int): PendingIntent {
         val intent = Intent(MusicService.ACTION_CMD)
-        intent.putExtra("Control", operation)
+        intent.putExtra(EXTRA_CONTROl, operation)
         intent.component = ComponentName(context, MusicService::class.java)
-        intent.putExtra("FromNotify", true)
+        intent.putExtra(EXTRA_FROM_NOTIFY, true)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)

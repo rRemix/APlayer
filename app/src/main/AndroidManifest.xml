@@ -155,9 +155,6 @@
             android:name=".ui.dialog.PlayQueueDialog"
             android:theme="@style/BaseDialogTheme" />
         <!-- 选项 -->
-        <activity
-            android:name=".ui.dialog.OptionDialog"
-            android:theme="@style/BaseDialogTheme" />
         <!-- 定时停止 -->
         <activity
             android:name=".ui.dialog.TimerDialog"

@@ -63,6 +63,7 @@ import remix.myplayer.ui.dialog.ThemeDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -74,7 +75,12 @@ import static remix.myplayer.helper.M3UHelper.exportPlayListToFile;
 import static remix.myplayer.helper.M3UHelper.importLocalPlayList;
 import static remix.myplayer.helper.M3UHelper.importM3UFile;
 import static remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM;
+import static remix.myplayer.service.MusicService.EXTRA_FLOAT_LYRIC;
 import static remix.myplayer.theme.Theme.getBaseDialog;
+import static remix.myplayer.ui.activity.MainActivity.EXTRA_CATEGORY;
+import static remix.myplayer.ui.activity.MainActivity.EXTRA_RECREATE;
+import static remix.myplayer.ui.activity.MainActivity.EXTRA_REFRESH_ADAPTER;
+import static remix.myplayer.ui.activity.MainActivity.EXTRA_REFRESH_LIBRARY;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
 
@@ -127,8 +133,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     private boolean mNeedRefreshAdapter = false;
     //是否需要刷新library
     private boolean mNeedRefreshLibrary;
-    //是否从主题颜色选择对话框返回
-    private boolean mFromColorChoose = false;
+    //    //是否从主题颜色选择对话框返回
+//    private boolean mFromColorChoose = false;
     //缓存大小
     private long mCacheSize = 0;
     private final int RECREATE = 100;
@@ -151,9 +157,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         //读取重启aitivity之前的数据
         if (savedInstanceState != null) {
-            mNeedRecreate = savedInstanceState.getBoolean("needRecreate");
-            mNeedRefreshAdapter = savedInstanceState.getBoolean("needRefresh");
-            mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
+            mNeedRecreate = savedInstanceState.getBoolean(EXTRA_RECREATE);
+            mNeedRefreshAdapter = savedInstanceState.getBoolean(EXTRA_REFRESH_ADAPTER);
+//            mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
         }
 
         final String[] keyWord = new String[]{SPUtil.SETTING_KEY.COLOR_NAVIGATION, SPUtil.SETTING_KEY.SHAKE,
@@ -204,9 +210,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     return;
                                 }
                                 mFloatLrcTip.setText(isChecked ? R.string.opened_float_lrc : R.string.closed_float_lrc);
-                                Intent intent = new Intent(MusicService.ACTION_CMD);
-                                intent.putExtra("FloatLrc", mFloatLrcSwitch.isChecked());
-                                intent.putExtra("Control", Command.TOGGLE_FLOAT_LRC);
+                                Intent intent = MusicUtil.makeCmdIntent(Command.TOGGLE_FLOAT_LRC);
+                                intent.putExtra(EXTRA_FLOAT_LYRIC, mFloatLrcSwitch.isChecked());
                                 sendLocalBroadcast(intent);
                                 break;
                             //屏幕常亮
@@ -214,8 +219,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //通知栏样式
                             case R.id.setting_notify_switch:
-                                sendLocalBroadcast(new Intent(MusicService.ACTION_CMD)
-                                        .putExtra("Control", Command.TOGGLE_NOTIFY)
+                                sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.TOGGLE_NOTIFY)
                                         .putExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, isChecked));
                                 break;
                             //沉浸式状态栏
@@ -226,9 +230,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //断点播放
                             case R.id.setting_breakpoint_switch:
-                                sendLocalBroadcast(new Intent(MusicService.ACTION_CMD)
-                                        .putExtra("Control", Command.PLAY_AT_BREAKPOINT)
-                                        .putExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, view.isChecked()));
+                                sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.PLAY_AT_BREAKPOINT)
+                                        .putExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, isChecked));
                                 break;
                             //忽略内嵌
                             case R.id.setting_ignore_mediastore_switch:
@@ -297,9 +300,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     @Override
     public void onBackPressed() {
         Intent intent = getIntent();
-        intent.putExtra("needRecreate", mNeedRecreate);
-        intent.putExtra("needRefreshAdapter", mNeedRefreshAdapter);
-        intent.putExtra("needRefreshLibrary", mNeedRefreshLibrary);
+        intent.putExtra(EXTRA_RECREATE, mNeedRecreate);
+        intent.putExtra(EXTRA_REFRESH_ADAPTER, mNeedRefreshAdapter);
+        intent.putExtra(EXTRA_REFRESH_LIBRARY, mNeedRefreshLibrary);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }
@@ -786,7 +789,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     }
                     if (!newCategories.equals(oldCategories)) {
                         mNeedRefreshLibrary = true;
-                        getIntent().putExtra("Category", newCategories);
+                        getIntent().putExtra(EXTRA_CATEGORY, newCategories);
                         SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, new Gson().toJson(newCategories, new TypeToken<List<Category>>() {
                         }.getType()));
                     }
@@ -848,9 +851,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("needRecreate", mNeedRecreate);
-        outState.putBoolean("fromColorChoose", mFromColorChoose);
-        outState.putBoolean("needRefresh", mNeedRefreshAdapter);
+        outState.putBoolean(EXTRA_RECREATE, mNeedRecreate);
+//        outState.putBoolean("fromColorChoose", mFromColorChoose);
+        outState.putBoolean(EXTRA_REFRESH_ADAPTER, mNeedRefreshAdapter);
     }
 
     @Override
@@ -871,9 +874,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_THEME_COLOR) {
             if (data != null) {
-                mNeedRecreate = data.getBooleanExtra("needRecreate", false);
-                mFromColorChoose = data.getBooleanExtra("fromColorChoose", false);
-                if (mNeedRecreate) {
+//                mFromColorChoose = data.getBooleanExtra("fromColorChoose", false);
+                if (mNeedRecreate = data.getBooleanExtra(EXTRA_RECREATE, false)) {
                     mHandler.sendEmptyMessage(RECREATE);
                 }
             }

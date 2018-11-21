@@ -21,6 +21,8 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 
+import static remix.myplayer.ui.activity.MainActivity.EXTRA_RECREATE;
+
 /**
  * @ClassName ThemeDialog
  * @Description 主题颜色选择
@@ -113,8 +115,8 @@ public class ThemeDialog extends BaseDialogActivity {
 
         private void changeThemeColor(boolean isFromNight) {
             Intent intent = new Intent();
-            intent.putExtra("needRecreate", true);
-            intent.putExtra("fromColorChoose", isFromNight);
+            intent.putExtra(EXTRA_RECREATE, true);
+//            intent.putExtra("fromColorChoose", isFromNight);
             setResult(Activity.RESULT_OK, intent);
             ThemeStore.THEME_MODE = ThemeStore.DAY;
             ThemeStore.THEME_COLOR = mThemeColor;

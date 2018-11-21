@@ -1,7 +1,6 @@
 package remix.myplayer.ui.activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -17,18 +16,20 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.adapter.SongAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
+
+import static remix.myplayer.helper.MusicServiceRemote.setPlayQueue;
+import static remix.myplayer.service.MusicService.EXTRA_POSITION;
+import static remix.myplayer.util.MusicUtil.makeCmdIntent;
 
 /**
  * Created by taeja on 16-3-4.
@@ -64,12 +65,8 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
             public void onItemClick(View view, int position) {
                 final Song song = mAdapter.getDatas().get(position);
                 if (song != null && !mChoice.click(position, song)) {
-                    Intent intent = new Intent(MusicService.ACTION_CMD);
-                    Bundle arg = new Bundle();
-                    arg.putInt("Control", Command.PLAYSELECTEDSONG);
-                    arg.putInt("Position", position);
-                    intent.putExtras(arg);
-                    MusicServiceRemote.setPlayQueue(mIdList, intent);
+                    setPlayQueue(mIdList, makeCmdIntent(Command.PLAYSELECTEDSONG)
+                            .putExtra(EXTRA_POSITION, position));
                 }
             }
 
@@ -99,7 +96,6 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
         }
         return id;
     }
-
 
 
     @Override
