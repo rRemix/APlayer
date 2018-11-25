@@ -36,6 +36,14 @@ public class Category implements Serializable {
         mOrder = mTag;
     }
 
+    public boolean isPlayList(){
+        return mClassName.equals(PlayListFragment.class.getName());
+    }
+
+    public boolean isSongList(){
+        return mClassName.equals(SongFragment.class.getName());
+    }
+
     public String getClassName() {
         return mClassName;
     }

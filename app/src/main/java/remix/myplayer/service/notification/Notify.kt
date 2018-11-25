@@ -14,7 +14,7 @@ import android.support.v4.app.TaskStackBuilder
 import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.service.MusicService.EXTRA_CONTROl
+import remix.myplayer.service.MusicService.EXTRA_CONTROL
 import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.activity.PlayerActivity.EXTRA_FROM_NOTIFY
 import remix.myplayer.util.LogUtil
@@ -107,7 +107,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
     internal fun buildPendingIntent(context: Context, operation: Int): PendingIntent {
         val intent = Intent(MusicService.ACTION_CMD)
-        intent.putExtra(EXTRA_CONTROl, operation)
+        intent.putExtra(EXTRA_CONTROL, operation)
         intent.component = ComponentName(context, MusicService::class.java)
         intent.putExtra(EXTRA_FROM_NOTIFY, true)
 

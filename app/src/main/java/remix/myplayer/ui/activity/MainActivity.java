@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -96,6 +97,7 @@ import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
+import remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -130,6 +132,7 @@ public class MainActivity extends MenuActivity {
     public static final String EXTRA_REFRESH_LIBRARY = "needRefreshLibrary";
     public static final String EXTRA_CATEGORY = "Category";
 
+    public static final long DELAY_HIDE_LOCATION = TimeUnit.SECONDS.toMillis(4);
 
     @BindView(R.id.tabs)
     TabLayout mTablayout;
@@ -141,6 +144,8 @@ public class MainActivity extends MenuActivity {
     DrawerLayout mDrawerLayout;
     @BindView(R.id.add)
     ImageView mAddButton;
+    @BindView(R.id.location)
+    ImageView mLocation;
     @BindView(R.id.header_txt)
     TextView mHeadText;
     @BindView(R.id.header_img)
@@ -162,6 +167,23 @@ public class MainActivity extends MenuActivity {
 
     //当前选中的fragment
     private LibraryFragment mCurrentFragment;
+    private RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if (Math.abs(dy) > 1) {
+                showViewWithAnim(mLocation, true);
+                mLocation.removeCallbacks(mLocationRunnable);
+                mLocation.postDelayed(mLocationRunnable,DELAY_HIDE_LOCATION);
+            }
+        }
+    };
+    private Runnable mLocationRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mLocation.setVisibility(View.GONE);
+        }
+    };
 
     @Override
     protected void onResume() {
@@ -233,7 +255,7 @@ public class MainActivity extends MenuActivity {
      *
      * @param v
      */
-    @OnClick({R.id.add})
+    @OnClick({R.id.add, R.id.location})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.add:
@@ -268,11 +290,14 @@ public class MainActivity extends MenuActivity {
                         })
                         .show();
                 break;
-//            case R.id.multi_close:
-//                getMultiToolbar().setVisibility(View.GONE);
-//                getToolbar().setVisibility(View.VISIBLE);
-//                getChoice().clearCheck();
-//                break;
+            case R.id.location:
+                List<Fragment> fragments = getSupportFragmentManager().getFragments();
+                for (Fragment fragment : fragments) {
+                    if (fragment instanceof SongFragment) {
+                        ((SongFragment) fragment).scrollToCurrent();
+                    }
+                }
+                break;
         }
     }
 
@@ -289,9 +314,10 @@ public class MainActivity extends MenuActivity {
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mPagerAdapter.setList(categories);
         mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(0).getTag());
-        //有且仅有播放列表一个tab
-        if (categories.size() == 1 && categories.get(0).getTag() == R.string.tab_playlist) {
-            showAddPlayListButton(true);
+        //有且仅有一个tab
+        if (categories.size() == 1) {
+            if (categories.get(0).isPlayList())
+                showViewWithAnim(mAddButton, true);
         }
 
         mAddButton.setImageResource(ThemeStore.isDay() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
@@ -305,24 +331,32 @@ public class MainActivity extends MenuActivity {
 
             @Override
             public void onPageSelected(int position) {
-                showAddPlayListButton(mPagerAdapter.getList().get(position).getTitle().equals(getString(R.string.tab_playlist)));
+                final Category category = mPagerAdapter.getList().get(position);
+                showViewWithAnim(mAddButton, category.isPlayList());
+                if(!category.isSongList()){ //滑动到其他tab时隐藏歌曲列表的定位按钮
+                    showViewWithAnim(mLocation, false);
+                }
+
                 mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getTag());
-                LogUtil.d("MenuParse", "LayoutID: " + mMenuLayoutId);
                 mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(position);
-                LogUtil.d("MenuParse", "CurrentFragment: " + mCurrentFragment);
 
                 invalidateOptionsMenu();
+
+                addScrollListener();
             }
+
 
             @Override
             public void onPageScrollStateChanged(int state) {
             }
         });
         mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(0);
+
+        mLocation.setImageDrawable(Theme.TintDrawable(R.drawable.ic_my_location_black_24dp, ThemeStore.getAccentColor()));
+        mLocation.postDelayed(this::addScrollListener,500);
     }
 
     private int mMenuLayoutId = R.menu.menu_main;
-
     public int parseMenuId(int tag) {
         return tag == Category.TAG_SONG ? R.menu.menu_main :
                 tag == Category.TAG_ALBUM ? R.menu.menu_album :
@@ -374,20 +408,31 @@ public class MainActivity extends MenuActivity {
         mCurrentFragment.onMediaStoreChanged();
     }
 
-    private void showAddPlayListButton(boolean show) {
+    private void addScrollListener() {
+        RecyclerView recyclerView = findViewById(R.id.recyclerview);
+        if(recyclerView instanceof LocationRecyclerView){
+            LocationRecyclerView locationRecyclerView = (LocationRecyclerView) recyclerView;
+            locationRecyclerView.removeOnScrollListener(mScrollListener);
+            locationRecyclerView.addOnScrollListener(mScrollListener);
+        }
+    }
+
+    private void showViewWithAnim(View view, boolean show) {
         if (show) {
-            mAddButton.setVisibility(View.VISIBLE);
-            SpringSystem.create().createSpring()
-                    .addListener(new SimpleSpringListener() {
-                        @Override
-                        public void onSpringUpdate(Spring spring) {
-                            mAddButton.setScaleX((float) spring.getCurrentValue());
-                            mAddButton.setScaleY((float) spring.getCurrentValue());
-                        }
-                    })
-                    .setEndValue(1);
+            if (view.getVisibility() != View.VISIBLE) {
+                view.setVisibility(View.VISIBLE);
+                SpringSystem.create().createSpring()
+                        .addListener(new SimpleSpringListener() {
+                            @Override
+                            public void onSpringUpdate(Spring spring) {
+                                view.setScaleX((float) spring.getCurrentValue());
+                                view.setScaleY((float) spring.getCurrentValue());
+                            }
+                        })
+                        .setEndValue(1);
+            }
         } else {
-            mAddButton.setVisibility(View.GONE);
+            view.setVisibility(View.GONE);
         }
 
     }

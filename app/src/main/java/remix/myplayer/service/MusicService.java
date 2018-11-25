@@ -317,7 +317,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     //播放状态变化
     public static final String PLAY_STATE_CHANGE = APLAYER_PACKAGE_NAME + ".play_state.change";
 
-    public static final String EXTRA_CONTROl = "Control";
+    public static final String EXTRA_CONTROL = "Control";
     public static final String ACTION_APPWIDGET_OPERATE = APLAYER_PACKAGE_NAME + "appwidget.operate";
     public static final String ACTION_SHORTCUT_SHUFFLE = APLAYER_PACKAGE_NAME + ".shortcut.shuffle";
     public static final String ACTION_SHORTCUT_MYLOVE = APLAYER_PACKAGE_NAME + ".shortcut.my_love";
@@ -1112,7 +1112,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             LogUtil.d(TAG, "ControlReceiver: " + intent);
             if (intent == null || intent.getExtras() == null)
                 return;
-            int control = intent.getIntExtra(EXTRA_CONTROl, -1);
+            int control = intent.getIntExtra(EXTRA_CONTROL, -1);
             mControl = control;
 
             if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT

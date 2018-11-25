@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,9 +100,11 @@ import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.service.MusicService.EXTRA_CONTROL;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
 import static remix.myplayer.util.Util.registerLocalReceiver;
+import static remix.myplayer.util.Util.sendLocalBroadcast;
 import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 /**
@@ -516,16 +519,16 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         Intent intent = new Intent(MusicService.ACTION_CMD);
         switch (v.getId()) {
             case R.id.playbar_prev:
-                intent.putExtra("Control", Command.PREV);
+                intent.putExtra(EXTRA_CONTROL, Command.PREV);
                 break;
             case R.id.playbar_next:
-                intent.putExtra("Control", Command.NEXT);
+                intent.putExtra(EXTRA_CONTROL, Command.NEXT);
                 break;
             case R.id.playbar_play_container:
-                intent.putExtra("Control", Command.TOGGLE);
+                intent.putExtra(EXTRA_CONTROL, Command.TOGGLE);
                 break;
         }
-        Util.sendLocalBroadcast(intent);
+        sendLocalBroadcast(intent);
     }
 
     /**
@@ -735,9 +738,11 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
                     mHandler.removeCallbacks(mVolumeRunnable);
                     mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
                 }
-                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-                        (int) (seekBar.getProgress() / 100f * max),
-                        AudioManager.FLAG_PLAY_SOUND);
+                if (fromUser) {
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                            (int) (seekBar.getProgress() / 100f * max),
+                            AudioManager.FLAG_PLAY_SOUND);
+                }
             }
 
             @Override
@@ -1021,6 +1026,12 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         @Override
         public void run() {
             while (mIsForeground) {
+                //音量
+                if (mVolumeSeekbar.getVisibility() == View.VISIBLE) {
+                    final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                    final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                    runOnUiThread(() -> mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100)));
+                }
                 if (!MusicServiceRemote.isPlaying())
                     continue;
                 int progress = MusicServiceRemote.getProgress();
@@ -1036,6 +1047,11 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return super.onKeyDown(keyCode, event);
     }
 
     /**
@@ -1214,7 +1230,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //        }
         SPUtil.putValue(mContext, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", SPUtil.LYRIC_KEY.LYRIC_MANUAL);
         mLyricFragment.updateLrc(file.getAbsolutePath());
-        Util.sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
+        sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
     }
 
     @Override

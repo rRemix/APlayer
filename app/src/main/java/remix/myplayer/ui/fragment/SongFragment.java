@@ -21,7 +21,7 @@ import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.ui.adapter.SongAdapter;
-import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
+import remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView;
 import remix.myplayer.util.MediaStoreUtil;
 
 import static remix.myplayer.helper.MusicServiceRemote.setAllSongAsPlayQueue;
@@ -37,7 +37,7 @@ import static remix.myplayer.util.MusicUtil.makeCmdIntent;
  */
 public class SongFragment extends LibraryFragment<Song, SongAdapter> {
     @BindView(R.id.recyclerview)
-    FastScrollRecyclerView mRecyclerView;
+    LocationRecyclerView mRecyclerView;
 
     public static final String TAG = SongFragment.class.getSimpleName();
 
@@ -120,6 +120,10 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
     @Override
     public SongAdapter getAdapter() {
         return mAdapter;
+    }
+
+    public void scrollToCurrent(){
+        mRecyclerView.smoothScrollToCurrentSong(mAdapter.getDatas());
     }
 
     private static class AsyncSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
