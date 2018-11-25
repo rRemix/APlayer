@@ -57,6 +57,8 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  */
 public class RecordShareActivity extends BaseMusicActivity {
     private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 268);
+    public static final String EXTRA_SONG = "Song";
+    public static final String EXTRA_CONTENT = "Content";
 
     @BindView(R.id.recordshare_image)
     SimpleDraweeView mImage;
@@ -131,7 +133,7 @@ public class RecordShareActivity extends BaseMusicActivity {
         //初始化控件
         mContainer.setDrawingCacheEnabled(true);
 
-        mInfo = getIntent().getExtras().getParcelable("Song");
+        mInfo = getIntent().getExtras().getParcelable(EXTRA_SONG);
         if (mInfo == null)
             return;
 
@@ -140,7 +142,7 @@ public class RecordShareActivity extends BaseMusicActivity {
                 new RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load();
 
         //设置歌曲名与分享内容
-        String content = getIntent().getExtras().getString("Content");
+        String content = getIntent().getExtras().getString(EXTRA_CONTENT);
         mContent.setText(TextUtils.isEmpty(content) ? "" : content);
         mSong.setText(String.format("《%s》", mInfo.getTitle()));
         //背景

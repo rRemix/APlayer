@@ -40,6 +40,7 @@ import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
 import static remix.myplayer.helper.MusicServiceRemote.getCurrentSong;
 import static remix.myplayer.helper.MusicServiceRemote.getMediaPlayer;
 import static remix.myplayer.theme.Theme.getBaseDialog;
+import static remix.myplayer.ui.dialog.AddtoPlayListDialog.EXTRA_SONG_LIST;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 /**
@@ -144,7 +145,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
             case R.id.menu_add_to_playlist:
                 Intent intentAdd = new Intent(this, AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
-                ardAdd.putSerializable("list", new ArrayList<>(Collections.singletonList(mInfo.getId())));
+                ardAdd.putSerializable(EXTRA_SONG_LIST, new ArrayList<>(Collections.singletonList(mInfo.getId())));
                 intentAdd.putExtras(ardAdd);
                 startActivity(intentAdd);
                 break;
@@ -160,9 +161,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                     ToastUtil.show(mActivity, getString(R.string.delete_success));
                                     //移除的是正在播放的歌曲
                                     if (mInfo.getId() == getCurrentSong().getId()) {
-                                        Intent intent = new Intent(MusicService.ACTION_CMD);
-                                        intent.putExtra("Control", Command.NEXT);
-                                        Util.sendLocalBroadcast(intent);
+                                        Util.sendCMDLocalBroadcast(Command.NEXT);
                                     }
                                 } else {
                                     ToastUtil.show(mActivity, getString(R.string.delete_error));
@@ -196,7 +195,6 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                 SPUtil.putValue(mActivity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED, input.toString());
                             }
                         })
-                        .inputRange(1, 3)
 //                        .inputType(InputType.TYPE_NUMBER_FLAG_DECIMAL)
                         .show();
                 break;

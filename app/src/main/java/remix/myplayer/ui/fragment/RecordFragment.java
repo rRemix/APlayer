@@ -18,6 +18,9 @@ import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.ui.activity.RecordShareActivity;
 import remix.myplayer.ui.fragment.base.BaseMusicFragment;
 
+import static remix.myplayer.ui.activity.RecordShareActivity.EXTRA_CONTENT;
+import static remix.myplayer.ui.activity.RecordShareActivity.EXTRA_SONG;
+
 /**
  * Created by Remix on 2015/12/28.
  */
@@ -52,8 +55,8 @@ public class RecordFragment extends BaseMusicFragment {
 //            }
             Intent intent = new Intent(mContext, RecordShareActivity.class);
             Bundle arg = new Bundle();
-            arg.putString("Content", mEdit.getText().toString());
-            arg.putParcelable("Song", MusicServiceRemote.getCurrentSong());
+            arg.putString(EXTRA_CONTENT, mEdit.getText().toString());
+            arg.putParcelable(EXTRA_SONG, MusicServiceRemote.getCurrentSong());
             intent.putExtras(arg);
             startActivityForResult(intent, REQUEST_SHARE);
         });

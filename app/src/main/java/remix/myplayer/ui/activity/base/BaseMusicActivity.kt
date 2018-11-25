@@ -139,7 +139,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
                         activity.onMediaStoreChanged()
                     }
                     MusicService.PERMISSION_CHANGE -> {
-                        activity.onPermissionChanged(msg.arg1 == 1)
+                        activity.onPermissionChanged(msg.arg1 == PERMISSION_GRANT)
                     }
                     MusicService.PLAYLIST_CHANGE -> {
                         activity.onPlayListChanged()
@@ -164,7 +164,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
                 val action = intent.action
                 val msg = it.obtainMessage(action.hashCode())
                 msg.obj = action
-                msg.arg1 = if (intent.getBooleanExtra("permission", false)) 1 else 0
+                msg.arg1 = if (intent.getBooleanExtra("permission", false)) PERMISSION_GRANT else PERMISSION_NOT_GRANT
                 it.removeMessages(msg.what)
                 it.sendMessageDelayed(msg, 200)
             }
@@ -188,5 +188,10 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
 //                }
 //            }
         }
+    }
+
+    companion object {
+        private const val PERMISSION_GRANT = 1
+        private const val PERMISSION_NOT_GRANT = 0
     }
 }

@@ -397,7 +397,8 @@ public class MediaStoreUtil {
         Set<String> deleteId = new HashSet<>(SPUtil.getStringSet(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG));
         //保存到sp
         for (Song temp : songs) {
-            deleteId.add(temp.getId() + "");
+            if (temp != null)
+                deleteId.add(temp.getId() + "");
         }
         SPUtil.putStringSet(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG, deleteId);
         //从播放队列和全部歌曲移除

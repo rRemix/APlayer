@@ -11,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:id="@+id/divider"/>
 
-    <remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
+    <remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

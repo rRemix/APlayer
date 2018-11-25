@@ -30,7 +30,7 @@ import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Album;
 import remix.myplayer.misc.asynctask.AsynLoadSongNum;
-import remix.myplayer.misc.menu.AlbArtFolderPlaylistListener;
+import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
@@ -172,7 +172,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
             Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton, Gravity.END);
             popupMenu.getMenuInflater().inflate(R.menu.menu_album_item, popupMenu.getMenu());
-            popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
+            popupMenu.setOnMenuItemClickListener(new LibraryListener(mContext,
                     albumId,
                     Constants.ALBUM,
                     album.getAlbum()));

@@ -110,6 +110,10 @@ import static remix.myplayer.util.Util.unregisterLocalReceiver;
  */
 public class MusicService extends BaseService implements Playback, MusicEventCallback {
     private final static String TAG = "MusicService";
+    public static final String EXTRA_FLOAT_LYRIC = "FloatLrc";
+    public static final String EXTRA_SONG = "Song";
+    public static final String EXTRA_POSITION = "Position";
+
     /**
      * 所有歌曲id
      */
@@ -313,6 +317,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     //播放状态变化
     public static final String PLAY_STATE_CHANGE = APLAYER_PACKAGE_NAME + ".play_state.change";
 
+    public static final String EXTRA_CONTROL = "Control";
     public static final String ACTION_APPWIDGET_OPERATE = APLAYER_PACKAGE_NAME + "appwidget.operate";
     public static final String ACTION_SHORTCUT_SHUFFLE = APLAYER_PACKAGE_NAME + ".shortcut.shuffle";
     public static final String ACTION_SHORTCUT_MYLOVE = APLAYER_PACKAGE_NAME + ".shortcut.my_love";
@@ -1107,7 +1112,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             LogUtil.d(TAG, "ControlReceiver: " + intent);
             if (intent == null || intent.getExtras() == null)
                 return;
-            int control = intent.getIntExtra("Control", -1);
+            int control = intent.getIntExtra(EXTRA_CONTROL, -1);
             mControl = control;
 
             if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT
@@ -1177,8 +1182,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 //桌面歌词
                 case Command.TOGGLE_FLOAT_LRC:
                     boolean open;
-                    if (intent.hasExtra("FloatLrc")) {
-                        open = intent.getBooleanExtra("FloatLrc", false);
+                    if (intent.hasExtra(EXTRA_FLOAT_LYRIC)) {
+                        open = intent.getBooleanExtra(EXTRA_FLOAT_LYRIC, false);
                     } else {
                         open = !SPUtil.getValue(mService,
                                 SPUtil.SETTING_KEY.NAME,
@@ -1219,7 +1224,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     break;
                 //临时播放一首歌曲
                 case Command.PLAY_TEMP:
-                    Song tempSong = intent.getParcelableExtra("Song");
+                    Song tempSong = intent.getParcelableExtra(EXTRA_SONG);
                     if (tempSong != null) {
                         mCurrentSong = tempSong;
                         Global.Operation = Command.PLAY_TEMP;
@@ -1244,7 +1249,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                     break;
                 //某一首歌曲添加至下一首播放
                 case Command.ADD_TO_NEXT_SONG:
-                    Song nextSong = intent.getParcelableExtra("song");
+                    Song nextSong = intent.getParcelableExtra(EXTRA_SONG);
                     if (nextSong == null)
                         return;
                     //添加到播放队列

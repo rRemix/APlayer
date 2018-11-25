@@ -42,6 +42,7 @@ import remix.myplayer.util.ToastUtil;
  * 将歌曲添加到播放列表的对话框
  */
 public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+    public static final String EXTRA_SONG_LIST = "list";
     @BindView(R.id.playlist_addto_list)
     RecyclerView mRecyclerView;
     @BindView(R.id.playlist_addto_new)
@@ -63,7 +64,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
         setContentView(R.layout.dialog_addto_playlist);
         ButterKnife.bind(this);
 
-        mList = (List<Integer>) getIntent().getExtras().getSerializable("list");
+        mList = (List<Integer>) getIntent().getExtras().getSerializable(EXTRA_SONG_LIST);
         if (mList == null) {
             ToastUtil.show(mContext, R.string.add_song_playlist_error);
             finish();

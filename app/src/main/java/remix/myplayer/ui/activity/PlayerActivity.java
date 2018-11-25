@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,9 +100,11 @@ import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.service.MusicService.EXTRA_CONTROL;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
 import static remix.myplayer.util.Util.registerLocalReceiver;
+import static remix.myplayer.util.Util.sendLocalBroadcast;
 import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 /**
@@ -113,6 +116,11 @@ import static remix.myplayer.util.Util.unregisterLocalReceiver;
  */
 public class PlayerActivity extends BaseMusicActivity implements FileChooserDialog.FileCallback, OnTagEditListener {
     private static final String TAG = "PlayerActivity";
+    public static final String EXTRA_FROM_NOTIFY = "FromNotify";
+    public static final String EXTRA_FROM_ACTIVITY = "FromActivity";
+    public static final String EXTRA_ANIM_URL = "AnimUrl";
+    public static final String EXTRA_RECT = "Rect";
+
     //上次选中的Fragment
     private int mPrevPosition = 1;
     //第一次启动的标志变量
@@ -300,8 +308,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mFromNotify = getIntent().getBooleanExtra("Notify", false);
-        mFromActivity = getIntent().getBooleanExtra("FromActivity", false);
+        mFromNotify = getIntent().getBooleanExtra(EXTRA_FROM_NOTIFY, false);
+        mFromActivity = getIntent().getBooleanExtra(EXTRA_FROM_ACTIVITY, false);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
@@ -312,7 +320,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         registerLocalReceiver(mTagReceiver, new IntentFilter(Constants.TAG_EDIT));
 
         mInfo = MusicServiceRemote.getCurrentSong();
-        mAnimUrl = getIntent().getParcelableExtra("AnimUrl");
+        mAnimUrl = getIntent().getParcelableExtra(EXTRA_ANIM_URL);
         mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
         setUpBottom();
@@ -341,8 +349,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         }
 
         //恢复位置信息
-        if (savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null) {
-            mOriginRect = savedInstanceState.getParcelable("Rect");
+        if (savedInstanceState != null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
+            mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
         }
     }
 
@@ -395,14 +403,14 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("Rect", mOriginRect);
+        outState.putParcelable(EXTRA_RECT, mOriginRect);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if (mOriginRect == null && savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null)
-            mOriginRect = savedInstanceState.getParcelable("Rect");
+        if (mOriginRect == null && savedInstanceState != null && savedInstanceState.getParcelable(EXTRA_RECT) != null)
+            mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
     }
 
     @Override
@@ -511,16 +519,16 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         Intent intent = new Intent(MusicService.ACTION_CMD);
         switch (v.getId()) {
             case R.id.playbar_prev:
-                intent.putExtra("Control", Command.PREV);
+                intent.putExtra(EXTRA_CONTROL, Command.PREV);
                 break;
             case R.id.playbar_next:
-                intent.putExtra("Control", Command.NEXT);
+                intent.putExtra(EXTRA_CONTROL, Command.NEXT);
                 break;
             case R.id.playbar_play_container:
-                intent.putExtra("Control", Command.TOGGLE);
+                intent.putExtra(EXTRA_CONTROL, Command.TOGGLE);
                 break;
         }
-        Util.sendLocalBroadcast(intent);
+        sendLocalBroadcast(intent);
     }
 
     /**
@@ -730,9 +738,11 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
                     mHandler.removeCallbacks(mVolumeRunnable);
                     mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
                 }
-                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-                        (int) (seekBar.getProgress() / 100f * max),
-                        AudioManager.FLAG_PLAY_SOUND);
+                if (fromUser) {
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                            (int) (seekBar.getProgress() / 100f * max),
+                            AudioManager.FLAG_PLAY_SOUND);
+                }
             }
 
             @Override
@@ -831,7 +841,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
             if (mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
                 //获取传入的界面信息
-                mOriginRect = getIntent().getParcelableExtra("Rect");
+                mOriginRect = getIntent().getParcelableExtra(EXTRA_RECT);
             }
 
             if (mOriginRect == null) {
@@ -1016,6 +1026,12 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         @Override
         public void run() {
             while (mIsForeground) {
+                //音量
+                if (mVolumeSeekbar.getVisibility() == View.VISIBLE) {
+                    final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                    final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                    runOnUiThread(() -> mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100)));
+                }
                 if (!MusicServiceRemote.isPlaying())
                     continue;
                 int progress = MusicServiceRemote.getProgress();
@@ -1031,6 +1047,11 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return super.onKeyDown(keyCode, event);
     }
 
     /**
@@ -1209,7 +1230,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //        }
         SPUtil.putValue(mContext, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "", SPUtil.LYRIC_KEY.LYRIC_MANUAL);
         mLyricFragment.updateLrc(file.getAbsolutePath());
-        Util.sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
+        sendLocalBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
     }
 
     @Override

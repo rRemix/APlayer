@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -19,9 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import remix.myplayer.App;
-import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
+
+import static remix.myplayer.helper.MusicServiceRemote.setPlayQueue;
+import static remix.myplayer.service.MusicService.EXTRA_POSITION;
 
 public class MusicUtil {
     private static final String TAG = MusicUtil.class.getSimpleName();
@@ -88,12 +89,8 @@ public class MusicUtil {
 
 
         if (songs != null && !songs.isEmpty()) {
-            Intent intent = new Intent(MusicService.ACTION_CMD);
-            Bundle arg = new Bundle();
-            arg.putInt("Control", Command.PLAYSELECTEDSONG);
-            arg.putInt("Position", 0);
-            intent.putExtras(arg);
-            MusicServiceRemote.setPlayQueue(songs, intent);
+            setPlayQueue(songs, makeCmdIntent(Command.PLAYSELECTEDSONG)
+                    .putExtra(EXTRA_POSITION, 0));
         } else {
             Util.writeLogToExternalStorage("exception", "Unknown Uri: " + uri);
 //            CrashReport.postCatchedException(new Throwable("Unknown Uri: " + uri));

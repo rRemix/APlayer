@@ -1,7 +1,6 @@
 package remix.myplayer.ui.activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -29,13 +28,15 @@ import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.adapter.SearchAdapter;
 import remix.myplayer.ui.widget.SearchToolBar;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
-import remix.myplayer.util.Util;
+
+import static remix.myplayer.service.MusicService.EXTRA_SONG;
+import static remix.myplayer.util.MusicUtil.makeCmdIntent;
+import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 /**
  * Created by taeja on 16-1-22.
@@ -92,10 +93,8 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
             @Override
             public void onItemClick(View view, int position) {
                 if (mAdapter != null && mAdapter.getDatas() != null) {
-                    Intent intent = new Intent(MusicService.ACTION_CMD);
-                    intent.putExtra("Control", Command.PLAY_TEMP);
-                    intent.putExtra("Song", mAdapter.getDatas().get(position));
-                    Util.sendLocalBroadcast(intent);
+                    sendLocalBroadcast(makeCmdIntent(Command.PLAY_TEMP)
+                            .putExtra(EXTRA_SONG, mAdapter.getDatas().get(position)));
                 } else {
                     ToastUtil.show(mContext, R.string.illegal_arg);
                 }

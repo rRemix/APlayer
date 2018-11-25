@@ -12,23 +12,26 @@ import com.soundcloud.android.crop.Crop
 import remix.myplayer.Global
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomThumb
-import remix.myplayer.helper.MusicServiceRemote
+import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.MusicService.EXTRA_POSITION
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
+import remix.myplayer.ui.dialog.AddtoPlayListDialog.EXTRA_SONG_LIST
 import remix.myplayer.util.*
 import remix.myplayer.util.MediaStoreUtil.*
+import remix.myplayer.util.MusicUtil.makeCmdIntent
 import java.util.*
 
 /**
  * Created by taeja on 16-1-25.
  */
-class AlbArtFolderPlaylistListener(private val context: Context, //专辑id 艺术家id 歌曲id 文件夹position
-                                   private val id: Int, //0:专辑 1:歌手 2:文件夹 3:播放列表
-                                   private val type: Int, //专辑名 艺术家名 文件夹position或者播放列表名字
-                                   private val key: String) : PopupMenu.OnMenuItemClickListener {
+class LibraryListener(private val context: Context, //专辑id 艺术家id 歌曲id 文件夹position
+                      private val id: Int, //0:专辑 1:歌手 2:文件夹 3:播放列表
+                      private val type: Int, //专辑名 艺术家名 文件夹position或者播放列表名字
+                      private val key: String) : PopupMenu.OnMenuItemClickListener {
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
         val ids = when (type) {
@@ -49,12 +52,8 @@ class AlbArtFolderPlaylistListener(private val context: Context, //专辑id 艺�
                     ToastUtil.show(context, R.string.list_is_empty)
                     return true
                 }
-                val intent = Intent(MusicService.ACTION_CMD)
-                val arg = Bundle()
-                arg.putInt("Control", Command.PLAYSELECTEDSONG)
-                arg.putInt("Position", 0)
-                intent.putExtras(arg)
-                MusicServiceRemote.setPlayQueue(ids, intent)
+                setPlayQueue(ids, makeCmdIntent(Command.PLAYSELECTEDSONG)
+                        .putExtra(EXTRA_POSITION, 0))
             }
             //添加到播放队列
             R.id.menu_add_to_play_queue -> {
@@ -68,7 +67,7 @@ class AlbArtFolderPlaylistListener(private val context: Context, //专辑id 艺�
             R.id.menu_add_to_playlist -> {
                 val intentAdd = Intent(context, AddtoPlayListDialog::class.java)
                 val ardAdd = Bundle()
-                ardAdd.putSerializable("list", ArrayList(ids!!))
+                ardAdd.putSerializable(EXTRA_SONG_LIST, ArrayList(ids!!))
                 intentAdd.putExtras(ardAdd)
                 context.startActivity(intentAdd)
             }
