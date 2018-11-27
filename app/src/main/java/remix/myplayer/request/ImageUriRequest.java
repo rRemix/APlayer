@@ -25,6 +25,7 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -59,7 +60,8 @@ import static remix.myplayer.util.Util.isWifi;
  */
 
 public abstract class ImageUriRequest<T> {
-    private static final String LASTFM_DEFAULT_COVER = "https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png";
+    public static final List<String> BLACKLIST = Arrays.asList("https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png",
+            "https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png");
 
     private static final String PREFIX_FILE = "file://";
     private static final String PREFIX_EMBEDDED = "embedded://";
@@ -259,10 +261,6 @@ public abstract class ImageUriRequest<T> {
             if (lastFmArtist.getArtist() != null)
                 imageUrl = ImageUriUtil.getLargestArtistImageUrl(lastFmArtist.getArtist().getImage());
         }
-
-        //忽略LastFM的默认图
-        if (LASTFM_DEFAULT_COVER.equals(imageUrl))
-            imageUrl = "";
 
         if (!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))) {
             SPUtil.putValue(App.getContext(), SPUtil.COVER_KEY.NAME, request.getLastFMKey(), imageUrl);

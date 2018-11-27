@@ -42,7 +42,11 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
     public void onSuccess(String result) {
         if (TextUtils.isEmpty(result)) {
-            onError("Empty Result");
+            onError("empty result");
+            return;
+        }
+        if (ImageUriRequest.BLACKLIST.contains(result)) {
+            onError("in blackList");
             return;
         }
         LogUtil.i(TAG, "onSuccess: " + result);
