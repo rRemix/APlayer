@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -14,7 +15,9 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
 import android.widget.EditText;
@@ -42,6 +45,21 @@ import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
  * @Date 2016/8/9 14:55
  */
 public class Theme {
+    public static Drawable getVectorDrawable(@NonNull Context context, @DrawableRes int id) {
+        return getVectorDrawable(context.getResources(), id, context.getTheme());
+    }
+
+    public static Drawable getVectorDrawable(@NonNull Resources res, @DrawableRes int resId, @Nullable Resources.Theme theme) {
+        if (Build.VERSION.SDK_INT >= 21) {
+            return res.getDrawable(resId, theme);
+        }
+        return VectorDrawableCompat.create(res, resId, theme);
+    }
+
+    public static Drawable TintVectorDrawable(@NonNull Context context, @DrawableRes int id, @ColorInt int color) {
+        return TintDrawable(getVectorDrawable(context.getResources(), id, context.getTheme()), color);
+    }
+
     /**
      * thumb加深色边框并着色
      */

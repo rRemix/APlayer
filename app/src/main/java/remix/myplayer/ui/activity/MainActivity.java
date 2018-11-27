@@ -352,7 +352,7 @@ public class MainActivity extends MenuActivity {
         });
         mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(0);
 
-        mLocation.setImageDrawable(Theme.TintDrawable(R.drawable.ic_my_location_black_24dp, ThemeStore.getAccentColor()));
+        mLocation.setImageDrawable(Theme.TintVectorDrawable(this,R.drawable.ic_my_location_black_24dp, ThemeStore.getAccentColor()));
         mLocation.postDelayed(this::addScrollListener,500);
     }
 
