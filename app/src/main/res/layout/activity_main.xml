@@ -66,8 +66,7 @@
                 android:layout_gravity="bottom|right"
                 android:layout_marginRight="48dp"
                 android:layout_marginBottom="92dp"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_my_location_black_24dp" />
+                android:visibility="gone"/>
         </android.support.design.widget.CoordinatorLayout>
 
     </LinearLayout>
