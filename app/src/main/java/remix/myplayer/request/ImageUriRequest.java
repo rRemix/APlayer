@@ -250,7 +250,7 @@ public abstract class ImageUriRequest<T> {
     }
 
     private String parseLastFMNetworkImageUrl(UriRequest request, ResponseBody body) throws IOException {
-        String imageUrl = "";
+        String imageUrl = null;
         String bodyString = body.string();
         if (request.getSearchType() == ImageUriRequest.URL_ALBUM) {
             LastFmAlbum lastFmAlbum = new Gson().fromJson(bodyString, LastFmAlbum.class);
