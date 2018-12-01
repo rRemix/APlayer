@@ -60,7 +60,7 @@ import static remix.myplayer.util.Util.isWifi;
  */
 
 public abstract class ImageUriRequest<T> {
-    public static final List<String> BLACKLIST = Arrays.asList("https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png",
+    private static final List<String> BLACKLIST = Arrays.asList("https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png",
             "https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png");
 
     private static final String PREFIX_FILE = "file://";
@@ -227,7 +227,7 @@ public abstract class ImageUriRequest<T> {
             @Override
             public void subscribe(ObservableEmitter<String> emitter) throws Exception {
                 String imageUrl = SPUtil.getValue(App.getContext(), SPUtil.COVER_KEY.NAME, request.getLastFMKey(), "");
-                if (!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))) {
+                if (!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl)) && !BLACKLIST.contains(imageUrl)) {
                     emitter.onNext(imageUrl);
                 }
                 emitter.onComplete();
@@ -261,7 +261,9 @@ public abstract class ImageUriRequest<T> {
             if (lastFmArtist.getArtist() != null)
                 imageUrl = ImageUriUtil.getLargestArtistImageUrl(lastFmArtist.getArtist().getImage());
         }
-
+        if (BLACKLIST.contains(imageUrl)) {
+            imageUrl = null;
+        }
         if (!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))) {
             SPUtil.putValue(App.getContext(), SPUtil.COVER_KEY.NAME, request.getLastFMKey(), imageUrl);
         }
