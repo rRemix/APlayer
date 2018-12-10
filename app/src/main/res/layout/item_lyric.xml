@@ -8,14 +8,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/item_content"
-        android:textColor="?attr/text_color"
+        android:textColor="?attr/text_color_secondary"
         android:gravity="center_horizontal"
         android:layout_centerHorizontal="true" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/item_translation"
-        android:textColor="?attr/text_color"
+        android:textColor="?attr/text_color_secondary"
         android:gravity="center"
         android:layout_below="@id/item_content"
         android:layout_centerHorizontal="true"

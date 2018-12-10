@@ -24,7 +24,7 @@ class LyricPriorityDialog : android.support.v4.app.DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val view = activity.layoutInflater.inflate(R.layout.dialog_lyric_priority, null)
+        val view = requireActivity().layoutInflater.inflate(R.layout.dialog_lyric_priority, null)
 
         val adapter = LyricPriorityAdapter(activity, R.layout.item_lyric_priority)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)

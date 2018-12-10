@@ -55,7 +55,7 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
         holder.mCount.setText(String.format("%d首", folder.getCount()));
         //根据主题模式 设置图片
         if (holder.mImg != null) {
-            holder.mImg.setImageDrawable(Theme.TintDrawable(mContext.getResources().getDrawable(R.drawable.icon_folder), ThemeStore.isDay() ? Color.BLACK : Color.WHITE));
+            holder.mImg.setImageDrawable(Theme.TintDrawable(mContext.getResources().getDrawable(R.drawable.icon_folder), ThemeStore.isLight() ? Color.BLACK : Color.WHITE));
         }
 
         //背景点击效果
@@ -63,7 +63,7 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
                 Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL, mContext));
 
         if (holder.mButton != null) {
-            int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+            int tintColor = ThemeStore.isLight() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
             Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
             //item点击效果

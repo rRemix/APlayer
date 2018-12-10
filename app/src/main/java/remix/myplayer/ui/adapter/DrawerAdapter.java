@@ -1,7 +1,6 @@
 package remix.myplayer.ui.adapter;
 
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.widget.ImageView;
@@ -55,11 +54,11 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
     protected void convert(final DrawerHolder holder, Integer titleRes, int position) {
         Theme.TintDrawable(holder.mImg, IMAGES[position], ThemeStore.getAccentColor());
         holder.mText.setText(titleRes);
-        holder.mText.setTextColor(ThemeStore.isDay() ? ColorUtil.getColor(R.color.gray_34353a) : ThemeStore.getTextColorPrimary());
-        holder.mText.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_34353a : R.color.white_e5e5e5));
+        holder.mText.setTextColor(ThemeStore.isLight() ? ColorUtil.getColor(R.color.gray_34353a) : ThemeStore.getTextColorPrimary());
+        holder.mText.setTextColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.gray_34353a : R.color.white_e5e5e5));
         if (titleRes == R.string.drawer_night) {
             holder.mSwitch.setVisibility(View.VISIBLE);
-            holder.mSwitch.setChecked(!ThemeStore.isDay());
+            holder.mSwitch.setChecked(!ThemeStore.isLight());
             holder.mSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (mModeChangeListener != null)
                     mModeChangeListener.OnModeChange(isChecked);
@@ -69,10 +68,11 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
         }
         holder.mRoot.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition()));
         holder.mRoot.setSelected(mSelectIndex == position);
-        holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(mContext,
-                Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerEffectColor()),
-                Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerDefaultColor()),
-                ThemeStore.getDrawerEffectColor()));
+        //todo
+//        holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(mContext,
+//                Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerEffectColor()),
+//                Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerDefaultColor()),
+//                ThemeStore.getDrawerEffectColor()));
     }
 
     @Override

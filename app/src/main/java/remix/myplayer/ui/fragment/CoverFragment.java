@@ -63,7 +63,7 @@ public class CoverFragment extends BaseMusicFragment {
         View rootView = inflater.inflate(R.layout.fragment_cover, container, false);
         mUnBinder = ButterKnife.bind(this, rootView);
 
-        mImage.getHierarchy().setFailureImage(ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night);
+        mImage.getHierarchy().setFailureImage(ThemeStore.isLight() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night);
         mImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {

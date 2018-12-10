@@ -2,10 +2,8 @@ package remix.myplayer.theme;
 
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.StyleRes;
 
 import remix.myplayer.App;
 import remix.myplayer.R;
@@ -20,202 +18,57 @@ import remix.myplayer.util.StatusBarUtil;
  * @Date 2016/8/1 09:50
  */
 public class ThemeStore {
-    public static final int DAY = 0;
-    public static final int NIGHT = 1;
+    private static final String NAME = "aplayer-theme";
 
-    /**
-     * 当前主题模式 0:白天 1:夜间
-     */
-    public static int THEME_MODE = NIGHT;
-
-    public static final int THEME_RED = 100;
-    public static final int THEME_BROWN = 101;
-    public static final int THEME_NAVY = 102;
-    public static final int THEME_GREEN = 103;
-    public static final int THEME_YELLOW = 104;
-    public static final int THEME_PURPLE = 105;
-    public static final int THEME_INDIGO = 106;
-    public static final int THEME_PLUM = 107;
-    public static final int THEME_BLUE = 108;
-    public static final int THEME_WHITE = 109;
-    public static final int THEME_PINK = 110;
-
-    /**
-     * 当前主题颜色
-     */
-    public static int THEME_COLOR = THEME_BLUE;
+    private static final String LIGHT = "light";
+    private static final String DARK = "dark";
+    private static final String BLACK = "black";
+    private static final String KEY_THEME = "theme";
+    private static final String KEY_PRIMARY_COLOR = "primary_color";
+    private static final String KEY_PRIMARY_DARK_COLOR = "primary_dark_color";
+    private static final String KEY_ACCENT_COLOR = "accent_color";
 
     public static int STATUS_BAR_ALPHA = 150;
-    public static int MATERIAL_COLOR_PRIMARY = R.color.transparent;
-    public static int MATERIAL_COLOR_PRIMARY_DARK = R.color.transparent;
 
     public static boolean IMMERSIVE_MODE = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.IMMERSIVE_MODE, false);
 
-    /**
-     * 当前是否是白天主题
-     *
-     * @return
-     */
-    public static boolean isDay() {
-        return THEME_MODE == DAY;
+    public static boolean isLight() {
+        return getTheme() == R.style.Theme_APlayer;
     }
 
-    /**
-     * 获取主题的materialPrimaryColor
-     *
-     * @return
-     */
-    @ColorRes
-    public static int getMaterialPrimaryColorRes() {
-        if (THEME_MODE == NIGHT) {
-            return R.color.md_night_primary;
+    @StyleRes
+    public static int getTheme() {
+        String theme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
+        switch (theme) {
+            case LIGHT:
+                return R.style.Theme_APlayer;
+            case BLACK:
+                return R.style.Theme_APlayer_Black;
+            case DARK:
+                return R.style.Theme_APlayer_Dark;
+            default:
+                return R.style.Theme_APlayer;
         }
-        int colorRes = -1;
-        switch (THEME_COLOR) {
-            case THEME_RED:
-                colorRes = R.color.md_red_primary;
-                break;
-            case THEME_BROWN:
-                colorRes = R.color.md_brown_primary;
-                break;
-            case THEME_NAVY:
-                colorRes = R.color.md_navy_primary;
-                break;
-            case THEME_GREEN:
-                colorRes = R.color.md_green_primary;
-                break;
-            case THEME_YELLOW:
-                colorRes = R.color.md_yellow_primary;
-                break;
-            case THEME_PURPLE:
-                colorRes = R.color.md_purple_primary;
-                break;
-            case THEME_INDIGO:
-                colorRes = R.color.md_indigo_primary;
-                break;
-            case THEME_PLUM:
-                colorRes = R.color.md_plum_primary;
-                break;
-            case THEME_BLUE:
-                colorRes = R.color.md_blue_primary;
-                break;
-            case THEME_WHITE:
-                colorRes = R.color.md_white_primary;
-                break;
-            case THEME_PINK:
-                colorRes = R.color.md_pink_primary;
-                break;
-        }
-        return colorRes;
-    }
-
-    /**
-     * 获取主题的materialPrimaryDarkColor
-     *
-     * @return
-     */
-    @ColorRes
-    public static int getMaterialPrimaryDarkColorRes() {
-        if (THEME_MODE == NIGHT) {
-            return R.color.md_night_primary_dark;
-        }
-        int colorRes = -1;
-        switch (THEME_COLOR) {
-            case THEME_RED:
-                colorRes = R.color.md_red_primary_dark;
-                break;
-            case THEME_BROWN:
-                colorRes = R.color.md_brown_primary_dark;
-                break;
-            case THEME_NAVY:
-                colorRes = R.color.md_navy_primary_dark;
-                break;
-            case THEME_GREEN:
-                colorRes = R.color.md_green_primay_dark;
-                break;
-            case THEME_YELLOW:
-                colorRes = R.color.md_yellow_primay_dark;
-                break;
-            case THEME_PURPLE:
-                colorRes = R.color.md_purple_primary_dark;
-                break;
-            case THEME_INDIGO:
-                colorRes = R.color.md_indigo_primary_dark;
-                break;
-            case THEME_PLUM:
-                colorRes = R.color.md_plum_primary_dark;
-                break;
-            case THEME_BLUE:
-                colorRes = R.color.md_blue_primary_dark;
-                break;
-            case THEME_WHITE:
-                colorRes = R.color.md_white_primary_dark;
-                break;
-            case THEME_PINK:
-                colorRes = R.color.md_pink_primary_dark;
-                break;
-        }
-        return colorRes;
-    }
-
-    public static int getThemeColor() {
-        return THEME_COLOR;
-    }
-
-    /**
-     * 保存当前主题颜色
-     *
-     * @param themeColor
-     */
-    public static void saveThemeColor(int themeColor) {
-        SPUtil.putValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "ThemeColor", themeColor);
-    }
-
-    /**
-     * 读取当前主题颜色
-     *
-     * @return
-     */
-    public static int loadThemeColor() {
-        return SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "ThemeColor", ThemeStore.THEME_BLUE);
-    }
-
-    /**
-     * 保存当前主题模式
-     *
-     * @param mode
-     */
-    public static void saveThemeMode(int mode) {
-        SPUtil.putValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "ThemeMode", mode);
-    }
-
-    /**
-     * 读取当前主题模式
-     *
-     * @return
-     */
-    public static int loadThemeMode() {
-        return SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "ThemeMode", DAY);
-    }
-
-    @ColorInt
-    public static int getAccentColor() {
-        return ColorUtil.getColor(isDay() ? (THEME_COLOR != THEME_WHITE ? getMaterialPrimaryColorRes() : R.color.black) : R.color.purple_555393);
     }
 
     @ColorInt
     public static int getMaterialPrimaryColor() {
-        return ColorUtil.getColor(getMaterialPrimaryColorRes());
+        return SPUtil.getValue(App.getContext(), NAME, KEY_PRIMARY_COLOR, Color.parseColor("#698CF6"));
+    }
+
+    @ColorInt
+    public static int getMaterialPrimaryDarkColor() {
+        return SPUtil.getValue(App.getContext(), NAME, KEY_PRIMARY_DARK_COLOR, Color.parseColor("#5C7EE4"));
+    }
+
+    @ColorInt
+    public static int getAccentColor() {
+        return SPUtil.getValue(App.getContext(), NAME, KEY_ACCENT_COLOR, Color.parseColor("#698CF6"));
     }
 
     @ColorInt
     public static int getNavigationBarColor() {
         return getMaterialPrimaryColor();
-    }
-
-    @ColorInt
-    public static int getMaterialPrimaryDarkColor() {
-        return ColorUtil.getColor(getMaterialPrimaryDarkColorRes());
     }
 
     @ColorInt
@@ -225,132 +78,67 @@ public class ThemeStore {
 
     @ColorInt
     public static int getTextColorPrimary() {
-        return ColorUtil.getColor(isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary);
+        return ColorUtil.getColor(isLight() ? R.color.light_text_color_primary : R.color.dark_text_color_primary);
     }
 
     @ColorInt
-    public static int getTextColor() {
-        return ColorUtil.getColor(isDay() ? R.color.day_textcolor : R.color.night_textcolor);
+    public static int getTextColorSecondary() {
+        return ColorUtil.getColor(isLight() ? R.color.light_text_color_primary : R.color.dark_text_color_primary);
     }
 
     @ColorInt
     public static int getBackgroundColorMain() {
-        return ColorUtil.getColor(isDay() ? R.color.day_background_color_main : R.color.night_background_color_main);
+        return ColorUtil.getColor(isLight() ? R.color.light_background_color_main : R.color.dark_background_color_main);
     }
 
     @ColorInt
-    public static int getBackgroundColor1() {
-        return ColorUtil.getColor(isDay() ? R.color.day_background_color_1 : R.color.night_background_color_1);
-    }
-
-    @ColorInt
-    public static int getBackgroundColor2() {
-        return ColorUtil.getColor(isDay() ? R.color.day_background_color_2 : R.color.night_background_color_2);
-    }
-
-    @ColorInt
-    public static int getBackgroundColor3() {
-        return ColorUtil.getColor(isDay() ? R.color.day_background_color_3 : R.color.night_background_color_3);
+    public static int getBackgroundColorDialog() {
+        return ColorUtil.getColor(isLight() ? R.color.light_background_color_dialog : R.color.dark_background_color_dialog);
     }
 
     @ColorInt
     public static int getRippleColor() {
-        return ColorUtil.getColor(isDay() ? R.color.day_ripple_color : R.color.night_ripple_color);
+        return ColorUtil.getColor(isLight() ? R.color.light_ripple_color : R.color.dark_ripple_color);
     }
 
     @ColorInt
     public static int getSelectColor() {
-        return ColorUtil.getColor(isDay() ? R.color.day_selected_color : R.color.night_selected_color);
+        return ColorUtil.getColor(isLight() ? R.color.light_select_color : R.color.dark_select_color);
     }
 
     @ColorInt
     public static int getDividerColor() {
-        return ColorUtil.getColor(isDay() ? R.color.day_list_divider : R.color.night_list_divier);
+        return ColorUtil.getColor(isLight() ? R.color.light_divider_color : R.color.dark_divider_color);
     }
 
-    @ColorInt
-    public static int getDrawerEffectColor() {
-        return ColorUtil.getColor(ThemeStore.isDay() ? R.color.drawer_selected_day : R.color.drawer_selected_night);
+    @DrawableRes
+    public static int getDefaultAlbumRes() {
+        return isLight() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night;
     }
 
-    @ColorInt
-    public static int getDrawerDefaultColor() {
-        return ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.gray_343438);
+    @DrawableRes
+    public static int getDefaultArtistRes() {
+        return isLight() ? R.drawable.artist_empty_bg_day : R.drawable.artist_empty_bg_night;
     }
+
+
+//    @ColorInt
+//    public static int getDrawerEffectColor() {
+//        return ColorUtil.getColor(ThemeStore.isLight()()() ? R.color.drawer_selected_day : R.color.drawer_selected_night);
+//    }
+//
+//    @ColorInt
+//    public static int getDrawerDefaultColor() {
+//        return ColorUtil.getColor(ThemeStore.isLight()() ? R.color.white : R.color.gray_343438);
+//    }
 
     public static com.afollestad.materialdialogs.Theme getMDDialogTheme() {
-        return isDay() ? com.afollestad.materialdialogs.Theme.LIGHT : com.afollestad.materialdialogs.Theme.DARK;
+        return isLightTheme() ? com.afollestad.materialdialogs.Theme.LIGHT : com.afollestad.materialdialogs.Theme.DARK;
     }
 
     public static boolean isLightTheme() {
         return StatusBarUtil.MeizuStatusbar.toGrey(getMaterialPrimaryColor()) >= 254;
     }
 
-    /**
-     * 获得所有的主题颜色
-     *
-     * @return
-     */
-    public static List<Integer> getAllThemeColor() {
-        List<Integer> themeColor = new ArrayList<>();
-        themeColor.add(THEME_RED);
-        themeColor.add(THEME_BROWN);
-        themeColor.add(THEME_NAVY);
-        themeColor.add(THEME_GREEN);
-        themeColor.add(THEME_YELLOW);
-        themeColor.add(THEME_PURPLE);
-        themeColor.add(THEME_INDIGO);
-        themeColor.add(THEME_PLUM);
-        themeColor.add(THEME_BLUE);
-        themeColor.add(THEME_PINK);
-        return themeColor;
-    }
-
-    /**
-     * @param theme
-     * @return
-     */
-    @ColorInt
-    public static int getThemeColorInt(int theme) {
-        int colorRes = -1;
-        switch (theme) {
-            case THEME_RED:
-                colorRes = R.color.md_red_primary;
-                break;
-            case THEME_BROWN:
-                colorRes = R.color.md_brown_primary;
-                break;
-            case THEME_NAVY:
-                colorRes = R.color.md_navy_primary;
-                break;
-            case THEME_GREEN:
-                colorRes = R.color.md_green_primary;
-                break;
-            case THEME_YELLOW:
-                colorRes = R.color.md_yellow_primary;
-                break;
-            case THEME_PURPLE:
-                colorRes = R.color.md_purple_primary;
-                break;
-            case THEME_INDIGO:
-                colorRes = R.color.md_indigo_primary;
-                break;
-            case THEME_PLUM:
-                colorRes = R.color.md_plum_primary;
-                break;
-            case THEME_BLUE:
-                colorRes = R.color.md_blue_primary;
-                break;
-            case THEME_WHITE:
-                colorRes = R.color.md_white_primary;
-                break;
-            case THEME_PINK:
-                colorRes = R.color.md_pink_primary;
-                break;
-            default:
-                return Color.WHITE;
-        }
-        return ColorUtil.getColor(colorRes);
-    }
 
 }

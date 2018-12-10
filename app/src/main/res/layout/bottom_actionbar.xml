@@ -72,7 +72,7 @@
                 android:maxLines="1"
                 android:id="@+id/bottom_artist"
                 android:textSize="@dimen/s14_size"
-                android:textColor="?attr/text_color" />
+                android:textColor="?attr/text_color_secondary" />
         </LinearLayout>
     </RelativeLayout>
 </LinearLayout>

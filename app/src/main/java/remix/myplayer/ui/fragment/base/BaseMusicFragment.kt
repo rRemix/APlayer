@@ -26,7 +26,7 @@ open class BaseMusicFragment : BaseFragment(), MusicEventCallback {
         mMusicActivity = null
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 //        MusicEventHelper.addCallback(this)
         mMusicActivity?.addMusicServiceEventListener(this)

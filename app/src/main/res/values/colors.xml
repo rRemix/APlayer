@@ -89,10 +89,6 @@
     <color name="dark_normal_tab_text_color">@color/night_textcolor</color>
     <color name="search_hint_text_color">#33ffffff</color>
 
-    <!--<color name="lrc_normal_day">#e8e8e8</color>-->
-    <!--<color name="lrc_highlight_day">#4a4a4a</color>-->
-    <!--<color name="lrc_normal_night">#7e7e7e</color>-->
-    <!--<color name="lrc_highlight_night">#e5e5e5</color>-->
     <color name="lrc_normal_day">@color/day_textcolor</color>
     <color name="lrc_highlight_day">@color/day_textcolor_primary</color>
     <color name="lrc_normal_night">@color/night_textcolor</color>
@@ -112,6 +108,25 @@
     <color name="appwidget_track_end_color">#5179f5</color>
     <color name="appwidget_big_bar_color">#4f000000</color>
 
+    <!--New Start-->
+    <color name="light_background_color_main">#ffffff</color>
+    <color name="light_background_color_dialog">#ffffff</color>
+    <color name="light_text_color_primary">#1c1b19</color>
+    <color name="light_text_color_secondary">#6d6c69</color>
+    <color name="light_divider_color">#ededed</color>
+    <color name="light_ripple_color">#1f000000</color>
+    <color name="light_select_color">#1f000000</color>
+    <color name="light_library_color">#f1f1f1</color>
+    <!--Divider-->
+    <color name="dark_background_color_main">#242428</color>
+    <color name="dark_background_color_dialog">#1d1a1d</color>
+    <color name="dark_text_color_primary">#ffffff</color>
+    <color name="dark_text_color_secondary">#6c6a6c</color>
+    <color name="dark_divider_color">#322f33</color>
+    <color name="dark_ripple_color">#33ffffff</color>
+    <color name="dark_select_color">#33ffffff</color>
+    <color name="dark_library_color">#171719</color>
+    <!--New End-->
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
     <color name="day_textcolor">@color/gray_6d6c69</color>

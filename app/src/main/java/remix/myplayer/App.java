@@ -18,7 +18,6 @@ import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.exception.RxException;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.CrashHandler;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
@@ -86,11 +85,7 @@ public class App extends MultiDexApplication {
      * 初始化主题
      */
     private void initTheme() {
-        ThemeStore.THEME_MODE = ThemeStore.loadThemeMode();
-        ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
 
-        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
-        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
     }
 
     public static Context getContext() {

@@ -3,14 +3,12 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_root"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="3dp">
+    android:layout_height="wrap_content">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/item_container"
-        android:background="?attr/background_grid">
+        android:id="@+id/item_container">
         <remix.myplayer.ui.widget.WidthFitSquareLayout
             android:id="@+id/item_simpleiview_container"
             android:layout_width="match_parent"
@@ -69,7 +67,7 @@
                     android:id="@+id/item_text2"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:textColor="?attr/text_color"
+                    android:textColor="?attr/text_color_secondary"
                     android:textSize="@dimen/s12_size"/>
             </LinearLayout>
 

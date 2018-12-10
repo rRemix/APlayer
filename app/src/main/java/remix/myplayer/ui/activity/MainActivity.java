@@ -320,7 +320,7 @@ public class MainActivity extends MenuActivity {
                 showViewWithAnim(mAddButton, true);
         }
 
-        mAddButton.setImageResource(ThemeStore.isDay() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
+        mAddButton.setImageResource(ThemeStore.isLight() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
         mViewPager.setCurrentItem(0);
@@ -440,7 +440,7 @@ public class MainActivity extends MenuActivity {
     //初始化custontab
     private void setUpTab() {
         //添加tab选项卡
-        boolean isLightColor = ThemeStore.isLightTheme();
+        boolean isLightColor = ThemeStore.isLight();
 //        mTablayout = new TabLayout(new ContextThemeWrapper(this, !ColorUtil.isColorLight(ThemeStore.getMaterialPrimaryColor()) ? R.style.CustomTabLayout_Light : R.style.CustomTabLayout_Dark));
 //        mTablayout = new TabLayout(new ContextThemeWrapper(this,R.style.CustomTabLayout_Light));
 //        mTablayout.setLayoutParams(new AppBarLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,DensityUtil.dip2px(this,48)));
@@ -467,11 +467,12 @@ public class MainActivity extends MenuActivity {
      * @param isNight
      */
     private void setNightMode(boolean isNight) {
-        ThemeStore.THEME_MODE = isNight ? ThemeStore.NIGHT : ThemeStore.DAY;
-        ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
-        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
-        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
-        ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);
+        //todo
+//        ThemeStore.THEME_MODE = isNight ? ThemeStore.NIGHT : ThemeStore.DAY;
+//        ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
+//        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
+//        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
+//        ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);
         mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
     }
 
@@ -493,7 +494,7 @@ public class MainActivity extends MenuActivity {
                         break;
                     //夜间模式
                     case 2:
-                        setNightMode(ThemeStore.isDay());
+                        setNightMode(ThemeStore.isLight());
                         break;
                     //捐赠
                     case 3:
@@ -546,17 +547,17 @@ public class MainActivity extends MenuActivity {
     private void setUpViewColor() {
         //正在播放文字的背景
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(ThemeStore.isDay() ?
+        bg.setColor(ThemeStore.isLight() ?
                 ThemeStore.isLightTheme() ? Color.TRANSPARENT : ThemeStore.getMaterialPrimaryDarkColor() :
                 ColorUtil.getColor(R.color.gray_343438));
         bg.setCornerRadius(DensityUtil.dip2px(this, 4));
         mHeadText.setBackground(bg);
-        mHeadText.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ?
+        mHeadText.setTextColor(ColorUtil.getColor(ThemeStore.isLight() ?
                 ThemeStore.isLightTheme() ? R.color.black : R.color.white :
                 R.color.white_e5e5e5));
         //抽屉
-        mHeadRoot.setBackgroundColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : ColorUtil.getColor(R.color.night_background_color_main));
-        mNavigationView.setBackgroundColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.gray_343438));
+        mHeadRoot.setBackgroundColor(ThemeStore.isLight() ? ThemeStore.getMaterialPrimaryColor() : ColorUtil.getColor(R.color.night_background_color_main));
+        mNavigationView.setBackgroundColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.white : R.color.gray_343438));
 
     }
 
@@ -718,7 +719,7 @@ public class MainActivity extends MenuActivity {
     @Override
     public void onPlayStateChange() {
         super.onPlayStateChange();
-        mHeadImg.setBackgroundResource(MusicServiceRemote.isPlaying() && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
+        mHeadImg.setBackgroundResource(MusicServiceRemote.isPlaying() && ThemeStore.isLight() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
     }
 
     @Override

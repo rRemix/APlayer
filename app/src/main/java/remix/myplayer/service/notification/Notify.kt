@@ -40,12 +40,12 @@ abstract class Notify internal constructor(internal var service: MusicService) {
             stackBuilder.addParentStack(PlayerActivity::class.java)
             stackBuilder.addNextIntent(result)
 
-            stackBuilder.editIntentAt(1).putExtra(EXTRA_FROM_NOTIFY, true)
-            stackBuilder.editIntentAt(0).putExtra(EXTRA_FROM_NOTIFY, true)
+            stackBuilder.editIntentAt(1)?.putExtra(EXTRA_FROM_NOTIFY, true)
+            stackBuilder.editIntentAt(0)?.putExtra(EXTRA_FROM_NOTIFY, true)
             return stackBuilder.getPendingIntent(
                     0,
                     PendingIntent.FLAG_UPDATE_CURRENT
-            )
+            )!!
         }
 
     init {

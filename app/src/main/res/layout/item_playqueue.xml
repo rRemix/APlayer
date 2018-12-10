@@ -37,7 +37,7 @@
             android:id="@+id/playlist_item_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="?attr/text_color"
+            android:textColor="?attr/text_color_secondary"
             android:textSize="@dimen/s10_size"
             android:maxLines="1"
             android:ellipsize="end"/>

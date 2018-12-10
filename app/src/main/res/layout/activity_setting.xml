@@ -10,14 +10,12 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/material_color_primary"
             app:layout_scrollFlags="scroll|enterAlways" />
     </android.support.design.widget.AppBarLayout>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/background_color_3">
+        android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,7 +54,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/set_filter_size"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
 
@@ -85,7 +83,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/choose_or_close_lockscreen"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
 
@@ -111,7 +109,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/manual_scan_tip"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
 
@@ -136,7 +134,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/playlist_import_tip"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
 
@@ -161,7 +159,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/export_play_list_tip"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
 
@@ -188,7 +186,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/restore_songs_tip"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size" />
                 </LinearLayout>
 
@@ -219,7 +217,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/play_breakpoint_tip"
-                            android:textColor="?attr/text_color"
+                            android:textColor="?attr/text_color_secondary"
                             android:textSize="@dimen/s14_size"/>
                     </LinearLayout>
                     <android.support.v7.widget.SwitchCompat
@@ -260,7 +258,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/shake_tip"
-                            android:textColor="?attr/text_color"
+                            android:textColor="?attr/text_color_secondary"
                             android:textSize="@dimen/s14_size"/>
                     </LinearLayout>
                     <android.support.v7.widget.SwitchCompat
@@ -304,7 +302,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/show_displayname_tip"
-                            android:textColor="?attr/text_color"
+                            android:textColor="?attr/text_color_secondary"
                             android:textSize="@dimen/s14_size" />
                     </LinearLayout>
 
@@ -363,7 +361,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/configure_library_category"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
 
@@ -411,7 +409,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/show_of_bottom_tip"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
 
@@ -443,7 +441,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/screen_always_on_tip"
-                            android:textColor="?attr/text_color"
+                            android:textColor="?attr/text_color_secondary"
                             android:textSize="@dimen/s14_size"/>
                     </LinearLayout>
                     <android.support.v7.widget.SwitchCompat
@@ -505,7 +503,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/ignore_mediastore_artwork_tips"
-                            android:textColor="?attr/text_color"
+                            android:textColor="?attr/text_color_secondary"
                             android:textSize="@dimen/s14_size"/>
                     </LinearLayout>
                     <android.support.v7.widget.SwitchCompat
@@ -541,7 +539,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/always"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
                 <LinearLayout
@@ -565,7 +563,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/cover_download_source_tip"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
                 <View
@@ -613,7 +611,7 @@
                             android:id="@+id/setting_lrc_float_tip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="?attr/text_color"
+                            android:textColor="?attr/text_color_secondary"
                             android:textSize="@dimen/s14_size"
                             android:text="@string/opened_float_lrc"/>
                     </LinearLayout>
@@ -651,7 +649,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/lrc_priorty_tip"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size" />
                 </LinearLayout>
 
@@ -678,7 +676,7 @@
                 <!--android:layout_width="wrap_content"-->
                 <!--android:layout_height="wrap_content"-->
                 <!--android:text="@string/default_lrc_path"-->
-                <!--android:textColor="?attr/text_color"-->
+                <!--android:textColor="?attr/text_color_secondary"-->
                 <!--android:textSize="@dimen/s14_size"/>-->
                 <!--</LinearLayout>-->
 
@@ -729,7 +727,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/notify_style_tip"
-                            android:textColor="?attr/text_color"
+                            android:textColor="?attr/text_color_secondary"
                             android:textSize="@dimen/s14_size"/>
                     </LinearLayout>
                     <android.support.v7.widget.SwitchCompat
@@ -767,7 +765,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/notify_bg_color_info"
-                        android:textColor="?attr/text_color"
+                        android:textColor="?attr/text_color_secondary"
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
 
@@ -818,7 +816,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/theme_color_info"
-                            android:textColor="?attr/text_color"
+                            android:textColor="?attr/text_color_secondary"
                             android:textSize="@dimen/s14_size"/>
                     </LinearLayout>
                     <ImageView
@@ -859,7 +857,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/immersive_tip"
-                            android:textColor="?attr/text_color"
+                            android:textColor="?attr/text_color_secondary"
                             android:textSize="@dimen/s14_size"/>
                     </LinearLayout>
                     <android.support.v7.widget.SwitchCompat
@@ -901,7 +899,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/navigation_is_show"
-                            android:textColor="?attr/text_color"
+                            android:textColor="?attr/text_color_secondary"
                             android:textSize="@dimen/s14_size"/>
                     </LinearLayout>
                     <android.support.v7.widget.SwitchCompat

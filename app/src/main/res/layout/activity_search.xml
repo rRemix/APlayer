@@ -11,7 +11,6 @@
         <remix.myplayer.ui.widget.SearchToolBar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/material_color_primary"
             android:id="@+id/search_view"
             app:contentInsetStartWithNavigation="0dp">
             <FrameLayout
@@ -26,7 +25,6 @@
                     android:singleLine="true"
                     android:layout_marginRight="@dimen/d8_size"
                     android:hint="@string/search_song_artist_album"
-                    android:textCursorDrawable="?attr/textCursor"
                     android:imeOptions="actionSearch"/>
                 <ImageButton
                     android:src="@drawable/actionbar_delete"
@@ -55,8 +53,7 @@
     <FrameLayout
         android:id="@+id/search_result_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/background_color_3">
+        android:layout_height="match_parent">
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,7 +68,7 @@
             android:gravity="center"
             android:text="@string/no_search_result"
             android:textSize="@dimen/s16_size"
-            android:textColor="?attr/text_color"/>
+            android:textColor="?attr/text_color_secondary"/>
     </FrameLayout>
 
 </LinearLayout>

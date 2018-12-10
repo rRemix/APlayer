@@ -31,7 +31,7 @@ class CustomSortAdapter(context: Context, layoutId: Int) : BaseAdapter<Song, Cus
         holder.mImage.tag = disposable
     }
 
-    override fun onViewRecycled(holder: CustomSortHolder?) {
+    override fun onViewRecycled(holder: CustomSortHolder) {
         super.onViewRecycled(holder)
         holder?.let {
             if (it.mImage.tag != null) {

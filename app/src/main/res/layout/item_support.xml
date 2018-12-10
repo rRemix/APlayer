@@ -43,7 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:textColor="?attr/text_color"
+                android:textColor="?attr/text_color_secondary"
                 android:textSize="@dimen/s14_size"
                 tools:text="Title" />
         </LinearLayout>

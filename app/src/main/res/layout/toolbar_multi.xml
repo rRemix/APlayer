@@ -3,8 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/toolbar_multi"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/material_color_primary">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

@@ -4,7 +4,6 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/background_color_3"
     android:layout_gravity="bottom">
     <LinearLayout
         android:layout_width="match_parent"
@@ -63,7 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="?attr/text_color"
+                android:textColor="?attr/text_color_secondary"
                 android:textSize="@dimen/s15_size"
                 android:text="@string/join"/>
         </LinearLayout>

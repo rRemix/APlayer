@@ -3,53 +3,45 @@ package remix.myplayer.ui;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
-import android.support.annotation.ColorInt;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import remix.myplayer.R;
-import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.theme.ThemeUtil;
 import remix.myplayer.util.DensityUtil;
 
 /**
  * Created by taeja on 16-6-23.
  */
-public class ListItemDecoration extends RecyclerView.ItemDecoration {
+public class Decoration extends RecyclerView.ItemDecoration {
     private Context mContext;
 
-    public static final int HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL;
+    public static final int VERTICAL_LIST = 1;
+    public static final int GRID_LIST = 2;
 
-    public static final int VERTICAL_LIST = LinearLayoutManager.VERTICAL;
-
-    private InsetDrawable mDivider;
-    private GradientDrawable mContentDrawable;
+    private Drawable mDivider;
     private int mOrientation;
 
-    public ListItemDecoration(Context context, int orientation) {
+    public Decoration(Context context) {
         mContext = context;
-        mContentDrawable = (GradientDrawable) mContext.getResources().getDrawable(R.drawable.bg_divider_day);
-        mContentDrawable.setColor(ThemeStore.getDividerColor());
-        mDivider = new InsetDrawable(mContentDrawable, DensityUtil.dip2px(context, 4), 0, 0, 0);
-        setOrientation(orientation);
+        mDivider = context.getResources().getDrawable(R.drawable.bg_divider_grid);
+        setOrientation(GRID_LIST);
     }
 
-    public ListItemDecoration(Context context, int orientation, int insetLeft) {
+    public Decoration(Context context, float insetLeftInDp) {
         mContext = context;
-        mContentDrawable = (GradientDrawable) mContext.getResources().getDrawable(R.drawable.bg_divider_day).mutate();
-        mContentDrawable.setColor(ThemeStore.getDividerColor());
-        mDivider = new InsetDrawable(mContentDrawable, insetLeft, 0, 0, 0);
-        setOrientation(orientation);
+        GradientDrawable contentDrawable = (GradientDrawable) mContext.getResources().getDrawable(R.drawable.bg_divider_list).mutate();
+        contentDrawable.setColor(ThemeUtil.resolveColor(context, R.attr.divider_color));
+        mDivider = new InsetDrawable(contentDrawable, DensityUtil.dip2px(insetLeftInDp), 0, 0, 0);
+        setOrientation(VERTICAL_LIST);
     }
 
-    public void setDividerColor(@ColorInt int color) {
-        mContentDrawable.setColor(color);
-    }
 
     public void setOrientation(int orientation) {
-        if (orientation != HORIZONTAL_LIST && orientation != VERTICAL_LIST) {
+        if (orientation != VERTICAL_LIST && orientation != GRID_LIST) {
             throw new IllegalArgumentException("invalid orientation");
         }
         mOrientation = orientation;
@@ -59,8 +51,9 @@ public class ListItemDecoration extends RecyclerView.ItemDecoration {
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
         if (mOrientation == VERTICAL_LIST) {
             drawVertical(c, parent);
-        } else {
+        } else if (mOrientation == GRID_LIST) {
             drawHorizontal(c, parent);
+            drawVertical(c, parent);
         }
     }
 
@@ -100,8 +93,8 @@ public class ListItemDecoration extends RecyclerView.ItemDecoration {
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         if (mOrientation == VERTICAL_LIST) {
             outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
-        } else {
-            outRect.set(0, 0, mDivider.getIntrinsicWidth(), 0);
+        } else if (mOrientation == GRID_LIST) {
+            outRect.set(0, 0, mDivider.getIntrinsicWidth(), mDivider.getIntrinsicHeight());
         }
     }
 

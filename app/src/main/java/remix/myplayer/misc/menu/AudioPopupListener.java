@@ -75,8 +75,6 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                 getString(R.string.select_lrc),
                                 getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc),
                                 getString(R.string.change_offset))
-                        .itemsColorAttr(R.attr.text_color_primary)
-                        .backgroundColorAttr(R.attr.background_color_3)
                         .itemsCallback((dialog, itemView, position, text) -> {
                             switch (position) {
                                 case 0: //网易

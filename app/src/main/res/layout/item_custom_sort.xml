@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s12_size"
-            android:textColor="?attr/text_color"
+            android:textColor="?attr/text_color_secondary"
             android:lines="1"
             android:ellipsize="end"/>
     </LinearLayout>

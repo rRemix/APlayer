@@ -43,7 +43,7 @@
             android:lines="1"
             android:ellipsize="end"
             android:textSize="@dimen/s12_size"
-            android:textColor="?attr/text_color"
+            android:textColor="?attr/text_color_secondary"
             android:layout_marginTop="4dp"/>
     </LinearLayout>
     <!--结尾处按钮-->

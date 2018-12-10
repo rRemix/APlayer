@@ -59,7 +59,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.FolderChooserDialog;
 import remix.myplayer.ui.dialog.LyricPriorityDialog;
-import remix.myplayer.ui.dialog.ThemeDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -259,7 +258,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         //主题颜色指示器
         ((GradientDrawable) mColorSrc.getDrawable()).setColor(
-                ThemeStore.isDay() ? ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.md_white_primary_dark) : ThemeStore.getMaterialPrimaryColor() : Color.TRANSPARENT);
+                ThemeStore.isLight() ? ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.md_white_primary_dark) : ThemeStore.getMaterialPrimaryColor() : Color.TRANSPARENT);
         //初始化箭头颜色
         final int arrowColor = ThemeStore.getAccentColor();
         ButterKnife.apply(new ImageView[]{findViewById(R.id.setting_eq_arrow),
@@ -452,7 +451,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //选择主色调
             case R.id.setting_color_container:
-                startActivityForResult(new Intent(this, ThemeDialog.class), REQUEST_THEME_COLOR);
+//                startActivityForResult(new Intent(this, ThemeDialog.class), REQUEST_THEME_COLOR);
                 break;
             //通知栏底色
             case R.id.setting_notify_color_container:

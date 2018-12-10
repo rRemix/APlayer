@@ -42,7 +42,7 @@
             android:lines="1"
             android:ellipsize="end"
             android:textSize="@dimen/s12_size"
-            android:textColor="?attr/text_color"
+            android:textColor="?attr/text_color_secondary"
             android:layout_marginTop="@dimen/d4_size"/>
     </LinearLayout>
     <!--结尾处按钮-->
@@ -56,10 +56,4 @@
         android:src="@drawable/icon_player_more"
         android:background="@color/transparent"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/d1_size"
-        android:background="?attr/divider_color"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="@dimen/d8_size"/>
 </RelativeLayout>

@@ -77,7 +77,6 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.notification.Notify;
 import remix.myplayer.service.notification.NotifyImpl;
 import remix.myplayer.service.notification.NotifyImpl24;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.LockScreenActivity;
 import remix.myplayer.ui.widget.floatwidget.FloatLrcView;
 import remix.myplayer.util.Constants;
@@ -91,7 +90,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 import static remix.myplayer.lyric.UpdateLyricThread.LRC_INTERVAL;
-import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONIS;
+import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.Util.registerLocalReceiver;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
@@ -381,7 +380,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         mIsServiceStop = false;
 
         Single.create((SingleOnSubscribe<String>) emitter -> {
-            if (!mLoadFinished && (mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONIS))) {
+            if (!mLoadFinished && (mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS))) {
                 load();
             }
             String action = commandIntent != null ? commandIntent.getAction() : "";
@@ -1676,9 +1675,6 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 //添加我的收藏列表
                 Global.MyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
                 SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, "MyLoveID", Global.MyLoveID);
-                //保存默认主题设置
-                SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, "ThemeMode", ThemeStore.DAY);
-                SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, "ThemeColor", ThemeStore.THEME_BLUE);
                 //通知栏样式
                 SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, Build.VERSION.SDK_INT < Build.VERSION_CODES.N);
             } catch (Exception e) {

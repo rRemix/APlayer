@@ -11,7 +11,8 @@ import butterknife.Unbinder;
 import remix.myplayer.App;
 import remix.myplayer.util.Util;
 
-import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONIS;
+import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS;
+
 
 /**
  * @ClassName
@@ -34,7 +35,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONIS);
+        mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS);
     }
 
     @Override

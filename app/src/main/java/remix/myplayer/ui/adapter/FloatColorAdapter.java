@@ -1,8 +1,6 @@
 package remix.myplayer.ui.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +10,6 @@ import android.widget.RelativeLayout;
 
 import butterknife.BindView;
 import remix.myplayer.R;
-import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
@@ -29,11 +25,12 @@ public class FloatColorAdapter extends BaseAdapter<Integer, FloatColorAdapter.Fl
 
     public FloatColorAdapter(Context Context, int layoutId, int width) {
         super(Context, layoutId);
-        mCurrentColor = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_COLOR, ThemeStore.getThemeColor());
-        mItemWidth = width / ThemeStore.getAllThemeColor().size();
-        //宽度太小
-        if (mItemWidth < DensityUtil.dip2px(mContext, 20))
-            mItemWidth = DensityUtil.dip2px(mContext, 20);
+        //todo
+//        mCurrentColor = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_COLOR, ThemeStore.getThemeColor());
+//        mItemWidth = width / ThemeStore.getAllThemeColor().size();
+//        //宽度太小
+//        if (mItemWidth < DensityUtil.dip2px(mContext, 20))
+//            mItemWidth = DensityUtil.dip2px(mContext, 20);
     }
 
     /**
@@ -69,19 +66,19 @@ public class FloatColorAdapter extends BaseAdapter<Integer, FloatColorAdapter.Fl
 
     @Override
     protected void convert(FloatColorHolder holder, Integer integer, final int position) {
-        if (isColorChoose(integer)) {
-            holder.mColor.setBackground(Theme.getShape(GradientDrawable.OVAL, ThemeStore.getThemeColorInt(integer), 0, DensityUtil.dip2px(mContext, 1), Color.BLACK,
-                    DensityUtil.dip2px(mContext, 18), DensityUtil.dip2px(mContext, 18), 1));
-        } else {
-            holder.mColor.setBackground(Theme.getShape(GradientDrawable.OVAL, ThemeStore.getThemeColorInt(integer), DensityUtil.dip2px(mContext, 18), DensityUtil.dip2px(mContext, 18)));
-        }
-        holder.mRoot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mOnItemClickLitener.onItemClick(v, position);
-            }
-        });
-//        holder.mColorBg.setVisibility(isColorChoose(mColorList.get(position)) ? View.VISIBLE : View.GONE);
+        //todo
+//        if (isColorChoose(integer)) {
+//            holder.mColor.setBackground(Theme.getShape(GradientDrawable.OVAL, ThemeStore.getThemeColorInt(integer), 0, DensityUtil.dip2px(mContext, 1), Color.BLACK,
+//                    DensityUtil.dip2px(mContext, 18), DensityUtil.dip2px(mContext, 18), 1));
+//        } else {
+//            holder.mColor.setBackground(Theme.getShape(GradientDrawable.OVAL, ThemeStore.getThemeColorInt(integer), DensityUtil.dip2px(mContext, 18), DensityUtil.dip2px(mContext, 18)));
+//        }
+//        holder.mRoot.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mOnItemClickLitener.onItemClick(v, position);
+//            }
+//        });
     }
 
     static class FloatColorHolder extends BaseViewHolder {

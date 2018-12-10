@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import remix.myplayer.R;
 import remix.myplayer.misc.manager.ActivityManager;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -34,60 +33,20 @@ public class BaseActivity extends AppCompatActivity {
     protected boolean mIsDestroyed;
     protected boolean mIsForeground;
     protected boolean mHasPermission;
-    public static final String[] EXTERNAL_STORAGE_PERMISSIONIS = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    public static final String[] EXTERNAL_STORAGE_PERMISSIONS = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
 
     /**
      * 设置主题
      */
     protected void setUpTheme() {
-        if (ThemeStore.THEME_MODE == ThemeStore.NIGHT) {
-            setTheme(R.style.NightTheme);
-            return;
-        }
-        switch (ThemeStore.THEME_COLOR) {
-            case ThemeStore.THEME_RED:
-                setTheme(R.style.DayTheme_Red);
-                break;
-            case ThemeStore.THEME_BROWN:
-                setTheme(R.style.DayTheme_Brown);
-                break;
-            case ThemeStore.THEME_NAVY:
-                setTheme(R.style.DayTheme_Navy);
-                break;
-            case ThemeStore.THEME_GREEN:
-                setTheme(R.style.DayTheme_Green);
-                break;
-            case ThemeStore.THEME_YELLOW:
-                setTheme(R.style.DayTheme_Yellow);
-                break;
-            case ThemeStore.THEME_PURPLE:
-                setTheme(R.style.DayTheme_Purple);
-                break;
-            case ThemeStore.THEME_INDIGO:
-                setTheme(R.style.DayTheme_Indigo);
-                break;
-            case ThemeStore.THEME_PLUM:
-                setTheme(R.style.DayTheme_Plum);
-                break;
-            case ThemeStore.THEME_BLUE:
-                setTheme(R.style.DayTheme_Blue);
-                break;
-            case ThemeStore.THEME_WHITE:
-                setTheme(R.style.DayTheme_White);
-                break;
-            case ThemeStore.THEME_PINK:
-                setTheme(R.style.DayTheme_Pink);
-                break;
-            default:
-                throw new IllegalArgumentException("No Available Theme");
-        }
+       setTheme(ThemeStore.getTheme());
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mContext = this;
-        mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONIS);
+        mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS);
         //严格模式
 //        if (BuildConfig.DEBUG) {
 //            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -162,7 +121,7 @@ public class BaseActivity extends AppCompatActivity {
         super.onResume();
         mIsForeground = true;
         new RxPermissions(this)
-                .request(EXTERNAL_STORAGE_PERMISSIONIS)
+                .request(EXTERNAL_STORAGE_PERMISSIONS)
                 .subscribe(has -> {
                     if (has != mHasPermission) {
                         Intent intent = new Intent(MusicService.PERMISSION_CHANGE);

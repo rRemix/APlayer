@@ -32,7 +32,7 @@ import remix.myplayer.util.MediaStoreUtil;
  * 文件夹Fragment
  */
 public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
-    @BindView(R.id.folder_recyclerview)
+    @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
 
     public static final String TAG = FolderFragment.class.getSimpleName();

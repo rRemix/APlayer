@@ -2,13 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/background_grid_color">
+    android:layout_height="match_parent">
 
     <remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/album_recycleview"
+        android:id="@+id/recyclerView"
         app:bubbleColor="?attr/colorAccent"
         app:handleColor="?attr/colorAccent"
         app:hideScrollbar="true"

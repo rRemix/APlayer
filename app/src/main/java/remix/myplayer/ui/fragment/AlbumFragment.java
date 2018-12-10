@@ -33,7 +33,7 @@ import remix.myplayer.util.SPUtil;
  * 专辑Fragment
  */
 public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
-    @BindView(R.id.album_recycleview)
+    @BindView(R.id.recyclerView)
     FastScrollRecyclerView mRecyclerView;
 
     public static final String TAG = AlbumFragment.class.getSimpleName();
@@ -54,6 +54,7 @@ public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
         mAdapter = new AlbumAdapter(mContext, R.layout.item_album_recycle_grid, mChoice);
         mAdapter.setModeChangeCallback(mode -> {
             mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
+            resetItemDecoration(mRecyclerView,mode);
             mRecyclerView.setAdapter(mAdapter);
         });
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
@@ -81,12 +82,14 @@ public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
 
     @Override
     protected void initView() {
-        int model = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, "AlbumModel", Constants.GRID_MODEL);
+        int mode = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, "AlbumModel", Constants.GRID_MODEL);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setLayoutManager(model == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
+        mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
+        resetItemDecoration(mRecyclerView,mode);
     }
+
 
 
     @Override

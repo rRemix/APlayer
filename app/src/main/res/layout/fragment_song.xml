@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background_grid_color">
+    android:background="?attr/background_library_color">
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/d1_size"
@@ -12,7 +12,7 @@
         android:id="@+id/divider"/>
 
     <remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView
-        android:id="@+id/recyclerview"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/divider"

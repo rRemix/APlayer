@@ -36,7 +36,7 @@ import static remix.myplayer.util.MusicUtil.makeCmdIntent;
  * 全部歌曲的Fragment
  */
 public class SongFragment extends LibraryFragment<Song, SongAdapter> {
-    @BindView(R.id.recyclerview)
+    @BindView(R.id.recyclerView)
     LocationRecyclerView mRecyclerView;
 
     public static final String TAG = SongFragment.class.getSimpleName();

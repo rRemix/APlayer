@@ -33,7 +33,7 @@ import remix.myplayer.util.SPUtil;
  * 艺术家Fragment
  */
 public class ArtistFragment extends LibraryFragment<Artist, ArtistAdapter> {
-    @BindView(R.id.artist_recycleview)
+    @BindView(R.id.recyclerView)
     FastScrollRecyclerView mRecyclerView;
 
     public static final String TAG = ArtistFragment.class.getSimpleName();

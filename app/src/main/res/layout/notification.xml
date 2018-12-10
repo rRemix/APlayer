@@ -30,7 +30,7 @@
             android:orientation="vertical"
             android:gravity="center_vertical">
             <TextView
-                style="@style/TextAppearance.AppCompat.Notification.Title"
+                style="@android:style/TextAppearance.StatusBar.EventContent.Title"
                 android:id="@+id/notify_song"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

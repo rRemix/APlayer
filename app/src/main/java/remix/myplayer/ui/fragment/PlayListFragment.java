@@ -33,7 +33,7 @@ import remix.myplayer.util.ToastUtil;
  */
 public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter> {
     public static final String TAG = PlayListFragment.class.getSimpleName();
-    @BindView(R.id.playlist_recycleview)
+    @BindView(R.id.recyclerView)
     FastScrollRecyclerView mRecyclerView;
 
     @Override

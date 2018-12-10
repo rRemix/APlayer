@@ -13,7 +13,6 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/material_color_primary"
             app:layout_scrollFlags="scroll|enterAlways" />
     </android.support.design.widget.AppBarLayout>
 
@@ -21,7 +20,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="?attr/background_color_3"
         android:gravity="center_horizontal">
         <EditText
             android:id="@+id/feedback_content"
@@ -50,7 +48,7 @@
             android:textSize="@dimen/s13_size"
             android:textColor="?attr/text_color_primary"
             android:hint="@string/feedback_contact_hint"
-            android:textColorHint="?attr/text_color"
+            android:textColorHint="?attr/text_color_secondary"
             android:textCursorDrawable="@drawable/bg_cursor_light"
             android:padding="@dimen/d4_size"/>
 

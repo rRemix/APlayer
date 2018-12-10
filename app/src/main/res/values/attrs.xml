@@ -52,31 +52,23 @@
     </declare-styleable>
 
     <attr name="text_color_primary" format="color|reference"/>
-    <attr name="text_color" format="color|reference"/>
+    <attr name="text_color_secondary" format="color|reference"/>
     <attr name="background_color_main" format="color|reference"/>
-    <attr name="background_color_1" format="color|reference"/>
-    <attr name="background_color_2" format="color|reference"/>
-    <attr name="background_color_3" format="color|reference"/>
-    <attr name="background_grid_color" format="color|reference"/>
-    <attr name="stress_color" format="color|reference"/>
+    <attr name="background_color_dialog" format="color|reference"/>
+    <attr name="background_library_color" format="color|reference"/>
     <!--点击效果-->
     <attr name="background_grid" format="reference"/>
     <attr name="background_list" format="reference"/>
     <attr name="background_common" format="reference"/>
-    <!--设置界面选项点击效果-->
-    <attr name="background_list_1" format="reference"/>
+
     <!--默认专辑和艺术家封面-->
     <attr name="default_album" format="reference"/>
     <attr name="default_artist" format="reference"/>
     <!--波纹颜色-->
     <attr name="ripple_color" format="reference|color"/>
-    <attr name="background_aboutus_color" format="color|reference"/>
-    <attr name="material_color_primary" format="color|reference"/>
-    <attr name="material_color_primary_dark" format="color|reference"/>
-    <attr name="material_color_secondry" format="color|reference"/>
     <!--分割线-->
     <attr name="divider_color" format="color|reference"/>
-    <!--光标-->
-    <attr name="textCursor" format="reference"/>
-    <attr name="tab" format="reference"/>
+    <!--&lt;!&ndash;光标&ndash;&gt;-->
+    <!--<attr name="textCursor" format="reference"/>-->
+    <!--<attr name="tab" format="reference"/>-->
 </resources>

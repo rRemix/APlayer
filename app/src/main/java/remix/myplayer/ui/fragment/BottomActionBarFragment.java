@@ -94,10 +94,10 @@ public class BottomActionBarFragment extends BaseMusicFragment {
         //设置整个背景着色
         Theme.TintDrawable(rootView,
                 R.drawable.commom_playercontrols_bg,
-                ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.day_background_color_3 : R.color.night_background_color_3));
+                ColorUtil.getColor(ThemeStore.isLight() ? R.color.day_background_color_3 : R.color.night_background_color_3));
         Theme.TintDrawable(mPlayNext,
                 R.drawable.bf_btn_next,
-                ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
+                ColorUtil.getColor(ThemeStore.isLight() ? R.color.black_323335 : R.color.white));
 
         //手势检测
         mGestureDetector = new GestureDetector(mContext, new GestureListener(this));
@@ -144,11 +144,11 @@ public class BottomActionBarFragment extends BaseMusicFragment {
         if (MusicServiceRemote.isPlaying()) {
             Theme.TintDrawable(mPlayButton,
                     R.drawable.bf_btn_stop,
-                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
+                    ColorUtil.getColor(ThemeStore.isLight() ? R.color.black_323335 : R.color.white));
         } else {
             Theme.TintDrawable(mPlayButton,
                     R.drawable.bf_btn_play,
-                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
+                    ColorUtil.getColor(ThemeStore.isLight() ? R.color.black_323335 : R.color.white));
         }
     }
 

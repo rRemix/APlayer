@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Message;
-import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -28,7 +27,6 @@ import remix.myplayer.helper.SleepTimer;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.widget.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
@@ -132,7 +130,8 @@ public class TimerDialog extends BaseDialogActivity {
         });
 
         //初始化switch
-        mSwitch = new SwitchCompat(new ContextThemeWrapper(this, ThemeStore.isDay() ? Theme.getTheme() : R.style.TimerDialogNightTheme));
+        //todo
+//        mSwitch = new SwitchCompat(new ContextThemeWrapper(this, ThemeStore.isLight() ? Theme.getTheme() : R.style.TimerDialogNightTheme));
         ((LinearLayout) findViewById(R.id.popup_timer_container)).addView(mSwitch);
 
         //读取保存的配置

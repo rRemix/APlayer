@@ -180,7 +180,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
         holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL, mContext));
 
         //设置按钮着色
-        int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+        int tintColor = ThemeStore.isLight() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         //按钮点击效果
@@ -263,7 +263,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
                 }
             }
             if (oldHolder != null) {
-                oldHolder.mName.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+                oldHolder.mName.setTextColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
                 oldHolder.mColumnView.stopAnim();
                 oldHolder.mColumnView.setVisibility(View.GONE);
             }

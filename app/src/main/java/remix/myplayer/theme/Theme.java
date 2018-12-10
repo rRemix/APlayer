@@ -218,47 +218,7 @@ public class Theme {
         return getShape(shape, color, 0, 0, color, 0, 0, 1);
     }
 
-    /**
-     * @param ignoreNight
-     * @return
-     */
-    public static int getTheme(boolean ignoreNight) {
-        if (!ignoreNight && ThemeStore.THEME_MODE == ThemeStore.NIGHT) {
-            return R.style.NightTheme;
-        }
-        switch (ThemeStore.THEME_COLOR) {
-            case ThemeStore.THEME_RED:
-                return R.style.DayTheme_Red;
-            case ThemeStore.THEME_BROWN:
-                return R.style.DayTheme_Brown;
-            case ThemeStore.THEME_NAVY:
-                return R.style.DayTheme_Navy;
-            case ThemeStore.THEME_GREEN:
-                return R.style.DayTheme_Green;
-            case ThemeStore.THEME_YELLOW:
-                return R.style.DayTheme_Yellow;
-            case ThemeStore.THEME_PURPLE:
-                return R.style.DayTheme_Purple;
-            case ThemeStore.THEME_INDIGO:
-                return R.style.DayTheme_Indigo;
-            case ThemeStore.THEME_PLUM:
-                return R.style.DayTheme_Plum;
-            case ThemeStore.THEME_BLUE:
-                return R.style.DayTheme_Blue;
-            case ThemeStore.THEME_PINK:
-                return R.style.DayTheme_Pink;
-            default:
-                return -1;
-        }
-    }
 
-    /**
-     * @return
-     */
-    @StyleRes
-    public static int getTheme() {
-        return getTheme(false);
-    }
 
     /**
      * 根据当前主题获得popupmenu风格
@@ -267,7 +227,7 @@ public class Theme {
      */
     @StyleRes
     public static int getPopupMenuStyle() {
-        return ThemeStore.isDay() ? R.style.PopupMenuDayStyle : R.style.PopupMenuNightStyle;
+        return ThemeStore.isLight() ? R.style.PopupMenuLightStyle : R.style.PopupMenuDarkStyle;
     }
 
     /**
@@ -473,7 +433,7 @@ public class Theme {
                 .negativeColorAttr(R.attr.text_color_primary)
                 .neutralColorAttr(R.attr.text_color_primary)
                 .buttonRippleColorAttr(R.attr.ripple_color)
-                .backgroundColorAttr(R.attr.background_color_3)
+                .backgroundColorAttr(R.attr.background_color_dialog)
                 .itemsColorAttr(R.attr.text_color_primary)
                 .theme(ThemeStore.getMDDialogTheme());
     }

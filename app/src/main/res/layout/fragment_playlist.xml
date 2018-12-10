@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background_grid_color">
+    android:background="?attr/background_library_color">
 
     <remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/playlist_recycleview"
+        android:id="@+id/recyclerView"
         app:bubbleColor="?attr/colorAccent"
         app:handleColor="?attr/colorAccent"
         app:hideScrollbar="true"

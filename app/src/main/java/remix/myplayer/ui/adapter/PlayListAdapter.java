@@ -133,7 +133,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
         Theme.TintDrawable(holder.mButton,
                 R.drawable.icon_player_more,
-                ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
+                ColorUtil.getColor(ThemeStore.isLight() ? R.color.gray_6c6a6c : R.color.white));
 
         holder.mButton.setOnClickListener(v -> {
             if (mChoice.isActive())

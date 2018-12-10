@@ -10,16 +10,14 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/material_color_primary">
+            android:layout_height="wrap_content">
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="?attr/background_color_3">
+        android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -37,13 +35,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/use_eq"
-                    android:textColor="?attr/text_color"
+                    android:textColor="?attr/text_color_secondary"
                     android:textSize="@dimen/s14_size"
                     android:layout_marginBottom="@dimen/d6_size"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?attr/text_color"
+                    android:textColor="?attr/text_color_secondary"
                     android:textSize="@dimen/s12_size"
                     android:text="@string/need_earphone"/>
             </LinearLayout>

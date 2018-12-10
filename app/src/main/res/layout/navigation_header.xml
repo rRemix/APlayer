@@ -5,8 +5,7 @@
     android:layout_width="@dimen/d264_size"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:background="?attr/material_color_primary">
+    android:gravity="center_horizontal">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/header_img"

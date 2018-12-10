@@ -20,25 +20,25 @@ repositories {
 }
 
 ext {
-    supportLibVersion = '26.1.0'
+    supportLibVersion = '27.1.1'
 }
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion '28.0.2'
 
 
     defaultConfig {
         applicationId "remix.myplayer"
         minSdkVersion 16
-        targetSdkVersion 26
-        versionCode 107
-        versionName "1.4.5.2"
+        targetSdkVersion 27
+        versionCode 99
+        versionName "2.0.0.0"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
-            abiFilters 'armeabi-v7a'
-//            abiFilters 'armeabi-v7a', 'x86'
+//            abiFilters 'armeabi-v7a'
+            abiFilters 'armeabi-v7a', 'x86'
         }
         externalNativeBuild {
             cmake {

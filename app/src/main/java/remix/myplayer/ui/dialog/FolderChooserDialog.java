@@ -128,7 +128,7 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
                 .positiveColorAttr(R.attr.text_color_primary)
                 .negativeText(getBuilder().mCancelButton)
                 .negativeColorAttr(R.attr.text_color_primary)
-                .backgroundColorAttr(R.attr.background_color_3);
+                .backgroundColorAttr(R.attr.background_color_dialog);
         if (getBuilder().mAllowNewFolder) {
             builder.neutralText(getBuilder().mNewFolderButton);
             builder.onNeutral(new MaterialDialog.SingleButtonCallback() {

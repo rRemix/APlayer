@@ -12,7 +12,6 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/material_color_primary"
             app:layout_scrollFlags="scroll|enterAlways" />
     </android.support.design.widget.AppBarLayout>
 
@@ -20,8 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:background="?attr/background_color_3">
+        android:gravity="center_horizontal">
 
         <ImageView
             android:layout_marginTop="@dimen/d8_size"
@@ -39,7 +37,7 @@
             android:layout_marginBottom="@dimen/d12_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="?attr/text_color"
+            android:textColor="?attr/text_color_secondary"
             android:textSize="@dimen/s15_size"
             android:text="@string/version"/>
     </RelativeLayout>

@@ -131,8 +131,8 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         }
 
         //背景点击效果
-        holder.mContainer.setBackground(
-                Theme.getPressAndSelectedStateListRippleDrawable(listModel, mContext));
+//        holder.mContainer.setBackground(
+//                Theme.getPressAndSelectedStateListRippleDrawable(listModel, mContext));
 
         holder.mContainer.setOnClickListener(v -> {
             if (holder.getAdapterPosition() - 1 < 0) {
@@ -152,7 +152,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         });
 
         //着色
-        int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+        int tintColor = ThemeStore.isLight() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         //点击效果
@@ -185,17 +185,17 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         //半圆着色
         if (listModel == Constants.GRID_MODEL) {
             Theme.TintDrawable(holder.mHalfCircle, R.drawable.icon_half_circular_left,
-                    ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.night_background_color_main));
+                    ColorUtil.getColor(ThemeStore.isLight() ? R.color.white : R.color.night_background_color_main));
         }
 
-        //设置padding
-        if (listModel == 2 && holder.mRoot != null) {
-            if (position % 2 == 1) {
-                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4));
-            } else {
-                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4));
-            }
-        }
+//        //设置padding
+//        if (listModel == Constants.GRID_MODEL && holder.mRoot != null) {
+//            if (position % 2 == 1) {
+//                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4));
+//            } else {
+//                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4));
+//            }
+//        }
     }
 
 

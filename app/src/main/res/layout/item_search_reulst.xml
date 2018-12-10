@@ -40,7 +40,7 @@
             android:id="@+id/search_detail"
             android:layout_width="@dimen/d200_size"
             android:layout_height="wrap_content"
-            android:textColor="?attr/text_color"
+            android:textColor="?attr/text_color_secondary"
             android:textSize="@dimen/s12_size"
             android:lines="1"
             android:ellipsize="end"/>
