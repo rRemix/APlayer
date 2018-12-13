@@ -36,6 +36,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
+import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -55,9 +56,8 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
  * 艺术家界面的适配器
  */
 public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> implements FastScroller.SectionIndexer {
-    public ArtistAdapter(Context context, int layoutId, MultipleChoice multiChoice) {
-        super(context, layoutId, multiChoice);
-        listModel = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "ArtistModel", Constants.GRID_MODEL);
+    public ArtistAdapter(Context context, int layoutId, MultipleChoice multiChoice, FastScrollRecyclerView recyclerView) {
+        super(context, layoutId, multiChoice, recyclerView);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         if (viewType == TYPE_HEADER) {
             return new AlbumAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2, parent, false));
         }
-        return viewType == Constants.LIST_MODEL ?
+        return viewType == HeaderAdapter.LIST_MODE ?
                 new ArtistAdapter.ArtistListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_list, parent, false)) :
                 new ArtistAdapter.ArtistGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_grid, parent, false));
     }
@@ -93,9 +93,9 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
                 return;
             }
             //设置图标
-            headerHolder.mDivider.setVisibility(listModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
-            headerHolder.mListModelBtn.setColorFilter(listModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-            headerHolder.mGridModelBtn.setColorFilter(listModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mDivider.setVisibility(mMode == HeaderAdapter.LIST_MODE ? View.VISIBLE : View.GONE);
+            headerHolder.mListModelBtn.setColorFilter(mMode == HeaderAdapter.LIST_MODE ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mGridModelBtn.setColorFilter(mMode == HeaderAdapter.GRID_MODE ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
             headerHolder.mGridModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
             headerHolder.mListModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
             return;
@@ -120,20 +120,20 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
             }
         }
         //设置封面
-        final int imageSize = listModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
+        final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
         Disposable disposable = new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(artist), new RequestConfig.Builder(imageSize, imageSize).build()).load();
         holder.mImage.setTag(disposable);
 
-        //item点击效果
-        holder.mContainer.setBackground(
-                Theme.getPressAndSelectedStateListRippleDrawable(listModel, mContext));
+//        //item点击效果
+//        holder.mContainer.setBackground(
+//                Theme.getPressAndSelectedStateListRippleDrawable(mMode, mContext));
 
         holder.mContainer.setOnClickListener(v -> {
             if (holder.getAdapterPosition() - 1 < 0) {
                 ToastUtil.show(mContext, R.string.illegal_arg);
                 return;
             }
-            mOnItemClickLitener.onItemClick(holder.mContainer, position - 1);
+            mOnItemClickListener.onItemClick(holder.mContainer, position - 1);
         });
         //多选菜单
         holder.mContainer.setOnLongClickListener(v -> {
@@ -141,7 +141,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
                 ToastUtil.show(mContext, R.string.illegal_arg);
                 return true;
             }
-            mOnItemClickLitener.onItemLongClick(holder.mContainer, position - 1);
+            mOnItemClickListener.onItemLongClick(holder.mContainer, position - 1);
             return true;
         });
 
@@ -151,8 +151,8 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
         //按钮点击效果
         int size = DensityUtil.dip2px(mContext, 45);
-        Drawable defaultDrawable = Theme.getShape(listModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-        Drawable selectDrawable = Theme.getShape(listModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
+        Drawable defaultDrawable = Theme.getShape(mMode == HeaderAdapter.LIST_MODE ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+        Drawable selectDrawable = Theme.getShape(mMode == HeaderAdapter.LIST_MODE ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
         holder.mButton.setBackground(Theme.getPressDrawable(
                 defaultDrawable,
                 selectDrawable,
@@ -179,20 +179,9 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
 
         //设置padding
-        if (listModel == 2 && holder.mRoot != null) {
-            if (position % 2 == 1) {
-                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4));
-            } else {
-                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4));
-            }
-        }
+        setMarginForGridLayout(holder,position);
     }
 
-
-    @Override
-    public void saveMode() {
-        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, "ArtistModel", listModel);
-    }
 
 //    @NonNull
 //    @Override
@@ -229,9 +218,6 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         ImageButton mButton;
         @BindView(R.id.item_container)
         RelativeLayout mContainer;
-        @BindView(R.id.item_root)
-        @Nullable
-        View mRoot;
 
         ArtistHolder(View v) {
             super(v);

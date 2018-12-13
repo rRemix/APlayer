@@ -64,8 +64,8 @@ public class PlayQueueAdapter extends BaseAdapter<Song, PlayQueueAdapter.PlayQue
             }
 
         });
-        if (mOnItemClickLitener != null) {
-            holder.mContainer.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition()));
+        if (mOnItemClickListener != null) {
+            holder.mContainer.setOnClickListener(v -> mOnItemClickListener.onItemClick(v, holder.getAdapterPosition()));
         }
 
     }

@@ -20,10 +20,13 @@ import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.adapter.ArtistAdapter;
+import remix.myplayer.ui.adapter.HeaderAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
+
+import static remix.myplayer.ui.adapter.HeaderAdapter.LIST_MODE;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -51,11 +54,7 @@ public class ArtistFragment extends LibraryFragment<Artist, ArtistAdapter> {
 
     @Override
     protected void initAdapter() {
-        mAdapter = new ArtistAdapter(mContext, R.layout.item_artist_recycle_grid, mChoice);
-        mAdapter.setModeChangeCallback(mode -> {
-            mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
-            mRecyclerView.setAdapter(mAdapter);
-        });
+        mAdapter = new ArtistAdapter(mContext, R.layout.item_artist_recycle_grid, mChoice,mRecyclerView);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -84,8 +83,8 @@ public class ArtistFragment extends LibraryFragment<Artist, ArtistAdapter> {
 
     @Override
     protected void initView() {
-        int model = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, "ArtistModel", Constants.GRID_MODEL);
-        mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
+        int model = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ARTIST, HeaderAdapter.GRID_MODE);
+        mRecyclerView.setLayoutManager(model == LIST_MODE ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);

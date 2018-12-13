@@ -76,7 +76,7 @@ public class FloatColorAdapter extends BaseAdapter<Integer, FloatColorAdapter.Fl
 //        holder.mRoot.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                mOnItemClickLitener.onItemClick(v, position);
+//                mOnItemClickListener.onItemClick(v, position);
 //            }
 //        });
     }

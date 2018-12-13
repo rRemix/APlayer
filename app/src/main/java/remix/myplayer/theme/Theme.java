@@ -31,8 +31,8 @@ import java.lang.reflect.Field;
 
 import remix.myplayer.App;
 import remix.myplayer.R;
+import remix.myplayer.ui.adapter.HeaderAdapter;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 
 import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
@@ -387,8 +387,8 @@ public class Theme {
         int defaultColor = ThemeStore.getBackgroundColorMain();
 
         return getPressAndSelectedStateListRippleDrawable(context,
-                model == Constants.GRID_MODEL ? getCorner(1, DensityUtil.dip2px(context, 2), 0, ThemeStore.getSelectColor()) : getShape(GradientDrawable.RECTANGLE, ThemeStore.getSelectColor()),
-                model == Constants.GRID_MODEL ? getCorner(1, DensityUtil.dip2px(context, 2), 0, defaultColor) : getShape(GradientDrawable.RECTANGLE, defaultColor));
+                model == HeaderAdapter.GRID_MODE ? getCorner(1, DensityUtil.dip2px(context, 2), 0, ThemeStore.getSelectColor()) : getShape(GradientDrawable.RECTANGLE, ThemeStore.getSelectColor()),
+                model == HeaderAdapter.GRID_MODE ? getCorner(1, DensityUtil.dip2px(context, 2), 0, defaultColor) : getShape(GradientDrawable.RECTANGLE, defaultColor));
     }
 
     /**

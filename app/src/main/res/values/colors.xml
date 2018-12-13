@@ -126,6 +126,8 @@
     <color name="dark_ripple_color">#33ffffff</color>
     <color name="dark_select_color">#33ffffff</color>
     <color name="dark_library_color">#171719</color>
+    <color name="black_library_color">#000000</color>
+    <!--Divider-->
     <!--New End-->
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>

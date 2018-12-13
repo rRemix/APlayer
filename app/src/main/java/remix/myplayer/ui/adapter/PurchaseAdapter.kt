@@ -37,7 +37,7 @@ class PurchaseAdapter(context: Context, layoutId: Int) : BaseAdapter<PurchaseBea
         }
 
         holder.mRoot.setOnClickListener {
-            mOnItemClickLitener.onItemClick(it, position)
+            mOnItemClickListener.onItemClick(it, position)
         }
     }
 

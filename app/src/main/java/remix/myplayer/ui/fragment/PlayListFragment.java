@@ -18,12 +18,15 @@ import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.ui.activity.ChildHolderActivity;
+import remix.myplayer.ui.adapter.HeaderAdapter;
 import remix.myplayer.ui.adapter.PlayListAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+
+import static remix.myplayer.ui.adapter.HeaderAdapter.LIST_MODE;
 
 /**
  * @ClassName
@@ -43,11 +46,7 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
 
     @Override
     protected void initAdapter() {
-        mAdapter = new PlayListAdapter(mContext, R.layout.item_playlist_recycle_grid, mChoice);
-        mAdapter.setModeChangeCallback(mode -> {
-            mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
-            mRecyclerView.setAdapter(mAdapter);
-        });
+        mAdapter = new PlayListAdapter(mContext, R.layout.item_playlist_recycle_grid, mChoice,mRecyclerView);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -77,9 +76,9 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
 
     @Override
     protected void initView() {
-        int model = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, "PlayListModel", Constants.GRID_MODEL);
+        int model = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_PLAYLIST, HeaderAdapter.GRID_MODE);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
+        mRecyclerView.setLayoutManager(model == LIST_MODE ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
     }

@@ -192,6 +192,12 @@ public class SPUtil {
         String FIRST_SHOW_MULTI = "first_show_multi";
         //列表歌曲名是否取代为文件夹名
         String SHOW_DISPLAYNAME = "show_displayname";
+        //专辑列表的显示模式
+        String MODE_FOR_ALBUM = "mode_for_album";
+        //艺术家列表的显示模式
+        String MODE_FOR_ARTIST = "mode_for_artist";
+        //播放列表的显示模式
+        String MODE_FOR_PLAYLIST = "mode_for_playlist";
     }
 
     public interface LYRIC_OFFSET_KEY {

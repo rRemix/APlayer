@@ -20,10 +20,13 @@ import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.adapter.AlbumAdapter;
+import remix.myplayer.ui.adapter.HeaderAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
+
+import static remix.myplayer.ui.adapter.HeaderAdapter.LIST_MODE;
 
 /**
  * Created by Remix on 2015/12/20.
@@ -51,12 +54,7 @@ public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
 
     @Override
     protected void initAdapter() {
-        mAdapter = new AlbumAdapter(mContext, R.layout.item_album_recycle_grid, mChoice);
-        mAdapter.setModeChangeCallback(mode -> {
-            mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
-            resetItemDecoration(mRecyclerView,mode);
-            mRecyclerView.setAdapter(mAdapter);
-        });
+        mAdapter = new AlbumAdapter(mContext, R.layout.item_album_recycle_grid, mChoice,mRecyclerView);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -82,14 +80,12 @@ public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
 
     @Override
     protected void initView() {
-        int mode = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, "AlbumModel", Constants.GRID_MODEL);
+        int mode = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ALBUM, HeaderAdapter.GRID_MODE);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
+        mRecyclerView.setLayoutManager(mode == LIST_MODE ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
-        resetItemDecoration(mRecyclerView,mode);
     }
-
 
 
     @Override

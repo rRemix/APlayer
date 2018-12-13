@@ -66,7 +66,7 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
         } else {
             holder.mSwitch.setVisibility(View.GONE);
         }
-        holder.mRoot.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition()));
+        holder.mRoot.setOnClickListener(v -> mOnItemClickListener.onItemClick(v, holder.getAdapterPosition()));
         holder.mRoot.setSelected(mSelectIndex == position);
         //todo
 //        holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(mContext,

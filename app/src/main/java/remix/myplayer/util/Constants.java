@@ -20,10 +20,6 @@ public class Constants {
     //我的收藏
     public final static String MYLOVE = App.getContext().getString(R.string.my_favorite);
 
-    //显示模式 1:列表 2:网格
-    public final static int LIST_MODEL = 1;
-    public final static int GRID_MODEL = 2;
-
     //操作类型
     public final static int SONG = 0;
     public final static int ALBUM = 1;

@@ -52,15 +52,12 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
 
     private Drawable mDefaultDrawable;
     private Drawable mSelectDrawable;
-    private RecyclerView mRecyclerView;
     private int mLastIndex;
 
     public ChildHolderAdapter(Context context, int layoutId, int type, String arg, MultipleChoice multiChoice, RecyclerView recyclerView) {
-        super(context, layoutId, multiChoice);
-        this.mContext = context;
+        super(context, layoutId, multiChoice, recyclerView);
         this.mType = type;
         this.mArg = arg;
-        this.mRecyclerView = recyclerView;
         int size = DensityUtil.dip2px(mContext, 60);
         mDefaultDrawable = Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
         mSelectDrawable = Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
@@ -170,23 +167,23 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
         }
 
         //背景点击效果
-        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL, mContext));
+        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(HeaderAdapter.LIST_MODE, mContext));
 
-        if (holder.mContainer != null && mOnItemClickLitener != null) {
+        if (holder.mContainer != null && mOnItemClickListener != null) {
             holder.mContainer.setOnClickListener(v -> {
                 if (holder.getAdapterPosition() - 1 < 0) {
                     ToastUtil.show(mContext, R.string.illegal_arg);
                     return;
                 }
                 if (song != null && song.getId() > 0)
-                    mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition() - 1);
+                    mOnItemClickListener.onItemClick(v, holder.getAdapterPosition() - 1);
             });
             holder.mContainer.setOnLongClickListener(v -> {
                 if (holder.getAdapterPosition() - 1 < 0) {
                     ToastUtil.show(mContext, R.string.illegal_arg);
                     return true;
                 }
-                mOnItemClickLitener.onItemLongClick(v, holder.getAdapterPosition() - 1);
+                mOnItemClickListener.onItemLongClick(v, holder.getAdapterPosition() - 1);
                 return true;
             });
         }

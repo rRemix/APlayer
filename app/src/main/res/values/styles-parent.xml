@@ -52,6 +52,8 @@
     <style name="Theme.APlayer.Base.Black" parent="@style/Theme.APlayer.Base.Dark">
         <item name="android:windowBackground">@android:color/black</item>
         <item name="colorPrimary">?android:attr/windowBackground</item>
+        <item name="background_library_color">@color/black_library_color</item>
+
     </style>
 
 </resources>

@@ -6,9 +6,9 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +37,6 @@ import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
 import static remix.myplayer.request.ImageUriRequest.BIG_IMAGE_SIZE;
@@ -52,10 +51,8 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
  */
 public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> implements FastScroller.SectionIndexer {
 
-    public PlayListAdapter(Context context, int layoutId, MultipleChoice multiChoice) {
-        super(context, layoutId, multiChoice);
-        listModel = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "PlayListModel", Constants.GRID_MODEL);
-
+    public PlayListAdapter(Context context, int layoutId, MultipleChoice multiChoice, RecyclerView recyclerView) {
+        super(context, layoutId, multiChoice, recyclerView);
     }
 
     @Override
@@ -63,7 +60,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         if (viewType == TYPE_HEADER) {
             return new AlbumAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2, parent, false));
         }
-        return viewType == Constants.LIST_MODEL ?
+        return viewType == HeaderAdapter.LIST_MODE ?
                 new PlayListListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_list, parent, false)) :
                 new PlayListGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_grid, parent, false));
     }
@@ -92,9 +89,9 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
                 return;
             }
             //设置图标
-            headerHolder.mDivider.setVisibility(listModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
-            headerHolder.mListModelBtn.setColorFilter(listModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-            headerHolder.mGridModelBtn.setColorFilter(listModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mDivider.setVisibility(mMode == HeaderAdapter.LIST_MODE ? View.VISIBLE : View.GONE);
+            headerHolder.mListModelBtn.setColorFilter(mMode == HeaderAdapter.LIST_MODE ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mGridModelBtn.setColorFilter(mMode == HeaderAdapter.GRID_MODE ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
             headerHolder.mGridModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
             headerHolder.mListModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
             return;
@@ -109,7 +106,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         holder.mName.setText(info.Name);
         holder.mOther.setText(mContext.getString(R.string.song_count, info.Count));
         //设置专辑封面
-        final int imageSize = listModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
+        final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
         Disposable disposable = new PlayListUriRequest(holder.mImage,
                 new UriRequest(info.getId(), UriRequest.TYPE_NETEASE_SONG, ImageUriRequest.URL_PLAYLIST),
                 new RequestConfig.Builder(imageSize, imageSize).build()).load();
@@ -119,7 +116,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
                 ToastUtil.show(mContext, R.string.illegal_arg);
                 return;
             }
-            mOnItemClickLitener.onItemClick(holder.mContainer, holder.getAdapterPosition() - 1);
+            mOnItemClickListener.onItemClick(holder.mContainer, holder.getAdapterPosition() - 1);
         });
         //多选菜单
         holder.mContainer.setOnLongClickListener(v -> {
@@ -127,7 +124,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
                 ToastUtil.show(mContext, R.string.illegal_arg);
                 return true;
             }
-            mOnItemClickLitener.onItemLongClick(holder.mContainer, holder.getAdapterPosition() - 1);
+            mOnItemClickListener.onItemLongClick(holder.mContainer, holder.getAdapterPosition() - 1);
             return true;
         });
 
@@ -146,8 +143,8 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         });
         //点击效果
         int size = DensityUtil.dip2px(mContext, 45);
-        Drawable defaultDrawable = Theme.getShape(listModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-        Drawable selectDrawable = Theme.getShape(listModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
+        Drawable defaultDrawable = Theme.getShape(mMode == HeaderAdapter.LIST_MODE ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+        Drawable selectDrawable = Theme.getShape(mMode == HeaderAdapter.LIST_MODE ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
         holder.mButton.setBackground(Theme.getPressDrawable(
                 defaultDrawable,
                 selectDrawable,
@@ -155,21 +152,23 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
                 null,
                 null));
 
-        //背景点击效果
-        holder.mContainer.setBackground(
-                Theme.getPressAndSelectedStateListRippleDrawable(listModel, mContext));
+//        //背景点击效果
+//        holder.mContainer.setBackground(
+//                Theme.getPressAndSelectedStateListRippleDrawable(mMode, mContext));
 
         //是否处于选中状态
         holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
 
-        //设置padding
-        if (listModel == 2 && holder.mRoot != null) {
-            if (position % 2 == 1) {
-                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4));
-            } else {
-                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4));
-            }
-        }
+
+        setMarginForGridLayout(holder, position);
+//        //设置padding
+//        if (mMode == 2 && holder.mRoot != null) {
+//            if (position % 2 == 1) {
+//                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4));
+//            } else {
+//                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4));
+//            }
+//        }
     }
 
 
@@ -196,18 +195,9 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         @BindView(R.id.item_container)
         RelativeLayout mContainer;
 
-        @BindView(R.id.item_root)
-        @Nullable
-        View mRoot;
-
         PlayListHolder(View itemView) {
             super(itemView);
         }
-    }
-
-    @Override
-    protected void saveMode() {
-        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, "PlayListModel", listModel);
     }
 
     static class PlayListListHolder extends PlayListHolder {

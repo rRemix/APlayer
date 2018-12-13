@@ -92,8 +92,8 @@ public class SearchAdapter extends BaseAdapter<Song, SearchAdapter.SearchResHold
             popupMenu.show();
         });
 
-        if (mOnItemClickLitener != null && holder.mRooView != null) {
-            holder.mRooView.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition()));
+        if (mOnItemClickListener != null && holder.mRooView != null) {
+            holder.mRooView.setOnClickListener(v -> mOnItemClickListener.onItemClick(v, holder.getAdapterPosition()));
         }
     }
 

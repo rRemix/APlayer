@@ -41,7 +41,6 @@ import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.widget.ColumnView;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.ToastUtil;
@@ -63,12 +62,10 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
     private final Drawable mDefaultDrawable;
     private final Drawable mSelectDrawable;
 
-    private final RecyclerView mRecyclerView;
     private int mLastIndex = 1;
 
     public SongAdapter(Context context, int layoutId, MultipleChoice multiChoice, int type, RecyclerView recyclerView) {
-        super(context, layoutId, multiChoice);
-        mChoice = multiChoice;
+        super(context, layoutId, multiChoice, recyclerView);
         mType = type;
         mRecyclerView = recyclerView;
         int size = DensityUtil.dip2px(mContext, 60);
@@ -177,7 +174,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
         holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
 
         //背景点击效果
-        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL, mContext));
+        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(HeaderAdapter.LIST_MODE, mContext));
 
         //设置按钮着色
         int tintColor = ThemeStore.isLight() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
@@ -205,14 +202,14 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
                 ToastUtil.show(mContext, R.string.illegal_arg);
                 return;
             }
-            mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition() - 1);
+            mOnItemClickListener.onItemClick(v, holder.getAdapterPosition() - 1);
         });
         holder.mContainer.setOnLongClickListener(v -> {
             if (holder.getAdapterPosition() - 1 < 0) {
                 ToastUtil.show(mContext, R.string.illegal_arg);
                 return true;
             }
-            mOnItemClickLitener.onItemLongClick(v, holder.getAdapterPosition() - 1);
+            mOnItemClickListener.onItemLongClick(v, holder.getAdapterPosition() - 1);
             return true;
         });
 

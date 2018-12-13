@@ -22,7 +22,7 @@ import remix.myplayer.ui.adapter.holder.BaseViewHolder;
  */
 public abstract class BaseAdapter<D, T extends BaseViewHolder> extends RecyclerView.Adapter<T> {
     protected Context mContext;
-    protected OnItemClickListener mOnItemClickLitener;
+    protected OnItemClickListener mOnItemClickListener;
     List<D> mDatas;
     protected int mLayoutId;
     private Constructor mConstructor;
@@ -71,7 +71,7 @@ public abstract class BaseAdapter<D, T extends BaseViewHolder> extends RecyclerV
     }
 
     public void setOnItemClickListener(OnItemClickListener l) {
-        this.mOnItemClickLitener = l;
+        this.mOnItemClickListener = l;
     }
 
     @Override

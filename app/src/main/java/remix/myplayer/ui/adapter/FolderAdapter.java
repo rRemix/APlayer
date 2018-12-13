@@ -60,7 +60,7 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
 
         //背景点击效果
         holder.mContainer.setBackground(
-                Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL, mContext));
+                Theme.getPressAndSelectedStateListRippleDrawable(HeaderAdapter.LIST_MODE, mContext));
 
         if (holder.mButton != null) {
             int tintColor = ThemeStore.isLight() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
@@ -86,10 +86,10 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
             });
         }
 
-        if (mOnItemClickLitener != null && holder.mContainer != null) {
-            holder.mContainer.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition()));
+        if (mOnItemClickListener != null && holder.mContainer != null) {
+            holder.mContainer.setOnClickListener(v -> mOnItemClickListener.onItemClick(v, holder.getAdapterPosition()));
             holder.mContainer.setOnLongClickListener(v -> {
-                mOnItemClickLitener.onItemLongClick(v, holder.getAdapterPosition());
+                mOnItemClickListener.onItemLongClick(v, holder.getAdapterPosition());
                 return true;
             });
         }

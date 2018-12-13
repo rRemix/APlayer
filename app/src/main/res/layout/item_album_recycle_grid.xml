@@ -1,89 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/item_root"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:id="@+id/item_container"
+    android:background="?attr/background_grid">
+    <remix.myplayer.ui.widget.WidthFitSquareLayout
+        android:id="@+id/item_simpleiview_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true">
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/item_simpleiview"
+            android:layout_gravity="center"
+            fresco:fadeDuration="@integer/FadeDuration"
+            fresco:placeholderImage="?attr/default_album"
+            fresco:placeholderImageScaleType="centerCrop"
+            fresco:actualImageScaleType="centerCrop"
+            fresco:failureImage="?attr/default_album"
+            fresco:failureImageScaleType="centerCrop"
+            fresco:roundedCornerRadius="@dimen/d2_size" />
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/item_half_circle"
+            android:layout_gravity="right|center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_half_circular_left"/>
+    </remix.myplayer.ui.widget.WidthFitSquareLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/item_container">
-        <remix.myplayer.ui.widget.WidthFitSquareLayout
-            android:id="@+id/item_simpleiview_container"
+        android:layout_height="@dimen/item_grid_text_container_height"
+        android:layout_below="@+id/item_simpleiview_container">
+        <LinearLayout
+            android:layout_centerVertical="true"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginLeft="@dimen/d10_size"
+            android:layout_marginRight="@dimen/d10_size"
+            android:gravity="center_vertical"
+            android:layout_toLeftOf="@id/item_button"
+            android:layout_alignParentLeft="true">
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/item_text1"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="?attr/text_color_primary"
+                android:textSize="@dimen/s14_size"/>
+            <TextView
+                android:layout_marginTop="@dimen/d2_size"
+                android:layout_gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/item_text2"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="?attr/text_color_secondary"
+                android:textSize="@dimen/s12_size"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:layout_width="@dimen/d40_size"
             android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true">
-            <com.facebook.drawee.view.SimpleDraweeView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/item_simpleiview"
-                android:layout_gravity="center"
-                fresco:fadeDuration="@integer/FadeDuration"
-                fresco:placeholderImage="?attr/default_album"
-                fresco:placeholderImageScaleType="centerCrop"
-                fresco:actualImageScaleType="centerCrop"
-                fresco:failureImage="?attr/default_album"
-                fresco:failureImageScaleType="centerCrop"
-                fresco:roundedCornerRadius="@dimen/d2_size" />
-            <ImageView
-                android:visibility="gone"
-                android:id="@+id/item_half_circle"
-                android:layout_gravity="right|center_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/icon_half_circular_left"/>
-        </remix.myplayer.ui.widget.WidthFitSquareLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/item_grid_text_container_height"
-            android:layout_below="@+id/item_simpleiview_container">
-            <LinearLayout
-                android:layout_centerVertical="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginLeft="@dimen/d10_size"
-                android:layout_marginRight="@dimen/d10_size"
-                android:gravity="center_vertical"
-                android:layout_toLeftOf="@id/item_button"
-                android:layout_alignParentLeft="true">
-                <TextView
-                    android:layout_gravity="center_vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/item_text1"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:textColor="?attr/text_color_primary"
-                    android:textSize="@dimen/s14_size"/>
-                <TextView
-                    android:layout_marginTop="@dimen/d2_size"
-                    android:layout_gravity="center_vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/item_text2"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:textColor="?attr/text_color_secondary"
-                    android:textSize="@dimen/s12_size"/>
-            </LinearLayout>
-
-            <ImageButton
-                android:layout_width="@dimen/d40_size"
-                android:layout_height="match_parent"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:id="@+id/item_button"
-                android:src="@drawable/icon_player_more"
-                android:background="@color/transparent"/>
-        </RelativeLayout>
-
-
-
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:id="@+id/item_button"
+            android:src="@drawable/icon_player_more"
+            android:background="@color/transparent"/>
     </RelativeLayout>
 
 
-</FrameLayout>
+
+</RelativeLayout>
