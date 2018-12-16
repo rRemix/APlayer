@@ -227,7 +227,7 @@ public class Theme {
      */
     @StyleRes
     public static int getPopupMenuStyle() {
-        return ThemeStore.isLight() ? R.style.PopupMenuLightStyle : R.style.PopupMenuDarkStyle;
+        return ThemeStore.isLightTheme() ? R.style.PopupMenuLightStyle : R.style.PopupMenuDarkStyle;
     }
 
     /**

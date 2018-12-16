@@ -93,7 +93,7 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
         editDialog.show()
 
         editDialog.customView?.let { root ->
-            if (!ThemeStore.isLight()) {
+            if (!ThemeStore.isLightTheme()) {
                 root.song_layout.editText?.setTextColor(ThemeStore.getTextColorPrimary())
 //                root.song_layout.editText?.background?.setColorFilter(Color.WHITE,PorterDuff.Mode.SRC_ATOP)
                 root.album_layout.editText?.setTextColor(ThemeStore.getTextColorPrimary())

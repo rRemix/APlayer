@@ -11,7 +11,6 @@
     <string name="drawer_song">Library</string>
     <string name="drawer_recently">Recently</string>
     <string name="drawer_folder">Folder</string>
-    <string name="drawer_night">Night mode</string>
     <string name="drawer_setting">Settings</string>
 
     <string name="from_aplayer">From APlayer</string>
@@ -143,8 +142,8 @@
     <string name="shake">Shake</string>
     <string name="shake_tip">Shake to change song</string>
     <string name="color">Colors</string>
-    <string name="theme_color">Theme color</string>
-    <string name="theme_color_info">Allow yourself to choose colors that you love</string>
+    <string name="primary_color">Primary color</string>
+    <string name="primary_color_tip">Allow yourself to choose colors that you love</string>
     <string name="notify_bg_color">Background color</string>
     <string name="notify_bg_color_info">Background color of notification</string>
     <string name="other">Other</string>
@@ -368,4 +367,16 @@
     <string name="speed_range_tip">The range is 0.5 to 1.5</string>
     <string name="show_displayname">Display filename</string>
     <string name="show_displayname_tip">Replace the title with the filename in the song list</string>
+    <string name="accent_color">Accent color</string>
+    <string name="accent_color_tip">Allow yourself to choose colors that you love</string>
+    <string name="general_theme">General theme</string>
+    <string name="light_theme">Light</string>
+    <string name="dark_theme">Dark</string>
+    <string name="black_theme">Black (AMOLED)</string>
+
+    <string name="md_back_label">Back</string>
+    <string name="md_done_label">Done</string>
+    <string name="md_cancel_label">Cancel</string>
+    <string name="md_custom_label">Custom</string>
+    <string name="md_presets_label">Presets</string>
 </resources>

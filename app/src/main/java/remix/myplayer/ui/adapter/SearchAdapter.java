@@ -74,7 +74,7 @@ public class SearchAdapter extends BaseAdapter<Song, SearchAdapter.SearchResHold
         holder.mImage.setTag(disposable);
 
         //设置按钮着色
-        int tintColor = ThemeStore.isLight() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+        int tintColor = ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         //按钮点击效果

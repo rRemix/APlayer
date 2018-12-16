@@ -8,7 +8,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -115,6 +114,8 @@ import static remix.myplayer.bean.misc.Category.DEFAULT_LIBRARY;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DISMISS_DIALOG;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DOWNLOAD_COMPLETE;
 import static remix.myplayer.misc.update.DownloadService.ACTION_SHOW_DIALOG;
+import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
+import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColorReverse;
 import static remix.myplayer.ui.activity.SongChooseActivity.EXTRA_ID;
 import static remix.myplayer.ui.activity.SongChooseActivity.EXTRA_NAME;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
@@ -174,7 +175,7 @@ public class MainActivity extends MenuActivity {
             if (Math.abs(dy) > 1) {
                 showViewWithAnim(mLocation, true);
                 mLocation.removeCallbacks(mLocationRunnable);
-                mLocation.postDelayed(mLocationRunnable,DELAY_HIDE_LOCATION);
+                mLocation.postDelayed(mLocationRunnable, DELAY_HIDE_LOCATION);
             }
         }
     };
@@ -244,8 +245,8 @@ public class MainActivity extends MenuActivity {
         super.setUpToolbar(toolbar, "");
         if (toolbar != null) {
             toolbar.setTitle("");
-            int themeColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white);
-            toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.actionbar_menu, themeColor));
+            int reverseColor = getMaterialPrimaryColorReverse();
+            toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.actionbar_menu,reverseColor));
             toolbar.setNavigationOnClickListener(v -> mDrawerLayout.openDrawer(mNavigationView));
         }
     }
@@ -320,7 +321,7 @@ public class MainActivity extends MenuActivity {
                 showViewWithAnim(mAddButton, true);
         }
 
-        mAddButton.setImageResource(ThemeStore.isLight() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
+        mAddButton.setImageResource(ThemeStore.isLightTheme() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
         mViewPager.setCurrentItem(0);
@@ -333,7 +334,7 @@ public class MainActivity extends MenuActivity {
             public void onPageSelected(int position) {
                 final Category category = mPagerAdapter.getList().get(position);
                 showViewWithAnim(mAddButton, category.isPlayList());
-                if(!category.isSongList()){ //滑动到其他tab时隐藏歌曲列表的定位按钮
+                if (!category.isSongList()) { //滑动到其他tab时隐藏歌曲列表的定位按钮
                     showViewWithAnim(mLocation, false);
                 }
 
@@ -352,11 +353,12 @@ public class MainActivity extends MenuActivity {
         });
         mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(0);
 
-        mLocation.setImageDrawable(Theme.TintVectorDrawable(this,R.drawable.ic_my_location_black_24dp, ThemeStore.getAccentColor()));
-        mLocation.postDelayed(this::addScrollListener,500);
+        mLocation.setImageDrawable(Theme.TintVectorDrawable(this, R.drawable.ic_my_location_black_24dp, ThemeStore.getAccentColor()));
+        mLocation.postDelayed(this::addScrollListener, 500);
     }
 
     private int mMenuLayoutId = R.menu.menu_main;
+
     public int parseMenuId(int tag) {
         return tag == Category.TAG_SONG ? R.menu.menu_main :
                 tag == Category.TAG_ALBUM ? R.menu.menu_album :
@@ -410,7 +412,7 @@ public class MainActivity extends MenuActivity {
 
     private void addScrollListener() {
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
-        if(recyclerView instanceof LocationRecyclerView){
+        if (recyclerView instanceof LocationRecyclerView) {
             LocationRecyclerView locationRecyclerView = (LocationRecyclerView) recyclerView;
             locationRecyclerView.removeOnScrollListener(mScrollListener);
             locationRecyclerView.addOnScrollListener(mScrollListener);
@@ -440,11 +442,12 @@ public class MainActivity extends MenuActivity {
     //初始化custontab
     private void setUpTab() {
         //添加tab选项卡
-        boolean isLightColor = ThemeStore.isLight();
+        boolean isLightColor = ThemeStore.isMDColorLight();
 //        mTablayout = new TabLayout(new ContextThemeWrapper(this, !ColorUtil.isColorLight(ThemeStore.getMaterialPrimaryColor()) ? R.style.CustomTabLayout_Light : R.style.CustomTabLayout_Dark));
 //        mTablayout = new TabLayout(new ContextThemeWrapper(this,R.style.CustomTabLayout_Light));
 //        mTablayout.setLayoutParams(new AppBarLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,DensityUtil.dip2px(this,48)));
 //        mTablayout = new TabLayout(this);
+        mTablayout.setBackgroundColor(getMaterialPrimaryColor());
         mTablayout.addTab(mTablayout.newTab().setText(R.string.tab_song));
         mTablayout.addTab(mTablayout.newTab().setText(R.string.tab_album));
         mTablayout.addTab(mTablayout.newTab().setText(R.string.tab_artist));
@@ -452,34 +455,16 @@ public class MainActivity extends MenuActivity {
         mTablayout.addTab(mTablayout.newTab().setText(R.string.tab_folder));
         //viewpager与tablayout关联
         mTablayout.setupWithViewPager(mViewPager);
-        mTablayout.setSelectedTabIndicatorColor(ColorUtil.getColor(isLightColor ? R.color.black : R.color.white));
+        mTablayout.setSelectedTabIndicatorColor(ThemeStore.getAccentColor());
+//        mTablayout.setSelectedTabIndicatorColor(ColorUtil.getColor(isLightColor ? R.color.black : R.color.white));
         mTablayout.setSelectedTabIndicatorHeight(DensityUtil.dip2px(this, 3));
         mTablayout.setTabTextColors(ColorUtil.getColor(isLightColor ? R.color.dark_normal_tab_text_color : R.color.light_normal_tab_text_color),
                 ColorUtil.getColor(isLightColor ? R.color.black : R.color.white));
-
-//        AppBarLayout appBarLayout = findView(R.id.appbar);
-//        appBarLayout.addView(mTablayout);
-    }
-
-    /**
-     * 设置夜间模式
-     *
-     * @param isNight
-     */
-    private void setNightMode(boolean isNight) {
-        //todo
-//        ThemeStore.THEME_MODE = isNight ? ThemeStore.NIGHT : ThemeStore.DAY;
-//        ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
-//        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
-//        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
-//        ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);
-        mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
     }
 
 
     private void setUpDrawerLayout() {
         mDrawerAdapter = new DrawerAdapter(this, R.layout.item_drawer);
-        mDrawerAdapter.setOnModeChangeListener(this::setNightMode);
         mDrawerAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -492,20 +477,16 @@ public class MainActivity extends MenuActivity {
                     case 1:
                         startActivity(new Intent(mContext, RecentlyActivity.class));
                         break;
-                    //夜间模式
-                    case 2:
-                        setNightMode(ThemeStore.isLight());
-                        break;
                     //捐赠
-                    case 3:
+                    case 2:
                         startActivity(new Intent(mContext, SupportDevelopActivity.class));
                         break;
                     //设置
-                    case 4:
+                    case 3:
                         startActivityForResult(new Intent(mContext, SettingActivity.class), REQUEST_SETTING);
                         break;
                     //退出
-                    case 5:
+                    case 4:
                         sendBroadcast(new Intent(Constants.EXIT)
                                 .setComponent(new ComponentName(mContext, ExitReceiver.class)));
                         break;
@@ -547,18 +528,12 @@ public class MainActivity extends MenuActivity {
     private void setUpViewColor() {
         //正在播放文字的背景
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(ThemeStore.isLight() ?
-                ThemeStore.isLightTheme() ? Color.TRANSPARENT : ThemeStore.getMaterialPrimaryDarkColor() :
-                ColorUtil.getColor(R.color.gray_343438));
+        bg.setColor(ColorUtil.darkenColor(getMaterialPrimaryColor()));
         bg.setCornerRadius(DensityUtil.dip2px(this, 4));
         mHeadText.setBackground(bg);
-        mHeadText.setTextColor(ColorUtil.getColor(ThemeStore.isLight() ?
-                ThemeStore.isLightTheme() ? R.color.black : R.color.white :
-                R.color.white_e5e5e5));
+        mHeadText.setTextColor(getMaterialPrimaryColorReverse());
         //抽屉
-        mHeadRoot.setBackgroundColor(ThemeStore.isLight() ? ThemeStore.getMaterialPrimaryColor() : ColorUtil.getColor(R.color.night_background_color_main));
-        mNavigationView.setBackgroundColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.white : R.color.gray_343438));
-
+        mHeadRoot.setBackgroundColor(getMaterialPrimaryColor());
     }
 
     @SuppressLint("CheckResult")
@@ -719,7 +694,7 @@ public class MainActivity extends MenuActivity {
     @Override
     public void onPlayStateChange() {
         super.onPlayStateChange();
-        mHeadImg.setBackgroundResource(MusicServiceRemote.isPlaying() && ThemeStore.isLight() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
+        mHeadImg.setBackgroundResource(MusicServiceRemote.isPlaying() && ThemeStore.isLightTheme() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
     }
 
     @Override

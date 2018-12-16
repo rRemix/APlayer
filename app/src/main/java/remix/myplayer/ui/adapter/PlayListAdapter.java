@@ -58,7 +58,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
-            return new AlbumAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2, parent, false));
+            return new AlbumAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_header_2, parent, false));
         }
         return viewType == HeaderAdapter.LIST_MODE ?
                 new PlayListListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_list, parent, false)) :
@@ -130,7 +130,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
         Theme.TintDrawable(holder.mButton,
                 R.drawable.icon_player_more,
-                ColorUtil.getColor(ThemeStore.isLight() ? R.color.gray_6c6a6c : R.color.white));
+                ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.gray_6c6a6c : R.color.white));
 
         holder.mButton.setOnClickListener(v -> {
             if (mChoice.isActive())

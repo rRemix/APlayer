@@ -24,9 +24,9 @@
     <!--dialog白天模式-->
     <style name="Dialog.DayTheme" parent="BaseDialogTheme">
         <item name="background_color_main">@color/day_background_color_main</item>
-        <item name="background_grid">@drawable/bg_grid_day</item>
-        <item name="background_list">@drawable/bg_list_day</item>
-        <item name="background_common">@drawable/bg_common_ripple_day</item>
+        <item name="background_grid">@drawable/bg_grid_light</item>
+        <item name="background_list">@drawable/bg_list_light</item>
+        <item name="background_common">@drawable/bg_common_ripple_light</item>
         <item name="text_color_primary">@color/day_textcolor_primary</item>
         <item name="text_color_secondary">@color/day_textcolor</item>
         <item name="colorControlHighlight">@color/day_ripple_color</item>
@@ -36,9 +36,9 @@
     <!--dialog夜间模式-->
     <style name="Dialog.NightTheme" parent="BaseDialogTheme">
         <item name="background_color_main">@color/night_background_color_main</item>
-        <item name="background_grid">@drawable/bg_grid_night</item>
-        <item name="background_list">@drawable/bg_list_night</item>
-        <item name="background_common">@drawable/bg_common_ripple_night</item>
+        <item name="background_grid">@drawable/bg_grid_dark</item>
+        <item name="background_list">@drawable/bg_list_dark</item>
+        <item name="background_common">@drawable/bg_common_ripple_dark</item>
         <item name="text_color_primary">@color/night_textcolor_primary</item>
         <item name="text_color_secondary">@color/night_textcolor</item>
         <item name="colorControlHighlight">@color/night_ripple_color</item>
@@ -160,9 +160,9 @@
 
     <style name="DayTheme" parent="@style/ActivityStyle">
         <item name="background_color_main">@color/day_background_color_main</item>
-        <item name="background_grid">@drawable/bg_grid_day</item>
-        <item name="background_list">@drawable/bg_list_day</item>
-        <item name="background_common">@drawable/bg_common_ripple_day</item>
+        <item name="background_grid">@drawable/bg_grid_light</item>
+        <item name="background_list">@drawable/bg_list_light</item>
+        <item name="background_common">@drawable/bg_common_ripple_light</item>
         <item name="text_color_primary">@color/day_textcolor_primary</item>
         <item name="text_color_secondary">@color/day_textcolor</item>
         <item name="default_album">@drawable/album_empty_bg_day</item>
@@ -178,9 +178,9 @@
     <!--夜间模式-->
     <style name="NightTheme" parent="@style/ActivityStyle">
         <item name="background_color_main">@color/night_background_color_main</item>
-        <item name="background_grid">@drawable/bg_grid_night</item>
-        <item name="background_list">@drawable/bg_list_night</item>
-        <item name="background_common">@drawable/bg_common_ripple_night</item>
+        <item name="background_grid">@drawable/bg_grid_dark</item>
+        <item name="background_list">@drawable/bg_list_dark</item>
+        <item name="background_common">@drawable/bg_common_ripple_dark</item>
         <item name="text_color_primary">@color/night_textcolor_primary</item>
         <item name="text_color_secondary">@color/night_textcolor</item>
         <item name="default_album">@drawable/album_empty_bg_night</item>

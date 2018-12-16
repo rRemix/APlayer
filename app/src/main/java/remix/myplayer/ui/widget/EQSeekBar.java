@@ -225,19 +225,19 @@ public class EQSeekBar extends View {
         //todo
         //使能状态下的颜色
         mEnableTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqenabletrackcolor,
-                ColorUtil.getColor(ThemeStore.isLight() ? R.color.day_enable_track_color : R.color.night_enable_track_color));
+                ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_enable_track_color : R.color.night_enable_track_color));
 //        mEnableProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqenableprogresscolor,
-//                ColorUtil.getColor(ThemeStore.isLight()() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.night_nonenable_progress_color));
+//                ColorUtil.getColor(ThemeStore.isLightTheme()() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.night_nonenable_progress_color));
         mEnableTextColor = typedArray.getColor(R.styleable.EQSeekBar_eqtextcolor,
-                ColorUtil.getColor(ThemeStore.isLight() ? R.color.day_enable_text_color : R.color.night_enable_text_color));
+                ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_enable_text_color : R.color.night_enable_text_color));
 
         //非使能状态下的颜色
         mTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqtrackcolor,
-                ColorUtil.getColor(ThemeStore.isLight() ? R.color.day_nonenable_track_color : R.color.night_nonenable_track_color));
+                ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_nonenable_track_color : R.color.night_nonenable_track_color));
         mProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqprogresscolor,
-                ColorUtil.getColor(ThemeStore.isLight() ? R.color.day_nonenable_progress_color : R.color.night_nonenable_progress_color));
+                ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_nonenable_progress_color : R.color.night_nonenable_progress_color));
         mTextColor = typedArray.getColor(R.styleable.EQSeekBar_eqtextcolor,
-                ColorUtil.getColor(ThemeStore.isLight() ? R.color.day_nonenable_text_color : R.color.night_nonenable_text_color));
+                ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_nonenable_text_color : R.color.night_nonenable_text_color));
 
         //间隔点数量
         mDotNum = typedArray.getInteger(R.styleable.EQSeekBar_eqdotnum, 31);

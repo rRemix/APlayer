@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/navigation_drawer_menu_category_sections"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_song"
+            android:icon="@drawable/drawer_icon_musicbox"
+            android:title="@string/drawer_song" />
+        <item
+            android:id="@+id/nav_recently"
+            android:icon="@drawable/drawer_icon_recently"
+            android:title="@string/drawer_recently" />
+        <item
+            android:id="@+id/nav_support"
+            android:icon="@drawable/darwer_icon_support"
+            android:title="@string/support_develop" />
+        <item
+            android:id="@+id/nav_setting"
+            android:icon="@drawable/drawer_icon_recently"
+            android:title="@string/drawer_setting" />
+        <item
+            android:id="@+id/nav_exit"
+            android:icon="@drawable/drawer_icon_exit"
+            android:title="@string/exit" />
+
+    </group>
+
+</menu>

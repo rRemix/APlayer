@@ -42,7 +42,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
 import static remix.myplayer.request.ImageUriRequest.BIG_IMAGE_SIZE;
@@ -63,7 +62,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
-            return new AlbumAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2, parent, false));
+            return new AlbumAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_header_2, parent, false));
         }
         return viewType == HeaderAdapter.LIST_MODE ?
                 new ArtistAdapter.ArtistListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_list, parent, false)) :
@@ -146,7 +145,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         });
 
         //popupmenu
-        int tintColor = ThemeStore.isLight() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+        int tintColor = ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         //按钮点击效果

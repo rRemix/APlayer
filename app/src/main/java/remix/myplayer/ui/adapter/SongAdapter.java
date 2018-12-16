@@ -76,7 +76,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return viewType == TYPE_HEADER ?
-                new HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_1, parent, false)) :
+                new HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_header_1, parent, false)) :
                 new SongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_song_recycle, parent, false));
     }
 
@@ -173,11 +173,11 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
         //艺术家与专辑
         holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
 
-        //背景点击效果
-        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(HeaderAdapter.LIST_MODE, mContext));
+//        //背景点击效果
+//        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(HeaderAdapter.LIST_MODE, mContext));
 
         //设置按钮着色
-        int tintColor = ThemeStore.isLight() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+        int tintColor = ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         //按钮点击效果
@@ -260,7 +260,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
                 }
             }
             if (oldHolder != null) {
-                oldHolder.mName.setTextColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+                oldHolder.mName.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
                 oldHolder.mColumnView.stopAnim();
                 oldHolder.mColumnView.setVisibility(View.GONE);
             }

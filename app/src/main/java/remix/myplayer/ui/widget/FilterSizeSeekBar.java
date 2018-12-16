@@ -254,7 +254,7 @@ public class FilterSizeSeekBar extends View {
         mTrackCenterY = mThumbHeight / 2;
 
         //轨道 已完成轨道 文字颜色
-        mTrackColor = ColorUtil.getColor(ThemeStore.isLight() ? R.color.day_scan_track_color : R.color.night_scan_track_color);
+        mTrackColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_scan_track_color : R.color.night_scan_track_color);
         mProgressColor = ThemeStore.getAccentColor();
         mTextColor = ThemeStore.getTextColorPrimary();
 

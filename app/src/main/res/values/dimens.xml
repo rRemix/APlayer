@@ -125,4 +125,5 @@
     <dimen name="item_grid_height">234dp</dimen>
     <dimen name="item_grid_text_container_height">58dp</dimen>
 
+    <dimen name="md_colorchooser_circlesize">56dp</dimen>
 </resources>

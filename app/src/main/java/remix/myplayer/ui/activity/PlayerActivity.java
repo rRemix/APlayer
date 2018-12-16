@@ -277,7 +277,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
     @Override
     protected void setUpTheme() {
-        if (ThemeStore.isLight())
+        if (ThemeStore.isLightTheme())
             super.setUpTheme();
         else {
             setTheme(R.style.AudioHolderStyle_Night);
@@ -289,7 +289,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         super.setNavigationBarColor();
         //导航栏变色
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION, false)) {
-            final int navigationColor = ThemeStore.isLight() ? ThemeStore.getNavigationBarColor() : ColorUtil.getColor(R.color.night_background_color_main);
+            final int navigationColor = ThemeStore.isLightTheme() ? ThemeStore.getNavigationBarColor() : ColorUtil.getColor(R.color.night_background_color_main);
             getWindow().setNavigationBarColor(navigationColor);
             Theme.setLightNavigationbarAuto(this, ColorUtil.isColorLight(navigationColor));
         }
@@ -334,7 +334,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         //设置失败加载的图片和缩放类型
         mAnimCover = new SimpleDraweeView(this);
         mAnimCover.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
-        mAnimCover.getHierarchy().setFailureImage(ThemeStore.isLight() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night, ScalingUtils.ScaleType.CENTER_CROP);
+        mAnimCover.getHierarchy().setFailureImage(ThemeStore.isLightTheme() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night, ScalingUtils.ScaleType.CENTER_CROP);
         mContainer.addView(mAnimCover);
 
         //设置封面
@@ -546,7 +546,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
                 MusicServiceRemote.setPlayModel(currentModel);
                 Theme.TintDrawable(mPlayModel, currentModel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                         currentModel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                                R.drawable.play_btn_loop_one, ColorUtil.getColor(ThemeStore.isLight() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b));
+                                R.drawable.play_btn_loop_one, ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b));
 
                 String msg = currentModel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
                         currentModel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
@@ -928,9 +928,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
                     mHandler.sendEmptyMessage(UPDATE_TIME_ALL);
                 }
             });
-            mLrcView.setHighLightColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.lrc_highlight_day : R.color.lrc_highlight_night));
-            mLrcView.setOtherColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
-            mLrcView.setTimeLineColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
+            mLrcView.setHighLightColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.lrc_highlight_day : R.color.lrc_highlight_night));
+            mLrcView.setOtherColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
+            mLrcView.setTimeLineColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
         });
         mLyricFragment.setArguments(bundle);
         mAdapter.addFragment(mLyricFragment);
@@ -1084,7 +1084,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
      */
     private void setUpViewColor() {
         int accentColor = ThemeStore.getAccentColor();
-        int tintColor = ColorUtil.getColor(ThemeStore.isLight() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b);
+        int tintColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b);
 
         setProgressDrawable(mProgressSeekBar, accentColor);
         setProgressDrawable(mVolumeSeekbar, accentColor);
@@ -1105,7 +1105,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         Theme.TintDrawable(mPlayBarPrev, R.drawable.play_btn_pre, accentColor);
 
         //歌曲名颜色
-        mTopTitle.setTextColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.black_333333 : R.color.white_e5e5e5));
+        mTopTitle.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black_333333 : R.color.white_e5e5e5));
 
         //修改顶部按钮颜色
         Theme.TintDrawable(mTopHide, R.drawable.icon_player_back, tintColor);
@@ -1125,16 +1125,16 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
         mPlayPauseView.setBackgroundColor(accentColor);
         //下一首背景
-        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, ColorUtil.getColor(ThemeStore.isLight() ? R.color.white_fafafa : R.color.gray_343438),
+        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.white_fafafa : R.color.gray_343438),
                 DensityUtil.dip2px(this, 2), 0, 0, DensityUtil.dip2px(this, 288), DensityUtil.dip2px(this, 38), 1));
-        mNextSong.setTextColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.gray_a8a8a8 : R.color.white_e5e5e5));
+        mNextSong.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.gray_a8a8a8 : R.color.white_e5e5e5));
 
     }
 
     private void setProgressDrawable(SeekBar seekBar, int accentColor) {
         LayerDrawable progressDrawable = (LayerDrawable) seekBar.getProgressDrawable();
         //修改progress颜色
-        ((GradientDrawable) progressDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.gray_efeeed : R.color.gray_343438));
+        ((GradientDrawable) progressDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.gray_efeeed : R.color.gray_343438));
         (progressDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
         seekBar.setProgressDrawable(progressDrawable);
     }
@@ -1176,7 +1176,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     private void requestCover(boolean withAnimation) {
         //更新封面
         if (mInfo == null) {
-            mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isLight() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
+            mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isLightTheme() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
             updateCover(withAnimation);
         } else {
             new ImageUriRequest<String>() {

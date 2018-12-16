@@ -1,0 +1,37 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/top_bar"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/d48_size"
+    android:minHeight="@dimen/d48_size"
+    android:background="?attr/background_color_main">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/play_shuffle">
+        <ImageView
+            android:id="@+id/play_shuffle_button"
+            android:layout_width="@dimen/d44_size"
+            android:layout_height="@dimen/d44_size"
+            android:src="@drawable/btn_shuffle"
+            android:background="@color/transparent" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/play_random"
+            android:textColor="?attr/text_color_secondary"
+            android:layout_marginLeft="@dimen/d8_size" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/divider"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="?attr/divider_color"/>
+
+</RelativeLayout>

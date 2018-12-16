@@ -28,11 +28,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
+import java.sql.RowId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
+import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
@@ -41,6 +43,7 @@ import io.reactivex.disposables.Disposable;
 import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.Category;
+import remix.myplayer.bean.mp3.ColorChoose;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.ShakeDetector;
@@ -59,6 +62,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.FolderChooserDialog;
 import remix.myplayer.ui.dialog.LyricPriorityDialog;
+import remix.myplayer.ui.dialog.color.ColorChooserDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -76,6 +80,9 @@ import static remix.myplayer.helper.M3UHelper.importM3UFile;
 import static remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM;
 import static remix.myplayer.service.MusicService.EXTRA_FLOAT_LYRIC;
 import static remix.myplayer.theme.Theme.getBaseDialog;
+import static remix.myplayer.theme.ThemeStore.getThemeText;
+import static remix.myplayer.theme.ThemeStore.saveAccentColor;
+import static remix.myplayer.theme.ThemeStore.saveMaterialPrimaryColor;
 import static remix.myplayer.ui.activity.MainActivity.EXTRA_CATEGORY;
 import static remix.myplayer.ui.activity.MainActivity.EXTRA_RECREATE;
 import static remix.myplayer.ui.activity.MainActivity.EXTRA_REFRESH_ADAPTER;
@@ -89,11 +96,14 @@ import static remix.myplayer.util.Util.sendLocalBroadcast;
  * @Author Xiaoborui
  * @Date 2016/8/23 13:51
  */
-public class SettingActivity extends ToolbarActivity implements FolderChooserDialog.FolderCallback, FileChooserDialog.FileCallback {
+public class SettingActivity extends ToolbarActivity implements FolderChooserDialog.FolderCallback,
+        FileChooserDialog.FileCallback,ColorChooserDialog.ColorCallback {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
-    @BindView(R.id.setting_color_src)
-    ImageView mColorSrc;
+    @BindView(R.id.setting_color_primary_indicator)
+    ImageView mPrimaryColorSrc;
+    @BindView(R.id.setting_color_accent_indicator)
+    ImageView mAccentColorSrc;
     @BindView(R.id.setting_clear_text)
     TextView mCache;
     @BindView(R.id.setting_navaigation_switch)
@@ -122,6 +132,17 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     SwitchCompat mIgnoreMediastoreSwitch;
     @BindView(R.id.setting_displayname_switch)
     SwitchCompat mShowDisplaynameSwitch;
+    @BindView(R.id.setting_general_theme_text)
+    TextView mThemeText;
+
+    @BindViews({R.id.setting_common_title,R.id.setting_color_title,R.id.setting_cover_title,
+    R.id.setting_library_title,R.id.setting_lrc_title,R.id.setting_notify_title,
+    R.id.setting_other_title,R.id.setting_player_title})
+    TextView[] mTitles;
+
+    @BindViews({R.id.setting_eq_arrow,R.id.setting_feedback_arrow,R.id.setting_about_arrow,
+    R.id.setting_update_arrow})
+    ImageView[] mArrows;
 
     private static final int REQUEST_THEME_COLOR = 0x10;
     private static final int REQUEST_EQ = 0x100;
@@ -257,15 +278,17 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         mFloatLrcTip.setText(mFloatLrcSwitch.isChecked() ? R.string.opened_float_lrc : R.string.closed_float_lrc);
 
         //主题颜色指示器
-        ((GradientDrawable) mColorSrc.getDrawable()).setColor(
-                ThemeStore.isLight() ? ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.md_white_primary_dark) : ThemeStore.getMaterialPrimaryColor() : Color.TRANSPARENT);
+        ((GradientDrawable) mPrimaryColorSrc.getDrawable()).setColor(ThemeStore.getMaterialPrimaryColor());
+        ((GradientDrawable) mAccentColorSrc.getDrawable()).setColor(ThemeStore.getAccentColor());
+
         //初始化箭头颜色
-        final int arrowColor = ThemeStore.getAccentColor();
-        ButterKnife.apply(new ImageView[]{findViewById(R.id.setting_eq_arrow),
-                        findViewById(R.id.setting_feedback_arrow),
-                        findViewById(R.id.setting_about_arrow),
-                        findViewById(R.id.setting_update_arrow)},
-                (view, index) -> Theme.TintDrawable(view, view.getBackground(), arrowColor));
+        final int accentColor = ThemeStore.getAccentColor();
+        ButterKnife.apply(mArrows,
+                (view, index) -> Theme.TintDrawable(view, view.getBackground(), accentColor));
+
+        //标题颜色
+        ButterKnife.apply(mTitles,
+                (view, index) -> view.setTextColor(accentColor));
 
         //封面
         mOriginalAlbumChoice = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, mContext.getString(R.string.always));
@@ -273,6 +296,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         //根据系统版本决定是否显示通知栏样式切换
         findViewById(R.id.setting_classic_notify_container).setVisibility(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? View.VISIBLE : View.GONE);
+
+        //当前主题
+        mThemeText.setText(getThemeText());
 
         //锁屏样式
         int lockScreen = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN);
@@ -289,6 +315,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 mHandler.sendEmptyMessage(CACHE_SIZE);
             }
         }.start();
+
 
         if (IS_GOOGLEPLAY) {
             findViewById(R.id.setting_update_container).setVisibility(View.GONE);
@@ -381,8 +408,23 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     }
 
+
+    @Override
+    public void onColorSelection(@NonNull ColorChooserDialog dialog, int selectedColor) {
+        switch (dialog.getTitle()){
+            case R.string.primary_color:
+                saveMaterialPrimaryColor(selectedColor);
+                break;
+            case R.string.accent_color:
+                saveAccentColor(selectedColor);
+                break;
+        }
+        mNeedRecreate = true;
+        recreate();
+    }
+
     @SuppressLint("CheckResult")
-    @OnClick({R.id.setting_filter_container, R.id.setting_color_container, R.id.setting_notify_color_container,
+    @OnClick({R.id.setting_filter_container, R.id.setting_primary_color_container, R.id.setting_notify_color_container,
             R.id.setting_feedback_container, R.id.setting_about_container, R.id.setting_update_container,
             R.id.setting_lockscreen_container, R.id.setting_lrc_priority_container, R.id.setting_lrc_float_container,
             R.id.setting_navigation_container, R.id.setting_shake_container, R.id.setting_eq_container,
@@ -390,7 +432,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_scan_container, R.id.setting_classic_notify_container, R.id.setting_album_cover_container,
             R.id.setting_library_category_container, R.id.setting_immersive_container, R.id.setting_import_playlist_container,
             R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container, R.id.setting_cover_source_container,
-            R.id.setting_player_bottom_container, R.id.setting_restore_delete_container, R.id.setting_displayname_container})
+            R.id.setting_player_bottom_container, R.id.setting_restore_delete_container, R.id.setting_displayname_container,
+            R.id.setting_general_theme_container,R.id.setting_accent_color_container})
     public void onClick(View v) {
         switch (v.getId()) {
             //文件过滤
@@ -450,8 +493,22 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 mShakeSwitch.setChecked(!mShakeSwitch.isChecked());
                 break;
             //选择主色调
-            case R.id.setting_color_container:
-//                startActivityForResult(new Intent(this, ThemeDialog.class), REQUEST_THEME_COLOR);
+            case R.id.setting_primary_color_container:
+                new ColorChooserDialog.Builder(SettingActivity.this,R.string.primary_color)
+                        .accentMode(false)
+                        .preselect(ThemeStore.getMaterialPrimaryColor())
+                        .allowUserColorInput(true)
+                        .allowUserColorInputAlpha(false)
+                        .show();
+                break;
+            //选择强调色
+            case R.id.setting_accent_color_container:
+                new ColorChooserDialog.Builder(SettingActivity.this,R.string.accent_color)
+                        .accentMode(true)
+                        .preselect(ThemeStore.getAccentColor())
+                        .allowUserColorInput(true)
+                        .allowUserColorInputAlpha(false)
+                        .show();
                 break;
             //通知栏底色
             case R.id.setting_notify_color_container:
@@ -523,8 +580,30 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             case R.id.setting_displayname_container:
                 mShowDisplaynameSwitch.setChecked(!mShowDisplaynameSwitch.isChecked());
                 break;
+            //全局主题
+            case R.id.setting_general_theme_container:
+                configGeneralTheme();
+                break;
         }
     }
+
+    /**
+     * 配置全局主题
+     */
+    private void configGeneralTheme() {
+        getBaseDialog(this)
+                .items(R.array.general_theme)
+                .itemsCallback((dialog, itemView, position, text) -> {
+                    String valTheme = getThemeText();
+                    if(!text.equals(valTheme)){
+                        ThemeStore.setGeneralTheme(position);
+                        mThemeText.setText(text);
+                        mNeedRecreate = true;
+                        recreate();
+                    }
+                }).show();
+    }
+
 
     /**
      * 恢复移除的歌曲

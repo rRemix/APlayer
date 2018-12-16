@@ -32,12 +32,29 @@ public class ThemeStore {
 
     public static boolean IMMERSIVE_MODE = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.IMMERSIVE_MODE, false);
 
-    public static boolean isLight() {
-        return getTheme() == R.style.Theme_APlayer;
+
+
+    public static void setGeneralTheme(int pos){
+        SPUtil.putValue(App.getContext(),NAME,KEY_THEME,
+                pos == 0 ? LIGHT : pos == 1 ? DARK : BLACK);
+    }
+
+    public static String getThemeText(){
+        String theme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
+        switch (theme) {
+            case LIGHT:
+                return App.getContext().getString(R.string.light_theme);
+            case BLACK:
+                return App.getContext().getString(R.string.black_theme);
+            case DARK:
+                return App.getContext().getString(R.string.dark_theme);
+            default:
+                return App.getContext().getString(R.string.light_theme);
+        }
     }
 
     @StyleRes
-    public static int getTheme() {
+    public static int getThemeRes() {
         String theme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
         switch (theme) {
             case LIGHT:
@@ -51,19 +68,28 @@ public class ThemeStore {
         }
     }
 
+    public static void saveMaterialPrimaryColor(@ColorInt int color){
+        SPUtil.putValue(App.getContext(),NAME,KEY_PRIMARY_COLOR,color);
+        SPUtil.putValue(App.getContext(),NAME,KEY_PRIMARY_DARK_COLOR,ColorUtil.darkenColor(color));
+    }
+
     @ColorInt
     public static int getMaterialPrimaryColor() {
-        return SPUtil.getValue(App.getContext(), NAME, KEY_PRIMARY_COLOR, Color.parseColor("#698CF6"));
+        return SPUtil.getValue(App.getContext(), NAME, KEY_PRIMARY_COLOR, Color.parseColor("#698cf6"));
     }
 
     @ColorInt
     public static int getMaterialPrimaryDarkColor() {
-        return SPUtil.getValue(App.getContext(), NAME, KEY_PRIMARY_DARK_COLOR, Color.parseColor("#5C7EE4"));
+        return SPUtil.getValue(App.getContext(), NAME, KEY_PRIMARY_DARK_COLOR, Color.parseColor("#5c7ee4"));
     }
 
     @ColorInt
     public static int getAccentColor() {
-        return SPUtil.getValue(App.getContext(), NAME, KEY_ACCENT_COLOR, Color.parseColor("#698CF6"));
+        return SPUtil.getValue(App.getContext(), NAME, KEY_ACCENT_COLOR, Color.parseColor("#ffb61e"));
+    }
+
+    public static void saveAccentColor(@ColorInt int color){
+        SPUtil.putValue(App.getContext(),NAME,KEY_ACCENT_COLOR,color);
     }
 
     @ColorInt
@@ -78,67 +104,80 @@ public class ThemeStore {
 
     @ColorInt
     public static int getTextColorPrimary() {
-        return ColorUtil.getColor(isLight() ? R.color.light_text_color_primary : R.color.dark_text_color_primary);
+        return ColorUtil.getColor(isLightTheme() ? R.color.light_text_color_primary : R.color.dark_text_color_primary);
+    }
+
+    @ColorInt
+    public static int getMaterialPrimaryColorReverse(){
+        return ColorUtil.getColor(!isMDColorLight() ? R.color.white : R.color.black);
+    }
+
+    @ColorInt
+    public static int getTextColorprimaryReverse(){
+        return ColorUtil.getColor(!isMDColorLight() ? R.color.dark_text_color_primary : R.color.light_text_color_primary);
     }
 
     @ColorInt
     public static int getTextColorSecondary() {
-        return ColorUtil.getColor(isLight() ? R.color.light_text_color_primary : R.color.dark_text_color_primary);
+        return ColorUtil.getColor(isLightTheme() ? R.color.light_text_color_primary : R.color.dark_text_color_primary);
     }
 
     @ColorInt
     public static int getBackgroundColorMain() {
-        return ColorUtil.getColor(isLight() ? R.color.light_background_color_main : R.color.dark_background_color_main);
+        return ColorUtil.getColor(isLightTheme() ? R.color.light_background_color_main : R.color.dark_background_color_main);
     }
 
     @ColorInt
     public static int getBackgroundColorDialog() {
-        return ColorUtil.getColor(isLight() ? R.color.light_background_color_dialog : R.color.dark_background_color_dialog);
+        return ColorUtil.getColor(isLightTheme() ? R.color.light_background_color_dialog : R.color.dark_background_color_dialog);
     }
 
     @ColorInt
     public static int getRippleColor() {
-        return ColorUtil.getColor(isLight() ? R.color.light_ripple_color : R.color.dark_ripple_color);
+        return ColorUtil.getColor(isLightTheme() ? R.color.light_ripple_color : R.color.dark_ripple_color);
     }
 
     @ColorInt
     public static int getSelectColor() {
-        return ColorUtil.getColor(isLight() ? R.color.light_select_color : R.color.dark_select_color);
+        return ColorUtil.getColor(isLightTheme() ? R.color.light_select_color : R.color.dark_select_color);
     }
 
     @ColorInt
     public static int getDividerColor() {
-        return ColorUtil.getColor(isLight() ? R.color.light_divider_color : R.color.dark_divider_color);
+        return ColorUtil.getColor(isLightTheme() ? R.color.light_divider_color : R.color.dark_divider_color);
     }
 
     @DrawableRes
     public static int getDefaultAlbumRes() {
-        return isLight() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night;
+        return isLightTheme() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night;
     }
 
     @DrawableRes
     public static int getDefaultArtistRes() {
-        return isLight() ? R.drawable.artist_empty_bg_day : R.drawable.artist_empty_bg_night;
+        return isLightTheme() ? R.drawable.artist_empty_bg_day : R.drawable.artist_empty_bg_night;
     }
 
 
 //    @ColorInt
 //    public static int getDrawerEffectColor() {
-//        return ColorUtil.getColor(ThemeStore.isLight()()() ? R.color.drawer_selected_day : R.color.drawer_selected_night);
+//        return ColorUtil.getColor(ThemeStore.isLightTheme()()() ? R.color.drawer_selected_day : R.color.drawer_selected_night);
 //    }
 //
 //    @ColorInt
 //    public static int getDrawerDefaultColor() {
-//        return ColorUtil.getColor(ThemeStore.isLight()() ? R.color.white : R.color.gray_343438);
+//        return ColorUtil.getColor(ThemeStore.isLightTheme()() ? R.color.white : R.color.gray_343438);
 //    }
 
     public static com.afollestad.materialdialogs.Theme getMDDialogTheme() {
-        return isLightTheme() ? com.afollestad.materialdialogs.Theme.LIGHT : com.afollestad.materialdialogs.Theme.DARK;
+        return isMDColorLight() ? com.afollestad.materialdialogs.Theme.LIGHT : com.afollestad.materialdialogs.Theme.DARK;
+    }
+
+    public static boolean isMDColorLight() {
+        return ColorUtil.isColorLight(getMaterialPrimaryColor());
     }
 
     public static boolean isLightTheme() {
-        return StatusBarUtil.MeizuStatusbar.toGrey(getMaterialPrimaryColor()) >= 254;
+        return getThemeRes() == R.style.Theme_APlayer;
     }
-
 
 }

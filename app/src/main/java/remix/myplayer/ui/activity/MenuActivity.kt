@@ -10,7 +10,6 @@ import remix.myplayer.helper.SortOrder
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.dialog.TimerDialog
-import remix.myplayer.util.ColorUtil
 
 /**
  * @ClassName
@@ -132,11 +131,11 @@ abstract class MenuActivity : ToolbarActivity() {
 
     private fun tintMenuIcon(menu: Menu) {
         //主题颜色
-        val themeColor = ColorUtil.getColor(if (ThemeStore.isLightTheme()) R.color.black else R.color.white)
+        val color = ThemeStore.getMaterialPrimaryColorReverse()
         for (i in 0 until menu.size()) {
             val menuItem = menu.getItem(i)
             if (menuItem.icon != null)
-                menuItem.icon = Theme.TintDrawable(menuItem.icon, themeColor)
+                menuItem.icon = Theme.TintDrawable(menuItem.icon, color)
         }
     }
 

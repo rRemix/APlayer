@@ -39,8 +39,6 @@
 
     <!--桌面部件背景色-->
     <color name="widget_bg_color">#f9f9f9</color>
-    <!--默认textview颜色-->
-    <color name="default_textview_color">#727273</color>
     <!-- 抽屉ListView背景颜色-->
     <color name="drawer_list_color">#1d1a1d</color>
 
@@ -126,8 +124,9 @@
     <color name="dark_ripple_color">#33ffffff</color>
     <color name="dark_select_color">#33ffffff</color>
     <color name="dark_library_color">#171719</color>
-    <color name="black_library_color">#000000</color>
     <!--Divider-->
+    <color name="black_background_color_main">#000000</color>
+    <color name="black_library_color">#000000</color>
     <!--New End-->
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>

@@ -81,11 +81,12 @@ public class ColorUtil {
     /**
      * 是否是亮色
      *
-     * @param paramInt
+     * @param color
      * @return
      */
-    public static boolean isColorLight(@ColorInt int paramInt) {
-        return 1.0D - (0.299D * Color.red(paramInt) + 0.587D * Color.green(paramInt) + 0.114D * Color.blue(paramInt)) / 255.0D < 0.4D;
+    public static boolean isColorLight(@ColorInt int color) {
+        double darkness = 1.0D - (0.299D * (double)Color.red(color) + 0.587D * (double)Color.green(color) + 0.114D * (double)Color.blue(color)) / 255.0D;
+        return darkness < 0.4D;
     }
 
     /**

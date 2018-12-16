@@ -3,6 +3,7 @@
 /.idea
 *.iml
 /build
+.DS_Store
 /.git
 
 /app/app-release.apk
@@ -10,3 +11,5 @@
 StackBlur/build
 PushSDK/build
 app/.externalNativeBuild/
+
+app/src/main/res/drawable-xxhdpi/common_btn_back.png

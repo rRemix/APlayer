@@ -131,7 +131,7 @@ public class TimerDialog extends BaseDialogActivity {
 
         //初始化switch
         //todo
-//        mSwitch = new SwitchCompat(new ContextThemeWrapper(this, ThemeStore.isLight() ? Theme.getTheme() : R.style.TimerDialogNightTheme));
+//        mSwitch = new SwitchCompat(new ContextThemeWrapper(this, ThemeStore.isLightTheme() ? Theme.getThemeRes() : R.style.TimerDialogNightTheme));
         ((LinearLayout) findViewById(R.id.popup_timer_container)).addView(mSwitch);
 
         //读取保存的配置

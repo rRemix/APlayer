@@ -9,6 +9,10 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.base.BaseMusicActivity;
 import remix.myplayer.util.ColorUtil;
 
+import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
+import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColorReverse;
+import static remix.myplayer.theme.ThemeStore.isMDColorLight;
+
 
 /**
  * Created by taeja on 16-3-15.
@@ -20,25 +24,14 @@ public class ToolbarActivity extends BaseMusicActivity {
 
         setSupportActionBar(toolbar);
         //主题颜色
-        int themeColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white);
-        toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.common_btn_back, themeColor));
-        toolbar.setTitleTextColor(themeColor);
-
+        int reverseColor = getMaterialPrimaryColorReverse();
+        toolbar.setBackgroundColor(getMaterialPrimaryColor());
+        toolbar.setTitleTextColor(reverseColor);
+//        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+//        toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.ic_arrow_back_black_24dp,reverseColor));
+        toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.common_btn_back,reverseColor));
         toolbar.setNavigationOnClickListener(v -> onClickNavigation());
-//        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                switch (item.getItemId()) {
-//                    case R.id.toolbar_search:
-//                        startActivity(new Intent(mContext, SearchActivity.class));
-//                        break;
-//                    case R.id.toolbar_timer:
-//                        startActivity(new Intent(mContext, TimerDialog.class));
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
+
     }
 
     protected void onClickNavigation() {

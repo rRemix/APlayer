@@ -40,7 +40,7 @@ public class BaseActivity extends AppCompatActivity {
      * 设置主题
      */
     protected void setUpTheme() {
-       setTheme(ThemeStore.getTheme());
+       setTheme(ThemeStore.getThemeRes());
     }
 
     @Override

@@ -135,7 +135,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setBubbleTextColor(ThemeStore.isLightTheme()
+        mRecyclerView.setBubbleTextColor(ThemeStore.isMDColorLight()
                 ? ColorUtil.getColor(R.color.white)
                 : ThemeStore.getTextColorPrimary());
 

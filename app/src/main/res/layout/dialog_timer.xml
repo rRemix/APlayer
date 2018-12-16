@@ -198,7 +198,7 @@
                 android:paddingBottom="@dimen/d6_size"
                 android:paddingRight="@dimen/d12_size"
                 android:paddingLeft="@dimen/d12_size"
-                android:background="@drawable/bg_grid_day"/>
+                android:background="@drawable/bg_grid_light"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -212,7 +212,7 @@
                 android:paddingBottom="@dimen/d6_size"
                 android:paddingRight="@dimen/d12_size"
                 android:paddingLeft="@dimen/d12_size"
-                android:background="@drawable/bg_grid_day"/>
+                android:background="@drawable/bg_grid_light"/>
         </RelativeLayout>
     </LinearLayout>
 </FrameLayout>

@@ -85,7 +85,7 @@ class CustomSortActivity : ToolbarActivity() {
         mRecyclerView.layoutManager = LinearLayoutManager(this)
         mRecyclerView.itemAnimator = DefaultItemAnimator()
         mRecyclerView.adapter = mAdapter
-        mRecyclerView.setBubbleTextColor(if (ThemeStore.isLightTheme())
+        mRecyclerView.setBubbleTextColor(if (ThemeStore.isMDColorLight())
             ColorUtil.getColor(R.color.white)
         else
             ThemeStore.getTextColorPrimary())

@@ -5,4 +5,10 @@
     <integer name="PlayerActivityAnimDuration">200</integer>
     <integer name="AutoHideDelay">600</integer>
     <integer name="FadeDuration">300</integer>
+
+    <string-array name="general_theme">
+        <item>@string/light_theme</item>
+        <item>@string/dark_theme</item>
+        <item>@string/black_theme</item>
+    </string-array>
 </resources>

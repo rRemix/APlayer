@@ -14,17 +14,7 @@
         android:id="@+id/item_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/gray_34353a"
         android:textSize="@dimen/s16_size"
         android:layout_marginLeft="@dimen/d70_size"
-        android:layout_centerVertical="true"/>
-    <android.support.v7.widget.SwitchCompat
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textOn=""
-        android:textOff=""
-        android:id="@+id/item_switch"
-        android:layout_marginLeft="@dimen/d210_size"
         android:layout_centerVertical="true"/>
 </RelativeLayout>

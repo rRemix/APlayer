@@ -11,7 +11,6 @@
     <string name="drawer_song">歌曲库</string>
     <string name="drawer_recently">最近添加</string>
     <string name="drawer_folder">文件夹</string>
-    <string name="drawer_night">夜间模式</string>
     <string name="drawer_setting">设置</string>
 
     <string name="from_aplayer">来自APlayer播放器</string>
@@ -143,8 +142,8 @@
     <string name="shake">摇一摇</string>
     <string name="shake_tip">摇一摇手机切换歌曲</string>
     <string name="color">色彩</string>
-    <string name="theme_color">主题色</string>
-    <string name="theme_color_info">所有页面主色调</string>
+    <string name="primary_color">主色调</string>
+    <string name="primary_color_tip">所有页面主色调</string>
     <string name="notify_bg_color">通知栏底色</string>
     <string name="notify_bg_color_info">通知栏背景颜色</string>
     <string name="other">其他</string>
@@ -368,4 +367,16 @@
     <string name="speed_range_tip">输入范围为0.5-1.5</string>
     <string name="show_displayname">歌曲列表显示文件名</string>
     <string name="show_displayname_tip">如果歌曲列表出现乱码可尝试开启该选项</string>
+    <string name="accent_color">强调色</string>
+    <string name="accent_color_tip">选择你喜欢的强调色</string>
+    <string name="general_theme">全局主题</string>
+    <string name="light_theme">浅色</string>
+    <string name="dark_theme">浅色</string>
+    <string name="black_theme">浅色</string>
+
+    <string name="md_back_label">返回</string>
+    <string name="md_done_label">完成</string>
+    <string name="md_cancel_label">取消</string>
+    <string name="md_custom_label">自定义</string>
+    <string name="md_presets_label">预设</string>
 </resources>

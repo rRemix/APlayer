@@ -54,7 +54,7 @@ public class StatusBarUtil {
         //非miui 非魅族 非6.0以上 需要改变颜色
         if (!Build.MANUFACTURER.equalsIgnoreCase("Meizu") && !Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") &&
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            if (ThemeStore.isLightTheme())
+            if (ThemeStore.isMDColorLight())
                 color = ColorUtil.getColor(R.color.statusbar_gray_color);
         }
 
@@ -201,7 +201,7 @@ public class StatusBarUtil {
         //非miui 非魅族 非6.0以上 需要改变颜色
         if (!Build.MANUFACTURER.equalsIgnoreCase("Meizu") && !Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") &&
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            if (ThemeStore.isLightTheme())
+            if (ThemeStore.isMDColorLight())
                 color = ColorUtil.getColor(R.color.statusbar_gray_color);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

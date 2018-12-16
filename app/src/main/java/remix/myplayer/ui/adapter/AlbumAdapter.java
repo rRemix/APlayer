@@ -43,7 +43,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
 import static remix.myplayer.request.ImageUriRequest.BIG_IMAGE_SIZE;
@@ -66,7 +65,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
-            return new HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2, parent, false));
+            return new HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_header_2, parent, false));
         }
         return viewType == HeaderAdapter.LIST_MODE ?
                 new AlbumListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_album_recycle_list, parent, false)) :
@@ -152,7 +151,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         });
 
         //着色
-        int tintColor = ThemeStore.isLight() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+        int tintColor = ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         //点击效果
@@ -185,7 +184,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         //半圆着色
         if (mMode == HeaderAdapter.GRID_MODE) {
             Theme.TintDrawable(holder.mHalfCircle, R.drawable.icon_half_circular_left,
-                    ColorUtil.getColor(ThemeStore.isLight() ? R.color.white : R.color.night_background_color_main));
+                    ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.white : R.color.night_background_color_main));
         }
 
         setMarginForGridLayout(holder,position);

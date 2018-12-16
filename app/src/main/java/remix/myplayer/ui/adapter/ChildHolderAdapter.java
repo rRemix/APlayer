@@ -66,7 +66,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return viewType == TYPE_HEADER ?
-                new SongAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_1, parent, false)) :
+                new SongAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_header_1, parent, false)) :
                 new ChildHolderViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_child_holder, parent, false));
     }
 
@@ -137,7 +137,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
 
             if (holder.mButton != null) {
                 //设置按钮着色
-                int tintColor = ThemeStore.isLight() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+                int tintColor = ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
                 Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
                 //item点击效果
@@ -232,7 +232,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
                 }
             }
             if (oldHolder != null) {
-                oldHolder.mTitle.setTextColor(ColorUtil.getColor(ThemeStore.isLight() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+                oldHolder.mTitle.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
                 oldHolder.mColumnView.stopAnim();
                 oldHolder.mColumnView.setVisibility(View.GONE);
             }
