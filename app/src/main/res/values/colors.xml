@@ -162,40 +162,4 @@
     <color name="float_control_color">#9f000000</color>
     <color name="float_divider_color">#d4d4d4</color>
 
-    <color name="md_night_primary">@color/background_color_3</color>
-    <color name="md_night_primary_dark">@color/background_color_3</color>
-
-    <color name="md_red_primary">#c91f37</color>
-    <color name="md_red_primary_dark">#b5162c</color>
-
-    <color name="md_brown_primary">#7d6b5d</color>
-    <color name="md_brown_primary_dark">#68574b</color>
-
-    <color name="md_navy_primary">#3a6960</color>
-    <color name="md_navy_primary_dark">#325d55</color>
-
-    <color name="md_green_primary">#007b43</color>
-    <color name="md_green_primay_dark">#026c3c</color>
-
-    <color name="md_yellow_primary">#ffb61e</color>
-    <color name="md_yellow_primay_dark">#eea91a</color>
-
-    <color name="md_purple_primary">#5d3f6a</color>
-    <color name="md_purple_primary_dark">#52355e</color>
-
-    <color name="md_indigo_primary">#6967ab</color>
-    <color name="md_indigo_primary_dark">#555393</color>
-
-    <color name="md_plum_primary">#db5a6b</color>
-    <color name="md_plum_primary_dark">#c74a5b</color>
-
-    <color name="md_blue_primary">#698CF6</color>
-    <color name="md_blue_primary_dark">#5C7EE4</color>
-
-    <color name="md_white_primary">#fefefe</color>
-    <color name="md_white_primary_dark">#e5e5e5</color>
-
-    <color name="md_pink_primary">#fa7299</color>
-    <color name="md_pink_primary_dark">#ed6d99</color>
-
 </resources>
