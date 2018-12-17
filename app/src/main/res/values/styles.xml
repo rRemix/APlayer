@@ -8,46 +8,8 @@
 
 
     <!-- Base application theme. -->
-    <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar" />
 
-    <style name="BaseDialogTheme" parent="Theme.AppCompat.Dialog">
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:windowCloseOnTouchOutside">true</item>
-        <item name="colorControlHighlight">?android:attr/colorControlHighlight</item>
-    </style>
-
-    <!--dialog白天模式-->
-    <style name="Dialog.DayTheme" parent="BaseDialogTheme">
-        <item name="background_color_main">@color/day_background_color_main</item>
-        <item name="background_grid">@drawable/bg_grid_light</item>
-        <item name="background_list">@drawable/bg_list_light</item>
-        <item name="background_common">@drawable/bg_common_ripple_light</item>
-        <item name="text_color_primary">@color/day_textcolor_primary</item>
-        <item name="text_color_secondary">@color/day_textcolor</item>
-        <item name="colorControlHighlight">@color/day_ripple_color</item>
-        <item name="divider_color">@color/day_list_divider</item>
-    </style>
-
-    <!--dialog夜间模式-->
-    <style name="Dialog.NightTheme" parent="BaseDialogTheme">
-        <item name="background_color_main">@color/night_background_color_main</item>
-        <item name="background_grid">@drawable/bg_grid_dark</item>
-        <item name="background_list">@drawable/bg_list_dark</item>
-        <item name="background_common">@drawable/bg_common_ripple_dark</item>
-        <item name="text_color_primary">@color/night_textcolor_primary</item>
-        <item name="text_color_secondary">@color/night_textcolor</item>
-        <item name="colorControlHighlight">@color/night_ripple_color</item>
-        <item name="divider_color">@color/night_list_divier</item>
-        <item name="actionBarTabStyle">@style/CustomTabLayout.Dark</item>
-    </style>
-
-
-    <style name="AppTheme" parent="BaseTheme">
+    <style name="AppTheme" parent="Theme.APlayer">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/transparent</item>
         <item name="colorPrimaryDark">@color/transparent</item>
@@ -70,32 +32,6 @@
 
     <style name="AudioHolderStyle" parent="ActivityStyle">
         <item name="android:windowIsTranslucent">true</item>
-    </style>
-
-    <style name="CustomTabLayout.Light" parent="Widget.Design.TabLayout">
-        <item name="tabIndicatorColor">@color/white</item>
-        <item name="tabIndicatorHeight">3dp</item>
-        <item name="tabTextAppearance">@style/CustomTabTextAppearance.Light</item>
-        <item name="tabSelectedTextColor">@color/white</item>
-    </style>
-
-    <style name="CustomTabLayout.Dark" parent="Widget.Design.TabLayout">
-        <item name="tabIndicatorColor">@color/black</item>
-        <item name="tabIndicatorHeight">3dp</item>
-        <item name="tabTextAppearance">@style/CustomTabTextAppearance.Dark</item>
-        <item name="tabSelectedTextColor">@color/black</item>
-    </style>
-
-    <style name="CustomTabTextAppearance.Light" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">@dimen/tab_text_size</item>
-        <item name="android:textColor">@color/light_normal_tab_text_color</item>
-        <item name="textAllCaps">true</item>
-    </style>
-
-    <style name="CustomTabTextAppearance.Dark" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">@dimen/tab_text_size</item>
-        <item name="android:textColor">@color/dark_normal_tab_text_color</item>
-        <item name="textAllCaps">true</item>
     </style>
 
     <style name="AnimBottom" parent="@android:style/Animation">
@@ -142,12 +78,6 @@
         <item name="android:windowAnimationStyle">@style/AnimActivity</item>
     </style>
 
-    <style name="AudioHolderStyle.Night" parent="NightTheme">
-        <item name="colorControlActivated">@color/white</item>
-        <item name="colorControlNormal">@color/white_f2f2f2</item>
-        <item name="android:textColorHint">@color/night_textcolor</item>
-        <item name="android:windowBackground">@color/night_background_color_3</item>
-    </style>
 
     <style name="AppShortcut" parent="ActivityStyle">
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -158,56 +88,9 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="DayTheme" parent="@style/ActivityStyle">
-        <item name="background_color_main">@color/day_background_color_main</item>
-        <item name="background_grid">@drawable/bg_grid_light</item>
-        <item name="background_list">@drawable/bg_list_light</item>
-        <item name="background_common">@drawable/bg_common_ripple_light</item>
-        <item name="text_color_primary">@color/day_textcolor_primary</item>
-        <item name="text_color_secondary">@color/day_textcolor</item>
-        <item name="default_album">@drawable/album_empty_bg_day</item>
-        <item name="default_artist">@drawable/artist_empty_bg_day</item>
-        <item name="colorControlHighlight">@color/day_ripple_color</item>
-        <item name="ripple_color">@color/day_ripple_color</item>
-        <item name="divider_color">@color/day_list_divider</item>
-        <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Light</item>
-        <item name="android:tabWidgetStyle">@style/CustomTabLayout.Light</item>
-    </style>
-
-
-    <!--夜间模式-->
-    <style name="NightTheme" parent="@style/ActivityStyle">
-        <item name="background_color_main">@color/night_background_color_main</item>
-        <item name="background_grid">@drawable/bg_grid_dark</item>
-        <item name="background_list">@drawable/bg_list_dark</item>
-        <item name="background_common">@drawable/bg_common_ripple_dark</item>
-        <item name="text_color_primary">@color/night_textcolor_primary</item>
-        <item name="text_color_secondary">@color/night_textcolor</item>
-        <item name="default_album">@drawable/album_empty_bg_night</item>
-        <item name="default_artist">@drawable/artist_empty_bg_night</item>
-        <item name="ripple_color">@color/night_ripple_color</item>
-        <item name="divider_color">@color/night_list_divier</item>
-        <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Dark</item>
-        <item name="android:textColor">@color/purple_555393</item>
-        <item name="colorControlActivated">@color/purple_555393</item>
-        <item name="colorAccent">@color/purple_555393</item>
-        <item name="colorControlHighlight">@color/night_ripple_color</item>
-        <item name="android:tabWidgetStyle">@style/CustomTabLayout.Light</item>
-    </style>
-
-    <style name="TimerDialogNightTheme" parent="NightTheme">
-        <item name="colorControlHighlight">@color/day_ripple_color</item>
-    </style>
 
     <style name="EditTextStyle" parent="Widget.AppCompat.EditText" />
 
-    <style name="DayTheme.Red" parent="@style/DayTheme">
-        <item name="colorPrimary">@color/md_red_primary</item>
-        <item name="colorPrimaryDark">@color/md_red_primary_dark</item>
-        <item name="colorControlActivated">@color/md_red_primary</item>
-        <item name="colorAccent">@color/md_red_primary</item>
-        <item name="android:textColor">@color/md_red_primary</item>
-    </style>
 
 
 </resources>

@@ -384,7 +384,7 @@ public class Theme {
      * @return
      */
     public static StateListDrawable getPressAndSelectedStateListRippleDrawable(int model, Context context) {
-        int defaultColor = ThemeStore.getBackgroundColorMain();
+        int defaultColor = ThemeStore.getBackgroundColorMain(context);
 
         return getPressAndSelectedStateListRippleDrawable(context,
                 model == HeaderAdapter.GRID_MODE ? getCorner(1, DensityUtil.dip2px(context, 2), 0, ThemeStore.getSelectColor()) : getShape(GradientDrawable.RECTANGLE, ThemeStore.getSelectColor()),

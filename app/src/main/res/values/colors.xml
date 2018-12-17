@@ -4,93 +4,10 @@
 
     <!-- Transparent -->
     <color name="transparent">#00000000</color>
-    <!--分割线-->
-    <!-- 轨道背景-->
-    <!-- 已完成轨道背景-->
-
-    <!-- 主色-->
-    <color name="background_color_main">#242428</color>
-    <!-- 背景色1(底部播放控件背景色)-->
-    <color name="background_color_1">#232023</color>
-    <!-- 背景色2(卡片背景色)-->
-    <color name="background_color_2">#2a282b</color>
-    <!-- 背景色3-->
-    <color name="background_color_3">#1d1a1d</color>
-    <!--状态栏灰色-->
-    <color name="statusbar_gray_color">#e0e0e0</color>
-
-
-    <!-- 分割线颜色-->
-    <color name="day_list_divider">#ededed</color>
-    <color name="night_list_divier">#322f33</color>
-    <!--侧滑菜单选中颜色-->
-    <color name="drawer_selected_day">#f5f5f5</color>
-    <color name="drawer_selected_night">#3d3d42</color>
-    <!--默认的colorControlHighLight-->
-    <color name="day_ripple_color">#1f000000</color>
-    <color name="day_selected_color">#1f000000</color>
-    <color name="night_selected_color">#353538</color>
-    <color name="night_ripple_color">#353538</color>
-    <color name="default_model_button_color">#e2e4e8</color>
-    <color name="select_model_button_color">#ffce64</color>
-    <color name="day_background_grid_color">#f1f1f1</color>
-    <color name="night_background_grid_color">#171719</color>
-    <!--<color name="night_selected_color">@color/default_control_highlight</color>-->
-
-    <!--桌面部件背景色-->
-    <color name="widget_bg_color">#f9f9f9</color>
-    <!-- 抽屉ListView背景颜色-->
-    <color name="drawer_list_color">#1d1a1d</color>
 
     <color name="white">#ffffff</color>
-
-    <color name="white_f2f2f2">#f2f2f2</color>
-    <!-- 灰色字体 -->
-    <color name="gray_6c6a6c">#6c6a6c</color>
-    <!--专辑与艺术家灰色字体-->
-    <color name="gray_8d8c8e">#8d8c8e</color>
-    <!--黑色字体-->
-    <color name="black_1b1a1c">#1b1a1c</color>
-    <color name="black_1c1b19">#1c1b19</color>
-    <color name="black_737373">#737373</color>
-    <color name="black_323335">#323335</color>
-    <color name="gray_34353a">#34353a</color>
     <color name="black">#000000</color>
-    <color name="gray_6d6c69">#6d6c69</color>
-    <color name="gray_323232">#323232</color>
-    <color name="white_f6f6f5">#f6f6f5</color>
-    <color name="white_f4f4f5">#f4f4f5</color>
-    <color name="purple_555393">#555393</color>
-    <color name="gray_e6e6e6">#e6e6e6</color>
-    <color name="gray_efeeed">#efeeed</color>
-    <color name="gray_e2e2e2">#e2e2e2</color>
-    <color name="black_333333">#333333</color>
-    <color name="gray_7e7e7e">#7e7e7e</color>
-    <color name="gray_a8a8a8">#a8a8a8</color>
-    <color name="gray_cecece">#cecece</color>
-    <color name="gray_e6dccb">#e6dccb</color>
-    <color name="white_fafafa">#fafafa</color>
-    <color name="white_c6c6c6">#c6c6c6</color>
-    <color name="white_dcdcdc">#dcdcdc</color>
-    <color name="black_313131">#313131</color>
-    <color name="gray_666666">#666666</color>
-    <color name="black_2a2a2a">#2a2a2a</color>
-    <color name="gray_6967ab">#6967ab</color>
-    <color name="gray_8b8b8b">#8b8b8b</color>
-    <color name="gray_404040">#404040</color>
-    <color name="gray_3c3c3c">#3c3c3c</color>
-    <color name="gray_b7b7b7">#b7b7b7</color>
-    <color name="white_e5e5e5">#e5e5e5</color>
-    <color name="gray_6b6b6b">#6b6b6b</color>
-    <color name="gray_343438">#343438</color>
-    <color name="light_normal_tab_text_color">#99ffffff</color>
-    <color name="dark_normal_tab_text_color">@color/night_textcolor</color>
-    <color name="search_hint_text_color">#33ffffff</color>
 
-    <color name="lrc_normal_day">@color/day_textcolor</color>
-    <color name="lrc_highlight_day">@color/day_textcolor_primary</color>
-    <color name="lrc_normal_night">@color/night_textcolor</color>
-    <color name="lrc_highlight_night">@color/night_textcolor_primary</color>
 
     <color name="appwidget_title_color_white_1f">#252525</color>
     <color name="appwidget_title_color_transparent">#ffffff</color>
@@ -122,44 +39,45 @@
     <color name="dark_text_color_secondary">#6c6a6c</color>
     <color name="dark_divider_color">#322f33</color>
     <color name="dark_ripple_color">#33ffffff</color>
+    <!--<color name="night_ripple_color">#353538</color>-->
     <color name="dark_select_color">#33ffffff</color>
     <color name="dark_library_color">#171719</color>
     <!--Divider-->
     <color name="black_background_color_main">#000000</color>
     <color name="black_library_color">#000000</color>
+
     <!--New End-->
 
-    <color name="day_textcolor_primary">@color/black_1c1b19</color>
-    <color name="day_textcolor">@color/gray_6d6c69</color>
-    <color name="day_background_color_main">@color/white</color>
-    <color name="day_background_color_1">@color/white</color>
-    <color name="day_background_color_2">#f7f7f6</color>
-    <color name="day_background_color_3">@color/white</color>
-    <color name="day_scan_track_color">#edeceb</color>
-    <color name="day_nonenable_track_color">#ececec</color>
-    <color name="day_nonenable_progress_color">#d2d2d2</color>
-    <color name="day_nonenable_text_color">#afafaf</color>
-    <color name="day_enable_track_color">#d8d8d8</color>
-    <color name="day_enable_text_color">#808080</color>
+    <color name="light_scan_track_color">#edeceb</color>
+    <color name="light_nonenable_track_color">#ececec</color>
+    <color name="light_nonenable_progress_color">#d2d2d2</color>
+    <color name="light_nonenable_text_color">#afafaf</color>
+    <color name="light_enable_track_color">#d8d8d8</color>
+    <color name="light_enable_text_color">#808080</color>
 
-    <color name="night_textcolor_primary">@color/white</color>
-    <color name="night_textcolor">@color/gray_6c6a6c</color>
-    <color name="night_background_color_main">@color/background_color_main</color>
-    <color name="night_background_color_1">@color/background_color_1</color>
-    <color name="night_background_color_2">@color/background_color_2</color>
-    <color name="night_background_color_3">@color/background_color_3</color>
-    <color name="night_interval_color">#e2e1e2</color>
-    <color name="night_scan_track_color">@color/gray_6d6c69</color>
-    <color name="night_nonenable_track_color">@color/white</color>
-    <color name="night_nonenable_progress_color">@color/purple_555393</color>
-    <color name="night_nonenable_text_color">@color/white</color>
-    <color name="night_enable_track_color">@color/white</color>
-    <color name="night_enable_text_color">@color/white</color>
+    <color name="dark_scan_track_color">#6d6c69</color>
+    <color name="dark_nonenable_track_color">@color/white</color>
+    <color name="dark_nonenable_progress_color">#555393</color>
+    <color name="dark_nonenable_text_color">@color/white</color>
+    <color name="dark_enable_track_color">@color/white</color>
+    <color name="dark_enable_text_color">@color/white</color>
 
-    <color name="cover_border_color">@color/white</color>
+    <color name="light_normal_tab_text_color">#99ffffff</color>
+    <color name="dark_normal_tab_text_color">@color/dark_text_color_secondary</color>
+
+    <color name="detail_text_color">#737373</color>
+
+    <color name="default_accent_color">#555393</color>
+    <color name="player_top_detail_text_color">#7e7e7e</color>
+    <color name="player_time_text_color">#6b6b6b</color>
+    <color name="timer_text_color">#404040</color>
 
     <color name="float_text_color">#d4d4d4</color>
     <color name="float_control_color">#9f000000</color>
     <color name="float_divider_color">#d4d4d4</color>
 
+    <color name="default_model_button_color">#e2e4e8</color>
+    <color name="select_model_button_color">#ffce64</color>
+
+    <color name="statusbar_gray_color">#e0e0e0</color>
 </resources>

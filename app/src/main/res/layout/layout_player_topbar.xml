@@ -35,7 +35,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_333333"
             android:gravity="center"/>
         <TextView
             android:id="@+id/top_detail"
@@ -45,6 +44,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textSize="@dimen/s14_size"
-            android:textColor="@color/gray_7e7e7e"/>
+            android:textColor="@color/player_top_detail_text_color"/>
     </LinearLayout>
 </RelativeLayout>

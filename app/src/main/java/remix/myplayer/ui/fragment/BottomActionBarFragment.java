@@ -38,7 +38,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.ui.activity.base.BaseActivity;
 import remix.myplayer.ui.fragment.base.BaseMusicFragment;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
 
@@ -93,11 +92,10 @@ public class BottomActionBarFragment extends BaseMusicFragment {
 
         //设置整个背景着色
         Theme.TintDrawable(rootView,
-                R.drawable.commom_playercontrols_bg,
-                ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_background_color_3 : R.color.night_background_color_3));
+                R.drawable.commom_playercontrols_bg, ThemeStore.getBackgroundColorDialog(mContext));
         Theme.TintDrawable(mPlayNext,
                 R.drawable.bf_btn_next,
-                ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black_323335 : R.color.white));
+                ThemeStore.getBottomBarBtnColor());
 
         //手势检测
         mGestureDetector = new GestureDetector(mContext, new GestureListener(this));
@@ -144,11 +142,11 @@ public class BottomActionBarFragment extends BaseMusicFragment {
         if (MusicServiceRemote.isPlaying()) {
             Theme.TintDrawable(mPlayButton,
                     R.drawable.bf_btn_stop,
-                    ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black_323335 : R.color.white));
+                    ThemeStore.getBottomBarBtnColor());
         } else {
             Theme.TintDrawable(mPlayButton,
                     R.drawable.bf_btn_play,
-                    ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black_323335 : R.color.white));
+                    ThemeStore.getBottomBarBtnColor());
         }
     }
 

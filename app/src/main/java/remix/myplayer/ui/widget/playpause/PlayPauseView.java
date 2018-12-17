@@ -46,7 +46,7 @@ public class PlayPauseView extends FrameLayout {
     public PlayPauseView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setWillNotDraw(false);
-        mBackgroundColor = getResources().getColor(R.color.md_red_primary);
+        mBackgroundColor = getResources().getColor(R.color.white);
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(mBackgroundColor);

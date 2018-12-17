@@ -33,7 +33,6 @@
             android:lines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/black_333333"
             android:textSize="@dimen/s16_size"
             android:gravity="center"/>
         <TextView
@@ -43,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textColor="@color/gray_7e7e7e"
+            android:textColor="@color/player_top_detail_text_color"
             android:textSize="@dimen/s14_size"/>
     </LinearLayout>
 </RelativeLayout>

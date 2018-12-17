@@ -146,9 +146,9 @@ public class RecordShareActivity extends BaseMusicActivity {
         mContent.setText(TextUtils.isEmpty(content) ? "" : content);
         mSong.setText(String.format("《%s》", mInfo.getTitle()));
         //背景
-        mBackground1.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 2), ColorUtil.getColor(R.color.black_2a2a2a), 0, 0, 1));
-        mBackground2.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 1), ColorUtil.getColor(R.color.black_2a2a2a), 0, 0, 1));
-        mImageBackground.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 1), ColorUtil.getColor(R.color.white_f6f6f5), 0, 0, 1));
+        mBackground1.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 2), Color.parseColor("#2a2a2a"), 0, 0, 1));
+        mBackground2.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 1), Color.parseColor("#2a2a2a"), 0, 0, 1));
+        mImageBackground.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 1), Color.parseColor("#f6f6f5"), 0, 0, 1));
 
         mProgressDialog = Theme.getBaseDialog(mContext)
                 .title(R.string.please_wait)

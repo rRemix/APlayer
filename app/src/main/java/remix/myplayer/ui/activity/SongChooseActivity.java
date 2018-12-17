@@ -27,6 +27,9 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 
+import static remix.myplayer.theme.ThemeStore.getTextColorPrimary;
+import static remix.myplayer.theme.ThemeStore.getTextColorSecondary;
+
 /**
  * @ClassName SongChooseActivity
  * @Description 新建列表后添加歌曲
@@ -60,8 +63,8 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> 
         mPlayListName = getIntent().getStringExtra(EXTRA_NAME);
 
         TextView cancel = findViewById(R.id.cancel);
-        cancel.setTextColor(ColorUtil.getColor(ThemeStore.isMDColorLight() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-        mConfirm.setTextColor(ColorUtil.getColor(ThemeStore.isMDColorLight() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+        cancel.setTextColor(getTextColorPrimary());
+        mConfirm.setTextColor(getTextColorSecondary());
         mAdapter = new SongChooseAdaper(this, R.layout.item_song_choose, isValid -> {
             mConfirm.setAlpha(isValid ? 1.0f : 0.6f);
             mConfirm.setClickable(isValid);

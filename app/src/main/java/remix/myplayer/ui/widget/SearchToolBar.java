@@ -77,8 +77,6 @@ public class SearchToolBar extends Toolbar {
         mEditText.getBackground().setColorFilter(
                 ColorUtil.getColor(ThemeStore.isMDColorLight() ? R.color.black : R.color.white),
                 PorterDuff.Mode.SRC_ATOP);
-        mEditText.setTextColor(ColorUtil.getColor(ThemeStore.isMDColorLight() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-        mEditText.setHintTextColor(ColorUtil.getColor(ThemeStore.isMDColorLight() ? R.color.day_textcolor : R.color.search_hint_text_color));
         mEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 afterExplainChanged(v.getEditableText());

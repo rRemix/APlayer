@@ -18,11 +18,6 @@ public abstract class BaseDialogActivity extends BaseMusicActivity {
     }
 
     @Override
-    protected void setUpTheme() {
-        setTheme(ThemeStore.isLightTheme() ? R.style.Dialog_DayTheme : R.style.Dialog_NightTheme);
-    }
-
-    @Override
     protected void setStatusBarColor() {
     }
 

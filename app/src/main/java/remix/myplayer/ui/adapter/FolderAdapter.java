@@ -63,7 +63,7 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
 //                Theme.getPressAndSelectedStateListRippleDrawable(HeaderAdapter.LIST_MODE, mContext));
 
         if (holder.mButton != null) {
-            int tintColor = ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+            int tintColor = ThemeStore.getLibraryBtnColor();;
             Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
             //item点击效果

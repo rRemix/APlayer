@@ -17,6 +17,6 @@
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_marginLeft="@dimen/d10_size"
-        android:background="@color/gray_e6e6e6"
+        android:background="?attr/divider_color"
         android:layout_alignParentTop="true"/>
 </RelativeLayout>

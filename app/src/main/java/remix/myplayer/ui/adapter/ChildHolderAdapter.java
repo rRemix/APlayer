@@ -137,7 +137,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
 
             if (holder.mButton != null) {
                 //设置按钮着色
-                int tintColor = ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+                int tintColor = ThemeStore.getLibraryBtnColor();
                 Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
                 //item点击效果
@@ -167,7 +167,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
         }
 
         //背景点击效果
-        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(HeaderAdapter.LIST_MODE, mContext));
+//        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(HeaderAdapter.LIST_MODE, mContext));
 
         if (holder.mContainer != null && mOnItemClickListener != null) {
             holder.mContainer.setOnClickListener(v -> {
@@ -232,7 +232,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
                 }
             }
             if (oldHolder != null) {
-                oldHolder.mTitle.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+                oldHolder.mTitle.setTextColor(ThemeStore.getTextColorPrimary());
                 oldHolder.mColumnView.stopAnim();
                 oldHolder.mColumnView.setVisibility(View.GONE);
             }

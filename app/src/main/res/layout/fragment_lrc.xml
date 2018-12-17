@@ -15,7 +15,6 @@
         android:layout_marginTop="@dimen/d8_size"
         android:paddingLeft="@dimen/d30_size"
         android:paddingRight="@dimen/d30_size"
-        android:textColor="@color/day_enable_text_color"
         android:visibility="visible" />
 
     <LinearLayout

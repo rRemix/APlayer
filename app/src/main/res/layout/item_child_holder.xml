@@ -23,7 +23,7 @@
         android:layout_width="@dimen/d18_size"
         android:layout_height="@dimen/d16_size"
         app:columnwidth="@dimen/d2_size"
-        app:columncolor="@color/purple_555393"
+        app:columncolor="@color/white"
         app:columnnum="4"
         android:id="@+id/song_columnview"
         android:layout_marginRight="@dimen/d8_size" />

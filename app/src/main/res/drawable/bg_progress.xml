@@ -3,7 +3,7 @@
     <!-- 轨道背景-->
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="@color/gray_efeeed"/>
+            <solid android:color="@color/white"/>
             <size android:height="@dimen/d2_size"/>
         </shape>
     </item>
@@ -11,7 +11,7 @@
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <solid android:color="@color/md_red_primary"/>
+                <solid android:color="@color/white"/>
                 <size android:height="@dimen/d2_size"/>
             </shape>
         </clip>

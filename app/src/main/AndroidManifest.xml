@@ -148,17 +148,14 @@
             android:theme="@style/AppShortcut" />
         <!-- 添加歌曲到播放列表 -->
         <activity
-            android:name=".ui.dialog.AddtoPlayListDialog"
-            android:theme="@style/BaseDialogTheme" />
+            android:name=".ui.dialog.AddtoPlayListDialog" />
         <!-- 播放队列 -->
         <activity
-            android:name=".ui.dialog.PlayQueueDialog"
-            android:theme="@style/BaseDialogTheme" />
+            android:name=".ui.dialog.PlayQueueDialog" />
         <!-- 选项 -->
         <!-- 定时停止 -->
         <activity
-            android:name=".ui.dialog.TimerDialog"
-            android:theme="@style/BaseDialogTheme" />
+            android:name=".ui.dialog.TimerDialog" />
         <!-- 主题色选择 -->
 
         <!-- 图片裁剪 -->

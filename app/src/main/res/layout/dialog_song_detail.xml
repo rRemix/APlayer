@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -14,13 +16,13 @@
             android:textSize="@dimen/s16_size"
             android:text="@string/song_path"
             android:textStyle="bold"
-            android:textColor="@color/black_737373"/>
+            android:textColor="@color/detail_text_color"/>
         <TextView
             android:id="@+id/song_detail_path"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373" />
+            android:textColor="@color/detail_text_color" />
     </LinearLayout>
 
     <LinearLayout
@@ -34,13 +36,13 @@
             android:textSize="@dimen/s16_size"
             android:text="@string/song_name"
             android:textStyle="bold"
-            android:textColor="@color/black_737373"/>
+            android:textColor="@color/detail_text_color"/>
         <TextView
             android:id="@+id/song_detail_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373" />
+            android:textColor="@color/detail_text_color" />
     </LinearLayout>
 
     <LinearLayout
@@ -54,13 +56,13 @@
             android:textSize="@dimen/s16_size"
             android:text="@string/file_size"
             android:textStyle="bold"
-            android:textColor="@color/black_737373"/>
+            android:textColor="@color/detail_text_color"/>
         <TextView
             android:id="@+id/song_detail_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373" />
+            android:textColor="@color/detail_text_color" />
     </LinearLayout>
 
     <LinearLayout
@@ -74,13 +76,13 @@
             android:textSize="@dimen/s16_size"
             android:text="@string/format"
             android:textStyle="bold"
-            android:textColor="@color/black_737373"/>
+            android:textColor="@color/detail_text_color"/>
         <TextView
             android:id="@+id/song_detail_mime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373" />
+            android:textColor="@color/detail_text_color" />
     </LinearLayout>
 
     <LinearLayout
@@ -94,14 +96,14 @@
             android:textSize="@dimen/s16_size"
             android:text="@string/length"
             android:textStyle="bold"
-            android:textColor="@color/black_737373"/>
+            android:textColor="@color/detail_text_color"/>
         <TextView
             android:id="@+id/song_detail_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373"
-            android:text="123123123123123"/>
+            android:textColor="@color/detail_text_color"
+            tools:text="123123123123123"/>
     </LinearLayout>
 
     <LinearLayout
@@ -115,13 +117,13 @@
             android:textSize="@dimen/s16_size"
             android:text="@string/bitrate"
             android:textStyle="bold"
-            android:textColor="@color/black_737373"/>
+            android:textColor="@color/detail_text_color"/>
         <TextView
             android:id="@+id/song_detail_bit_rate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373" />
+            android:textColor="@color/detail_text_color" />
     </LinearLayout>
 
     <LinearLayout
@@ -136,13 +138,13 @@
             android:textSize="@dimen/s16_size"
             android:text="@string/sample_rate"
             android:textStyle="bold"
-            android:textColor="@color/black_737373"/>
+            android:textColor="@color/detail_text_color"/>
         <TextView
             android:id="@+id/song_detail_sample_rate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373" />
+            android:textColor="@color/detail_text_color" />
     </LinearLayout>
 
 </LinearLayout>

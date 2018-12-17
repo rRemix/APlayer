@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -55,8 +56,10 @@ public class FeedBackActivity extends ToolbarActivity {
         ButterKnife.bind(this);
         setUpToolbar(mToolBar, getString(R.string.back));
 
-        mSubmit.setBackground(Theme.getCorner(1.0f, DensityUtil.dip2px(this, 2), 0, ThemeStore.getAccentColor()));
-        mContent.setBackground(Theme.getCorner(1.0f, DensityUtil.dip2px(this, 2), 0, ColorUtil.getColor(R.color.gray_e2e2e2)));
+        mSubmit.setBackground(Theme.getCorner(1.0f, DensityUtil.dip2px(this, 2), 0,
+                ThemeStore.getAccentColor()));
+        mContent.setBackground(Theme.getCorner(1.0f, DensityUtil.dip2px(this, 2), 0,
+                Color.parseColor("#e2e2e2")));
         Theme.setTint(mContact, ThemeStore.getMaterialPrimaryColor(), false);
     }
 

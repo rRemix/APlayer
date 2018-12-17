@@ -77,7 +77,7 @@
                 android:text="00:00"
                 android:layout_marginLeft="@dimen/d20_size"
                 android:layout_alignParentLeft="true"
-                android:textColor="@color/gray_cecece"/>
+                android:textColor="@color/player_time_text_color"/>
             <!--剩余播放时间-->
             <TextView
                 android:id="@+id/text_remain"
@@ -88,7 +88,7 @@
                 android:text="00:00"
                 android:layout_marginRight="@dimen/d20_size"
                 android:layout_alignParentRight="true"
-                android:textColor="@color/gray_cecece"/>
+                android:textColor="@color/player_time_text_color"/>
             <SeekBar
                 android:id="@+id/seekbar"
                 android:layout_width="match_parent"

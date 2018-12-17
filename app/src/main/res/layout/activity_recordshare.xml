@@ -59,7 +59,7 @@
                     <View
                         android:layout_width="@dimen/d28_size"
                         android:layout_height="@dimen/d1_size"
-                        android:background="@color/white_dcdcdc"
+                        android:background="#dcdcdc"
                         android:layout_centerInParent="true"/>
                 </RelativeLayout>
 
@@ -76,7 +76,7 @@
                     android:layout_marginRight="@dimen/d19_size"
                     android:gravity="center_horizontal"
                     android:ellipsize="end"
-                    android:textColor="@color/black_313131"
+                    android:textColor="#313131"
                     android:textSize="@dimen/s16_size"
                     android:background="@color/transparent"/>
                 <RelativeLayout
@@ -100,7 +100,7 @@
                         android:maxLines="1"
                         android:ellipsize="end"
                         android:textSize="@dimen/s14_size"
-                        android:textColor="@color/gray_666666"/>
+                        android:textColor="#666666"/>
                 </RelativeLayout>
                 <View
                     android:layout_width="match_parent"
@@ -115,7 +115,7 @@
             android:gravity="center_vertical|left"
             android:text="@string/from_aplayer"
             android:textSize="@dimen/s12_size"
-            android:textColor="@color/white_c6c6c6"
+            android:textColor="#c6c6c6"
             android:paddingLeft="@dimen/d10_size" />
     </LinearLayout>
 
@@ -154,7 +154,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/d6_size"
             android:layout_marginBottom="@dimen/d6_size"
-            android:background="@color/gray_6c6a6c"/>
+            android:background="#6c6a6c"/>
 
         <LinearLayout
             android:id="@+id/recordshare_cancel"

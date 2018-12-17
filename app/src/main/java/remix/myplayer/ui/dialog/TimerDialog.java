@@ -176,7 +176,7 @@ public class TimerDialog extends BaseDialogActivity {
                             Color.TRANSPARENT,
                             DensityUtil.dip2px(mContext, 1),
                             DensityUtil.dip2px(mContext, 1),
-                            ColorUtil.getColor(R.color.gray_404040),
+                            ColorUtil.getColor(R.color.timer_text_color),
                             0, 0, 1);
                     view.setBackground(drawable);
                 });

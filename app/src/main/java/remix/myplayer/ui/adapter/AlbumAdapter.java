@@ -151,7 +151,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         });
 
         //着色
-        int tintColor = ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+        int tintColor = ThemeStore.getLibraryBtnColor();
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         //点击效果
@@ -184,7 +184,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         //半圆着色
         if (mMode == HeaderAdapter.GRID_MODE) {
             Theme.TintDrawable(holder.mHalfCircle, R.drawable.icon_half_circular_left,
-                    ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.white : R.color.night_background_color_main));
+                    ThemeStore.getBackgroundColorMain(mContext));
         }
 
         setMarginForGridLayout(holder,position);

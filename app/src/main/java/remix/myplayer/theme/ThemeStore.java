@@ -1,9 +1,12 @@
 package remix.myplayer.theme;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StyleRes;
+
+import java.net.ContentHandler;
 
 import remix.myplayer.App;
 import remix.myplayer.R;
@@ -123,13 +126,13 @@ public class ThemeStore {
     }
 
     @ColorInt
-    public static int getBackgroundColorMain() {
-        return ColorUtil.getColor(isLightTheme() ? R.color.light_background_color_main : R.color.dark_background_color_main);
+    public static int getBackgroundColorMain(Context context) {
+        return ThemeUtil.resolveColor(context,R.attr.background_color_main);
     }
 
     @ColorInt
-    public static int getBackgroundColorDialog() {
-        return ColorUtil.getColor(isLightTheme() ? R.color.light_background_color_dialog : R.color.dark_background_color_dialog);
+    public static int getBackgroundColorDialog(Context context) {
+        return ThemeUtil.resolveColor(context,R.attr.background_color_dialog);
     }
 
     @ColorInt
@@ -145,6 +148,41 @@ public class ThemeStore {
     @ColorInt
     public static int getDividerColor() {
         return ColorUtil.getColor(isLightTheme() ? R.color.light_divider_color : R.color.dark_divider_color);
+    }
+
+    @ColorInt
+    public static int getPlayerBtnColor(){
+        return Color.parseColor(isLightTheme() ? "#6c6a6c" : "#6b6b6b");
+    }
+
+    @ColorInt
+    public static int getPlayerTitleColor(){
+        return Color.parseColor(isLightTheme() ? "#333333" : "#e5e5e5");
+    }
+
+    @ColorInt
+    public static int getPlayerProgressColor(){
+        return Color.parseColor(isLightTheme() ? "#efeeed" : "#343438");
+    }
+
+    @ColorInt
+    public static int getBottomBarBtnColor(){
+        return Color.parseColor(isLightTheme() ? "#323334" : "#ffffff");
+    }
+
+    @ColorInt
+    public static int getLibraryBtnColor(){
+        return Color.parseColor(isLightTheme() ? "#6c6a6c" : "#ffffff");
+    }
+
+    @ColorInt
+    public static int getPlayerNextSongBgColor(){
+        return Color.parseColor(isLightTheme() ? "#fafafa" : "#343438");
+    }
+
+    @ColorInt
+    public static int getPlayerNextSongTextColor(){
+        return Color.parseColor(isLightTheme() ? "#a8a8a8" : "#e5e5e5");
     }
 
     @DrawableRes

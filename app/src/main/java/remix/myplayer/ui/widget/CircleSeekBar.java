@@ -3,6 +3,7 @@ package remix.myplayer.ui.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.GradientDrawable;
@@ -233,7 +234,7 @@ public class CircleSeekBar extends AbsSeekBar {
         mCirclePaint = new Paint();
         mCirclePaint.setAntiAlias(true);
         mCirclePaint.setStyle(Paint.Style.STROKE);
-        mCirclePaint.setColor(ColorUtil.getColor(R.color.gray_b7b7b7));
+        mCirclePaint.setColor(Color.parseColor("#b7b7b7"));
         mCirclePaint.setStrokeWidth(mProgressWidth);
 
         //圆弧画笔
@@ -247,9 +248,9 @@ public class CircleSeekBar extends AbsSeekBar {
         mShadowCirclePaint = new Paint();
         mShadowCirclePaint.setAntiAlias(true);
         mShadowCirclePaint.setStyle(Paint.Style.STROKE);
-        mShadowCirclePaint.setColor(ColorUtil.getColor(R.color.gray_b7b7b7));
+        mShadowCirclePaint.setColor(Color.parseColor("#b7b7b7"));
         mShadowCirclePaint.setStrokeWidth(mProgressWidth);
-        mShadowCirclePaint.setShadowLayer(DensityUtil.dip2px(mContext, 2.5f), 0, 0, ColorUtil.getColor(R.color.gray_b7b7b7));
+        mShadowCirclePaint.setShadowLayer(DensityUtil.dip2px(mContext, 2.5f), 0, 0, Color.parseColor("#b7b7b7"));
 
         setLayerType(LAYER_TYPE_SOFTWARE, mShadowCirclePaint);
 

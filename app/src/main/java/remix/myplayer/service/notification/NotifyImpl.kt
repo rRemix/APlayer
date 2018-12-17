@@ -46,8 +46,8 @@ class NotifyImpl(context: MusicService) : Notify(context) {
 
             //设置了黑色背景
             if (!isSystemColor) {
-                remoteBigView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.night_textcolor_primary))
-                remoteView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.night_textcolor_primary))
+                remoteBigView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))
+                remoteView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))
                 //背景
                 remoteBigView.setImageViewResource(R.id.notify_bg, R.drawable.bg_notification_black)
                 remoteBigView.setViewVisibility(R.id.notify_bg, View.VISIBLE)
