@@ -34,12 +34,12 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
-    <style name="AnimBottom" parent="@android:style/Animation">
+    <style name="DialogAnimBottom" parent="@android:style/Animation">
         <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
         <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
     </style>
 
-    <style name="AnimPopup">
+    <style name="DialogAnimPopup">
         <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
         <item name="android:windowExitAnimation">@android:anim/fade_out</item>
     </style>
@@ -87,10 +87,6 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
-
-
-    <style name="EditTextStyle" parent="Widget.AppCompat.EditText" />
-
 
 
 </resources>

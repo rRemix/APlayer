@@ -15,7 +15,7 @@
             android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/EditTextStyle"/>
+            android:textColor="?attr/text_color_primary"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -30,7 +30,7 @@
             android:ellipsize="end"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/EditTextStyle"/>
+            android:textColor="?attr/text_color_primary"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -44,7 +44,7 @@
             android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/EditTextStyle"/>
+            android:textColor="?attr/text_color_primary"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -59,7 +59,7 @@
             android:inputType="number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/EditTextStyle"/>
+            android:textColor="?attr/text_color_primary"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -74,7 +74,7 @@
             android:inputType="number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/EditTextStyle"/>
+            android:textColor="?attr/text_color_primary"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -87,7 +87,7 @@
             android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/EditTextStyle"/>
+            android:textColor="?attr/text_color_primary"/>
     </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

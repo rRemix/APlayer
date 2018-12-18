@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:CircleSeekBar="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="270dp"
-    android:layout_height="wrap_content"
-    android:background="@drawable/timer_bg">
+    android:orientation="vertical" android:layout_width="100dp"
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:orientation="vertical"
@@ -193,12 +192,11 @@
                 android:layout_marginLeft="@dimen/d2_size"
                 android:textSize="@dimen/s16_size"
                 android:text="@string/start_timer"
-                android:textColor="#6967ab"
+                android:textColor="@color/light_text_color_primary"
                 android:paddingTop="@dimen/d6_size"
                 android:paddingBottom="@dimen/d6_size"
                 android:paddingRight="@dimen/d12_size"
-                android:paddingLeft="@dimen/d12_size"
-                android:background="@drawable/bg_grid_light"/>
+                android:paddingLeft="@dimen/d12_size"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -207,12 +205,11 @@
                 android:gravity="center"
                 android:textSize="@dimen/s16_size"
                 android:text="@string/close"
-                android:textColor="#8b8b8b"
+                android:textColor="@color/light_text_color_secondary"
                 android:paddingTop="@dimen/d6_size"
                 android:paddingBottom="@dimen/d6_size"
                 android:paddingRight="@dimen/d12_size"
-                android:paddingLeft="@dimen/d12_size"
-                android:background="@drawable/bg_grid_light"/>
+                android:paddingLeft="@dimen/d12_size"/>
         </RelativeLayout>
     </LinearLayout>
 </FrameLayout>

@@ -1,7 +1,10 @@
 package remix.myplayer.ui.dialog;
 
+import android.app.Dialog;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -18,6 +21,9 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -25,9 +31,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.Global;
 import remix.myplayer.R;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.AddtoPlayListAdapter;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
@@ -41,8 +49,18 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 将歌曲添加到播放列表的对话框
  */
-public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AddtoPlayListDialog extends BaseDialog implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String EXTRA_SONG_LIST = "list";
+
+    public static AddtoPlayListDialog newInstance(List<Integer> ids){
+        AddtoPlayListDialog dialog = new AddtoPlayListDialog();
+        Bundle arg = new Bundle();
+        arg.putSerializable(EXTRA_SONG_LIST,new ArrayList(ids));
+        dialog.setArguments(arg);
+        return dialog;
+    }
+
+
     @BindView(R.id.playlist_addto_list)
     RecyclerView mRecyclerView;
     @BindView(R.id.playlist_addto_new)
@@ -58,28 +76,31 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
 
     private List<Integer> mList;
 
+    @NonNull
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_addto_playlist);
-        ButterKnife.bind(this);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        MaterialDialog dialog = Theme.getBaseDialog(getActivity())
+                .customView(R.layout.dialog_addto_playlist,false)
+                .build();
 
-        mList = (List<Integer>) getIntent().getExtras().getSerializable(EXTRA_SONG_LIST);
+        ButterKnife.bind(this, dialog.getCustomView());
+
+        mList = (List<Integer>) getArguments().getSerializable(EXTRA_SONG_LIST);
         if (mList == null) {
             ToastUtil.show(mContext, R.string.add_song_playlist_error);
-            finish();
+            dismiss();
         }
 
-        mAdapter = new AddtoPlayListAdapter(this);
+        mAdapter = new AddtoPlayListAdapter(mContext);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 if (view != null) {
                     ToastUtil.show(mContext, R.string.add_song_playlist_success, PlayListUtil.addMultiSongs(mList, getPlayListName(position)), getPlayListName(position));
                 } else {
-                    ToastUtil.show(AddtoPlayListDialog.this, R.string.add_song_playlist_error, Toast.LENGTH_SHORT);
+                    ToastUtil.show(mContext, R.string.add_song_playlist_error, Toast.LENGTH_SHORT);
                 }
-                finish();
+                dismiss();
             }
 
             @Override
@@ -88,29 +109,25 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
         });
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
 
-        getSupportLoaderManager().initLoader(LOADER_ID++, null, this);
+        getLoaderManager().initLoader(LOADER_ID++,null,this);
 
         //改变高度，并置于底部
-        Window w = getWindow();
-        WindowManager wm = getWindowManager();
-        Display display = wm.getDefaultDisplay();
+        Window window = dialog.getWindow();
+        window.setWindowAnimations(R.style.DialogAnimBottom);
+
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        WindowManager.LayoutParams lp = window.getAttributes();
         lp.width = metrics.widthPixels;
-        w.setAttributes(lp);
-        w.setGravity(Gravity.BOTTOM);
+        window.setAttributes(lp);
+        window.setGravity(Gravity.BOTTOM);
+
+        return dialog;
     }
 
-    private int getPlayListId(int position) {
-        int playListId = -1;
-        if (mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)) {
-            playListId = mCursor.getInt(mCursor.getColumnIndex(PlayLists.PlayListColumns._ID));
-        }
-        return playListId;
-    }
 
     private String getPlayListName(int position) {
         String playlistName = "";
@@ -148,31 +165,16 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                             }
                         }
                     })
-                    .dismissListener(dialog -> finish())
+                    .dismissListener(dialog -> dismiss())
                     .show();
 
         }
     }
 
-    public AddtoPlayListAdapter getAdaper() {
-        return mAdapter;
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        overridePendingTransition(R.anim.slide_bottom_in, 0);
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(0, R.anim.slide_bottom_out);
-    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, PlayLists.CONTENT_URI, null,
+        return new CursorLoader(mContext, PlayLists.CONTENT_URI, null,
                 PlayLists.PlayListColumns.NAME + "!= ?", new String[]{Constants.PLAY_QUEUE}, null);
     }
 

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="ActivityAnimDuration">330</integer>
-    <integer name="DialogAnimDuration">350</integer>
     <integer name="PlayerActivityAnimDuration">200</integer>
-    <integer name="AutoHideDelay">600</integer>
     <integer name="FadeDuration">300</integer>
 
     <string-array name="general_theme">

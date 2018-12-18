@@ -3,12 +3,14 @@ package remix.myplayer.misc.menu;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 
 import com.soundcloud.android.crop.Crop;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import remix.myplayer.App;
@@ -19,6 +21,7 @@ import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.Tag;
+import remix.myplayer.ui.activity.base.BaseMusicActivity;
 import remix.myplayer.ui.dialog.AddtoPlayListDialog;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -41,10 +44,10 @@ public class SongPopupListener
     private String mPlayListName;
     private boolean mIsDeletePlayList;
     private Song mSong;
-    private Activity mActivity;
+    private AppCompatActivity mActivity;
     private Tag mTag;
 
-    public SongPopupListener(Activity activity, Song song, boolean isDeletePlayList, String playListName) {
+    public SongPopupListener(AppCompatActivity activity, Song song, boolean isDeletePlayList, String playListName) {
         mIsDeletePlayList = isDeletePlayList;
         mPlayListName = playListName;
         mSong = song;
@@ -60,11 +63,8 @@ public class SongPopupListener
                         .putExtra(EXTRA_SONG, mSong));
                 break;
             case R.id.menu_add_to_playlist:
-                Intent intentAdd = new Intent(mActivity, AddtoPlayListDialog.class);
-                Bundle ardAdd = new Bundle();
-                ardAdd.putSerializable(EXTRA_SONG_LIST, new ArrayList<>(Collections.singletonList(mSong.getId())));
-                intentAdd.putExtras(ardAdd);
-                mActivity.startActivity(intentAdd);
+                AddtoPlayListDialog.newInstance(Collections.singletonList(mSong.getId()))
+                        .show(mActivity.getSupportFragmentManager(), AddtoPlayListDialog.class.getSimpleName());
                 break;
             case R.id.menu_add_to_play_queue:
                 ToastUtil.show(mActivity, mActivity.getString(R.string.add_song_playqueue_success, MusicService.AddSongToPlayQueue(Collections.singletonList(mSong.getId()))));

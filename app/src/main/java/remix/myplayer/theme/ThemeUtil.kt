@@ -2,6 +2,7 @@ package remix.myplayer.theme
 
 import android.content.Context
 import android.support.annotation.AttrRes
+import remix.myplayer.util.ColorUtil
 
 object ThemeUtil {
 
@@ -24,6 +25,8 @@ object ThemeUtil {
         return color
     }
 
-
-
+    @JvmStatic
+    fun isWindowBackgroundDark(context: Context): Boolean {
+        return !ColorUtil.isColorLight(resolveColor(context, android.R.attr.windowBackground))
+    }
 }

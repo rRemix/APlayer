@@ -1,6 +1,7 @@
 package remix.myplayer.ui.widget;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -15,6 +16,7 @@ import butterknife.OnTextChanged;
 import butterknife.Unbinder;
 import remix.myplayer.R;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.theme.TintHelper;
 import remix.myplayer.util.ColorUtil;
 
 /**
@@ -74,9 +76,7 @@ public class SearchToolBar extends Toolbar {
     private void init() {
         //设置EditText光标与下划线颜色
         mUnBinder = ButterKnife.bind(this);
-        mEditText.getBackground().setColorFilter(
-                ColorUtil.getColor(ThemeStore.isMDColorLight() ? R.color.black : R.color.white),
-                PorterDuff.Mode.SRC_ATOP);
+        TintHelper.setTintAuto(mEditText,Color.WHITE,false);
         mEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 afterExplainChanged(v.getEditableText());

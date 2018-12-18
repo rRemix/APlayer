@@ -1,7 +1,9 @@
 package remix.myplayer.ui.dialog;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -12,6 +14,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +29,7 @@ import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.adapter.PlayQueueAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView;
 import remix.myplayer.util.DensityUtil;
@@ -41,19 +46,27 @@ import static remix.myplayer.util.Util.sendLocalBroadcast;
 /**
  * 正在播放列表Dialog
  */
-public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager.LoaderCallbacks<List<Song>> {
+public class PlayQueueDialog extends BaseDialog implements LoaderManager.LoaderCallbacks<List<Song>> {
+    public static PlayQueueDialog newInstance(){
+        PlayQueueDialog playQueueDialog = new PlayQueueDialog();
+        return playQueueDialog;
+    }
+
     @BindView(R.id.bottom_actionbar_play_list)
     LocationRecyclerView mRecyclerView;
     private PlayQueueAdapter mAdapter;
     private static int LOADER_ID = 0;
 
+    @NonNull
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_playqueue);
-        ButterKnife.bind(this);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        MaterialDialog dialog = Theme.getBaseDialog(getActivity())
+                .customView(R.layout.dialog_playqueue,false)
+                .build();
 
-        mAdapter = new PlayQueueAdapter(this, R.layout.item_playqueue);
+        ButterKnife.bind(this,dialog.getCustomView());
+
+        mAdapter = new PlayQueueAdapter(mContext, R.layout.item_playqueue);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -68,40 +81,53 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
             }
         });
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         //初始化LoaderManager
-        getSupportLoaderManager().initLoader(LOADER_ID++, null, this);
+        getLoaderManager().initLoader(LOADER_ID++, null, this);
         //改变播放列表高度，并置于底部
-        Window w = getWindow();
-//        w.setWindowAnimations(R.style.AnimBottom);
-        WindowManager wm = getWindowManager();
-        Display display = wm.getDefaultDisplay();
+        Window window = dialog.getWindow();
+        window.setWindowAnimations(R.style.DialogAnimBottom);
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        WindowManager.LayoutParams lp = window.getAttributes();
         lp.height = DensityUtil.dip2px(mContext, 354);
         lp.width = metrics.widthPixels;
-        w.setAttributes(lp);
-        w.setGravity(Gravity.BOTTOM);
+        window.setAttributes(lp);
+        window.setGravity(Gravity.BOTTOM);
+
+        return dialog;
+
     }
+
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.dialog_playqueue);
+//        ButterKnife.bind(this);
+//
+//
+//        //初始化LoaderManager
+//        getSupportLoaderManager().initLoader(LOADER_ID++, null, this);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//    }
 
     public PlayQueueAdapter getAdapter() {
         return mAdapter;
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        overridePendingTransition(R.anim.slide_bottom_in, 0);
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(0, R.anim.slide_bottom_out);
-    }
 
     @Override
     public Loader<List<Song>> onCreateLoader(int id, Bundle args) {
@@ -125,26 +151,6 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
             mAdapter.setData(null);
     }
 
-    @Override
-    public void onMediaStoreChanged() {
-        if (mHasPermission) {
-            getSupportLoaderManager().initLoader(LOADER_ID++, null, this);
-        } else {
-            if (mAdapter != null)
-                mAdapter.setData(null);
-        }
-    }
-
-    @Override
-    public void onPermissionChanged(boolean has) {
-        onMediaStoreChanged();
-    }
-
-    @Override
-    public void onPlayListChanged() {
-        onMediaStoreChanged();
-    }
-
     private static class AsyncPlayQueueSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
         private AsyncPlayQueueSongLoader(Context context) {
             super(context);
@@ -159,4 +165,24 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
             return PlayListUtil.getMP3ListByIds(ids, Global.PlayQueueID);
         }
     }
+
+    //    @Override
+//    public void onMediaStoreChanged() {
+//        if (mHasPermission) {
+//            getSupportLoaderManager().initLoader(LOADER_ID++, null, this);
+//        } else {
+//            if (mAdapter != null)
+//                mAdapter.setData(null);
+//        }
+//    }
+//
+//    @Override
+//    public void onPermissionChanged(boolean has) {
+//        onMediaStoreChanged();
+//    }
+//
+//    @Override
+//    public void onPlayListChanged() {
+//        onMediaStoreChanged();
+//    }
 }

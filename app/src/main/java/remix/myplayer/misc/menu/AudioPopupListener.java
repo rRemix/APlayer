@@ -3,7 +3,6 @@ package remix.myplayer.misc.menu;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.media.audiofx.AudioEffect;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -12,6 +11,7 @@ import android.view.MenuItem;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import remix.myplayer.App;
@@ -40,7 +40,6 @@ import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
 import static remix.myplayer.helper.MusicServiceRemote.getCurrentSong;
 import static remix.myplayer.helper.MusicServiceRemote.getMediaPlayer;
 import static remix.myplayer.theme.Theme.getBaseDialog;
-import static remix.myplayer.ui.dialog.AddtoPlayListDialog.EXTRA_SONG_LIST;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 /**
@@ -124,7 +123,8 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                 mTag.detail();
                 break;
             case R.id.menu_timer:
-                mActivity.startActivity(new Intent(mActivity, TimerDialog.class));
+                TimerDialog.newInstance()
+                        .show(mActivity.getSupportFragmentManager(), TimerDialog.class.getSimpleName());
                 break;
             case R.id.menu_eq:
                 Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
@@ -141,11 +141,8 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                         PlayListUtil.addSong(info) > 0 ? getString(R.string.add_song_playlist_success, 1, Constants.MYLOVE) : getString(R.string.add_song_playlist_error));
                 break;
             case R.id.menu_add_to_playlist:
-                Intent intentAdd = new Intent(this, AddtoPlayListDialog.class);
-                Bundle ardAdd = new Bundle();
-                ardAdd.putSerializable(EXTRA_SONG_LIST, new ArrayList<>(Collections.singletonList(mInfo.getId())));
-                intentAdd.putExtras(ardAdd);
-                startActivity(intentAdd);
+                AddtoPlayListDialog.newInstance(Collections.singletonList(mInfo.getId()))
+                        .show(mActivity.getSupportFragmentManager(), AddtoPlayListDialog.class.getSimpleName());
                 break;
             case R.id.menu_delete:
                 getBaseDialog(mActivity)

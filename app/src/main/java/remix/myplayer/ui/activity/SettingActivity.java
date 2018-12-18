@@ -59,6 +59,7 @@ import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.theme.TintHelper;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.FolderChooserDialog;
 import remix.myplayer.ui.dialog.LyricPriorityDialog;
@@ -192,6 +193,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 mIgnoreMediastoreSwitch, mShowDisplaynameSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
+                TintHelper.setTintAuto(view,ThemeStore.getAccentColor(),false);
+
                 view.setChecked(SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, keyWord[index], false));
                 //5.0以上才支持变色导航栏
                 if (view.getId() == R.id.setting_navaigation_switch) {

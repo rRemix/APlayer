@@ -3,6 +3,7 @@ package remix.myplayer.ui
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.graphics.Color
 import android.support.design.widget.TextInputLayout
 import android.text.Editable
 import android.text.TextUtils
@@ -16,8 +17,10 @@ import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.misc.tageditor.TagEditor
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.Command
+import remix.myplayer.theme.TextInputLayoutUtil
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
+import remix.myplayer.theme.TintHelper
 import remix.myplayer.util.Constants
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
@@ -93,22 +96,32 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
         editDialog.show()
 
         editDialog.customView?.let { root ->
-            if (!ThemeStore.isLightTheme()) {
-                root.song_layout.editText?.setTextColor(ThemeStore.getTextColorPrimary())
-//                root.song_layout.editText?.background?.setColorFilter(Color.WHITE,PorterDuff.Mode.SRC_ATOP)
-                root.album_layout.editText?.setTextColor(ThemeStore.getTextColorPrimary())
-                root.artist_layout.editText?.setTextColor(ThemeStore.getTextColorPrimary())
-                root.year_layout.editText?.setTextColor(ThemeStore.getTextColorPrimary())
-                root.genre_layout.editText?.setTextColor(ThemeStore.getTextColorPrimary())
-                root.track_layout.editText?.setTextColor(ThemeStore.getTextColorPrimary())
-            }
+            val accentColor = ThemeStore.getAccentColor()
+            TextInputLayoutUtil.setAccent(root.song_layout,accentColor)
+            TintHelper.setTintAuto(root.song_layout.editText!!,Color.WHITE,false)
             root.song_layout.editText?.addTextChangedListener(TextInputEditWatcher(root.song_layout, getString(R.string.song_not_empty)))
             root.song_layout.editText?.setText(song.title)
+
+            TextInputLayoutUtil.setAccent(root.album_layout,accentColor)
+            TintHelper.setTintAuto(root.album_layout.editText!!,Color.WHITE, false)
             root.album_layout.editText?.setText(song.album)
+
+            TextInputLayoutUtil.setAccent(root.artist_layout,accentColor)
+            TintHelper.setTintAuto(root.artist_layout.editText!!,Color.WHITE,false)
             root.artist_layout.editText?.setText(song.artist)
+
+            TextInputLayoutUtil.setAccent(root.year_layout,accentColor)
+            TintHelper.setTintAuto(root.year_layout.editText!!,Color.WHITE,false)
             root.year_layout.editText?.setText(song.year)
+
+            TextInputLayoutUtil.setAccent(root.track_layout,accentColor)
+            TintHelper.setTintAuto(root.track_layout.editText!!,Color.WHITE,false)
+            root.track_layout.editText?.setText(tagEditor.trackNumber)
+
+            TextInputLayoutUtil.setAccent(root.genre_layout,accentColor)
+            TintHelper.setTintAuto(root.genre_layout.editText!!,Color.WHITE,false)
             root.genre_layout.editText?.setText(tagEditor.genreName)
-            root.genre_layout.editText?.setText(tagEditor.trackNumber)
+
         }
 
     }

@@ -28,7 +28,8 @@ abstract class MenuActivity : ToolbarActivity() {
             startActivity(Intent(mContext, SearchActivity::class.java))
             return true
         } else if (item.itemId == R.id.action_timer) {
-            startActivity(Intent(mContext, TimerDialog::class.java))
+            TimerDialog.newInstance()
+                    .show(supportFragmentManager,TimerDialog::class.java.simpleName)
             return true
         } else {
             var sortOrder: String? = null

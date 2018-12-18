@@ -15,7 +15,7 @@ import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import java.util.*
 
-class LyricPriorityDialog : android.support.v4.app.DialogFragment() {
+class LyricPriorityDialog : BaseDialog() {
     companion object {
         @JvmStatic
         fun newInstance(): LyricPriorityDialog {

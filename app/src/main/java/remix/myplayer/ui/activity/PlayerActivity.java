@@ -558,8 +558,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
                 break;
             //打开正在播放列表
             case R.id.playbar_playinglist:
-                Intent intent = new Intent(this, PlayQueueDialog.class);
-                startActivity(intent);
+                PlayQueueDialog.newInstance()
+                        .show(getSupportFragmentManager(),PlayQueueDialog.class.getSimpleName());
                 break;
             //关闭
             case R.id.top_hide:

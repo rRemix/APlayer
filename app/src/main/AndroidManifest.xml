@@ -82,7 +82,6 @@
         <activity
             android:name=".ui.activity.PlayerActivity"
             android:parentActivityName=".ui.activity.MainActivity"
-            android:theme="@style/AudioHolderStyle"
             android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -146,17 +145,6 @@
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:theme="@style/AppShortcut" />
-        <!-- 添加歌曲到播放列表 -->
-        <activity
-            android:name=".ui.dialog.AddtoPlayListDialog" />
-        <!-- 播放队列 -->
-        <activity
-            android:name=".ui.dialog.PlayQueueDialog" />
-        <!-- 选项 -->
-        <!-- 定时停止 -->
-        <activity
-            android:name=".ui.dialog.TimerDialog" />
-        <!-- 主题色选择 -->
 
         <!-- 图片裁剪 -->
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />

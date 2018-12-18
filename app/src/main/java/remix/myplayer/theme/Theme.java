@@ -435,7 +435,9 @@ public class Theme {
                 .buttonRippleColorAttr(R.attr.ripple_color)
                 .backgroundColorAttr(R.attr.background_color_dialog)
                 .itemsColorAttr(R.attr.text_color_primary)
+                .widgetColor(ThemeStore.getAccentColor())
                 .theme(ThemeStore.getMDDialogTheme());
+
     }
 
     public static void setLightNavigationbarAuto(Activity activity, boolean enabled) {
