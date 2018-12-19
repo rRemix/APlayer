@@ -52,7 +52,7 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
     //搜索结果的listview
     @BindView(R.id.search_result_native)
     RecyclerView mSearchResRecyclerView;
-    @BindView(R.id.search_view)
+    @BindView(R.id.toolbar)
     SearchToolBar mSearchToolBar;
     //无搜索结果
     @BindView(R.id.search_result_blank)
@@ -65,7 +65,7 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
-        setUpToolbar(mSearchToolBar, "");
+        setUpToolbar("");
 
         mSearchToolBar.addSearchListener(new SearchToolBar.SearchListener() {
             @Override

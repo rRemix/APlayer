@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,9 +19,7 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.SongChooseAdaper;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
@@ -97,10 +94,6 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> 
     @Override
     protected int getLoaderId() {
         return LoaderIds.SONGCHOOSE_ACTIVITY;
-    }
-
-    @Override
-    protected void setUpToolbar(Toolbar toolbar, String title) {
     }
 
 

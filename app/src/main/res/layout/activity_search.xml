@@ -11,7 +11,7 @@
         <remix.myplayer.ui.widget.SearchToolBar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/search_view"
+            android:id="@+id/toolbar"
             app:contentInsetStartWithNavigation="0dp">
             <FrameLayout
                 android:layout_width="match_parent"

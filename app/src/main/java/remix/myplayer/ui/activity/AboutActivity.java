@@ -15,8 +15,6 @@ import remix.myplayer.R;
  * Created by Remix on 2016/3/26.
  */
 public class AboutActivity extends ToolbarActivity {
-    @BindView(R.id.toolbar)
-    Toolbar mToolBar;
     @BindView(R.id.about_text)
     TextView mVersion;
 
@@ -34,7 +32,7 @@ public class AboutActivity extends ToolbarActivity {
 
         }
 
-        setUpToolbar(mToolBar, getString(R.string.about));
+        setUpToolbar(getString(R.string.about));
     }
 
 }

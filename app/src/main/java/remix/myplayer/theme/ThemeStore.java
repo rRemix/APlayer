@@ -6,13 +6,10 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StyleRes;
 
-import java.net.ContentHandler;
-
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
-import remix.myplayer.util.StatusBarUtil;
 
 /**
  * @ClassName
@@ -88,8 +85,18 @@ public class ThemeStore {
 
     @ColorInt
     public static int getAccentColor() {
-        return SPUtil.getValue(App.getContext(), NAME, KEY_ACCENT_COLOR, Color.parseColor("#ffb61e"));
+        //纯白需要处理下
+        int accentColor = SPUtil.getValue(App.getContext(), NAME, KEY_ACCENT_COLOR, Color.parseColor("#ffb61e"));
+        if(ColorUtil.isColorLight(accentColor)){
+            accentColor = ColorUtil.getColor(R.color.statusbar_gray_color);
+        }
+        return accentColor;
     }
+
+//    @ColorInt
+//    public static int getOriginalAccentColor(){
+//        return SPUtil.getValue(App.getContext(), NAME, KEY_ACCENT_COLOR, Color.parseColor("#ffb61e"));
+//    }
 
     public static void saveAccentColor(@ColorInt int color){
         SPUtil.putValue(App.getContext(),NAME,KEY_ACCENT_COLOR,color);
@@ -196,15 +203,15 @@ public class ThemeStore {
     }
 
 
-//    @ColorInt
-//    public static int getDrawerEffectColor() {
-//        return ColorUtil.getColor(ThemeStore.isLightTheme()()() ? R.color.drawer_selected_day : R.color.drawer_selected_night);
-//    }
-//
-//    @ColorInt
-//    public static int getDrawerDefaultColor() {
-//        return ColorUtil.getColor(ThemeStore.isLightTheme()() ? R.color.white : R.color.gray_343438);
-//    }
+    @ColorInt
+    public static int getDrawerEffectColor() {
+        return ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.drawer_effect_light : R.color.drawer_effect_dark);
+    }
+
+    @ColorInt
+    public static int getDrawerDefaultColor() {
+        return ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.drawer_default_light : R.color.drawer_default_dark);
+    }
 
     public static com.afollestad.materialdialogs.Theme getMDDialogTheme() {
         return isMDColorLight() ? com.afollestad.materialdialogs.Theme.LIGHT : com.afollestad.materialdialogs.Theme.DARK;

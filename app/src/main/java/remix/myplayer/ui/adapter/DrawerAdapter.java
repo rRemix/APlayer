@@ -1,6 +1,7 @@
 package remix.myplayer.ui.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.view.View;
 import android.widget.ImageView;
@@ -46,7 +47,8 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
 
     @Override
     protected void convert(final DrawerHolder holder, Integer titleRes, int position) {
-        Theme.TintDrawable(holder.mImg, IMAGES[position], ThemeStore.getAccentColor());
+        Theme.TintDrawable(holder.mImg, IMAGES[position], ThemeStore.getSelectColor());
+
         holder.mText.setText(titleRes);
         holder.mText.setTextColor(ThemeUtil.resolveColor(mContext,R.attr.text_color_primary));
         holder.mRoot.setOnClickListener(v -> mOnItemClickListener.onItemClick(v, holder.getAdapterPosition()));

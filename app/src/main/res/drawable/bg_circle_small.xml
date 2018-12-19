@@ -3,4 +3,6 @@
     android:shape="oval">
     <solid android:color="@color/white"/>
     <size android:height="@dimen/d30_size" android:width="@dimen/d30_size"/>
+    <stroke android:color="@color/drawer_effect_light"
+        android:width="1dp"/>
 </shape>

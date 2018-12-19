@@ -9,6 +9,7 @@ import remix.myplayer.R
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
+import remix.myplayer.theme.ToolbarContentTintHelper
 import remix.myplayer.ui.dialog.TimerDialog
 
 /**
@@ -100,6 +101,7 @@ abstract class MenuActivity : ToolbarActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
+        super.onCreateOptionsMenu(menu)
         menuInflater.inflate(getMenuLayoutId(), menu)
         tintMenuIcon(menu)
         return true
@@ -131,13 +133,7 @@ abstract class MenuActivity : ToolbarActivity() {
     }
 
     private fun tintMenuIcon(menu: Menu) {
-        //主题颜色
-        val color = ThemeStore.getMaterialPrimaryColorReverse()
-        for (i in 0 until menu.size()) {
-            val menuItem = menu.getItem(i)
-            if (menuItem.icon != null)
-                menuItem.icon = Theme.TintDrawable(menuItem.icon, color)
-        }
+        ToolbarContentTintHelper.handleOnCreateOptionsMenu(this, toolbar, menu, getToolbarBackgroundColor(toolbar))
     }
 
     protected open fun saveSortOrder(sortOrder: String?) {

@@ -217,7 +217,7 @@ public class MainActivity extends MenuActivity {
         registerLocalReceiver(mReceiver, intentFilter);
 
         //初始化控件
-        setUpToolbar(findViewById(R.id.toolbar));
+        setUpToolbar();
         setUpPager();
         setUpTab();
         //初始化测滑菜单
@@ -238,17 +238,11 @@ public class MainActivity extends MenuActivity {
 
     /**
      * 初始化toolbar
-     *
-     * @param toolbar
      */
-    protected void setUpToolbar(Toolbar toolbar) {
-        super.setUpToolbar(toolbar, "");
-        if (toolbar != null) {
-            toolbar.setTitle("");
-            int reverseColor = getMaterialPrimaryColorReverse();
-            toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.actionbar_menu,reverseColor));
-            toolbar.setNavigationOnClickListener(v -> mDrawerLayout.openDrawer(mNavigationView));
-        }
+    protected void setUpToolbar() {
+        super.setUpToolbar("");
+        toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp);
+        toolbar.setNavigationOnClickListener(v -> mDrawerLayout.openDrawer(mNavigationView));
     }
 
     /**
@@ -528,7 +522,7 @@ public class MainActivity extends MenuActivity {
     private void setUpViewColor() {
         //正在播放文字的背景
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(ColorUtil.darkenColor(getMaterialPrimaryColor()));
+        bg.setColor(ThemeStore.getDrawerEffectColor());
         bg.setCornerRadius(DensityUtil.dip2px(this, 4));
         mHeadText.setBackground(bg);
         mHeadText.setTextColor(getMaterialPrimaryColorReverse());

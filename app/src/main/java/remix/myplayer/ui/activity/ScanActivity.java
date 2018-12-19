@@ -21,8 +21,6 @@ import remix.myplayer.util.SPUtil;
  * Created by taeja on 16-3-7.
  */
 public class ScanActivity extends ToolbarActivity {
-    @BindView(R.id.toolbar)
-    Toolbar mToolBar;
     @BindView(R.id.custom_seekbar)
     FilterSizeSeekBar mFilterSizeSeekbar;
     private int mPosition;
@@ -48,7 +46,7 @@ public class ScanActivity extends ToolbarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
         ButterKnife.bind(this);
-        setUpToolbar(mToolBar, getString(R.string.back));
+        setUpToolbar(getString(R.string.back));
         initSeekbar();
     }
 

@@ -99,8 +99,6 @@ import static remix.myplayer.util.Util.sendLocalBroadcast;
  */
 public class SettingActivity extends ToolbarActivity implements FolderChooserDialog.FolderCallback,
         FileChooserDialog.FileCallback,ColorChooserDialog.ColorCallback {
-    @BindView(R.id.toolbar)
-    Toolbar mToolbar;
     @BindView(R.id.setting_color_primary_indicator)
     ImageView mPrimaryColorSrc;
     @BindView(R.id.setting_color_accent_indicator)
@@ -173,7 +171,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
-        setUpToolbar(mToolbar, getString(R.string.setting));
+        setUpToolbar( getString(R.string.setting));
         mHandler = new MsgHandler(this);
 
         //读取重启aitivity之前的数据

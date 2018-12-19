@@ -49,8 +49,6 @@ public class EQActivity extends ToolbarActivity {
 
     @BindView(R.id.eq_switch)
     SwitchCompat mSwitch;
-    @BindView(R.id.toolbar)
-    Toolbar mToolBar;
     @BindView(R.id.eq_reset)
     Button mReset;
     @BindView(R.id.eq_container)
@@ -135,7 +133,7 @@ public class EQActivity extends ToolbarActivity {
         setContentView(R.layout.activity_eq);
         ButterKnife.bind(this);
 
-        setUpToolbar(mToolBar, getString(R.string.eq));
+        setUpToolbar(getString(R.string.eq));
 
         mSwitch.setChecked(mEnable);
 //        Theme.TintDrawable(mLockScreenSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));

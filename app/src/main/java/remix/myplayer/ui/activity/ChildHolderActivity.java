@@ -153,7 +153,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         } else
             Title = mArg.substring(mArg.lastIndexOf("/") + 1, mArg.length());
         //初始化toolbar
-        setUpToolbar(mToolBar, Title);
+        setUpToolbar(Title);
 
 //        mMDDialog = new MaterialDialog.Builder(this)
 //                .title(R.string.loading)

@@ -80,7 +80,7 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
 
-        setUpToolbar(findViewById(R.id.toolbar), getString(R.string.recently));
+        setUpToolbar(getString(R.string.recently));
     }
 
     /**

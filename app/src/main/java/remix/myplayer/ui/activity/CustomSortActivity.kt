@@ -46,7 +46,7 @@ class CustomSortActivity : ToolbarActivity() {
         mPlayListName = intent.getStringExtra("name")
         mInfoList = intent.getSerializableExtra("list") as List<Song>
 
-        setUpToolbar(findViewById(R.id.toolbar), mPlayListName)
+        setUpToolbar(mPlayListName)
 
         mAdapter = CustomSortAdapter(mContext, R.layout.item_custom_sort)
         mAdapter.setData(mInfoList)

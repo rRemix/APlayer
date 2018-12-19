@@ -62,7 +62,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_support_develop)
         ButterKnife.bind(this)
-        setUpToolbar(mToolBar, getString(R.string.support_develop))
+        setUpToolbar(getString(R.string.support_develop))
 
         mAdapter = PurchaseAdapter(mContext, R.layout.item_support)
 

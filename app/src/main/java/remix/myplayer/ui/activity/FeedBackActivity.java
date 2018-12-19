@@ -37,8 +37,6 @@ import static remix.myplayer.App.IS_GOOGLEPLAY;
  * 将用户的反馈通过邮箱发送
  */
 public class FeedBackActivity extends ToolbarActivity {
-    @BindView(R.id.toolbar)
-    Toolbar mToolBar;
     @BindView(R.id.feedback_content)
     EditText mContent;
     @BindView(R.id.feedback_contact)
@@ -54,7 +52,7 @@ public class FeedBackActivity extends ToolbarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback);
         ButterKnife.bind(this);
-        setUpToolbar(mToolBar, getString(R.string.back));
+        setUpToolbar(getString(R.string.back));
 
         mSubmit.setBackground(Theme.getCorner(1.0f, DensityUtil.dip2px(this, 2), 0,
                 ThemeStore.getAccentColor()));

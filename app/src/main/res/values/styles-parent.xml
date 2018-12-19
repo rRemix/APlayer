@@ -4,6 +4,9 @@
     <style name="Theme.APlayer.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="md_dark_theme">false</item>
 
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+
         <item name="android:windowBackground">@color/light_background_color_main</item>
         <item name="colorPrimary">?android:attr/windowBackground</item>
 
@@ -27,6 +30,11 @@
     </style>
 
     <style name="Theme.APlayer.Base.Dark" parent="Theme.AppCompat.NoActionBar">
+        <item name="md_dark_theme">false</item>
+
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+
         <item name="android:windowBackground">@color/dark_background_color_main</item>
         <item name="colorPrimary">?android:attr/windowBackground</item>
 
@@ -45,6 +53,7 @@
 
         <item name="default_album">@drawable/album_empty_bg_night</item>
         <item name="default_artist">@drawable/artist_empty_bg_night</item>
+
 
         <!--<item name="toolbarPopupTheme">@style/ThemeOverlay.AppCompat</item>-->
     </style>
