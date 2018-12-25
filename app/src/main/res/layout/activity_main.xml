@@ -50,10 +50,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|right"
+                android:scaleType="center"
                 android:layout_marginRight="@dimen/d38_size"
                 android:layout_marginBottom="@dimen/d80_size"
-                android:background="@color/transparent"
-                android:src="@drawable/icon_floatingbtn_day"
                 android:visibility="gone" />
 
             <ImageView

@@ -15,10 +15,9 @@
         android:id="@+id/play_shuffle">
         <ImageView
             android:id="@+id/play_shuffle_button"
-            android:layout_width="@dimen/d44_size"
-            android:layout_height="@dimen/d44_size"
-            android:src="@drawable/btn_shuffle"
-            android:background="@color/transparent" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

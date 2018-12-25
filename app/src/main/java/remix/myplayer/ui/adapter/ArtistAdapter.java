@@ -36,9 +36,9 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
+import remix.myplayer.ui.adapter.holder.HeaderHolder;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
@@ -62,7 +62,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
-            return new AlbumAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_header_2, parent, false));
+            return new HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_header_2, parent, false));
         }
         return viewType == HeaderAdapter.LIST_MODE ?
                 new ArtistAdapter.ArtistListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_list, parent, false)) :
@@ -86,17 +86,8 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     @Override
     protected void convert(final BaseViewHolder baseHolder, final Artist artist, final int position) {
         if (position == 0) {
-            final AlbumAdapter.HeaderHolder headerHolder = (AlbumAdapter.HeaderHolder) baseHolder;
-            if (mDatas == null || mDatas.size() == 0) {
-                headerHolder.mRoot.setVisibility(View.GONE);
-                return;
-            }
-            //设置图标
-            headerHolder.mDivider.setVisibility(mMode == HeaderAdapter.LIST_MODE ? View.VISIBLE : View.GONE);
-            headerHolder.mListModelBtn.setColorFilter(mMode == HeaderAdapter.LIST_MODE ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-            headerHolder.mGridModelBtn.setColorFilter(mMode == HeaderAdapter.GRID_MODE ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-            headerHolder.mGridModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
-            headerHolder.mListModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
+            final HeaderHolder headerHolder = (HeaderHolder) baseHolder;
+            setUpModeButton(headerHolder);
             return;
         }
 

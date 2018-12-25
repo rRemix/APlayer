@@ -93,7 +93,7 @@ public class LockScreenActivity extends BaseMusicActivity {
     private int mWidth;
 
     //是否正在播放
-    private CompositeDisposable mDisposable = new CompositeDisposable();
+    private Disposable mDisposable;
     private volatile LyricRowWrapper mCurLyric;
     private UpdateLyricThread mUpdateLyricThread;
 
@@ -257,7 +257,10 @@ public class LockScreenActivity extends BaseMusicActivity {
 
             @Override
             public Disposable load() {
-                final Disposable disposable = getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(song))
+                if(mDisposable != null){
+                    mDisposable.dispose();
+                }
+                mDisposable = getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(song))
                         .compose(RxUtil.applySchedulerToIO())
                         .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette>) e -> {
                             if (bitmap == null) {
@@ -269,8 +272,7 @@ public class LockScreenActivity extends BaseMusicActivity {
                         .onErrorResumeNext(Observable.create(e -> processBitmap(e, DEFAULT_BITMAP)))
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
-                mDisposable.add(disposable);
-                return disposable;
+                return mDisposable;
             }
         }.load();
     }

@@ -63,7 +63,7 @@ public class Theme {
     /**
      * thumb加深色边框并着色
      */
-    public static GradientDrawable getTinThumb(Context context) {
+    public static GradientDrawable getTintThumb(Context context) {
         GradientDrawable thumbDrawable = (GradientDrawable) context.getResources().getDrawable(R.drawable.bg_circleseekbar_thumb);
         thumbDrawable.setStroke(DensityUtil.dip2px(context, 1), ColorUtil.shiftColor(ThemeStore.getAccentColor(), 0.8f));
         thumbDrawable.setColor(ThemeStore.getAccentColor());

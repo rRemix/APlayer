@@ -1,6 +1,7 @@
 package remix.myplayer.ui.adapter;
 
 import android.content.Context;
+import android.graphics.drawable.VectorDrawable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -8,8 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.theme.TintHelper;
 import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
+import remix.myplayer.ui.adapter.holder.HeaderHolder;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
@@ -77,14 +82,28 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
             gridManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
-                    int size = getItemViewType(position) == TYPE_HEADER ? gridManager.getSpanCount() : 1;
-//                    if(this instanceof AlbumAdapter){
-//
-//                    }
-                    return size;
+                    return getItemViewType(position) == TYPE_HEADER ? gridManager.getSpanCount() : 1;
                 }
             });
         }
+    }
+
+
+    /**
+     * 初始化列表模式切换的按钮
+     */
+    void setUpModeButton(HeaderHolder headerHolder) {
+        if (mDatas == null || mDatas.size() == 0) {
+            headerHolder.mRoot.setVisibility(View.GONE);
+            return;
+        }
+        //设置图标
+
+        headerHolder.mDivider.setVisibility(mMode == HeaderAdapter.LIST_MODE ? View.VISIBLE : View.GONE);
+        headerHolder.mGridModeBtn.setOnClickListener(v -> switchMode(headerHolder, v));
+        headerHolder.mListModeBtn.setOnClickListener(v -> switchMode(headerHolder, v));
+        headerHolder.mDivider.setVisibility(mMode == LIST_MODE ? View.VISIBLE : View.GONE);
+        tintModeButton(headerHolder);
     }
 
     /**
@@ -93,21 +112,30 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
      * @param headerHolder
      * @param v
      */
-    void switchMode(AlbumAdapter.HeaderHolder headerHolder, View v) {
+    void switchMode(HeaderHolder headerHolder, View v) {
         int newModel = v.getId() == R.id.list_model ? LIST_MODE : GRID_MODE;
         if (newModel == mMode)
             return;
         mMode = newModel;
-        //列表模式下隐藏
-        headerHolder.mListModelBtn.setColorFilter(mMode == LIST_MODE ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-        headerHolder.mGridModelBtn.setColorFilter(mMode == GRID_MODE ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-        headerHolder.mDivider.setVisibility(mMode == LIST_MODE ? View.VISIBLE : View.GONE);
+        setUpModeButton(headerHolder);
         //重新设置LayoutManager和adapter并刷新列表
-        mRecyclerView.setLayoutManager(mMode == HeaderAdapter.LIST_MODE ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
+        mRecyclerView.setLayoutManager(mMode == LIST_MODE ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
         mRecyclerView.setAdapter(this);
-//        notifyDataSetChanged();
         //保存当前模式
         saveMode();
+    }
+
+    private void tintModeButton(HeaderHolder headerHolder) {
+        headerHolder.mListModeBtn.setImageDrawable(
+                Theme.TintVectorDrawable(mContext, R.drawable.ic_format_list_bulleted_white_24dp,
+                        mMode == LIST_MODE ? ThemeStore.getAccentColor() : ColorUtil.getColor(R.color.default_model_button_color))
+        );
+
+        headerHolder.mGridModeBtn.setImageDrawable(
+                Theme.TintVectorDrawable(mContext, R.drawable.ic_apps_white_24dp,
+                        mMode == GRID_MODE ? ThemeStore.getAccentColor() : ColorUtil.getColor(R.color.default_model_button_color))
+        );
+
     }
 
     private void saveMode() {

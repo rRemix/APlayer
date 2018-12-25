@@ -85,6 +85,7 @@ class LyricFragment : BaseMusicFragment(), Runnable {
             lrcView.setOffset(0)
         }
         val id = info?.id
+        disposable?.dispose()
         disposable = SearchLrc(info!!).getLyric(manualPath, clearCache)
                 .doOnSubscribe { lrcView.setText(getStringSafely(R.string.searching)) }
                 .subscribe(Consumer {

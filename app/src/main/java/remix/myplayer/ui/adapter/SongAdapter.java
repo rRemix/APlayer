@@ -15,7 +15,9 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -36,6 +38,7 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.Command;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.theme.TintHelper;
 import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.widget.ColumnView;
@@ -106,6 +109,10 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
                 headerHolder.mRoot.setVisibility(View.VISIBLE);
             }
 
+            headerHolder.mShuffleIv.setImageDrawable(
+                    Theme.TintVectorDrawable(mContext,R.drawable.ic_shuffle_white_24dp,ThemeStore.getAccentColor())
+            );
+
             headerHolder.mShuffle.setOnClickListener(v -> {
                 Intent intent = MusicUtil.makeCmdIntent(Command.NEXT, true);
                 if (mType == ALLSONG) {
@@ -158,7 +165,6 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
 //        }
 
         //封面
-//        new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
         Disposable disposable = new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song), new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
         holder.mImage.setTag(disposable);
 //        //是否为无损
@@ -295,6 +301,8 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
         View mDivider;
         @BindView(R.id.play_shuffle)
         View mShuffle;
+        @BindView(R.id.play_shuffle_button)
+        ImageView mShuffleIv;
 
         HeaderHolder(View itemView) {
             super(itemView);

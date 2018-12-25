@@ -14,7 +14,6 @@ import android.widget.AbsSeekBar;
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 
 /**
@@ -221,7 +220,7 @@ public class CircleSeekBar extends AbsSeekBar {
     private void init() {
         final TypedArray typedArray = mContext.obtainStyledAttributes(mAttrs, R.styleable.CircleSeekBar);
 
-        mThumbDrawable = Theme.getTinThumb(mContext);
+        mThumbDrawable = Theme.getTintThumb(mContext);
 
         //轨道颜色 宽度 最大值
         mProgressColor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color,

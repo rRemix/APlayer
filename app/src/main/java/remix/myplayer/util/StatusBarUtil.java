@@ -55,7 +55,7 @@ public class StatusBarUtil {
         if (!Build.MANUFACTURER.equalsIgnoreCase("Meizu") && !Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") &&
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             if (ThemeStore.isMDColorLight())
-                color = ColorUtil.getColor(R.color.statusbar_gray_color);
+                color = ColorUtil.getColor(R.color.accent_gray_color);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -202,7 +202,7 @@ public class StatusBarUtil {
         if (!Build.MANUFACTURER.equalsIgnoreCase("Meizu") && !Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") &&
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             if (ThemeStore.isMDColorLight())
-                color = ColorUtil.getColor(R.color.statusbar_gray_color);
+                color = ColorUtil.getColor(R.color.accent_gray_color);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);

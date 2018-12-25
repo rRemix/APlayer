@@ -88,7 +88,7 @@ public class ThemeStore {
         //纯白需要处理下
         int accentColor = SPUtil.getValue(App.getContext(), NAME, KEY_ACCENT_COLOR, Color.parseColor("#ffb61e"));
         if(ColorUtil.isColorLight(accentColor)){
-            accentColor = ColorUtil.getColor(R.color.statusbar_gray_color);
+            accentColor = ColorUtil.getColor(R.color.accent_gray_color);
         }
         return accentColor;
     }

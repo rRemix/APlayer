@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +12,19 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import butterknife.ButterKnife;
+import remix.myplayer.R;
 import remix.myplayer.helper.MusicEventCallback;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.BaseAdapter;
 import remix.myplayer.ui.fragment.base.BaseMusicFragment;
+import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+
+import static remix.myplayer.util.ColorUtil.getColor;
+import static remix.myplayer.util.ColorUtil.isColorLight;
 
 /**
  * Created by Remix on 2016/12/23.
@@ -48,9 +57,19 @@ public abstract class LibraryFragment<D, A extends BaseAdapter> extends BaseMusi
                         this instanceof ArtistFragment ? Constants.ARTIST :
                                 this instanceof PlayListFragment ? Constants.PLAYLIST :
                                         Constants.FOLDER;
-        mChoice = new MultipleChoice<>(getActivity(), type);
+        mChoice = new MultipleChoice<>(requireActivity(), type);
         initAdapter();
         initView();
+
+        //recyclerView的滚动条
+        final int accentColor = ThemeStore.getAccentColor();
+        final RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
+        if(recyclerView instanceof FastScrollRecyclerView){
+            ((FastScrollRecyclerView) recyclerView).setBubbleColor(accentColor);
+            ((FastScrollRecyclerView) recyclerView).setHandleColor(accentColor);
+            ((FastScrollRecyclerView) recyclerView).setBubbleTextColor(getColor(isColorLight(accentColor) ?
+                    R.color.light_text_color_primary : R.color.dark_text_color_primary));
+        }
 
         mChoice.setAdapter(mAdapter);
         return rootView;

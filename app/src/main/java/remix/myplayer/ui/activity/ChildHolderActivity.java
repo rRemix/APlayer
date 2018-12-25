@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -135,9 +136,12 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setBubbleTextColor(ThemeStore.isMDColorLight()
-                ? ColorUtil.getColor(R.color.white)
-                : ThemeStore.getTextColorPrimary());
+        final int accentColor = ThemeStore.getAccentColor();
+        mRecyclerView.setBubbleColor(accentColor);
+        mRecyclerView.setHandleColor(accentColor);
+        mRecyclerView.setBubbleTextColor(ColorUtil.getColor(ColorUtil.isColorLight(accentColor) ?
+                R.color.dark_text_color_primary : R.color.light_text_color_primary));
+
 
         //标题
         if (mType != Constants.FOLDER) {

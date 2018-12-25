@@ -38,8 +38,8 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
+import remix.myplayer.ui.adapter.holder.HeaderHolder;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
@@ -90,16 +90,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     protected void convert(BaseViewHolder baseHolder, Album album, int position) {
         if (position == 0) {
             final HeaderHolder headerHolder = (HeaderHolder) baseHolder;
-            if (mDatas == null || mDatas.size() == 0) {
-                headerHolder.mRoot.setVisibility(View.GONE);
-                return;
-            }
-            //设置图标
-            headerHolder.mDivider.setVisibility(mMode == HeaderAdapter.LIST_MODE ? View.VISIBLE : View.GONE);
-            headerHolder.mListModelBtn.setColorFilter(mMode == HeaderAdapter.LIST_MODE ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-            headerHolder.mGridModelBtn.setColorFilter(mMode == HeaderAdapter.GRID_MODE ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-            headerHolder.mGridModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
-            headerHolder.mListModelBtn.setOnClickListener(v -> switchMode(headerHolder, v));
+            setUpModeButton(headerHolder);
             return;
         }
 
@@ -234,20 +225,6 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     static class AlbumListHolder extends AlbumHolder {
         AlbumListHolder(View v) {
             super(v);
-        }
-    }
-
-    static class HeaderHolder extends BaseViewHolder {
-        //列表显示与网格显示切换
-        @BindView(R.id.list_model)
-        ImageButton mListModelBtn;
-        @BindView(R.id.grid_model)
-        ImageButton mGridModelBtn;
-        @BindView(R.id.divider)
-        View mDivider;
-
-        HeaderHolder(View itemView) {
-            super(itemView);
         }
     }
 

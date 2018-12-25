@@ -21,7 +21,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
@@ -315,7 +314,6 @@ public class MainActivity extends MenuActivity {
                 showViewWithAnim(mAddButton, true);
         }
 
-        mAddButton.setImageResource(ThemeStore.isLightTheme() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
         mViewPager.setCurrentItem(0);
@@ -405,7 +403,7 @@ public class MainActivity extends MenuActivity {
     }
 
     private void addScrollListener() {
-        RecyclerView recyclerView = findViewById(R.id.recyclerview);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
         if (recyclerView instanceof LocationRecyclerView) {
             LocationRecyclerView locationRecyclerView = (LocationRecyclerView) recyclerView;
             locationRecyclerView.removeOnScrollListener(mScrollListener);
@@ -528,6 +526,11 @@ public class MainActivity extends MenuActivity {
         mHeadText.setTextColor(getMaterialPrimaryColorReverse());
         //抽屉
         mHeadRoot.setBackgroundColor(getMaterialPrimaryColor());
+
+        //这种图片不知道该怎么着色 暂时先这样处理
+        mAddButton.setBackground(Theme.TintDrawable(R.drawable.bg_playlist_add,
+                ThemeStore.getAccentColor()));
+        mAddButton.setImageResource(R.drawable.icon_playlist_add);
     }
 
     @SuppressLint("CheckResult")

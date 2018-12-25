@@ -211,7 +211,7 @@ public class EQSeekBar extends View {
         mContext = context;
         TypedArray typedArray = mContext.obtainStyledAttributes(attributeSet, R.styleable.EQSeekBar);
         //初始化thumbdrawable及其状态
-        mThumbDrawable = Theme.getTinThumb(mContext);
+        mThumbDrawable = Theme.getTintThumb(mContext);
         if (mThumbDrawable == null)
             mThumbDrawable = getResources().getDrawable(R.drawable.bg_circleseekbar_thumb);
 

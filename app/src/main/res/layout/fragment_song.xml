@@ -16,8 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/divider"
-        app:bubbleColor="?attr/colorAccent"
-        app:handleColor="?attr/colorAccent"
         app:hideScrollbar="true"
         app:showTrack="true"/>
 
