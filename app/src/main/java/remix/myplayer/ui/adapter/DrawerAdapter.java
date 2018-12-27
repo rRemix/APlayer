@@ -47,7 +47,7 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
 
     @Override
     protected void convert(final DrawerHolder holder, Integer titleRes, int position) {
-        Theme.TintDrawable(holder.mImg, IMAGES[position], ThemeStore.getSelectColor());
+        Theme.TintDrawable(holder.mImg, IMAGES[position], ThemeStore.getAccentColor());
 
         holder.mText.setText(titleRes);
         holder.mText.setTextColor(ThemeUtil.resolveColor(mContext,R.attr.text_color_primary));
@@ -55,9 +55,9 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
         holder.mRoot.setSelected(mSelectIndex == position);
         holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(
                 mContext,
-                Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getSelectColor()),
-                Theme.getShape(GradientDrawable.RECTANGLE, ThemeUtil.resolveColor(mContext,R.attr.background_color_main)),
-                ThemeUtil.resolveColor(mContext,R.attr.ripple_color)));
+                Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerEffectColor()),
+                Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerDefaultColor()),
+                ThemeStore.getDrawerEffectColor()));
     }
 
     @Override

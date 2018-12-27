@@ -199,7 +199,7 @@ public final class ToolbarContentTintHelper {
     @CheckResult
     @ColorInt
     public static int toolbarContentColor(@NonNull Context context, @ColorInt int toolbarColor) {
-        if (ColorUtil.isColorLight(toolbarColor)) {
+        if (ColorUtil.isColorCloseToWhite(toolbarColor)) {
             return toolbarSubtitleColor(context, toolbarColor);
         }
         return toolbarTitleColor(context, toolbarColor);
@@ -208,7 +208,7 @@ public final class ToolbarContentTintHelper {
     @CheckResult
     @ColorInt
     public static int toolbarSubtitleColor(@NonNull Context context, @ColorInt int toolbarColor) {
-        if (ColorUtil.isColorLight(toolbarColor)) {
+        if (ColorUtil.isColorCloseToWhite(toolbarColor)) {
             return ContextCompat.getColor(context, R.color.secondary_text_default_material_light);
         }
         return ContextCompat.getColor(context, R.color.secondary_text_default_material_dark);
@@ -217,7 +217,7 @@ public final class ToolbarContentTintHelper {
     @CheckResult
     @ColorInt
     public static int toolbarTitleColor(@NonNull Context context, @ColorInt int toolbarColor) {
-        if (ColorUtil.isColorLight(toolbarColor)) {
+        if (ColorUtil.isColorCloseToWhite(toolbarColor)) {
             return ContextCompat.getColor(context, R.color.primary_text_default_material_light);
         }
         return ContextCompat.getColor(context, R.color.primary_text_default_material_dark);
@@ -299,7 +299,7 @@ public final class ToolbarContentTintHelper {
                                 Field radioButtonField = ListMenuItemView.class.getDeclaredField("mRadioButton");
                                 radioButtonField.setAccessible(true);
 
-                                final boolean isDark = !ColorUtil.isColorLight(ThemeUtil.resolveColor(context, android.R.attr.windowBackground));
+                                final boolean isDark = !ColorUtil.isColorCloseToWhite(ThemeUtil.resolveColor(context, android.R.attr.windowBackground));
 
                                 for (int i = 0; i < listView.getChildCount(); i++) {
                                     View v = listView.getChildAt(i);

@@ -74,8 +74,7 @@
         android:id="@+id/navigation_view"
         android:layout_width="@dimen/d264_size"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="?attr/background_color_main">
+        android:layout_gravity="start">
 
         <LinearLayout
             android:id="@+id/navigation_header_container"

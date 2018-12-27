@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -434,7 +435,7 @@ public class MainActivity extends MenuActivity {
     //初始化custontab
     private void setUpTab() {
         //添加tab选项卡
-        boolean isLightColor = ThemeStore.isMDColorLight();
+        boolean isPrimaryColorCloseToWhite = ThemeStore.isMDColorCloseToWhite();
 //        mTablayout = new TabLayout(new ContextThemeWrapper(this, !ColorUtil.isColorLight(ThemeStore.getMaterialPrimaryColor()) ? R.style.CustomTabLayout_Light : R.style.CustomTabLayout_Dark));
 //        mTablayout = new TabLayout(new ContextThemeWrapper(this,R.style.CustomTabLayout_Light));
 //        mTablayout.setLayoutParams(new AppBarLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,DensityUtil.dip2px(this,48)));
@@ -447,11 +448,11 @@ public class MainActivity extends MenuActivity {
         mTablayout.addTab(mTablayout.newTab().setText(R.string.tab_folder));
         //viewpager与tablayout关联
         mTablayout.setupWithViewPager(mViewPager);
-        mTablayout.setSelectedTabIndicatorColor(ThemeStore.getAccentColor());
+        mTablayout.setSelectedTabIndicatorColor(isPrimaryColorCloseToWhite ? Color.BLACK : Color.WHITE);
 //        mTablayout.setSelectedTabIndicatorColor(ColorUtil.getColor(isLightColor ? R.color.black : R.color.white));
         mTablayout.setSelectedTabIndicatorHeight(DensityUtil.dip2px(this, 3));
-        mTablayout.setTabTextColors(ColorUtil.getColor(isLightColor ? R.color.dark_normal_tab_text_color : R.color.light_normal_tab_text_color),
-                ColorUtil.getColor(isLightColor ? R.color.black : R.color.white));
+        mTablayout.setTabTextColors(ColorUtil.getColor(isPrimaryColorCloseToWhite ? R.color.dark_normal_tab_text_color : R.color.light_normal_tab_text_color),
+                ColorUtil.getColor(isPrimaryColorCloseToWhite ? R.color.black : R.color.white));
     }
 
 
@@ -520,12 +521,15 @@ public class MainActivity extends MenuActivity {
     private void setUpViewColor() {
         //正在播放文字的背景
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(ThemeStore.getDrawerEffectColor());
+        final int primaryColor = ThemeStore.getMaterialPrimaryColor();
+
+        bg.setColor(ColorUtil.darkenColor(primaryColor));
         bg.setCornerRadius(DensityUtil.dip2px(this, 4));
         mHeadText.setBackground(bg);
         mHeadText.setTextColor(getMaterialPrimaryColorReverse());
         //抽屉
-        mHeadRoot.setBackgroundColor(getMaterialPrimaryColor());
+        mHeadRoot.setBackgroundColor(primaryColor);
+        mNavigationView.setBackgroundColor(ThemeStore.getDrawerDefaultColor());
 
         //这种图片不知道该怎么着色 暂时先这样处理
         mAddButton.setBackground(Theme.TintDrawable(R.drawable.bg_playlist_add,

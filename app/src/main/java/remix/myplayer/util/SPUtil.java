@@ -112,8 +112,6 @@ public class SPUtil {
         String FLOAT_TEXT_SIZE = "float_text_size";
         //桌面歌词y坐标
         String FLOAT_Y = "float_y";
-        //桌面歌词的字体颜色
-        String FLOAT_TEXT_COLOR = "float_text_color";
         //是否开启屏幕常亮
         String SCREEN_ALWAYS_ON = "key_screen_always_on";
         //通知栏是否启用经典样式

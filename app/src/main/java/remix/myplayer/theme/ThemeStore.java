@@ -27,19 +27,19 @@ public class ThemeStore {
     private static final String KEY_PRIMARY_COLOR = "primary_color";
     private static final String KEY_PRIMARY_DARK_COLOR = "primary_dark_color";
     private static final String KEY_ACCENT_COLOR = "accent_color";
+    private static final String KEY_FLOAT_LYRIC_TEXT_COLOR = "float_lyric_text_color";
 
     public static int STATUS_BAR_ALPHA = 150;
 
     public static boolean IMMERSIVE_MODE = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.IMMERSIVE_MODE, false);
 
 
-
-    public static void setGeneralTheme(int pos){
-        SPUtil.putValue(App.getContext(),NAME,KEY_THEME,
+    public static void setGeneralTheme(int pos) {
+        SPUtil.putValue(App.getContext(), NAME, KEY_THEME,
                 pos == 0 ? LIGHT : pos == 1 ? DARK : BLACK);
     }
 
-    public static String getThemeText(){
+    public static String getThemeText() {
         String theme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
         switch (theme) {
             case LIGHT:
@@ -68,9 +68,9 @@ public class ThemeStore {
         }
     }
 
-    public static void saveMaterialPrimaryColor(@ColorInt int color){
-        SPUtil.putValue(App.getContext(),NAME,KEY_PRIMARY_COLOR,color);
-        SPUtil.putValue(App.getContext(),NAME,KEY_PRIMARY_DARK_COLOR,ColorUtil.darkenColor(color));
+    public static void saveMaterialPrimaryColor(@ColorInt int color) {
+        SPUtil.putValue(App.getContext(), NAME, KEY_PRIMARY_COLOR, color);
+        SPUtil.putValue(App.getContext(), NAME, KEY_PRIMARY_DARK_COLOR, ColorUtil.darkenColor(color));
     }
 
     @ColorInt
@@ -80,14 +80,15 @@ public class ThemeStore {
 
     @ColorInt
     public static int getMaterialPrimaryDarkColor() {
-        return SPUtil.getValue(App.getContext(), NAME, KEY_PRIMARY_DARK_COLOR, Color.parseColor("#5c7ee4"));
+//        return SPUtil.getValue(App.getContext(), NAME, KEY_PRIMARY_DARK_COLOR, Color.parseColor("#5c7ee4"));
+        return ColorUtil.darkenColor(getMaterialPrimaryColor());
     }
 
     @ColorInt
     public static int getAccentColor() {
         //纯白需要处理下
         int accentColor = SPUtil.getValue(App.getContext(), NAME, KEY_ACCENT_COLOR, Color.parseColor("#ffb61e"));
-        if(ColorUtil.isColorLight(accentColor)){
+        if (ColorUtil.isColorCloseToWhite(accentColor)) {
             accentColor = ColorUtil.getColor(R.color.accent_gray_color);
         }
         return accentColor;
@@ -98,8 +99,8 @@ public class ThemeStore {
 //        return SPUtil.getValue(App.getContext(), NAME, KEY_ACCENT_COLOR, Color.parseColor("#ffb61e"));
 //    }
 
-    public static void saveAccentColor(@ColorInt int color){
-        SPUtil.putValue(App.getContext(),NAME,KEY_ACCENT_COLOR,color);
+    public static void saveAccentColor(@ColorInt int color) {
+        SPUtil.putValue(App.getContext(), NAME, KEY_ACCENT_COLOR, color);
     }
 
     @ColorInt
@@ -118,12 +119,12 @@ public class ThemeStore {
     }
 
     @ColorInt
-    public static int getMaterialPrimaryColorReverse(){
+    public static int getMaterialPrimaryColorReverse() {
         return ColorUtil.getColor(!isMDColorLight() ? R.color.white : R.color.black);
     }
 
     @ColorInt
-    public static int getTextColorprimaryReverse(){
+    public static int getTextColorprimaryReverse() {
         return ColorUtil.getColor(!isMDColorLight() ? R.color.dark_text_color_primary : R.color.light_text_color_primary);
     }
 
@@ -134,12 +135,12 @@ public class ThemeStore {
 
     @ColorInt
     public static int getBackgroundColorMain(Context context) {
-        return ThemeUtil.resolveColor(context,R.attr.background_color_main);
+        return ThemeUtil.resolveColor(context, R.attr.background_color_main);
     }
 
     @ColorInt
     public static int getBackgroundColorDialog(Context context) {
-        return ThemeUtil.resolveColor(context,R.attr.background_color_dialog);
+        return ThemeUtil.resolveColor(context, R.attr.background_color_dialog);
     }
 
     @ColorInt
@@ -158,37 +159,37 @@ public class ThemeStore {
     }
 
     @ColorInt
-    public static int getPlayerBtnColor(){
+    public static int getPlayerBtnColor() {
         return Color.parseColor(isLightTheme() ? "#6c6a6c" : "#6b6b6b");
     }
 
     @ColorInt
-    public static int getPlayerTitleColor(){
+    public static int getPlayerTitleColor() {
         return Color.parseColor(isLightTheme() ? "#333333" : "#e5e5e5");
     }
 
     @ColorInt
-    public static int getPlayerProgressColor(){
+    public static int getPlayerProgressColor() {
         return Color.parseColor(isLightTheme() ? "#efeeed" : "#343438");
     }
 
     @ColorInt
-    public static int getBottomBarBtnColor(){
+    public static int getBottomBarBtnColor() {
         return Color.parseColor(isLightTheme() ? "#323334" : "#ffffff");
     }
 
     @ColorInt
-    public static int getLibraryBtnColor(){
+    public static int getLibraryBtnColor() {
         return Color.parseColor(isLightTheme() ? "#6c6a6c" : "#ffffff");
     }
 
     @ColorInt
-    public static int getPlayerNextSongBgColor(){
+    public static int getPlayerNextSongBgColor() {
         return Color.parseColor(isLightTheme() ? "#fafafa" : "#343438");
     }
 
     @ColorInt
-    public static int getPlayerNextSongTextColor(){
+    public static int getPlayerNextSongTextColor() {
         return Color.parseColor(isLightTheme() ? "#a8a8a8" : "#e5e5e5");
     }
 
@@ -202,15 +203,25 @@ public class ThemeStore {
         return isLightTheme() ? R.drawable.artist_empty_bg_day : R.drawable.artist_empty_bg_night;
     }
 
-
     @ColorInt
     public static int getDrawerEffectColor() {
-        return ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.drawer_effect_light : R.color.drawer_effect_dark);
+        return ColorUtil.getColor(isLightTheme() ? R.color.drawer_effect_light :
+                isBlackTheme() ? R.color.drawer_effect_black : R.color.drawer_effect_dark);
     }
 
     @ColorInt
     public static int getDrawerDefaultColor() {
-        return ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.drawer_default_light : R.color.drawer_default_dark);
+        return ColorUtil.getColor(isLightTheme() ? R.color.drawer_default_light :
+                 isBlackTheme() ? R.color.drawer_default_black : R.color.drawer_default_dark);
+    }
+
+    @ColorInt
+    public static int getFloatLyricTextColor() {
+        return SPUtil.getValue(App.getContext(), NAME, KEY_FLOAT_LYRIC_TEXT_COLOR, getMaterialPrimaryColor());
+    }
+
+    public static void saveFloatLyricTextColor(@ColorInt int color) {
+        SPUtil.putValue(App.getContext(), NAME, KEY_FLOAT_LYRIC_TEXT_COLOR, color);
     }
 
     public static com.afollestad.materialdialogs.Theme getMDDialogTheme() {
@@ -221,8 +232,16 @@ public class ThemeStore {
         return ColorUtil.isColorLight(getMaterialPrimaryColor());
     }
 
+    public static boolean isMDColorCloseToWhite() {
+        return ColorUtil.isColorCloseToWhite(getMaterialPrimaryColor());
+    }
+
     public static boolean isLightTheme() {
         return getThemeRes() == R.style.Theme_APlayer;
+    }
+
+    public static boolean isBlackTheme(){
+        return getThemeRes() == R.style.Theme_APlayer_Black;
     }
 
 }

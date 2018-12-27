@@ -177,6 +177,10 @@ public class ColorUtil {
         return new Palette.Swatch(Color.GRAY, 100);
     }
 
+    public static boolean isColorCloseToWhite(@ColorInt int color) {
+        return StatusBarUtil.MeizuStatusbar.toGrey(color) >= 254;
+    }
+
     private static class SwatchComparator implements Comparator<Palette.Swatch> {
         private static SwatchComparator sInstance;
 

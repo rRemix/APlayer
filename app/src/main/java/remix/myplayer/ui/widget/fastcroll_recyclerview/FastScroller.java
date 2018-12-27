@@ -514,9 +514,6 @@ public class FastScroller extends LinearLayout {
             }
         }
 
-        setBubbleTextColor(ThemeStore.isMDColorLight()
-                ? ColorUtil.getColor(R.color.white)
-                : ThemeStore.getTextColorPrimary());
         setTrackColor(trackColor);
         setHandleColor(handleColor);
         setBubbleColor(bubbleColor);

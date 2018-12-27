@@ -3,6 +3,7 @@ package remix.myplayer.theme
 import android.content.Context
 import android.support.annotation.AttrRes
 import remix.myplayer.util.ColorUtil
+import remix.myplayer.util.StatusBarUtil
 
 object ThemeUtil {
 

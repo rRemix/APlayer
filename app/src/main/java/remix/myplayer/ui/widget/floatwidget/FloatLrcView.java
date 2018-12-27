@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.MotionEvent;
@@ -30,9 +31,12 @@ import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.lyric.bean.LyricRowWrapper;
+import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.FloatColorAdapter;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.SPUtil;
@@ -40,6 +44,7 @@ import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
 import static remix.myplayer.service.MusicService.EXTRA_FLOAT_LYRIC;
+import static remix.myplayer.ui.adapter.FloatColorAdapter.COLORS;
 
 
 /**
@@ -129,36 +134,33 @@ public class FloatLrcView extends RelativeLayout {
         mColorRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
-                //todo
-//                mColorRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-//                mColorAdapter = new FloatColorAdapter(mService, R.layout.item_float_lrc_color, mColorRecyclerView.getMeasuredWidth());
-//                mColorAdapter.setData(ThemeStore.getAllThemeColor());
-//                mColorAdapter.setOnItemClickListener(new OnItemClickListener() {
-//                    @Override
-//                    public void onItemClick(View view, int position) {
-//                        final int themeColor = ThemeStore.getAllThemeColor().get(position);
-//                        mText1.setTextColor(ThemeStore.getThemeColorInt(themeColor));
-//                        mColorAdapter.setCurrentColor(themeColor);
-//                        mColorAdapter.notifyDataSetChanged();
-//                        resetHide();
-//                    }
-//
-//                    @Override
-//                    public void onItemLongClick(View view, int position) {
-//
-//                    }
-//                });
-//                mColorRecyclerView.setLayoutManager(new LinearLayoutManager(mService, LinearLayoutManager.HORIZONTAL, false));
-//                mColorRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-//                mColorRecyclerView.setAdapter(mColorAdapter);
+                mColorRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
+                mColorAdapter = new FloatColorAdapter(mService, R.layout.item_float_lrc_color, mColorRecyclerView.getMeasuredWidth());
+                mColorAdapter.setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        final int color = ColorUtil.getColor(COLORS.get(position));
+                        mText1.setTextColor(color);
+                        mColorAdapter.setCurrentColor(color);
+                        mColorAdapter.notifyDataSetChanged();
+                        resetHide();
+                    }
+
+                    @Override
+                    public void onItemLongClick(View view, int position) {
+
+                    }
+                });
+                mColorRecyclerView.setLayoutManager(new LinearLayoutManager(mService, LinearLayoutManager.HORIZONTAL, false));
+                mColorRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+                mColorRecyclerView.setAdapter(mColorAdapter);
                 return true;
             }
         });
     }
 
     private void setUpView() {
-        //todo
-//        mText1.setTextColor(ThemeStore.getThemeColorInt(SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_COLOR, ThemeStore.getThemeColor())));
+        mText1.setTextColor(ThemeStore.getFloatLyricTextColor());
         mText1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
         mText2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
         mIsLock = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_LOCK, false);

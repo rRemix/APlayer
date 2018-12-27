@@ -84,6 +84,31 @@
     <!--侧滑菜单-->
     <color name="drawer_effect_light">#f5f5f5</color>
     <color name="drawer_effect_dark">#3d3d42</color>
+    <color name="drawer_effect_black">#3d3d42</color>
     <color name="drawer_default_light">#ffffff</color>
     <color name="drawer_default_dark">#343438</color>
+    <color name="drawer_default_black">@color/black_background_color_main</color>
+
+
+    <color name="md_red_primary">#c91f37</color>
+
+    <color name="md_brown_primary">#7d6b5d</color>
+
+    <color name="md_navy_primary">#3a6960</color>
+
+    <color name="md_green_primary">#007b43</color>
+
+    <color name="md_yellow_primary">#ffb61e</color>
+
+    <color name="md_purple_primary">#5d3f6a</color>
+
+    <color name="md_indigo_primary">#6967ab</color>
+
+    <color name="md_plum_primary">#db5a6b</color>
+
+    <color name="md_blue_primary">#698CF6</color>
+
+    <color name="md_white_primary">#fefefe</color>
+
+    <color name="md_pink_primary">#fa7299</color>
 </resources>

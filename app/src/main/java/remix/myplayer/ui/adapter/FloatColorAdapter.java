@@ -1,6 +1,9 @@
 package remix.myplayer.ui.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,11 +11,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import java.util.Arrays;
+import java.util.List;
+
 import butterknife.BindView;
 import remix.myplayer.R;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.SPUtil;
 
 /**
  * Created by Remix on 2017/8/15.
@@ -23,14 +31,22 @@ public class FloatColorAdapter extends BaseAdapter<Integer, FloatColorAdapter.Fl
     private int mCurrentColor;
     private int mItemWidth;
 
+    public static final List<Integer> COLORS = Arrays.asList(
+            R.color.md_red_primary, R.color.md_brown_primary, R.color.md_navy_primary,
+            R.color.md_green_primary, R.color.md_yellow_primary, R.color.md_purple_primary,
+            R.color.md_indigo_primary, R.color.md_plum_primary, R.color.md_blue_primary,
+            R.color.md_white_primary, R.color.md_pink_primary
+    );
+
     public FloatColorAdapter(Context Context, int layoutId, int width) {
         super(Context, layoutId);
-        //todo
-//        mCurrentColor = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_COLOR, ThemeStore.getThemeColor());
-//        mItemWidth = width / ThemeStore.getAllThemeColor().size();
-//        //宽度太小
-//        if (mItemWidth < DensityUtil.dip2px(mContext, 20))
-//            mItemWidth = DensityUtil.dip2px(mContext, 20);
+        setData(COLORS);
+        mItemWidth = width / COLORS.size();
+        //宽度太小
+        if (mItemWidth < DensityUtil.dip2px(mContext, 20))
+            mItemWidth = DensityUtil.dip2px(mContext, 20);
+        mCurrentColor = ThemeStore.getFloatLyricTextColor();
+
     }
 
     /**
@@ -43,12 +59,13 @@ public class FloatColorAdapter extends BaseAdapter<Integer, FloatColorAdapter.Fl
         return color == mCurrentColor;
     }
 
-    public void setCurrentColor(int theme) {
-        mCurrentColor = theme;
-        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_COLOR, mCurrentColor);
+    public void setCurrentColor(int color) {
+        mCurrentColor = color;
+        ThemeStore.saveFloatLyricTextColor(color);
     }
 
 
+    @NonNull
     @Override
     public FloatColorHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         FloatColorHolder holder = new FloatColorHolder(LayoutInflater.from(mContext).inflate(R.layout.item_float_lrc_color, parent, false));
@@ -65,20 +82,25 @@ public class FloatColorAdapter extends BaseAdapter<Integer, FloatColorAdapter.Fl
 
 
     @Override
-    protected void convert(FloatColorHolder holder, Integer integer, final int position) {
-        //todo
-//        if (isColorChoose(integer)) {
-//            holder.mColor.setBackground(Theme.getShape(GradientDrawable.OVAL, ThemeStore.getThemeColorInt(integer), 0, DensityUtil.dip2px(mContext, 1), Color.BLACK,
-//                    DensityUtil.dip2px(mContext, 18), DensityUtil.dip2px(mContext, 18), 1));
-//        } else {
-//            holder.mColor.setBackground(Theme.getShape(GradientDrawable.OVAL, ThemeStore.getThemeColorInt(integer), DensityUtil.dip2px(mContext, 18), DensityUtil.dip2px(mContext, 18)));
-//        }
-//        holder.mRoot.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mOnItemClickListener.onItemClick(v, position);
-//            }
-//        });
+    protected void convert(FloatColorHolder holder, Integer colorRes, final int position) {
+        final int color = ColorUtil.getColor(colorRes);
+        if (isColorChoose(colorRes)) {
+            holder.mColor.setBackground(
+                    Theme.getShape(GradientDrawable.OVAL,
+                            color,
+                            0,
+                            DensityUtil.dip2px(mContext, 1),
+                            Color.BLACK,
+                            DensityUtil.dip2px(mContext, 18),
+                            DensityUtil.dip2px(mContext, 18), 1));
+        } else {
+            holder.mColor.setBackground(
+                    Theme.getShape(GradientDrawable.OVAL,
+                            color,
+                            DensityUtil.dip2px(mContext, 18),
+                            DensityUtil.dip2px(mContext, 18)));
+        }
+        holder.mRoot.setOnClickListener(v -> mOnItemClickListener.onItemClick(v, position));
     }
 
     static class FloatColorHolder extends BaseViewHolder {
