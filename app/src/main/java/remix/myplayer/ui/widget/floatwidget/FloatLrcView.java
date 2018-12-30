@@ -126,7 +126,7 @@ public class FloatLrcView extends RelativeLayout {
         mNotify = new UnLockNotify();
         mWindowManager = (WindowManager) mService.getSystemService(Context.WINDOW_SERVICE);
 
-        ButterKnife.bind(this, inflate(mService, R.layout.layout_floatwidget, this));
+        ButterKnife.bind(this, inflate(mService, R.layout.layout_float_lyric, this));
         setUpView();
     }
 

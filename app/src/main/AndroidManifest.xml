@@ -111,9 +111,6 @@
             android:name=".ui.activity.RecentlyActivity"
             android:theme="@style/ActivityStyle" />
         <!-- 反馈 -->
-        <activity
-            android:name=".ui.activity.FeedBackActivity"
-            android:theme="@style/ActivityStyle" />
         <!-- 扫描大小设置 -->
         <activity
             android:name=".ui.activity.ScanActivity"

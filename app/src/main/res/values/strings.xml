@@ -66,7 +66,7 @@
     <string name="cancel_success">Cancel success</string>
     <string name="play_random">Shuffle all</string>
     <string name="scan_tip">The audio file that is larger than this setting will appear in the song library</string>
-    <string name="search_song_artist_album">Search song artist album</string>
+    <string name="search_hint">Search song artist album</string>
     <string name="no_search_result">No result</string>
     <string name="create_playlist">Create playlist...</string>
     <string name="use_system_color">Use the system background color</string>
@@ -90,7 +90,7 @@
     <string name="save_error_arg">Save failed: %s</string>
     <string name="arg_illegal">Parameter illegal: %d</string>
     <string name="send_success">Sent successfully.Thanks to your feedback!</string>
-    <string name="send_error">Sent failed.Please try again!</string>
+    <string name="send_error">Sent failed: %s</string>
     <string name="screenshot_save_at">The screenshot has been saved to %s</string>
     <string name="not_install_weibo">You haven\'t installed Weibo </string>
     <string name="create_dir_error">Create folder failed</string>
@@ -379,4 +379,6 @@
     <string name="md_cancel_label">Cancel</string>
     <string name="md_custom_label">Custom</string>
     <string name="md_presets_label">Presets</string>
+
+    <string name="not_found_email">Not found email</string>
 </resources>

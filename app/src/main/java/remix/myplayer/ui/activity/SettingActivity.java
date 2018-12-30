@@ -3,7 +3,8 @@ package remix.myplayer.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
@@ -14,7 +15,6 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -28,7 +28,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
-import java.sql.RowId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +42,7 @@ import io.reactivex.disposables.Disposable;
 import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.Category;
-import remix.myplayer.bean.mp3.ColorChoose;
+import remix.myplayer.bean.misc.Feedback;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.ShakeDetector;
@@ -64,7 +63,6 @@ import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.FolderChooserDialog;
 import remix.myplayer.ui.dialog.LyricPriorityDialog;
 import remix.myplayer.ui.dialog.color.ColorChooserDialog;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.MusicUtil;
@@ -521,7 +519,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //意见与反馈
             case R.id.setting_feedback_container:
-                startActivity(new Intent(this, FeedBackActivity.class));
+                gotoEmail();
                 break;
             //关于我们
             case R.id.setting_about_container:
@@ -585,6 +583,36 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             case R.id.setting_general_theme_container:
                 configGeneralTheme();
                 break;
+        }
+    }
+
+    private void gotoEmail() {
+        try {
+
+            PackageManager pm = getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES);
+            Feedback feedBack = new Feedback(
+                    pi.versionName,
+                    pi.versionCode + "",
+                    Build.DISPLAY,
+                    Build.CPU_ABI + "," + Build.CPU_ABI2,
+                    Build.MANUFACTURER,
+                    Build.MODEL,
+                    Build.VERSION.RELEASE,
+                    Build.VERSION.SDK_INT + ""
+            );
+            Intent data = new Intent(Intent.ACTION_SENDTO);
+            data.setData(Uri.parse(!IS_GOOGLEPLAY ? "mailto:568920427@qq.com" : "mailto:rRemix.me@gmail.com"));
+            data.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback));
+            data.putExtra(Intent.EXTRA_TEXT, "\n\n\n" + feedBack);
+            if (Util.isIntentAvailable(this, data)) {
+                startActivity(data);
+            } else {
+                ToastUtil.show(this, R.string.not_found_email);
+            }
+
+        } catch (Exception e) {
+            ToastUtil.show(this, R.string.send_error,e.toString());
         }
     }
 

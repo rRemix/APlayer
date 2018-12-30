@@ -132,7 +132,7 @@ abstract class MenuActivity : ToolbarActivity() {
         }
     }
 
-    private fun tintMenuIcon(menu: Menu) {
+    protected fun tintMenuIcon(menu: Menu) {
         ToolbarContentTintHelper.handleOnCreateOptionsMenu(this, toolbar, menu, getToolbarBackgroundColor(toolbar))
     }
 

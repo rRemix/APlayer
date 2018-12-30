@@ -5,7 +5,6 @@ package remix.myplayer.bean.misc;
  */
 
 public class Feedback {
-    public String Content;
     public String AppVersion;
     public String AppVersionCode;
     public String CpuABI;
@@ -14,12 +13,9 @@ public class Feedback {
     public String ReleaseVersion;
     public String SdkVersion;
     public String Display;
-    public String Contact;
 
-    public Feedback(String content, String contact, String appVersion, String appVersionCode, String display, String cpuABI, String deviceManufacturer, String deviceModel, String releaseVersion, String sdkVersion) {
+    public Feedback(String appVersion, String appVersionCode, String display, String cpuABI, String deviceManufacturer, String deviceModel, String releaseVersion, String sdkVersion) {
         super();
-        Content = content;
-        Contact = contact;
         AppVersion = appVersion;
         AppVersionCode = appVersionCode;
         Display = display;
@@ -42,25 +38,9 @@ public class Feedback {
                 "DeviceModel: " + DeviceModel + '\n' +
                 "ReleaseVersion: " + ReleaseVersion + '\n' +
                 "SdkVersion= : " + SdkVersion + '\n' +
-                "Display: " + Display + '\n' +
-                "Contact: " + Contact + '\n';
+                "Display: " + Display + '\n';
     }
 
-    public String getContent() {
-        return Content;
-    }
-
-    public void setContent(String content) {
-        Content = content;
-    }
-
-    public String getContact() {
-        return Contact;
-    }
-
-    public void setContact(String contact) {
-        Contact = contact;
-    }
 
     public String getAppVersion() {
         return AppVersion;

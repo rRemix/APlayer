@@ -124,7 +124,7 @@ public class ThemeStore {
     }
 
     @ColorInt
-    public static int getTextColorprimaryReverse() {
+    public static int getTextColorPrimaryReverse() {
         return ColorUtil.getColor(!isMDColorLight() ? R.color.dark_text_color_primary : R.color.light_text_color_primary);
     }
 

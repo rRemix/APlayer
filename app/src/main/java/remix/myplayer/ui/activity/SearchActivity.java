@@ -3,18 +3,22 @@ package remix.myplayer.ui.activity;
 import android.content.Context;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +33,6 @@ import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.ui.adapter.SearchAdapter;
-import remix.myplayer.ui.widget.SearchToolBar;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -46,14 +49,14 @@ import static remix.myplayer.util.Util.sendLocalBroadcast;
 /**
  * 搜索界面，根据关键字，搜索歌曲名，艺术家，专辑中的记录
  */
-public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
+public class SearchActivity extends LibraryActivity<Song, SearchAdapter> implements SearchView.OnQueryTextListener {
     //搜索的关键字
     private String mkey;
     //搜索结果的listview
     @BindView(R.id.search_result_native)
     RecyclerView mSearchResRecyclerView;
-    @BindView(R.id.toolbar)
-    SearchToolBar mSearchToolBar;
+    //    @BindView(R.id.search_view)
+//    SearchView mSearchView;
     //无搜索结果
     @BindView(R.id.search_result_blank)
     TextView mSearchResBlank;
@@ -67,26 +70,27 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
         ButterKnife.bind(this);
         setUpToolbar("");
 
-        mSearchToolBar.addSearchListener(new SearchToolBar.SearchListener() {
-            @Override
-            public void onSearch(String key, boolean isclick) {
-                if (!key.equals(mkey))
-                    search(key);
-            }
+//        mSearchView.setIconified(false);
 
-            @Override
-            public void onClear() {
-                //清空搜索结果，并更新界面
-                mAdapter.setData(null);
-                mkey = "";
-                UpdateUI();
-            }
-
-            @Override
-            public void onBack() {
-                finish();
-            }
-        });
+//        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String key) {
+//                if (!key.equals(mkey)){
+//                    search(key);
+//                    return true;
+//                }
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String key) {
+//                if (!key.equals(mkey)){
+//                    search(key);
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
 
         mAdapter = new SearchAdapter(this, R.layout.item_search_reulst);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
@@ -108,15 +112,62 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
         mSearchResRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mSearchResRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        UpdateUI();
+        updateUI();
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        final MenuItem searchItem = menu.findItem(R.id.search);
+        searchItem.expandActionView();
+
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setQueryHint(getString(R.string.search_hint));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
+        //去掉搜索图标
+        try {
+            Field mDrawable = SearchView.class.getDeclaredField("mSearchHintIcon");
+            mDrawable.setAccessible(true);
+            Drawable drawable = (Drawable) mDrawable.get(searchView);
+            drawable.setBounds(0, 0, 0, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                onBackPressed();
+                return false;
+            }
+        });
+
+        searchView.setQuery(mkey, false);
+        searchView.post(() -> searchView.setOnQueryTextListener(SearchActivity.this));
+
+        return true;
+    }
+
+
+    @Override
+    public int getMenuLayoutId() {
+        return R.menu.menu_search;
+    }
+
 
     @Override
     public void onLoadFinished(Loader<List<Song>> loader, List<Song> data) {
         super.onLoadFinished(loader, data);
         //更新界面
-        UpdateUI();
+        updateUI();
     }
 
     @Override
@@ -129,10 +180,6 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
         return LoaderIds.SEARCH_ACTIVITY;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return false;
-    }
 
     /**
      * 搜索歌曲名，专辑，艺术家中包含该关键的记录
@@ -142,6 +189,24 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
     private void search(String key) {
         mkey = key;
         getLoaderManager().restartLoader(LoaderIds.SEARCH_ACTIVITY, null, this);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String key) {
+        if (!key.equals(mkey)) {
+            search(key);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String key) {
+        if (!key.equals(mkey)) {
+            search(key);
+            return true;
+        }
+        return false;
     }
 
 
@@ -185,7 +250,7 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> {
     /**
      * 更新界面
      */
-    private void UpdateUI() {
+    private void updateUI() {
         boolean flag = mAdapter.getDatas() != null && mAdapter.getDatas().size() > 0;
         mSearchResRecyclerView.setVisibility(flag ? View.VISIBLE : View.GONE);
         mSearchResBlank.setVisibility(flag ? View.GONE : View.VISIBLE);
