@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -17,6 +18,8 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.interfaces.OnSongChooseListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.theme.TintHelper;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
@@ -61,6 +64,7 @@ public class SongChooseAdaper extends BaseAdapter<Song, SongChooseAdaper.SongCho
         });
 
         final int audioId = song.getId();
+        TintHelper.setTint(holder.mCheck,ThemeStore.getAccentColor(),!ThemeStore.isLightTheme());
         holder.mCheck.setOnCheckedChangeListener(null);
         holder.mCheck.setChecked(mCheckSongIdList != null && mCheckSongIdList.contains(audioId));
         holder.mCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -75,7 +79,7 @@ public class SongChooseAdaper extends BaseAdapter<Song, SongChooseAdaper.SongCho
 
     static class SongChooseHolder extends BaseViewHolder {
         @BindView(R.id.checkbox)
-        AppCompatCheckBox mCheck;
+        CheckBox mCheck;
         @BindView(R.id.item_img)
         SimpleDraweeView mImage;
         @BindView(R.id.item_song)

@@ -31,7 +31,7 @@
                 android:id="@+id/widget_play"
                 android:layout_width="@dimen/float_button_size"
                 android:layout_height="@dimen/float_button_size"
-                android:background="@drawable/bg_common_borderless_ripple"
+                android:background="@drawable/bg_oval_ripple_light"
                 android:src="@drawable/widget_btn_play_normal"
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="@dimen/d40_size"
@@ -42,7 +42,7 @@
                 android:id="@+id/widget_next"
                 android:layout_width="@dimen/float_button_size"
                 android:layout_height="@dimen/float_button_size"
-                android:background="@drawable/bg_common_borderless_ripple"
+                android:background="@drawable/bg_oval_ripple_light"
                 android:src="@drawable/widget_btn_next_normal"
                 android:layout_toRightOf="@id/widget_play"
                 android:layout_centerVertical="true"/>
@@ -50,7 +50,7 @@
                 android:id="@+id/widget_prev"
                 android:layout_width="@dimen/float_button_size"
                 android:layout_height="@dimen/float_button_size"
-                android:background="@drawable/bg_common_borderless_ripple"
+                android:background="@drawable/bg_oval_ripple_light"
                 android:src="@drawable/widget_btn_previous_normal"
                 android:layout_toLeftOf="@id/widget_play"
                 android:layout_centerVertical="true"/>
@@ -58,7 +58,7 @@
                 android:id="@+id/widget_lock"
                 android:layout_width="@dimen/float_button_size"
                 android:layout_height="@dimen/float_button_size"
-                android:background="@drawable/bg_common_borderless_ripple"
+                android:background="@drawable/bg_oval_ripple_light"
                 android:src="@drawable/widget_btn_lock"
                 android:layout_alignParentLeft="true"
                 android:layout_marginTop="@dimen/float_image_margin"
@@ -68,7 +68,7 @@
                 android:id="@+id/widget_setting"
                 android:layout_width="@dimen/float_button_size"
                 android:layout_height="@dimen/float_button_size"
-                android:background="@drawable/bg_common_borderless_ripple"
+                android:background="@drawable/bg_oval_ripple_light"
                 android:src="@drawable/widget_btn_setting"
                 android:layout_alignParentRight="true"
                 android:layout_marginTop="@dimen/float_image_margin"
@@ -102,7 +102,7 @@
                     android:id="@+id/widget_lrc_smaller"
                     android:src="@drawable/widget_btn_lrc_small"
                     android:layout_alignParentRight="true"
-                    android:background="@drawable/bg_common_borderless_ripple"
+                    android:background="@drawable/bg_oval_ripple_light"
                     android:layout_centerVertical="true"/>
                 <ImageButton
                     android:layout_width="wrap_content"
@@ -112,7 +112,7 @@
                     android:layout_toLeftOf="@id/widget_lrc_smaller"
                     android:layout_marginRight="@dimen/d16_size"
                     android:layout_marginLeft="@dimen/d6_size"
-                    android:background="@drawable/bg_common_borderless_ripple"
+                    android:background="@drawable/bg_oval_ripple_light"
                     android:layout_centerVertical="true"/>
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/widget_color_recyclerview"
@@ -126,7 +126,7 @@
     <ImageButton
         android:layout_width="@dimen/float_button_size"
         android:layout_height="@dimen/float_button_size"
-        android:background="@drawable/bg_common_borderless_ripple"
+        android:background="@drawable/bg_oval_ripple_light"
         android:src="@drawable/widget_lrc_unlock"
         android:id="@+id/widget_unlock"
         android:visibility="gone"/>

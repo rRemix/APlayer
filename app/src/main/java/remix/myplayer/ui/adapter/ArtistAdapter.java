@@ -137,15 +137,6 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
-        //按钮点击效果
-        holder.mButton.setBackground(Theme.getPressDrawable(
-                mDefaultDrawable,
-                mSelectDrawable,
-                ThemeStore.getRippleColor(),
-                null,
-                null));
-
-
         holder.mButton.setOnClickListener(v -> {
             if (mChoice.isActive())
                 return;

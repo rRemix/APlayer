@@ -9,12 +9,11 @@
     <ImageButton
         android:layout_alignParentRight="true"
         android:id="@+id/song_item_button"
-        android:layout_width="@dimen/d60_size"
-        android:layout_height="match_parent"
+        android:layout_width="@dimen/item_list_btn_size"
+        android:layout_height="@dimen/item_list_btn_size"
         android:layout_centerVertical="true"
         android:scaleType="center"
-        android:src="@drawable/icon_player_more"
-        android:background="@color/transparent"/>
+        android:background="?attr/background_oval_ripple"/>
 
     <remix.myplayer.ui.widget.ColumnView
         android:layout_toLeftOf="@id/song_item_button"

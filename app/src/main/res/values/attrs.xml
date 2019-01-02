@@ -59,7 +59,8 @@
     <!--点击效果-->
     <attr name="background_grid" format="reference"/>
     <attr name="background_list" format="reference"/>
-    <attr name="background_common" format="reference"/>
+    <attr name="background_rect_ripple" format="reference"/>
+    <attr name="background_oval_ripple" format="reference"/>
 
     <!--默认专辑和艺术家封面-->
     <attr name="default_album" format="reference"/>

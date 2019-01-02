@@ -273,10 +273,7 @@ public class MainActivity extends MenuActivity {
                                             Toast.LENGTH_SHORT);
                                     if (newPlayListId > 0) {
                                         //跳转到添加歌曲界面
-                                        Intent intent = new Intent(mContext, SongChooseActivity.class);
-                                        intent.putExtra(EXTRA_ID, newPlayListId);
-                                        intent.putExtra(EXTRA_NAME, input.toString());
-                                        startActivity(intent);
+                                        SongChooseActivity.start(MainActivity.this,newPlayListId,input.toString());
                                     }
                                 }
                             } catch (Exception e) {

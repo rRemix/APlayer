@@ -121,10 +121,6 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
             holder.mText2.setText(album.getArtist());
         }
 
-        //背景点击效果
-//        holder.mContainer.setBackground(
-//                Theme.getPressAndSelectedStateListRippleDrawable(mMode, mContext));
-
         holder.mContainer.setOnClickListener(v -> {
             if (holder.getAdapterPosition() - 1 < 0) {
                 ToastUtil.show(mContext, R.string.illegal_arg);
@@ -145,14 +141,6 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         //着色
         int tintColor = ThemeStore.getLibraryBtnColor();
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
-
-        //点击效果
-        holder.mButton.setBackground(Theme.getPressDrawable(
-                mDefaultDrawable,
-                mSelectDrawable,
-                ThemeStore.getRippleColor(),
-                null,
-                null));
 
         holder.mButton.setOnClickListener(v -> {
             if (mChoice.isActive())

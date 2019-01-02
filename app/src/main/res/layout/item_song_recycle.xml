@@ -28,20 +28,19 @@
 
     <ImageButton
         android:id="@+id/song_button"
-        android:layout_width="60dp"
-        android:layout_height="0dp"
-        android:background="@color/transparent"
+        android:layout_width="@dimen/item_list_btn_size"
+        android:layout_height="@dimen/item_list_btn_size"
+        android:background="?attr/background_oval_ripple"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/icon_player_more" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/divider"
         android:layout_width="0dp"
         android:layout_height="@dimen/d1_size"
-        android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
         android:background="?attr/divider_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -105,10 +104,10 @@
     </android.support.constraint.ConstraintLayout>
 
     <remix.myplayer.ui.widget.ColumnView
-        android:visibility="gone"
+        android:id="@+id/song_columnview"
         android:layout_width="@dimen/d18_size"
         android:layout_height="@dimen/d16_size"
-        app:columnwidth="@dimen/d2_size"
+        android:visibility="gone"
         app:columnnum="4"
-        android:id="@+id/song_columnview" />
+        app:columnwidth="@dimen/d2_size" />
 </android.support.constraint.ConstraintLayout>

@@ -31,7 +31,7 @@
             android:id="@+id/offsetReduce"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_common_borderless_ripple"
+            android:background="@drawable/bg_oval_ripple_light"
             android:orientation="vertical"
             android:gravity="center"
             android:padding="12dp">
@@ -54,13 +54,13 @@
             android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
             android:src="@drawable/ic_lyric_reset"
-            android:background="@drawable/bg_common_borderless_ripple"/>
+            android:background="@drawable/bg_oval_ripple_light"/>
 
         <LinearLayout
             android:id="@+id/offsetAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_common_borderless_ripple"
+            android:background="@drawable/bg_oval_ripple_light"
             android:orientation="vertical"
             android:padding="12dp"
             android:gravity="center">

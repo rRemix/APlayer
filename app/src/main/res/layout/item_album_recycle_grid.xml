@@ -69,13 +69,12 @@
         </LinearLayout>
 
         <ImageButton
-            android:layout_width="@dimen/d40_size"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/item_list_btn_size"
+            android:layout_height="@dimen/item_list_btn_size"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:id="@+id/item_button"
-            android:src="@drawable/icon_player_more"
-            android:background="@color/transparent"/>
+            android:background="?attr/background_oval_ripple" />
     </RelativeLayout>
 
 

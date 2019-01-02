@@ -42,24 +42,8 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  */
 public class SearchAdapter extends BaseAdapter<Song, SearchAdapter.SearchResHolder> {
 
-    private final GradientDrawable mDefaultDrawable;
-    private final GradientDrawable mSelectDrawable;
-
     public SearchAdapter(Context context, int layoutId) {
         super(context, layoutId);
-        int size = DensityUtil.dip2px(mContext, 60);
-        mDefaultDrawable = new GradientDrawableMaker()
-                .shape(GradientDrawable.OVAL)
-                .color(Color.TRANSPARENT)
-                .width(size)
-                .height(size)
-                .make();
-        mSelectDrawable = new GradientDrawableMaker()
-                .shape(GradientDrawable.OVAL)
-                .color(ThemeStore.getSelectColor())
-                .width(size)
-                .height(size)
-                .make();
     }
 
     @Override
@@ -87,13 +71,6 @@ public class SearchAdapter extends BaseAdapter<Song, SearchAdapter.SearchResHold
         //设置按钮着色
         int tintColor = ThemeStore.getLibraryBtnColor();
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
-
-        //按钮点击效果
-        holder.mButton.setBackground(Theme.getPressDrawable(
-                mDefaultDrawable,
-                mSelectDrawable,
-                ThemeStore.getRippleColor(),
-                null, null));
 
         holder.mButton.setOnClickListener(v -> {
             Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());

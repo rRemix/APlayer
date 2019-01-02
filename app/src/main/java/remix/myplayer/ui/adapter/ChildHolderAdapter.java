@@ -57,18 +57,6 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
         super(context, layoutId, multiChoice, recyclerView);
         this.mType = type;
         this.mArg = arg;
-
-        int size = DensityUtil.dip2px(mContext, 60);
-        mDefaultDrawable = new GradientDrawableMaker()
-                .color(Color.TRANSPARENT)
-                .width(size)
-                .height(size)
-                .make();
-        mSelectDrawable = new GradientDrawableMaker()
-                .color(ThemeStore.getSelectColor())
-                .width(size)
-                .height(size)
-                .make();
     }
 
     @Override
@@ -87,8 +75,13 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
                 headerHolder.mRoot.setVisibility(View.GONE);
                 return;
             }
+
+            headerHolder.mShuffleIv.setImageDrawable(
+                    Theme.TintVectorDrawable(mContext, R.drawable.ic_shuffle_white_24dp, ThemeStore.getAccentColor())
+            );
+
             //显示当前排序方式
-            headerHolder.mShuffle.setOnClickListener(v -> {
+            headerHolder.mRoot.setOnClickListener(v -> {
                 //设置正在播放列表
                 ArrayList<Integer> ids = new ArrayList<>();
                 for (Song info : mDatas)
@@ -148,13 +141,6 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
                 int tintColor = ThemeStore.getLibraryBtnColor();
                 Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
-                //item点击效果
-                holder.mButton.setBackground(Theme.getPressDrawable(
-                        mDefaultDrawable,
-                        mSelectDrawable,
-                        ThemeStore.getRippleColor(),
-                        null, null));
-
                 holder.mButton.setOnClickListener(v -> {
                     if (mChoice.isActive())
                         return;
@@ -163,19 +149,9 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
                     popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(new SongPopupListener((AppCompatActivity) mContext, song, mType == Constants.PLAYLIST, mArg));
                     popupMenu.show();
-//                    Intent intent = new Intent(mContext, OptionDialog.class);
-//                    intent.putExtra("Song", song);
-//                    if (mType == Constants.PLAYLIST) {
-//                        intent.putExtra("IsDeletePlayList", true);
-//                        intent.putExtra("PlayListName", mArg);
-//                    }
-//                    mContext.startActivity(intent);
                 });
             }
         }
-
-        //背景点击效果
-//        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(HeaderAdapter.LIST_MODE, mContext));
 
         if (holder.mContainer != null && mOnItemClickListener != null) {
             holder.mContainer.setOnClickListener(v -> {

@@ -32,12 +32,11 @@
         android:layout_below="@+id/item_simpleiview_container">
         <ImageButton
             android:id="@+id/item_button"
-            android:layout_width="@dimen/d48_size"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/item_list_btn_size"
+            android:layout_height="@dimen/item_list_btn_size"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@color/transparent"
-            android:src="@drawable/icon_player_more" />
+            android:background="?attr/background_oval_ripple" />
 
         <TextView
             android:id="@+id/item_text1"

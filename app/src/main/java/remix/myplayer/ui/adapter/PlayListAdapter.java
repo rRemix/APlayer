@@ -123,7 +123,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
         Theme.TintDrawable(holder.mButton,
                 R.drawable.icon_player_more,
-                ThemeStore.getBottomBarBtnColor());
+                ThemeStore.getLibraryBtnColor());
 
         holder.mButton.setOnClickListener(v -> {
             if (mChoice.isActive())
@@ -135,31 +135,11 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
             popupMenu.show();
         });
 
-        //点击效果
-        holder.mButton.setBackground(Theme.getPressDrawable(
-                mDefaultDrawable,
-                mSelectDrawable,
-                ThemeStore.getRippleColor(),
-                null,
-                null));
-
-//        //背景点击效果
-//        holder.mContainer.setBackground(
-//                Theme.getPressAndSelectedStateListRippleDrawable(mMode, mContext));
-
         //是否处于选中状态
         holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
 
 
         setMarginForGridLayout(holder, position);
-//        //设置padding
-//        if (mMode == 2 && holder.mRoot != null) {
-//            if (position % 2 == 1) {
-//                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4));
-//            } else {
-//                holder.mRoot.setPadding(DensityUtil.dip2px(mContext, 3), DensityUtil.dip2px(mContext, 4), DensityUtil.dip2px(mContext, 6), DensityUtil.dip2px(mContext, 4));
-//            }
-//        }
     }
 
 

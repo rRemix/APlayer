@@ -68,20 +68,9 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
             holder.mImg.setImageDrawable(Theme.TintDrawable(mContext.getResources().getDrawable(R.drawable.icon_folder), ThemeStore.isLightTheme() ? Color.BLACK : Color.WHITE));
         }
 
-//        //背景点击效果
-//        holder.mContainer.setBackground(
-//                Theme.getPressAndSelectedStateListRippleDrawable(HeaderAdapter.LIST_MODE, mContext));
-
         if (holder.mButton != null) {
-            int tintColor = ThemeStore.getLibraryBtnColor();;
+            int tintColor = ThemeStore.getLibraryBtnColor();
             Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
-
-            //item点击效果
-            holder.mButton.setBackground(Theme.getPressDrawable(
-                    mDefaultDrawable,
-                    mSelectDrawable,
-                    ThemeStore.getRippleColor(),
-                    null, null));
 
             holder.mButton.setOnClickListener(v -> {
                 Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());

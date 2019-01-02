@@ -1,8 +1,11 @@
 package remix.myplayer.ui.activity;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +22,7 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.SongChooseAdaper;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -43,8 +47,19 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> 
     private String mPlayListName;
     @BindView(R.id.confirm)
     TextView mConfirm;
+    @BindView(R.id.cancel)
+    TextView mCancel;
+    @BindView(R.id.title)
+    TextView mTitle;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
+
+    public static void start(Activity activity,int playListId, String playListName){
+        Intent intent = new Intent(activity, SongChooseActivity.class);
+        intent.putExtra(EXTRA_ID, playListId);
+        intent.putExtra(EXTRA_NAME, playListName);
+        activity.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +87,13 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mConfirm.setAlpha(0.6f);
 
+        findViewById(R.id.header).setBackgroundColor(ThemeStore.getMaterialPrimaryColor());
+        ButterKnife.apply(new TextView[]{mConfirm,mCancel,mTitle}, new ButterKnife.Action<TextView>() {
+            @Override
+            public void apply(@NonNull TextView view, int index) {
+                view.setTextColor(ThemeStore.getTextColorPrimaryReverse());
+            }
+        });
     }
 
     @OnClick({R.id.confirm, R.id.cancel})

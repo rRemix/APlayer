@@ -13,12 +13,11 @@
 
     <ImageButton
         android:layout_alignParentRight="true"
-        android:layout_marginRight="@dimen/d18_size"
         android:id="@+id/folder_button"
-        android:layout_width="@dimen/d45_size"
-        android:layout_height="@dimen/d45_size"
-        android:layout_centerVertical="true"
-        android:src="@drawable/icon_player_more" />
+        android:layout_width="@dimen/item_list_btn_size"
+        android:layout_height="@dimen/item_list_btn_size"
+        android:background="?attr/background_oval_ripple"
+        android:layout_centerVertical="true" />
     <TextView
         android:layout_centerVertical="true"
         android:layout_width="wrap_content"

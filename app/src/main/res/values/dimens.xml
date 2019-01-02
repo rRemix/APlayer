@@ -126,4 +126,6 @@
     <dimen name="item_grid_text_container_height">58dp</dimen>
 
     <dimen name="md_colorchooser_circlesize">56dp</dimen>
+
+    <dimen name="item_list_btn_size">60dp</dimen>
 </resources>

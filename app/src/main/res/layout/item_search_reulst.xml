@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/item_height"
     android:id="@+id/reslist_item"
-    android:background="?attr/background_common">
+    android:background="?attr/background_rect_ripple">
     <com.facebook.drawee.view.SimpleDraweeView
         android:layout_alignParentLeft="true"
         android:id="@+id/search_image"
@@ -50,11 +50,10 @@
     <ImageButton
         android:layout_alignParentRight="true"
         android:id="@+id/search_button"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="@dimen/item_list_btn_size"
+        android:layout_height="@dimen/item_list_btn_size"
         android:layout_centerVertical="true"
-        android:src="@drawable/icon_player_more"
-        android:background="@color/transparent"/>
+        android:background="?attr/background_oval_ripple"/>
 
     <View
         android:layout_width="match_parent"

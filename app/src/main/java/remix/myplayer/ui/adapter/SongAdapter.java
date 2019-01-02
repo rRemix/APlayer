@@ -3,10 +3,6 @@ package remix.myplayer.ui.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.StateListDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -16,7 +12,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -37,16 +32,12 @@ import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.Command;
-import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.theme.TintHelper;
 import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.widget.ColumnView;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
-import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -71,20 +62,6 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
         super(context, layoutId, multiChoice, recyclerView);
         mType = type;
         mRecyclerView = recyclerView;
-
-        int size = DensityUtil.dip2px(mContext, 60);
-        mDefaultDrawable = new GradientDrawableMaker()
-                .shape(GradientDrawable.OVAL)
-                .color(Color.TRANSPARENT)
-                .width(size)
-                .height(size)
-                .make();
-        mSelectDrawable = new GradientDrawableMaker()
-                .shape(GradientDrawable.OVAL)
-                .color(ThemeStore.getSelectColor())
-                .width(size)
-                .height(size)
-                .make();
     }
 
     @Override
@@ -121,10 +98,10 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
             }
 
             headerHolder.mShuffleIv.setImageDrawable(
-                    Theme.TintVectorDrawable(mContext,R.drawable.ic_shuffle_white_24dp,ThemeStore.getAccentColor())
+                    Theme.TintVectorDrawable(mContext, R.drawable.ic_shuffle_white_24dp, ThemeStore.getAccentColor())
             );
 
-            headerHolder.mShuffle.setOnClickListener(v -> {
+            headerHolder.mRoot.setOnClickListener(v -> {
                 Intent intent = MusicUtil.makeCmdIntent(Command.NEXT, true);
                 if (mType == ALLSONG) {
                     List<Integer> allSong = MusicServiceRemote.getAllSong();
@@ -190,19 +167,9 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
         //艺术家与专辑
         holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
 
-//        //背景点击效果
-//        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(HeaderAdapter.LIST_MODE, mContext));
-
         //设置按钮着色
         int tintColor = ThemeStore.getLibraryBtnColor();
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
-
-        //按钮点击效果
-        holder.mButton.setBackground(Theme.getPressDrawable(
-                mDefaultDrawable,
-                mSelectDrawable,
-                ThemeStore.getRippleColor(),
-                null, null));
 
         holder.mButton.setOnClickListener(v -> {
             if (mChoice.isActive())
@@ -310,8 +277,6 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
         View mRoot;
         @BindView(R.id.divider)
         View mDivider;
-        @BindView(R.id.play_shuffle)
-        View mShuffle;
         @BindView(R.id.play_shuffle_button)
         ImageView mShuffleIv;
 

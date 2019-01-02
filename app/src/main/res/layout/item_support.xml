@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/d4_size"
-        android:foreground="?attr/background_common"
+        android:foreground="?attr/background_rect_ripple"
         app:cardBackgroundColor="?attr/background_color_main"
         app:contentPadding="@dimen/d16_size">
 
