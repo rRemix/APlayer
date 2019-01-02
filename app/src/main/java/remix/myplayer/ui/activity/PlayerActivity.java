@@ -78,6 +78,7 @@ import remix.myplayer.request.UriRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.base.BaseMusicActivity;
@@ -102,6 +103,7 @@ import remix.myplayer.util.Util;
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.service.MusicService.EXTRA_CONTROL;
 import static remix.myplayer.theme.ThemeStore.getAccentColor;
+import static remix.myplayer.theme.ThemeStore.getPlayerNextSongBgColor;
 import static remix.myplayer.theme.ThemeStore.getPlayerProgressColor;
 import static remix.myplayer.theme.ThemeStore.isLightTheme;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
@@ -559,7 +561,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
             //打开正在播放列表
             case R.id.playbar_playinglist:
                 PlayQueueDialog.newInstance()
-                        .show(getSupportFragmentManager(),PlayQueueDialog.class.getSimpleName());
+                        .show(getSupportFragmentManager(), PlayQueueDialog.class.getSimpleName());
                 break;
             //关闭
             case R.id.top_hide:
@@ -656,8 +658,19 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         mDotList.add(findViewById(R.id.guide_03));
         int width = DensityUtil.dip2px(this, 8);
         int height = DensityUtil.dip2px(this, 2);
-        mHighLightIndicator = Theme.getShape(GradientDrawable.RECTANGLE, getAccentColor(), width, height);
-        mNormalIndicator = Theme.getShape(GradientDrawable.RECTANGLE, ColorUtil.adjustAlpha(getAccentColor(), 0.3f), width, height);
+
+        mHighLightIndicator = new GradientDrawableMaker()
+                .width(width)
+                .height(height)
+                .color(getAccentColor())
+                .make();
+
+        mNormalIndicator = new GradientDrawableMaker()
+                .width(width)
+                .height(height)
+                .color(getAccentColor())
+                .alpha(0.3f)
+                .make();
         for (int i = 0; i < mDotList.size(); i++) {
             mDotList.get(i).setImageDrawable(mNormalIndicator);
         }
@@ -1090,9 +1103,28 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         setProgressDrawable(mVolumeSeekbar, accentColor);
         //修改thumb
         int inset = DensityUtil.dip2px(mContext, 6);
-        mProgressSeekBar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE, accentColor, DensityUtil.dip2px(this, 2), DensityUtil.dip2px(this, 6)), accentColor),
+
+        final int width = DensityUtil.dip2px(this, 2);
+        final int height = DensityUtil.dip2px(this, 6);
+
+        new GradientDrawableMaker()
+                .width(width)
+                .height(height)
+                .color(accentColor)
+                .make();
+
+        mProgressSeekBar.setThumb(new InsetDrawable(
+                new GradientDrawableMaker()
+                        .width(width)
+                        .height(height)
+                        .color(accentColor)
+                        .make(),
                 inset, inset, inset, inset));
-        mVolumeSeekbar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE, accentColor, DensityUtil.dip2px(this, 2), DensityUtil.dip2px(this, 6)), accentColor),
+        mVolumeSeekbar.setThumb(new InsetDrawable(new GradientDrawableMaker()
+                .width(width)
+                .height(height)
+                .color(accentColor)
+                .make(),
                 inset, inset, inset, inset));
 //        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
 //        Drawable seekbarBackground = mProgressSeekBar.getBackground();
@@ -1125,8 +1157,12 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
         mPlayPauseView.setBackgroundColor(accentColor);
         //下一首背景
-        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getPlayerNextSongBgColor(),
-                DensityUtil.dip2px(this, 2), 0, 0, DensityUtil.dip2px(this, 288), DensityUtil.dip2px(this, 38), 1));
+        mNextSong.setBackground(new GradientDrawableMaker()
+                .color(getPlayerNextSongBgColor())
+                .corner(DensityUtil.dip2px(2))
+                .width(DensityUtil.dip2px(288))
+                .height(DensityUtil.dip2px(38))
+                .make());
         mNextSong.setTextColor(ThemeStore.getPlayerNextSongTextColor());
 
     }

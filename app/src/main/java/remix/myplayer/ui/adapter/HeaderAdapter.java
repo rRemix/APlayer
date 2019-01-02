@@ -1,6 +1,9 @@
 package remix.myplayer.ui.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.VectorDrawable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.theme.TintHelper;
@@ -37,6 +41,10 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
 
     static final int TYPE_HEADER = 0;
     static final int TYPE_NORMAL = 1;
+
+    GradientDrawable mSelectDrawable;
+    GradientDrawable mDefaultDrawable;
+
     protected MultipleChoice mChoice;
     protected RecyclerView mRecyclerView;
 
@@ -53,6 +61,24 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
                                 null;
         //其他的列表都是List模式
         this.mMode = key != null ? SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, key, GRID_MODE) : LIST_MODE;
+
+        int size = DensityUtil.dip2px(mContext, 45);
+
+        mDefaultDrawable = new GradientDrawableMaker()
+//                .shape(mMode == LIST_MODE ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE)
+                .shape(GradientDrawable.RECTANGLE)
+                .color(Color.TRANSPARENT)
+                .width(size)
+                .height(size)
+                .make();
+
+        mSelectDrawable = new GradientDrawableMaker()
+//                .shape(mMode == LIST_MODE ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE)
+                .shape(GradientDrawable.RECTANGLE)
+                .color(ThemeStore.getSelectColor())
+                .width(size)
+                .height(size)
+                .make();
 
     }
 

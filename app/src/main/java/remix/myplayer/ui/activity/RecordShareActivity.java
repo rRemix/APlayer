@@ -38,6 +38,7 @@ import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.activity.base.BaseMusicActivity;
 import remix.myplayer.util.ColorUtil;
@@ -146,9 +147,21 @@ public class RecordShareActivity extends BaseMusicActivity {
         mContent.setText(TextUtils.isEmpty(content) ? "" : content);
         mSong.setText(String.format("《%s》", mInfo.getTitle()));
         //背景
-        mBackground1.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 2), Color.parseColor("#2a2a2a"), 0, 0, 1));
-        mBackground2.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 1), Color.parseColor("#2a2a2a"), 0, 0, 1));
-        mImageBackground.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE, 0, DensityUtil.dip2px(this, 1), Color.parseColor("#f6f6f5"), 0, 0, 1));
+        mBackground1.setBackground(new GradientDrawableMaker()
+                .color(Color.WHITE)
+                .strokeSize(DensityUtil.dip2px(2))
+                .strokeColor(Color.parseColor("#2a2a2a"))
+                .make());
+        mBackground2.setBackground(new GradientDrawableMaker()
+                .color(Color.WHITE)
+                .strokeSize(DensityUtil.dip2px(1))
+                .strokeColor(Color.parseColor("#2a2a2a"))
+                .make());
+        mImageBackground.setBackground(new GradientDrawableMaker()
+                .color(Color.WHITE)
+                .strokeSize(DensityUtil.dip2px(1))
+                .strokeColor(Color.parseColor("#f6f6f5"))
+                .make());
 
         mProgressDialog = Theme.getBaseDialog(mContext)
                 .title(R.string.please_wait)

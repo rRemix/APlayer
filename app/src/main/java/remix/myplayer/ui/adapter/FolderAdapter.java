@@ -17,6 +17,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Folder;
 import remix.myplayer.misc.menu.LibraryListener;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
@@ -37,8 +38,17 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
         super(context, layoutId);
         int size = DensityUtil.dip2px(mContext, 45);
         mChoice = multiChoice;
-        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL, Color.TRANSPARENT, size, size);
-        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL, ThemeStore.getSelectColor(), size, size);
+
+        mDefaultDrawable = new GradientDrawableMaker()
+                .color(Color.TRANSPARENT)
+                .width(size)
+                .height(size)
+                .make();
+        mSelectDrawable = new GradientDrawableMaker()
+                .color(ThemeStore.getSelectColor())
+                .width(size)
+                .height(size)
+                .make();
     }
 
     @Override

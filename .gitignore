@@ -3,6 +3,7 @@
 /.idea
 *.iml
 /build
+/app/bugly
 .DS_Store
 /.git
 

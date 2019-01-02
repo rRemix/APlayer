@@ -22,6 +22,7 @@ import remix.myplayer.App;
 import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.helper.MusicServiceRemote;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.widget.EQSeekBar;
@@ -152,7 +153,12 @@ public class EQActivity extends ToolbarActivity {
         });
 
         //初始化重置按钮背景
-        mReset.setBackground(Theme.getCorner(1.0f, 5, 0, ThemeStore.getAccentColor()));
+
+
+        mReset.setBackground(new GradientDrawableMaker()
+                .corner(5)
+                .color(ThemeStore.getAccentColor())
+                .make());
 
         addEQSeekBar();
 //        for(int i = 0 ; i < mEQSeekBars.size() ;i++){

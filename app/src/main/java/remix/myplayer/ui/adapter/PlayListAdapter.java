@@ -29,6 +29,7 @@ import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.PlayListUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.UriRequest;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
@@ -133,13 +134,11 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
             popupMenu.setOnMenuItemClickListener(new LibraryListener(mContext, info._Id, Constants.PLAYLIST, info.Name));
             popupMenu.show();
         });
+
         //点击效果
-        int size = DensityUtil.dip2px(mContext, 45);
-        Drawable defaultDrawable = Theme.getShape(mMode == HeaderAdapter.LIST_MODE ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-        Drawable selectDrawable = Theme.getShape(mMode == HeaderAdapter.LIST_MODE ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
         holder.mButton.setBackground(Theme.getPressDrawable(
-                defaultDrawable,
-                selectDrawable,
+                mDefaultDrawable,
+                mSelectDrawable,
                 ThemeStore.getRippleColor(),
                 null,
                 null));

@@ -23,6 +23,7 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
@@ -47,8 +48,18 @@ public class SearchAdapter extends BaseAdapter<Song, SearchAdapter.SearchResHold
     public SearchAdapter(Context context, int layoutId) {
         super(context, layoutId);
         int size = DensityUtil.dip2px(mContext, 60);
-        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL, Color.TRANSPARENT, size, size);
-        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL, ThemeStore.getSelectColor(), size, size);
+        mDefaultDrawable = new GradientDrawableMaker()
+                .shape(GradientDrawable.OVAL)
+                .color(Color.TRANSPARENT)
+                .width(size)
+                .height(size)
+                .make();
+        mSelectDrawable = new GradientDrawableMaker()
+                .shape(GradientDrawable.OVAL)
+                .color(ThemeStore.getSelectColor())
+                .width(size)
+                .height(size)
+                .make();
     }
 
     @Override

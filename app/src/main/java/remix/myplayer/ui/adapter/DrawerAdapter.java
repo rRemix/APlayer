@@ -1,8 +1,6 @@
 package remix.myplayer.ui.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -10,11 +8,14 @@ import android.widget.TextView;
 
 import butterknife.BindView;
 import remix.myplayer.R;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.theme.ThemeUtil;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.util.ColorUtil;
+
+import static remix.myplayer.theme.ThemeStore.getDrawerDefaultColor;
+import static remix.myplayer.theme.ThemeStore.getDrawerEffectColor;
 
 /**
  * @ClassName
@@ -50,14 +51,17 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
         Theme.TintDrawable(holder.mImg, IMAGES[position], ThemeStore.getAccentColor());
 
         holder.mText.setText(titleRes);
-        holder.mText.setTextColor(ThemeUtil.resolveColor(mContext,R.attr.text_color_primary));
+        holder.mText.setTextColor(ThemeUtil.resolveColor(mContext, R.attr.text_color_primary));
         holder.mRoot.setOnClickListener(v -> mOnItemClickListener.onItemClick(v, holder.getAdapterPosition()));
         holder.mRoot.setSelected(mSelectIndex == position);
         holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(
                 mContext,
-                Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerEffectColor()),
-                Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerDefaultColor()),
-                ThemeStore.getDrawerEffectColor()));
+                new GradientDrawableMaker()
+                        .color(getDrawerEffectColor()).make(),
+                new GradientDrawableMaker()
+                        .color(getDrawerDefaultColor()).make(),
+                getDrawerEffectColor()));
+
     }
 
     @Override

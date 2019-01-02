@@ -28,6 +28,7 @@ import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.service.Command;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
@@ -50,17 +51,24 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
     private int mType;
     private String mArg;
 
-    private Drawable mDefaultDrawable;
-    private Drawable mSelectDrawable;
     private int mLastIndex;
 
     public ChildHolderAdapter(Context context, int layoutId, int type, String arg, MultipleChoice multiChoice, RecyclerView recyclerView) {
         super(context, layoutId, multiChoice, recyclerView);
         this.mType = type;
         this.mArg = arg;
+
         int size = DensityUtil.dip2px(mContext, 60);
-        mDefaultDrawable = Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-        mSelectDrawable = Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
+        mDefaultDrawable = new GradientDrawableMaker()
+                .color(Color.TRANSPARENT)
+                .width(size)
+                .height(size)
+                .make();
+        mSelectDrawable = new GradientDrawableMaker()
+                .color(ThemeStore.getSelectColor())
+                .width(size)
+                .height(size)
+                .make();
     }
 
     @Override

@@ -135,92 +135,6 @@ public class Theme {
     }
 
     /**
-     * * 根据当前主题生成背景色为md_color_material的圆角矩形
-     *
-     * @param alpha
-     * @param corner
-     * @param stroke
-     * @return
-     */
-    public static GradientDrawable getMDCorner(@FloatRange(from = 0.0D, to = 1.0D) float alpha, float corner, int stroke) {
-        return getCorner(alpha, corner, stroke, ThemeStore.getMaterialPrimaryColor());
-    }
-
-    /**
-     * 根据当前主题生成背景色为md_color_material的圆角矩形
-     *
-     * @param corner
-     * @return
-     */
-    public static GradientDrawable getMDCorner(float corner) {
-        return getMDCorner(1.0f, corner, 0);
-    }
-
-    /**
-     * 获得圆角矩形背景
-     *
-     * @param alpha
-     * @param corner
-     * @param stroke
-     * @param color
-     * @return
-     */
-    public static GradientDrawable getCorner(@FloatRange(from = 0.0D, to = 1.0D) float alpha, float corner, int stroke, @ColorInt int color) {
-        return getShape(GradientDrawable.RECTANGLE, color, corner, stroke, color, 0, 0, alpha);
-    }
-
-    /**
-     * @param shape
-     * @param corner
-     * @param color
-     * @param strokeSize
-     * @param strokeColor
-     * @param width
-     * @param height
-     * @return
-     */
-    public static GradientDrawable getShape(int shape, @ColorInt int color, float corner, int strokeSize, @ColorInt int strokeColor, int width, int height, @FloatRange(from = 0.0D, to = 1.0D) float alpha) {
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(ColorUtil.adjustAlpha(color, alpha));
-        bg.setShape(shape);
-        if (corner > 0)
-            bg.setCornerRadius(corner);
-        if (strokeSize > 0)
-            bg.setStroke(strokeSize, strokeColor);
-
-        if (width > 0 && height > 0)
-            bg.setSize(width, height);
-
-        return bg;
-    }
-
-    /**
-     * 生成圆形或者矩形背景
-     *
-     * @param shape
-     * @param color
-     * @param width
-     * @param height
-     * @return
-     */
-    public static GradientDrawable getShape(int shape, @ColorInt int color, int width, int height) {
-        return getShape(shape, color, 0, 0, color, width, height, 1);
-    }
-
-    /**
-     * 生成圆形或者矩形背景
-     *
-     * @param shape
-     * @param color
-     * @return
-     */
-    public static GradientDrawable getShape(int shape, @ColorInt int color) {
-        return getShape(shape, color, 0, 0, color, 0, 0, 1);
-    }
-
-
-
-    /**
      * 根据当前主题获得popupmenu风格
      *
      * @return
@@ -228,38 +142,6 @@ public class Theme {
     @StyleRes
     public static int getPopupMenuStyle() {
         return ThemeStore.isLightTheme() ? R.style.PopupMenuLightStyle : R.style.PopupMenuDarkStyle;
-    }
-
-    /**
-     * 为seekbar着色
-     *
-     * @param seekBar
-     * @param color
-     */
-    public static void setTint(@NonNull SeekBar seekBar, @ColorInt int color) {
-        ColorStateList s1 = ColorStateList.valueOf(color);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            seekBar.setThumbTintList(s1);
-            seekBar.setProgressTintList(s1);
-        } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1) {
-            Drawable progressDrawable = DrawableCompat.wrap(seekBar.getProgressDrawable());
-            seekBar.setProgressDrawable(progressDrawable);
-            DrawableCompat.setTintList(progressDrawable, s1);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                Drawable thumbDrawable = DrawableCompat.wrap(seekBar.getThumb());
-                DrawableCompat.setTintList(thumbDrawable, s1);
-                seekBar.setThumb(thumbDrawable);
-            }
-        } else {
-            PorterDuff.Mode mode = PorterDuff.Mode.SRC_IN;
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1) {
-                mode = PorterDuff.Mode.MULTIPLY;
-            }
-            if (seekBar.getIndeterminateDrawable() != null)
-                seekBar.getIndeterminateDrawable().setColorFilter(color, mode);
-            if (seekBar.getProgressDrawable() != null)
-                seekBar.getProgressDrawable().setColorFilter(color, mode);
-        }
     }
 
     /**
@@ -365,31 +247,31 @@ public class Theme {
         }
     }
 
-    /**
-     * 按下与选中触摸效果
-     *
-     * @param context
-     * @param selectDrawable
-     * @param defaultDrawable
-     * @return
-     */
-    public static StateListDrawable getPressAndSelectedStateListRippleDrawable(Context context,
-                                                                               Drawable selectDrawable,
-                                                                               Drawable defaultDrawable) {
-        return getPressAndSelectedStateListRippleDrawable(context, selectDrawable, defaultDrawable, ThemeStore.getRippleColor());
-    }
+//    /**
+//     * 按下与选中触摸效果
+//     *
+//     * @param context
+//     * @param selectDrawable
+//     * @param defaultDrawable
+//     * @return
+//     */
+//    public static StateListDrawable getPressAndSelectedStateListRippleDrawable(Context context,
+//                                                                               Drawable selectDrawable,
+//                                                                               Drawable defaultDrawable) {
+//        return getPressAndSelectedStateListRippleDrawable(context, selectDrawable, defaultDrawable, ThemeStore.getRippleColor());
+//    }
 
-    /**
-     * @param context
-     * @return
-     */
-    public static StateListDrawable getPressAndSelectedStateListRippleDrawable(int model, Context context) {
-        int defaultColor = ThemeStore.getBackgroundColorMain(context);
-
-        return getPressAndSelectedStateListRippleDrawable(context,
-                model == HeaderAdapter.GRID_MODE ? getCorner(1, DensityUtil.dip2px(context, 2), 0, ThemeStore.getSelectColor()) : getShape(GradientDrawable.RECTANGLE, ThemeStore.getSelectColor()),
-                model == HeaderAdapter.GRID_MODE ? getCorner(1, DensityUtil.dip2px(context, 2), 0, defaultColor) : getShape(GradientDrawable.RECTANGLE, defaultColor));
-    }
+//    /**
+//     * @param context
+//     * @return
+//     */
+//    public static StateListDrawable getPressAndSelectedStateListRippleDrawable(int model, Context context) {
+//        int defaultColor = ThemeStore.getBackgroundColorMain(context);
+//
+//        return getPressAndSelectedStateListRippleDrawable(context,
+//                model == HeaderAdapter.GRID_MODE ? getCorner(1, DensityUtil.dip2px(context, 2), 0, ThemeStore.getSelectColor()) : getShape(GradientDrawable.RECTANGLE, ThemeStore.getSelectColor()),
+//                model == HeaderAdapter.GRID_MODE ? getCorner(1, DensityUtil.dip2px(context, 2), 0, defaultColor) : getShape(GradientDrawable.RECTANGLE, defaultColor));
+//    }
 
     /**
      * @param color

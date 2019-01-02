@@ -31,6 +31,7 @@ import remix.myplayer.R;
 import remix.myplayer.helper.SleepTimer;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.theme.TintHelper;
@@ -52,7 +53,7 @@ public class TimerDialog extends BaseDialog {
     private static final String EXTRA_MINUTE = "Minute";
     private static final String EXTRA_SECOND = "Second";
 
-    public static TimerDialog newInstance(){
+    public static TimerDialog newInstance() {
         TimerDialog timerDialog = new TimerDialog();
         return timerDialog;
     }
@@ -93,12 +94,12 @@ public class TimerDialog extends BaseDialog {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         MaterialDialog dialog = new MaterialDialog.Builder(mContext)
-                .customView(R.layout.dialog_timer,false)
+                .customView(R.layout.dialog_timer, false)
                 .theme(com.afollestad.materialdialogs.Theme.LIGHT)
                 .build();
 
         View root = dialog.getCustomView();
-        ButterKnife.bind(this,root);
+        ButterKnife.bind(this, root);
 
         mHandler = new MsgHandler(this);
 
@@ -138,7 +139,7 @@ public class TimerDialog extends BaseDialog {
 
         //初始化switch
         mSwitch = new SwitchCompat(mContext);
-        TintHelper.setTintAuto(mSwitch,ThemeStore.getAccentColor(),false);
+        TintHelper.setTintAuto(mSwitch, ThemeStore.getAccentColor(), false);
         ((LinearLayout) root.findViewById(R.id.popup_timer_container)).addView(mSwitch);
 
         //读取保存的配置
@@ -178,14 +179,12 @@ public class TimerDialog extends BaseDialog {
         ButterKnife.apply(new View[]{root.findViewById(R.id.timer_minute_container),
                         root.findViewById(R.id.timer_second_container)},
                 (view, index) -> {
-                    final Drawable drawable = Theme.getShape(
-                            GradientDrawable.RECTANGLE,
-                            Color.TRANSPARENT,
-                            DensityUtil.dip2px(mContext, 1),
-                            DensityUtil.dip2px(mContext, 1),
-                            ColorUtil.getColor(R.color.timer_text_color),
-                            0, 0, 1);
-                    view.setBackground(drawable);
+                    view.setBackground(new GradientDrawableMaker()
+                            .color(Color.TRANSPARENT)
+                            .corner(DensityUtil.dip2px(1))
+                            .strokeSize(DensityUtil.dip2px(1))
+                            .strokeColor(ColorUtil.getColor(R.color.timer_text_color))
+                            .make());
                 });
 
         //改变宽度

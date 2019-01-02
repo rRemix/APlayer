@@ -16,6 +16,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import remix.myplayer.R;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
@@ -30,6 +31,8 @@ public class FloatColorAdapter extends BaseAdapter<Integer, FloatColorAdapter.Fl
     //当前桌面歌词的字体颜色 默认为当前主题颜色
     private int mCurrentColor;
     private int mItemWidth;
+
+    private static final int SIZE = DensityUtil.dip2px(18);
 
     public static final List<Integer> COLORS = Arrays.asList(
             R.color.md_red_primary, R.color.md_brown_primary, R.color.md_navy_primary,
@@ -85,20 +88,21 @@ public class FloatColorAdapter extends BaseAdapter<Integer, FloatColorAdapter.Fl
     protected void convert(FloatColorHolder holder, Integer colorRes, final int position) {
         final int color = ColorUtil.getColor(colorRes);
         if (isColorChoose(colorRes)) {
-            holder.mColor.setBackground(
-                    Theme.getShape(GradientDrawable.OVAL,
-                            color,
-                            0,
-                            DensityUtil.dip2px(mContext, 1),
-                            Color.BLACK,
-                            DensityUtil.dip2px(mContext, 18),
-                            DensityUtil.dip2px(mContext, 18), 1));
+            holder.mColor.setBackground(new GradientDrawableMaker()
+                    .color(color)
+                    .strokeSize(DensityUtil.dip2px(1))
+                    .strokeColor(Color.BLACK)
+                    .width(SIZE)
+                    .height(SIZE)
+                    .make()
+            );
         } else {
-            holder.mColor.setBackground(
-                    Theme.getShape(GradientDrawable.OVAL,
-                            color,
-                            DensityUtil.dip2px(mContext, 18),
-                            DensityUtil.dip2px(mContext, 18)));
+            holder.mColor.setBackground(new GradientDrawableMaker()
+                    .shape(GradientDrawable.OVAL)
+                    .color(color)
+                    .width(SIZE)
+                    .height(SIZE)
+                    .make());
         }
         holder.mRoot.setOnClickListener(v -> mOnItemClickListener.onItemClick(v, position));
     }

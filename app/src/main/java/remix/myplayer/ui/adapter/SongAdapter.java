@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -36,6 +37,7 @@ import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.Command;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.theme.TintHelper;
@@ -62,8 +64,6 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
     private int mType;
     public static final int ALLSONG = 0;
     public static final int RECENTLY = 1;
-    private final Drawable mDefaultDrawable;
-    private final Drawable mSelectDrawable;
 
     private int mLastIndex = 1;
 
@@ -71,9 +71,20 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
         super(context, layoutId, multiChoice, recyclerView);
         mType = type;
         mRecyclerView = recyclerView;
+
         int size = DensityUtil.dip2px(mContext, 60);
-        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL, Color.TRANSPARENT, size, size);
-        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL, ThemeStore.getSelectColor(), size, size);
+        mDefaultDrawable = new GradientDrawableMaker()
+                .shape(GradientDrawable.OVAL)
+                .color(Color.TRANSPARENT)
+                .width(size)
+                .height(size)
+                .make();
+        mSelectDrawable = new GradientDrawableMaker()
+                .shape(GradientDrawable.OVAL)
+                .color(ThemeStore.getSelectColor())
+                .width(size)
+                .height(size)
+                .make();
     }
 
     @Override

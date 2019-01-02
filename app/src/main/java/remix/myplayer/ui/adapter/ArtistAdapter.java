@@ -32,6 +32,7 @@ import remix.myplayer.misc.asynctask.AsynLoadSongNum;
 import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
@@ -114,10 +115,6 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         Disposable disposable = new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(artist), new RequestConfig.Builder(imageSize, imageSize).build()).load();
         holder.mImage.setTag(disposable);
 
-//        //item点击效果
-//        holder.mContainer.setBackground(
-//                Theme.getPressAndSelectedStateListRippleDrawable(mMode, mContext));
-
         holder.mContainer.setOnClickListener(v -> {
             if (holder.getAdapterPosition() - 1 < 0) {
                 ToastUtil.show(mContext, R.string.illegal_arg);
@@ -141,15 +138,13 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         //按钮点击效果
-        int size = DensityUtil.dip2px(mContext, 45);
-        Drawable defaultDrawable = Theme.getShape(mMode == HeaderAdapter.LIST_MODE ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-        Drawable selectDrawable = Theme.getShape(mMode == HeaderAdapter.LIST_MODE ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
         holder.mButton.setBackground(Theme.getPressDrawable(
-                defaultDrawable,
-                selectDrawable,
+                mDefaultDrawable,
+                mSelectDrawable,
                 ThemeStore.getRippleColor(),
                 null,
                 null));
+
 
         holder.mButton.setOnClickListener(v -> {
             if (mChoice.isActive())
