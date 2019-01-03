@@ -57,12 +57,7 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
                         ToastUtil.show(mContext, getStringSafely(R.string.list_is_empty));
                         return;
                     }
-                    Intent intent = new Intent(mContext, ChildHolderActivity.class);
-                    intent.putExtra("Id", getPlayListId(position));
-                    intent.putExtra("Title", name);
-                    intent.putExtra("Type", Constants.PLAYLIST);
-                    intent.putExtra("PlayListID", getPlayListId(position));
-                    startActivity(intent);
+                    ChildHolderActivity.start(mContext,Constants.PLAYLIST,getPlayListId(position),name);
                 }
             }
 

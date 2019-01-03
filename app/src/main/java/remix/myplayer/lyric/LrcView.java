@@ -732,7 +732,7 @@ public class LrcView extends View implements ILrcView {
     public void setTimeLineColor(@ColorInt int color) {
         if (mTimeLineColor != color) {
             mTimeLineColor = color;
-            Theme.TintDrawable(TIMELINE_DRAWABLE, color);
+            Theme.tintDrawable(TIMELINE_DRAWABLE, color);
             mPaintForTimeLine.setColor(color);
         }
     }

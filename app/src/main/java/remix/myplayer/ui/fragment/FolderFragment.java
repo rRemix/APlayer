@@ -52,11 +52,7 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
                 String path = folder.getPath();
                 if (getUserVisibleHint() && !TextUtils.isEmpty(path) &&
                         !mChoice.click(position, folder)) {
-                    Intent intent = new Intent(mContext, ChildHolderActivity.class);
-                    intent.putExtra("Id", folder.getParentId());
-                    intent.putExtra("Type", Constants.FOLDER);
-                    intent.putExtra("Title", path);
-                    startActivity(intent);
+                    ChildHolderActivity.start(mContext,Constants.FOLDER,folder.getParentId(),path);
                 }
             }
 

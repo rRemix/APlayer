@@ -2,6 +2,7 @@ package remix.myplayer;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.multidex.MultiDexApplication;
 
@@ -18,10 +19,11 @@ import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.exception.RxException;
+import remix.myplayer.theme.Migration;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CrashHandler;
 import remix.myplayer.util.LogUtil;
-import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
 
@@ -42,8 +44,7 @@ public class App extends MultiDexApplication {
 
         if (!BuildConfig.DEBUG)
             IS_GOOGLEPLAY = "google".equalsIgnoreCase(Util.getAppMetaData("BUGLY_APP_CHANNEL"));
-        initUtil();
-        initTheme();
+        setUp();
 
         //异常捕获
         CrashHandler.getInstance().init(this);
@@ -66,27 +67,15 @@ public class App extends MultiDexApplication {
             CrashReport.postCatchedException(new RxException(throwable));
         });
 
-        //兼容性
-        if (SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, "CategoryReset", true)) {
-            SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, "CategoryReset", false);
-            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, "");
-        }
+
     }
 
-    private void initUtil() {
-        //初始化工具类
+    private void setUp() {
         DBManager.initialInstance(new DBOpenHelper(this));
         DiskCache.init(this);
-        MediaStoreUtil.setContext(this);
-        PlayListUtil.setContext(this);
+        Migration.migrationTheme(this);
     }
 
-    /**
-     * 初始化主题
-     */
-    private void initTheme() {
-
-    }
 
     public static Context getContext() {
         return mContext;

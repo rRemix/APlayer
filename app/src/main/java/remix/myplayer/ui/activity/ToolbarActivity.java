@@ -12,7 +12,6 @@ import remix.myplayer.theme.ToolbarContentTintHelper;
 import remix.myplayer.ui.activity.base.BaseMusicActivity;
 
 import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
-import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColorReverse;
 
 
 /**

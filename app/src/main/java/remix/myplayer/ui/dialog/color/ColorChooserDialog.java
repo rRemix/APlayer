@@ -323,7 +323,7 @@ public class ColorChooserDialog extends DialogFragment implements View.OnClickLi
 
         mCircleSize = getResources().getDimensionPixelSize(R.dimen.md_colorchooser_circlesize);
         final Builder builder = getBuilder();
-        MaterialDialog.Builder bd = new MaterialDialog.Builder(getActivity())
+        MaterialDialog.Builder bd = remix.myplayer.theme.Theme.getBaseDialog(getActivity())
                 .title(getTitle())
                 .autoDismiss(false)
                 .customView(R.layout.md_dialog_colorchooser, false)

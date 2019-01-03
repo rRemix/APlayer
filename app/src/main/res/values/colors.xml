@@ -79,7 +79,7 @@
     <color name="default_model_button_color">#e2e4e8</color>
     <color name="select_model_button_color">#ffce64</color>
 
-    <color name="accent_gray_color">#e0e0e0</color>
+    <color name="accent_gray_color">#DEDEDE</color>
 
     <!--侧滑菜单-->
     <color name="drawer_effect_light">#f5f5f5</color>

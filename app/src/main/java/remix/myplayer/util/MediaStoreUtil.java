@@ -58,15 +58,15 @@ public class MediaStoreUtil {
     @SuppressLint("StaticFieldLeak")
     private static Context mContext;
 
+    static{
+        mContext = App.getContext();
+    }
+
     private MediaStoreUtil() {
     }
 
-    //    public static String BASE_SELECTION = " and is_music = 1 ";
     private static String BASE_SELECTION = " ";
 
-    public static void setContext(Context context) {
-        mContext = context;
-    }
 
     static {
         SCAN_SIZE = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE, ByteConstants.KB * 500);

@@ -91,9 +91,9 @@ public class BottomActionBarFragment extends BaseMusicFragment {
         mUnBinder = ButterKnife.bind(this, rootView);
 
         //设置整个背景着色
-        Theme.TintDrawable(rootView,
+        Theme.tintDrawable(rootView,
                 R.drawable.commom_playercontrols_bg, ThemeStore.getBackgroundColorDialog(mContext));
-        Theme.TintDrawable(mPlayNext,
+        Theme.tintDrawable(mPlayNext,
                 R.drawable.bf_btn_next,
                 ThemeStore.getBottomBarBtnColor());
 
@@ -140,11 +140,11 @@ public class BottomActionBarFragment extends BaseMusicFragment {
         if (mPlayButton == null)
             return;
         if (MusicServiceRemote.isPlaying()) {
-            Theme.TintDrawable(mPlayButton,
+            Theme.tintDrawable(mPlayButton,
                     R.drawable.bf_btn_stop,
                     ThemeStore.getBottomBarBtnColor());
         } else {
-            Theme.TintDrawable(mPlayButton,
+            Theme.tintDrawable(mPlayButton,
                     R.drawable.bf_btn_play,
                     ThemeStore.getBottomBarBtnColor());
         }

@@ -1133,27 +1133,27 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //        }
 
         //修改控制按钮颜色
-        Theme.TintDrawable(mPlayBarNext, R.drawable.play_btn_next, accentColor);
-        Theme.TintDrawable(mPlayBarPrev, R.drawable.play_btn_pre, accentColor);
+        Theme.tintDrawable(mPlayBarNext, R.drawable.play_btn_next, accentColor);
+        Theme.tintDrawable(mPlayBarPrev, R.drawable.play_btn_pre, accentColor);
 
         //歌曲名颜色
         mTopTitle.setTextColor(ThemeStore.getPlayerTitleColor());
 
         //修改顶部按钮颜色
-        Theme.TintDrawable(mTopHide, R.drawable.icon_player_back, tintColor);
-        Theme.TintDrawable(mTopMore, R.drawable.icon_player_more, tintColor);
+        Theme.tintDrawable(mTopHide, R.drawable.icon_player_back, tintColor);
+        Theme.tintDrawable(mTopMore, R.drawable.icon_player_more, tintColor);
         //播放模式与播放队列
         int playMode = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL, Constants.PLAY_LOOP);
-        Theme.TintDrawable(mPlayModel, playMode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+        Theme.tintDrawable(mPlayModel, playMode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                 playMode == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                         R.drawable.play_btn_loop_one, tintColor);
-        Theme.TintDrawable(mPlayQueue, R.drawable.play_btn_normal_list, tintColor);
+        Theme.tintDrawable(mPlayQueue, R.drawable.play_btn_normal_list, tintColor);
 
         //音量控制
         mVolumeDown.getDrawable().setColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP);
         mVolumeUp.getDrawable().setColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP);
-//        Theme.TintDrawable(mVolumeDown,R.drawable.ic_volume_down_black_24dp,tintColor);
-//        Theme.TintDrawable(mVolumeUp,R.drawable.ic_volume_up_black_24dp,tintColor);
+//        Theme.tintDrawable(mVolumeDown,R.drawable.ic_volume_down_black_24dp,tintColor);
+//        Theme.tintDrawable(mVolumeUp,R.drawable.ic_volume_up_black_24dp,tintColor);
 
         mPlayPauseView.setBackgroundColor(accentColor);
         //下一首背景

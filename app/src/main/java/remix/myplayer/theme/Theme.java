@@ -5,12 +5,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
-import android.graphics.PorterDuff;
+import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
+import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.FloatRange;
@@ -20,18 +21,12 @@ import android.support.annotation.StyleRes;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import java.lang.reflect.Field;
-
 import remix.myplayer.App;
 import remix.myplayer.R;
-import remix.myplayer.ui.adapter.HeaderAdapter;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 
@@ -56,8 +51,8 @@ public class Theme {
         return VectorDrawableCompat.create(res, resId, theme);
     }
 
-    public static Drawable TintVectorDrawable(@NonNull Context context, @DrawableRes int id, @ColorInt int color) {
-        return TintDrawable(getVectorDrawable(context.getResources(), id, context.getTheme()), color);
+    public static Drawable tintVectorDrawable(@NonNull Context context, @DrawableRes int id, @ColorInt int color) {
+        return tintDrawable(getVectorDrawable(context.getResources(), id, context.getTheme()), color);
     }
 
     /**
@@ -70,8 +65,8 @@ public class Theme {
         return thumbDrawable;
     }
 
-    public static Drawable TintDrawable(@DrawableRes int DrawRes, @ColorInt int color) {
-        return TintDrawable(App.getContext().getResources().getDrawable(DrawRes), color, 1.0f);
+    public static Drawable tintDrawable(@DrawableRes int DrawRes, @ColorInt int color) {
+        return tintDrawable(App.getContext().getResources().getDrawable(DrawRes), color, 1.0f);
     }
 
     /**
@@ -81,19 +76,13 @@ public class Theme {
      * @param color
      * @return
      */
-    public static Drawable TintDrawable(Drawable oriDrawable, @ColorInt int color, @FloatRange(from = 0.0D, to = 1.0D) float alpha) {
+    public static Drawable tintDrawable(Drawable oriDrawable, @ColorInt int color, @FloatRange(from = 0.0D, to = 1.0D) float alpha) {
 
         final Drawable wrappedDrawable = DrawableCompat.wrap(oriDrawable.mutate());
         DrawableCompat.setTintList(wrappedDrawable, ColorStateList.valueOf(ColorUtil.adjustAlpha(color, alpha)));
         return wrappedDrawable;
     }
 
-    public static Drawable TintListDrawable(Drawable oriDrawable, @ColorInt int color) {
-        final Drawable wrappedDrawable = DrawableCompat.wrap(oriDrawable.mutate());
-        DrawableCompat.setTint(oriDrawable, color);
-        return wrappedDrawable;
-    }
-
     /**
      * 为drawable着色
      *
@@ -101,8 +90,8 @@ public class Theme {
      * @param color
      * @return
      */
-    public static Drawable TintDrawable(Drawable oriDrawable, @ColorInt int color) {
-        return TintDrawable(oriDrawable, color, 1.0f);
+    public static Drawable tintDrawable(Drawable oriDrawable, @ColorInt int color) {
+        return tintDrawable(oriDrawable, color, 1.0f);
     }
 
     /**
@@ -111,11 +100,11 @@ public class Theme {
      * @param view
      * @param color
      */
-    public static void TintDrawable(View view, Drawable drawable, @ColorInt int color) {
+    public static void tintDrawable(View view, Drawable drawable, @ColorInt int color) {
         if (view instanceof ImageView) {
-            ((ImageView) view).setImageDrawable(TintDrawable(drawable, color));
+            ((ImageView) view).setImageDrawable(tintDrawable(drawable, color));
         } else {
-            view.setBackground(TintDrawable(drawable, color));
+            view.setBackground(tintDrawable(drawable, color));
         }
     }
 
@@ -126,11 +115,11 @@ public class Theme {
      * @param res
      * @param color
      */
-    public static void TintDrawable(View view, @DrawableRes int res, @ColorInt int color) {
+    public static void tintDrawable(View view, @DrawableRes int res, @ColorInt int color) {
         if (view instanceof ImageView) {
-            ((ImageView) view).setImageDrawable(TintDrawable(App.getContext().getResources().getDrawable(res), color));
+            ((ImageView) view).setImageDrawable(tintDrawable(App.getContext().getResources().getDrawable(res), color));
         } else {
-            view.setBackground(TintDrawable(App.getContext().getResources().getDrawable(res), color));
+            view.setBackground(tintDrawable(App.getContext().getResources().getDrawable(res), color));
         }
     }
 
@@ -144,42 +133,6 @@ public class Theme {
         return ThemeStore.isLightTheme() ? R.style.PopupMenuLightStyle : R.style.PopupMenuDarkStyle;
     }
 
-    /**
-     * 修改edittext光标颜色
-     *
-     * @param editText
-     * @param color
-     */
-    public static void setTint(EditText editText, int color, boolean underline) {
-        try {
-            final Field drawableResField = TextView.class.getDeclaredField("mCursorDrawableRes");
-            drawableResField.setAccessible(true);
-            final Drawable drawable = getDrawable(editText.getContext(), drawableResField.getInt(editText));
-            if (drawable == null) {
-                return;
-            }
-            drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
-            final Object drawableFieldOwner;
-            final Class<?> drawableFieldClass;
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                drawableFieldOwner = editText;
-                drawableFieldClass = TextView.class;
-            } else {
-                final Field editorField = TextView.class.getDeclaredField("mEditor");
-                editorField.setAccessible(true);
-                drawableFieldOwner = editorField.get(editText);
-                drawableFieldClass = drawableFieldOwner.getClass();
-            }
-            final Field drawableField = drawableFieldClass.getDeclaredField("mCursorDrawable");
-            drawableField.setAccessible(true);
-            drawableField.set(drawableFieldOwner, new Drawable[]{drawable, drawable});
-
-            if (underline) {
-                editText.getBackground().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-            }
-        } catch (Exception ignored) {
-        }
-    }
 
     /**
      * 修改edittext光标与下划线颜色
@@ -213,8 +166,8 @@ public class Theme {
      */
     public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context, @DrawableRes int resId, @ColorInt int color) {
         StateListDrawable stateListDrawable = new StateListDrawable();
-        stateListDrawable.addState(new int[]{android.R.attr.state_selected}, TintDrawable(context.getResources().getDrawable(resId), color));
-        stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, TintDrawable(context.getResources().getDrawable(resId), color));
+        stateListDrawable.addState(new int[]{android.R.attr.state_selected}, tintDrawable(context.getResources().getDrawable(resId), color));
+        stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, tintDrawable(context.getResources().getDrawable(resId), color));
         stateListDrawable.addState(new int[]{}, getDrawable(context, resId));
 
         return stateListDrawable;
@@ -317,8 +270,8 @@ public class Theme {
                 .buttonRippleColorAttr(R.attr.ripple_color)
                 .backgroundColorAttr(R.attr.background_color_dialog)
                 .itemsColorAttr(R.attr.text_color_primary)
-                .widgetColor(ThemeStore.getAccentColor())
-                .theme(ThemeStore.getMDDialogTheme());
+                .widgetColor(ThemeStore.getAccentColor());
+//                .theme(ThemeStore.getMDDialogTheme());
 
     }
 
@@ -335,4 +288,24 @@ public class Theme {
         }
 
     }
+
+    public static int resolveColor(Context context, @AttrRes int attr){
+        return resolveColor(context,attr,0);
+    }
+
+    public static int resolveColor(Context context, @AttrRes int attr,int fallback){
+        TypedArray ta = context.getTheme().obtainStyledAttributes(new int[]{attr});
+        int color;
+        try {
+            color = ta.getColor(0,fallback);
+        } finally {
+            ta.recycle();
+        }
+        return color;
+    }
+
+    public static boolean isWindowBackgroundDark(Context context){
+        return !ColorUtil.isColorLight(resolveColor(context,android.R.attr.windowBackground));
+    }
+
 }

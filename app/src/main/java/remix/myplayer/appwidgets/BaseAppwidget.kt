@@ -161,7 +161,7 @@ abstract class BaseAppwidget : AppWidgetProvider() {
     }
 
     //    protected void updateSkin(RemoteViews remoteViews){
-    //        Drawable skinDrawable = Theme.TintDrawable(R.drawable.widget_btn_skin, skin.getBtnColor());
+    //        Drawable skinDrawable = Theme.tintDrawable(R.drawable.widget_btn_skin, skin.getBtnColor());
     //        remoteViews.setImageViewBitmap(R.id.appwidget_skin,drawableToBitmap(skinDrawable));
     //    }
 

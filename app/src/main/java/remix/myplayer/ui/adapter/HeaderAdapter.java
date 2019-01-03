@@ -1,10 +1,6 @@
 package remix.myplayer.ui.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.VectorDrawable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,10 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import remix.myplayer.R;
-import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.theme.TintHelper;
 import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.adapter.holder.HeaderHolder;
@@ -131,12 +125,12 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
 
     private void tintModeButton(HeaderHolder headerHolder) {
         headerHolder.mListModeBtn.setImageDrawable(
-                Theme.TintVectorDrawable(mContext, R.drawable.ic_format_list_bulleted_white_24dp,
+                Theme.tintVectorDrawable(mContext, R.drawable.ic_format_list_bulleted_white_24dp,
                         mMode == LIST_MODE ? ThemeStore.getAccentColor() : ColorUtil.getColor(R.color.default_model_button_color))
         );
 
         headerHolder.mGridModeBtn.setImageDrawable(
-                Theme.TintVectorDrawable(mContext, R.drawable.ic_apps_white_24dp,
+                Theme.tintVectorDrawable(mContext, R.drawable.ic_apps_white_24dp,
                         mMode == GRID_MODE ? ThemeStore.getAccentColor() : ColorUtil.getColor(R.color.default_model_button_color))
         );
 

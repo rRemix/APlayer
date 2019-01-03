@@ -2,8 +2,6 @@ package remix.myplayer.ui.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
@@ -23,12 +21,9 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
-import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.DensityUtil;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
@@ -70,7 +65,7 @@ public class SearchAdapter extends BaseAdapter<Song, SearchAdapter.SearchResHold
 
         //设置按钮着色
         int tintColor = ThemeStore.getLibraryBtnColor();
-        Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
+        Theme.tintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         holder.mButton.setOnClickListener(v -> {
             Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());

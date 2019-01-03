@@ -2,9 +2,6 @@ package remix.myplayer.ui.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -28,16 +25,13 @@ import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.service.Command;
-import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.widget.ColumnView;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ToastUtil;
 
 import static remix.myplayer.helper.MusicServiceRemote.setPlayQueue;
@@ -77,7 +71,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
             }
 
             headerHolder.mShuffleIv.setImageDrawable(
-                    Theme.TintVectorDrawable(mContext, R.drawable.ic_shuffle_white_24dp, ThemeStore.getAccentColor())
+                    Theme.tintVectorDrawable(mContext, R.drawable.ic_shuffle_white_24dp, ThemeStore.getAccentColor())
             );
 
             //显示当前排序方式
@@ -139,7 +133,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
             if (holder.mButton != null) {
                 //设置按钮着色
                 int tintColor = ThemeStore.getLibraryBtnColor();
-                Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
+                Theme.tintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
                 holder.mButton.setOnClickListener(v -> {
                     if (mChoice.isActive())

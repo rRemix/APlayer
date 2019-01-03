@@ -370,9 +370,9 @@
     <string name="accent_color">强调色</string>
     <string name="accent_color_tip">选择你喜欢的强调色</string>
     <string name="general_theme">全局主题</string>
-    <string name="light_theme">浅色</string>
-    <string name="dark_theme">浅色</string>
-    <string name="black_theme">浅色</string>
+    <string name="light_theme">亮色</string>
+    <string name="dark_theme">暗色</string>
+    <string name="black_theme">黑色(A屏黑)</string>
 
     <string name="md_back_label">返回</string>
     <string name="md_done_label">完成</string>

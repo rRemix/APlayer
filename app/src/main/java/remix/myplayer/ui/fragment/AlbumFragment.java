@@ -60,13 +60,7 @@ public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
             public void onItemClick(View view, int position) {
                 Album album = mAdapter.getDatas().get(position);
                 if (getUserVisibleHint() && !mChoice.click(position, album)) {
-                    int albumId = album.getAlbumID();
-                    String title = album.getAlbum();
-                    Intent intent = new Intent(mContext, ChildHolderActivity.class);
-                    intent.putExtra("Id", albumId);
-                    intent.putExtra("Title", title);
-                    intent.putExtra("Type", Constants.ALBUM);
-                    startActivity(intent);
+                    ChildHolderActivity.start(mContext,Constants.ALBUM,album.getAlbumID(),album.getAlbum());
                 }
             }
 

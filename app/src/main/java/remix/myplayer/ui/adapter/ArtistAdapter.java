@@ -2,9 +2,6 @@ package remix.myplayer.ui.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
@@ -32,7 +29,6 @@ import remix.myplayer.misc.asynctask.AsynLoadSongNum;
 import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
-import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
@@ -41,7 +37,6 @@ import remix.myplayer.ui.adapter.holder.HeaderHolder;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -135,7 +130,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         //popupmenu
         int tintColor = ThemeStore.getLibraryBtnColor();
 
-        Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
+        Theme.tintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         holder.mButton.setOnClickListener(v -> {
             if (mChoice.isActive())

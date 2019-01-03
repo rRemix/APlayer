@@ -11,6 +11,8 @@ import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
 
+import static remix.myplayer.theme.Theme.resolveColor;
+
 /**
  * @ClassName
  * @Description 保存和主题相关的数据
@@ -20,9 +22,9 @@ import remix.myplayer.util.SPUtil;
 public class ThemeStore {
     private static final String NAME = "aplayer-theme";
 
-    private static final String LIGHT = "light";
-    private static final String DARK = "dark";
-    private static final String BLACK = "black";
+    public static final String LIGHT = "light";
+    public static final String DARK = "dark";
+    public static final String BLACK = "black";
     private static final String KEY_THEME = "theme";
     private static final String KEY_PRIMARY_COLOR = "primary_color";
     private static final String KEY_PRIMARY_DARK_COLOR = "primary_dark_color";
@@ -38,6 +40,12 @@ public class ThemeStore {
         SPUtil.putValue(App.getContext(), NAME, KEY_THEME,
                 pos == 0 ? LIGHT : pos == 1 ? DARK : BLACK);
     }
+
+    public static void setGeneralTheme(String theme){
+        SPUtil.putValue(App.getContext(),NAME,KEY_THEME,theme);
+    }
+
+//    public static void setGeneralTheme
 
     public static String getThemeText() {
         String theme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
@@ -70,7 +78,6 @@ public class ThemeStore {
 
     public static void saveMaterialPrimaryColor(@ColorInt int color) {
         SPUtil.putValue(App.getContext(), NAME, KEY_PRIMARY_COLOR, color);
-        SPUtil.putValue(App.getContext(), NAME, KEY_PRIMARY_DARK_COLOR, ColorUtil.darkenColor(color));
     }
 
     @ColorInt
@@ -87,7 +94,7 @@ public class ThemeStore {
     @ColorInt
     public static int getAccentColor() {
         //纯白需要处理下
-        int accentColor = SPUtil.getValue(App.getContext(), NAME, KEY_ACCENT_COLOR, Color.parseColor("#ffb61e"));
+        int accentColor = SPUtil.getValue(App.getContext(), NAME, KEY_ACCENT_COLOR, Color.parseColor("#698cf6"));
         if (ColorUtil.isColorCloseToWhite(accentColor)) {
             accentColor = ColorUtil.getColor(R.color.accent_gray_color);
         }
@@ -120,12 +127,12 @@ public class ThemeStore {
 
     @ColorInt
     public static int getMaterialPrimaryColorReverse() {
-        return ColorUtil.getColor(!isMDColorLight() ? R.color.white : R.color.black);
+        return ColorUtil.getColor(!isMDColorCloseToWhite() ? R.color.white : R.color.black);
     }
 
     @ColorInt
     public static int getTextColorPrimaryReverse() {
-        return ColorUtil.getColor(!isMDColorLight() ? R.color.dark_text_color_primary : R.color.light_text_color_primary);
+        return ColorUtil.getColor(!isMDColorCloseToWhite() ? R.color.dark_text_color_primary : R.color.light_text_color_primary);
     }
 
     @ColorInt
@@ -135,12 +142,12 @@ public class ThemeStore {
 
     @ColorInt
     public static int getBackgroundColorMain(Context context) {
-        return ThemeUtil.resolveColor(context, R.attr.background_color_main);
+        return resolveColor(context, R.attr.background_color_main);
     }
 
     @ColorInt
     public static int getBackgroundColorDialog(Context context) {
-        return ThemeUtil.resolveColor(context, R.attr.background_color_dialog);
+        return resolveColor(context, R.attr.background_color_dialog);
     }
 
     @ColorInt

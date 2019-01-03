@@ -2,9 +2,6 @@ package remix.myplayer.ui.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -29,16 +26,13 @@ import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.PlayListUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.UriRequest;
-import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.adapter.holder.HeaderHolder;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ToastUtil;
 
 import static remix.myplayer.request.ImageUriRequest.BIG_IMAGE_SIZE;
@@ -121,7 +115,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
             return true;
         });
 
-        Theme.TintDrawable(holder.mButton,
+        Theme.tintDrawable(holder.mButton,
                 R.drawable.icon_player_more,
                 ThemeStore.getLibraryBtnColor());
 

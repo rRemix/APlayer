@@ -1,5 +1,7 @@
 package remix.myplayer.ui.activity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
@@ -99,9 +101,9 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         registerLocalReceiver(mTagEditReceiver, new IntentFilter(TAG_EDIT));
 
         //参数id，类型，标题
-        mId = getIntent().getIntExtra("Id", -1);
-        mType = getIntent().getIntExtra("Type", -1);
-        mArg = getIntent().getStringExtra("Title");
+        mId = getIntent().getIntExtra(EXTRA_ID, -1);
+        mType = getIntent().getIntExtra(EXTRA_TYPE, -1);
+        mArg = getIntent().getStringExtra(EXTRA_TITLE);
 
         mChoice = new MultipleChoice<>(this, mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
 
@@ -196,10 +198,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
                     !mSortOrder.equalsIgnoreCase(sortOrder)) {
                 //选择的是手动排序
                 if (sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)) {
-                    startActivity(new Intent(mContext, CustomSortActivity.class)
-                            .putExtra("list", new ArrayList<>(mAdapter.getDatas()))
-                            .putExtra("id", mId)
-                            .putExtra("name", mArg));
+                    CustomSortActivity.start(mContext,mId,mArg,new ArrayList<>(mAdapter.getDatas()));
                 } else {
                     update = true;
                 }
@@ -344,6 +343,17 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     @Override
     protected Loader<List<Song>> getLoader() {
         return new AsyncChildSongLoader(this);
+    }
+
+
+    private static final String EXTRA_ID = "id";
+    private static final String EXTRA_TYPE = "type";
+    private static final String EXTRA_TITLE = "title";
+    public static void start(Context contex, int type, int id, String title){
+        contex.startActivity(new Intent(contex,ChildHolderActivity.class)
+            .putExtra(EXTRA_ID,id)
+            .putExtra(EXTRA_TYPE,type)
+            .putExtra(EXTRA_TITLE,title));
     }
 
     private static class AsyncChildSongLoader extends AppWrappedAsyncTaskLoader<List<Song>> {

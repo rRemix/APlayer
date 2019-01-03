@@ -62,13 +62,7 @@ public class ArtistFragment extends LibraryFragment<Artist, ArtistAdapter> {
                 if (getUserVisibleHint() && artist != null &&
                         !mChoice.click(position, artist)) {
                     if (mAdapter.getDatas() != null) {
-                        int artistid = artist.getArtistID();
-                        String title = artist.getArtist();
-                        Intent intent = new Intent(mContext, ChildHolderActivity.class);
-                        intent.putExtra("Id", artistid);
-                        intent.putExtra("Title", title);
-                        intent.putExtra("Type", Constants.ARTIST);
-                        startActivity(intent);
+                        ChildHolderActivity.start(mContext,Constants.ARTIST,artist.getArtistID(),artist.getArtist());
                     }
                 }
             }

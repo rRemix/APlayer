@@ -98,7 +98,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
             }
 
             headerHolder.mShuffleIv.setImageDrawable(
-                    Theme.TintVectorDrawable(mContext, R.drawable.ic_shuffle_white_24dp, ThemeStore.getAccentColor())
+                    Theme.tintVectorDrawable(mContext, R.drawable.ic_shuffle_white_24dp, ThemeStore.getAccentColor())
             );
 
             headerHolder.mRoot.setOnClickListener(v -> {
@@ -169,7 +169,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
 
         //设置按钮着色
         int tintColor = ThemeStore.getLibraryBtnColor();
-        Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
+        Theme.tintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
         holder.mButton.setOnClickListener(v -> {
             if (mChoice.isActive())

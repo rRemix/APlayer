@@ -116,8 +116,6 @@ import static remix.myplayer.misc.update.DownloadService.ACTION_DOWNLOAD_COMPLET
 import static remix.myplayer.misc.update.DownloadService.ACTION_SHOW_DIALOG;
 import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
 import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColorReverse;
-import static remix.myplayer.ui.activity.SongChooseActivity.EXTRA_ID;
-import static remix.myplayer.ui.activity.SongChooseActivity.EXTRA_NAME;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.Util.installApk;
 import static remix.myplayer.util.Util.registerLocalReceiver;
@@ -343,7 +341,7 @@ public class MainActivity extends MenuActivity {
         });
         mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(0);
 
-        mLocation.setImageDrawable(Theme.TintVectorDrawable(this, R.drawable.ic_my_location_black_24dp, ThemeStore.getAccentColor()));
+        mLocation.setImageDrawable(Theme.tintVectorDrawable(this, R.drawable.ic_my_location_black_24dp, ThemeStore.getAccentColor()));
         mLocation.postDelayed(this::addScrollListener, 500);
     }
 
@@ -529,7 +527,7 @@ public class MainActivity extends MenuActivity {
         mNavigationView.setBackgroundColor(ThemeStore.getDrawerDefaultColor());
 
         //这种图片不知道该怎么着色 暂时先这样处理
-        mAddButton.setBackground(Theme.TintDrawable(R.drawable.bg_playlist_add,
+        mAddButton.setBackground(Theme.tintDrawable(R.drawable.bg_playlist_add,
                 ThemeStore.getAccentColor()));
         mAddButton.setImageResource(R.drawable.icon_playlist_add);
     }

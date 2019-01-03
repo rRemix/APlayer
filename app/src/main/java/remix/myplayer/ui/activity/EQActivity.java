@@ -137,8 +137,8 @@ public class EQActivity extends ToolbarActivity {
         setUpToolbar(getString(R.string.eq));
 
         mSwitch.setChecked(mEnable);
-//        Theme.TintDrawable(mLockScreenSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
-//        Theme.TintDrawable(mLockScreenSwitch.getTrackDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
+//        Theme.tintDrawable(mLockScreenSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
+//        Theme.tintDrawable(mLockScreenSwitch.getTrackDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
         mSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked == mEnable)
                 return;

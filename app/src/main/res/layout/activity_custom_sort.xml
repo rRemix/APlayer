@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:id="@+id/custom_sort_save"
             android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/d16_size"
+            android:layout_margin="32dp"
             app:srcCompat="@drawable/ic_save_white_24dp" />
     </FrameLayout>
 

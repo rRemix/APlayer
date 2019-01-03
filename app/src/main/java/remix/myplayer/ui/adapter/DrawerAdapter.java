@@ -11,7 +11,6 @@ import remix.myplayer.R;
 import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.theme.ThemeUtil;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 
 import static remix.myplayer.theme.ThemeStore.getDrawerDefaultColor;
@@ -48,10 +47,10 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
 
     @Override
     protected void convert(final DrawerHolder holder, Integer titleRes, int position) {
-        Theme.TintDrawable(holder.mImg, IMAGES[position], ThemeStore.getAccentColor());
+        Theme.tintDrawable(holder.mImg, IMAGES[position], ThemeStore.getAccentColor());
 
         holder.mText.setText(titleRes);
-        holder.mText.setTextColor(ThemeUtil.resolveColor(mContext, R.attr.text_color_primary));
+        holder.mText.setTextColor(Theme.resolveColor(mContext, R.attr.text_color_primary));
         holder.mRoot.setOnClickListener(v -> mOnItemClickListener.onItemClick(v, holder.getAdapterPosition()));
         holder.mRoot.setSelected(mSelectIndex == position);
         holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(

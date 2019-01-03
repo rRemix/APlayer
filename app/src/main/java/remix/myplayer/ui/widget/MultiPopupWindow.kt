@@ -1,12 +1,16 @@
 package remix.myplayer.ui.widget
 
 import android.app.Activity
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 import remix.myplayer.R
+import remix.myplayer.theme.ThemeStore
+import remix.myplayer.theme.TintHelper
 import remix.myplayer.util.StatusBarUtil
 
 class MultiPopupWindow(activity: Activity) : PopupWindow(activity) {
@@ -18,9 +22,15 @@ class MultiPopupWindow(activity: Activity) : PopupWindow(activity) {
         val actionBarSize = ta.getDimensionPixelSize(0, 0)
         ta.recycle()
         height = StatusBarUtil.getStatusBarHeight(activity) + actionBarSize
-        setBackgroundDrawable(BitmapDrawable())
+        setBackgroundDrawable(ColorDrawable(ThemeStore.getMaterialPrimaryColor()))
         isFocusable = false
         isOutsideTouchable = false
+
+
+        TintHelper.setTintAuto(contentView.findViewById(R.id.multi_close),
+//                if (ThemeStore.isMDColorCloseToWhite()) Color.BLACK else Color.WHITE,
+                ThemeStore.getMaterialPrimaryColorReverse(),
+                false)
     }
 
     fun show(parent: View) {

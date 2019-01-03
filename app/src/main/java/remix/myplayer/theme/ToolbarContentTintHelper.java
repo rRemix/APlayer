@@ -299,7 +299,7 @@ public final class ToolbarContentTintHelper {
                                 Field radioButtonField = ListMenuItemView.class.getDeclaredField("mRadioButton");
                                 radioButtonField.setAccessible(true);
 
-                                final boolean isDark = !ColorUtil.isColorCloseToWhite(ThemeUtil.resolveColor(context, android.R.attr.windowBackground));
+                                final boolean isDark = !ColorUtil.isColorCloseToWhite(Theme.resolveColor(context, android.R.attr.windowBackground));
 
                                 for (int i = 0; i < listView.getChildCount(); i++) {
                                     View v = listView.getChildAt(i);

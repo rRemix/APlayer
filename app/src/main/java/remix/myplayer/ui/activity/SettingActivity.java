@@ -283,7 +283,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         //初始化箭头颜色
         final int accentColor = ThemeStore.getAccentColor();
         ButterKnife.apply(mArrows,
-                (view, index) -> Theme.TintDrawable(view, view.getBackground(), accentColor));
+                (view, index) -> Theme.tintDrawable(view, view.getBackground(), accentColor));
 
         //标题颜色
         ButterKnife.apply(mTitles,

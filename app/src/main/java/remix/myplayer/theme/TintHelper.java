@@ -133,7 +133,7 @@ public final class TintHelper {
 
     public static void setTintAuto(final @NonNull View view, final @ColorInt int color,
                                    boolean background) {
-        setTintAuto(view, color, background, ThemeUtil.isWindowBackgroundDark(view.getContext()));
+        setTintAuto(view, color, background, Theme.isWindowBackgroundDark(view.getContext()));
     }
 
     @SuppressWarnings("deprecation")

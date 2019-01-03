@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
@@ -22,7 +21,6 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 
@@ -65,12 +63,12 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
         holder.mCount.setText(String.format("%d首", folder.getCount()));
         //根据主题模式 设置图片
         if (holder.mImg != null) {
-            holder.mImg.setImageDrawable(Theme.TintDrawable(mContext.getResources().getDrawable(R.drawable.icon_folder), ThemeStore.isLightTheme() ? Color.BLACK : Color.WHITE));
+            holder.mImg.setImageDrawable(Theme.tintDrawable(mContext.getResources().getDrawable(R.drawable.icon_folder), ThemeStore.isLightTheme() ? Color.BLACK : Color.WHITE));
         }
 
         if (holder.mButton != null) {
             int tintColor = ThemeStore.getLibraryBtnColor();
-            Theme.TintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
+            Theme.tintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
             holder.mButton.setOnClickListener(v -> {
                 Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
