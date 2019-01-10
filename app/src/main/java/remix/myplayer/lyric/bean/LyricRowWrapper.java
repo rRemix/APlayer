@@ -1,8 +1,8 @@
 package remix.myplayer.lyric.bean;
 
-import remix.myplayer.lyric.UpdateLyricThread;
-
 import static remix.myplayer.lyric.UpdateLyricThread.EMPTY_ROW;
+
+import remix.myplayer.lyric.UpdateLyricThread;
 
 /**
  * @ClassName
@@ -12,39 +12,40 @@ import static remix.myplayer.lyric.UpdateLyricThread.EMPTY_ROW;
  */
 
 public class LyricRowWrapper {
-    public LrcRow LineOne = EMPTY_ROW;
-    public LrcRow LineTwo = EMPTY_ROW;
-    public UpdateLyricThread.Status mStatus;
 
-    public LrcRow getLineOne() {
-        return LineOne;
-    }
+  public LrcRow LineOne = EMPTY_ROW;
+  public LrcRow LineTwo = EMPTY_ROW;
+  public UpdateLyricThread.Status mStatus;
 
-    public void setLineOne(LrcRow lineOne) {
-        LineOne = lineOne;
-    }
+  public LrcRow getLineOne() {
+    return LineOne;
+  }
 
-    public LrcRow getLineTwo() {
-        return LineTwo;
-    }
+  public void setLineOne(LrcRow lineOne) {
+    LineOne = lineOne;
+  }
 
-    public void setLineTwo(LrcRow lineTwo) {
-        LineTwo = lineTwo;
-    }
+  public LrcRow getLineTwo() {
+    return LineTwo;
+  }
 
-    public UpdateLyricThread.Status getStatus() {
-        return mStatus;
-    }
+  public void setLineTwo(LrcRow lineTwo) {
+    LineTwo = lineTwo;
+  }
 
-    public void setStatus(UpdateLyricThread.Status status) {
-        mStatus = status;
-    }
+  public UpdateLyricThread.Status getStatus() {
+    return mStatus;
+  }
 
-    @Override
-    public String toString() {
-        return "LyricRowWrapper{" +
-                "LineOne=" + LineOne +
-                ", LineTwo=" + LineTwo +
-                '}';
-    }
+  public void setStatus(UpdateLyricThread.Status status) {
+    mStatus = status;
+  }
+
+  @Override
+  public String toString() {
+    return "LyricRowWrapper{" +
+        "LineOne=" + LineOne +
+        ", LineTwo=" + LineTwo +
+        '}';
+  }
 }

@@ -16,20 +16,20 @@
   -->
 
 <shape
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:shape="rectangle">
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:shape="rectangle">
 
-    <tools:solid android:color="#777777" />
+  <tools:solid android:color="#777777"/>
 
-    <corners
-        android:topLeftRadius="@dimen/fastscroll_bubble_radius"
-        android:topRightRadius="@dimen/fastscroll_bubble_radius"
-        android:bottomLeftRadius="@dimen/fastscroll_bubble_radius"
-        android:bottomRightRadius="0dp" />
+  <corners
+    android:topLeftRadius="@dimen/fastscroll_bubble_radius"
+    android:topRightRadius="@dimen/fastscroll_bubble_radius"
+    android:bottomLeftRadius="@dimen/fastscroll_bubble_radius"
+    android:bottomRightRadius="0dp"/>
 
-    <size
-        android:height="@dimen/fastscroll_bubble_size"
-        android:width="@dimen/fastscroll_bubble_size" />
+  <size
+    android:height="@dimen/fastscroll_bubble_size"
+    android:width="@dimen/fastscroll_bubble_size"/>
 
 </shape>

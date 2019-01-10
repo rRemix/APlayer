@@ -1,118 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="@dimen/app_widget_big_height"
+  android:background="@drawable/bg_corner_app_widget_white_1f">
+  <TextView
+    android:visibility="gone"
+    android:id="@+id/appwidget_artist"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/d6_size"
+    android:textSize="@dimen/s12_size"
+    android:textColor="@color/appwidget_artist_color_white_1f"
+    android:maxLines="1"/>
+  <ImageButton
+    android:id="@+id/appwidget_timer"
+    android:visibility="gone"
+    android:background="@drawable/bg_oval_ripple_light"
+    android:src="@drawable/widget_btn_timer"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"/>
+
+  <ImageView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/appwidget_clickable"/>
+
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="@dimen/app_widget_big_height"
-    android:background="@drawable/bg_corner_app_widget_white_1f">
-    <TextView
-        android:visibility="gone"
-        android:id="@+id/appwidget_artist"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/d6_size"
-        android:textSize="@dimen/s12_size"
-        android:textColor="@color/appwidget_artist_color_white_1f"
-        android:maxLines="1"/>
-    <ImageButton android:id="@+id/appwidget_timer"
-        android:visibility="gone"
-        android:background="@drawable/bg_oval_ripple_light"
-        android:src="@drawable/widget_btn_timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    android:orientation="vertical">
 
-    <ImageView
+    <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1">
+      <ImageView
+        android:id="@+id/appwidget_image"
+        android:src="@drawable/album_empty_bg_night"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/appwidget_clickable"/>
-
-    <LinearLayout
+        android:scaleType="centerCrop"/>
+      <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_widget_big_height"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:background="@color/appwidget_big_bar_color"
+        android:gravity="center_vertical">
+        <TextView
+          android:id="@+id/appwidget_progress"
+          android:gravity="center"
+          android:layout_width="@dimen/d32_size"
+          android:layout_height="wrap_content"
+          android:layout_marginRight="@dimen/d4_size"
+          android:layout_marginLeft="@dimen/d4_size"
+          android:textSize="@dimen/s12_size"
+          android:textColor="@color/appwidget_progress_color_white_1f"
+          android:maxLines="1"/>
+        <ProgressBar
+          android:id="@+id/appwidget_seekbar"
+          style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+          android:progressDrawable="@drawable/bg_appwidget_progress"
+          android:layout_width="match_parent"
+          android:layout_height="@dimen/d2_size"
+          android:layout_marginRight="@dimen/d4_size"/>
+      </LinearLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-            <ImageView android:id="@+id/appwidget_image"
-                android:src="@drawable/album_empty_bg_night"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop" />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_alignParentBottom="true"
-                android:background="@color/appwidget_big_bar_color"
-                android:gravity="center_vertical">
-                <TextView
-                    android:id="@+id/appwidget_progress"
-                    android:gravity="center"
-                    android:layout_width="@dimen/d32_size"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="@dimen/d4_size"
-                    android:layout_marginLeft="@dimen/d4_size"
-                    android:textSize="@dimen/s12_size"
-                    android:textColor="@color/appwidget_progress_color_white_1f"
-                    android:maxLines="1"/>
-                <ProgressBar
-                    android:id="@+id/appwidget_seekbar"
-                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                    android:progressDrawable="@drawable/bg_appwidget_progress"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/d2_size"
-                    android:layout_marginRight="@dimen/d4_size"/>
-            </LinearLayout>
+      <ImageButton
+        android:id="@+id/appwidget_skin"
+        android:visibility="gone"
+        android:background="@drawable/bg_oval_ripple_light"
+        android:src="@drawable/widget_btn_skin"
+        android:layout_width="@dimen/app_widget_big_button_size"
+        android:layout_height="@dimen/app_widget_big_button_size"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/d4_size"/>
+    </RelativeLayout>
 
-            <ImageButton android:id="@+id/appwidget_skin"
-                android:visibility="gone"
-                android:background="@drawable/bg_oval_ripple_light"
-                android:src="@drawable/widget_btn_skin"
-                android:layout_width="@dimen/app_widget_big_button_size"
-                android:layout_height="@dimen/app_widget_big_button_size"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="@dimen/d4_size"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/app_widget_big_control_height">
-            <ImageButton android:id="@+id/appwidget_model"
-                android:background="@drawable/bg_oval_ripple_light"
-                android:src="@drawable/widget_btn_loop_normal"
-                android:layout_width="@dimen/app_widget_big_button_size"
-                android:layout_height="@dimen/app_widget_big_button_size"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"/>
-            <ImageButton android:id="@+id/appwidget_love"
-                android:background="@drawable/bg_oval_ripple_light"
-                android:src="@drawable/widget_btn_like_nor"
-                android:layout_width="@dimen/app_widget_big_button_size"
-                android:layout_height="@dimen/app_widget_big_button_size"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"/>
-            <ImageButton android:id="@+id/appwidget_toggle"
-                android:background="@drawable/bg_oval_ripple_light"
-                android:src="@drawable/widget_btn_play_normal"
-                android:layout_width="@dimen/app_widget_big_button_size"
-                android:layout_height="@dimen/app_widget_big_button_size"
-                android:layout_centerInParent="true"
-                android:layout_marginLeft="@dimen/d36_size"
-                android:layout_marginRight="@dimen/d36_size"/>
-            <ImageButton android:id="@+id/appwidget_prev"
-                android:background="@drawable/bg_oval_ripple_light"
-                android:src="@drawable/widget_btn_previous_normal"
-                android:layout_width="@dimen/app_widget_big_button_size"
-                android:layout_height="@dimen/app_widget_big_button_size"
-                android:layout_toLeftOf="@id/appwidget_toggle"
-                android:layout_centerVertical="true"/>
-            <ImageButton android:id="@+id/appwidget_next"
-                android:background="@drawable/bg_oval_ripple_light"
-                android:src="@drawable/widget_btn_next_normal"
-                android:layout_width="@dimen/app_widget_big_button_size"
-                android:layout_height="@dimen/app_widget_big_button_size"
-                android:layout_toRightOf="@id/appwidget_toggle"
-                android:layout_centerVertical="true"/>
-        </RelativeLayout>
-    </LinearLayout>
+    <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/app_widget_big_control_height">
+      <ImageButton
+        android:id="@+id/appwidget_model"
+        android:background="@drawable/bg_oval_ripple_light"
+        android:src="@drawable/widget_btn_loop_normal"
+        android:layout_width="@dimen/app_widget_big_button_size"
+        android:layout_height="@dimen/app_widget_big_button_size"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"/>
+      <ImageButton
+        android:id="@+id/appwidget_love"
+        android:background="@drawable/bg_oval_ripple_light"
+        android:src="@drawable/widget_btn_like_nor"
+        android:layout_width="@dimen/app_widget_big_button_size"
+        android:layout_height="@dimen/app_widget_big_button_size"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"/>
+      <ImageButton
+        android:id="@+id/appwidget_toggle"
+        android:background="@drawable/bg_oval_ripple_light"
+        android:src="@drawable/widget_btn_play_normal"
+        android:layout_width="@dimen/app_widget_big_button_size"
+        android:layout_height="@dimen/app_widget_big_button_size"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="@dimen/d36_size"
+        android:layout_marginRight="@dimen/d36_size"/>
+      <ImageButton
+        android:id="@+id/appwidget_prev"
+        android:background="@drawable/bg_oval_ripple_light"
+        android:src="@drawable/widget_btn_previous_normal"
+        android:layout_width="@dimen/app_widget_big_button_size"
+        android:layout_height="@dimen/app_widget_big_button_size"
+        android:layout_toLeftOf="@id/appwidget_toggle"
+        android:layout_centerVertical="true"/>
+      <ImageButton
+        android:id="@+id/appwidget_next"
+        android:background="@drawable/bg_oval_ripple_light"
+        android:src="@drawable/widget_btn_next_normal"
+        android:layout_width="@dimen/app_widget_big_button_size"
+        android:layout_height="@dimen/app_widget_big_button_size"
+        android:layout_toRightOf="@id/appwidget_toggle"
+        android:layout_centerVertical="true"/>
+    </RelativeLayout>
+  </LinearLayout>
 </FrameLayout>

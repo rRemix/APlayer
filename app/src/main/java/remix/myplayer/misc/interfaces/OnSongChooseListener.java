@@ -8,5 +8,6 @@ package remix.myplayer.misc.interfaces;
  */
 
 public interface OnSongChooseListener {
-    void OnSongChoose(boolean isValid);
+
+  void OnSongChoose(boolean isValid);
 }

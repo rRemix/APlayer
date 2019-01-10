@@ -24,117 +24,117 @@ import remix.myplayer.util.LogUtil
  */
 
 abstract class Notify internal constructor(internal var service: MusicService) {
-    private var notificationManager: NotificationManager? = null
+  private var notificationManager: NotificationManager? = null
 
-    private var notifyMode = NOTIFY_MODE_BACKGROUND
+  private var notifyMode = NOTIFY_MODE_BACKGROUND
 
-    //    Notification mNotification;
-    internal var isStop: Boolean = false
+  //    Notification mNotification;
+  internal var isStop: Boolean = false
 
 
-    internal val contentIntent: PendingIntent
-        get() {
-            val result = Intent(service, PlayerActivity::class.java)
+  internal val contentIntent: PendingIntent
+    get() {
+      val result = Intent(service, PlayerActivity::class.java)
 
-            val stackBuilder = TaskStackBuilder.create(service)
-            stackBuilder.addParentStack(PlayerActivity::class.java)
-            stackBuilder.addNextIntent(result)
+      val stackBuilder = TaskStackBuilder.create(service)
+      stackBuilder.addParentStack(PlayerActivity::class.java)
+      stackBuilder.addNextIntent(result)
 
-            stackBuilder.editIntentAt(1)?.putExtra(EXTRA_FROM_NOTIFY, true)
-            stackBuilder.editIntentAt(0)?.putExtra(EXTRA_FROM_NOTIFY, true)
-            return stackBuilder.getPendingIntent(
-                    0,
-                    PendingIntent.FLAG_UPDATE_CURRENT
-            )!!
-        }
-
-    init {
-        init()
+      stackBuilder.editIntentAt(1)?.putExtra(EXTRA_FROM_NOTIFY, true)
+      stackBuilder.editIntentAt(0)?.putExtra(EXTRA_FROM_NOTIFY, true)
+      return stackBuilder.getPendingIntent(
+          0,
+          PendingIntent.FLAG_UPDATE_CURRENT
+      )!!
     }
 
-    private fun init() {
-        notificationManager = service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel()
-        }
+  init {
+    init()
+  }
+
+  private fun init() {
+    notificationManager = service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      createNotificationChannel()
+    }
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.O)
+  private fun createNotificationChannel() {
+    val playingNotificationChannel = NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID, service.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW)
+    playingNotificationChannel.setShowBadge(false)
+    playingNotificationChannel.enableLights(false)
+    playingNotificationChannel.enableVibration(false)
+    playingNotificationChannel.description = service.getString(R.string.playing_notification_description)
+    notificationManager?.createNotificationChannel(playingNotificationChannel)
+  }
+
+  abstract fun updateForPlaying()
+
+  internal fun pushNotify(notification: Notification) {
+    val newNotifyMode: Int
+    if (service.isPlaying) {
+      newNotifyMode = NOTIFY_MODE_FOREGROUND
+    } else {
+      newNotifyMode = NOTIFY_MODE_BACKGROUND
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private fun createNotificationChannel() {
-        val playingNotificationChannel = NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID, service.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW)
-        playingNotificationChannel.setShowBadge(false)
-        playingNotificationChannel.enableLights(false)
-        playingNotificationChannel.enableVibration(false)
-        playingNotificationChannel.description = service.getString(R.string.playing_notification_description)
-        notificationManager?.createNotificationChannel(playingNotificationChannel)
+    if (notifyMode != newNotifyMode && newNotifyMode == NOTIFY_MODE_BACKGROUND) {
+      //            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+      service.stopForeground(false)
+    }
+    if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
+      LogUtil.d("ServiceLifeCycle", "启动前台服务")
+      service.startForeground(PLAYING_NOTIFICATION_ID, notification)
+    } else {
+      notificationManager?.notify(PLAYING_NOTIFICATION_ID, notification)
     }
 
-    abstract fun updateForPlaying()
+    notifyMode = newNotifyMode
+    isNotifyShowing = true
+  }
 
-    internal fun pushNotify(notification: Notification) {
-        val newNotifyMode: Int
-        if (service.isPlaying) {
-            newNotifyMode = NOTIFY_MODE_FOREGROUND
-        } else {
-            newNotifyMode = NOTIFY_MODE_BACKGROUND
-        }
+  /**
+   * 取消通知栏
+   */
+  fun cancelPlayingNotify() {
+    service.stopForeground(true)
+    notificationManager?.cancel(PLAYING_NOTIFICATION_ID)
+    isStop = true
+    isNotifyShowing = false
+    //        notifyMode = NOTIFY_MODE_NONE;
+  }
 
-        if (notifyMode != newNotifyMode && newNotifyMode == NOTIFY_MODE_BACKGROUND) {
-            //            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-            service.stopForeground(false)
-        }
-        if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
-            LogUtil.d("ServiceLifeCycle", "启动前台服务")
-            service.startForeground(PLAYING_NOTIFICATION_ID, notification)
-        } else {
-            notificationManager?.notify(PLAYING_NOTIFICATION_ID, notification)
-        }
+  internal fun buildPendingIntent(context: Context, operation: Int): PendingIntent {
+    val intent = Intent(MusicService.ACTION_CMD)
+    intent.putExtra(EXTRA_CONTROL, operation)
+    intent.component = ComponentName(context, MusicService::class.java)
+    intent.putExtra(EXTRA_FROM_NOTIFY, true)
 
-        notifyMode = newNotifyMode
-        isNotifyShowing = true
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    } else {
+      if (operation != Command.TOGGLE_FLOAT_LRC && operation != Command.CLOSE_NOTIFY) {
+        return PendingIntent.getForegroundService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+      } else {
+        PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+      }
     }
 
+    return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+  }
+
+  companion object {
     /**
-     * 取消通知栏
+     * 通知栏是否显示
      */
-    fun cancelPlayingNotify() {
-        service.stopForeground(true)
-        notificationManager?.cancel(PLAYING_NOTIFICATION_ID)
-        isStop = true
-        isNotifyShowing = false
-        //        notifyMode = NOTIFY_MODE_NONE;
-    }
+    @JvmStatic
+    var isNotifyShowing = false
 
-    internal fun buildPendingIntent(context: Context, operation: Int): PendingIntent {
-        val intent = Intent(MusicService.ACTION_CMD)
-        intent.putExtra(EXTRA_CONTROL, operation)
-        intent.component = ComponentName(context, MusicService::class.java)
-        intent.putExtra(EXTRA_FROM_NOTIFY, true)
+    private const val NOTIFY_MODE_FOREGROUND = 1
+    private const val NOTIFY_MODE_BACKGROUND = 2
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        } else {
-            if (operation != Command.TOGGLE_FLOAT_LRC && operation != Command.CLOSE_NOTIFY) {
-                return PendingIntent.getForegroundService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-            } else {
-                PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-            }
-        }
-
-        return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-    }
-
-    companion object {
-        /**
-         * 通知栏是否显示
-         */
-        @JvmStatic
-        var isNotifyShowing = false
-
-        private const val NOTIFY_MODE_FOREGROUND = 1
-        private const val NOTIFY_MODE_BACKGROUND = 2
-
-        internal const val PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification"
-        private const val PLAYING_NOTIFICATION_ID = 1
-    }
+    internal const val PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification"
+    private const val PLAYING_NOTIFICATION_ID = 1
+  }
 }

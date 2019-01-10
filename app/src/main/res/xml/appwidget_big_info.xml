@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<appwidget-provider android:minWidth="@dimen/app_widget_big_min_width"
-    android:minHeight="@dimen/app_widget_big_min_height"
-    android:updatePeriodMillis="0" android:initialLayout="@layout/app_widget_big" android:resizeMode="horizontal|vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android" />
+<appwidget-provider
+  android:minWidth="@dimen/app_widget_big_min_width"
+  android:minHeight="@dimen/app_widget_big_min_height"
+  android:updatePeriodMillis="0"
+  android:initialLayout="@layout/app_widget_big"
+  android:resizeMode="horizontal|vertical"
+  xmlns:android="http://schemas.android.com/apk/res/android"/>

@@ -3,48 +3,49 @@ package remix.myplayer.bean.misc;
 import java.io.Serializable;
 
 public class PurchaseBean implements Serializable {
-    private static final long serialVersionUID = -2117631704348736859L;
-    private String id;
-    private String logo;
-    private String title;
-    private String price;
 
-    public PurchaseBean(String id, String logo, String title, String price) {
-        this.id = id;
-        this.logo = logo;
-        this.title = title;
-        this.price = price;
-    }
+  private static final long serialVersionUID = -2117631704348736859L;
+  private String id;
+  private String logo;
+  private String title;
+  private String price;
 
-    public String getPrice() {
-        return price;
-    }
+  public PurchaseBean(String id, String logo, String title, String price) {
+    this.id = id;
+    this.logo = logo;
+    this.title = title;
+    this.price = price;
+  }
 
-    public void setPrice(String price) {
-        this.price = price;
-    }
+  public String getPrice() {
+    return price;
+  }
 
-    public String getId() {
-        return id;
-    }
+  public void setPrice(String price) {
+    this.price = price;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public String getLogo() {
-        return logo;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public void setLogo(String logo) {
-        this.logo = logo;
-    }
+  public String getLogo() {
+    return logo;
+  }
 
-    public String getTitle() {
-        return title;
-    }
+  public void setLogo(String logo) {
+    this.logo = logo;
+  }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
 }

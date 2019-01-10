@@ -14,18 +14,18 @@ import remix.myplayer.appshortcuts.AppShortcutActivity
 @TargetApi(Build.VERSION_CODES.N_MR1)
 abstract class BaseShortcutType constructor(val context: Context) {
 
-    abstract val shortcutInfo: ShortcutInfo
+  abstract val shortcutInfo: ShortcutInfo
 
 
-    fun getIntent(type: Int): Intent {
-        val intent = Intent(context, AppShortcutActivity::class.java)
-        intent.putExtra(AppShortcutActivity.KEY_SHORTCUT_TYPE, type)
-        intent.action = Intent.ACTION_VIEW
-        return intent
-    }
+  fun getIntent(type: Int): Intent {
+    val intent = Intent(context, AppShortcutActivity::class.java)
+    intent.putExtra(AppShortcutActivity.KEY_SHORTCUT_TYPE, type)
+    intent.action = Intent.ACTION_VIEW
+    return intent
+  }
 
-    companion object {
-        val ID_PREFIX = "com.remix.myplayer.appshortcuts.id."
+  companion object {
+    val ID_PREFIX = "com.remix.myplayer.appshortcuts.id."
 
-    }
+  }
 }

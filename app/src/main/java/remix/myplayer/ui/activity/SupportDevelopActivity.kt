@@ -44,219 +44,219 @@ import java.io.OutputStream
 import java.util.*
 
 class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
-    @BindView(R.id.toolbar)
-    lateinit var mToolBar: Toolbar
-    @BindView(R.id.activity_support_recyclerView)
-    lateinit var mRecyclerView: RecyclerView
+  @BindView(R.id.toolbar)
+  lateinit var mToolBar: Toolbar
+  @BindView(R.id.activity_support_recyclerView)
+  lateinit var mRecyclerView: RecyclerView
 
-    lateinit var mAdapter: PurchaseAdapter
+  lateinit var mAdapter: PurchaseAdapter
 
-    val SKU_IDS = arrayListOf("price_3", "price_8", "price_15", "price_25", "price_40")
+  val SKU_IDS = arrayListOf("price_3", "price_8", "price_15", "price_25", "price_40")
 
-    private var mBillingProcessor: BillingProcessor? = null
-    private var mDisposable: Disposable? = null
+  private var mBillingProcessor: BillingProcessor? = null
+  private var mDisposable: Disposable? = null
 
-    private lateinit var mLoading: MaterialDialog
+  private lateinit var mLoading: MaterialDialog
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_support_develop)
-        ButterKnife.bind(this)
-        setUpToolbar(getString(R.string.support_develop))
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_support_develop)
+    ButterKnife.bind(this)
+    setUpToolbar(getString(R.string.support_develop))
 
-        mAdapter = PurchaseAdapter(mContext, R.layout.item_support)
+    mAdapter = PurchaseAdapter(mContext, R.layout.item_support)
 
-        val beans = ArrayList<PurchaseBean>()
-        if(!App.IS_GOOGLEPLAY){
-            beans.add(PurchaseBean("wechat", "icon_wechat_donate", getString(R.string.wechat), ""))
-            beans.add(PurchaseBean("alipay", "icon_alipay_donate", getString(R.string.alipay), ""))
-            beans.add(PurchaseBean("paypal", "icon_paypal_donate", getString(R.string.paypal), ""))
+    val beans = ArrayList<PurchaseBean>()
+    if (!App.IS_GOOGLEPLAY) {
+      beans.add(PurchaseBean("wechat", "icon_wechat_donate", getString(R.string.wechat), ""))
+      beans.add(PurchaseBean("alipay", "icon_alipay_donate", getString(R.string.alipay), ""))
+      beans.add(PurchaseBean("paypal", "icon_paypal_donate", getString(R.string.paypal), ""))
+    }
+
+    mAdapter.setData(beans)
+    mAdapter.setOnItemClickListener(object : OnItemClickListener {
+      override fun onItemLongClick(view: View?, position: Int) {
+      }
+
+      override fun onItemClick(view: View?, position: Int) {
+        if (App.IS_GOOGLEPLAY) {
+          mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position])
+        } else {
+          when (position) {
+            0 -> {
+              var outputStream: OutputStream? = null
+              var cursor: Cursor? = null
+              //保存微信图片
+              Observable.just(BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode))
+                  .flatMap(Function<Bitmap, ObservableSource<File>> {
+                    return@Function ObservableSource<File> {
+                      val weChatBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode)
+                      if (weChatBitmap == null || weChatBitmap.isRecycled) {
+                        it.onError(Throwable("Invalid Bitmap"))
+                        return@ObservableSource
+                      }
+                      val dir = DiskCache.getDiskCacheDir(mContext, "qrCode")
+                      if (!dir.exists())
+                        dir.mkdirs()
+                      val qrCodeFile = File(dir, "qrCode.png")
+
+                      //删除旧文件
+                      cursor = contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                          null, MediaStore.Images.Media.DATA + "=?", arrayOf(qrCodeFile.absolutePath), null)
+                      if (cursor != null && cursor!!.count > 0) {
+                        contentResolver.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.DATA + "=?", arrayOf(qrCodeFile.absolutePath))
+                      }
+                      if (qrCodeFile.exists()) {
+                        qrCodeFile.delete()
+                      }
+                      qrCodeFile.createNewFile()
+
+                      // 保存到系统MediaStore
+                      val values = ContentValues()
+                      values.put(MediaStore.Images.ImageColumns.DATA, qrCodeFile.absolutePath)
+                      values.put(MediaStore.Images.ImageColumns.TITLE, "qrCode")
+                      values.put(MediaStore.Images.ImageColumns.DISPLAY_NAME, "qrCode")
+                      values.put(MediaStore.Images.ImageColumns.DATE_TAKEN, System.currentTimeMillis())
+                      values.put(MediaStore.Images.ImageColumns.DATE_ADDED, System.currentTimeMillis() / 1000)
+                      values.put(MediaStore.Images.ImageColumns.DATE_MODIFIED, System.currentTimeMillis() / 1000)
+                      values.put(MediaStore.Images.ImageColumns.MIME_TYPE, "image/png")
+                      values.put(MediaStore.Images.ImageColumns.WIDTH, weChatBitmap.width)
+                      values.put(MediaStore.Images.ImageColumns.HEIGHT, weChatBitmap.height)
+                      val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                          values)
+                      if (uri == null) {
+                        it.onError(Throwable("Uri Empty"))
+                        return@ObservableSource
+                      }
+                      outputStream = contentResolver.openOutputStream(uri)
+                      weChatBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                      values.clear()
+                      values.put(MediaStore.Images.ImageColumns.SIZE, qrCodeFile.length())
+                      contentResolver.update(uri, values, null, null)
+                      weChatBitmap.recycle()
+                      it.onNext(qrCodeFile)
+                      it.onComplete()
+                    }
+                  })
+                  .compose(RxUtil.applyScheduler())
+                  .doFinally {
+                    cursor?.close()
+                    outputStream?.close()
+                  }
+                  .subscribe({
+                    ToastUtil.showLong(mContext, R.string.save_wechat_qrcode_success, it.absolutePath)
+                  }, {
+                    ToastUtil.show(mContext, R.string.save_error)
+                  })
+            }
+            1 -> {
+              Theme.getBaseDialog(mContext)
+                  .title(R.string.support_develop)
+                  .positiveText(R.string.jump_alipay_account)
+                  .negativeText(R.string.cancel)
+                  .content(R.string.donate_tip)
+                  .onPositive { _, _ -> AlipayUtil.startAlipayClient(mContext as Activity) }
+                  .show()
+            }
+            2 -> {
+              val intent = Intent("android.intent.action.VIEW")
+              intent.data = Uri.parse("https://www.paypal.me/rRemix")
+              startActivity(intent)
+            }
+            else -> {
+              mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position - 3])
+            }
+          }
         }
 
-        mAdapter.setData(beans)
-        mAdapter.setOnItemClickListener(object : OnItemClickListener {
-            override fun onItemLongClick(view: View?, position: Int) {
-            }
+      }
+    })
 
-            override fun onItemClick(view: View?, position: Int) {
-                if(App.IS_GOOGLEPLAY){
-                    mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position])
-                } else{
-                    when (position) {
-                        0 -> {
-                            var outputStream: OutputStream? = null
-                            var cursor: Cursor? = null
-                            //保存微信图片
-                            Observable.just(BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode))
-                                    .flatMap(Function<Bitmap, ObservableSource<File>> {
-                                        return@Function ObservableSource<File> {
-                                            val weChatBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode)
-                                            if (weChatBitmap == null || weChatBitmap.isRecycled) {
-                                                it.onError(Throwable("Invalid Bitmap"))
-                                                return@ObservableSource
-                                            }
-                                            val dir = DiskCache.getDiskCacheDir(mContext, "qrCode")
-                                            if (!dir.exists())
-                                                dir.mkdirs()
-                                            val qrCodeFile = File(dir, "qrCode.png")
+    mRecyclerView.layoutManager = GridLayoutManager(mContext, 2)
+    mRecyclerView.adapter = mAdapter
 
-                                            //删除旧文件
-                                            cursor = contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                                                    null, MediaStore.Images.Media.DATA + "=?", arrayOf(qrCodeFile.absolutePath), null)
-                                            if (cursor != null && cursor!!.count > 0) {
-                                                contentResolver.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.DATA + "=?", arrayOf(qrCodeFile.absolutePath))
-                                            }
-                                            if (qrCodeFile.exists()) {
-                                                qrCodeFile.delete()
-                                            }
-                                            qrCodeFile.createNewFile()
+    mLoading = Theme.getBaseDialog(mContext)
+        .title(R.string.loading)
+        .content(R.string.please_wait)
+        .canceledOnTouchOutside(false)
+        .progress(true, 0)
+        .progressIndeterminateStyle(false).build()
 
-                                            // 保存到系统MediaStore
-                                            val values = ContentValues()
-                                            values.put(MediaStore.Images.ImageColumns.DATA, qrCodeFile.absolutePath)
-                                            values.put(MediaStore.Images.ImageColumns.TITLE, "qrCode")
-                                            values.put(MediaStore.Images.ImageColumns.DISPLAY_NAME, "qrCode")
-                                            values.put(MediaStore.Images.ImageColumns.DATE_TAKEN, System.currentTimeMillis())
-                                            values.put(MediaStore.Images.ImageColumns.DATE_ADDED, System.currentTimeMillis() / 1000)
-                                            values.put(MediaStore.Images.ImageColumns.DATE_MODIFIED, System.currentTimeMillis() / 1000)
-                                            values.put(MediaStore.Images.ImageColumns.MIME_TYPE, "image/png")
-                                            values.put(MediaStore.Images.ImageColumns.WIDTH, weChatBitmap.width)
-                                            values.put(MediaStore.Images.ImageColumns.HEIGHT, weChatBitmap.height)
-                                            val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                                                    values)
-                                            if (uri == null) {
-                                                it.onError(Throwable("Uri Empty"))
-                                                return@ObservableSource
-                                            }
-                                            outputStream = contentResolver.openOutputStream(uri)
-                                            weChatBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                                            values.clear()
-                                            values.put(MediaStore.Images.ImageColumns.SIZE, qrCodeFile.length())
-                                            contentResolver.update(uri, values, null, null)
-                                            weChatBitmap.recycle()
-                                            it.onNext(qrCodeFile)
-                                            it.onComplete()
-                                        }
-                                    })
-                                    .compose(RxUtil.applyScheduler())
-                                    .doFinally {
-                                        cursor?.close()
-                                        outputStream?.close()
-                                    }
-                                    .subscribe({
-                                        ToastUtil.showLong(mContext, R.string.save_wechat_qrcode_success, it.absolutePath)
-                                    }, {
-                                        ToastUtil.show(mContext, R.string.save_error)
-                                    })
-                        }
-                        1 -> {
-                            Theme.getBaseDialog(mContext)
-                                    .title(R.string.support_develop)
-                                    .positiveText(R.string.jump_alipay_account)
-                                    .negativeText(R.string.cancel)
-                                    .content(R.string.donate_tip)
-                                    .onPositive { _, _ -> AlipayUtil.startAlipayClient(mContext as Activity) }
-                                    .show()
-                        }
-                        2 -> {
-                            val intent = Intent("android.intent.action.VIEW")
-                            intent.data = Uri.parse("https://www.paypal.me/rRemix")
-                            startActivity(intent)
-                        }
-                        else -> {
-                            mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position - 3])
-                        }
-                    }
-                }
+    mBillingProcessor = BillingProcessor(this, BuildConfig.GOOGLE_PLAY_LICENSE_KEY, this)
+  }
 
-            }
+  private fun loadSkuDetails() {
+    if (mAdapter.datas.size > 3)
+      return
+    mDisposable = Single.fromCallable { mBillingProcessor?.getPurchaseListingDetails(SKU_IDS) }
+        .map {
+          val beans = ArrayList<PurchaseBean>()
+          it.sortedWith(kotlin.Comparator { o1, o2 ->
+            o1.priceValue.compareTo(o2.priceValue)
+          }).forEach {
+            beans.add(PurchaseBean(it.productId, "", it.title, it.priceText))
+          }
+          beans
+        }
+        .doFinally { mLoading.dismiss() }
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeWith(object : DisposableSingleObserver<List<PurchaseBean>>() {
+          override fun onSuccess(datas: List<PurchaseBean>) {
+            mAdapter.datas.addAll(datas)
+            mAdapter.notifyDataSetChanged()
+          }
+
+          override fun onError(e: Throwable) {
+            ToastUtil.show(mContext, R.string.error_occur, e)
+          }
+
+          override fun onStart() {
+            mLoading.show()
+          }
+        })
+  }
+
+  override fun onBillingInitialized() {
+    loadSkuDetails()
+  }
+
+  override fun onPurchaseHistoryRestored() {
+    Toast.makeText(this, R.string.restored_previous_purchases, Toast.LENGTH_SHORT).show()
+  }
+
+  override fun onProductPurchased(productId: String, details: TransactionDetails?) {
+    Single.fromCallable {
+      mBillingProcessor?.consumePurchase(productId)
+    }.subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(Consumer {
+          Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show()
         })
 
-        mRecyclerView.layoutManager = GridLayoutManager(mContext, 2)
-        mRecyclerView.adapter = mAdapter
+  }
 
-        mLoading = Theme.getBaseDialog(mContext)
-                .title(R.string.loading)
-                .content(R.string.please_wait)
-                .canceledOnTouchOutside(false)
-                .progress(true, 0)
-                .progressIndeterminateStyle(false).build()
+  override fun onBillingError(errorCode: Int, error: Throwable?) {
+    ToastUtil.show(mContext, R.string.error_occur, "code = $errorCode err =  $error")
+  }
 
-        mBillingProcessor = BillingProcessor(this, BuildConfig.GOOGLE_PLAY_LICENSE_KEY, this)
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    mBillingProcessor?.let {
+      if (!it.handleActivityResult(requestCode, resultCode, data))
+        super.onActivityResult(requestCode, resultCode, data)
     }
+  }
 
-    private fun loadSkuDetails() {
-        if (mAdapter.datas.size > 3)
-            return
-        mDisposable = Single.fromCallable { mBillingProcessor?.getPurchaseListingDetails(SKU_IDS) }
-                .map {
-                    val beans = ArrayList<PurchaseBean>()
-                    it.sortedWith(kotlin.Comparator { o1, o2 ->
-                        o1.priceValue.compareTo(o2.priceValue)
-                    }).forEach {
-                        beans.add(PurchaseBean(it.productId, "", it.title, it.priceText))
-                    }
-                    beans
-                }
-                .doFinally { mLoading.dismiss() }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : DisposableSingleObserver<List<PurchaseBean>>() {
-                    override fun onSuccess(datas: List<PurchaseBean>) {
-                        mAdapter.datas.addAll(datas)
-                        mAdapter.notifyDataSetChanged()
-                    }
-
-                    override fun onError(e: Throwable) {
-                        ToastUtil.show(mContext, R.string.error_occur, e)
-                    }
-
-                    override fun onStart() {
-                        mLoading.show()
-                    }
-                })
+  override fun onDestroy() {
+    mBillingProcessor?.release()
+    super.onDestroy()
+    mDisposable?.let {
+      if (!it.isDisposed)
+        it.dispose()
     }
-
-    override fun onBillingInitialized() {
-        loadSkuDetails()
-    }
-
-    override fun onPurchaseHistoryRestored() {
-        Toast.makeText(this, R.string.restored_previous_purchases, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onProductPurchased(productId: String, details: TransactionDetails?) {
-        Single.fromCallable {
-            mBillingProcessor?.consumePurchase(productId)
-        }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Consumer {
-                    Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show()
-                })
-
-    }
-
-    override fun onBillingError(errorCode: Int, error: Throwable?) {
-        ToastUtil.show(mContext, R.string.error_occur, "code = $errorCode err =  $error")
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        mBillingProcessor?.let {
-            if (!it.handleActivityResult(requestCode, resultCode, data))
-                super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    override fun onDestroy() {
-        mBillingProcessor?.release()
-        super.onDestroy()
-        mDisposable?.let {
-            if (!it.isDisposed)
-                it.dispose()
-        }
-        if (mLoading.isShowing)
-            mLoading.dismiss()
-    }
+    if (mLoading.isShowing)
+      mLoading.dismiss()
+  }
 
 
 }

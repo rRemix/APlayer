@@ -9,8 +9,8 @@ import remix.myplayer.misc.interfaces.OnTagEditListener
 
 class TagReceiver(private val listener: OnTagEditListener?) : BroadcastReceiver() {
 
-    override fun onReceive(context: Context, intent: Intent) {
-        val newSong = intent.getParcelableExtra<Song>("newSong")
-        listener?.onTagEdit(newSong)
-    }
+  override fun onReceive(context: Context, intent: Intent) {
+    val newSong = intent.getParcelableExtra<Song>("newSong")
+    listener?.onTagEdit(newSong)
+  }
 }

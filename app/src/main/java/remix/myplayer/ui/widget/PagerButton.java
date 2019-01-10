@@ -13,23 +13,25 @@ import android.widget.Button;
  * 自定义Button 主要用于嵌套与ViewPagrer
  */
 public class PagerButton extends Button {
-    public PagerButton(Context context) {
-        super(context);
-    }
 
-    public PagerButton(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+  public PagerButton(Context context) {
+    super(context);
+  }
 
-    public PagerButton(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
+  public PagerButton(Context context, AttributeSet attrs) {
+    super(context, attrs);
+  }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        //ACTION_MOVE事件继续向上传递,否则ViewPager无法滑动
-        if (event.getAction() == MotionEvent.ACTION_MOVE)
-            return true;
-        return super.onTouchEvent(event);
+  public PagerButton(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+  }
+
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    //ACTION_MOVE事件继续向上传递,否则ViewPager无法滑动
+    if (event.getAction() == MotionEvent.ACTION_MOVE) {
+      return true;
     }
+    return super.onTouchEvent(event);
+  }
 }

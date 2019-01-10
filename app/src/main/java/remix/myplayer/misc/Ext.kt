@@ -9,17 +9,17 @@ import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.PlayListUtil
 
 fun Album.getSongIds(): List<Int> {
-    return MediaStoreUtil.getSongIds(MediaStore.Audio.Media.ALBUM_ID + "=?", arrayOf((albumID.toString())))
+  return MediaStoreUtil.getSongIds(MediaStore.Audio.Media.ALBUM_ID + "=?", arrayOf((albumID.toString())))
 }
 
 fun Artist.getSongIds(): List<Int> {
-    return MediaStoreUtil.getSongIds(MediaStore.Audio.Media.ARTIST_ID + "=?", arrayOf(artistID.toString()))
+  return MediaStoreUtil.getSongIds(MediaStore.Audio.Media.ARTIST_ID + "=?", arrayOf(artistID.toString()))
 }
 
 fun Folder.getSongIds(): List<Int> {
-    return MediaStoreUtil.getSongIdsByParentId(parentId)
+  return MediaStoreUtil.getSongIdsByParentId(parentId)
 }
 
 fun PlayList.getSongIds(): List<Int> {
-    return PlayListUtil.getSongIds(_Id)
+  return PlayListUtil.getSongIds(_Id)
 }

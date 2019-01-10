@@ -5,5 +5,6 @@ package remix.myplayer.misc.interfaces;
  */
 
 public interface OnUpdateHighLightListener {
-    void onUpdateHighLight();
+
+  void onUpdateHighLight();
 }

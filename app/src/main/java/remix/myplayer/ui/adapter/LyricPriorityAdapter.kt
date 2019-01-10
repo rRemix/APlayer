@@ -11,17 +11,17 @@ import remix.myplayer.util.SPUtil
 
 
 class LyricPriorityAdapter(context: Context?, layoutId: Int) : BaseAdapter<LyricPriority, LyricPriorityAdapter.LyricPriorityHolder>(context, layoutId) {
-    init {
-        mDatas = Gson().fromJson(SPUtil.getValue(mContext, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
-                object : TypeToken<List<LyricPriority>>() {}.type)
+  init {
+    mDatas = Gson().fromJson(SPUtil.getValue(mContext, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
+        object : TypeToken<List<LyricPriority>>() {}.type)
+  }
+
+  override fun convert(holder: LyricPriorityHolder?, d: LyricPriority?, position: Int) {
+    holder?.view?.item_title?.text = d?.desc
+    holder?.view?.setOnClickListener {
+
     }
+  }
 
-    override fun convert(holder: LyricPriorityHolder?, d: LyricPriority?, position: Int) {
-        holder?.view?.item_title?.text = d?.desc
-        holder?.view?.setOnClickListener {
-
-        }
-    }
-
-    class LyricPriorityHolder(val view: View) : BaseViewHolder(view)
+  class LyricPriorityHolder(val view: View) : BaseViewHolder(view)
 }

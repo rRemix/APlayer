@@ -11,11 +11,12 @@ import android.view.View;
  * @Date 2016/7/29 09:07
  */
 public class StatusBarView extends View {
-    public StatusBarView(Context context) {
-        super(context);
-    }
 
-    public StatusBarView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+  public StatusBarView(Context context) {
+    super(context);
+  }
+
+  public StatusBarView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+  }
 }

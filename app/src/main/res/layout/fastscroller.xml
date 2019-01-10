@@ -16,49 +16,49 @@
   -->
 
 <merge
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/fastscroll_bubble"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:gravity="center"
-        android:textSize="@dimen/fastscroll_bubble_textsize"
-        android:visibility="gone"
-        tools:background="@drawable/fastscroll_bubble"
-        tools:visibility="visible"
-        tools:textColor="#ffffff"
-        tools:text="A" />
+  <TextView
+    android:id="@+id/fastscroll_bubble"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="end"
+    android:gravity="center"
+    android:textSize="@dimen/fastscroll_bubble_textsize"
+    android:visibility="gone"
+    tools:background="@drawable/fastscroll_bubble"
+    tools:visibility="visible"
+    tools:textColor="#ffffff"
+    tools:text="A"/>
 
-    <FrameLayout
-        android:id="@+id/fastscroll_scrollbar"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:paddingLeft="@dimen/fastscroll_scrollbar_padding"
-        android:paddingRight="@dimen/fastscroll_scrollbar_padding"
-        android:paddingStart="@dimen/fastscroll_scrollbar_padding"
-        android:paddingEnd="@dimen/fastscroll_scrollbar_padding"
-        android:visibility="gone"
-        tools:visibility="visible">
+  <FrameLayout
+    android:id="@+id/fastscroll_scrollbar"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/fastscroll_scrollbar_padding"
+    android:paddingRight="@dimen/fastscroll_scrollbar_padding"
+    android:paddingStart="@dimen/fastscroll_scrollbar_padding"
+    android:paddingEnd="@dimen/fastscroll_scrollbar_padding"
+    android:visibility="gone"
+    tools:visibility="visible">
 
-        <ImageView
-            android:id="@+id/fastscroll_track"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            tools:src="@drawable/fastscroll_track"
-            tools:ignore="ContentDescription" />
+    <ImageView
+      android:id="@+id/fastscroll_track"
+      android:layout_width="wrap_content"
+      android:layout_height="match_parent"
+      android:layout_gravity="center_horizontal"
+      tools:src="@drawable/fastscroll_track"
+      tools:ignore="ContentDescription"/>
 
-        <ImageView
-            android:id="@+id/fastscroll_handle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            tools:src="@drawable/fastscroll_handle"
-            tools:ignore="ContentDescription" />
+    <ImageView
+      android:id="@+id/fastscroll_handle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      tools:src="@drawable/fastscroll_handle"
+      tools:ignore="ContentDescription"/>
 
-    </FrameLayout>
+  </FrameLayout>
 
 </merge>

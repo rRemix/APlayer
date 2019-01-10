@@ -2,7 +2,6 @@ package remix.myplayer.lyric;
 
 import java.io.BufferedReader;
 import java.util.List;
-
 import remix.myplayer.lyric.bean.LrcRow;
 
 /**
@@ -13,7 +12,9 @@ import remix.myplayer.lyric.bean.LrcRow;
  */
 
 public interface ILrcParser {
-    void saveLrcRows(List<LrcRow> lrcRows, String cacheKey, String searchKey);
 
-    List<LrcRow> getLrcRows(BufferedReader bufferedReader, boolean needCache, String cacheKey, String searchKey);
+  void saveLrcRows(List<LrcRow> lrcRows, String cacheKey, String searchKey);
+
+  List<LrcRow> getLrcRows(BufferedReader bufferedReader, boolean needCache, String cacheKey,
+      String searchKey);
 }

@@ -5,61 +5,62 @@ package remix.myplayer.bean.mp3;
  */
 
 public class Album {
-    private int AlbumID;
-    private String Album;
-    private int ArtistID;
-    private String Artist;
-    private int Count;
 
-    public Album(int albumID){
-        AlbumID = albumID;
-    }
+  private int AlbumID;
+  private String Album;
+  private int ArtistID;
+  private String Artist;
+  private int Count;
 
-    public Album(int albumID, String album, int artistId, String artist, int count) {
-        AlbumID = albumID;
-        Album = album;
-        ArtistID = artistId;
-        Artist = artist;
-        Count = count;
-    }
+  public Album(int albumID) {
+    AlbumID = albumID;
+  }
 
-    public int getCount() {
-        return Count;
-    }
+  public Album(int albumID, String album, int artistId, String artist, int count) {
+    AlbumID = albumID;
+    Album = album;
+    ArtistID = artistId;
+    Artist = artist;
+    Count = count;
+  }
 
-    public void setCount(int count) {
-        this.Count = count;
-    }
+  public int getCount() {
+    return Count;
+  }
 
-    public int getAlbumID() {
-        return AlbumID;
-    }
+  public void setCount(int count) {
+    this.Count = count;
+  }
 
-    public void setAlbumID(int albumID) {
-        AlbumID = albumID;
-    }
+  public int getAlbumID() {
+    return AlbumID;
+  }
 
-    public String getAlbum() {
-        return Album;
-    }
+  public void setAlbumID(int albumID) {
+    AlbumID = albumID;
+  }
 
-    public void setAlbum(String album) {
-        Album = album;
-    }
+  public String getAlbum() {
+    return Album;
+  }
 
-    public int getArtistID() {
-        return ArtistID;
-    }
+  public void setAlbum(String album) {
+    Album = album;
+  }
 
-    public void setArtistID(int artistID) {
-        ArtistID = artistID;
-    }
+  public int getArtistID() {
+    return ArtistID;
+  }
 
-    public String getArtist() {
-        return Artist;
-    }
+  public void setArtistID(int artistID) {
+    ArtistID = artistID;
+  }
 
-    public void setArtist(String artist) {
-        Artist = artist;
-    }
+  public String getArtist() {
+    return Artist;
+  }
+
+  public void setArtist(String artist) {
+    Artist = artist;
+  }
 }

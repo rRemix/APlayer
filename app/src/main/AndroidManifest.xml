@@ -82,6 +82,7 @@
         <activity
             android:name=".ui.activity.PlayerActivity"
             android:parentActivityName=".ui.activity.MainActivity"
+            android:theme="@style/PlayerActivityStyle"
             android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

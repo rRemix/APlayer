@@ -1,6 +1,10 @@
 package remix.myplayer.ui.fragment;
 
 
+import static remix.myplayer.helper.MusicServiceRemote.setAllSongAsPlayQueue;
+import static remix.myplayer.service.MusicService.EXTRA_POSITION;
+import static remix.myplayer.util.MusicUtil.makeCmdIntent;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,11 +12,9 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
-
+import butterknife.BindView;
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
@@ -24,10 +26,6 @@ import remix.myplayer.ui.adapter.SongAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView;
 import remix.myplayer.util.MediaStoreUtil;
 
-import static remix.myplayer.helper.MusicServiceRemote.setAllSongAsPlayQueue;
-import static remix.myplayer.service.MusicService.EXTRA_POSITION;
-import static remix.myplayer.util.MusicUtil.makeCmdIntent;
-
 /**
  * Created by Remix on 2015/11/30.
  */
@@ -36,104 +34,109 @@ import static remix.myplayer.util.MusicUtil.makeCmdIntent;
  * 全部歌曲的Fragment
  */
 public class SongFragment extends LibraryFragment<Song, SongAdapter> {
-    @BindView(R.id.recyclerView)
-    LocationRecyclerView mRecyclerView;
 
-    public static final String TAG = SongFragment.class.getSimpleName();
+  @BindView(R.id.recyclerView)
+  LocationRecyclerView mRecyclerView;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mPageName = TAG;
-    }
+  public static final String TAG = SongFragment.class.getSimpleName();
 
-    @Override
-    protected int getLayoutID() {
-        return R.layout.fragment_song;
-    }
+  @Override
+  public void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    mPageName = TAG;
+  }
 
-    @Override
-    protected void initAdapter() {
-        mAdapter = new SongAdapter(mContext, R.layout.item_song_recycle, mChoice, SongAdapter.ALLSONG, mRecyclerView);
-        mAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                final Song song = mAdapter.getDatas().get(position);
-                if (getUserVisibleHint() && !mChoice.click(position, song)) {
-                    setAllSongAsPlayQueue(makeCmdIntent(Command.PLAYSELECTEDSONG)
-                            .putExtra(EXTRA_POSITION, position));
-                }
-            }
+  @Override
+  protected int getLayoutID() {
+    return R.layout.fragment_song;
+  }
 
-            @Override
-            public void onItemLongClick(View view, int position) {
-                if (getUserVisibleHint())
-                    mChoice.longClick(position, mAdapter.getDatas().get(position));
-            }
-        });
-
-    }
-
-    @Override
-    protected void initView() {
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setHasFixedSize(true);
-    }
-
-    /**
-     * 重新排序后需要重置全部歌曲列表
-     */
-    private synchronized void setAllSongList() {
-        if (mAdapter == null || mAdapter.getDatas() == null)
-            return;
-        List<Integer> allSong = new ArrayList<>();
-        for (Song song : mAdapter.getDatas()) {
-            allSong.add(song.getId());
+  @Override
+  protected void initAdapter() {
+    mAdapter = new SongAdapter(mContext, R.layout.item_song_recycle, mChoice, SongAdapter.ALLSONG,
+        mRecyclerView);
+    mAdapter.setOnItemClickListener(new OnItemClickListener() {
+      @Override
+      public void onItemClick(View view, int position) {
+        final Song song = mAdapter.getDatas().get(position);
+        if (getUserVisibleHint() && !mChoice.click(position, song)) {
+          setAllSongAsPlayQueue(makeCmdIntent(Command.PLAYSELECTEDSONG)
+              .putExtra(EXTRA_POSITION, position));
         }
-        MusicServiceRemote.setAllSong(allSong);
-    }
+      }
 
-
-    @Override
-    protected Loader<List<Song>> getLoader() {
-        return new AsyncSongLoader(mContext);
-    }
-
-    @Override
-    protected int getLoaderId() {
-        return LoaderIds.SONG_FRAGMENT;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<Song>> loader, List<Song> data) {
-        super.onLoadFinished(loader, data);
-        new Thread() {
-            @Override
-            public void run() {
-                setAllSongList();
-            }
-        }.start();
-    }
-
-    @Override
-    public SongAdapter getAdapter() {
-        return mAdapter;
-    }
-
-    public void scrollToCurrent(){
-        mRecyclerView.smoothScrollToCurrentSong(mAdapter.getDatas());
-    }
-
-    private static class AsyncSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
-        private AsyncSongLoader(Context context) {
-            super(context);
+      @Override
+      public void onItemLongClick(View view, int position) {
+        if (getUserVisibleHint()) {
+          mChoice.longClick(position, mAdapter.getDatas().get(position));
         }
+      }
+    });
 
-        @Override
-        public List<Song> loadInBackground() {
-            return MediaStoreUtil.getAllSong();
-        }
+  }
+
+  @Override
+  protected void initView() {
+    mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+    mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+    mRecyclerView.setAdapter(mAdapter);
+    mRecyclerView.setHasFixedSize(true);
+  }
+
+  /**
+   * 重新排序后需要重置全部歌曲列表
+   */
+  private synchronized void setAllSongList() {
+    if (mAdapter == null || mAdapter.getDatas() == null) {
+      return;
     }
+    List<Integer> allSong = new ArrayList<>();
+    for (Song song : mAdapter.getDatas()) {
+      allSong.add(song.getId());
+    }
+    MusicServiceRemote.setAllSong(allSong);
+  }
+
+
+  @Override
+  protected Loader<List<Song>> getLoader() {
+    return new AsyncSongLoader(mContext);
+  }
+
+  @Override
+  protected int getLoaderId() {
+    return LoaderIds.SONG_FRAGMENT;
+  }
+
+  @Override
+  public void onLoadFinished(Loader<List<Song>> loader, List<Song> data) {
+    super.onLoadFinished(loader, data);
+    new Thread() {
+      @Override
+      public void run() {
+        setAllSongList();
+      }
+    }.start();
+  }
+
+  @Override
+  public SongAdapter getAdapter() {
+    return mAdapter;
+  }
+
+  public void scrollToCurrent() {
+    mRecyclerView.smoothScrollToCurrentSong(mAdapter.getDatas());
+  }
+
+  private static class AsyncSongLoader extends WrappedAsyncTaskLoader<List<Song>> {
+
+    private AsyncSongLoader(Context context) {
+      super(context);
+    }
+
+    @Override
+    public List<Song> loadInBackground() {
+      return MediaStoreUtil.getAllSong();
+    }
+  }
 }

@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -14,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 import remix.myplayer.App;
 import remix.myplayer.bean.lastfm.Image;
 import remix.myplayer.bean.mp3.Album;
@@ -29,60 +27,63 @@ import remix.myplayer.request.UriRequest;
  */
 
 public class ImageUriUtil {
-    private ImageUriUtil() {
-    }
 
-    private static final String TAG = "ImageUriUtil";
+  private ImageUriUtil() {
+  }
+
+  private static final String TAG = "ImageUriUtil";
 
 
-    /**
-     * 获得某歌手在本地数据库的封面
-     */
-    public static File getArtistThumbInMediaCache(int artistId) {
-        try (Cursor cursor = App.getContext().getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.Albums.ALBUM_ART},
-                MediaStore.Audio.Media.ARTIST_ID + "=?", new String[]{artistId + ""}, null)) {
-            if (cursor != null && cursor.moveToFirst()) {
-                String imagePath = cursor.getString(0);
-                if (!TextUtils.isEmpty(imagePath))
-                    return new File(imagePath);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+  /**
+   * 获得某歌手在本地数据库的封面
+   */
+  public static File getArtistThumbInMediaCache(int artistId) {
+    try (Cursor cursor = App.getContext().getContentResolver()
+        .query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+            new String[]{MediaStore.Audio.Albums.ALBUM_ART},
+            MediaStore.Audio.Media.ARTIST_ID + "=?", new String[]{artistId + ""}, null)) {
+      if (cursor != null && cursor.moveToFirst()) {
+        String imagePath = cursor.getString(0);
+        if (!TextUtils.isEmpty(imagePath)) {
+          return new File(imagePath);
         }
-        return null;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+    return null;
+  }
 
-    /**
-     * 判断某专辑在本地数据库是否有封面
-     *
-     * @param uri
-     * @return
-     */
-    public static boolean isAlbumThumbExistInMediaCache(Uri uri) {
-        boolean exist = false;
-        try (InputStream ignored = App.getContext().getContentResolver().openInputStream(uri)) {
-            exist = true;
-        } catch (Exception ignored) {
-        }
-        return exist;
+  /**
+   * 判断某专辑在本地数据库是否有封面
+   */
+  public static boolean isAlbumThumbExistInMediaCache(Uri uri) {
+    boolean exist = false;
+    try (InputStream ignored = App.getContext().getContentResolver().openInputStream(uri)) {
+      exist = true;
+    } catch (Exception ignored) {
     }
+    return exist;
+  }
 
-    /**
-     * 返回自定义的封面
-     *
-     * @param arg
-     * @param type
-     * @return
-     */
-    public static File getCustomThumbIfExist(int arg, int type) {
-        File img = type == ImageUriRequest.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/album") + "/" + Util.hashKeyForDisk(arg * 255 + ""))
-                : type == ImageUriRequest.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/artist") + "/" + Util.hashKeyForDisk(arg * 255 + ""))
-                : new File(DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/playlist") + "/" + Util.hashKeyForDisk(arg * 255 + ""));
-        if (img.exists()) {
-            return img;
-        }
-        return null;
+  /**
+   * 返回自定义的封面
+   */
+  public static File getCustomThumbIfExist(int arg, int type) {
+    File img = type == ImageUriRequest.URL_ALBUM ? new File(
+        DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/album") + "/" + Util
+            .hashKeyForDisk(arg * 255 + ""))
+        : type == ImageUriRequest.URL_ARTIST ? new File(
+            DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/artist") + "/" + Util
+                .hashKeyForDisk(arg * 255 + ""))
+            : new File(
+                DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/playlist") + "/" + Util
+                    .hashKeyForDisk(arg * 255 + ""));
+    if (img.exists()) {
+      return img;
     }
+    return null;
+  }
 
 //    /**
 //     * 根据歌曲信息构建请求参数
@@ -114,13 +115,10 @@ public class ImageUriUtil {
 //        return SearchRequest.DEFAULT_REQUEST;
 //    }
 
-    /**
-     * 根据专辑信息构建请求参数
-     *
-     * @param album
-     * @return
-     */
-    public static UriRequest getSearchRequest(Album album) {
+  /**
+   * 根据专辑信息构建请求参数
+   */
+  public static UriRequest getSearchRequest(Album album) {
 //        if(album == null)
 //            return SearchRequest.DEFAULT_REQUEST;
 //        boolean isAlbumAvailable = !TextUtils.isEmpty(album.getAlbum()) && !album.getAlbum().contains(mContext.getString(R.string.unknown_album));
@@ -129,18 +127,17 @@ public class ImageUriUtil {
 //            return new SearchRequest(album.getAlbumID(),album.getArtist() + "-" + album.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,ImageUriRequest.URL_ALBUM);
 //        }
 //        return SearchRequest.DEFAULT_REQUEST;
-        if (album == null)
-            return UriRequest.DEFAULT_REQUEST;
-        return new UriRequest(album.getAlbumID(), ImageUriRequest.URL_ALBUM, UriRequest.TYPE_NETEASE_ALBUM, album.getAlbum(), album.getArtist());
+    if (album == null) {
+      return UriRequest.DEFAULT_REQUEST;
     }
+    return new UriRequest(album.getAlbumID(), ImageUriRequest.URL_ALBUM,
+        UriRequest.TYPE_NETEASE_ALBUM, album.getAlbum(), album.getArtist());
+  }
 
-    /**
-     * 根据艺术家信息构建请求参数
-     *
-     * @param artist
-     * @return
-     */
-    public static UriRequest getSearchRequest(Artist artist) {
+  /**
+   * 根据艺术家信息构建请求参数
+   */
+  public static UriRequest getSearchRequest(Artist artist) {
 //        if(artist == null)
 //            return SearchRequest.DEFAULT_REQUEST;
 //        boolean isArtistAvailable = !TextUtils.isEmpty(artist.getArtist()) && !artist.getArtist().contains(mContext.getString(R.string.unknown_artist));
@@ -148,124 +145,136 @@ public class ImageUriUtil {
 //            return new SearchRequest(artist.getArtistID(),artist.getArtist(), SearchRequest.TYPE_NETEASE_ARTIST,ImageUriRequest.URL_ARTIST);
 //        }
 //        return SearchRequest.DEFAULT_REQUEST;
-        if (artist == null)
-            return UriRequest.DEFAULT_REQUEST;
-        return new UriRequest(artist.getArtistID(), ImageUriRequest.URL_ARTIST, UriRequest.TYPE_NETEASE_ARTIST, artist.getArtist());
+    if (artist == null) {
+      return UriRequest.DEFAULT_REQUEST;
     }
+    return new UriRequest(artist.getArtistID(), ImageUriRequest.URL_ARTIST,
+        UriRequest.TYPE_NETEASE_ARTIST, artist.getArtist());
+  }
 
-    public static UriRequest getSearchRequestWithAlbumType(Song song) {
-        return new UriRequest(song.getAlbumId(), ImageUriRequest.URL_ALBUM, UriRequest.TYPE_NETEASE_SONG,
-                song.getTitle(), song.getAlbum(), song.getArtist());
+  public static UriRequest getSearchRequestWithAlbumType(Song song) {
+    return new UriRequest(song.getAlbumId(), ImageUriRequest.URL_ALBUM,
+        UriRequest.TYPE_NETEASE_SONG,
+        song.getTitle(), song.getAlbum(), song.getArtist());
+  }
+
+  public static boolean isArtistNameUnknownOrEmpty(@Nullable String artistName) {
+    if (TextUtils.isEmpty(artistName)) {
+      return true;
     }
+    artistName = artistName.trim().toLowerCase();
+    return artistName.equals("unknown") || artistName.equals("<unknown>") || artistName
+        .equals("未知艺术家");
+  }
 
-    public static boolean isArtistNameUnknownOrEmpty(@Nullable String artistName) {
-        if (TextUtils.isEmpty(artistName)) return true;
-        artistName = artistName.trim().toLowerCase();
-        return artistName.equals("unknown") || artistName.equals("<unknown>") || artistName.equals("未知艺术家");
+  public static boolean isAlbumNameUnknownOrEmpty(@Nullable String albumName) {
+    if (TextUtils.isEmpty(albumName)) {
+      return true;
     }
+    albumName = albumName.trim().toLowerCase();
+    return albumName.equals("unknown") || albumName.equals("<unknown>") || albumName.equals("未知专辑");
+  }
 
-    public static boolean isAlbumNameUnknownOrEmpty(@Nullable String albumName) {
-        if (TextUtils.isEmpty(albumName)) return true;
-        albumName = albumName.trim().toLowerCase();
-        return albumName.equals("unknown") || albumName.equals("<unknown>") || albumName.equals("未知专辑");
+  public static boolean isSongNameUnknownOrEmpty(@Nullable String songName) {
+    if (TextUtils.isEmpty(songName)) {
+      return true;
     }
+    songName = songName.trim().toLowerCase();
+    return songName.equals("unknown") || songName.equals("<unknown>") || songName.equals("未知歌曲");
+  }
 
-    public static boolean isSongNameUnknownOrEmpty(@Nullable String songName) {
-        if (TextUtils.isEmpty(songName)) return true;
-        songName = songName.trim().toLowerCase();
-        return songName.equals("unknown") || songName.equals("<unknown>") || songName.equals("未知歌曲");
-    }
+  public enum ImageSize {
+    SMALL, MEDIUM, LARGE, EXTRALARGE, MEGA, UNKNOWN
+  }
 
-    public enum ImageSize {
-        SMALL, MEDIUM, LARGE, EXTRALARGE, MEGA, UNKNOWN
-    }
-
-    public static String getLargestAlbumImageUrl(List<Image> images) {
-        HashMap<ImageSize, String> imageUrls = new HashMap<>();
-        for (Image image : images) {
-            ImageSize size = null;
-            final String attribute = image.getSize();
-            if (attribute == null) {
-                size = ImageSize.UNKNOWN;
-            } else {
-                try {
-                    size = ImageSize.valueOf(attribute.toUpperCase(Locale.ENGLISH));
-                } catch (final IllegalArgumentException e) {
-                    // if they suddenly again introduce a new image size
-                }
-            }
-            if (size != null) {
-                imageUrls.put(size, image.getText());
-            }
+  public static String getLargestAlbumImageUrl(List<Image> images) {
+    HashMap<ImageSize, String> imageUrls = new HashMap<>();
+    for (Image image : images) {
+      ImageSize size = null;
+      final String attribute = image.getSize();
+      if (attribute == null) {
+        size = ImageSize.UNKNOWN;
+      } else {
+        try {
+          size = ImageSize.valueOf(attribute.toUpperCase(Locale.ENGLISH));
+        } catch (final IllegalArgumentException e) {
+          // if they suddenly again introduce a new image size
         }
-        return getLargestImageUrl(imageUrls);
+      }
+      if (size != null) {
+        imageUrls.put(size, image.getText());
+      }
     }
+    return getLargestImageUrl(imageUrls);
+  }
 
-    public static String getLargestArtistImageUrl(List<Image> images) {
-        Map<ImageSize, String> imageUrls = new HashMap<>();
-        for (Image image : images) {
-            ImageSize size = null;
-            final String attribute = image.getSize();
-            if (attribute == null) {
-                size = ImageSize.UNKNOWN;
-            } else {
-                try {
-                    size = ImageSize.valueOf(attribute.toUpperCase(Locale.ENGLISH));
-                } catch (final IllegalArgumentException e) {
-                    // if they suddenly again introduce a new image size
-                }
-            }
-            if (size != null) {
-                imageUrls.put(size, image.getText());
-            }
+  public static String getLargestArtistImageUrl(List<Image> images) {
+    Map<ImageSize, String> imageUrls = new HashMap<>();
+    for (Image image : images) {
+      ImageSize size = null;
+      final String attribute = image.getSize();
+      if (attribute == null) {
+        size = ImageSize.UNKNOWN;
+      } else {
+        try {
+          size = ImageSize.valueOf(attribute.toUpperCase(Locale.ENGLISH));
+        } catch (final IllegalArgumentException e) {
+          // if they suddenly again introduce a new image size
         }
-        return getLargestImageUrl(imageUrls);
+      }
+      if (size != null) {
+        imageUrls.put(size, image.getText());
+      }
     }
+    return getLargestImageUrl(imageUrls);
+  }
 
-    private static String getLargestImageUrl(Map<ImageSize, String> imageUrls) {
-        if (imageUrls.containsKey(ImageSize.MEGA)) {
-            return imageUrls.get(ImageSize.MEGA);
-        }
-        if (imageUrls.containsKey(ImageSize.EXTRALARGE)) {
-            return imageUrls.get(ImageSize.EXTRALARGE);
-        }
-        if (imageUrls.containsKey(ImageSize.LARGE)) {
-            return imageUrls.get(ImageSize.LARGE);
-        }
-        if (imageUrls.containsKey(ImageSize.MEDIUM)) {
-            return imageUrls.get(ImageSize.MEDIUM);
-        }
-        if (imageUrls.containsKey(ImageSize.SMALL)) {
-            return imageUrls.get(ImageSize.SMALL);
-        }
-        if (imageUrls.containsKey(ImageSize.UNKNOWN)) {
-            return imageUrls.get(ImageSize.UNKNOWN);
-        }
-        return null;
+  private static String getLargestImageUrl(Map<ImageSize, String> imageUrls) {
+    if (imageUrls.containsKey(ImageSize.MEGA)) {
+      return imageUrls.get(ImageSize.MEGA);
     }
-
-
-    public static String getArtistArt(int artistId){
-        try (Cursor cursor = App.getContext().getContentResolver().query(
-                MediaStore.Audio.Artists.Albums.getContentUri("external",artistId),
-                null,
-                null,null,null)) {
-            if(cursor != null && cursor.getCount() > 0){
-                List<Album> albums = new ArrayList<>();
-                String[] names = cursor.getColumnNames();
-                while (cursor.moveToNext()){
-                    albums.add(new Album(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Albums._ID))));
-                }
-                for(Album album : albums){
-                    Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), album.getAlbumID());
-                    if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
-                        return uri.toString();
-                    }
-                }
-            }
-        } catch (Exception e){
-            LogUtil.e(e);
-        }
-        return "";
+    if (imageUrls.containsKey(ImageSize.EXTRALARGE)) {
+      return imageUrls.get(ImageSize.EXTRALARGE);
     }
+    if (imageUrls.containsKey(ImageSize.LARGE)) {
+      return imageUrls.get(ImageSize.LARGE);
+    }
+    if (imageUrls.containsKey(ImageSize.MEDIUM)) {
+      return imageUrls.get(ImageSize.MEDIUM);
+    }
+    if (imageUrls.containsKey(ImageSize.SMALL)) {
+      return imageUrls.get(ImageSize.SMALL);
+    }
+    if (imageUrls.containsKey(ImageSize.UNKNOWN)) {
+      return imageUrls.get(ImageSize.UNKNOWN);
+    }
+    return null;
+  }
+
+
+  public static String getArtistArt(int artistId) {
+    try (Cursor cursor = App.getContext().getContentResolver().query(
+        MediaStore.Audio.Artists.Albums.getContentUri("external", artistId),
+        null,
+        null, null, null)) {
+      if (cursor != null && cursor.getCount() > 0) {
+        List<Album> albums = new ArrayList<>();
+        String[] names = cursor.getColumnNames();
+        while (cursor.moveToNext()) {
+          albums.add(new Album(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Albums._ID))));
+        }
+        for (Album album : albums) {
+          Uri uri = ContentUris
+              .withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
+                  album.getAlbumID());
+          if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
+            return uri.toString();
+          }
+        }
+      }
+    } catch (Exception e) {
+      LogUtil.e(e);
+    }
+    return "";
+  }
 }

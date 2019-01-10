@@ -2,7 +2,6 @@ package remix.myplayer.request;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-
 import io.reactivex.disposables.Disposable;
 import remix.myplayer.request.network.RxUtil;
 
@@ -11,19 +10,20 @@ import remix.myplayer.request.network.RxUtil;
  */
 
 public abstract class RemoteUriRequest extends ImageUriRequest<Bitmap> {
-    private UriRequest mRequest;
 
-    public RemoteUriRequest(@NonNull UriRequest request, @NonNull RequestConfig config) {
-        super(config);
-        mRequest = request;
-    }
+  private UriRequest mRequest;
 
-    @Override
-    public Disposable load() {
-        return getThumbBitmapObservable(mRequest)
-                .compose(RxUtil.applySchedulerToIO())
-                .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
-    }
+  public RemoteUriRequest(@NonNull UriRequest request, @NonNull RequestConfig config) {
+    super(config);
+    mRequest = request;
+  }
+
+  @Override
+  public Disposable load() {
+    return getThumbBitmapObservable(mRequest)
+        .compose(RxUtil.applySchedulerToIO())
+        .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
+  }
 
 
 }

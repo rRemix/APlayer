@@ -1,29 +1,36 @@
 package remix.myplayer.misc.menu
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.os.Bundle
 import android.provider.MediaStore
 import android.support.v7.widget.PopupMenu
 import android.view.MenuItem
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.soundcloud.android.crop.Crop
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
 import remix.myplayer.Global
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomThumb
+import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.EXTRA_POSITION
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
+import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
-import remix.myplayer.ui.dialog.AddtoPlayListDialog.EXTRA_SONG_LIST
-import remix.myplayer.util.*
-import remix.myplayer.util.MediaStoreUtil.*
+import remix.myplayer.util.Constants
+import remix.myplayer.util.MediaStoreUtil.getSongIds
+import remix.myplayer.util.MediaStoreUtil.getSongIdsByParentId
 import remix.myplayer.util.MusicUtil.makeCmdIntent
-import java.util.*
+import remix.myplayer.util.PlayListUtil
+import remix.myplayer.util.SPUtil
+import remix.myplayer.util.ToastUtil
 
 /**
  * Created by taeja on 16-1-25.
@@ -33,96 +40,120 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
                       private val type: Int, //专辑名 艺术家名 文件夹position或者播放列表名字
                       private val key: String) : PopupMenu.OnMenuItemClickListener {
 
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        val ids = when (type) {
-            Constants.ALBUM, Constants.ARTIST //专辑或者艺术家
-            -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + id, null)
-            Constants.PLAYLIST //播放列表
-            -> PlayListUtil.getSongIds(id)
-            Constants.FOLDER //文件夹
-            -> getSongIdsByParentId(id)
-            else -> emptyList<Int>()
-        }
+  private fun getSongIdSingle(): Single<List<Int>> {
+    return Single.fromCallable {
+      when (type) {
+        Constants.ALBUM, Constants.ARTIST //专辑或者艺术家
+        -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + id, null)
+        Constants.PLAYLIST //播放列表
+        -> PlayListUtil.getSongIds(id)
+        Constants.FOLDER //文件夹
+        -> getSongIdsByParentId(id)
+        else -> emptyList<Int>()
+      }
+    }
+  }
 
-        //根据不同参数获得歌曲id列表
-        when (item.itemId) {
+  @SuppressLint("CheckResult")
+  override fun onMenuItemClick(item: MenuItem): Boolean {
+//        val ids = when (type) {
+//            Constants.ALBUM, Constants.ARTIST //专辑或者艺术家
+//            -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + id, null)
+//            Constants.PLAYLIST //播放列表
+//            -> PlayListUtil.getSongIds(id)
+//            Constants.FOLDER //文件夹
+//            -> getSongIdsByParentId(id)
+//            else -> emptyList<Int>()
+//        }
+
+    getSongIdSingle()
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeOn(Schedulers.io())
+        .subscribe(Consumer { songIds ->
+          when (item.itemId) {
             //播放
             R.id.menu_play -> {
-                if (ids == null || ids.isEmpty()) {
-                    ToastUtil.show(context, R.string.list_is_empty)
-                    return true
-                }
-                setPlayQueue(ids, makeCmdIntent(Command.PLAYSELECTEDSONG)
-                        .putExtra(EXTRA_POSITION, 0))
+              if (songIds == null || songIds.isEmpty()) {
+                ToastUtil.show(context, R.string.list_is_empty)
+                return@Consumer
+              }
+              setPlayQueue(songIds, makeCmdIntent(Command.PLAYSELECTEDSONG)
+                  .putExtra(EXTRA_POSITION, 0))
             }
             //添加到播放队列
             R.id.menu_add_to_play_queue -> {
-                if (ids == null || ids.isEmpty()) {
-                    ToastUtil.show(context, R.string.list_is_empty)
-                    return true
-                }
-                ToastUtil.show(context, context.getString(R.string.add_song_playqueue_success, MusicService.AddSongToPlayQueue(ids)))
+              if (songIds == null || songIds.isEmpty()) {
+                ToastUtil.show(context, R.string.list_is_empty)
+                return@Consumer
+              }
+              Single.fromCallable {
+                PlayListUtil.addMultiSongs(songIds,Constants.PLAY_QUEUE)
+              }.subscribeOn(Schedulers.io())
+                  .observeOn(AndroidSchedulers.mainThread())
+                  .subscribe(Consumer {
+                    ToastUtil.show(context, context.getString(R.string.add_song_playqueue_success, it))
+                  })
             }
             //添加到播放列表
             R.id.menu_add_to_playlist -> {
-                val intentAdd = Intent(context, AddtoPlayListDialog::class.java)
-                val ardAdd = Bundle()
-                ardAdd.putSerializable(EXTRA_SONG_LIST, ArrayList(ids!!))
-                intentAdd.putExtras(ardAdd)
-                context.startActivity(intentAdd)
+              AddtoPlayListDialog.newInstance(songIds)
+                  .show((context as BaseActivity).supportFragmentManager, AddtoPlayListDialog::class.java.simpleName)
             }
             //删除
             R.id.menu_delete -> {
-                if (id == Global.MyLoveID && type == Constants.PLAYLIST) {
-                    ToastUtil.show(context, context.getString(R.string.mylove_cant_edit))
-                    return true
-                }
+              if (id == Global.MyLoveID && type == Constants.PLAYLIST) {
+                ToastUtil.show(context, context.getString(R.string.mylove_cant_edit))
+                return@Consumer
+              }
 
-                Theme.getBaseDialog(context)
-                        .content(if (type == Constants.PLAYLIST) R.string.confirm_delete_playlist else R.string.confirm_delete_from_library)
-                        .positiveText(R.string.confirm)
-                        .negativeText(R.string.cancel)
-                        .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
-                        .onAny { dialog, which ->
-                            if (which == POSITIVE) {
-                                if (type != Constants.PLAYLIST) {
-                                    ToastUtil.show(context, if (MediaStoreUtil.delete(id, type, dialog.isPromptCheckBoxChecked) > 0) R.string.delete_success else R.string.delete_error)
-                                } else {
-                                    if (dialog.isPromptCheckBoxChecked) {
-                                        MediaStoreUtil.delete(getSongsByIds(ids), true)
-                                    }
-                                    ToastUtil.show(context, if (PlayListUtil.deletePlayList(id)) R.string.delete_success else R.string.delete_error)
-                                }
-                            }
-                        }
-                        .show()
+              Theme.getBaseDialog(context)
+                  .content(if (type == Constants.PLAYLIST) R.string.confirm_delete_playlist else R.string.confirm_delete_from_library)
+                  .positiveText(R.string.confirm)
+                  .negativeText(R.string.cancel)
+                  .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
+                  .onAny { dialog, which ->
+                    if (which == POSITIVE) {
+                      DeleteHelper.deleteSongs(songIds, dialog.isPromptCheckBoxChecked, id, type == Constants.PLAYLIST)
+                          .subscribe(Consumer {
+                            ToastUtil.show(context, if (it) R.string.delete_success else R.string.delete_error)
+                          }, Consumer {
+                            ToastUtil.show(context,R.string.delete_error)
+                          })
+                    }
+                  }
+                  .show()
             }
             //设置封面
             R.id.menu_album_thumb -> {
-                val thumbBean = CustomThumb(id, type, key)
-                val thumbIntent = (context as Activity).intent
-                thumbIntent.putExtra("thumb", thumbBean)
-                context.intent = thumbIntent
-                Crop.pickImage(context, Crop.REQUEST_PICK)
+              val thumbBean = CustomThumb(id, type, key)
+              val thumbIntent = (context as Activity).intent
+              thumbIntent.putExtra("thumb", thumbBean)
+              context.intent = thumbIntent
+              Crop.pickImage(context, Crop.REQUEST_PICK)
             }
             //列表重命名
             R.id.menu_playlist_rename -> {
-                if (id == Global.MyLoveID && type == Constants.PLAYLIST) {
-                    ToastUtil.show(context, context.getString(R.string.mylove_cant_edit))
-                    return true
-                }
-                Theme.getBaseDialog(context)
-                        .title(R.string.rename)
-                        .input("", "", false) { dialog, input -> ToastUtil.show(context, context.getString(if (PlayListUtil.rename(id, input.toString())) R.string.save_success else R.string.save_error)) }
-                        .buttonRippleColor(ThemeStore.getRippleColor())
-                        .positiveText(R.string.confirm)
-                        .negativeText(R.string.cancel)
-                        .show()
+              if (id == Global.MyLoveID && type == Constants.PLAYLIST) {
+                ToastUtil.show(context, context.getString(R.string.mylove_cant_edit))
+                return@Consumer
+              }
+              Theme.getBaseDialog(context)
+                  .title(R.string.rename)
+                  .input("", "", false) { dialog, input ->
+                    ToastUtil.show(context, context.getString(if (PlayListUtil.rename(id, input.toString())) R.string.save_success else R.string.save_error))
+                  }
+                  .buttonRippleColor(ThemeStore.getRippleColor())
+                  .positiveText(R.string.confirm)
+                  .negativeText(R.string.cancel)
+                  .show()
             }
             else -> {
             }
-        }
-        return true
-    }
+          }
+        })
+
+
+    return true
+  }
 
 }

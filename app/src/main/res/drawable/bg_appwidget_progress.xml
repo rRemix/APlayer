@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- 轨道背景-->
-    <item android:id="@android:id/background">
-        <shape android:shape="rectangle">
-            <solid android:color="@color/appwidget_track_color"/>
-            <size android:height="@dimen/d2_size"/>
-        </shape>
-    </item>
-    <!-- 已完成轨道-->
-    <item android:id="@android:id/progress">
-        <clip>
-            <shape android:shape="rectangle">
-                <size android:height="@dimen/d2_size"/>
-                <gradient android:startColor="@color/appwidget_track_start_color"
-                    android:endColor="@color/appwidget_track_end_color"
-                    android:type="linear"/>
-            </shape>
-        </clip>
-    </item>
+<layer-list
+  xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- 轨道背景-->
+  <item android:id="@android:id/background">
+    <shape android:shape="rectangle">
+      <solid android:color="@color/appwidget_track_color"/>
+      <size android:height="@dimen/d2_size"/>
+    </shape>
+  </item>
+  <!-- 已完成轨道-->
+  <item android:id="@android:id/progress">
+    <clip>
+      <shape android:shape="rectangle">
+        <size android:height="@dimen/d2_size"/>
+        <gradient
+          android:startColor="@color/appwidget_track_start_color"
+          android:endColor="@color/appwidget_track_end_color"
+          android:type="linear"/>
+      </shape>
+    </clip>
+  </item>
 </layer-list>

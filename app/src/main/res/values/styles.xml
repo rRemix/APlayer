@@ -1,92 +1,79 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.APlayer" parent="@style/Theme.APlayer.Base" tools:ignore="ResourceCycle" />
+  <style name="Theme.APlayer" parent="@style/Theme.APlayer.Base" tools:ignore="ResourceCycle"/>
 
-    <style name="Theme.APlayer.Dark" parent="@style/Theme.APlayer.Base.Dark" />
+  <style name="Theme.APlayer.Dark" parent="@style/Theme.APlayer.Base.Dark"/>
 
-    <style name="Theme.APlayer.Black" parent="@style/Theme.APlayer.Base.Black" />
-
-
-    <!-- Base application theme. -->
-
-    <style name="AppTheme" parent="Theme.APlayer">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/transparent</item>
-        <item name="colorPrimaryDark">@color/transparent</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar.Translucent">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="AudioHolderStyle" parent="ActivityStyle">
-        <item name="android:windowIsTranslucent">true</item>
-    </style>
-
-    <style name="DialogAnimBottom" parent="@android:style/Animation">
-        <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
-        <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
-    </style>
-
-    <style name="DialogAnimPopup">
-        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
-        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
-    </style>
-
-    <!--锁屏-->
-    <style name="LockScreenActivity" parent="AppTheme.NoActionBar.Translucent">
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">true</item>
-    </style>
-
-    <!--白天主题菜单-->
-    <style name="PopupMenuLightStyle" parent="Base.ThemeOverlay.AppCompat.Light">
-        <item name="android:disabledAlpha">0.5</item>
-        <item name="android:textColor">@color/light_text_color_primary</item>
-    </style>
-    <!--夜间模式菜单-->
-    <style name="PopupMenuDarkStyle" parent="Base.ThemeOverlay.AppCompat.Dark">
-        <item name="android:disabledAlpha">0.5</item>
-        <item name="android:textColor">@color/dark_text_color_primary</item>
-    </style>
-
-    <!--popup_style-->
-
-    <style name="AnimActivity">
-        <item name="android:activityOpenExitAnimation">@anim/slide_left_out</item>
-        <item name="android:activityOpenEnterAnimation">@anim/slide_left_in</item>
-        <item name="android:activityCloseExitAnimation">@anim/slide_right_out</item>
-        <item name="android:activityCloseEnterAnimation">@anim/slide_right_in</item>
-    </style>
-
-    <style name="ActivityStyle" parent="@style/AppTheme">
-        <item name="android:windowAnimationStyle">@style/AnimActivity</item>
-    </style>
+  <style name="Theme.APlayer.Black" parent="@style/Theme.APlayer.Base.Black"/>
 
 
-    <style name="AppShortcut" parent="ActivityStyle">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowAnimationStyle">@android:style/Animation</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
+  <!-- Base application theme. -->
+
+  <style name="AppTheme" parent="Theme.APlayer">
+    <!-- Customize your theme here. -->
+    <item name="colorPrimary">@color/transparent</item>
+    <item name="colorPrimaryDark">@color/transparent</item>
+  </style>
+
+  <style name="AppTheme.NoActionBar">
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+  </style>
+
+  <style name="AppTheme.NoActionBar.Translucent">
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+    <item name="android:windowIsTranslucent">true</item>
+  </style>
+
+  <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+  <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+  <style name="PlayerActivityStyle" parent="ActivityStyle">
+    <item name="android:windowIsTranslucent">true</item>
+  </style>
+
+  <style name="DialogAnimBottom" parent="@android:style/Animation">
+    <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
+    <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
+  </style>
+
+  <style name="DialogAnimPopup">
+    <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+    <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+  </style>
+
+  <!--锁屏-->
+  <style name="LockScreenActivity" parent="AppTheme.NoActionBar.Translucent">
+    <item name="android:windowFrame">@null</item>
+    <item name="android:windowIsFloating">false</item>
+    <item name="android:windowIsTranslucent">true</item>
+    <item name="android:windowNoTitle">true</item>
+    <item name="android:windowBackground">@android:color/transparent</item>
+    <item name="android:backgroundDimEnabled">true</item>
+  </style>
+
+  <style name="AnimActivity">
+    <item name="android:activityOpenExitAnimation">@anim/slide_left_out</item>
+    <item name="android:activityOpenEnterAnimation">@anim/slide_left_in</item>
+    <item name="android:activityCloseExitAnimation">@anim/slide_right_out</item>
+    <item name="android:activityCloseEnterAnimation">@anim/slide_right_in</item>
+  </style>
+
+  <style name="ActivityStyle" parent="@style/AppTheme">
+    <item name="android:windowAnimationStyle">@style/AnimActivity</item>
+  </style>
+
+
+  <style name="AppShortcut" parent="ActivityStyle">
+    <item name="android:windowBackground">@android:color/transparent</item>
+    <item name="android:colorBackgroundCacheHint">@null</item>
+    <item name="android:windowIsTranslucent">true</item>
+    <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    <item name="android:windowNoTitle">true</item>
+    <item name="android:windowContentOverlay">@null</item>
+  </style>
 
 
 </resources>

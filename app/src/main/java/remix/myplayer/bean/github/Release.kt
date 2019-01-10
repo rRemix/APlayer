@@ -22,21 +22,21 @@ data class Release(var url: String?,
                    var zipball_url: String?,
                    var body: String?,
                    var assets: ArrayList<AssetsBean>?) :
-        Parcelable {
+    Parcelable {
 
-    @Parcelize
-    data class AssetsBean(var url: String?,
-                          var id: Int = 0,
-                          var node_id: String?,
-                          var name: String?,
-                          var label: String?,
-                          var content_type: String?,
-                          var state: String?,
-                          var size: Long = 0,
-                          var download_count: Int = 0,
-                          var created_at: String?,
-                          var updated_at: String?,
-                          var browser_download_url: String?)
-        : Parcelable
+  @Parcelize
+  data class AssetsBean(var url: String?,
+                        var id: Int = 0,
+                        var node_id: String?,
+                        var name: String?,
+                        var label: String?,
+                        var content_type: String?,
+                        var state: String?,
+                        var size: Long = 0,
+                        var download_count: Int = 0,
+                        var created_at: String?,
+                        var updated_at: String?,
+                        var browser_download_url: String?)
+    : Parcelable
 
 }

@@ -18,14 +18,14 @@ class MediaStoreObserver
  */
 (service: MusicService) : BaseObserver(service, null) {
 
-    internal override fun onAccept(uri: Uri) {
-        //        MusicServiceRemote.setAllSong(MediaStoreUtil.getAllSongsId());
-        mService.get()?.allSong = MediaStoreUtil.getAllSongsId()
-        sendLocalBroadcast(Intent(MusicService.MEDIA_STORE_CHANGE))
+  internal override fun onAccept(uri: Uri) {
+    //        MusicServiceRemote.setAllSong(MediaStoreUtil.getAllSongsId());
+    mService.get()?.allSong = MediaStoreUtil.getAllSongsId()
+    sendLocalBroadcast(Intent(MusicService.MEDIA_STORE_CHANGE))
 //        mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER)
-    }
+  }
 
-    internal override fun onFilter(uri: Uri?): Boolean {
-        return uri != null && uri.toString().contains("content://media/")
-    }
+  internal override fun onFilter(uri: Uri?): Boolean {
+    return uri != null && uri.toString().contains("content://media/")
+  }
 }

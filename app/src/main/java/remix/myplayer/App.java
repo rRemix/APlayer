@@ -2,17 +2,14 @@ package remix.myplayer;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Build;
 import android.support.multidex.MultiDexApplication;
-
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.squareup.leakcanary.LeakCanary;
 import com.tencent.bugly.crashreport.CrashReport;
-
 import io.reactivex.plugins.RxJavaPlugins;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.db.DBManager;
@@ -20,11 +17,8 @@ import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.exception.RxException;
 import remix.myplayer.theme.Migration;
-import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CrashHandler;
 import remix.myplayer.util.LogUtil;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
 
 /**
@@ -32,57 +26,60 @@ import remix.myplayer.util.Util;
  */
 
 public class App extends MultiDexApplication {
-    private static Context mContext;
 
-    //是否是googlePlay版本
-    public static boolean IS_GOOGLEPLAY;
+  private static Context mContext;
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mContext = getApplicationContext();
+  //是否是googlePlay版本
+  public static boolean IS_GOOGLEPLAY;
 
-        if (!BuildConfig.DEBUG)
-            IS_GOOGLEPLAY = "google".equalsIgnoreCase(Util.getAppMetaData("BUGLY_APP_CHANNEL"));
-        setUp();
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    mContext = getApplicationContext();
 
-        //异常捕获
-        CrashHandler.getInstance().init(this);
+    if (!BuildConfig.DEBUG) {
+      IS_GOOGLEPLAY = "google".equalsIgnoreCase(Util.getAppMetaData("BUGLY_APP_CHANNEL"));
+    }
+    setUp();
 
-        //检测内存泄漏
-        if (!LeakCanary.isInAnalyzerProcess(this)) {
-            LeakCanary.install(this);
-        }
+    //异常捕获
+    CrashHandler.getInstance().init(this);
 
-        //AppShortcut
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
-            new DynamicShortcutManager(this).setUpShortcut();
-
-        //加载第三方库
-        loadLibrary();
-
-        //处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
-        RxJavaPlugins.setErrorHandler(throwable -> {
-            LogUtil.e("RxError", throwable);
-            CrashReport.postCatchedException(new RxException(throwable));
-        });
-
-
+    //检测内存泄漏
+    if (!LeakCanary.isInAnalyzerProcess(this)) {
+      LeakCanary.install(this);
     }
 
-    private void setUp() {
-        DBManager.initialInstance(new DBOpenHelper(this));
-        DiskCache.init(this);
-        Migration.migrationTheme(this);
+    //AppShortcut
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+      new DynamicShortcutManager(this).setUpShortcut();
     }
 
+    //加载第三方库
+    loadLibrary();
 
-    public static Context getContext() {
-        return mContext;
-    }
+    //处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
+    RxJavaPlugins.setErrorHandler(throwable -> {
+      LogUtil.e("RxError", throwable);
+      CrashReport.postCatchedException(new RxException(throwable));
+    });
 
-    private void loadLibrary() {
-        //bugly
+
+  }
+
+  private void setUp() {
+    DBManager.initialInstance(new DBOpenHelper(this));
+    DiskCache.init(this);
+    Migration.migrationTheme(this);
+  }
+
+
+  public static Context getContext() {
+    return mContext;
+  }
+
+  private void loadLibrary() {
+    //bugly
 //        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
 //        strategy.setCrashHandleCallback(new CrashReport.CrashHandleCallback() {
 //            public Map<String, String> onCrashHandleStart(int crashType, String errorType,
@@ -93,15 +90,17 @@ public class App extends MultiDexApplication {
 //            }
 //
 //        });
-        CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG);
+    CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG);
 
-        //fresco
-        final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
-        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-                .setBitmapMemoryCacheParamsSupplier(() -> new MemoryCacheParams(cacheSize, Integer.MAX_VALUE, cacheSize, Integer.MAX_VALUE, 2 * ByteConstants.MB))
-                .setBitmapsConfig(Bitmap.Config.RGB_565)
-                .setDownsampleEnabled(true)
-                .build();
-        Fresco.initialize(this, config);
-    }
+    //fresco
+    final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
+    ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
+        .setBitmapMemoryCacheParamsSupplier(
+            () -> new MemoryCacheParams(cacheSize, Integer.MAX_VALUE, cacheSize, Integer.MAX_VALUE,
+                2 * ByteConstants.MB))
+        .setBitmapsConfig(Bitmap.Config.RGB_565)
+        .setDownsampleEnabled(true)
+        .build();
+    Fresco.initialize(this, config);
+  }
 }

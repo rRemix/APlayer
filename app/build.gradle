@@ -32,8 +32,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 2000
-        versionName "2.0.0.0-beta"
+        versionCode 1460
+        versionName "1.4.6.0"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
@@ -110,11 +110,11 @@ android {
 //        baidu{}
 //        anzhuomarket{}
 
-        chuizi{}
-        qihu360{}
-        xiaomi{}
+        chuizi {}
+        qihu360 {}
+        xiaomi {}
         kuan {}
-        google{}
+        google {}
         productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }
@@ -189,7 +189,7 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
     debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.1'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.1'
-    kapt  'com.jakewharton:butterknife-compiler:8.8.1'
+    kapt 'com.jakewharton:butterknife-compiler:8.8.1'
 
     implementation 'com.tencent.bugly:crashreport:2.6.6.1'
     implementation 'com.anjlab.android.iab.v3:library:1.0.44'

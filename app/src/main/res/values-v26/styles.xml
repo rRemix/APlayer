@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
-        <item name="android:importantForAutofill">noExcludeDescendants</item>
-    </style>
+
+  <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+    <item name="android:importantForAutofill">noExcludeDescendants</item>
+  </style>
 </resources>

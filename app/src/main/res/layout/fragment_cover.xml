@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
 
-    <remix.myplayer.ui.widget.AutoFitSquareCardView
-        android:id="@+id/cover_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:visibility="invisible"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginTop="4dp"
-        app:cardElevation="8dp">
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/cover_image"
-            android:visibility="invisible"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            app:failureImage="@drawable/album_empty_bg_day"
-            app:failureImageScaleType="centerCrop"
-            app:actualImageScaleType="centerCrop"
-            app:placeholderImageScaleType="centerCrop"
-            app:fadeDuration="0"/>
-    </remix.myplayer.ui.widget.AutoFitSquareCardView>
+  <remix.myplayer.ui.widget.AutoFitSquareCardView
+    android:id="@+id/cover_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerHorizontal="true"
+    android:visibility="invisible"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginBottom="16dp"
+    android:layout_marginTop="4dp"
+    app:cardElevation="8dp">
+    <com.facebook.drawee.view.SimpleDraweeView
+      android:id="@+id/cover_image"
+      android:visibility="invisible"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_gravity="center"
+      app:failureImage="@drawable/album_empty_bg_day"
+      app:failureImageScaleType="centerCrop"
+      app:actualImageScaleType="centerCrop"
+      app:placeholderImageScaleType="centerCrop"
+      app:fadeDuration="0"/>
+  </remix.myplayer.ui.widget.AutoFitSquareCardView>
 
 </RelativeLayout>

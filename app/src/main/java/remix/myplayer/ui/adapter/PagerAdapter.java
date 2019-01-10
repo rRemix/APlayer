@@ -4,7 +4,6 @@ package remix.myplayer.ui.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,39 +16,40 @@ import java.util.List;
  */
 
 public class PagerAdapter extends FragmentPagerAdapter {
-    private List<Fragment> mFragmentList = new ArrayList<>();
 
-    public PagerAdapter(FragmentManager fm) {
-        super(fm);
-    }
+  private List<Fragment> mFragmentList = new ArrayList<>();
 
-    private List<String> mTitles = new ArrayList<>();
+  public PagerAdapter(FragmentManager fm) {
+    super(fm);
+  }
 
-    public void addFragment(Fragment fragment) {
-        mFragmentList.add(fragment);
-    }
+  private List<String> mTitles = new ArrayList<>();
 
-    public void setTitles(List<String> titles) {
-        mTitles = titles;
-    }
+  public void addFragment(Fragment fragment) {
+    mFragmentList.add(fragment);
+  }
 
-    public void addTitle(String title) {
-        mTitles.add(title);
-    }
+  public void setTitles(List<String> titles) {
+    mTitles = titles;
+  }
 
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return mTitles.get(position);
-    }
+  public void addTitle(String title) {
+    mTitles.add(title);
+  }
 
-    @Override
-    public Fragment getItem(int position) {
-        return mFragmentList.get(position);
-    }
+  @Override
+  public CharSequence getPageTitle(int position) {
+    return mTitles.get(position);
+  }
 
-    @Override
-    public int getCount() {
-        return mFragmentList.size();
-    }
+  @Override
+  public Fragment getItem(int position) {
+    return mFragmentList.get(position);
+  }
+
+  @Override
+  public int getCount() {
+    return mFragmentList.size();
+  }
 
 }

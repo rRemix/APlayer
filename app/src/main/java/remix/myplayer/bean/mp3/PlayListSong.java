@@ -7,22 +7,23 @@ package remix.myplayer.bean.mp3;
  * @Date 2016/10/13 11:21
  */
 public class PlayListSong {
-    public int _Id;
-    public int AudioId;
-    //    public int AlbumID;
+
+  public int _Id;
+  public int AudioId;
+  //    public int AlbumID;
 //    public String Album;
 //    public int ArtistID;
 //    public String Artist;
 //    public String Data;
-    public int PlayListID;
-    public String PlayListName;
+  public int PlayListID;
+  public String PlayListName;
 
-    public PlayListSong() {
-    }
+  public PlayListSong() {
+  }
 
-    public PlayListSong(int audioId, int playListID, String playListName) {
-        AudioId = audioId;
-        PlayListID = playListID;
-        PlayListName = playListName;
-    }
+  public PlayListSong(int audioId, int playListID, String playListName) {
+    AudioId = audioId;
+    PlayListID = playListID;
+    PlayListName = playListName;
+  }
 }

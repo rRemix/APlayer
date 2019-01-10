@@ -8,15 +8,15 @@ package remix.myplayer.service
  */
 
 interface Playback {
-    fun playSelectSong(position: Int)
+  fun playSelectSong(position: Int)
 
-    fun toggle()
+  fun toggle()
 
-    fun playNext()
+  fun playNext()
 
-    fun playPrevious()
+  fun playPrevious()
 
-    fun play(fadeIn: Boolean)
+  fun play(fadeIn: Boolean)
 
-    fun pause(updateMediasessionOnly: Boolean)
+  fun pause(updateMediasessionOnly: Boolean)
 }

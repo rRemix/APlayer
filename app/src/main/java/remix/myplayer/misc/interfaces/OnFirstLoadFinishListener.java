@@ -5,5 +5,6 @@ package remix.myplayer.misc.interfaces;
  */
 
 public interface OnFirstLoadFinishListener {
-    void onFirstLoadFinish();
+
+  void onFirstLoadFinish();
 }

@@ -15,11 +15,11 @@ import remix.myplayer.appshortcuts.AppShortcutActivity
 @TargetApi(Build.VERSION_CODES.N_MR1)
 class LastAddedShortcutType(context: Context) : BaseShortcutType(context) {
 
-    override val shortcutInfo: ShortcutInfo
-        get() = ShortcutInfo.Builder(context, ID_PREFIX + "last_added")
-                .setShortLabel(context.getString(R.string.recently))
-                .setLongLabel(context.getString(R.string.recently))
-                .setIcon(Icon.createWithResource(context, R.drawable.icon_appshortcut_last_add))
-                .setIntent(getIntent(AppShortcutActivity.SHORTCUT_TYPE_LAST_ADDED))
-                .build()
+  override val shortcutInfo: ShortcutInfo
+    get() = ShortcutInfo.Builder(context, ID_PREFIX + "last_added")
+        .setShortLabel(context.getString(R.string.recently))
+        .setLongLabel(context.getString(R.string.recently))
+        .setIcon(Icon.createWithResource(context, R.drawable.icon_appshortcut_last_add))
+        .setIntent(getIntent(AppShortcutActivity.SHORTCUT_TYPE_LAST_ADDED))
+        .build()
 }

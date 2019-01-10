@@ -5,5 +5,5 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class AnimationUrl(
-        var albumId: Int = 0,
-        var url: String? = null) : Parcelable
+    var albumId: Int = 0,
+    var url: String? = null) : Parcelable

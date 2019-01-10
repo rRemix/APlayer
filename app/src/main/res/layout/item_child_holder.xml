@@ -1,63 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="@dimen/d64_size"
+  android:gravity="center_vertical"
+  android:background="?attr/background_list">
+  <!--结尾处按钮-->
+  <ImageButton
+    android:layout_alignParentRight="true"
+    android:id="@+id/song_item_button"
+    android:layout_width="@dimen/item_list_btn_size"
+    android:layout_height="@dimen/item_list_btn_size"
+    android:layout_centerVertical="true"
+    android:scaleType="center"
+    android:background="?attr/background_oval_ripple"/>
+
+  <remix.myplayer.ui.widget.ColumnView
+    android:layout_toLeftOf="@id/song_item_button"
+    android:visibility="gone"
+    android:layout_centerVertical="true"
+    android:layout_width="@dimen/d18_size"
+    android:layout_height="@dimen/d16_size"
+    app:columnwidth="@dimen/d2_size"
+    app:columncolor="@color/white"
+    app:columnnum="4"
+    android:id="@+id/song_columnview"
+    android:layout_marginRight="@dimen/d8_size"/>
+
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="@dimen/d64_size"
+    android:orientation="horizontal"
+    android:layout_toLeftOf="@id/song_columnview"
     android:gravity="center_vertical"
-    android:background="?attr/background_list">
-    <!--结尾处按钮-->
-    <ImageButton
-        android:layout_alignParentRight="true"
-        android:id="@+id/song_item_button"
-        android:layout_width="@dimen/item_list_btn_size"
-        android:layout_height="@dimen/item_list_btn_size"
-        android:layout_centerVertical="true"
-        android:scaleType="center"
-        android:background="?attr/background_oval_ripple"/>
+    android:layout_marginLeft="@dimen/d16_size"
+    android:layout_marginRight="@dimen/d8_size">
+    <ImageView
+      android:id="@+id/sq"
+      android:visibility="gone"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/icon_sq"
+      android:background="@color/transparent"
+      android:layout_marginRight="@dimen/d2_size"/>
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center_vertical"
+      android:id="@+id/album_holder_item_title"
+      android:lines="1"
+      android:ellipsize="end"
+      android:textSize="@dimen/s16_size"
+      android:textColor="?attr/text_color_primary"/>
+  </LinearLayout>
 
-    <remix.myplayer.ui.widget.ColumnView
-        android:layout_toLeftOf="@id/song_item_button"
-        android:visibility="gone"
-        android:layout_centerVertical="true"
-        android:layout_width="@dimen/d18_size"
-        android:layout_height="@dimen/d16_size"
-        app:columnwidth="@dimen/d2_size"
-        app:columncolor="@color/white"
-        app:columnnum="4"
-        android:id="@+id/song_columnview"
-        android:layout_marginRight="@dimen/d8_size" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/d64_size"
-        android:orientation="horizontal"
-        android:layout_toLeftOf="@id/song_columnview"
-        android:gravity="center_vertical"
-        android:layout_marginLeft="@dimen/d16_size"
-        android:layout_marginRight="@dimen/d8_size">
-        <ImageView
-            android:id="@+id/sq"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/icon_sq"
-            android:background="@color/transparent"
-            android:layout_marginRight="@dimen/d2_size"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:id="@+id/album_holder_item_title"
-            android:lines="1"
-            android:ellipsize="end"
-            android:textSize="@dimen/s16_size"
-            android:textColor="?attr/text_color_primary"/>
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/d1_size"
-        android:background="?attr/divider_color"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="@dimen/d16_size"/>
+  <View
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/d1_size"
+    android:background="?attr/divider_color"
+    android:layout_alignParentBottom="true"
+    android:layout_marginLeft="@dimen/d16_size"/>
 </RelativeLayout>

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="ActivityAnimDuration">330</integer>
-    <integer name="PlayerActivityAnimDuration">200</integer>
-    <integer name="FadeDuration">300</integer>
-    <integer name="DialogAnimDuration">300</integer>
-    <integer name="LockScreenRightOutDuration">250</integer>
+  <integer name="ActivityAnimDuration">330</integer>
+  <integer name="PlayerActivityAnimDuration">200</integer>
+  <integer name="FadeDuration">300</integer>
+  <integer name="DialogAnimDuration">300</integer>
+  <integer name="LockScreenRightOutDuration">250</integer>
 
-    <string-array name="general_theme">
-        <item>@string/light_theme</item>
-        <item>@string/dark_theme</item>
-        <item>@string/black_theme</item>
-    </string-array>
+  <string-array name="general_theme">
+    <item>@string/light_theme</item>
+    <item>@string/dark_theme</item>
+    <item>@string/black_theme</item>
+  </string-array>
 </resources>

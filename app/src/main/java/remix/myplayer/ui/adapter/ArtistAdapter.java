@@ -1,5 +1,8 @@
 package remix.myplayer.ui.adapter;
 
+import static remix.myplayer.request.ImageUriRequest.BIG_IMAGE_SIZE;
+import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
@@ -15,12 +18,10 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
+import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 import com.tencent.bugly.crashreport.CrashReport;
-
-import butterknife.BindView;
 import io.reactivex.disposables.Disposable;
 import remix.myplayer.App;
 import remix.myplayer.R;
@@ -40,9 +41,6 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.ToastUtil;
 
-import static remix.myplayer.request.ImageUriRequest.BIG_IMAGE_SIZE;
-import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
-
 /**
  * Created by Remix on 2015/12/22.
  */
@@ -50,110 +48,118 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 /**
  * 艺术家界面的适配器
  */
-public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> implements FastScroller.SectionIndexer {
-    public ArtistAdapter(Context context, int layoutId, MultipleChoice multiChoice, FastScrollRecyclerView recyclerView) {
-        super(context, layoutId, multiChoice, recyclerView);
+public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> implements
+    FastScroller.SectionIndexer {
+
+  public ArtistAdapter(Context context, int layoutId, MultipleChoice multiChoice,
+      FastScrollRecyclerView recyclerView) {
+    super(context, layoutId, multiChoice, recyclerView);
+  }
+
+  @Override
+  public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    if (viewType == TYPE_HEADER) {
+      return new HeaderHolder(
+          LayoutInflater.from(mContext).inflate(R.layout.layout_header_2, parent, false));
+    }
+    return viewType == HeaderAdapter.LIST_MODE ?
+        new ArtistAdapter.ArtistListHolder(LayoutInflater.from(parent.getContext())
+            .inflate(R.layout.item_artist_recycle_list, parent, false)) :
+        new ArtistAdapter.ArtistGridHolder(LayoutInflater.from(parent.getContext())
+            .inflate(R.layout.item_artist_recycle_grid, parent, false));
+  }
+
+  @Override
+  public void onViewRecycled(BaseViewHolder holder) {
+    super.onViewRecycled(holder);
+    if (holder instanceof ArtistHolder) {
+      if (((ArtistHolder) holder).mImage.getTag() != null) {
+        Disposable disposable = (Disposable) ((ArtistHolder) holder).mImage.getTag();
+        if (!disposable.isDisposed()) {
+          disposable.dispose();
+        }
+      }
+      ((ArtistHolder) holder).mImage.setImageURI(Uri.EMPTY);
+    }
+  }
+
+  @SuppressLint({"RestrictedApi", "CheckResult"})
+  @Override
+  protected void convert(final BaseViewHolder baseHolder, final Artist artist, final int position) {
+    if (position == 0) {
+      final HeaderHolder headerHolder = (HeaderHolder) baseHolder;
+      setUpModeButton(headerHolder);
+      return;
     }
 
-    @Override
-    public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == TYPE_HEADER) {
-            return new HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_header_2, parent, false));
-        }
-        return viewType == HeaderAdapter.LIST_MODE ?
-                new ArtistAdapter.ArtistListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_list, parent, false)) :
-                new ArtistAdapter.ArtistGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_grid, parent, false));
+    if (!(baseHolder instanceof ArtistHolder)) {
+      return;
     }
-
-    @Override
-    public void onViewRecycled(BaseViewHolder holder) {
-        super.onViewRecycled(holder);
-        if (holder instanceof ArtistHolder) {
-            if (((ArtistHolder) holder).mImage.getTag() != null) {
-                Disposable disposable = (Disposable) ((ArtistHolder) holder).mImage.getTag();
-                if (!disposable.isDisposed())
-                    disposable.dispose();
-            }
-            ((ArtistHolder) holder).mImage.setImageURI(Uri.EMPTY);
+    final ArtistHolder holder = (ArtistHolder) baseHolder;
+    //设置歌手名
+    holder.mText1.setText(artist.getArtist());
+    final int artistId = artist.getArtistID();
+    if (holder instanceof ArtistListHolder && holder.mText2 != null) {
+      if (artist.getCount() > 0) {
+        holder.mText2.setText(mContext.getString(R.string.song_count_1, artist.getCount()));
+      } else {
+        try {
+          new ArtistSongCountLoader(Constants.ARTIST, holder, artist)
+              .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, artistId);
+        } catch (Exception e) {
+          CrashReport.postCatchedException(e);
         }
+      }
     }
+    //设置封面
+    final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
+    Disposable disposable = new LibraryUriRequest(holder.mImage,
+        ImageUriUtil.getSearchRequest(artist),
+        new RequestConfig.Builder(imageSize, imageSize).build()).load();
+    holder.mImage.setTag(disposable);
 
-    @SuppressLint({"RestrictedApi", "CheckResult"})
-    @Override
-    protected void convert(final BaseViewHolder baseHolder, final Artist artist, final int position) {
-        if (position == 0) {
-            final HeaderHolder headerHolder = (HeaderHolder) baseHolder;
-            setUpModeButton(headerHolder);
-            return;
-        }
+    holder.mContainer.setOnClickListener(v -> {
+      if (holder.getAdapterPosition() - 1 < 0) {
+        ToastUtil.show(mContext, R.string.illegal_arg);
+        return;
+      }
+      mOnItemClickListener.onItemClick(holder.mContainer, position - 1);
+    });
+    //多选菜单
+    holder.mContainer.setOnLongClickListener(v -> {
+      if (holder.getAdapterPosition() - 1 < 0) {
+        ToastUtil.show(mContext, R.string.illegal_arg);
+        return true;
+      }
+      mOnItemClickListener.onItemLongClick(holder.mContainer, position - 1);
+      return true;
+    });
 
-        if (!(baseHolder instanceof ArtistHolder)) {
-            return;
-        }
-        final ArtistHolder holder = (ArtistHolder) baseHolder;
-        //设置歌手名
-        holder.mText1.setText(artist.getArtist());
-        final int artistId = artist.getArtistID();
-        if (holder instanceof ArtistListHolder && holder.mText2 != null) {
-            if (artist.getCount() > 0) {
-                holder.mText2.setText(mContext.getString(R.string.song_count_1, artist.getCount()));
-            } else {
-                try {
-                    new ArtistSongCountLoader(Constants.ARTIST, holder, artist).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, artistId);
-                } catch (Exception e) {
-                    CrashReport.postCatchedException(e);
-                }
-            }
-        }
-        //设置封面
-        final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
-        Disposable disposable = new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(artist), new RequestConfig.Builder(imageSize, imageSize).build()).load();
-        holder.mImage.setTag(disposable);
+    //popupmenu
+    int tintColor = ThemeStore.getLibraryBtnColor();
 
-        holder.mContainer.setOnClickListener(v -> {
-            if (holder.getAdapterPosition() - 1 < 0) {
-                ToastUtil.show(mContext, R.string.illegal_arg);
-                return;
-            }
-            mOnItemClickListener.onItemClick(holder.mContainer, position - 1);
-        });
-        //多选菜单
-        holder.mContainer.setOnLongClickListener(v -> {
-            if (holder.getAdapterPosition() - 1 < 0) {
-                ToastUtil.show(mContext, R.string.illegal_arg);
-                return true;
-            }
-            mOnItemClickListener.onItemLongClick(holder.mContainer, position - 1);
-            return true;
-        });
+    Theme.tintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
-        //popupmenu
-        int tintColor = ThemeStore.getLibraryBtnColor();
+    holder.mButton.setOnClickListener(v -> {
+      if (mChoice.isActive()) {
+        return;
+      }
+      final PopupMenu popupMenu = new PopupMenu(mContext, holder.mButton);
+      popupMenu.getMenuInflater().inflate(R.menu.menu_artist_item, popupMenu.getMenu());
+      popupMenu.setOnMenuItemClickListener(new LibraryListener(mContext,
+          artistId,
+          Constants.ARTIST,
+          artist.getArtist()));
+      popupMenu.setGravity(Gravity.END);
+      popupMenu.show();
+    });
 
-        Theme.tintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
+    //是否处于选中状态
+    holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
 
-        holder.mButton.setOnClickListener(v -> {
-            if (mChoice.isActive())
-                return;
-            Context wrapper = new ContextThemeWrapper(mContext, Theme.getPopupMenuStyle());
-            final PopupMenu popupMenu = new PopupMenu(wrapper, holder.mButton);
-            popupMenu.getMenuInflater().inflate(R.menu.menu_artist_item, popupMenu.getMenu());
-            popupMenu.setOnMenuItemClickListener(new LibraryListener(mContext,
-                    artistId,
-                    Constants.ARTIST,
-                    artist.getArtist()));
-            popupMenu.setGravity(Gravity.END);
-            popupMenu.show();
-        });
-
-        //是否处于选中状态
-        holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
-
-
-        //设置padding
-        setMarginForGridLayout(holder,position);
-    }
-
+    //设置padding
+    setMarginForGridLayout(holder, position);
+  }
 
 //    @NonNull
 //    @Override
@@ -167,64 +173,70 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 //        return "";
 //    }
 
+  @Override
+  public String getSectionText(int position) {
+    if (position == 0) {
+      return "";
+    }
+    if (mDatas != null && position - 1 < mDatas.size()) {
+      String artist = mDatas.get(position - 1).getArtist();
+      return !TextUtils.isEmpty(artist) ? (Pinyin.toPinyin(artist.charAt(0))).toUpperCase()
+          .substring(0, 1) : "";
+    }
+    return "";
+  }
+
+  static class ArtistHolder extends BaseViewHolder {
+
+    @BindView(R.id.item_text1)
+    TextView mText1;
+    @BindView(R.id.item_text2)
+    @Nullable
+    TextView mText2;
+    @BindView(R.id.item_simpleiview)
+    SimpleDraweeView mImage;
+    @BindView(R.id.item_button)
+    ImageButton mButton;
+    @BindView(R.id.item_container)
+    RelativeLayout mContainer;
+
+    ArtistHolder(View v) {
+      super(v);
+    }
+  }
+
+  static class ArtistListHolder extends ArtistHolder {
+
+    ArtistListHolder(View v) {
+      super(v);
+    }
+  }
+
+  static class ArtistGridHolder extends ArtistHolder {
+
+    ArtistGridHolder(View v) {
+      super(v);
+    }
+  }
+
+  private static class ArtistSongCountLoader extends AsynLoadSongNum {
+
+    private final ArtistHolder mHolder;
+    private final Artist mArtist;
+
+    ArtistSongCountLoader(int type, ArtistHolder holder, Artist artist) {
+      super(type);
+      mHolder = holder;
+      mArtist = artist;
+    }
+
     @Override
-    public String getSectionText(int position) {
-        if (position == 0)
-            return "";
-        if (mDatas != null && position - 1 < mDatas.size()) {
-            String artist = mDatas.get(position - 1).getArtist();
-            return !TextUtils.isEmpty(artist) ? (Pinyin.toPinyin(artist.charAt(0))).toUpperCase().substring(0, 1) : "";
-        }
-        return "";
+    protected void onPostExecute(Integer num) {
+      if (mHolder.mText2 != null && num > 0) {
+        mArtist.setCount(num);
+        mHolder.mText2.setText(App.getContext().getString(R.string.song_count_1, num));
+      }
     }
-
-    static class ArtistHolder extends BaseViewHolder {
-        @BindView(R.id.item_text1)
-        TextView mText1;
-        @BindView(R.id.item_text2)
-        @Nullable
-        TextView mText2;
-        @BindView(R.id.item_simpleiview)
-        SimpleDraweeView mImage;
-        @BindView(R.id.item_button)
-        ImageButton mButton;
-        @BindView(R.id.item_container)
-        RelativeLayout mContainer;
-
-        ArtistHolder(View v) {
-            super(v);
-        }
-    }
-
-    static class ArtistListHolder extends ArtistHolder {
-        ArtistListHolder(View v) {
-            super(v);
-        }
-    }
-
-    static class ArtistGridHolder extends ArtistHolder {
-        ArtistGridHolder(View v) {
-            super(v);
-        }
-    }
-
-    private static class ArtistSongCountLoader extends AsynLoadSongNum {
-        private final ArtistHolder mHolder;
-        private final Artist mArtist;
-
-        ArtistSongCountLoader(int type, ArtistHolder holder, Artist artist) {
-            super(type);
-            mHolder = holder;
-            mArtist = artist;
-        }
-
-        @Override
-        protected void onPostExecute(Integer num) {
-            if (mHolder.mText2 != null && num > 0) {
-                mArtist.setCount(num);
-                mHolder.mText2.setText(App.getContext().getString(R.string.song_count_1, num));
-            }
-        }
-    }
+  }
 
 }

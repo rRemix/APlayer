@@ -11,7 +11,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface OnHandleMessage {
-    int what() default 0;
 
-    String action() default "";
+  int what() default 0;
+
+  String action() default "";
 }

@@ -6,7 +6,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.View;
-
 import remix.myplayer.App;
 import remix.myplayer.util.DensityUtil;
 
@@ -19,32 +18,32 @@ import remix.myplayer.util.DensityUtil;
 
 public class BottomBarBehavior extends CoordinatorLayout.Behavior<View> {
 
-    public BottomBarBehavior() {
-        super();
-    }
+  public BottomBarBehavior() {
+    super();
+  }
 
-    public BottomBarBehavior(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+  public BottomBarBehavior(Context context, AttributeSet attrs) {
+    super(context, attrs);
+  }
 
-    @Override
-    public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
-        return dependency instanceof AppBarLayout;
-    }
+  @Override
+  public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
+    return dependency instanceof AppBarLayout;
+  }
 
-    @Override
-    public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-        final float top = Math.abs(dependency.getTop());
-        final Context context = App.getContext();
-        TypedArray ta = context.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
-        int actionBarSize = ta.getDimensionPixelSize(0, 0);
-        ta.recycle();
-        if (actionBarSize > 0) {
-            int bottomBarSize = DensityUtil.dip2px(context, 72);
-            child.setTranslationY(top * bottomBarSize / actionBarSize);
-            return true;
-        } else {
-            return false;
-        }
+  @Override
+  public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
+    final float top = Math.abs(dependency.getTop());
+    final Context context = App.getContext();
+    TypedArray ta = context.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
+    int actionBarSize = ta.getDimensionPixelSize(0, 0);
+    ta.recycle();
+    if (actionBarSize > 0) {
+      int bottomBarSize = DensityUtil.dip2px(context, 72);
+      child.setTranslationY(top * bottomBarSize / actionBarSize);
+      return true;
+    } else {
+      return false;
     }
+  }
 }

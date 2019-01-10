@@ -14,25 +14,26 @@ import android.view.MotionEvent;
  */
 public class PagerEditText extends AppCompatEditText {
 
-    public PagerEditText(Context context) {
-        super(context);
-    }
+  public PagerEditText(Context context) {
+    super(context);
+  }
 
-    public PagerEditText(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+  public PagerEditText(Context context, AttributeSet attrs) {
+    super(context, attrs);
+  }
 
-    public PagerEditText(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
+  public PagerEditText(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+  }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        //ACTION_MOVE事件继续向上传递,否则ViewPager无法滑动
-        if (event.getAction() == MotionEvent.ACTION_MOVE)
-            return true;
-        return super.onTouchEvent(event);
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    //ACTION_MOVE事件继续向上传递,否则ViewPager无法滑动
+    if (event.getAction() == MotionEvent.ACTION_MOVE) {
+      return true;
     }
+    return super.onTouchEvent(event);
+  }
 
 
 }

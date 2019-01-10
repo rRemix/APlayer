@@ -7,5 +7,6 @@ package remix.myplayer.misc.interfaces;
  * @Date 2016/9/29 10:10
  */
 public interface OnUpdateOptionMenuListener {
-    void onUpdate(boolean multiShow);
+
+  void onUpdate(boolean multiShow);
 }

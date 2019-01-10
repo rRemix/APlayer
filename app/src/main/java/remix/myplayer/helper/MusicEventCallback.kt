@@ -3,17 +3,17 @@ package remix.myplayer.helper
 import remix.myplayer.service.MusicService
 
 interface MusicEventCallback {
-    fun onMediaStoreChanged()
+  fun onMediaStoreChanged()
 
-    fun onPermissionChanged(has: Boolean)
+  fun onPermissionChanged(has: Boolean)
 
-    fun onPlayListChanged()
+  fun onPlayListChanged()
 
-    fun onServiceConnected(service: MusicService)
+  fun onServiceConnected(service: MusicService)
 
-    fun onMetaChanged()
+  fun onMetaChanged()
 
-    fun onPlayStateChange()
+  fun onPlayStateChange()
 
-    fun onServiceDisConnected()
+  fun onServiceDisConnected()
 }

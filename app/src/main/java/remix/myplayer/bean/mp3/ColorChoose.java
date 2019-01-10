@@ -9,24 +9,25 @@ import android.widget.ImageView;
  * @Date 2016/8/26 14:43
  */
 public class ColorChoose {
-    /**
-     * 主题颜色
-     */
-    public int mThemeColor;
 
-    /**
-     * 颜色文本
-     */
-    public String mColorText;
+  /**
+   * 主题颜色
+   */
+  public int mThemeColor;
 
-    /**
-     * 是否选中
-     */
-    public ImageView mCheck;
+  /**
+   * 颜色文本
+   */
+  public String mColorText;
 
-    public ColorChoose(int ThemeColor, String ColorText, ImageView Check) {
-        this.mThemeColor = ThemeColor;
-        this.mColorText = ColorText;
-        this.mCheck = Check;
-    }
+  /**
+   * 是否选中
+   */
+  public ImageView mCheck;
+
+  public ColorChoose(int ThemeColor, String ColorText, ImageView Check) {
+    this.mThemeColor = ThemeColor;
+    this.mColorText = ColorText;
+    this.mCheck = Check;
+  }
 }

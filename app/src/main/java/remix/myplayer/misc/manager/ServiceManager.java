@@ -1,7 +1,6 @@
 package remix.myplayer.misc.manager;
 
 import android.app.Service;
-
 import java.util.ArrayList;
 
 /**
@@ -9,24 +8,25 @@ import java.util.ArrayList;
  */
 
 /**
- * 管理所有Service
- * 当程序退出时，停止所有Service
+ * 管理所有Service 当程序退出时，停止所有Service
  */
 public class ServiceManager {
-    private static ArrayList<Service> mServiceList = new ArrayList<>();
 
-    public static void AddService(Service service) {
-        mServiceList.add(service);
-    }
+  private static ArrayList<Service> mServiceList = new ArrayList<>();
 
-    public static void RemoveService(Service service) {
-        mServiceList.remove(service);
-    }
+  public static void AddService(Service service) {
+    mServiceList.add(service);
+  }
 
-    public static void StopAll() {
-        for (Service service : mServiceList) {
-            if (service != null)
-                service.stopSelf();
-        }
+  public static void RemoveService(Service service) {
+    mServiceList.remove(service);
+  }
+
+  public static void StopAll() {
+    for (Service service : mServiceList) {
+      if (service != null) {
+        service.stopSelf();
+      }
     }
+  }
 }

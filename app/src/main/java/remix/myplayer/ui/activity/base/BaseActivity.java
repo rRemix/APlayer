@@ -1,5 +1,7 @@
 package remix.myplayer.ui.activity.base;
 
+import static remix.myplayer.util.Util.sendLocalBroadcast;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -8,9 +10,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
 import com.tbruyelle.rxpermissions2.RxPermissions;
-
 import remix.myplayer.misc.manager.ActivityManager;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -20,8 +20,6 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.Util;
 
-import static remix.myplayer.util.Util.sendLocalBroadcast;
-
 /**
  * Created by Remix on 2016/3/16.
  */
@@ -29,25 +27,27 @@ import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 @SuppressLint("Registered")
 public class BaseActivity extends AppCompatActivity {
-    protected Context mContext;
-    protected boolean mIsDestroyed;
-    protected boolean mIsForeground;
-    protected boolean mHasPermission;
-    public static final String[] EXTERNAL_STORAGE_PERMISSIONS = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+  protected Context mContext;
+  protected boolean mIsDestroyed;
+  protected boolean mIsForeground;
+  protected boolean mHasPermission;
+  public static final String[] EXTERNAL_STORAGE_PERMISSIONS = new String[]{
+      Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
 
-    /**
-     * 设置主题
-     */
-    protected void setUpTheme() {
-       setTheme(ThemeStore.getThemeRes());
-    }
+  /**
+   * 设置主题
+   */
+  protected void setUpTheme() {
+    setTheme(ThemeStore.getThemeRes());
+  }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        mContext = this;
-        mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS);
-        //严格模式
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    mContext = this;
+    mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS);
+    //严格模式
 //        if (BuildConfig.DEBUG) {
 //            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 //                    .detectDiskReads()
@@ -63,82 +63,84 @@ public class BaseActivity extends AppCompatActivity {
 //                    .build());
 //        }
 
-        setUpTheme();
-        super.onCreate(savedInstanceState);
-        //静止横屏
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        //将该activity添加到ActivityManager,用于退出程序时关闭
-        ActivityManager.AddActivity(this);
-        setNavigationBarColor();
-    }
+    setUpTheme();
+    super.onCreate(savedInstanceState);
+    //静止横屏
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    //将该activity添加到ActivityManager,用于退出程序时关闭
+    ActivityManager.AddActivity(this);
+    setNavigationBarColor();
+  }
 
-    @Override
-    public void setContentView(int layoutResID) {
-        super.setContentView(layoutResID);
-        setStatusBarColor();
-        setStatusBarMode();
-    }
+  @Override
+  public void setContentView(int layoutResID) {
+    super.setContentView(layoutResID);
+    setStatusBarColor();
+    setStatusBarMode();
+  }
 
-    protected void setStatusBarMode() {
-        StatusBarUtil.setStatusBarModeAuto(this);
-    }
+  protected void setStatusBarMode() {
+    StatusBarUtil.setStatusBarModeAuto(this);
+  }
 
-    /**
-     * 设置状态栏颜色
-     */
-    protected void setStatusBarColor() {
-        StatusBarUtil.setColorNoTranslucent(this, ThemeStore.getStatusBarColor());
-    }
+  /**
+   * 设置状态栏颜色
+   */
+  protected void setStatusBarColor() {
+    StatusBarUtil.setColorNoTranslucent(this, ThemeStore.getStatusBarColor());
+  }
 
-    /**
-     * 设置导航栏颜色
-     */
-    protected void setNavigationBarColor() {
-        //导航栏变色
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION, false)) {
-            final int navigationColor = ThemeStore.getNavigationBarColor();
-            getWindow().setNavigationBarColor(navigationColor);
-            Theme.setLightNavigationbarAuto(this, ColorUtil.isColorLight(navigationColor));
-        }
+  /**
+   * 设置导航栏颜色
+   */
+  protected void setNavigationBarColor() {
+    //导航栏变色
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil
+        .getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION, false)) {
+      final int navigationColor = ThemeStore.getNavigationBarColor();
+      getWindow().setNavigationBarColor(navigationColor);
+      Theme.setLightNavigationbarAuto(this, ColorUtil.isColorLight(navigationColor));
     }
+  }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ActivityManager.RemoveActivity(this);
-        mIsDestroyed = true;
-    }
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    ActivityManager.RemoveActivity(this);
+    mIsDestroyed = true;
+  }
 
-    @Override
-    public boolean isDestroyed() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 ? super.isDestroyed() : mIsDestroyed;
-    }
+  @Override
+  public boolean isDestroyed() {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 ? super.isDestroyed()
+        : mIsDestroyed;
+  }
 
 
-    @SuppressLint("CheckResult")
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mIsForeground = true;
-        new RxPermissions(this)
-                .request(EXTERNAL_STORAGE_PERMISSIONS)
-                .subscribe(has -> {
-                    if (has != mHasPermission) {
-                        Intent intent = new Intent(MusicService.PERMISSION_CHANGE);
-                        intent.putExtra("permission", has);
-                        sendLocalBroadcast(intent);
-                    }
-                });
-    }
+  @SuppressLint("CheckResult")
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mIsForeground = true;
+    new RxPermissions(this)
+        .request(EXTERNAL_STORAGE_PERMISSIONS)
+        .subscribe(has -> {
+          if (has != mHasPermission) {
+            Intent intent = new Intent(MusicService.PERMISSION_CHANGE);
+            intent.putExtra("permission", has);
+            sendLocalBroadcast(intent);
+          }
+        });
+  }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mIsForeground = false;
-    }
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mIsForeground = false;
+  }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
+  @Override
+  protected void onStop() {
+    super.onStop();
+  }
 }

@@ -7,63 +7,64 @@ package remix.myplayer.bean.mp3;
  * @Date 2016/10/13 11:22
  */
 public class PlayList {
-    public int _Id;
-    public String Name;
-    public int Count;
-    public int Date;
 
-    public PlayList() {
-    }
+  public int _Id;
+  public String Name;
+  public int Count;
+  public int Date;
 
-    public PlayList(String name, int count) {
-        Name = name;
-        Count = count;
-    }
+  public PlayList() {
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
+  public PlayList(String name, int count) {
+    Name = name;
+    Count = count;
+  }
 
-    public int getId() {
-        return _Id;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
 
-    public void setId(int _Id) {
-        this._Id = _Id;
-    }
+  public int getId() {
+    return _Id;
+  }
 
-    public String getName() {
-        return Name;
-    }
+  public void setId(int _Id) {
+    this._Id = _Id;
+  }
 
-    public void setName(String name) {
-        Name = name;
-    }
+  public String getName() {
+    return Name;
+  }
 
-    public int getCount() {
-        return Count;
-    }
+  public void setName(String name) {
+    Name = name;
+  }
 
-    public void setCount(int count) {
-        Count = count;
-    }
+  public int getCount() {
+    return Count;
+  }
 
-    public int getDate() {
-        return Date;
-    }
+  public void setCount(int count) {
+    Count = count;
+  }
 
-    public void setDate(int date) {
-        Date = date;
-    }
+  public int getDate() {
+    return Date;
+  }
 
-    @Override
-    public String toString() {
-        return "PlayList{" +
-                "_Id=" + _Id +
-                ", Name='" + Name + '\'' +
-                ", Count=" + Count +
-                ", Date=" + Date +
-                '}';
-    }
+  public void setDate(int date) {
+    Date = date;
+  }
+
+  @Override
+  public String toString() {
+    return "PlayList{" +
+        "_Id=" + _Id +
+        ", Name='" + Name + '\'' +
+        ", Count=" + Count +
+        ", Date=" + Date +
+        '}';
+  }
 }

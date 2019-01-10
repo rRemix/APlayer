@@ -8,180 +8,177 @@ import java.util.List;
  */
 
 public class NArtistSearchResponse implements Serializable {
-    private static final long serialVersionUID = 7911648889868864488L;
+
+  private static final long serialVersionUID = 7911648889868864488L;
+  /**
+   * result : {"artistCount":6,"artists":[{"id":18355,"name":"AKB48","picUrl":"http://p1.music.126.net/AjQKwXEp0VXXAkyISRl7Xw==/109951163016683093.jpg","alias":["エーケービー
+   * フォーティエイト"],"albumSize":200,"picId":109951163016683093,"img1v1Url":"http://p1.music.126.net/ybqv1sPl7l1J-inzlcMRRg==/109951163073222217.jpg","img1v1":109951163073222217,"mvSize":217,"followed":false,"alia":["エーケービー
+   * フォーティエイト"],"trans":null}]} code : 200
+   */
+
+  private ResultBean result;
+  private int code;
+
+  public ResultBean getResult() {
+    return result;
+  }
+
+  public void setResult(ResultBean result) {
+    this.result = result;
+  }
+
+  public int getCode() {
+    return code;
+  }
+
+  public void setCode(int code) {
+    this.code = code;
+  }
+
+  public static class ResultBean {
+
     /**
-     * result : {"artistCount":6,"artists":[{"id":18355,"name":"AKB48","picUrl":"http://p1.music.126.net/AjQKwXEp0VXXAkyISRl7Xw==/109951163016683093.jpg","alias":["エーケービー フォーティエイト"],"albumSize":200,"picId":109951163016683093,"img1v1Url":"http://p1.music.126.net/ybqv1sPl7l1J-inzlcMRRg==/109951163073222217.jpg","img1v1":109951163073222217,"mvSize":217,"followed":false,"alia":["エーケービー フォーティエイト"],"trans":null}]}
-     * code : 200
+     * artistCount : 6 artists : [{"id":18355,"name":"AKB48","picUrl":"http://p1.music.126.net/AjQKwXEp0VXXAkyISRl7Xw==/109951163016683093.jpg","alias":["エーケービー
+     * フォーティエイト"],"albumSize":200,"picId":109951163016683093,"img1v1Url":"http://p1.music.126.net/ybqv1sPl7l1J-inzlcMRRg==/109951163073222217.jpg","img1v1":109951163073222217,"mvSize":217,"followed":false,"alia":["エーケービー
+     * フォーティエイト"],"trans":null}]
      */
 
-    private ResultBean result;
-    private int code;
+    private int artistCount;
+    private List<ArtistsBean> artists;
 
-    public ResultBean getResult() {
-        return result;
+    public int getArtistCount() {
+      return artistCount;
     }
 
-    public void setResult(ResultBean result) {
-        this.result = result;
+    public void setArtistCount(int artistCount) {
+      this.artistCount = artistCount;
     }
 
-    public int getCode() {
-        return code;
+    public List<ArtistsBean> getArtists() {
+      return artists;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public void setArtists(List<ArtistsBean> artists) {
+      this.artists = artists;
     }
 
-    public static class ResultBean {
-        /**
-         * artistCount : 6
-         * artists : [{"id":18355,"name":"AKB48","picUrl":"http://p1.music.126.net/AjQKwXEp0VXXAkyISRl7Xw==/109951163016683093.jpg","alias":["エーケービー フォーティエイト"],"albumSize":200,"picId":109951163016683093,"img1v1Url":"http://p1.music.126.net/ybqv1sPl7l1J-inzlcMRRg==/109951163073222217.jpg","img1v1":109951163073222217,"mvSize":217,"followed":false,"alia":["エーケービー フォーティエイト"],"trans":null}]
-         */
+    public static class ArtistsBean {
 
-        private int artistCount;
-        private List<ArtistsBean> artists;
+      /**
+       * id : 18355 name : AKB48 picUrl : http://p1.music.126.net/AjQKwXEp0VXXAkyISRl7Xw==/109951163016683093.jpg
+       * alias : ["エーケービー フォーティエイト"] albumSize : 200 picId : 109951163016683093 img1v1Url :
+       * http://p1.music.126.net/ybqv1sPl7l1J-inzlcMRRg==/109951163073222217.jpg img1v1 :
+       * 109951163073222217 mvSize : 217 followed : false alia : ["エーケービー フォーティエイト"] trans : null
+       */
 
-        public int getArtistCount() {
-            return artistCount;
-        }
+      private int id;
+      private String name;
+      private String picUrl;
+      private int albumSize;
+      private long picId;
+      private String img1v1Url;
+      private long img1v1;
+      private int mvSize;
+      private boolean followed;
+      private Object trans;
+      private List<String> alias;
+      private List<String> alia;
 
-        public void setArtistCount(int artistCount) {
-            this.artistCount = artistCount;
-        }
+      public int getId() {
+        return id;
+      }
 
-        public List<ArtistsBean> getArtists() {
-            return artists;
-        }
+      public void setId(int id) {
+        this.id = id;
+      }
 
-        public void setArtists(List<ArtistsBean> artists) {
-            this.artists = artists;
-        }
+      public String getName() {
+        return name;
+      }
 
-        public static class ArtistsBean {
-            /**
-             * id : 18355
-             * name : AKB48
-             * picUrl : http://p1.music.126.net/AjQKwXEp0VXXAkyISRl7Xw==/109951163016683093.jpg
-             * alias : ["エーケービー フォーティエイト"]
-             * albumSize : 200
-             * picId : 109951163016683093
-             * img1v1Url : http://p1.music.126.net/ybqv1sPl7l1J-inzlcMRRg==/109951163073222217.jpg
-             * img1v1 : 109951163073222217
-             * mvSize : 217
-             * followed : false
-             * alia : ["エーケービー フォーティエイト"]
-             * trans : null
-             */
+      public void setName(String name) {
+        this.name = name;
+      }
 
-            private int id;
-            private String name;
-            private String picUrl;
-            private int albumSize;
-            private long picId;
-            private String img1v1Url;
-            private long img1v1;
-            private int mvSize;
-            private boolean followed;
-            private Object trans;
-            private List<String> alias;
-            private List<String> alia;
+      public String getPicUrl() {
+        return picUrl;
+      }
 
-            public int getId() {
-                return id;
-            }
+      public void setPicUrl(String picUrl) {
+        this.picUrl = picUrl;
+      }
 
-            public void setId(int id) {
-                this.id = id;
-            }
+      public int getAlbumSize() {
+        return albumSize;
+      }
 
-            public String getName() {
-                return name;
-            }
+      public void setAlbumSize(int albumSize) {
+        this.albumSize = albumSize;
+      }
 
-            public void setName(String name) {
-                this.name = name;
-            }
+      public long getPicId() {
+        return picId;
+      }
 
-            public String getPicUrl() {
-                return picUrl;
-            }
+      public void setPicId(long picId) {
+        this.picId = picId;
+      }
 
-            public void setPicUrl(String picUrl) {
-                this.picUrl = picUrl;
-            }
+      public String getImg1v1Url() {
+        return img1v1Url;
+      }
 
-            public int getAlbumSize() {
-                return albumSize;
-            }
+      public void setImg1v1Url(String img1v1Url) {
+        this.img1v1Url = img1v1Url;
+      }
 
-            public void setAlbumSize(int albumSize) {
-                this.albumSize = albumSize;
-            }
+      public long getImg1v1() {
+        return img1v1;
+      }
 
-            public long getPicId() {
-                return picId;
-            }
+      public void setImg1v1(long img1v1) {
+        this.img1v1 = img1v1;
+      }
 
-            public void setPicId(long picId) {
-                this.picId = picId;
-            }
+      public int getMvSize() {
+        return mvSize;
+      }
 
-            public String getImg1v1Url() {
-                return img1v1Url;
-            }
+      public void setMvSize(int mvSize) {
+        this.mvSize = mvSize;
+      }
 
-            public void setImg1v1Url(String img1v1Url) {
-                this.img1v1Url = img1v1Url;
-            }
+      public boolean isFollowed() {
+        return followed;
+      }
 
-            public long getImg1v1() {
-                return img1v1;
-            }
+      public void setFollowed(boolean followed) {
+        this.followed = followed;
+      }
 
-            public void setImg1v1(long img1v1) {
-                this.img1v1 = img1v1;
-            }
+      public Object getTrans() {
+        return trans;
+      }
 
-            public int getMvSize() {
-                return mvSize;
-            }
+      public void setTrans(Object trans) {
+        this.trans = trans;
+      }
 
-            public void setMvSize(int mvSize) {
-                this.mvSize = mvSize;
-            }
+      public List<String> getAlias() {
+        return alias;
+      }
 
-            public boolean isFollowed() {
-                return followed;
-            }
+      public void setAlias(List<String> alias) {
+        this.alias = alias;
+      }
 
-            public void setFollowed(boolean followed) {
-                this.followed = followed;
-            }
+      public List<String> getAlia() {
+        return alia;
+      }
 
-            public Object getTrans() {
-                return trans;
-            }
-
-            public void setTrans(Object trans) {
-                this.trans = trans;
-            }
-
-            public List<String> getAlias() {
-                return alias;
-            }
-
-            public void setAlias(List<String> alias) {
-                this.alias = alias;
-            }
-
-            public List<String> getAlia() {
-                return alia;
-            }
-
-            public void setAlia(List<String> alia) {
-                this.alia = alia;
-            }
-        }
+      public void setAlia(List<String> alia) {
+        this.alia = alia;
+      }
     }
+  }
 }

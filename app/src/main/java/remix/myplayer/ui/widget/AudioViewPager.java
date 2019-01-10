@@ -8,16 +8,16 @@ import android.util.AttributeSet;
  * Created by taeja on 16-1-25.
  */
 public class AudioViewPager extends ViewPager {
-    boolean mIntercept = false;
 
-    public AudioViewPager(Context context) {
-        super(context);
-    }
+  boolean mIntercept = false;
 
-    public AudioViewPager(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+  public AudioViewPager(Context context) {
+    super(context);
+  }
 
+  public AudioViewPager(Context context, AttributeSet attrs) {
+    super(context, attrs);
+  }
 
 //    @Override
 //    public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -26,9 +26,9 @@ public class AudioViewPager extends ViewPager {
 //        return super.onInterceptTouchEvent(ev);
 //    }
 
-    public void setIntercept(boolean value) {
-        mIntercept = value;
-    }
+  public void setIntercept(boolean value) {
+    mIntercept = value;
+  }
 
 
 }

@@ -5,37 +5,38 @@ package remix.myplayer.bean.mp3;
  */
 
 public class Artist {
-    private int ArtistID;
-    private String Artist;
-    private int Count;
 
-    public Artist(int artistID, String artist, int count) {
-        ArtistID = artistID;
-        Artist = artist;
-        Count = count;
-    }
+  private int ArtistID;
+  private String Artist;
+  private int Count;
 
-    public int getCount() {
-        return Count;
-    }
+  public Artist(int artistID, String artist, int count) {
+    ArtistID = artistID;
+    Artist = artist;
+    Count = count;
+  }
 
-    public void setCount(int count) {
-        this.Count = count;
-    }
+  public int getCount() {
+    return Count;
+  }
 
-    public int getArtistID() {
-        return ArtistID;
-    }
+  public void setCount(int count) {
+    this.Count = count;
+  }
 
-    public void setArtistID(int artistID) {
-        ArtistID = artistID;
-    }
+  public int getArtistID() {
+    return ArtistID;
+  }
 
-    public String getArtist() {
-        return Artist;
-    }
+  public void setArtistID(int artistID) {
+    ArtistID = artistID;
+  }
 
-    public void setArtist(String artist) {
-        Artist = artist;
-    }
+  public String getArtist() {
+    return Artist;
+  }
+
+  public void setArtist(String artist) {
+    Artist = artist;
+  }
 }

@@ -1,23 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:enabled="true">
-        <item android:title="@string/add_to_next_song"
-            android:id="@+id/menu_next"/>
-        <item android:title="@string/add_to_play_queue"
-            android:id="@+id/menu_add_to_play_queue"/>
-        <item android:title="@string/add_to_playlist"
-            android:id="@+id/menu_add_to_playlist"/>
-        <item android:title="@string/song_detail"
-            android:id="@+id/menu_detail"/>
-        <item android:title="@string/song_edit"
-            android:id="@+id/menu_edit"/>
-        <item android:title="@string/set_album_cover"
-            android:id="@+id/menu_album_thumb"/>
-        <item android:title="@string/share"
-            android:id="@+id/menu_share"/>
-        <item android:title="@string/ring"
-            android:id="@+id/menu_ring"/>
-        <item android:title="@string/delete"
-            android:id="@+id/menu_delete"/>
-    </group>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+  <group android:enabled="true">
+    <item
+      android:title="@string/add_to_next_song"
+      android:id="@+id/menu_next"/>
+    <item
+      android:title="@string/add_to_play_queue"
+      android:id="@+id/menu_add_to_play_queue"/>
+    <item
+      android:title="@string/add_to_playlist"
+      android:id="@+id/menu_add_to_playlist"/>
+    <item
+      android:title="@string/song_detail"
+      android:id="@+id/menu_detail"/>
+    <item
+      android:title="@string/song_edit"
+      android:id="@+id/menu_edit"/>
+    <item
+      android:title="@string/set_album_cover"
+      android:id="@+id/menu_album_thumb"/>
+    <item
+      android:title="@string/share"
+      android:id="@+id/menu_share"/>
+    <item
+      android:title="@string/ring"
+      android:id="@+id/menu_ring"/>
+    <item
+      android:title="@string/delete"
+      android:id="@+id/menu_delete"/>
+  </group>
 </menu>
