@@ -124,6 +124,11 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
     searchItem.expandActionView();
 
     SearchView searchView = (SearchView) searchItem.getActionView();
+    if(searchView == null){
+      ToastUtil.show(this,R.string.init_failed);
+      finish();
+      return true;
+    }
     searchView.setQueryHint(getString(R.string.search_hint));
     searchView.setMaxWidth(Integer.MAX_VALUE);
 
