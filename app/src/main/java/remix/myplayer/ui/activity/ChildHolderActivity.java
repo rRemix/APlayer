@@ -306,7 +306,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         if (playListSongIDList == null) {
           return new ArrayList<>();
         }
-        return PlayListUtil.getMP3ListByIds(playListSongIDList, mId);
+        return PlayListUtil.getMP3ListWithSort(playListSongIDList, mId,false);
     }
     return new ArrayList<>();
   }

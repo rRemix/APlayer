@@ -37,7 +37,7 @@ public class PlayListUriRequest extends LibraryUriRequest {
       @Override
       public void subscribe(ObservableEmitter<Song> emitter) throws Exception {
         List<Song> songs = PlayListUtil
-            .getMP3ListByIds(PlayListUtil.getSongIds(mRequest.getID()), mRequest.getID());
+            .getMP3ListWithSort(PlayListUtil.getSongIds(mRequest.getID()), mRequest.getID());
         for (Song song : songs) {
           emitter.onNext(song);
         }

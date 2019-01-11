@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import remix.myplayer.Global;
 import remix.myplayer.R;
+import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
@@ -34,6 +35,7 @@ import remix.myplayer.service.Command;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.adapter.PlayQueueAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -168,10 +170,11 @@ public class PlayQueueDialog extends BaseDialog implements
       if (ids == null || ids.isEmpty()) {
         return Collections.emptyList();
       }
-      List<Song> songs = new ArrayList<>();
-      for (Integer id : ids) {
-        songs.add(MediaStoreUtil.getSongById(id));
-      }
+//      List<Song> songs = new ArrayList<>();
+//      for (Integer id : ids) {
+//        songs.add(MediaStoreUtil.getSongById(id));
+//      }
+      List<Song> songs = PlayListUtil.getMP3ListWithSort(ids,Global.PlayQueueID);
       return songs;
     }
   }

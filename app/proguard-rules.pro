@@ -75,6 +75,7 @@ public static final int *;
 -keep public class com.android.vending.licensing.ILicensingService
 -keep public class * extends java.lang.annotation.Annotation
 -keep public class * extends android.os.Handler
+-keep class !android.support.v7.internal.view.menu.**,android.support.** {*;}
 
 -keep public class **.R$*{
    public static final int *;

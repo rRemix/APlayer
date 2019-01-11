@@ -438,14 +438,18 @@ public class PlayListUtil {
     return info;
   }
 
-  /**
-   * 根据多个歌曲id返回多个歌曲详细信息
-   *
-   * @param idList 歌曲id列表
-   * @param playlistId 播放列表id
-   * @return 对应所有歌曲信息列表
-   */
-  public static List<Song> getMP3ListByIds(List<Integer> idList, int playlistId) {
+  public static List<Song> getMP3ListWithSort(List<Integer> idList, int playlistId) {
+    return getMP3ListWithSort(idList,playlistId,true);
+  }
+
+    /**
+     * 根据多个歌曲id返回多个歌曲详细信息
+     *
+     * @param idList 歌曲id列表
+     * @param playlistId 播放列表id
+     * @return 对应所有歌曲信息列表
+     */
+  public static List<Song> getMP3ListWithSort(List<Integer> idList, int playlistId,boolean force) {
       if (idList == null || idList.size() == 0) {
           return new ArrayList<>();
       }
@@ -463,7 +467,7 @@ public class PlayListUtil {
 //                sortOrder.append(idList.get(i)).append( i == idList.size() - 1 ? "') " : ",");
 //            }
 //        }
-    boolean isCustom = sortOrder.toString()
+    boolean isCustom = force || sortOrder.toString()
         .equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM);
     if (isCustom) {
       sortOrder.delete(0, sortOrder.length());

@@ -58,7 +58,7 @@ import remix.myplayer.util.SPUtil;
 
 public abstract class ImageUriRequest<T> {
 
-  private static final List<String> BLACKLIST = Arrays
+  public static final List<String> BLACKLIST = Arrays
       .asList("https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png",
           "https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png");
 

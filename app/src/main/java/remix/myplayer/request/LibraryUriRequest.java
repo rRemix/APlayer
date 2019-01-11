@@ -45,6 +45,10 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
       onError("empty result");
       return;
     }
+    if (ImageUriRequest.BLACKLIST.contains(result)) {
+      onError("in blackList");
+      return;
+    }
     LogUtil.i(TAG, "onSuccess: " + result);
     ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder
         .newBuilderWithSource(Uri.parse(result));
