@@ -35,7 +35,7 @@ import remix.myplayer.util.MediaStoreUtil;
  */
 public class SongFragment extends LibraryFragment<Song, SongAdapter> {
 
-  @BindView(R.id.recyclerView)
+  @BindView(R.id.location_recyclerView)
   LocationRecyclerView mRecyclerView;
 
   public static final String TAG = SongFragment.class.getSimpleName();

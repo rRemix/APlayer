@@ -413,7 +413,7 @@ public class MainActivity extends MenuActivity {
   }
 
   private void addScrollListener() {
-    RecyclerView recyclerView = findViewById(R.id.recyclerView);
+    RecyclerView recyclerView = findViewById(R.id.location_recyclerView);
     if (recyclerView instanceof LocationRecyclerView) {
       LocationRecyclerView locationRecyclerView = (LocationRecyclerView) recyclerView;
       locationRecyclerView.removeOnScrollListener(mScrollListener);

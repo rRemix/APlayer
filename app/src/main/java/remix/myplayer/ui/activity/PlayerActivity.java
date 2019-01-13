@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -554,6 +555,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         currentModel = (currentModel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP
             : ++currentModel);
         MusicServiceRemote.setPlayModel(currentModel);
+        mPlayModel.setImageDrawable(Theme.tintDrawable(currentModel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+            currentModel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+                R.drawable.play_btn_loop_one,ThemeStore.getPlayerBtnColor()));
 
         String msg = currentModel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
             currentModel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random)

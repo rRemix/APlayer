@@ -57,18 +57,20 @@ class LocationRecyclerView @JvmOverloads constructor(
     val firstItem = layoutManager.findFirstVisibleItemPosition()
     val lastItem = layoutManager.findLastVisibleItemPosition()
     //然后区分情况
-    if (pos <= firstItem) {
-      //当要置顶的项在当前显示的第一个项的前面时
-      scrollToPosition(pos)
-    } else if (pos <= lastItem) {
-      //当要置顶的项已经在屏幕上显示时
-      val top = getChildAt(pos - firstItem).getTop()
-      scrollBy(0, top)
-    } else {
-      //当要置顶的项在当前显示的最后一项的后面时
-      scrollToPosition(pos)
-      //这里这个变量是用在RecyclerView滚动监听里面的
-      move = true
+    when {
+      pos <= firstItem -> //当要置顶的项在当前显示的第一个项的前面时
+        scrollToPosition(pos)
+      pos <= lastItem -> {
+        //当要置顶的项已经在屏幕上显示时
+        val top = getChildAt(pos - firstItem).getTop()
+        scrollBy(0, top)
+      }
+      else -> {
+        //当要置顶的项在当前显示的最后一项的后面时
+        scrollToPosition(pos)
+        //这里这个变量是用在RecyclerView滚动监听里面的
+        move = true
+      }
     }
     if (pos >= 0) {
       getLayoutManager().scrollToPosition(pos)

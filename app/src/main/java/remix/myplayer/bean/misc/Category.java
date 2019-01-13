@@ -30,24 +30,24 @@ public class Category implements Serializable {
             App.getContext().getString(R.string.tab_artist).equals(mTitle) ? TAG_ARTIST :
                 App.getContext().getString(R.string.tab_playlist).equals(mTitle) ? TAG_PLAYLIST
                     : TAG_FOLDER;
-    mClassName = mTag == TAG_SONG ? SongFragment.class.getName() :
-        mTag == TAG_ALBUM ? AlbumFragment.class.getName() :
-            mTag == TAG_ARTIST ? ArtistFragment.class.getName() :
-                mTag == TAG_PLAYLIST ? PlayListFragment.class.getName()
-                    : FolderFragment.class.getName();
+    mClassName = getClassName();
     mOrder = mTag;
   }
 
   public boolean isPlayList() {
-    return mClassName.equals(PlayListFragment.class.getName());
+    return getClassName().equals(PlayListFragment.class.getName());
   }
 
   public boolean isSongList() {
-    return mClassName.equals(SongFragment.class.getName());
+    return getClassName().equals(SongFragment.class.getName());
   }
 
   public String getClassName() {
-    return mClassName;
+    return mTag == TAG_SONG ? SongFragment.class.getName() :
+        mTag == TAG_ALBUM ? AlbumFragment.class.getName() :
+            mTag == TAG_ARTIST ? ArtistFragment.class.getName() :
+                mTag == TAG_PLAYLIST ? PlayListFragment.class.getName()
+                    : FolderFragment.class.getName();
   }
 
   public int getTag() {
@@ -75,9 +75,10 @@ public class Category implements Serializable {
   @Override
   public String toString() {
     return "Category{" +
-        "Title='" + mTitle + '\'' +
-        ", Order=" + mOrder +
-        ", Tag=" + mTag +
+        "mTitle='" + mTitle + '\'' +
+        ", mClassName='" + mClassName + '\'' +
+        ", mOrder=" + mOrder +
+        ", mTag=" + mTag +
         '}';
   }
 
