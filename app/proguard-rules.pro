@@ -62,9 +62,10 @@
 -keep public class remix.myplayer.R$*{
 public static final int *;
 }
--keepclasseswithmembers class * extends android.app.Activity{
-    <methods>;
+-keepclassmembers class ** {
+    @remix.myplayer.misc.handler.OnHandleMessage public *;
 }
+
 -keep public class * extends android.app.Activity
 -keep public class * extends android.app.Application
 -keep public class * extends android.app.Service
@@ -162,3 +163,4 @@ public static final int *;
 #bugly
 -dontwarn com.tencent.bugly.**
 -keep public class com.tencent.bugly.**{*;}
+

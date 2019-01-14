@@ -13,11 +13,9 @@ import static remix.myplayer.util.Util.sendLocalBroadcast;
 import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -34,7 +32,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
-import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -732,6 +729,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     mProgressSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if(fromUser){
+          updateProgressText(progress);
+        }
         mHandler.sendEmptyMessage(UPDATE_TIME_ONLY);
         mCurrentTime = progress;
         if (mLrcView != null) {
@@ -1305,14 +1305,18 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
   }
 
-  private void updateProgressByHandler() {
+  private void updateProgressText(int current){
     if (mHasPlay != null
         && mRemainPlay != null
-        && mCurrentTime > 0
-        && (mDuration - mCurrentTime) > 0) {
-      mHasPlay.setText(Util.getTime(mCurrentTime));
-      mRemainPlay.setText(Util.getTime(mDuration - mCurrentTime));
+        && current > 0
+        && (mDuration - current) > 0) {
+      mHasPlay.setText(Util.getTime(current));
+      mRemainPlay.setText(Util.getTime(mDuration - current));
     }
+  }
+
+  private void updateProgressByHandler() {
+    updateProgressText(mCurrentTime);
   }
 
   private void updateSeekbarByHandler() {
@@ -1326,6 +1330,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //            int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
 //            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
 //        }
+    LogUtil.d(TAG,"handleInternal: " + msg.what);
     if (msg.what == UPDATE_TIME_ONLY && !mIsDragSeekBarFromUser) {
       updateProgressByHandler();
     }

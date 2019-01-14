@@ -1828,7 +1828,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     if (!mShowFloatLrc) { //移除桌面歌词
       mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
     } else if (!updatePlayStateOnly(Global.Operation) || force || mFirstUpdateLrc) { //更新
-      if (createFloatLrcThreadIfNeed()) {
+      createFloatLrcThreadIfNeed();
+      if(mUpdateFloatLrcThread == null){
+        CrashReport.postCatchedException(
+            new RuntimeException("mShowFloatLrc: " + mShowFloatLrc + " isFloatLrcShowing: " + isFloatLrcShowing() + " Thread: " + mUpdateFloatLrcThread));
+      } else{
         mUpdateFloatLrcThread.setSongAndGetLyricRows(mCurrentSong);
       }
       mFirstUpdateLrc = false;
@@ -1839,8 +1843,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    * 创建更新桌面歌词的线程
    */
   private boolean createFloatLrcThreadIfNeed() {
-    LogUtil
-        .d("DesktopLrc", "createFloatLrcThreadIfNeed" + " isFloatShowing: " + isFloatLrcShowing());
+    LogUtil.d("DesktopLrc", "createFloatLrcThreadIfNeed" + " isFloatShowing: " + isFloatLrcShowing());
     if (mShowFloatLrc && !isFloatLrcShowing() && mUpdateFloatLrcThread == null) {
       mUpdateFloatLrcThread = new UpdateFloatLrcThread();
       mUpdateFloatLrcThread.start();
