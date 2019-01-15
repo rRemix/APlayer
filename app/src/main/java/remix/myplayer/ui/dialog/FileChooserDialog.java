@@ -1,5 +1,7 @@
 package remix.myplayer.ui.dialog;
 
+import static remix.myplayer.theme.Theme.getBaseDialog;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
@@ -22,6 +24,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.io.File;
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -159,14 +162,11 @@ public class FileChooserDialog extends DialogFragment implements MaterialDialog.
     parentFolder = new File(getArguments().getString("current_path"));
     checkIfCanGoUp();
     parentContents = listFiles(getBuilder().mimeType, getBuilder().extensions);
-    return new MaterialDialog.Builder(getActivity())
+    return getBaseDialog(getActivity())
         .title(parentFolder.getAbsolutePath())
-        .titleColorAttr(R.attr.text_color_primary)
         .theme(ThemeStore.getMDDialogTheme())
-        .itemsColorAttr(R.attr.text_color_primary)
         .items(getContentsArray())
         .itemsCallback(this)
-        .buttonRippleColorAttr(R.attr.ripple_color)
         .onNegative(new MaterialDialog.SingleButtonCallback() {
           @Override
           public void onClick(@NonNull MaterialDialog dialog,

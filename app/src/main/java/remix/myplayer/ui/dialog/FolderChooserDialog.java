@@ -4,6 +4,8 @@ package remix.myplayer.ui.dialog;
  * Created by Remix on 2016/11/2.
  */
 
+import static remix.myplayer.theme.Theme.getBaseDialog;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
@@ -108,14 +110,10 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
     }
     parentFolder = new File(getArguments().getString("current_path"));
     parentContents = listFiles();
-    MaterialDialog.Builder builder = new MaterialDialog.Builder(getActivity())
+    MaterialDialog.Builder builder = getBaseDialog(getActivity())
         .title(parentFolder.getAbsolutePath())
-        .titleColorAttr(R.attr.text_color_primary)
         .items(getContentsArray())
-        .theme(ThemeStore.getMDDialogTheme())
-        .itemsColorAttr(R.attr.text_color_primary)
         .itemsCallback(this)
-        .buttonRippleColorAttr(R.attr.ripple_color)
         .onPositive(new MaterialDialog.SingleButtonCallback() {
           @Override
           public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -131,10 +129,7 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
         })
         .autoDismiss(false)
         .positiveText(getBuilder().mChooseButton)
-        .positiveColorAttr(R.attr.text_color_primary)
-        .negativeText(getBuilder().mCancelButton)
-        .negativeColorAttr(R.attr.text_color_primary)
-        .backgroundColorAttr(R.attr.background_color_dialog);
+        .negativeText(getBuilder().mCancelButton);
     if (getBuilder().mAllowNewFolder) {
       builder.neutralText(getBuilder().mNewFolderButton);
       builder.onNeutral(new MaterialDialog.SingleButtonCallback() {
