@@ -844,9 +844,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         }
       }
     }
-    Bundle bundle = new Bundle();
-    bundle.putInt("Width", mWidth);
-    bundle.putParcelable("Song", mInfo);
 
     //初始化所有fragment
     if (mRecordFragment == null) {
@@ -936,7 +933,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       spring.setEndValue(1);
 
     });
-    mCoverFragment.setArguments(bundle);
 
     mAdapter.addFragment(mCoverFragment);
 
@@ -965,7 +961,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       mLrcView.setOtherColor(ThemeStore.getTextColorSecondary());
       mLrcView.setTimeLineColor(ThemeStore.getTextColorSecondary());
     });
-    mLyricFragment.setArguments(bundle);
+
     mAdapter.addFragment(mLyricFragment);
     mPager.setAdapter(mAdapter);
     mPager.setOffscreenPageLimit(mAdapter.getCount() - 1);
@@ -1033,7 +1029,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //            return;
 //        }
     //当操作不为播放或者暂停且正在运行时，更新所有控件
-    if ((Global.getOperation() != Command.TOGGLE || mFirstStart)) {
+    final int operation = MusicServiceRemote.getOperation();
+    if ((operation != Command.TOGGLE || mFirstStart)) {
       //更新顶部信息
       updateTopStatus(mInfo);
       //更新歌词
@@ -1046,7 +1043,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       //更新下一首歌曲
       mNextSong.setText(getString(R.string.next_song, MusicServiceRemote.getNextSong().getTitle()));
       updateBg();
-      requestCover(Global.getOperation() != Command.TOGGLE && !mFirstStart);
+      requestCover(operation != Command.TOGGLE && !mFirstStart);
     }
   }
 

@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import remix.myplayer.Global;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
@@ -19,6 +18,20 @@ import remix.myplayer.util.Constants;
  * 接收耳机插入与拔出的广播 当检测到耳机拔出并且正在播放时，发送停止播放的广播
  */
 public class HeadsetPlugReceiver extends BroadcastReceiver {
+
+  /**
+   * 耳机是否插入
+   */
+  public static boolean IsHeadsetOn = false;
+
+  public static void setHeadsetOn(boolean headsetOn) {
+    IsHeadsetOn = headsetOn;
+  }
+
+  public static boolean getHeadsetOn() {
+    return IsHeadsetOn;
+  }
+
 
   @Override
   public void onReceive(Context context, Intent intent) {
@@ -34,9 +47,9 @@ public class HeadsetPlugReceiver extends BroadcastReceiver {
       headsetOn = intent.getIntExtra("state", -1) == 1;
     }
 
-    Global.setHeadsetOn(headsetOn);
+    setHeadsetOn(headsetOn);
     Intent eqIntent = new Intent(Constants.SOUNDEFFECT_ACTION);
-    eqIntent.putExtra("IsHeadsetOn", Global.getHeadsetOn());
+    eqIntent.putExtra("IsHeadsetOn", getHeadsetOn());
     sendLocalBroadcast(eqIntent);
 
     if (!headsetOn /**&& MusicServiceRemote.isPlaying()*/) {

@@ -36,6 +36,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -65,6 +66,7 @@ import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
+import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicEventCallback;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.helper.SleepTimer;
@@ -284,6 +286,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   private boolean mPlayAtBreakPoint;
 
   /**
+   * 操作类型
+   */
+  private int mOperation = -1;
+
+  /**
    * Binder
    */
   private final IBinder mMusicBinder = new MusicBinder();
@@ -354,6 +361,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     LogUtil.d("ServiceLifeCycle", "onCreate");
     mService = this;
     setUp();
+
+
   }
 
   @Nullable
@@ -361,6 +370,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   public IBinder onBind(Intent intent) {
     return mMusicBinder;
   }
+
 
   public class MusicBinder extends Binder {
 
@@ -404,7 +414,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mVolumeController = new VolumeController(this);
     mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
-    Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
+    HeadsetPlugReceiver.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
 
     mPlaybackThread = new HandlerThread("IO");
     mPlaybackThread.start();
@@ -564,7 +574,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       } else {
         playNextOrPrev(true);
       }
-      Global.setOperation(Command.NEXT);
+      setOperation(Command.NEXT);
       acquireWakeLock();
     });
     mMediaPlayer.setOnPreparedListener(mp -> {
@@ -826,7 +836,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     //倍速播放
     setSpeed(mSpeed);
     //更新所有界面
-    update(Global.getOperation());
+    update(getOperation());
     mMediaPlayer.start();
     if (fadeIn) {
       mVolumeController.fadeIn();
@@ -861,13 +871,13 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   @Override
   public void pause(boolean updateMediaSessionOnly) {
     if (updateMediaSessionOnly) {
-      updateMediaSession(Global.Operation);
+      updateMediaSession(getOperation());
     } else {
       if (!isPlaying()) { //如果当前已经暂停了 就不重复操作了 避免已经关闭了通知栏又再次显示
         return;
       }
       setPlay(false);
-      update(Global.Operation);
+      update(getOperation());
       mVolumeController.fadeOut();
     }
   }
@@ -1084,7 +1094,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     updateFloatLrc(false);
     updateNotification();
 
-    updateMediaSession(Global.Operation);
+    updateMediaSession(getOperation());
     sendLocalBroadcast(new Intent(MusicService.META_CHANGE));
   }
 
@@ -1125,7 +1135,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT
           || control == Command.TOGGLE || control == Command.PAUSE || control == Command.START) {
         //保存控制命令,用于播放界面判断动画
-        Global.setOperation(control);
+        setOperation(control);
         if (mPlayQueue == null || mPlayQueue.size() == 0) {
           //列表为空，尝试读取
           Global.PlayQueueID = SPUtil
@@ -1241,7 +1251,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           Song tempSong = intent.getParcelableExtra(EXTRA_SONG);
           if (tempSong != null) {
             mCurrentSong = tempSong;
-            Global.Operation = Command.PLAY_TEMP;
+            setOperation(Command.PLAY_TEMP);
             prepare(mCurrentSong.getUrl());
           }
           break;
@@ -1674,6 +1684,15 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
   }
 
+
+  public void setOperation(int operation) {
+    mOperation = operation;
+  }
+
+  public int getOperation(){
+    return mOperation;
+  }
+
   /**
    * 读取歌曲id列表与播放队列
    */
@@ -1827,7 +1846,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
     if (!mShowFloatLrc) { //移除桌面歌词
       mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
-    } else if (!updatePlayStateOnly(Global.Operation) || force || mFirstUpdateLrc) { //更新
+    } else if (!updatePlayStateOnly(getOperation()) || force || mFirstUpdateLrc) { //更新
       if (createFloatLrcThreadIfNeed()) {
         mUpdateFloatLrcThread.setSongAndGetLyricRows(mCurrentSong);
       }
@@ -2091,14 +2110,14 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           } else if (mNeedContinue) {
             play(true);
             mNeedContinue = false;
-            Global.setOperation(Command.TOGGLE);
+            setOperation(Command.TOGGLE);
           }
           mVolumeController.directTo(1);
           break;
         case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT://短暂暂停
           mNeedContinue = mIsPlay;
           if (mIsPlay && mMediaPlayer != null) {
-            Global.setOperation(Command.TOGGLE);
+            setOperation(Command.TOGGLE);
             pause(false);
           }
           break;
@@ -2108,7 +2127,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         case AudioManager.AUDIOFOCUS_LOSS://暂停
           mAudioFocus = false;
           if (mIsPlay && mMediaPlayer != null) {
-            Global.setOperation(Command.TOGGLE);
+            setOperation(Command.TOGGLE);
             pause(false);
           }
           break;

@@ -19,9 +19,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import java.util.ArrayList;
 import remix.myplayer.App;
-import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.helper.MusicServiceRemote;
+import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
 import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.widget.EQSeekBar;
@@ -72,7 +72,7 @@ public class EQActivity extends ToolbarActivity {
           }
           //是否启用音效设置
           mEnable =
-              SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "EnableEQ", false) & Global
+              SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "EnableEQ", false) & HeadsetPlugReceiver
                   .getHeadsetOn();
 
           //EQ
@@ -144,7 +144,7 @@ public class EQActivity extends ToolbarActivity {
         return;
       }
 
-      if (!Global.getHeadsetOn()) {
+      if (!HeadsetPlugReceiver.getHeadsetOn()) {
         ToastUtil.show(EQActivity.this, R.string.plz_earphone);
         mSwitch.setChecked(false);
         return;
@@ -282,7 +282,7 @@ public class EQActivity extends ToolbarActivity {
 
   //重置音效设置
   public void onReset(View v) {
-    if (!Global.getHeadsetOn()) {
+    if (!HeadsetPlugReceiver.getHeadsetOn()) {
       ToastUtil.show(EQActivity.this, R.string.plz_earphone);
       return;
     }
@@ -316,7 +316,7 @@ public class EQActivity extends ToolbarActivity {
     public void onReceive(Context context, Intent intent) {
       if (Constants.SOUNDEFFECT_ACTION.equals(intent.getAction())) {
         //耳机拔出 关闭均衡器
-        boolean enable = Global.getHeadsetOn();
+        boolean enable = HeadsetPlugReceiver.getHeadsetOn();
         if (!enable) {
           mEnable = false;
           updateEnable(false);

@@ -32,8 +32,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 1462
-        versionName "1.4.6.2"
+        versionCode 1470
+        versionName "1.4.7"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
@@ -193,6 +193,14 @@ dependencies {
 
     implementation 'com.tencent.bugly:crashreport:2.8.6.0'
     implementation 'com.anjlab.android.iab.v3:library:1.0.44'
+
+    def room_version = "1.1.1"
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    kapt "android.arch.persistence.room:compiler:$room_version" // use kapt for Kotlin
+    // optional - RxJava support for Room
+    implementation "android.arch.persistence.room:rxjava2:$room_version"
+
+    implementation 'com.jakewharton.timber:timber:4.7.0'
 }
 
 def releaseTime() {

@@ -59,6 +59,7 @@ import remix.myplayer.R;
 import remix.myplayer.bean.misc.Category;
 import remix.myplayer.bean.misc.Feedback;
 import remix.myplayer.bean.mp3.PlayList;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
@@ -261,7 +262,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
               //文件名
               case R.id.setting_displayname_switch:
-                Global.SHOW_DISPLAYNAME = isChecked;
+                Song.SHOW_DISPLAYNAME = isChecked;
                 mNeedRefreshAdapter = true;
                 break;
             }

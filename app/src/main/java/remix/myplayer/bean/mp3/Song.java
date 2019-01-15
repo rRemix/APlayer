@@ -5,8 +5,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import remix.myplayer.App;
-import remix.myplayer.Global;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.SPUtil;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
@@ -19,6 +19,12 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 public class Song implements Cloneable, Parcelable {
 
   public static Song EMPTY_SONG = new Song(-1, "", "", "", -1, "", -1, -1, "", "", -1, "", "", -1);
+  /**
+   * 所有列表是否显示文件名
+   */
+  public static boolean SHOW_DISPLAYNAME = SPUtil
+      .getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SHOW_DISPLAYNAME,
+          false);
 
   public int Id;
   public String Title;
@@ -247,7 +253,7 @@ public class Song implements Cloneable, Parcelable {
   }
 
   public String getShowName() {
-    return !Global.SHOW_DISPLAYNAME ? Title : Displayname;
+    return !SHOW_DISPLAYNAME ? Title : Displayname;
   }
 
   @Override
