@@ -1,6 +1,7 @@
 package remix.myplayer.misc
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -8,9 +9,11 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.db.DBOpenHelper
 import remix.myplayer.db.room.DatabaseRepository
+import remix.myplayer.service.MusicService
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.SPUtil
+import remix.myplayer.util.Util
 import timber.log.Timber
 import kotlin.concurrent.thread
 
@@ -120,6 +123,10 @@ object Migration {
                         .insertToPlayList(entry.value, entry.key)
 
                   }
+            }
+            .doFinally {
+              Timber.v("更新界面")
+              Util.sendLocalBroadcast(Intent(MusicService.MEDIA_STORE_CHANGE))
             }
             .subscribe({
               Timber.v("插入播放列表: $it")

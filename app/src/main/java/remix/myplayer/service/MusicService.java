@@ -42,9 +42,11 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import com.tencent.bugly.crashreport.CrashReport;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import java.lang.ref.WeakReference;
@@ -55,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
 import org.jetbrains.annotations.NotNull;
 import remix.myplayer.R;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
@@ -737,7 +740,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     return mPlayQueue;
   }
 
-  public DatabaseRepository getRepository(){
+  public DatabaseRepository getRepository() {
     return mDBRepository;
   }
 
@@ -1203,6 +1206,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
                 @Override
                 public void accept(Boolean aBoolean) throws Exception {
                   updateAppwidget();
+                }
+              }, new Consumer<Throwable>() {
+                @Override
+                public void accept(Throwable throwable) throws Exception {
+                  Timber.v(throwable);
                 }
               });
 
@@ -1679,7 +1687,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         return (int) mMediaPlayer.getCurrentPosition();
       }
     } catch (IllegalStateException e) {
-      Timber.v("getProgress() %s",e.toString());
+      Timber.v("getProgress() %s", e.toString());
     }
     return 0;
   }
@@ -1726,7 +1734,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     //第一次启动软件
     if (isFirst) {
       //新建我的收藏
-      mDBRepository.insertPlayList(DatabaseRepository.getMyLove()).subscribe(new LogObserver(){
+      mDBRepository.insertPlayList(DatabaseRepository.getMyLove()).subscribe(new LogObserver() {
         @Override
         public void onSuccess(@NotNull Object value) {
           super.onSuccess(value);
@@ -1879,7 +1887,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    */
   private boolean createFloatLrcThreadIfNeed() {
     Timber.v("createFloatLrcThreadIfNeed() %s", isFloatLrcShowing());
-    if (mShowFloatLrc && !isFloatLrcShowing() && mUpdateFloatLrcThread == null) {
+    if (mShowFloatLrc && mUpdateFloatLrcThread == null) {
       mUpdateFloatLrcThread = new UpdateFloatLrcThread();
       mUpdateFloatLrcThread.start();
       return true;
@@ -2103,13 +2111,15 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     public void run() {
       for (Map.Entry<String, BaseAppwidget> entry : mAppWidgets.entrySet()) {
         if (entry.getValue() != null) {
-          entry.getValue().updateWidget(mService, null, false);
+          entry.getValue().partiallyUpdateWidget(mService);
         }
       }
-      final int progress = getProgress();
-      if (progress > 0 && mPlayAtBreakPoint) {
-        SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,
-            progress);
+      if (mPlayAtBreakPoint) {
+        final int progress = getProgress();
+        if (progress > 0) {
+          SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,
+              progress);
+        }
       }
     }
   }

@@ -1,6 +1,7 @@
 package remix.myplayer.appwidgets.medium
 
 import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
@@ -15,6 +16,7 @@ import remix.myplayer.util.Util
  */
 
 class AppWidgetMedium : BaseAppwidget() {
+
   override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
     defaultAppWidget(context, appWidgetIds)
     val intent = Intent(MusicService.ACTION_WIDGET_UPDATE)
@@ -30,9 +32,6 @@ class AppWidgetMedium : BaseAppwidget() {
     pushUpdate(context, appWidgetIds, remoteViews)
   }
 
-  override fun onReceive(context: Context, intent: Intent) {
-    super.onReceive(context, intent)
-  }
 
   override fun updateWidget(service: MusicService, appWidgetIds: IntArray?, reloadCover: Boolean) {
     val song = service.currentSong
@@ -50,5 +49,23 @@ class AppWidgetMedium : BaseAppwidget() {
     }
     //设置封面
     updateCover(service, remoteViews, appWidgetIds, reloadCover)
+  }
+
+  override fun partiallyUpdateWidget(service: MusicService){
+    val song = service.currentSong
+    if (song == null || !hasInstances(service))
+      return
+    val remoteViews = RemoteViews(service.packageName, R.layout.app_widget_medium)
+    buildAction(service, remoteViews)
+    skin = AppWidgetSkin.WHITE_1F
+    updateRemoteViews(service, remoteViews, song)
+    //设置时间
+    val currentTime = service.progress.toLong()
+    val remainTime = song.duration - service.progress
+    if (currentTime > 0 && remainTime > 0) {
+      remoteViews.setTextViewText(R.id.appwidget_progress, Util.getTime(currentTime) + "/" + Util.getTime(remainTime))
+    }
+    val appIds = AppWidgetManager.getInstance(service).getAppWidgetIds(ComponentName(service, javaClass))
+    pushPartiallyUpdate(service,appIds,remoteViews)
   }
 }

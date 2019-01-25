@@ -1,6 +1,7 @@
 package remix.myplayer.appwidgets.small
 
 import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
@@ -43,5 +44,18 @@ class AppWidgetSmall : BaseAppwidget() {
     updateRemoteViews(service, remoteViews, song)
     //设置封面
     updateCover(service, remoteViews, appWidgetIds, reloadCover)
+  }
+
+  override fun partiallyUpdateWidget(service: MusicService) {
+    val song = service.currentSong
+    if (song == null || !hasInstances(service))
+      return
+    val remoteViews = RemoteViews(service.packageName, R.layout.app_widget_small)
+    buildAction(service, remoteViews)
+    skin = AppWidgetSkin.WHITE_1F
+    updateRemoteViews(service, remoteViews, song)
+
+    val appIds = AppWidgetManager.getInstance(service).getAppWidgetIds(ComponentName(service, javaClass))
+    pushPartiallyUpdate(service,appIds,remoteViews)
   }
 }

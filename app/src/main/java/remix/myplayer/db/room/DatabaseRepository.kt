@@ -70,7 +70,7 @@ class DatabaseRepository private constructor() {
     return Single
         .fromCallable {
           db.playListDao().selectByName(name) ?: db.playListDao().selectById(playlistId)
-          ?: throw IllegalArgumentException()
+          ?: throw IllegalArgumentException("No Playlist Found")
         }
         .map {
           //不重复添加
@@ -210,10 +210,10 @@ class DatabaseRepository private constructor() {
     return isMyLove(audioId)
         .flatMap {
           if (it) {
-            deleteFromPlayList(arrayListOf(audioId))
+            deleteFromPlayList(arrayListOf(audioId), MyLove)
 
           } else {
-            insertToPlayList(arrayListOf(audioId))
+            insertToPlayList(arrayListOf(audioId), MyLove)
           }
         }
         .map {
@@ -365,12 +365,12 @@ class DatabaseRepository private constructor() {
         }
         //没有就新建
         .onErrorResumeNext(Single.fromCallable {
-          val newHistory = History(0,song.id,0,0)
+          val newHistory = History(0, song.id, 0, 0)
           val id = db.historyDao().insertHistory(newHistory)
           newHistory.copy(id = id.toInt())
         })
         .map {
-          db.historyDao().update(it.copy(play_count = it.play_count + 1,last_play = Date().time))
+          db.historyDao().update(it.copy(play_count = it.play_count + 1, last_play = Date().time))
         }
 
   }

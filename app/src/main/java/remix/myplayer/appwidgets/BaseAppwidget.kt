@@ -14,6 +14,7 @@ import android.os.Build
 import android.support.annotation.DrawableRes
 import android.widget.RemoteViews
 import com.tencent.bugly.crashreport.CrashReport
+import io.reactivex.functions.Consumer
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.appwidgets.AppWidgetSkin.WHITE_1F
@@ -21,6 +22,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.misc.exception.MusicServiceException
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
+import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.EXTRA_CONTROL
@@ -73,48 +75,79 @@ abstract class BaseAppwidget
 
   protected fun updateCover(service: MusicService, remoteViews: RemoteViews, appWidgetIds: IntArray?, reloadCover: Boolean) {
     val song = service.currentSong ?: return
-    //设置封面
-    if (!reloadCover) {
-      if (bitmap != null && !bitmap!!.isRecycled) {
-        Timber.v("复用Bitmao: $bitmap")
-        remoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap)
-      } else {
-        Timber.v("Bitmap复用失败: $bitmap")
+    val size = if (this.javaClass.simpleName.contains("Big")) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
+    object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
+      override fun onError(errMsg: String) {
+        Timber.v("onError: $errMsg")
+//        bitmap = null
         remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
+        pushUpdate(service, appWidgetIds, remoteViews)
       }
-      pushUpdate(service, appWidgetIds, remoteViews)
-    } else {
-      val size = if (this.javaClass.simpleName.contains("Big")) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
-      object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
-        override fun onError(errMsg: String) {
-          Timber.v("onError: $errMsg --- 清空bitmap: $bitmap")
-          bitmap = null
-          remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
+
+      override fun onSuccess(result: Bitmap?) {
+        try {
+//          if (result != bitmap && bitmap != null) {
+//            Timber.v("onSuccess")
+//            bitmap = null
+//          }
+//          bitmap = result
+//          Timber.v("onSuccess --- 获取Bitmap: $bitmap")
+          val bitmap = MusicService.copy(result)
+          if (bitmap != null) {
+            remoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap)
+          } else {
+            remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
+          }
+
+        } catch (e: Exception) {
+          Timber.v("onSuccess --- 发生异常: $e")
+        } finally {
           pushUpdate(service, appWidgetIds, remoteViews)
         }
-
-        override fun onSuccess(result: Bitmap?) {
-          try {
-            if (result != bitmap && bitmap != null) {
-              Timber.v("onSuccess --- 回收Bitmap: $bitmap")
-              bitmap = null
-            }
-            bitmap = result
-            Timber.v("onSuccess --- 获取Bitmap: $bitmap")
-            if (bitmap != null) {
-              remoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap)
-            } else {
-              remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
-            }
-
-          } catch (e: Exception) {
-            Timber.v("onSuccess --- 发生异常: $e")
-          } finally {
-            pushUpdate(service, appWidgetIds, remoteViews)
-          }
-        }
-      }.load()
-    }
+      }
+    }.load()
+//    //设置封面
+//    if (!reloadCover) {
+//      if (bitmap != null && !bitmap!!.isRecycled) {
+//        Timber.v("复用Bitmao: $bitmap")
+//        remoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap)
+//      } else {
+//        Timber.v("Bitmap复用失败: $bitmap")
+//        remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
+//      }
+//      pushUpdate(service, appWidgetIds, remoteViews)
+//    } else {
+//      val size = if (this.javaClass.simpleName.contains("Big")) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
+//      object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
+//        override fun onError(errMsg: String) {
+//          Timber.v("onError: $errMsg --- 清空bitmap: $bitmap")
+//          bitmap = null
+//          remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
+//          pushUpdate(service, appWidgetIds, remoteViews)
+//        }
+//
+//        override fun onSuccess(result: Bitmap?) {
+//          try {
+//            if (result != bitmap && bitmap != null) {
+//              Timber.v("onSuccess --- 回收Bitmap: $bitmap")
+//              bitmap = null
+//            }
+//            bitmap = result
+//            Timber.v("onSuccess --- 获取Bitmap: $bitmap")
+//            if (bitmap != null) {
+//              remoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap)
+//            } else {
+//              remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
+//            }
+//
+//          } catch (e: Exception) {
+//            Timber.v("onSuccess --- 发生异常: $e")
+//          } finally {
+//            pushUpdate(service, appWidgetIds, remoteViews)
+//          }
+//        }
+//      }.load()
+//    }
   }
 
   protected fun buildAction(context: Context, views: RemoteViews) {
@@ -140,6 +173,13 @@ abstract class BaseAppwidget
     appWidgetManager.updateAppWidget(ComponentName(context, javaClass), remoteViews)
   }
 
+  protected fun pushPartiallyUpdate(context: Context,appWidgetId: IntArray?,remoteViews: RemoteViews){
+    val appWidgetManager = AppWidgetManager.getInstance(context)
+    if (appWidgetId != null) {
+      appWidgetManager.partiallyUpdateAppWidget(appWidgetId,remoteViews)
+    }
+  }
+
   protected fun updateRemoteViews(service: MusicService, remoteViews: RemoteViews, song: Song) {
     //        int skin = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
     //        skin = skin == SKIN_TRANSPARENT ? AppWidgetSkin.TRANSPARENT : AppWidgetSkin.WHITE_1F;
@@ -158,7 +198,6 @@ abstract class BaseAppwidget
   private fun updateTimer(remoteViews: RemoteViews) {
     remoteViews.setImageViewResource(R.id.appwidget_timer, skin.timerRes)
   }
-
   //    protected void updateSkin(RemoteViews remoteViews){
   //        Drawable skinDrawable = Theme.tintDrawable(R.drawable.widget_btn_skin, skin.getBtnColor());
   //        remoteViews.setImageViewBitmap(R.id.appwidget_skin,drawableToBitmap(skinDrawable));
@@ -172,12 +211,16 @@ abstract class BaseAppwidget
   }
 
   private fun updateLove(service: MusicService,remoteViews: RemoteViews, song: Song) {
-    val isLove = service.repository.isMyLove(song.Id).blockingGet()
-    if (!isLove) {
-      remoteViews.setImageViewResource(R.id.appwidget_love, skin.loveRes)
-    } else {
-      remoteViews.setImageViewResource(R.id.appwidget_love, skin.lovedRes)
-    }
+    service.repository.isMyLove(song.Id)
+        .compose(RxUtil.applySingleScheduler())
+        .subscribe { isLove ->
+          if (!isLove) {
+            remoteViews.setImageViewResource(R.id.appwidget_love, skin.loveRes)
+          } else {
+            remoteViews.setImageViewResource(R.id.appwidget_love, skin.lovedRes)
+          }
+        }
+
   }
 
   private fun updateNextAndPrev(remoteViews: RemoteViews) {
@@ -213,6 +256,8 @@ abstract class BaseAppwidget
   }
 
   abstract fun updateWidget(service: MusicService, appWidgetIds: IntArray?, reloadCover: Boolean)
+
+  abstract fun partiallyUpdateWidget(service: MusicService)
 
   companion object {
     val SKIN_WHITE_1F = 1//白色不带透明
