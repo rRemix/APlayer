@@ -85,7 +85,6 @@ import remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -96,7 +95,6 @@ import remix.myplayer.util.ToastUtil;
  */
 public class MainActivity extends MenuActivity {
 
-  private final static String TAG = "MainActivity";
   public static final String EXTRA_RECREATE = "needRecreate";
   public static final String EXTRA_REFRESH_ADAPTER = "needRefreshAdapter";
   public static final String EXTRA_REFRESH_LIBRARY = "needRefreshLibrary";
@@ -544,7 +542,6 @@ public class MainActivity extends MenuActivity {
           mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         } else if (data.getBooleanExtra(EXTRA_REFRESH_LIBRARY, false)) { //刷新Library
           List<Category> categories = (List<Category>) data.getSerializableExtra(EXTRA_CATEGORY);
-          LogUtil.d("MainPagerAdapter", "更新过后: " + categories);
           if (categories != null && categories.size() > 0) {
             mPagerAdapter.setList(categories);
             mPagerAdapter.notifyDataSetChanged();

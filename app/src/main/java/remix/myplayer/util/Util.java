@@ -77,10 +77,8 @@ public class Util {
     try {
       if (context != null) {
         context.unregisterReceiver(receiver);
-        receiver = null;
       }
     } catch (Exception e) {
-      LogUtil.e("unregisterReceiver error", e.toString());
     }
   }
 

@@ -19,7 +19,11 @@ import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.tageditor.TagEditor
 import remix.myplayer.request.network.HttpClient
 import remix.myplayer.request.network.RxUtil
-import remix.myplayer.util.*
+import remix.myplayer.util.ImageUriUtil
+import remix.myplayer.util.LyricUtil
+import remix.myplayer.util.SPUtil
+import remix.myplayer.util.Util
+import timber.log.Timber
 import java.io.*
 import java.nio.charset.Charset
 import java.util.*
@@ -47,7 +51,7 @@ class SearchLrc(private val song: Song) {
       }
       searchKey = getLyricSearchKey(song)
     } catch (e: Exception) {
-      LogUtil.d(TAG, e.toString())
+      Timber.v(e)
       displayName = song.title
     }
 
@@ -64,7 +68,7 @@ class SearchLrc(private val song: Song) {
 
     val observable = when (type) {
       SPUtil.LYRIC_KEY.LYRIC_IGNORE -> {
-        LogUtil.d(TAG, "Ignore Lyric")
+        Timber.v("Ignore Lyric")
         Observable.error(Throwable("Ignore Lyric"))
       }
       SPUtil.LYRIC_KEY.LYRIC_EMBEDDED -> {
@@ -111,9 +115,9 @@ class SearchLrc(private val song: Song) {
           cacheKey = Util.hashKeyForDisk(song.id.toString() + "-" +
               (if (!TextUtils.isEmpty(song.artist)) song.artist else "") + "-" +
               if (!TextUtils.isEmpty(song.title)) song.title else "")
-          LogUtil.d(TAG, "CacheKey: $cacheKey SearchKey: $searchKey")
+          Timber.v("CacheKey: $cacheKey SearchKey: $searchKey")
           if (clearCache) {
-            LogUtil.d(TAG, "clearCache")
+            Timber.v("clearCache")
             DiskCache.getLrcDiskCache().remove(cacheKey)
           }
         }.compose(RxUtil.applyScheduler())
@@ -144,7 +148,7 @@ class SearchLrc(private val song: Song) {
       val lyric = TagEditor(song.url).lyric
       if (!lyric.isNullOrEmpty()) {
         e.onNext(lrcParser.getLrcRows(getBufferReader(lyric!!.toByteArray(UTF_8)), true, cacheKey, searchKey))
-        LogUtil.d(TAG, "EmbeddedLyric")
+        Timber.v("EmbeddedLyric")
       }
       e.onComplete()
     }
@@ -159,7 +163,7 @@ class SearchLrc(private val song: Song) {
         BufferedReader(InputStreamReader(getInputStream(0))).use {
           it.readLine().run {
             e.onNext(Gson().fromJson(this, object : TypeToken<List<LrcRow>>() {}.type))
-            LogUtil.d(TAG, "CacheLyric")
+            Timber.v("CacheLyric")
           }
         }
       }
@@ -188,7 +192,7 @@ class SearchLrc(private val song: Song) {
           .use { filesCursor ->
             while (filesCursor.moveToNext()) {
               val file = File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)))
-              LogUtil.d(TAG, "file: " + file.absolutePath)
+              Timber.v("file: " + file.absolutePath)
               if (file.exists() && file.isFile && file.canRead()) {
                 //非翻译文件只保留一个
                 if (results.isEmpty() || (results.size >= 1 && file.absolutePath.contains("translate")))
@@ -263,7 +267,7 @@ class SearchLrc(private val song: Song) {
     return Observable.create { e ->
       //手动设置的歌词
       if (!TextUtils.isEmpty(manualPath)) {
-        LogUtil.d(TAG, "ManualLyric")
+        Timber.v("ManualLyric")
         e.onNext(lrcParser.getLrcRows(getBufferReader(manualPath), true, cacheKey, searchKey))
       }
       e.onComplete()
@@ -294,7 +298,7 @@ class SearchLrc(private val song: Song) {
             localPath = path
           }
         }
-        LogUtil.d(TAG, "LocalLyric")
+        Timber.v("LocalLyric")
         if (translatePath == null) {
           e.onNext(lrcParser.getLrcRows(getBufferReader(localPath), true, cacheKey, searchKey))
         } else {
@@ -346,7 +350,7 @@ class SearchLrc(private val song: Song) {
                     }
                   }
                 }
-                LogUtil.d(TAG, "NeteaseLyric")
+                Timber.v("NeteaseLyric")
                 lrcParser.saveLrcRows(combine, cacheKey, searchKey)
                 combine
               }
@@ -368,7 +372,7 @@ class SearchLrc(private val song: Song) {
               searchResponse.candidates[0].accesskey)
               .map { lrcBody ->
                 val lrcResponse = Gson().fromJson(lrcBody.string(), KLrcResponse::class.java)
-                LogUtil.d(TAG, "KugouLyric")
+                Timber.v("KugouLyric")
                 lrcParser.getLrcRows(getBufferReader(Base64.decode(lrcResponse.content, Base64.DEFAULT)), true, cacheKey, searchKey)
               }
         }

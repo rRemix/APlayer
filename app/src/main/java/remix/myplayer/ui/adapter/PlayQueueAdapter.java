@@ -6,7 +6,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import butterknife.BindView;
-import io.reactivex.functions.Consumer;
 import java.util.Collections;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;

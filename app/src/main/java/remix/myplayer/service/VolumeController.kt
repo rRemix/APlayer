@@ -3,7 +3,7 @@ package remix.myplayer.service
 import android.os.CountDownTimer
 import android.os.Handler
 import android.support.annotation.FloatRange
-import remix.myplayer.util.LogUtil
+import timber.log.Timber
 import java.lang.ref.WeakReference
 
 /**
@@ -25,7 +25,7 @@ class VolumeController(musicService: MusicService) {
         try {
           mediaPlayer?.setVolume(volume, volume)
         } catch (e: IllegalStateException) {
-          LogUtil.d("VolumeController", e.toString())
+          Timber.v(e)
         }
       }
     }.start()
@@ -38,7 +38,7 @@ class VolumeController(musicService: MusicService) {
         try {
           mediaPlayer?.setVolume(volume, volume)
         } catch (e: IllegalStateException) {
-          LogUtil.d("VolumeController", e.toString())
+          Timber.v(e)
         }
       }
 
@@ -47,7 +47,7 @@ class VolumeController(musicService: MusicService) {
         try {
           mediaPlayer?.pause()
         } catch (e: IllegalStateException) {
-          LogUtil.d("VolumeController", e.toString())
+          Timber.v(e)
         }
       }
 
@@ -63,7 +63,7 @@ class VolumeController(musicService: MusicService) {
     try {
       mediaPlayer?.setVolume(leftVolume, rightVolume)
     } catch (e: IllegalStateException) {
-      LogUtil.d("VolumeController", e.toString())
+      Timber.v(e)
     }
   }
 

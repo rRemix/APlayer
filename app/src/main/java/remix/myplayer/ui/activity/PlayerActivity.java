@@ -66,12 +66,9 @@ import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
 import org.jetbrains.annotations.NotNull;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.AnimationUrl;
@@ -106,7 +103,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
@@ -1007,10 +1003,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       if (event.getAction() == MotionEvent.ACTION_UP) {
         mEventX2 = event.getX();
         mEventY2 = event.getY();
-        LogUtil.d("PlayerAction",
-            "ThresHoldX: " + THRESHOLD_X + " DistanceX: " + Math.abs(mEventX1 - mEventX2));
-        LogUtil.d("PlayerAction",
-            "ThresHoldY: " + THRESHOLD_Y + " DistanceY: " + (mEventY2 - mEventY1));
         if (mEventY2 - mEventY1 > THRESHOLD_Y && Math.abs(mEventX1 - mEventX2) < THRESHOLD_X) {
           onBackPressed();
         }

@@ -4,9 +4,6 @@ package remix.myplayer.util;
  * Created by taeja on 16-2-17.
  */
 
-import remix.myplayer.App;
-import remix.myplayer.R;
-
 /**
  * 常量值
  */

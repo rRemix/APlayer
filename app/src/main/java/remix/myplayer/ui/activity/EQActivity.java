@@ -27,16 +27,15 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.widget.EQSeekBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import timber.log.Timber;
 
 /**
  * Created by taeja on 16-4-13.
  */
 public class EQActivity extends ToolbarActivity {
 
-  private final static String TAG = "SetUpEQ";
   private static Equalizer mEqualizer;
   private static short mBandNumber = -1;
   private static short mMaxEQLevel = -1;
@@ -65,9 +64,9 @@ public class EQActivity extends ToolbarActivity {
         try {
           Thread.sleep(600);
           int AudioSessionId = MusicServiceRemote.getMediaPlayer().getAudioSessionId();
-          LogUtil.d(TAG, "AudioSessionId:" + AudioSessionId);
+          Timber.v("AudioSessionId:%s", AudioSessionId);
           if (AudioSessionId == 0) {
-            LogUtil.d(TAG, "AudioSessionId Error");
+            Timber.v("AudioSessionId Null");
             return;
           }
           //是否启用音效设置
@@ -109,7 +108,7 @@ public class EQActivity extends ToolbarActivity {
           //初始化完成
           mHasInitial = true;
         } catch (Exception e) {
-          LogUtil.d(TAG, e.toString());
+          Timber.v(e);
         }
       }
 

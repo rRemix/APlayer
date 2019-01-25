@@ -106,7 +106,6 @@ public class StatusBarUtil {
           miuiVersion = Integer.valueOf(miui.substring(1, 2));
         }
       } catch (Exception e) {
-        LogUtil.d("StatusBarUtil", e.toString());
       }
     }
     if (Build.MANUFACTURER.equals("Meizu")) {

@@ -162,3 +162,6 @@ public static final int *;
 #bugly
 -dontwarn com.tencent.bugly.**
 -keep public class com.tencent.bugly.**{*;}
+
+#timber
+-keep class timber.log.Timber{*;}

@@ -9,8 +9,8 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.lyric.bean.LyricRowWrapper;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
+import timber.log.Timber;
 
 public abstract class UpdateLyricThread extends Thread {
 
@@ -53,7 +53,7 @@ public abstract class UpdateLyricThread extends Thread {
             mLrcRows = lrcRows;
           }
         }, throwable -> {
-          LogUtil.e(throwable);
+          Timber.v(throwable);
           if (id == mSong.getId()) {
             mStatus = Status.ERROR;
             mLrcRows = null;
@@ -77,7 +77,7 @@ public abstract class UpdateLyricThread extends Thread {
   @Override
   public void interrupt() {
     super.interrupt();
-    LogUtil.d(TAG, "interrupt");
+    Timber.v("interrupt");
     if (mDisposable != null && !mDisposable.isDisposed()) {
       mDisposable.dispose();
     }
@@ -91,18 +91,18 @@ public abstract class UpdateLyricThread extends Thread {
     }
     LyricRowWrapper wrapper = new LyricRowWrapper();
     wrapper.setStatus(mStatus);
-    LogUtil.d(TAG, "Reference: " + mReference);
+
+    Timber.v("Reference: %s", mReference);
     if (mStatus == Status.SEARCHING) {
       return wrapper;
     }
 
     if (mStatus == Status.ERROR || mStatus == Status.NO) {
-      LogUtil.d("DesktopLrc", "当前歌词 -- findCurrentLyricError");
+      Timber.v("当前没有歌词");
       return wrapper;
     }
     final Song song = service.getCurrentSong();
     final int progress = service.getProgress() + mOffset;
-    LogUtil.d("DesktopLrc", "当前歌词 -- Progress: " + service.getProgress());
     if (mLrcRows == null || mLrcRows.isEmpty()) {
       return wrapper;
     }

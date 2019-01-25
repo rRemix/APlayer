@@ -15,7 +15,6 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2016/3/7.
@@ -177,8 +176,6 @@ public class FilterSizeSeekBar extends View {
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    LogUtil.d(TAG, "EventX:" + event.getX());
-    LogUtil.d(TAG, "EventY:" + event.getY());
     int eventX = (int) event.getX();
     boolean isUp = event.getAction() == MotionEvent.ACTION_UP;
 

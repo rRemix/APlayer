@@ -21,6 +21,7 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.UriRequest;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -273,7 +274,7 @@ public class ImageUriUtil {
         }
       }
     } catch (Exception e) {
-      LogUtil.e(e);
+      Timber.v(e);
     }
     return "";
   }

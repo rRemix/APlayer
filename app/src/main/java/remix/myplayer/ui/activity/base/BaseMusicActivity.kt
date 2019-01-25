@@ -21,10 +21,14 @@ import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.request.SimpleUriRequest
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.MusicService
-import remix.myplayer.util.*
+import remix.myplayer.util.Constants
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
+import remix.myplayer.util.MediaStoreUtil
+import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 import remix.myplayer.util.Util.registerLocalReceiver
 import remix.myplayer.util.Util.unregisterLocalReceiver
+import timber.log.Timber
 import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
@@ -74,14 +78,14 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   override fun onMediaStoreChanged() {
-    LogUtil.d(TAG, "onMediaStoreChanged:" + this.javaClass.name)
+    Timber.v("onMediaStoreChanged: ${this.javaClass.simpleName}")
     for (listener in mMusicServiceEventListeners) {
       listener.onMediaStoreChanged()
     }
   }
 
   override fun onPermissionChanged(has: Boolean) {
-    LogUtil.d(TAG, "onPermissionChanged:" + this.javaClass.name)
+    Timber.v("onPermissionChanged: ${this.javaClass.simpleName}")
     mHasPermission = has
     for (listener in mMusicServiceEventListeners) {
       listener.onPermissionChanged(has)
@@ -89,28 +93,28 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   override fun onPlayListChanged() {
-    LogUtil.d(TAG, "onPlayListChanged:" + this.javaClass.name)
+    Timber.v("onMediaStoreChanged: ${this.javaClass.simpleName}")
     for (listener in mMusicServiceEventListeners) {
       listener.onPlayListChanged()
     }
   }
 
   override fun onMetaChanged() {
-    LogUtil.d(TAG, "onMetaChange:" + this.javaClass.name)
+    Timber.v("onMetaChange: ${this.javaClass.simpleName}")
     for (listener in mMusicServiceEventListeners) {
       listener.onMetaChanged()
     }
   }
 
   override fun onPlayStateChange() {
-    LogUtil.d(TAG, "onPlayStateChange:" + this.javaClass.name)
+    Timber.v("onPlayStateChange: ${this.javaClass.simpleName}")
     for (listener in mMusicServiceEventListeners) {
       listener.onPlayStateChange()
     }
   }
 
   override fun onServiceConnected(service: MusicService) {
-    LogUtil.d(TAG, "onServiceConnected:" + this.javaClass.name)
+    Timber.v("onServiceConnected: ${this.javaClass.simpleName}")
     if (!mReceiverRegistered) {
       mMusicStateReceiver = MusicStateReceiver(this)
       val filter = IntentFilter()

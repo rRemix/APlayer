@@ -10,9 +10,9 @@ import remix.myplayer.R
 import remix.myplayer.bean.github.Release
 import remix.myplayer.request.network.HttpClient
 import remix.myplayer.request.network.RxUtil
-import remix.myplayer.util.LogUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.Util
+import timber.log.Timber
 
 object UpdateAgent {
   private const val TAG = "UpdateAgent"
@@ -80,7 +80,7 @@ object UpdateAgent {
     try {
       versionCode = App.getContext().packageManager.getPackageInfo(App.getContext().packageName, 0).versionCode
     } catch (e: PackageManager.NameNotFoundException) {
-      LogUtil.e(TAG, e)
+      Timber.v(e)
     }
     return versionCode
   }

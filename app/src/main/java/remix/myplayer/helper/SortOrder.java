@@ -5,7 +5,6 @@ import static remix.myplayer.helper.SortOrder.SongSortOrder.SONG_ARTIST_A_Z;
 import static remix.myplayer.helper.SortOrder.SongSortOrder.SONG_ARTIST_Z_A;
 
 import android.provider.MediaStore;
-import remix.myplayer.db.room.model.PlayList;
 
 /**
  * Created by Remix on 2018/3/22.

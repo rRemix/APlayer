@@ -27,7 +27,7 @@ import remix.myplayer.service.MusicService.EXTRA_CONTROL
 import remix.myplayer.ui.activity.MainActivity
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
-import remix.myplayer.util.LogUtil
+import timber.log.Timber
 
 /**
  * @ClassName
@@ -76,10 +76,10 @@ abstract class BaseAppwidget
     //设置封面
     if (!reloadCover) {
       if (bitmap != null && !bitmap!!.isRecycled) {
-        LogUtil.d(TAG, "复用Bitmap: $bitmap")
+        Timber.v("复用Bitmao: $bitmap")
         remoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap)
       } else {
-        LogUtil.d(TAG, "Bitmap复用失败: $bitmap")
+        Timber.v("Bitmap复用失败: $bitmap")
         remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
       }
       pushUpdate(service, appWidgetIds, remoteViews)
@@ -87,7 +87,7 @@ abstract class BaseAppwidget
       val size = if (this.javaClass.simpleName.contains("Big")) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
       object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
         override fun onError(errMsg: String) {
-          LogUtil.d(TAG, "onError: $errMsg --- 清空bitmap: $bitmap")
+          Timber.v("onError: $errMsg --- 清空bitmap: $bitmap")
           bitmap = null
           remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
           pushUpdate(service, appWidgetIds, remoteViews)
@@ -96,11 +96,11 @@ abstract class BaseAppwidget
         override fun onSuccess(result: Bitmap?) {
           try {
             if (result != bitmap && bitmap != null) {
-              LogUtil.d(TAG, "onSuccess --- 回收Bitmap: $bitmap")
+              Timber.v("onSuccess --- 回收Bitmap: $bitmap")
               bitmap = null
             }
             bitmap = result
-            LogUtil.d(TAG, "onSuccess --- 获取Bitmap: $bitmap")
+            Timber.v("onSuccess --- 获取Bitmap: $bitmap")
             if (bitmap != null) {
               remoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap)
             } else {
@@ -108,7 +108,7 @@ abstract class BaseAppwidget
             }
 
           } catch (e: Exception) {
-            LogUtil.d(TAG, "onSuccess --- 发生异常: $e")
+            Timber.v("onSuccess --- 发生异常: $e")
           } finally {
             pushUpdate(service, appWidgetIds, remoteViews)
           }

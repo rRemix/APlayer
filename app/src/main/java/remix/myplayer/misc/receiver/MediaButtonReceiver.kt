@@ -8,8 +8,8 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.ACTION_CMD
 import remix.myplayer.service.MusicService.EXTRA_CONTROL
-import remix.myplayer.util.LogUtil
 import remix.myplayer.util.Util.sendLocalBroadcast
+import timber.log.Timber
 
 /**
  * Created by taeja on 16-2-5.
@@ -23,7 +23,7 @@ class MediaButtonReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent?) {
 
     if (handleMediaButtonIntent(context, intent)) {
-      LogUtil.d(TAG, "onReceive")
+      Timber.v("onReceive")
       abortBroadcast()
     }
   }
@@ -35,7 +35,7 @@ class MediaButtonReceiver : BroadcastReceiver() {
 
     @JvmStatic
     fun handleMediaButtonIntent(context: Context, intent: Intent?): Boolean {
-      LogUtil.d(TAG, "handleMediaButtonIntent")
+      Timber.v("handleMediaButtonIntent")
       if (intent == null)
         return false
       val event = intent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT) ?: return false
@@ -59,7 +59,7 @@ class MediaButtonReceiver : BroadcastReceiver() {
           KeyEvent.KEYCODE_MEDIA_PREVIOUS -> Command.PREV
           else -> -1
         })
-        LogUtil.d(TAG, "sendLocalBroadcast: $ctrlIntent")
+        Timber.v("sendLocalBroadcast: $ctrlIntent")
         sendLocalBroadcast(ctrlIntent)
         return true
       }
@@ -79,7 +79,7 @@ class MediaButtonReceiver : BroadcastReceiver() {
                 else -> -1
               })
               sendLocalBroadcast(action)
-              LogUtil.d(TAG, "count=$clickCount")
+              Timber.v("count=$clickCount")
               clickCount = 0
             } catch (e: InterruptedException) {
               e.printStackTrace()

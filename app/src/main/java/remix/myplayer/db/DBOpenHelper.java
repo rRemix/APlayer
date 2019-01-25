@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import remix.myplayer.util.LogUtil;
 
 /**
  * @ClassName DBOpenHelper
@@ -62,7 +61,9 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
 
   public DBOpenHelper(Context context) {
-    this(context, DBNAME, null, VERSION, dbObj -> LogUtil.d("DBError", "error occur"));
+    this(context, DBNAME, null, VERSION, dbObj -> {
+
+    });
   }
 
   private DBOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory,

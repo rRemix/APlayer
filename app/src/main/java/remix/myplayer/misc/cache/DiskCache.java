@@ -7,7 +7,6 @@ import android.os.Environment;
 import com.facebook.common.util.ByteConstants;
 import java.io.File;
 import java.io.IOException;
-import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2016/6/14.
@@ -18,7 +17,6 @@ public class DiskCache {
 
   public static void init(Context context) {
     try {
-      LogUtil.d("DiskCache", "init");
       File lrcCacheDir = getDiskCacheDir(context, "lyric");
       if (!lrcCacheDir.exists()) {
         lrcCacheDir.mkdir();

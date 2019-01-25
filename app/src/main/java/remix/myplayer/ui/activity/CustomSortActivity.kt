@@ -18,7 +18,6 @@ import org.jetbrains.anko.uiThread
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore

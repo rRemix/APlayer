@@ -9,7 +9,6 @@ import android.os.Handler
 import android.os.Looper
 import remix.myplayer.App
 import remix.myplayer.service.Command
-import remix.myplayer.util.LogUtil
 import remix.myplayer.util.Util.sendCMDLocalBroadcast
 
 /**
@@ -66,7 +65,6 @@ class ShakeDetector private constructor() : SensorEventListener, Runnable {
     val deltaY = y - lastY
     val deltaZ = z - lastZ
     val speed = Math.sqrt((deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ).toDouble()) / detectInterval * 1000
-    LogUtil.d("ShakeDetector", "speed: " + speed + " interval: " + detectInterval + " sensorType: " + event.sensor.type)
     if (speed > SPEED_THRESHOLD) {
       val postInterval = currentTime - lastPostTime
       if (postInterval > POST_THRESHOLD) {

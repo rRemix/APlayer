@@ -60,7 +60,6 @@ public class App extends MultiDexApplication {
       CrashReport.postCatchedException(throwable);
     });
 
-
   }
 
   private void setUp() {

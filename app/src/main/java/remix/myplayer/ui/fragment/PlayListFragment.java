@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.View;
 import butterknife.BindView;
-import io.reactivex.functions.Function;
 import java.util.Collections;
 import java.util.List;
 import remix.myplayer.R;

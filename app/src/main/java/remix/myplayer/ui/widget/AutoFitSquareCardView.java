@@ -6,7 +6,6 @@ import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 import remix.myplayer.App;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
 
 public class AutoFitSquareCardView extends CardView {
 
@@ -31,7 +30,6 @@ public class AutoFitSquareCardView extends CardView {
     final int sizeMeasureSpec = MeasureSpec
         .makeMeasureSpec(Math.min(widthSize, heightSize), MeasureSpec.EXACTLY);
     super.onMeasure(sizeMeasureSpec, sizeMeasureSpec);
-    LogUtil.d("WidthFitSquareCardView", "ratio: " + heightSize * 1f / widthSize);
     //根据高宽比调整布局
     if (heightSize * 1f / widthSize > 1.2f) {
       RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) getLayoutParams();
