@@ -7,11 +7,9 @@ import android.content.Intent
 import remix.myplayer.db.room.AppDatabase.Companion.VERSION
 import remix.myplayer.db.room.dao.HistoryDao
 import remix.myplayer.db.room.dao.PlayListDao
-import remix.myplayer.db.room.dao.PlayListSongDao
 import remix.myplayer.db.room.dao.PlayQueueDao
 import remix.myplayer.db.room.model.History
 import remix.myplayer.db.room.model.PlayList
-import remix.myplayer.db.room.model.PlayListSong
 import remix.myplayer.db.room.model.PlayQueue
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Util.sendLocalBroadcast
@@ -22,15 +20,12 @@ import java.util.*
  */
 @Database(entities = [
   PlayList::class,
-  PlayListSong::class,
   PlayQueue::class,
   History::class
 ], version = VERSION, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
   abstract fun playListDao(): PlayListDao
-
-  abstract fun playListSongDao(): PlayListSongDao
 
   abstract fun playQueueDao(): PlayQueueDao
 

@@ -586,6 +586,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         return;
       }
       LogUtil.d(TAG, "开始播放");
+      //记录播放历史
+      updatePlayHistory();
       play(false);
     });
 
@@ -605,10 +607,21 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     });
   }
 
+
+  /**
+   * 更新播放历史
+   */
+  private void updatePlayHistory() {
+    mDBRepository.updateHistory(mCurrentSong)
+        .compose(applySingleScheduler())
+        .subscribe(new LogObserver());
+
+  }
+
   /**
    * 初始化mediaplayer
    */
-  public void setUpDataSource(Song item, int pos) {
+  private void setUpDataSource(Song item, int pos) {
     if (item == null) {
       return;
     }

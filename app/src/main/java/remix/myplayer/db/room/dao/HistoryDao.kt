@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy.REPLACE
 import android.arch.persistence.room.Query
+import android.arch.persistence.room.Update
 import remix.myplayer.db.room.model.History
 
 
@@ -19,8 +20,16 @@ interface HistoryDao {
   fun insertHistory(history: History): Long
 
   @Query("""
-    SELECT * FROM HISTORY
+    SELECT * FROM History
   """)
   fun selectAll(): List<History>
 
+  @Query("""
+    SELECT * FROM History
+    WHERE audio_id = :audioId
+  """)
+  fun selectByAudioId(audioId: Int): History?
+
+  @Update
+  fun update(history: History): Int
 }

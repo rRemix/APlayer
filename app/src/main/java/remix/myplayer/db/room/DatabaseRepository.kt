@@ -10,6 +10,7 @@ import io.reactivex.Single
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.db.room.model.History
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.db.room.model.PlayQueue
 import remix.myplayer.helper.SortOrder
@@ -354,6 +355,24 @@ class DatabaseRepository private constructor() {
     }
 
     return inStrBuilder.toString()
+  }
+
+  fun updateHistory(song: Song): Single<Int> {
+    //先判断是否存在
+    return Single
+        .fromCallable {
+          db.historyDao().selectByAudioId(song.id)
+        }
+        //没有就新建
+        .onErrorResumeNext(Single.fromCallable {
+          val newHistory = History(0,song.id,0,0)
+          val id = db.historyDao().insertHistory(newHistory)
+          newHistory.copy(id = id.toInt())
+        })
+        .map {
+          db.historyDao().update(it.copy(play_count = it.play_count + 1,last_play = Date().time))
+        }
+
   }
 
   /**
