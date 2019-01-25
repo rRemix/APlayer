@@ -12,14 +12,9 @@ import com.squareup.leakcanary.LeakCanary;
 import com.tencent.bugly.crashreport.CrashReport;
 import io.reactivex.plugins.RxJavaPlugins;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
-import remix.myplayer.db.DBManager;
-import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.misc.cache.DiskCache;
-import remix.myplayer.misc.exception.RxException;
-import remix.myplayer.theme.Migration;
-import remix.myplayer.util.CrashHandler;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.Util;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 16-3-16.
@@ -40,10 +35,11 @@ public class App extends MultiDexApplication {
     if (!BuildConfig.DEBUG) {
       IS_GOOGLEPLAY = "google".equalsIgnoreCase(Util.getAppMetaData("BUGLY_APP_CHANNEL"));
     }
+
     setUp();
 
-    //异常捕获
-    CrashHandler.getInstance().init(this);
+//    //异常捕获
+//    CrashHandler.getInstance().init(this);
 
     //检测内存泄漏
     if (!LeakCanary.isInAnalyzerProcess(this)) {
@@ -59,18 +55,17 @@ public class App extends MultiDexApplication {
     loadLibrary();
 
     //处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
-    RxJavaPlugins.setErrorHandler(throwable -> {
-      LogUtil.e("RxError", throwable);
-      CrashReport.postCatchedException(new RxException(throwable));
-    });
-
+    if(!BuildConfig.DEBUG){
+      RxJavaPlugins.setErrorHandler(throwable -> {
+        Timber.v(throwable);
+        CrashReport.postCatchedException(throwable);
+      });
+    }
 
   }
 
   private void setUp() {
-    DBManager.initialInstance(new DBOpenHelper(this));
     DiskCache.init(this);
-    Migration.migrationTheme(this);
   }
 
 
@@ -91,6 +86,7 @@ public class App extends MultiDexApplication {
 //
 //        });
     CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG);
+    CrashReport.setIsDevelopmentDevice(this, BuildConfig.DEBUG);
 
     //fresco
     final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
@@ -102,5 +98,8 @@ public class App extends MultiDexApplication {
         .setDownsampleEnabled(true)
         .build();
     Fresco.initialize(this, config);
+
+    //timer
+    Timber.plant(new Timber.DebugTree());
   }
 }

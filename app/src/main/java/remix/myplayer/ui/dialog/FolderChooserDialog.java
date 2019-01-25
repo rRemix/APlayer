@@ -129,7 +129,11 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
         })
         .autoDismiss(false)
         .positiveText(getBuilder().mChooseButton)
-        .negativeText(getBuilder().mCancelButton);
+        .negativeText(getBuilder().mCancelButton)
+        .positiveColorAttr(R.attr.text_color_primary)
+        .negativeColorAttr(R.attr.text_color_primary)
+        .neutralColorAttr(R.attr.text_color_primary)
+        .backgroundColorAttr(R.attr.background_color_dialog);
     if (getBuilder().mAllowNewFolder) {
       builder.neutralText(getBuilder().mNewFolderButton);
       builder.onNeutral(new MaterialDialog.SingleButtonCallback() {

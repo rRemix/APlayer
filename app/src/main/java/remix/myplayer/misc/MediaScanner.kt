@@ -15,9 +15,9 @@ import org.reactivestreams.Subscription
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.theme.Theme
-import remix.myplayer.util.LogUtil
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.ToastUtil
+import timber.log.Timber
 import java.io.File
 import java.util.*
 
@@ -39,7 +39,7 @@ class MediaScanner(private val context: Context) {
         .content(R.string.scaning)
         .progress(true, 0)
         .progressIndeterminateStyle(false)
-        .dismissListener { dialog -> connection.disconnect() }
+        .dismissListener { connection.disconnect() }
         .build()
 
     val client = object : MediaScannerConnection.MediaScannerConnectionClient {
@@ -55,26 +55,22 @@ class MediaScanner(private val context: Context) {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : FlowableSubscriber<File> {
               override fun onSubscribe(s: Subscription) {
-                LogUtil.d(TAG, "onSubscribe")
                 loadingDialog.show()
                 subscription = s
                 subscription?.request(1)
               }
 
               override fun onNext(file: File) {
-                LogUtil.d(TAG, "onNext: $file")
                 loadingDialog.setContent(file.absolutePath)
                 connection.scanFile(file.absolutePath, "audio/*")
               }
 
               override fun onError(throwable: Throwable) {
-                LogUtil.d(TAG, "onError: $throwable")
                 loadingDialog.dismiss()
                 ToastUtil.show(context, R.string.scan_failed, throwable.toString())
               }
 
               override fun onComplete() {
-                LogUtil.d(TAG, "onComplete")
                 loadingDialog.dismiss()
                 ToastUtil.show(context, context.getString(R.string.scanned_count, toScanFiles.size))
                 App.getContext().contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
@@ -85,7 +81,7 @@ class MediaScanner(private val context: Context) {
 
       override fun onScanCompleted(path: String, uri: Uri) {
         subscription?.request(1)
-        LogUtil.d(TAG, "onScanCompleted --- path: $path uri: $uri")
+        Timber.v("onScanCompleted --- path: $path uri: $uri")
       }
     }
 
@@ -113,7 +109,6 @@ class MediaScanner(private val context: Context) {
   private fun isAudioFile(file: File): Boolean {
     val ext = getFileExtension(file.name)
     val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext)
-    LogUtil.d(TAG, "Mime: $mime")
     return !mime.isNullOrEmpty() && mime.startsWith("audio") && !mime.contains("mpegurl")
   }
 

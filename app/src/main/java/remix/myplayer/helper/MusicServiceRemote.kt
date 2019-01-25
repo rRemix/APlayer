@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.*
 import android.os.IBinder
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Constants
 import remix.myplayer.util.ToastUtil
@@ -157,5 +158,15 @@ object MusicServiceRemote {
   @JvmStatic
   fun deleteFromService(songs: List<Song>) {
     service?.deleteSongFromService(songs)
+  }
+
+  @JvmStatic
+  fun setOperation(operation: Int){
+    service?.operation = operation
+  }
+
+  @JvmStatic
+  fun getOperation(): Int{
+    return service?.operation ?: Command.NEXT
   }
 }

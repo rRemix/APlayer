@@ -39,11 +39,11 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.FloatColorAdapter;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
+import timber.log.Timber;
 
 
 /**
@@ -390,7 +390,7 @@ public class FloatLrcView extends RelativeLayout {
    * 应用退出后清除通知
    */
   public void cancelNotify() {
-    LogUtil.d("DesktopLrc", "取消解锁通知");
+    Timber.v("取消解锁通知");
     if (mNotify != null) {
       mNotify.cancel();
     }

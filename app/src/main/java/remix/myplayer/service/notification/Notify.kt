@@ -10,14 +10,12 @@ import android.content.Intent
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.support.v4.app.TaskStackBuilder
-
 import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.EXTRA_CONTROL
 import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.activity.PlayerActivity.EXTRA_FROM_NOTIFY
-import remix.myplayer.util.LogUtil
 
 /**
  * Created by Remix on 2017/11/22.
@@ -84,7 +82,6 @@ abstract class Notify internal constructor(internal var service: MusicService) {
       service.stopForeground(false)
     }
     if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
-      LogUtil.d("ServiceLifeCycle", "启动前台服务")
       service.startForeground(PLAYING_NOTIFICATION_ID, notification)
     } else {
       notificationManager?.notify(PLAYING_NOTIFICATION_ID, notification)

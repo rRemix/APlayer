@@ -16,9 +16,9 @@ import remix.myplayer.lyric.LrcView
 import remix.myplayer.lyric.SearchLrc
 import remix.myplayer.misc.interfaces.OnInflateFinishListener
 import remix.myplayer.ui.fragment.base.BaseMusicFragment
-import remix.myplayer.util.LogUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
+import timber.log.Timber
 import java.util.*
 
 /**
@@ -98,7 +98,7 @@ class LyricFragment : BaseMusicFragment(), Runnable {
             lrcView.lrcRows = it
           }
         }, Consumer {
-          LogUtil.e(it)
+          Timber.v(it)
           if (id == info?.id) {
             lrcView.lrcRows = null
             lrcView.setText(getStringSafely(R.string.no_lrc))

@@ -1,17 +1,35 @@
 package remix.myplayer.ui.activity.base
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.*
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Message
+import android.text.TextUtils
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.soundcloud.android.crop.Crop
+import io.reactivex.Observable
+import io.reactivex.ObservableOnSubscribe
+import remix.myplayer.R
+import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.helper.MusicServiceRemote
+import remix.myplayer.misc.cache.DiskCache
+import remix.myplayer.request.SimpleUriRequest
+import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.MusicService
-import remix.myplayer.util.LogUtil
+import remix.myplayer.util.Constants
+import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
+import remix.myplayer.util.MediaStoreUtil
+import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 import remix.myplayer.util.Util.registerLocalReceiver
 import remix.myplayer.util.Util.unregisterLocalReceiver
+import timber.log.Timber
+import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -60,14 +78,14 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   override fun onMediaStoreChanged() {
-    LogUtil.d(TAG, "onMediaStoreChanged:" + this.javaClass.name)
+    Timber.v("onMediaStoreChanged: ${this.javaClass.simpleName}")
     for (listener in mMusicServiceEventListeners) {
       listener.onMediaStoreChanged()
     }
   }
 
   override fun onPermissionChanged(has: Boolean) {
-    LogUtil.d(TAG, "onPermissionChanged:" + this.javaClass.name)
+    Timber.v("onPermissionChanged: ${this.javaClass.simpleName}")
     mHasPermission = has
     for (listener in mMusicServiceEventListeners) {
       listener.onPermissionChanged(has)
@@ -75,28 +93,28 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   override fun onPlayListChanged() {
-    LogUtil.d(TAG, "onPlayListChanged:" + this.javaClass.name)
+    Timber.v("onMediaStoreChanged: ${this.javaClass.simpleName}")
     for (listener in mMusicServiceEventListeners) {
       listener.onPlayListChanged()
     }
   }
 
   override fun onMetaChanged() {
-    LogUtil.d(TAG, "onMetaChange:" + this.javaClass.name)
+    Timber.v("onMetaChange: ${this.javaClass.simpleName}")
     for (listener in mMusicServiceEventListeners) {
       listener.onMetaChanged()
     }
   }
 
   override fun onPlayStateChange() {
-    LogUtil.d(TAG, "onPlayStateChange:" + this.javaClass.name)
+    Timber.v("onPlayStateChange: ${this.javaClass.simpleName}")
     for (listener in mMusicServiceEventListeners) {
       listener.onPlayStateChange()
     }
   }
 
   override fun onServiceConnected(service: MusicService) {
-    LogUtil.d(TAG, "onServiceConnected:" + this.javaClass.name)
+    Timber.v("onServiceConnected: ${this.javaClass.simpleName}")
     if (!mReceiverRegistered) {
       mMusicStateReceiver = MusicStateReceiver(this)
       val filter = IntentFilter()
@@ -187,6 +205,93 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
 //                    }
 //                }
 //            }
+    }
+  }
+
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    when (requestCode) {
+      Crop.REQUEST_CROP, Crop.REQUEST_PICK -> {
+        val intent = intent
+        val customCover = intent.getParcelableExtra<CustomCover>("thumb") ?: return
+        val errorTxt = getString(
+            when {
+              customCover.type == Constants.ALBUM -> R.string.set_album_cover_error
+              customCover.type == Constants.ARTIST -> R.string.set_artist_cover_error
+              else -> R.string.set_playlist_cover_error
+            })
+        val id = customCover.id //专辑、艺术家、播放列表封面
+
+        if (resultCode != Activity.RESULT_OK) {
+          ToastUtil.show(this, errorTxt)
+          return
+        }
+        if (requestCode == Crop.REQUEST_PICK) {
+          //选择图片
+          val cacheDir = DiskCache.getDiskCacheDir(this,
+              "thumbnail/" + when {
+                customCover.type == Constants.ALBUM -> "album"
+                customCover.type == Constants.ARTIST -> "artist"
+                else -> "playlist"
+              })
+          if (!cacheDir.exists() && !cacheDir.mkdirs()) {
+            ToastUtil.show(this, errorTxt)
+            return
+          }
+          val destination = Uri.fromFile(File(cacheDir, Util.hashKeyForDisk(id.toString() + "")))
+          Crop.of(data?.data, destination).asSquare().start(this)
+        } else {
+          //图片裁剪
+          //裁剪后的图片路径
+          if (data == null) {
+            return
+          }
+          if (Crop.getOutput(data) == null) {
+            return
+          }
+
+          val path = Crop.getOutput(data).encodedPath
+          if (TextUtils.isEmpty(path) || id == -1) {
+            ToastUtil.show(mContext, errorTxt)
+            return
+          }
+          Observable
+              .create(ObservableOnSubscribe<Uri> { emitter ->
+                //获取以前的图片
+                if (customCover.type == Constants.ALBUM) {
+                  object : SimpleUriRequest(getSearchRequestWithAlbumType(
+                      MediaStoreUtil.getSongByAlbumId(customCover.id))) {
+                    override fun onError(errMsg: String) {
+                      emitter.onError(Throwable(errMsg))
+                    }
+
+                    override fun onSuccess(result: Uri?) {
+                      emitter.onNext(result!!)
+                      emitter.onComplete()
+                    }
+                  }.load()
+                } else {
+                  emitter.onNext(Uri.parse("file://$path"))
+                  emitter.onComplete()
+                }
+              })
+              .doOnSubscribe {
+                //如果设置的是专辑封面 修改内嵌封面
+                if (customCover.type == Constants.ALBUM) {
+                  MediaStoreUtil.saveArtwork(mContext, customCover.id, File(path))
+                }
+              }
+              .compose(RxUtil.applyScheduler())
+              .doFinally {
+                onMediaStoreChanged()
+              }
+              .subscribe({ uri ->
+                val imagePipeline = Fresco.getImagePipeline()
+                imagePipeline.evictFromCache(uri)
+                imagePipeline.evictFromDiskCache(uri)
+              }, { throwable -> ToastUtil.show(mContext, R.string.save_error, throwable.toString()) })
+        }
+      }
     }
   }
 

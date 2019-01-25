@@ -1,13 +1,14 @@
 package remix.myplayer.misc.receiver;
 
+import static remix.myplayer.service.MusicService.TAG_LIFECYCLE;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import remix.myplayer.db.DBManager;
 import remix.myplayer.misc.manager.ActivityManager;
 import remix.myplayer.misc.manager.ServiceManager;
-import remix.myplayer.util.LogUtil;
+import timber.log.Timber;
 
 /**
  * Created by taeja on 16-2-16.
@@ -26,12 +27,10 @@ public class ExitReceiver extends BroadcastReceiver {
 //        ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
     //停止摇一摇
 //        ShakeDetector.getInstance().stopListen();
-    //关闭数据库
-    DBManager.getInstance().closeIfNeed();
     //关闭所有activity
     ActivityManager.FinishAll();
     new Handler().postDelayed(() -> {
-      LogUtil.d("ServiceLifeCycle", "关闭App");
+      Timber.tag(TAG_LIFECYCLE).v("关闭App");
       System.exit(0);
     }, 1000);
 //        System.exit(0);

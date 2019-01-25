@@ -5,8 +5,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import remix.myplayer.App;
-import remix.myplayer.Global;
-import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.SPUtil;
+import timber.log.Timber;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
@@ -19,6 +19,12 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 public class Song implements Cloneable, Parcelable {
 
   public static Song EMPTY_SONG = new Song(-1, "", "", "", -1, "", -1, -1, "", "", -1, "", "", -1);
+  /**
+   * 所有列表是否显示文件名
+   */
+  public static boolean SHOW_DISPLAYNAME = SPUtil
+      .getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SHOW_DISPLAYNAME,
+          false);
 
   public int Id;
   public String Title;
@@ -202,16 +208,17 @@ public class Song implements Cloneable, Parcelable {
         ijkMediaPlayer.prepareAsync();
         Thread.sleep(20);
         Duration = ijkMediaPlayer.getDuration();
-        LogUtil.d("UpdateDuration", "Duration: " + Duration);
+        Timber.v("Duration: %s", Duration);
         if (Duration > 0) {
           ContentValues contentValues = new ContentValues();
           contentValues.put(MediaStore.Audio.Media.DURATION, Duration);
           int updateCount = App.getContext().getContentResolver()
               .update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                   contentValues, MediaStore.Audio.Media._ID + "=?", new String[]{Id + ""});
-          LogUtil.d("UpdateDuration", "UpdateCount: " + updateCount);
+          Timber.v("UpdateCount: %s", updateCount);
         }
       } catch (Exception e) {
+        Timber.v(e);
         e.printStackTrace();
       }
     }
@@ -247,7 +254,7 @@ public class Song implements Cloneable, Parcelable {
   }
 
   public String getShowName() {
-    return !Global.SHOW_DISPLAYNAME ? Title : Displayname;
+    return !SHOW_DISPLAYNAME ? Title : Displayname;
   }
 
   @Override

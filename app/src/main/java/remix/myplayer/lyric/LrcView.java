@@ -27,7 +27,6 @@ import remix.myplayer.R;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2018/1/3.
@@ -398,7 +397,6 @@ public class LrcView extends View implements ILrcView {
             mTimeLineWaiting = false;
             mHandler.removeCallbacks(mLongPressRunnable);
             float offset = event.getRawY() - mLastY;//偏移量
-            LogUtil.d("onTouchEvent", "scrollY: " + getScrollY() + " offset: " + offset);
             if (getScrollY() - offset < 0) {
               if (offset > 0) {
 //                                offset = offset / 3;

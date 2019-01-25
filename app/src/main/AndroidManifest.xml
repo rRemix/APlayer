@@ -167,11 +167,6 @@
         <service android:name=".misc.update.DownloadService"
             android:exported="false"/>
 
-        <provider
-            android:name=".db.DBContentProvider"
-            android:authorities="remix.myplayer"
-            android:exported="false" />
-
         <!-- 桌面部件 -->
         <receiver android:name=".appwidgets.big.AppWidgetBig"
             android:label="@string/app_widget_big_name">

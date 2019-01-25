@@ -13,7 +13,12 @@
     <!-- Customize your theme here. -->
     <item name="colorPrimary">@color/transparent</item>
     <item name="colorPrimaryDark">@color/transparent</item>
+    <item name="editTextStyle">@style/EditTextStyle</item>
   </style>
+
+  <style name="EditTextStyle" parent="@style/Widget.AppCompat.EditText">
+  </style>
+
 
   <style name="AppTheme.NoActionBar">
     <item name="windowActionBar">false</item>

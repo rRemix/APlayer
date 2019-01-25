@@ -6,7 +6,6 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
-import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -21,7 +20,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
-import remix.myplayer.bean.mp3.PlayList;
+import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.PlayListUriRequest;
@@ -95,8 +94,8 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
     if (info == null) {
       return;
     }
-    holder.mName.setText(info.Name);
-    holder.mOther.setText(mContext.getString(R.string.song_count, info.Count));
+    holder.mName.setText(info.getName());
+    holder.mOther.setText(mContext.getString(R.string.song_count, info.getAudioIds().size()));
     //设置专辑封面
     final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
     Disposable disposable = new PlayListUriRequest(holder.mImage,
@@ -131,7 +130,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
       final PopupMenu popupMenu = new PopupMenu(mContext, holder.mButton);
       popupMenu.getMenuInflater().inflate(R.menu.menu_playlist_item, popupMenu.getMenu());
       popupMenu.setOnMenuItemClickListener(
-          new LibraryListener(mContext, info._Id, Constants.PLAYLIST, info.Name));
+          new LibraryListener(mContext, info.getId(), Constants.PLAYLIST, info.getName()));
       popupMenu.show();
     });
 
@@ -148,7 +147,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
       return "";
     }
     if (mDatas != null && position - 1 < mDatas.size()) {
-      String title = mDatas.get(position - 1).Name;
+      String title = mDatas.get(position - 1).getName();
       return !TextUtils.isEmpty(title) ? (Pinyin.toPinyin(title.charAt(0))).toUpperCase()
           .substring(0, 1) : "";
     }

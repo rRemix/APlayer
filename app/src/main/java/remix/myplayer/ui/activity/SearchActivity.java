@@ -5,6 +5,7 @@ import static remix.myplayer.util.MusicUtil.makeCmdIntent;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -55,8 +56,6 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
   //搜索结果的listview
   @BindView(R.id.search_result_native)
   RecyclerView mSearchResRecyclerView;
-  //    @BindView(R.id.search_view)
-//    SearchView mSearchView;
   //无搜索结果
   @BindView(R.id.search_result_blank)
   TextView mSearchResBlank;
@@ -271,4 +270,8 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
     mSearchResBlank.setVisibility(flag ? View.GONE : View.VISIBLE);
   }
 
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+  }
 }

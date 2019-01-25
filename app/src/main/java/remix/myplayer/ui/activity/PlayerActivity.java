@@ -62,11 +62,14 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
+import io.reactivex.Completable;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import java.io.File;
 import java.util.ArrayList;
 import org.jetbrains.annotations.NotNull;
-import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
@@ -100,7 +103,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
@@ -554,7 +556,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         MusicServiceRemote.setPlayModel(currentModel);
         mPlayModel.setImageDrawable(Theme.tintDrawable(currentModel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
             currentModel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                R.drawable.play_btn_loop_one,ThemeStore.getPlayerBtnColor()));
+                R.drawable.play_btn_loop_one, ThemeStore.getPlayerBtnColor()));
 
         String msg = currentModel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
             currentModel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random)
@@ -577,8 +579,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         break;
       //弹出窗口
       case R.id.top_more:
-        @SuppressLint("RestrictedApi")
-        final PopupMenu popupMenu = new PopupMenu(mContext, v, Gravity.TOP);
+        @SuppressLint("RestrictedApi") final PopupMenu popupMenu = new PopupMenu(mContext, v, Gravity.TOP);
         popupMenu.getMenuInflater().inflate(R.menu.menu_audio_item, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(new AudioPopupListener(this, mInfo));
         popupMenu.show();
@@ -586,22 +587,35 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     }
   }
 
+  @SuppressLint("CheckResult")
   @OnClick({R.id.volume_down, R.id.volume_up, R.id.next_song})
   void onVolumeClick(View view) {
     switch (view.getId()) {
       case R.id.volume_down:
-        if (mAudioManager != null) {
-          mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-              AudioManager.ADJUST_LOWER,
-              AudioManager.FLAG_PLAY_SOUND);
-        }
+        Completable
+            .fromAction(() -> {
+              if (mAudioManager != null) {
+                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_LOWER,
+                    AudioManager.FLAG_PLAY_SOUND);
+              }
+            })
+            .subscribeOn(Schedulers.io())
+            .subscribe();
+
         break;
       case R.id.volume_up:
-        if (mAudioManager != null) {
-          mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-              AudioManager.ADJUST_RAISE,
-              AudioManager.FLAG_PLAY_SOUND);
-        }
+        Completable
+            .fromAction(() -> {
+              if (mAudioManager != null) {
+                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_RAISE,
+                    AudioManager.FLAG_PLAY_SOUND);
+              }
+            })
+            .subscribeOn(Schedulers.io())
+            .subscribe();
+
         break;
       case R.id.next_song:
 //                mLyric.setVisibility(View.GONE);
@@ -615,9 +629,12 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         break;
     }
     if (view.getId() != R.id.next_song) {
-      final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-      final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-      mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));
+      Single.zip(Single.fromCallable(() -> mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)),
+          Single.fromCallable(() -> mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)),
+          (max, current) -> new long[]{max, current})
+          .subscribeOn(Schedulers.io())
+          .observeOn(AndroidSchedulers.mainThread())
+          .subscribe(longs -> mVolumeSeekbar.setProgress((int) (longs[1] * 1.0 / longs[1] * 100)));
     }
   }
 
@@ -686,6 +703,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   /**
    * 初始化seekbar
    */
+  @SuppressLint("CheckResult")
   private void setUpSeekBar() {
 //        RelativeLayout seekbarContainer = findViewById(R.id.seekbar_container);
 //        mProgressSeekBar = new SeekBar(mContext);
@@ -755,31 +773,42 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       }
     });
 
-    final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-    final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-    mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));
-    mVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-      @Override
-      public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (mBottomConfig == 2) {
-          mHandler.removeCallbacks(mVolumeRunnable);
-          mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
-        }
-        if (fromUser) {
-          mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-              (int) (seekBar.getProgress() / 100f * max),
-              AudioManager.FLAG_PLAY_SOUND);
-        }
-      }
 
-      @Override
-      public void onStartTrackingTouch(SeekBar seekBar) {
-      }
+    //音量的Seekbar
+    Single.zip(Single.fromCallable(() -> mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)),
+        Single.fromCallable(() -> mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)),
+        (max, current) -> new int[]{max, current})
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(ints -> {
+          final int current = ints[1];
+          final int max = ints[0];
+          mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));
+          mVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+              if (mBottomConfig == 2) {
+                mHandler.removeCallbacks(mVolumeRunnable);
+                mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
+              }
+              if (fromUser) {
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                    (int) (seekBar.getProgress() / 100f * max),
+                    AudioManager.FLAG_PLAY_SOUND);
+              }
+            }
 
-      @Override
-      public void onStopTrackingTouch(SeekBar seekBar) {
-      }
-    });
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+          });
+        });
+
+
     if (mBottomConfig == 2) {
       mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
     }
@@ -844,9 +873,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         }
       }
     }
-    Bundle bundle = new Bundle();
-    bundle.putInt("Width", mWidth);
-    bundle.putParcelable("Song", mInfo);
 
     //初始化所有fragment
     if (mRecordFragment == null) {
@@ -936,7 +962,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       spring.setEndValue(1);
 
     });
-    mCoverFragment.setArguments(bundle);
 
     mAdapter.addFragment(mCoverFragment);
 
@@ -965,7 +990,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       mLrcView.setOtherColor(ThemeStore.getTextColorSecondary());
       mLrcView.setTimeLineColor(ThemeStore.getTextColorSecondary());
     });
-    mLyricFragment.setArguments(bundle);
+
     mAdapter.addFragment(mLyricFragment);
     mPager.setAdapter(mAdapter);
     mPager.setOffscreenPageLimit(mAdapter.getCount() - 1);
@@ -981,10 +1006,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       if (event.getAction() == MotionEvent.ACTION_UP) {
         mEventX2 = event.getX();
         mEventY2 = event.getY();
-        LogUtil.d("PlayerAction",
-            "ThresHoldX: " + THRESHOLD_X + " DistanceX: " + Math.abs(mEventX1 - mEventX2));
-        LogUtil.d("PlayerAction",
-            "ThresHoldY: " + THRESHOLD_Y + " DistanceY: " + (mEventY2 - mEventY1));
         if (mEventY2 - mEventY1 > THRESHOLD_Y && Math.abs(mEventX1 - mEventX2) < THRESHOLD_X) {
           onBackPressed();
         }
@@ -1033,7 +1054,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //            return;
 //        }
     //当操作不为播放或者暂停且正在运行时，更新所有控件
-    if ((Global.getOperation() != Command.TOGGLE || mFirstStart)) {
+    final int operation = MusicServiceRemote.getOperation();
+    if ((operation != Command.TOGGLE || mFirstStart)) {
       //更新顶部信息
       updateTopStatus(mInfo);
       //更新歌词
@@ -1046,7 +1068,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       //更新下一首歌曲
       mNextSong.setText(getString(R.string.next_song, MusicServiceRemote.getNextSong().getTitle()));
       updateBg();
-      requestCover(Global.getOperation() != Command.TOGGLE && !mFirstStart);
+      requestCover(operation != Command.TOGGLE && !mFirstStart);
     }
   }
 
@@ -1330,7 +1352,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //            int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
 //            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
 //        }
-    LogUtil.d(TAG,"handleInternal: " + msg.what);
     if (msg.what == UPDATE_TIME_ONLY && !mIsDragSeekBarFromUser) {
       updateProgressByHandler();
     }

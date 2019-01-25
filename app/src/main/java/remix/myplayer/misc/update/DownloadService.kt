@@ -13,7 +13,6 @@ import android.support.v4.app.NotificationCompat
 import remix.myplayer.R
 import remix.myplayer.bean.github.Release
 import remix.myplayer.request.network.OkHttpHelper
-import remix.myplayer.util.LogUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util.sendLocalBroadcast
 import java.io.File
@@ -136,7 +135,6 @@ class DownloadService : IntentService("DownloadService") {
       builder.setTicker(getString(R.string.downloading))
     }
     mNotificationManager.notify(UPDATE_NOTIFICATION_ID, builder.build())
-    LogUtil.d(TAG, "TargetSize: $targetSize DownloadSize: $downloadSize")
   }
 
   private fun getContentIntent(isFinish: Boolean, path: String): PendingIntent? {

@@ -15,6 +15,7 @@ import remix.myplayer.util.Util;
  * @Author Xiaoborui
  * @Date 2016/10/11 14:07
  */
+@Deprecated
 public abstract class AsynLoadSongNum extends AsyncTask<Integer, Integer, Integer> {
 
   private final int mType;

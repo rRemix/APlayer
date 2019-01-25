@@ -14,7 +14,6 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
 
 /**
  * Created by taeja on 16-4-13.
@@ -360,14 +359,12 @@ public class EQSeekBar extends View {
       mDBText = "0";
     }
 
-    LogUtil.d(TAG, "DB: " + mDB);
 
     invalidate();
   }
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    LogUtil.d(TAG, "EventY:" + event.getY());
     int eventY = (int) event.getY();
     seekTo(eventY, event.getAction() == MotionEvent.ACTION_UP);
     return true;

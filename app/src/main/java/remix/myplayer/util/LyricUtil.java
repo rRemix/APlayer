@@ -53,7 +53,6 @@ public class LyricUtil {
    * 判断是否是相匹配的歌词
    */
   public static boolean isRightLrc(File file, String displayName, String title, String artist) {
-    //todo优化判断
 //        BufferedReader br = null;
     try {
       if (file == null || !file.canRead() || !file.isFile()) {

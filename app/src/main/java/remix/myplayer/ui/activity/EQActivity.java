@@ -19,24 +19,23 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import java.util.ArrayList;
 import remix.myplayer.App;
-import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.helper.MusicServiceRemote;
+import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
 import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.widget.EQSeekBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import timber.log.Timber;
 
 /**
  * Created by taeja on 16-4-13.
  */
 public class EQActivity extends ToolbarActivity {
 
-  private final static String TAG = "SetUpEQ";
   private static Equalizer mEqualizer;
   private static short mBandNumber = -1;
   private static short mMaxEQLevel = -1;
@@ -65,14 +64,14 @@ public class EQActivity extends ToolbarActivity {
         try {
           Thread.sleep(600);
           int AudioSessionId = MusicServiceRemote.getMediaPlayer().getAudioSessionId();
-          LogUtil.d(TAG, "AudioSessionId:" + AudioSessionId);
+          Timber.v("AudioSessionId:%s", AudioSessionId);
           if (AudioSessionId == 0) {
-            LogUtil.d(TAG, "AudioSessionId Error");
+            Timber.v("AudioSessionId Null");
             return;
           }
           //是否启用音效设置
           mEnable =
-              SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "EnableEQ", false) & Global
+              SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, "EnableEQ", false) & HeadsetPlugReceiver
                   .getHeadsetOn();
 
           //EQ
@@ -109,7 +108,7 @@ public class EQActivity extends ToolbarActivity {
           //初始化完成
           mHasInitial = true;
         } catch (Exception e) {
-          LogUtil.d(TAG, e.toString());
+          Timber.v(e);
         }
       }
 
@@ -144,7 +143,7 @@ public class EQActivity extends ToolbarActivity {
         return;
       }
 
-      if (!Global.getHeadsetOn()) {
+      if (!HeadsetPlugReceiver.getHeadsetOn()) {
         ToastUtil.show(EQActivity.this, R.string.plz_earphone);
         mSwitch.setChecked(false);
         return;
@@ -282,7 +281,7 @@ public class EQActivity extends ToolbarActivity {
 
   //重置音效设置
   public void onReset(View v) {
-    if (!Global.getHeadsetOn()) {
+    if (!HeadsetPlugReceiver.getHeadsetOn()) {
       ToastUtil.show(EQActivity.this, R.string.plz_earphone);
       return;
     }
@@ -316,7 +315,7 @@ public class EQActivity extends ToolbarActivity {
     public void onReceive(Context context, Intent intent) {
       if (Constants.SOUNDEFFECT_ACTION.equals(intent.getAction())) {
         //耳机拔出 关闭均衡器
-        boolean enable = Global.getHeadsetOn();
+        boolean enable = HeadsetPlugReceiver.getHeadsetOn();
         if (!enable) {
           mEnable = false;
           updateEnable(false);

@@ -14,8 +14,8 @@ import remix.myplayer.service.MusicService
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
-import remix.myplayer.util.LogUtil
 import remix.myplayer.util.SPUtil
+import timber.log.Timber
 
 /**
  * Created by Remix on 2017/11/22.
@@ -83,7 +83,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
               remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             }
           } catch (e: Exception) {
-            LogUtil.d("Notify", e.toString())
+            Timber.v(e)
           } finally {
             pushNotify(notification)
           }

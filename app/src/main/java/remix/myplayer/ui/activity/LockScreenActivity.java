@@ -43,7 +43,6 @@ import remix.myplayer.ui.widget.VerticalScrollTextView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.StatusBarUtil;
 
 /**
@@ -107,7 +106,6 @@ public class LockScreenActivity extends BaseMusicActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    LogUtil.d(TAG, "onCreate");
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_lockscreen);
     ButterKnife.bind(this);
@@ -161,7 +159,6 @@ public class LockScreenActivity extends BaseMusicActivity {
         if (mDistance > 0 || ((decorView.getScrollX() + (-mDistance)) < 0)) {
           decorView.scrollBy((int) -mDistance, 0);
         }
-        LogUtil.d(TAG, "distance:" + mDistance + "\r\n");
         break;
       case MotionEvent.ACTION_UP:
         //判断当前位置是否超过整个屏幕宽度的0.25
@@ -196,7 +193,6 @@ public class LockScreenActivity extends BaseMusicActivity {
 
   @Override
   protected void onDestroy() {
-    LogUtil.d(TAG, "onDestroy");
     super.onDestroy();
     if (mUpdateLyricThread != null) {
       mUpdateLyricThread.interrupt();

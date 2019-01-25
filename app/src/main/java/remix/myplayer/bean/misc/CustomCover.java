@@ -7,13 +7,13 @@ import android.os.Parcelable;
  * Created by Remix on 2017/12/18.
  */
 
-public class CustomThumb implements Parcelable {
+public class CustomCover implements Parcelable {
 
   private int mId;
   private int mType;
   private String mkey;
 
-  public CustomThumb(int id, int type, String key) {
+  public CustomCover(int id, int type, String key) {
     this.mId = id;
     this.mType = type;
     this.mkey = key;
@@ -44,6 +44,15 @@ public class CustomThumb implements Parcelable {
   }
 
   @Override
+  public String toString() {
+    return "CustomCover{" +
+        "mId=" + mId +
+        ", mType=" + mType +
+        ", mkey='" + mkey + '\'' +
+        '}';
+  }
+
+  @Override
   public int describeContents() {
     return 0;
   }
@@ -55,21 +64,21 @@ public class CustomThumb implements Parcelable {
     dest.writeString(this.mkey);
   }
 
-  public CustomThumb(Parcel in) {
+  public CustomCover(Parcel in) {
     this.mId = in.readInt();
     this.mType = in.readInt();
     this.mkey = in.readString();
   }
 
-  public static final Parcelable.Creator<CustomThumb> CREATOR = new Parcelable.Creator<CustomThumb>() {
+  public static final Parcelable.Creator<CustomCover> CREATOR = new Parcelable.Creator<CustomCover>() {
     @Override
-    public CustomThumb createFromParcel(Parcel source) {
-      return new CustomThumb(source);
+    public CustomCover createFromParcel(Parcel source) {
+      return new CustomCover(source);
     }
 
     @Override
-    public CustomThumb[] newArray(int size) {
-      return new CustomThumb[size];
+    public CustomCover[] newArray(int size) {
+      return new CustomCover[size];
     }
   };
 }

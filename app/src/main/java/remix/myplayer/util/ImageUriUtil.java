@@ -21,6 +21,7 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.UriRequest;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -69,16 +70,16 @@ public class ImageUriUtil {
   /**
    * 返回自定义的封面
    */
-  public static File getCustomThumbIfExist(int arg, int type) {
+  public static File getCustomThumbIfExist(int id, int type) {
     File img = type == ImageUriRequest.URL_ALBUM ? new File(
         DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/album") + "/" + Util
-            .hashKeyForDisk(arg * 255 + ""))
+            .hashKeyForDisk(id + ""))
         : type == ImageUriRequest.URL_ARTIST ? new File(
             DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/artist") + "/" + Util
-                .hashKeyForDisk(arg * 255 + ""))
+                .hashKeyForDisk(id + ""))
             : new File(
                 DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/playlist") + "/" + Util
-                    .hashKeyForDisk(arg * 255 + ""));
+                    .hashKeyForDisk(id + ""));
     if (img.exists()) {
       return img;
     }
@@ -273,7 +274,7 @@ public class ImageUriUtil {
         }
       }
     } catch (Exception e) {
-      LogUtil.e(e);
+      Timber.v(e);
     }
     return "";
   }

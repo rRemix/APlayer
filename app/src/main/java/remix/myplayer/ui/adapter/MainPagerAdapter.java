@@ -18,7 +18,6 @@ import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
-import remix.myplayer.util.LogUtil;
 
 
 /**
@@ -98,10 +97,8 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
   @Override
   public Fragment getItem(int position) {
     if (position >= mCateGory.size()) {
-      LogUtil.d(TAG, "getItem异常: " + position);
       return new Fragment();
     }
-    LogUtil.d(TAG, "getItem --- position: " + position);
 
     WeakReference<Fragment> weakReference = mFragmentMap.get(position);
     if (weakReference != null && weakReference.get() != null) {
@@ -145,7 +142,6 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
         mFragmentMap.remove(i);
       }
     }
-    LogUtil.d(TAG, "CacheMap: " + mFragmentMap);
   }
 
   public List<Category> getList() {

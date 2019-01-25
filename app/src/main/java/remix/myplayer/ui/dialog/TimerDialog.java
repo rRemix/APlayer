@@ -27,7 +27,6 @@ import remix.myplayer.theme.TintHelper;
 import remix.myplayer.ui.widget.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -113,7 +112,6 @@ public class TimerDialog extends BaseDialog {
           //取整数分钟
           mTime = minute * 60;
           mSaveTime = minute * 60;
-          LogUtil.e("TimerDialog", "设置时间: " + mSaveTime + "s");
         }
       }
 
@@ -266,7 +264,6 @@ public class TimerDialog extends BaseDialog {
           Bundle data = new Bundle();
           data.putString(EXTRA_MINUTE, min < 10 ? "0" + min : "" + min);
           data.putString(EXTRA_SECOND, sec < 10 ? "0" + sec : "" + sec);
-          LogUtil.e("TimerDialog", "Minute: " + min + " Second: " + sec);
           msg.setData(data);
           mHandler.sendMessage(msg);
         }

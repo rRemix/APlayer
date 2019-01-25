@@ -1,5 +1,6 @@
 package remix.myplayer.bean.misc;
 
+import android.text.TextUtils;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +36,14 @@ public class Category implements Serializable {
   }
 
   public boolean isPlayList() {
-    return getClassName().equals(PlayListFragment.class.getName());
+    if(TextUtils.isEmpty(mClassName)){
+      mClassName = mTag == TAG_SONG ? SongFragment.class.getName() :
+          mTag == TAG_ALBUM ? AlbumFragment.class.getName() :
+              mTag == TAG_ARTIST ? ArtistFragment.class.getName() :
+                  mTag == TAG_PLAYLIST ? PlayListFragment.class.getName()
+                      : FolderFragment.class.getName();
+    }
+    return mClassName.equals(PlayListFragment.class.getName());
   }
 
   public boolean isSongList() {

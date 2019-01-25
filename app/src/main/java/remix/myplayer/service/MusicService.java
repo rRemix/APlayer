@@ -1,6 +1,7 @@
 package remix.myplayer.service;
 
 import static remix.myplayer.lyric.UpdateLyricThread.LRC_INTERVAL;
+import static remix.myplayer.request.network.RxUtil.applySingleScheduler;
 import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.Util.registerLocalReceiver;
@@ -32,6 +33,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -40,9 +42,12 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import com.tencent.bugly.crashreport.CrashReport;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -52,7 +57,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import remix.myplayer.Global;
+import java.util.concurrent.Callable;
+import org.jetbrains.annotations.NotNull;
 import remix.myplayer.R;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.appwidgets.BaseAppwidget;
@@ -61,18 +67,17 @@ import remix.myplayer.appwidgets.medium.AppWidgetMedium;
 import remix.myplayer.appwidgets.medium.AppWidgetMediumTransparent;
 import remix.myplayer.appwidgets.small.AppWidgetSmall;
 import remix.myplayer.appwidgets.small.AppWidgetSmallTransparent;
-import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.db.PlayListSongs;
-import remix.myplayer.db.PlayLists;
+import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicEventCallback;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.helper.SleepTimer;
 import remix.myplayer.lyric.UpdateLyricThread;
 import remix.myplayer.lyric.bean.LyricRowWrapper;
+import remix.myplayer.misc.LogObserver;
+import remix.myplayer.misc.Migration;
 import remix.myplayer.misc.exception.MusicServiceException;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
-import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
 import remix.myplayer.misc.receiver.MediaButtonReceiver;
@@ -84,12 +89,12 @@ import remix.myplayer.service.notification.NotifyImpl24;
 import remix.myplayer.ui.activity.LockScreenActivity;
 import remix.myplayer.ui.widget.floatwidget.FloatLrcView;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.SPUtil.SETTING_KEY;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
+import timber.log.Timber;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
@@ -100,9 +105,10 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 /**
  * 播放Service 歌曲的播放 控制 回调相关activity的界面更新 通知栏的控制
  */
+@SuppressLint("CheckResult")
 public class MusicService extends BaseService implements Playback, MusicEventCallback {
 
-  private final static String TAG = "MusicService";
+  public static final String TAG_LIFECYCLE = "ServiceLifeCycle";
   public static final String EXTRA_FLOAT_LYRIC = "FloatLrc";
   public static final String EXTRA_SONG = "Song";
   public static final String EXTRA_POSITION = "Position";
@@ -284,13 +290,20 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   private boolean mPlayAtBreakPoint;
 
   /**
+   * 操作类型
+   */
+  private int mOperation = -1;
+
+  /**
    * Binder
    */
   private final IBinder mMusicBinder = new MusicBinder();
+  /**
+   * 数据库
+   */
+  private final DatabaseRepository mDBRepository = DatabaseRepository.getInstance();
 
   private MediaStoreObserver mMediaStoreObserver;
-  private DBObserver mPlayListObserver;
-  private DBObserver mPlayListSongObserver;
   private MusicService mService;
 
   protected boolean mHasPermission = false;
@@ -334,7 +347,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   @Override
   public void onTaskRemoved(Intent rootIntent) {
     super.onTaskRemoved(rootIntent);
-    LogUtil.d("ServiceLifeCycle", "onTaskRemoved");
+    Timber.tag(TAG_LIFECYCLE).v("onTaskRemoved");
 //        unInit();
 //        stopSelf();
 //        System.exit(0);
@@ -342,7 +355,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
   @Override
   public void onDestroy() {
-    LogUtil.d("ServiceLifeCycle", "onDestroy");
+    Timber.tag(TAG_LIFECYCLE).v("onDestroy");
     super.onDestroy();
     mIsServiceStop = true;
     unInit();
@@ -351,9 +364,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   @Override
   public void onCreate() {
     super.onCreate();
-    LogUtil.d("ServiceLifeCycle", "onCreate");
+    Timber.tag(TAG_LIFECYCLE).v("onCreate");
     mService = this;
     setUp();
+
+
   }
 
   @Nullable
@@ -361,6 +376,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   public IBinder onBind(Intent intent) {
     return mMusicBinder;
   }
+
 
   public class MusicBinder extends Binder {
 
@@ -373,7 +389,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   @SuppressLint("CheckResult")
   @Override
   public int onStartCommand(Intent commandIntent, int flags, int startId) {
-    LogUtil.d("ServiceLifeCycle", "onStartCommand");
+    Timber.tag(TAG_LIFECYCLE).v("onStartCommand");
     mIsServiceStop = false;
 
     Single.create((SingleOnSubscribe<String>) emitter -> {
@@ -400,11 +416,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   }
 
   private void setUp() {
-    mShortcutManager = new DynamicShortcutManager(mService);
+    mShortcutManager = new DynamicShortcutManager(this);
     mVolumeController = new VolumeController(this);
     mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
-    Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
+    HeadsetPlugReceiver.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
 
     mPlaybackThread = new HandlerThread("IO");
     mPlaybackThread.start();
@@ -465,13 +481,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     //监听数据库变化
     mMediaStoreObserver = new MediaStoreObserver(this);
-    mPlayListObserver = new DBObserver(this);
-    mPlayListSongObserver = new DBObserver(this);
     getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true,
         mMediaStoreObserver);
-    getContentResolver().registerContentObserver(PlayLists.CONTENT_URI, true, mPlayListObserver);
-    getContentResolver()
-        .registerContentObserver(PlayListSongs.CONTENT_URI, true, mPlayListSongObserver);
 
     setUpPlayer();
     setUpSession();
@@ -510,25 +521,25 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
       @Override
       public void onSkipToNext() {
-        LogUtil.d(MediaButtonReceiver.TAG, "onSkipToNext");
+        Timber.v("onSkipToNext");
         playNext();
       }
 
       @Override
       public void onSkipToPrevious() {
-        LogUtil.d(MediaButtonReceiver.TAG, "onSkipToPrevious");
+        Timber.v("onSkipToPrevious");
         playPrevious();
       }
 
       @Override
       public void onPlay() {
-        LogUtil.d(MediaButtonReceiver.TAG, "onPlay");
+        Timber.v("onPlay");
         play(true);
       }
 
       @Override
       public void onPause() {
-        LogUtil.d(MediaButtonReceiver.TAG, "onPause");
+        Timber.v("onPause");
         pause(false);
       }
 
@@ -564,11 +575,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       } else {
         playNextOrPrev(true);
       }
-      Global.setOperation(Command.NEXT);
+      setOperation(Command.NEXT);
       acquireWakeLock();
     });
     mMediaPlayer.setOnPreparedListener(mp -> {
-      LogUtil.d(TAG, "准备完成:" + mFirstPrepared);
+      Timber.v("准备完成:%s", mFirstPrepared);
       if (mFirstPrepared) {
         mFirstPrepared = false;
         if (mLastProgress > 0) {
@@ -576,7 +587,9 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         }
         return;
       }
-      LogUtil.d(TAG, "开始播放");
+      Timber.v("开始播放");
+      //记录播放历史
+      updatePlayHistory();
       play(false);
     });
 
@@ -596,15 +609,26 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     });
   }
 
+
+  /**
+   * 更新播放历史
+   */
+  private void updatePlayHistory() {
+    mDBRepository.updateHistory(mCurrentSong)
+        .compose(applySingleScheduler())
+        .subscribe(new LogObserver());
+
+  }
+
   /**
    * 初始化mediaplayer
    */
-  public void setUpDataSource(Song item, int pos) {
+  private void setUpDataSource(Song item, int pos) {
     if (item == null) {
       return;
     }
     //初始化当前播放歌曲
-    LogUtil.d(TAG, "当前歌曲:" + item.getTitle());
+    Timber.v("当前歌曲:%s", item.getTitle());
     mCurrentSong = item;
     mCurrentId = mCurrentSong.getId();
     mCurrentIndex = pos;
@@ -682,8 +706,6 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     releaseWakeLock();
     getContentResolver().unregisterContentObserver(mMediaStoreObserver);
-    getContentResolver().unregisterContentObserver(mPlayListObserver);
-    getContentResolver().unregisterContentObserver(mPlayListSongObserver);
 
     ShakeDetector.getInstance().stopListen();
 
@@ -701,7 +723,6 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   private void openAudioEffectSession() {
     final Intent audioEffectsIntent = new Intent(
         AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
-    LogUtil.d(TAG, "AudioSessionId: " + mMediaPlayer.getAudioSessionId());
     audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
     audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
     sendBroadcast(audioEffectsIntent);
@@ -719,10 +740,15 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     return mPlayQueue;
   }
 
+  public DatabaseRepository getRepository() {
+    return mDBRepository;
+  }
+
   /**
    * 设置播放队列
    */
-  public void setPlayQueue(final List<Integer> newQueueList) {
+  @WorkerThread
+  public synchronized void setPlayQueue(final List<Integer> newQueueList) {
     if (newQueueList == null || newQueueList.size() == 0) {
       return;
     }
@@ -732,20 +758,18 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mPlayQueue.clear();
     mPlayQueue.addAll(newQueueList);
 
-    mPlaybackHandler.post(() -> {
-      try {
-        PlayListUtil.clearTable(Constants.PLAY_QUEUE);
-        PlayListUtil.addMultiSongs(mPlayQueue, Constants.PLAY_QUEUE, Global.PlayQueueID);
-      } catch (Exception e) {
-        LogUtil.d(TAG, e.toString());
-      }
+    mDBRepository.runInTransaction(() -> {
+      mDBRepository.clearPlayQueue()
+          .concatWith(mDBRepository.insertToPlayQueue(mPlayQueue))
+          .subscribe();
     });
   }
 
   /**
    * 设置播放队列
    */
-  public void setPlayQueue(final List<Integer> newQueueList, final Intent intent) {
+  @WorkerThread
+  public synchronized void setPlayQueue(final List<Integer> newQueueList, final Intent intent) {
     //当前模式是随机播放 或者即将设置为随机播放 都要更新mRandomList
     boolean shuffle = intent.getBooleanExtra("shuffle", false) ||
         SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL,
@@ -770,16 +794,12 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       return;
     }
 
-    mPlaybackHandler.post(() -> {
-      int deleteRow = 0;
-      int addRow = 0;
-      try {
-        deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
-        addRow = PlayListUtil.addMultiSongs(mPlayQueue, Constants.PLAY_QUEUE, Global.PlayQueueID);
-      } catch (Exception e) {
-        LogUtil.d(TAG, e.toString());
-      }
+    mDBRepository.runInTransaction(() -> {
+      mDBRepository.clearPlayQueue()
+          .concatWith(mDBRepository.insertToPlayQueue(mPlayQueue))
+          .subscribe();
     });
+
   }
 
   public void setPlay(boolean isPlay) {
@@ -826,7 +846,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     //倍速播放
     setSpeed(mSpeed);
     //更新所有界面
-    update(Global.getOperation());
+    update(getOperation());
     mMediaPlayer.start();
     if (fadeIn) {
       mVolumeController.fadeIn();
@@ -861,13 +881,13 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   @Override
   public void pause(boolean updateMediaSessionOnly) {
     if (updateMediaSessionOnly) {
-      updateMediaSession(Global.Operation);
+      updateMediaSession(getOperation());
     } else {
       if (!isPlaying()) { //如果当前已经暂停了 就不重复操作了 避免已经关闭了通知栏又再次显示
         return;
       }
       setPlay(false);
-      update(Global.Operation);
+      update(getOperation());
       mVolumeController.fadeOut();
     }
   }
@@ -1026,7 +1046,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         mControlReceiver.onReceive(this, shuffleIntent);
         break;
       case ACTION_SHORTCUT_MYLOVE:
-        List<Integer> myLoveIds = PlayListUtil.getSongIds(Global.MyLoveID);
+        List<Integer> myLoveIds = mDBRepository.getMyLoveList().blockingGet();
         if (myLoveIds == null || myLoveIds.size() == 0) {
           ToastUtil.show(mService, R.string.list_is_empty);
           return;
@@ -1084,7 +1104,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     updateFloatLrc(false);
     updateNotification();
 
-    updateMediaSession(Global.Operation);
+    updateMediaSession(getOperation());
     sendLocalBroadcast(new Intent(MusicService.META_CHANGE));
   }
 
@@ -1115,7 +1135,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     @Override
     public void onReceive(Context context, Intent intent) {
-      LogUtil.d(TAG, "ControlReceiver: " + intent);
+      Timber.v("ControlReceiver: %s", intent);
       if (intent == null || intent.getExtras() == null) {
         return;
       }
@@ -1125,12 +1145,12 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT
           || control == Command.TOGGLE || control == Command.PAUSE || control == Command.START) {
         //保存控制命令,用于播放界面判断动画
-        Global.setOperation(control);
+        setOperation(control);
         if (mPlayQueue == null || mPlayQueue.size() == 0) {
           //列表为空，尝试读取
-          Global.PlayQueueID = SPUtil
-              .getValue(mService, SPUtil.SETTING_KEY.NAME, "PlayQueueID", -1);
-          mPlayQueue = PlayListUtil.getSongIds(Global.PlayQueueID);
+          mDBRepository.getPlayQueue()
+              .compose(applySingleScheduler())
+              .subscribe(queues -> mPlayQueue = queues);
         }
       }
 
@@ -1180,14 +1200,20 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           break;
         //取消或者添加收藏
         case Command.LOVE:
-          int exist = PlayListUtil.isLove(mCurrentId);
-          if (exist == PlayListUtil.EXIST) {
-            PlayListUtil.deleteSong(mCurrentId, Global.MyLoveID);
-          } else if (exist == PlayListUtil.NONEXIST) {
-            PlayListUtil
-                .addSong(new PlayListSong(mCurrentSong.getId(), Global.MyLoveID, Constants.MYLOVE));
-          }
-          updateAppwidget();
+          mDBRepository.toggleMyLove(mCurrentId)
+              .compose(applySingleScheduler())
+              .subscribe(new Consumer<Boolean>() {
+                @Override
+                public void accept(Boolean aBoolean) throws Exception {
+                  updateAppwidget();
+                }
+              }, new Consumer<Throwable>() {
+                @Override
+                public void accept(Throwable throwable) throws Exception {
+                  Timber.v(throwable);
+                }
+              });
+
           break;
         //桌面歌词
         case Command.TOGGLE_FLOAT_LRC:
@@ -1241,7 +1267,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           Song tempSong = intent.getParcelableExtra(EXTRA_SONG);
           if (tempSong != null) {
             mCurrentSong = tempSong;
-            Global.Operation = Command.PLAY_TEMP;
+            setOperation(Command.PLAY_TEMP);
             prepare(mCurrentSong.getUrl());
           }
           break;
@@ -1298,12 +1324,18 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           updateNextSong();
           //保存到数据库
           if (mPlayModel != Constants.PLAY_SHUFFLE) {
-            mPlaybackHandler.post(() -> {
-              PlayListUtil.clearTable(Constants.PLAY_QUEUE);
-              PlayListUtil.addMultiSongs(mPlayQueue, Constants.PLAY_QUEUE, Global.PlayQueueID);
-            });
+            Single
+                .fromCallable(() -> {
+                  mDBRepository.runInTransaction(() -> {
+                    mDBRepository.clearPlayQueue();
+                    mDBRepository.insertToPlayQueue(mPlayQueue);
+                  });
+                  return true;
+                })
+                .compose(applySingleScheduler())
+                .subscribe(success -> ToastUtil.show(mService, R.string.already_add_to_next_song),
+                    throwable -> ToastUtil.show(mService, R.string.play_failed));
           }
-          ToastUtil.show(mService, R.string.already_add_to_next_song);
           break;
         //改变歌词源
         case Command.CHANGE_LYRIC:
@@ -1448,7 +1480,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    */
 
   private void prepare(final String path, final boolean requestFocus) {
-    LogUtil.d(TAG, "准备播放");
+    Timber.v("准备播放: %s", path);
     if (TextUtils.isEmpty(path)) {
       ToastUtil.show(mService, getString(R.string.path_empty));
       return;
@@ -1502,7 +1534,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       ToastUtil.show(mService, getString(R.string.list_is_empty));
       return;
     }
-    LogUtil.d(TAG, "播放下一首");
+    Timber.v("播放下一首");
     if (isNext) {
       //如果是点击下一首 播放预先设置好的下一首歌曲
       mCurrentId = mNextId;
@@ -1655,7 +1687,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         return (int) mMediaPlayer.getCurrentPosition();
       }
     } catch (IllegalStateException e) {
-      LogUtil.d(TAG, "getProgress Error: " + e);
+      Timber.v("getProgress() %s", e.toString());
     }
     return 0;
   }
@@ -1674,6 +1706,15 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
   }
 
+
+  public void setOperation(int operation) {
+    mOperation = operation;
+  }
+
+  public int getOperation() {
+    return mOperation;
+  }
+
   /**
    * 读取歌曲id列表与播放队列
    */
@@ -1681,35 +1722,41 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mPlaybackHandler.post(this::load);
   }
 
-  private void load() {
-    final boolean isFirst = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, "First", true);
-    SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, "First", false);
+  @WorkerThread
+  private synchronized void load() {
+    //迁移数据
+    Migration.migrationDatabase(this);
+
+    final boolean isFirst = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, true);
+    SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, false);
     //读取sd卡歌曲id
     mAllSong = MediaStoreUtil.getAllSongsId();
     //第一次启动软件
     if (isFirst) {
-      try {
-        //默认全部歌曲为播放队列
-        Global.PlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
-        setPlayQueue(mAllSong);
-        SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, "PlayQueueID", Global.PlayQueueID);
-        //添加我的收藏列表
-        Global.MyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
-        SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, "MyLoveID", Global.MyLoveID);
-        //通知栏样式
-        SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.N);
-      } catch (Exception e) {
-        LogUtil.d(TAG, e.toString());
-      }
+      //新建我的收藏
+      mDBRepository.insertPlayList(DatabaseRepository.getMyLove()).subscribe(new LogObserver() {
+        @Override
+        public void onSuccess(@NotNull Object value) {
+          super.onSuccess(value);
+        }
+
+        @Override
+        public void onError(@NotNull Throwable e) {
+          super.onError(e);
+        }
+      });
+      //默认全部歌曲为播放列表
+      setPlayQueue(mAllSong);
+      //通知栏样式
+      SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,
+          Build.VERSION.SDK_INT < Build.VERSION_CODES.N);
     } else {
       //播放模式
       mPlayModel = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL,
           Constants.PLAY_LOOP);
-      Global.PlayQueueID = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, "PlayQueueID", -1);
-      Global.MyLoveID = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, "MyLoveID", -1);
-      mPlayQueue = PlayListUtil.getSongIds(Global.PlayQueueID);
-      Global.PlayList = PlayListUtil.getAllPlayListInfo();
+      //读取播放列表
+      mPlayQueue = mDBRepository.getPlayQueue().blockingGet();
+
       mShowFloatLrc = SPUtil
           .getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
     }
@@ -1827,7 +1874,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
     if (!mShowFloatLrc) { //移除桌面歌词
       mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
-    } else if (!updatePlayStateOnly(Global.Operation) || force || mFirstUpdateLrc) { //更新
+    } else if (!updatePlayStateOnly(getOperation()) || force || mFirstUpdateLrc) { //更新
       createFloatLrcThreadIfNeed();
       if(mUpdateFloatLrcThread == null){
         CrashReport.postCatchedException(
@@ -1843,8 +1890,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    * 创建更新桌面歌词的线程
    */
   private boolean createFloatLrcThreadIfNeed() {
-    LogUtil.d("DesktopLrc", "createFloatLrcThreadIfNeed" + " isFloatShowing: " + isFloatLrcShowing());
-    if (mShowFloatLrc && !isFloatLrcShowing() && mUpdateFloatLrcThread == null) {
+    Timber.v("createFloatLrcThreadIfNeed() %s", isFloatLrcShowing());
+    if (mShowFloatLrc && mUpdateFloatLrcThread == null) {
       mUpdateFloatLrcThread = new UpdateFloatLrcThread();
       mUpdateFloatLrcThread.start();
       return true;
@@ -1863,7 +1910,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       }
       return false;
     } catch (Exception e) {
-      LogUtil.e(e);
+      Timber.v(e);
     }
     return true;
   }
@@ -1931,7 +1978,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     UpdateFloatLrcThread() {
       super(MusicService.this);
-      LogUtil.d("DesktopLrc", "创建线程");
+      Timber.v("创建线程");
     }
 
     void quitByNotification() {
@@ -1952,11 +1999,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 //                    LogUtil.d("DesktopLrc","间隔:" + interval);
           Thread.sleep(LRC_INTERVAL);
         } catch (InterruptedException e) {
-          LogUtil.d("DesktopLrc", "捕获异常,线程退出");
+          Timber.v("捕获异常,线程退出");
           mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
           return;
         }
-        LogUtil.d("DesktopLrc", "Thread:" + Thread.currentThread());
+        Timber.v("Thread:%s", Thread.currentThread());
         //判断权限
         if (checkNoPermission()) {
           return;
@@ -1974,11 +2021,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         } else {
           if (!isFloatLrcShowing()) {
             mUpdateUIHandler.removeMessages(Constants.CREATE_FLOAT_LRC);
-            LogUtil.d("DesktopLrc", "请求创建桌面歌词");
+            Timber.v("请求创建桌面歌词");
             mUpdateUIHandler.sendEmptyMessageDelayed(Constants.CREATE_FLOAT_LRC, 50);
           } else {
             mCurrentLrc = findCurrentLyric();
-            LogUtil.d("DesktopLrc", "当前歌词: " + mCurrentLrc);
+            Timber.v("当前歌词: %s", mCurrentLrc);
             mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
           }
         }
@@ -2023,7 +2070,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mFloatLrcView = new FloatLrcView(mService);
     mWindowManager.addView(mFloatLrcView, param);
     mIsFloatLrcInitializing = false;
-    LogUtil.d("DesktopLrc", "创建桌面歌词");
+    Timber.v("创建桌面歌词");
   }
 
   /**
@@ -2031,7 +2078,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    */
   private void removeFloatLrc() {
     if (mFloatLrcView != null) {
-      LogUtil.d("DesktopLrc", "移除桌面歌词");
+      Timber.v("移除桌面歌词");
       mFloatLrcView.cancelNotify();
       mWindowManager.removeView(mFloatLrcView);
       mFloatLrcView = null;
@@ -2068,13 +2115,15 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     public void run() {
       for (Map.Entry<String, BaseAppwidget> entry : mAppWidgets.entrySet()) {
         if (entry.getValue() != null) {
-          entry.getValue().updateWidget(mService, null, false);
+          entry.getValue().partiallyUpdateWidget(mService);
         }
       }
-      final int progress = getProgress();
-      if (progress > 0 && mPlayAtBreakPoint) {
-        SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,
-            progress);
+      if (mPlayAtBreakPoint) {
+        final int progress = getProgress();
+        if (progress > 0) {
+          SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,
+              progress);
+        }
       }
     }
   }
@@ -2094,14 +2143,14 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           } else if (mNeedContinue) {
             play(true);
             mNeedContinue = false;
-            Global.setOperation(Command.TOGGLE);
+            setOperation(Command.TOGGLE);
           }
           mVolumeController.directTo(1);
           break;
         case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT://短暂暂停
           mNeedContinue = mIsPlay;
           if (mIsPlay && mMediaPlayer != null) {
-            Global.setOperation(Command.TOGGLE);
+            setOperation(Command.TOGGLE);
             pause(false);
           }
           break;
@@ -2111,7 +2160,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         case AudioManager.AUDIOFOCUS_LOSS://暂停
           mAudioFocus = false;
           if (mIsPlay && mMediaPlayer != null) {
-            Global.setOperation(Command.TOGGLE);
+            setOperation(Command.TOGGLE);
             pause(false);
           }
           break;

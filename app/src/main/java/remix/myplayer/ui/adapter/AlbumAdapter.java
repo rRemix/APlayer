@@ -6,9 +6,7 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -23,12 +21,10 @@ import android.widget.TextView;
 import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
-import com.tencent.bugly.crashreport.CrashReport;
 import io.reactivex.disposables.Disposable;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Album;
-import remix.myplayer.misc.asynctask.AsynLoadSongNum;
 import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -108,17 +104,8 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         new RequestConfig.Builder(imageSize, imageSize).build()).load();
     holder.mImage.setTag(disposable);
     if (holder instanceof AlbumListHolder) {
-      if (album.getCount() > 0) {
-        holder.mText2.setText(
-            mContext.getString(R.string.song_count_2, album.getArtist(), album.getCount()));
-      } else {
-        try {
-          new AlbumSongCountLoader(Constants.ALBUM, holder, album)
-              .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, album.getAlbumID());
-        } catch (Exception e) {
-          CrashReport.postCatchedException(e);
-        }
-      }
+      holder.mText2
+          .setText(App.getContext().getString(R.string.song_count_2, album.getArtist(), album.getCount()));
     } else {
       holder.mText2.setText(album.getArtist());
     }
@@ -221,24 +208,4 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     }
   }
 
-  private static class AlbumSongCountLoader extends AsynLoadSongNum {
-
-    private final AlbumHolder mHolder;
-    private final Album mAlbum;
-
-    AlbumSongCountLoader(int type, AlbumHolder holder, Album album) {
-      super(type);
-      mHolder = holder;
-      mAlbum = album;
-    }
-
-    @Override
-    protected void onPostExecute(Integer num) {
-      if (mHolder.mText2 != null && num > 0) {
-        mAlbum.setCount(num);
-        mHolder.mText2
-            .setText(App.getContext().getString(R.string.song_count_2, mAlbum.getArtist(), num));
-      }
-    }
-  }
 }

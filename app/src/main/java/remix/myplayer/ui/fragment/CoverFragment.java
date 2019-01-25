@@ -19,9 +19,9 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
-import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.interfaces.OnFirstLoadFinishListener;
 import remix.myplayer.misc.interfaces.OnInflateFinishListener;
 import remix.myplayer.service.Command;
@@ -59,7 +59,7 @@ public class CoverFragment extends BaseMusicFragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
-    mWidth = getArguments().getInt("Width");
+    mWidth = getResources().getDisplayMetrics().widthPixels;
     View rootView = inflater.inflate(R.layout.fragment_cover, container, false);
     mUnBinder = ButterKnife.bind(this, rootView);
 
@@ -108,7 +108,7 @@ public class CoverFragment extends BaseMusicFragment {
     }
     mUri = uri;
     if (withAnim) {
-      int operation = Global.getOperation();
+      int operation = MusicServiceRemote.getOperation();
 
       int offsetX = (mWidth + mImage.getWidth()) >> 1;
       final double startValue = 0;

@@ -15,7 +15,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import remix.myplayer.request.network.RxUtil;
-import remix.myplayer.util.LogUtil;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2017/12/4.
@@ -37,7 +37,7 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
   public void onError(String errMsg) {
 //        mImage.setImageURI(Uri.EMPTY);
-    LogUtil.i(TAG, "onError: " + errMsg);
+    Timber.v("onError() %s",errMsg);
   }
 
   public void onSuccess(String result) {
@@ -49,7 +49,7 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
       onError("in blackList");
       return;
     }
-    LogUtil.i(TAG, "onSuccess: " + result);
+    Timber.v("onSuccess() %s",result);
     ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder
         .newBuilderWithSource(Uri.parse(result));
     if (mConfig.isResize()) {
@@ -76,12 +76,12 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
           @Override
           public void onIntermediateImageFailed(String s, Throwable throwable) {
-            LogUtil.d(TAG, "onIntermediateImageFailed: " + throwable);
+            Timber.v("onIntermediateImageFailed() %s",throwable.toString());
           }
 
           @Override
           public void onFailure(String s, Throwable throwable) {
-            LogUtil.d(TAG, "onFailure: " + throwable);
+            Timber.v("onFailure %s",throwable.toString());
           }
 
           @Override

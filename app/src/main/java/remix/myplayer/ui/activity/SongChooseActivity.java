@@ -21,12 +21,13 @@ import butterknife.OnClick;
 import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.SongChooseAdaper;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -107,10 +108,13 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> 
           ToastUtil.show(this, R.string.choose_no_song);
           return;
         }
-        final int num = PlayListUtil
-            .addMultiSongs(mAdapter.getCheckedSong(), mPlayListName, mPlayListID);
-        ToastUtil.show(this, getString(R.string.add_song_playlist_success, num, mPlayListName));
-        finish();
+        DatabaseRepository.getInstance()
+            .insertToPlayList(mAdapter.getCheckedSong(), mPlayListName, mPlayListID)
+            .compose(RxUtil.applySingleScheduler())
+            .subscribe(num -> {
+              ToastUtil.show(mContext, getString(R.string.add_song_playlist_success, num, mPlayListName));
+              finish();
+            }, throwable -> finish());
     }
   }
 

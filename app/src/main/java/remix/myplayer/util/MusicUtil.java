@@ -21,6 +21,7 @@ import java.util.List;
 import remix.myplayer.App;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
+import timber.log.Timber;
 
 public class MusicUtil {
 
@@ -120,7 +121,7 @@ public class MusicUtil {
         return cursor.getString(column_index);
       }
     } catch (Exception e) {
-      LogUtil.d(TAG, e.toString());
+      Timber.v(e);
     }
     return null;
   }

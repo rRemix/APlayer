@@ -11,10 +11,15 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import remix.myplayer.App
-import remix.myplayer.Global
 import remix.myplayer.R
-import remix.myplayer.bean.mp3.*
+import remix.myplayer.bean.mp3.Album
+import remix.myplayer.bean.mp3.Artist
+import remix.myplayer.bean.mp3.Folder
+import remix.myplayer.bean.mp3.Song
+import remix.myplayer.db.room.DatabaseRepository
+import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.misc.getSongIds
+import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.ui.activity.MainActivity
@@ -24,6 +29,7 @@ import remix.myplayer.ui.widget.TipPopupwindow
 import remix.myplayer.util.*
 
 class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.OnClickListener {
+  private val databaseRepository = DatabaseRepository.getInstance()
   //所有选中的position
   private val checkPos = ArrayList<Int>()
   //所有选中的参数 歌曲 专辑 艺术家 播放列表 文件夹
@@ -69,7 +75,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
         }
         Constants.PLAYLIST -> {
           checkParam.forEach {
-            ids.addAll((it as PlayList).getSongIds())
+            ids.addAll((it as PlayList).audioIds)
           }
         }
         Constants.FOLDER -> {
@@ -105,7 +111,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
       }
       Constants.PLAYLIST -> {
         checkParam.forEach {
-          ids.addAll((it as PlayList).getSongIds())
+          ids.addAll((it as PlayList).audioIds.toList())
         }
       }
       Constants.FOLDER -> {
@@ -130,9 +136,6 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
         .flatMap { getSongsSingle(it) }
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .doFinally {
-          close()
-        }
         .subscribe { songs ->
           Theme.getBaseDialog(activity)
               .content(title)
@@ -143,6 +146,9 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
                 deleteSingle(dialog, songs)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .doFinally {
+                      close()
+                    }
                     .subscribe(Consumer {
                       ToastUtil.show(activity, activity.getString(R.string.delete_multi_song, it))
 
@@ -161,14 +167,21 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
               if (dialog.isPromptCheckBoxChecked) {
                 MediaStoreUtil.delete(songs, true)
               }
-              checkParam.forEach { PlayListUtil.deletePlayList((it as PlayList)._Id) }
+
+              checkParam.forEach {
+                val playlist = it as PlayList
+                if(playlist.name != DatabaseRepository.MyLove){
+                  databaseRepository.deletePlayList((it as PlayList).id).subscribe()
+                }
+              }
+
               songs.size
             }
             Constants.PLAYLISTSONG -> { //删除播放列表内歌曲
               if (dialog.isPromptCheckBoxChecked) {
                 MediaStoreUtil.delete(songs, true)
               } else {
-                PlayListUtil.deleteMultiSongs(songs.map { it.Id }, extra)
+                databaseRepository.deleteFromPlayList(songs.map { it.id }, "", extra).blockingGet()
               }
             }
             else -> {
@@ -181,8 +194,8 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
   @SuppressLint("CheckResult")
   private fun addToPlayQueue() {
     getSongIdSingle()
-        .map {
-          PlayListUtil.addMultiSongs(it, Constants.PLAY_QUEUE)
+        .flatMap {
+          databaseRepository.insertToPlayQueue(it)
         }
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
@@ -196,31 +209,25 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
 
   @SuppressLint("CheckResult")
   private fun addToPlayList() {
-    getSongIdSingle()
-        .subscribe(Consumer {
-          LogUtil.d("", it.toString())
-        })
+
     //获得所有播放列表的信息
-    Single
-        .fromCallable {
-          PlayListUtil.getAllPlayListInfo()
-        }
-        .filter {
-          it.size > 0
-        }
+    databaseRepository.getAllPlaylist()
+//        .filter {
+//          it.isNotEmpty()
+//        }
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe({ playListInfoList ->
+        .subscribe({ playLists ->
           getBaseDialog(activity)
               .title(R.string.add_to_playlist)
-              .items(playListInfoList.map {
-                it.Name
+              .items(playLists.map {
+                it.name
               })
               .itemsCallback { dialog, view, which, text ->
                 //直接添加到已有的播放列表
                 getSongIdSingle()
-                    .map {
-                      PlayListUtil.addMultiSongs(it, playListInfoList[which].Name, playListInfoList[which]._Id)
+                    .flatMap {
+                      databaseRepository.insertToPlayList(it, playLists[which].name)
                     }
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
@@ -228,52 +235,42 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
                       close()
                     }
                     .subscribe(Consumer {
-                      ToastUtil.show(activity, activity.getString(R.string.add_song_playlist_success, it, playListInfoList[which].Name))
+                      ToastUtil.show(activity, activity.getString(R.string.add_song_playlist_success, it, playLists[which].name))
                     })
               }
               .neutralText(R.string.create_playlist)
               .onNeutral { dialog, which ->
                 //新建后再添加到新的列表
+
                 getBaseDialog(activity)
                     .title(R.string.new_playlist)
                     .positiveText(R.string.create)
                     .negativeText(R.string.cancel)
                     .content(R.string.input_playlist_name)
                     .inputRange(1, 15)
-                    .input("", activity.getString(R.string.local_list) + Global.PlayList.size) { _, input ->
-                      if (!TextUtils.isEmpty(input)) {
-                        Single
-                            .fromCallable {
-                              val newPlaylistId = PlayListUtil.addPlayList(input.toString())
-                              if (newPlaylistId == -2) {
-                                throw IllegalArgumentException(activity.getString(R.string.playlist_already_exist))
-                              } else if (newPlaylistId < 0) {
-                                throw IllegalArgumentException(activity.getString(R.string.add_playlist_error))
-                              }
-                              newPlaylistId
-                            }
-                            .filter {
-                              it > 0
-                            }
-                            .map {
-                              PlayListUtil.addMultiSongs(getSongIds(), input.toString(), it)
-                            }
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .doFinally {
-                              close()
-                            }
-                            .subscribe({
-                              ToastUtil.show(activity, activity.getString(R.string.add_song_playlist_success, it, input.toString()))
-                            }, {
-                              if (it is IllegalArgumentException) {
-                                ToastUtil.show(activity, it.message)
-                              } else {
-                                ToastUtil.show(activity, activity.getString(R.string.add_error))
-                              }
-                            })
-
+                    .input("", activity.getString(R.string.local_list) + playLists.size) { _, input ->
+                      if (TextUtils.isEmpty(input)) {
+                        ToastUtil.show(activity, R.string.add_error)
+                        return@input
                       }
+                      databaseRepository
+                          .insertPlayList(input.toString())
+                          .flatMap {
+                            getSongIdSingle()
+                          }
+                          .flatMap {
+                            databaseRepository.insertToPlayList(it, input.toString())
+                          }
+                          .compose(applySingleScheduler())
+                          .doFinally {
+                            close()
+                          }
+                          .subscribe({
+                            ToastUtil.show(activity, R.string.add_playlist_success)
+                            ToastUtil.show(activity, activity.getString(R.string.add_song_playlist_success, it, input.toString()))
+                          }, {
+                            ToastUtil.show(activity, activity.getString(R.string.add_error))
+                          })
                     }
                     .show()
               }
@@ -393,3 +390,4 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
     var isActiveSomeWhere = false
   }
 }
+

@@ -18,11 +18,14 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Audio.Media;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import com.facebook.common.util.ByteConstants;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -32,12 +35,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.CannotWriteException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.images.Artwork;
+import org.jaudiotagger.tag.images.ArtworkFactory;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Album;
 import remix.myplayer.bean.mp3.Artist;
 import remix.myplayer.bean.mp3.Folder;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
 
@@ -77,25 +91,20 @@ public class MediaStoreUtil {
       return new ArrayList<>();
     }
     ArrayList<Artist> artists = new ArrayList<>();
-    Cursor cursor = null;
-    try {
-      cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-          new String[]{"distinct " + MediaStore.Audio.Media.ARTIST_ID,
-              MediaStore.Audio.Media.ARTIST},
-          MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY ("
-              + MediaStore.Audio.Media.ARTIST_ID,
-          null,
-          SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
-              SortOrder.ArtistSortOrder.ARTIST_A_Z));
+    try (Cursor cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+        new String[]{MediaStore.Audio.Media.ARTIST_ID,
+            MediaStore.Audio.Media.ARTIST,
+            "count(" + Media.ARTIST_ID + ")"},
+        MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
+        null,
+        SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
+            SortOrder.ArtistSortOrder.ARTIST_A_Z))){
       if (cursor != null) {
         while (cursor.moveToNext()) {
-          artists.add(new Artist(cursor.getInt(0), cursor.getString(1),
-              0));
+          artists.add(new Artist(cursor.getInt(0),
+              cursor.getString(1),
+              cursor.getInt(2)));
         }
-      }
-    } finally {
-      if (cursor != null && !cursor.isClosed()) {
-        cursor.close();
       }
     }
 
@@ -107,36 +116,29 @@ public class MediaStoreUtil {
       return new ArrayList<>();
     }
     ArrayList<Album> albums = new ArrayList<>();
-    Cursor cursor = null;
-    try {
-      cursor = mContext.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-          null, null, null, null);
-
-      cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-          new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
-              MediaStore.Audio.Media.ALBUM,
-              MediaStore.Audio.Media.ARTIST_ID,
-              MediaStore.Audio.Media.ARTIST},
-          MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
-          null,
-          SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
-              SortOrder.AlbumSortOrder.ALBUM_A_Z));
+    try(Cursor cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+        new String[]{MediaStore.Audio.Media.ALBUM_ID,
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.ARTIST_ID,
+            MediaStore.Audio.Media.ARTIST,
+            "count(" + Media.ALBUM_ID + ")"},
+        MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
+        null,
+        SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
+            SortOrder.AlbumSortOrder.ALBUM_A_Z))) {
       if (cursor != null) {
         while (cursor.moveToNext()) {
           albums.add(new Album(cursor.getInt(0),
               processInfo(cursor.getString(1), TYPE_ALBUM),
               cursor.getInt(2),
               processInfo(cursor.getString(3), TYPE_ARTIST),
-              0));
+              cursor.getInt(4)));
         }
-      }
-    } finally {
-      if (cursor != null && !cursor.isClosed()) {
-        cursor.close();
       }
     }
     return albums;
   }
+
 
   public static List<Song> getAllSong() {
     return getSongs(null,
@@ -334,14 +336,17 @@ public class MediaStoreUtil {
     if (ids == null || ids.isEmpty()) {
       return songs;
     }
-    for (Integer id : ids) {
-      songs.add(getSongById(id));
+    StringBuilder selection = new StringBuilder(127);
+    selection.append(MediaStore.Audio.Media._ID + " in (");
+    for (int i = 0; i < ids.size(); i++) {
+      selection.append(ids.get(i)).append(i == ids.size() - 1 ? ") " : ",");
     }
-    return songs;
+
+    return getSongs(selection.toString(),null);
   }
 
 
-  public static void insertAlbumArt(@NonNull Context context, int albumId, String path) {
+  private static void insertAlbumArt(@NonNull Context context, int albumId, String path) {
     ContentResolver contentResolver = context.getContentResolver();
 
     Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
@@ -354,10 +359,26 @@ public class MediaStoreUtil {
     contentResolver.insert(artworkUri, values);
   }
 
-  public static void deleteAlbumArt(@NonNull Context context, int albumId) {
+  private static void deleteAlbumArt(@NonNull Context context, int albumId) {
     ContentResolver contentResolver = context.getContentResolver();
     Uri localUri = Uri.parse("content://media/external/audio/albumart");
     contentResolver.delete(ContentUris.withAppendedId(localUri, albumId), null, null);
+  }
+
+  @WorkerThread
+  public static void saveArtwork(Context context,int albumId, File artFile)
+      throws TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException, IOException, CannotWriteException {
+    Song song = MediaStoreUtil.getSongByAlbumId(albumId);
+    if (song == null) {
+      return;
+    }
+    AudioFile audioFile = AudioFileIO.read(new File(song.getUrl()));
+    Tag tag = audioFile.getTagOrCreateAndSetDefault();
+    Artwork artwork = ArtworkFactory.createArtworkFromFile(artFile);
+    tag.deleteArtworkField();
+    tag.setField(artwork);
+    audioFile.commit();
+    insertAlbumArt(context, albumId, artFile.getAbsolutePath());
   }
 
   /**
@@ -409,6 +430,7 @@ public class MediaStoreUtil {
   /**
    * 删除指定歌曲
    */
+  @WorkerThread
   public static int delete(List<Song> songs, boolean deleteSource) {
     //保存是否删除源文件
     SPUtil.putValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE,
@@ -430,7 +452,8 @@ public class MediaStoreUtil {
         deleteId);
     //从播放队列和全部歌曲移除
     MusicServiceRemote.deleteFromService(songs);
-    PlayListUtil.deleteSongs(songs);
+
+    DatabaseRepository.getInstance().deleteFromAllPlayList(songs).subscribe();
 
     //删除源文件
     if (deleteSource) {
@@ -476,7 +499,7 @@ public class MediaStoreUtil {
 
     Set<String> deleteId = SPUtil
         .getStringSet(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG);
-    if (deleteId == null || deleteId.size() == 0) {
+    if (deleteId.size() == 0) {
       return MediaStore.Audio.Media.SIZE + ">" + SCAN_SIZE;
     }
     StringBuilder blacklist = new StringBuilder();

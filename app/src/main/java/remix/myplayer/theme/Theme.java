@@ -19,7 +19,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StyleRes;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;

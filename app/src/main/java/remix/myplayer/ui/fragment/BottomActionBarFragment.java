@@ -42,7 +42,7 @@ import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.ui.activity.base.BaseActivity;
 import remix.myplayer.ui.fragment.base.BaseMusicFragment;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -153,7 +153,7 @@ public class BottomActionBarFragment extends BaseMusicFragment {
   //更新界面
   public void updateSong() {
     final Song song = MusicServiceRemote.getCurrentSong();
-    LogUtil.d("BottomBar", "CurrentSong: " + song);
+    Timber.v("updateSong() %s", song.toString());
     //歌曲名 艺术家
     if (mTitle != null) {
       mTitle.setText(song.getTitle());
@@ -218,19 +218,16 @@ public class BottomActionBarFragment extends BaseMusicFragment {
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
-      LogUtil.e(TAG, "onDoubleTap");
       return true;
     }
 
     @Override
     public boolean onDoubleTapEvent(MotionEvent e) {
-      LogUtil.e(TAG, "onDoubleTapEvent");
       return true;
     }
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
-      LogUtil.e(TAG, "onSingleTapConfirmed");
       if (mReference.get() != null) {
         mReference.get().startPlayerActivity();
       }
@@ -239,43 +236,36 @@ public class BottomActionBarFragment extends BaseMusicFragment {
 
     @Override
     public boolean onContextClick(MotionEvent e) {
-      LogUtil.e(TAG, "onContextClick");
       return true;
     }
 
     @Override
     public boolean onDown(MotionEvent e) {
-      LogUtil.e(TAG, "onDown");
       return true;
     }
 
     @Override
     public void onShowPress(MotionEvent e) {
-      LogUtil.e(TAG, "onShowPress");
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
-      LogUtil.e(TAG, "onSingleTapUp");
       return true;
     }
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-      LogUtil.e(TAG, "onScroll");
       return true;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
-      LogUtil.e(TAG, "onLongPress");
     }
 
     private static final int Y_THRESHOLD = DensityUtil.dip2px(App.getContext(), 10);
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-      LogUtil.e(TAG, "onFling  " + "Y1: " + e1.getY() + " Y2: " + e2.getY());
       if (mReference.get() != null && velocityY < 0 && e1.getY() - e2.getY() > Y_THRESHOLD) {
         mReference.get().startPlayerActivity();
       }
