@@ -1,11 +1,13 @@
 package remix.myplayer.ui.dialog;
 
+import static remix.myplayer.request.network.RxUtil.applySingleScheduler;
+
+import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,22 +20,23 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.afollestad.materialdialogs.MaterialDialog;
+import io.reactivex.SingleSource;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import java.util.ArrayList;
 import java.util.List;
-import remix.myplayer.Global;
 import remix.myplayer.R;
-import remix.myplayer.db.PlayLists;
+import remix.myplayer.db.room.DatabaseRepository;
+import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.adapter.AddtoPlayListAdapter;
-import remix.myplayer.util.Constants;
-import remix.myplayer.util.LogUtil;
-import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -44,7 +47,7 @@ import remix.myplayer.util.ToastUtil;
  * 将歌曲添加到播放列表的对话框
  */
 public class AddtoPlayListDialog extends BaseDialog implements
-    LoaderManager.LoaderCallbacks<Cursor> {
+    LoaderManager.LoaderCallbacks<List<PlayList>> {
 
   public static final String EXTRA_SONG_LIST = "list";
 
@@ -63,11 +66,7 @@ public class AddtoPlayListDialog extends BaseDialog implements
   TextView mNew;
 
   private AddtoPlayListAdapter mAdapter;
-  private Cursor mCursor;
-  public static int mPlayListNameIndex;
-  public static int mPlayListIdIndex;
 
-  private boolean mAddAfterCreate = true;
   private static int LOADER_ID = 0;
 
   private List<Integer> mList;
@@ -87,24 +86,26 @@ public class AddtoPlayListDialog extends BaseDialog implements
       dismiss();
     }
 
-    mAdapter = new AddtoPlayListAdapter(mContext);
-    mAdapter.setOnItemClickLitener(new OnItemClickListener() {
+    mAdapter = new AddtoPlayListAdapter(mContext, R.layout.item_playlist_addto);
+    mAdapter.setOnItemClickListener(new OnItemClickListener() {
+      @SuppressLint("CheckResult")
       @Override
       public void onItemClick(View view, int position) {
-        if (view != null) {
-          ToastUtil.show(mContext, R.string.add_song_playlist_success,
-              PlayListUtil.addMultiSongs(mList, getPlayListName(position)),
-              getPlayListName(position));
-        } else {
-          ToastUtil.show(mContext, R.string.add_song_playlist_error, Toast.LENGTH_SHORT);
-        }
-        dismiss();
+        PlayList playList = mAdapter.getDatas().get(position);
+        DatabaseRepository.getInstance()
+            .insertToPlayList(mList, playList.getName(), playList.getId())
+            .compose(RxUtil.applySingleScheduler())
+            .doFinally(() -> dismiss())
+            .subscribe(num -> ToastUtil.show(mContext, R.string.add_song_playlist_success, num, playList.getName()),
+                throwable -> ToastUtil.show(mContext, R.string.add_song_playlist_error));
       }
 
       @Override
       public void onItemLongClick(View view, int position) {
+
       }
     });
+
     mRecyclerView.setAdapter(mAdapter);
     mRecyclerView.setItemAnimator(new DefaultItemAnimator());
     mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -127,82 +128,78 @@ public class AddtoPlayListDialog extends BaseDialog implements
   }
 
 
-  private String getPlayListName(int position) {
-    String playlistName = "";
-    if (mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)) {
-      playlistName = mCursor.getString(mCursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
-    }
-    return playlistName;
-  }
-
+  @SuppressLint("CheckResult")
   @OnClick({R.id.playlist_addto_new})
   public void onClick(View v) {
-    if (v.getId() == R.id.playlist_addto_new) {
-      Theme.getBaseDialog(mContext)
-          .title(R.string.new_playlist)
-          .positiveText(R.string.create)
-          .negativeText(R.string.cancel)
-          .inputRange(1, 15)
-          .input("", "本地歌单" + Global.PlayList.size(), (dialog, input) -> {
-            if (!TextUtils.isEmpty(input)) {
-              int newPlayListId = -1;
-              try {
-                newPlayListId = PlayListUtil.addPlayList(input.toString());
-                ToastUtil.show(mContext, newPlayListId > 0 ?
-                        R.string.add_playlist_success :
-                        newPlayListId == -1 ? R.string.add_playlist_error
-                            : R.string.playlist_already_exist,
-                    Toast.LENGTH_SHORT);
-                if (newPlayListId < 0) {
-                  return;
-                }
-                if (mAddAfterCreate) {
-                  ToastUtil.show(mContext, R.string.add_song_playlist_success, input.toString(),
-                      PlayListUtil.addMultiSongs(mList, input.toString(), newPlayListId));
-                }
-              } catch (Exception e) {
-                LogUtil.d("AddtoPlayList", e.toString());
-              }
-            }
-          })
-          .dismissListener(dialog -> dismiss())
-          .show();
+    DatabaseRepository.getInstance()
+        .getAllPlaylist()
+        .compose(applySingleScheduler())
+        .subscribe(new Consumer<List<PlayList>>() {
+          @Override
+          public void accept(List<PlayList> playLists) throws Exception {
+            Theme.getBaseDialog(mContext)
+                .title(R.string.new_playlist)
+                .positiveText(R.string.create)
+                .negativeText(R.string.cancel)
+                .inputRange(1, 15)
+                .input("", getString(R.string.local_list) + playLists.size(), (dialog, input) -> {
+                  if (TextUtils.isEmpty(input)) {
+                    ToastUtil.show(mContext, R.string.add_error);
+                    return;
+                  }
 
+                  DatabaseRepository.getInstance()
+                      .insertPlayList(input.toString())
+                      .flatMap(new Function<Integer, SingleSource<Integer>>() {
+                        @Override
+                        public SingleSource<Integer> apply(Integer newId) throws Exception {
+                          return DatabaseRepository.getInstance().insertToPlayList(mList, input.toString(), newId);
+                        }
+                      })
+                      .subscribe(num -> {
+                        ToastUtil.show(mContext, R.string.add_playlist_success);
+                        ToastUtil
+                            .show(mContext, getString(R.string.add_song_playlist_success, num, input.toString()));
+                      }, throwable -> ToastUtil.show(mContext, R.string.add_error));
+                })
+                .dismissListener(dialog -> dismiss())
+                .show();
+          }
+        });
+
+
+  }
+
+
+  @NonNull
+  @Override
+  public Loader<List<PlayList>> onCreateLoader(int id, @Nullable Bundle args) {
+    return new PlayListFragment.AsyncPlayListLoader(mContext);
+  }
+
+  @Override
+  public void onLoadFinished(@NonNull Loader<List<PlayList>> loader, List<PlayList> data) {
+    if (data == null) {
+      return;
+    }
+    if (mAdapter != null) {
+      mAdapter.setData(data);
     }
   }
 
-
   @Override
-  public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-    return new CursorLoader(mContext, PlayLists.CONTENT_URI, null,
-        PlayLists.PlayListColumns.NAME + "!= ?", new String[]{Constants.PLAY_QUEUE}, null);
-  }
-
-  @Override
-  public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-      if (data == null) {
-          return;
-      }
-    mCursor = data;
-    mPlayListIdIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns._ID);
-    mPlayListNameIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.NAME);
-      if (mAdapter != null) {
-          mAdapter.setCursor(mCursor);
-      }
-  }
-
-  @Override
-  public void onLoaderReset(Loader<Cursor> loader) {
-      if (mAdapter != null) {
-          mAdapter.setCursor(null);
-      }
+  public void onLoaderReset(Loader<List<PlayList>> loader) {
+    if (mAdapter != null) {
+      mAdapter.setData(null);
+    }
   }
 
   @Override
   public void onDestroy() {
     super.onDestroy();
-      if (mCursor != null) {
-          mCursor.close();
-      }
+    if (mAdapter != null) {
+      mAdapter.setData(null);
+    }
   }
+
 }

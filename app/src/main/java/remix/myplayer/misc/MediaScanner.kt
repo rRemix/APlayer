@@ -39,7 +39,7 @@ class MediaScanner(private val context: Context) {
         .content(R.string.scaning)
         .progress(true, 0)
         .progressIndeterminateStyle(false)
-        .dismissListener { dialog -> connection.disconnect() }
+        .dismissListener { connection.disconnect() }
         .build()
 
     val client = object : MediaScannerConnection.MediaScannerConnectionClient {

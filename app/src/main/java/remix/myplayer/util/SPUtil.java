@@ -119,6 +119,8 @@ public class SPUtil {
   public interface SETTING_KEY {
 
     String NAME = "Setting";
+    //第一次读取数据
+    String FIRST_LOAD = "first_load";
     //桌面歌词是否可移动
     String FLOAT_LYRIC_LOCK = "float_lyric_lock";
     //桌面歌词字体大小
@@ -209,6 +211,10 @@ public class SPUtil {
     String MODE_FOR_ARTIST = "mode_for_artist";
     //播放列表的显示模式
     String MODE_FOR_PLAYLIST = "mode_for_playlist";
+    //迁移主题
+    String MIGRATION_THEME = "migration_theme";
+    //迁移数据库
+    String MIGRATION_DATABASE = "migration_database";
   }
 
   public interface LYRIC_OFFSET_KEY {

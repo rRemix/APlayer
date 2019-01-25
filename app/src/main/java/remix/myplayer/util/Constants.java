@@ -11,15 +11,15 @@ import remix.myplayer.R;
  * 常量值
  */
 public class Constants {
-
+  //todo 删除无用的
   //应用包名
   public final static String PACKAGE_NAME = "remix.myplayer";
   //播放队列
-  public final static String PLAY_QUEUE = App.getContext().getString(R.string.play_queue);
+//  public final static String PLAY_QUEUE = App.getContext().getString(R.string.play_queue);
   //最近添加
-  public final static String RECENTLY = App.getContext().getString(R.string.recently);
+//  public final static String RECENTLY = App.getContext().getString(R.string.recently);
   //我的收藏
-  public final static String MYLOVE = App.getContext().getString(R.string.my_favorite);
+//  public final static String MYLOVE = App.getContext().getString(R.string.my_favorite);
 
   //操作类型
   public final static int SONG = 0;

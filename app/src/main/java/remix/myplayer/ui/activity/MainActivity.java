@@ -6,6 +6,7 @@ import static remix.myplayer.bean.misc.Category.DEFAULT_LIBRARY;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DISMISS_DIALOG;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DOWNLOAD_COMPLETE;
 import static remix.myplayer.misc.update.DownloadService.ACTION_SHOW_DIALOG;
+import static remix.myplayer.request.network.RxUtil.applySingleScheduler;
 import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
 import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColorReverse;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
@@ -14,7 +15,6 @@ import static remix.myplayer.util.Util.registerLocalReceiver;
 import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -39,48 +39,27 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.soundcloud.android.crop.Crop;
-import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
-import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.CannotWriteException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagException;
-import org.jaudiotagger.tag.images.Artwork;
-import org.jaudiotagger.tag.images.ArtworkFactory;
 import org.jetbrains.annotations.NotNull;
 import remix.myplayer.App;
-import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.Category;
-import remix.myplayer.bean.misc.CustomThumb;
-import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
-import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
@@ -90,8 +69,6 @@ import remix.myplayer.misc.update.UpdateAgent;
 import remix.myplayer.misc.update.UpdateListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
-import remix.myplayer.request.SimpleUriRequest;
-import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -109,13 +86,10 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.MusicUtil;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
-import remix.myplayer.util.Util;
 
 /**
  *
@@ -250,31 +224,28 @@ public class MainActivity extends MenuActivity {
         if (MultipleChoice.isActiveSomeWhere()) {
           return;
         }
-        Theme.getBaseDialog(mContext)
-            .title(R.string.new_playlist)
-            .positiveText(R.string.create)
-            .negativeText(R.string.cancel)
-            .inputRange(1, 15)
-            .input("", getString(R.string.local_list) + Global.PlayList.size(), (dialog, input) -> {
-              int newPlayListId;
-              try {
-                if (!TextUtils.isEmpty(input)) {
-                  newPlayListId = PlayListUtil.addPlayList(input.toString());
-                  ToastUtil.show(mContext, newPlayListId > 0 ?
-                          R.string.add_playlist_success :
-                          newPlayListId == -1 ? R.string.add_playlist_error
-                              : R.string.playlist_already_exist,
-                      Toast.LENGTH_SHORT);
-                  if (newPlayListId > 0) {
-                    //跳转到添加歌曲界面
-                    SongChooseActivity.start(MainActivity.this, newPlayListId, input.toString());
+
+        DatabaseRepository.getInstance()
+            .getAllPlaylist()
+            .compose(applySingleScheduler())
+            .subscribe(playLists -> Theme.getBaseDialog(mContext)
+                .title(R.string.new_playlist)
+                .positiveText(R.string.create)
+                .negativeText(R.string.cancel)
+                .inputRange(1, 15)
+                .input("", getString(R.string.local_list) + playLists.size(), (dialog, input) -> {
+                  if (!TextUtils.isEmpty(input)) {
+                    DatabaseRepository.getInstance()
+                        .insertPlayList(input.toString())
+                        .compose(applySingleScheduler())
+                        .subscribe(id -> {
+                          //跳转到添加歌曲界面
+                          SongChooseActivity.start(MainActivity.this, id, input.toString());
+                        }, throwable -> ToastUtil
+                            .show(mContext, R.string.create_playlist_fail, throwable.toString()));
                   }
-                }
-              } catch (Exception e) {
-                ToastUtil.show(mContext, R.string.create_playlist_fail, e.toString());
-              }
-            })
-            .show();
+                })
+                .show());
         break;
       case R.id.location:
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
@@ -308,6 +279,9 @@ public class MainActivity extends MenuActivity {
       if (categories.get(0).isPlayList()) {
         showViewWithAnim(mAddButton, true);
       }
+      mTablayout.setVisibility(View.GONE);
+    } else{
+      mTablayout.setVisibility(View.VISIBLE);
     }
 
     mViewPager.setAdapter(mPagerAdapter);
@@ -549,6 +523,12 @@ public class MainActivity extends MenuActivity {
     mAddButton.setImageResource(R.drawable.icon_playlist_add);
   }
 
+  @Override
+  public void onMediaStoreChanged() {
+    super.onMediaStoreChanged();
+    mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+  }
+
   @SuppressLint("CheckResult")
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -574,84 +554,13 @@ public class MainActivity extends MenuActivity {
             mCurrentFragment = (LibraryFragment) mPagerAdapter
                 .getFragment(mViewPager.getCurrentItem());
             invalidateOptionsMenu();
-          }
-        }
-        break;
-      //图片选择
-      case Crop.REQUEST_CROP:
-      case Crop.REQUEST_PICK:
-        Intent intent = getIntent();
-        final CustomThumb thumbBean = intent.getParcelableExtra("thumb");
-        if (thumbBean == null) {
-          break;
-        }
-        String errorTxt = getString(
-            thumbBean.getType() == Constants.ALBUM ? R.string.set_album_cover_error
-                : thumbBean.getType() == Constants.ARTIST ? R.string.set_artist_cover_error
-                    : R.string.set_playlist_cover_error);
-        final int id = thumbBean.getId(); //专辑、艺术家、播放列表封面
-
-        if (resultCode != Activity.RESULT_OK) {
-          ToastUtil.show(this, errorTxt);
-          break;
-        }
-        if (requestCode == Crop.REQUEST_PICK) {
-          //选择图片
-          File cacheDir = DiskCache.getDiskCacheDir(this,
-              "thumbnail/" + (thumbBean.getType() == Constants.ALBUM ? "album"
-                  : thumbBean.getType() == Constants.ARTIST ? "artist" : "playlist"));
-          if (!cacheDir.exists() && !cacheDir.mkdirs()) {
-            ToastUtil.show(this, errorTxt);
-            return;
-          }
-          Uri destination = Uri.fromFile(new File(cacheDir, Util.hashKeyForDisk((id * 255) + "")));
-          Crop.of(data.getData(), destination).asSquare().start(this);
-        } else {
-          //图片裁剪
-          //裁剪后的图片路径
-          if (data == null) {
-            return;
-          }
-          if (Crop.getOutput(data) == null) {
-            return;
-          }
-
-          final String path = Crop.getOutput(data).getEncodedPath();
-          if (TextUtils.isEmpty(path) || id == -1) {
-            ToastUtil.show(mContext, errorTxt);
-            return;
-          }
-          //清除fresco的缓存
-          //如果设置的是专辑封面 修改内嵌封面
-          Observable.create((ObservableOnSubscribe<Uri>) emitter -> {
-            if (thumbBean.getType() == Constants.ALBUM) {
-              saveArtwork(thumbBean.getId(), new File(path));
+            //如果只有一个Library,隐藏标签栏
+            if(categories.size() == 1){
+              mTablayout.setVisibility(View.GONE);
+            } else{
+              mTablayout.setVisibility(View.VISIBLE);
             }
-            if (thumbBean.getType() == Constants.ALBUM) {
-              new SimpleUriRequest(getSearchRequestWithAlbumType(
-                  MediaStoreUtil.getSongByAlbumId(thumbBean.getId()))) {
-                @Override
-                public void onError(String errMsg) {
-                  emitter.onError(new Throwable(errMsg));
-                }
-
-                @Override
-                public void onSuccess(Uri result) {
-                  emitter.onNext(result);
-                  emitter.onComplete();
-                }
-              }.load();
-            } else {
-              emitter.onNext(Uri.parse("file://" + path));
-              emitter.onComplete();
-            }
-          }).compose(RxUtil.applyScheduler())
-              .doFinally(() -> mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER))
-              .subscribe(uri -> {
-                ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                imagePipeline.evictFromCache(uri);
-                imagePipeline.evictFromDiskCache(uri);
-              }, throwable -> ToastUtil.show(mContext, R.string.save_error, throwable.toString()));
+          }
         }
         break;
       case REQUEST_INSTALL_PACKAGES:
@@ -666,20 +575,6 @@ public class MainActivity extends MenuActivity {
     }
   }
 
-  private void saveArtwork(int albumId, File artFile)
-      throws TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException, IOException, CannotWriteException {
-    Song song = MediaStoreUtil.getSongByAlbumId(albumId);
-    if (song == null) {
-      return;
-    }
-    AudioFile audioFile = AudioFileIO.read(new File(song.getUrl()));
-    Tag tag = audioFile.getTagOrCreateAndSetDefault();
-    Artwork artwork = ArtworkFactory.createArtworkFromFile(artFile);
-    tag.deleteArtworkField();
-    tag.setField(artwork);
-    audioFile.commit();
-    MediaStoreUtil.insertAlbumArt(this, albumId, artFile.getAbsolutePath());
-  }
 
   @Override
   public void onBackPressed() {

@@ -12,13 +12,14 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
-import remix.myplayer.Global
 import remix.myplayer.R
-import remix.myplayer.bean.misc.CustomThumb
+import remix.myplayer.bean.misc.CustomCover
+import remix.myplayer.db.room.DatabaseRepository
+import remix.myplayer.db.room.DatabaseRepository.Companion.MyLove
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
+import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
-import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.EXTRA_POSITION
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
@@ -28,7 +29,6 @@ import remix.myplayer.util.Constants
 import remix.myplayer.util.MediaStoreUtil.getSongIds
 import remix.myplayer.util.MediaStoreUtil.getSongIdsByParentId
 import remix.myplayer.util.MusicUtil.makeCmdIntent
-import remix.myplayer.util.PlayListUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 
@@ -46,7 +46,11 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
         Constants.ALBUM, Constants.ARTIST //专辑或者艺术家
         -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + id, null)
         Constants.PLAYLIST //播放列表
-        -> PlayListUtil.getSongIds(id)
+        -> DatabaseRepository.getInstance().getPlayList(id)
+            .map {
+              it.audioIds.toList()
+            }
+            .blockingGet()
         Constants.FOLDER //文件夹
         -> getSongIdsByParentId(id)
         else -> emptyList<Int>()
@@ -86,10 +90,9 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
                 ToastUtil.show(context, R.string.list_is_empty)
                 return@Consumer
               }
-              Single.fromCallable {
-                PlayListUtil.addMultiSongs(songIds,Constants.PLAY_QUEUE)
-              }.subscribeOn(Schedulers.io())
-                  .observeOn(AndroidSchedulers.mainThread())
+              DatabaseRepository.getInstance()
+                  .insertToPlayQueue(songIds)
+                  .compose(applySingleScheduler())
                   .subscribe(Consumer {
                     ToastUtil.show(context, context.getString(R.string.add_song_playqueue_success, it))
                   })
@@ -101,11 +104,11 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
             }
             //删除
             R.id.menu_delete -> {
-              if (id == Global.MyLoveID && type == Constants.PLAYLIST) {
-                ToastUtil.show(context, context.getString(R.string.mylove_cant_edit))
+              if(MyLove == key){
+                //我的收藏不可删除
+                ToastUtil.show(context,R.string.mylove_cant_edit)
                 return@Consumer
               }
-
               Theme.getBaseDialog(context)
                   .content(if (type == Constants.PLAYLIST) R.string.confirm_delete_playlist else R.string.confirm_delete_from_library)
                   .positiveText(R.string.confirm)
@@ -114,10 +117,11 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
                   .onAny { dialog, which ->
                     if (which == POSITIVE) {
                       DeleteHelper.deleteSongs(songIds, dialog.isPromptCheckBoxChecked, id, type == Constants.PLAYLIST)
-                          .subscribe(Consumer {
+                          .compose(applySingleScheduler())
+                          .subscribe({
                             ToastUtil.show(context, if (it) R.string.delete_success else R.string.delete_error)
-                          }, Consumer {
-                            ToastUtil.show(context,R.string.delete_error)
+                          }, {
+                            ToastUtil.show(context, R.string.delete_error)
                           })
                     }
                   }
@@ -125,7 +129,7 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
             }
             //设置封面
             R.id.menu_album_thumb -> {
-              val thumbBean = CustomThumb(id, type, key)
+              val thumbBean = CustomCover(id, type, key)
               val thumbIntent = (context as Activity).intent
               thumbIntent.putExtra("thumb", thumbBean)
               context.intent = thumbIntent
@@ -133,14 +137,26 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
             }
             //列表重命名
             R.id.menu_playlist_rename -> {
-              if (id == Global.MyLoveID && type == Constants.PLAYLIST) {
-                ToastUtil.show(context, context.getString(R.string.mylove_cant_edit))
+              if(MyLove == key){
+                //我的收藏不可删除
+                ToastUtil.show(context,R.string.mylove_cant_edit)
                 return@Consumer
               }
               Theme.getBaseDialog(context)
                   .title(R.string.rename)
                   .input("", "", false) { dialog, input ->
-                    ToastUtil.show(context, context.getString(if (PlayListUtil.rename(id, input.toString())) R.string.save_success else R.string.save_error))
+                    DatabaseRepository.getInstance()
+                        .getPlayList(id)
+                        .flatMap {
+                          DatabaseRepository.getInstance()
+                              .updatePlayList(it.copy(name = input.toString()))
+                        }
+                        .compose(applySingleScheduler())
+                        .subscribe({
+                          ToastUtil.show(context, R.string.save_success)
+                        }, {
+                          ToastUtil.show(context, R.string.save_error)
+                        })
                   }
                   .buttonRippleColor(ThemeStore.getRippleColor())
                   .positiveText(R.string.confirm)

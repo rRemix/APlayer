@@ -1,6 +1,7 @@
 package remix.myplayer.service;
 
 import static remix.myplayer.lyric.UpdateLyricThread.LRC_INTERVAL;
+import static remix.myplayer.request.network.RxUtil.applySingleScheduler;
 import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.Util.registerLocalReceiver;
@@ -32,11 +33,11 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -44,6 +45,7 @@ import com.tencent.bugly.crashreport.CrashReport;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -53,7 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import remix.myplayer.Global;
+import org.jetbrains.annotations.NotNull;
 import remix.myplayer.R;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.appwidgets.BaseAppwidget;
@@ -62,19 +64,17 @@ import remix.myplayer.appwidgets.medium.AppWidgetMedium;
 import remix.myplayer.appwidgets.medium.AppWidgetMediumTransparent;
 import remix.myplayer.appwidgets.small.AppWidgetSmall;
 import remix.myplayer.appwidgets.small.AppWidgetSmallTransparent;
-import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.db.PlayListSongs;
-import remix.myplayer.db.PlayLists;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicEventCallback;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.helper.SleepTimer;
 import remix.myplayer.lyric.UpdateLyricThread;
 import remix.myplayer.lyric.bean.LyricRowWrapper;
+import remix.myplayer.misc.LogObserver;
+import remix.myplayer.misc.Migration;
 import remix.myplayer.misc.exception.MusicServiceException;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
-import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
 import remix.myplayer.misc.receiver.MediaButtonReceiver;
@@ -88,10 +88,11 @@ import remix.myplayer.ui.widget.floatwidget.FloatLrcView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.SPUtil.SETTING_KEY;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
+import timber.log.Timber;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
@@ -102,6 +103,7 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 /**
  * 播放Service 歌曲的播放 控制 回调相关activity的界面更新 通知栏的控制
  */
+@SuppressLint("CheckResult")
 public class MusicService extends BaseService implements Playback, MusicEventCallback {
 
   private final static String TAG = "MusicService";
@@ -294,10 +296,12 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    * Binder
    */
   private final IBinder mMusicBinder = new MusicBinder();
+  /**
+   * 数据库
+   */
+  private final DatabaseRepository mDBRepository = DatabaseRepository.getInstance();
 
   private MediaStoreObserver mMediaStoreObserver;
-  private DBObserver mPlayListObserver;
-  private DBObserver mPlayListSongObserver;
   private MusicService mService;
 
   protected boolean mHasPermission = false;
@@ -410,7 +414,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   }
 
   private void setUp() {
-    mShortcutManager = new DynamicShortcutManager(mService);
+    mShortcutManager = new DynamicShortcutManager(this);
     mVolumeController = new VolumeController(this);
     mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
@@ -475,13 +479,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     //监听数据库变化
     mMediaStoreObserver = new MediaStoreObserver(this);
-    mPlayListObserver = new DBObserver(this);
-    mPlayListSongObserver = new DBObserver(this);
     getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true,
         mMediaStoreObserver);
-    getContentResolver().registerContentObserver(PlayLists.CONTENT_URI, true, mPlayListObserver);
-    getContentResolver()
-        .registerContentObserver(PlayListSongs.CONTENT_URI, true, mPlayListSongObserver);
 
     setUpPlayer();
     setUpSession();
@@ -692,8 +691,6 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     releaseWakeLock();
     getContentResolver().unregisterContentObserver(mMediaStoreObserver);
-    getContentResolver().unregisterContentObserver(mPlayListObserver);
-    getContentResolver().unregisterContentObserver(mPlayListSongObserver);
 
     ShakeDetector.getInstance().stopListen();
 
@@ -729,10 +726,15 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     return mPlayQueue;
   }
 
+  public DatabaseRepository getRepository(){
+    return mDBRepository;
+  }
+
   /**
    * 设置播放队列
    */
-  public void setPlayQueue(final List<Integer> newQueueList) {
+  @WorkerThread
+  public synchronized void setPlayQueue(final List<Integer> newQueueList) {
     if (newQueueList == null || newQueueList.size() == 0) {
       return;
     }
@@ -742,20 +744,18 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mPlayQueue.clear();
     mPlayQueue.addAll(newQueueList);
 
-    mPlaybackHandler.post(() -> {
-      try {
-        PlayListUtil.clearTable(Constants.PLAY_QUEUE);
-        PlayListUtil.addMultiSongs(mPlayQueue, Constants.PLAY_QUEUE, Global.PlayQueueID);
-      } catch (Exception e) {
-        LogUtil.d(TAG, e.toString());
-      }
+    mDBRepository.runInTransaction(() -> {
+      mDBRepository.clearPlayQueue()
+          .concatWith(mDBRepository.insertToPlayQueue(mPlayQueue))
+          .subscribe();
     });
   }
 
   /**
    * 设置播放队列
    */
-  public void setPlayQueue(final List<Integer> newQueueList, final Intent intent) {
+  @WorkerThread
+  public synchronized void setPlayQueue(final List<Integer> newQueueList, final Intent intent) {
     //当前模式是随机播放 或者即将设置为随机播放 都要更新mRandomList
     boolean shuffle = intent.getBooleanExtra("shuffle", false) ||
         SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL,
@@ -780,16 +780,12 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       return;
     }
 
-    mPlaybackHandler.post(() -> {
-      int deleteRow = 0;
-      int addRow = 0;
-      try {
-        deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
-        addRow = PlayListUtil.addMultiSongs(mPlayQueue, Constants.PLAY_QUEUE, Global.PlayQueueID);
-      } catch (Exception e) {
-        LogUtil.d(TAG, e.toString());
-      }
+    mDBRepository.runInTransaction(() -> {
+      mDBRepository.clearPlayQueue()
+          .concatWith(mDBRepository.insertToPlayQueue(mPlayQueue))
+          .subscribe();
     });
+
   }
 
   public void setPlay(boolean isPlay) {
@@ -1036,7 +1032,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         mControlReceiver.onReceive(this, shuffleIntent);
         break;
       case ACTION_SHORTCUT_MYLOVE:
-        List<Integer> myLoveIds = PlayListUtil.getSongIds(Global.MyLoveID);
+        List<Integer> myLoveIds = mDBRepository.getMyLoveList().blockingGet();
         if (myLoveIds == null || myLoveIds.size() == 0) {
           ToastUtil.show(mService, R.string.list_is_empty);
           return;
@@ -1138,9 +1134,9 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         setOperation(control);
         if (mPlayQueue == null || mPlayQueue.size() == 0) {
           //列表为空，尝试读取
-          Global.PlayQueueID = SPUtil
-              .getValue(mService, SPUtil.SETTING_KEY.NAME, "PlayQueueID", -1);
-          mPlayQueue = PlayListUtil.getSongIds(Global.PlayQueueID);
+          mDBRepository.getPlayQueue()
+              .compose(applySingleScheduler())
+              .subscribe(queues -> mPlayQueue = queues);
         }
       }
 
@@ -1190,14 +1186,15 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           break;
         //取消或者添加收藏
         case Command.LOVE:
-          int exist = PlayListUtil.isLove(mCurrentId);
-          if (exist == PlayListUtil.EXIST) {
-            PlayListUtil.deleteSong(mCurrentId, Global.MyLoveID);
-          } else if (exist == PlayListUtil.NONEXIST) {
-            PlayListUtil
-                .addSong(new PlayListSong(mCurrentSong.getId(), Global.MyLoveID, Constants.MYLOVE));
-          }
-          updateAppwidget();
+          mDBRepository.toggleMyLove(mCurrentId)
+              .compose(applySingleScheduler())
+              .subscribe(new Consumer<Boolean>() {
+                @Override
+                public void accept(Boolean aBoolean) throws Exception {
+                  updateAppwidget();
+                }
+              });
+
           break;
         //桌面歌词
         case Command.TOGGLE_FLOAT_LRC:
@@ -1308,12 +1305,18 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           updateNextSong();
           //保存到数据库
           if (mPlayModel != Constants.PLAY_SHUFFLE) {
-            mPlaybackHandler.post(() -> {
-              PlayListUtil.clearTable(Constants.PLAY_QUEUE);
-              PlayListUtil.addMultiSongs(mPlayQueue, Constants.PLAY_QUEUE, Global.PlayQueueID);
-            });
+            Single
+                .fromCallable(() -> {
+                  mDBRepository.runInTransaction(() -> {
+                    mDBRepository.clearPlayQueue();
+                    mDBRepository.insertToPlayQueue(mPlayQueue);
+                  });
+                  return true;
+                })
+                .compose(applySingleScheduler())
+                .subscribe(success -> ToastUtil.show(mService, R.string.already_add_to_next_song),
+                    throwable -> ToastUtil.show(mService, R.string.play_failed));
           }
-          ToastUtil.show(mService, R.string.already_add_to_next_song);
           break;
         //改变歌词源
         case Command.CHANGE_LYRIC:
@@ -1689,7 +1692,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mOperation = operation;
   }
 
-  public int getOperation(){
+  public int getOperation() {
     return mOperation;
   }
 
@@ -1700,35 +1703,41 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mPlaybackHandler.post(this::load);
   }
 
-  private void load() {
-    final boolean isFirst = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, "First", true);
-    SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, "First", false);
+  @WorkerThread
+  private synchronized void load() {
+    //迁移数据
+    Migration.migrationDatabase(this);
+
+    final boolean isFirst = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, true);
+    SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, false);
     //读取sd卡歌曲id
     mAllSong = MediaStoreUtil.getAllSongsId();
     //第一次启动软件
     if (isFirst) {
-      try {
-        //默认全部歌曲为播放队列
-        Global.PlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
-        setPlayQueue(mAllSong);
-        SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, "PlayQueueID", Global.PlayQueueID);
-        //添加我的收藏列表
-        Global.MyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
-        SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, "MyLoveID", Global.MyLoveID);
-        //通知栏样式
-        SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.N);
-      } catch (Exception e) {
-        LogUtil.d(TAG, e.toString());
-      }
+      //新建我的收藏
+      mDBRepository.insertPlayList(DatabaseRepository.getMyLove()).subscribe(new LogObserver(){
+        @Override
+        public void onSuccess(@NotNull Object value) {
+          super.onSuccess(value);
+        }
+
+        @Override
+        public void onError(@NotNull Throwable e) {
+          super.onError(e);
+        }
+      });
+      //默认全部歌曲为播放列表
+      setPlayQueue(mAllSong);
+      //通知栏样式
+      SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,
+          Build.VERSION.SDK_INT < Build.VERSION_CODES.N);
     } else {
       //播放模式
       mPlayModel = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL,
           Constants.PLAY_LOOP);
-      Global.PlayQueueID = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, "PlayQueueID", -1);
-      Global.MyLoveID = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, "MyLoveID", -1);
-      mPlayQueue = PlayListUtil.getSongIds(Global.PlayQueueID);
-      Global.PlayList = PlayListUtil.getAllPlayListInfo();
+      //读取播放列表
+      mPlayQueue = mDBRepository.getPlayQueue().blockingGet();
+
       mShowFloatLrc = SPUtil
           .getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
     }

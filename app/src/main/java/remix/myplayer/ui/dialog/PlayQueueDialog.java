@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -21,13 +22,12 @@ import android.view.WindowManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.afollestad.materialdialogs.MaterialDialog;
-import java.util.ArrayList;
+import io.reactivex.functions.Function;
 import java.util.Collections;
 import java.util.List;
-import remix.myplayer.Global;
 import remix.myplayer.R;
-import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
@@ -35,10 +35,8 @@ import remix.myplayer.service.Command;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.adapter.PlayQueueAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PlayListUtil;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -105,27 +103,12 @@ public class PlayQueueDialog extends BaseDialog implements
 
   }
 
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.dialog_playqueue);
-//        ButterKnife.bind(this);
-//
-//
-//        //初始化LoaderManager
-//        getSupportLoaderManager().initLoader(LOADER_ID++, null, this);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//    }
+  @Override
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+
+
+  }
 
   public PlayQueueAdapter getAdapter() {
     return mAdapter;
@@ -165,18 +148,18 @@ public class PlayQueueDialog extends BaseDialog implements
 
     @Override
     public List<Song> loadInBackground() {
-
-      List<Integer> ids = PlayListUtil.getSongIds(Global.PlayQueueID);
-      if (ids == null || ids.isEmpty()) {
-        return Collections.emptyList();
-      }
-//      List<Song> songs = new ArrayList<>();
-//      for (Integer id : ids) {
-//        songs.add(MediaStoreUtil.getSongById(id));
-//      }
-      List<Song> songs = PlayListUtil.getMP3ListWithSort(ids,Global.PlayQueueID);
-      return songs;
+      return DatabaseRepository.getInstance()
+          .getPlayQueueSongs()
+          .onErrorReturn(new Function<Throwable, List<Song>>() {
+            @Override
+            public List<Song> apply(Throwable throwable) throws Exception {
+              Timber.v(throwable);
+              return Collections.emptyList();
+            }
+          })
+          .blockingGet();
     }
+
   }
 
   //    @Override

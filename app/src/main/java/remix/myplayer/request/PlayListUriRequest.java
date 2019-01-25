@@ -8,13 +8,16 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
+import io.reactivex.SingleSource;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import java.util.List;
+import remix.myplayer.App;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.db.room.DatabaseRepository;
+import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.request.network.RxUtil;
-import remix.myplayer.util.PlayListUtil;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -33,24 +36,37 @@ public class PlayListUriRequest extends LibraryUriRequest {
 
   @Override
   public Disposable load() {
-    Observable<String> coverObservable = Observable.create(new ObservableOnSubscribe<Song>() {
-      @Override
-      public void subscribe(ObservableEmitter<Song> emitter) throws Exception {
-        List<Song> songs = PlayListUtil
-            .getMP3ListWithSort(PlayListUtil.getSongIds(mRequest.getID()), mRequest.getID());
-        for (Song song : songs) {
-          emitter.onNext(song);
-        }
-        emitter.onComplete();
-      }
-    }).concatMapDelayError(new Function<Song, ObservableSource<String>>() {
-      @Override
-      public ObservableSource<String> apply(Song song) throws Exception {
-        return getCoverObservable(getSearchRequestWithAlbumType(song));
-      }
-    });
+    Observable<String> coverObservables = DatabaseRepository.getInstance()
+        .getPlayList(mRequest.getID())
+        .flatMap(new Function<PlayList, SingleSource<List<Song>>>() {
+          @Override
+          public SingleSource<List<Song>> apply(PlayList playList) throws Exception {
+            return DatabaseRepository.getInstance()
+                .getPlayListSongs(App.getContext(), playList, true);
+          }
+        })
+        .flatMapObservable(new Function<List<Song>, ObservableSource<Song>>() {
+          @Override
+          public ObservableSource<Song> apply(List<Song> songs) throws Exception {
+            return Observable.create(new ObservableOnSubscribe<Song>() {
+              @Override
+              public void subscribe(ObservableEmitter<Song> emitter) throws Exception {
+                for (Song song : songs) {
+                  emitter.onNext(song);
+                }
+                emitter.onComplete();
+              }
+            });
+          }
+        })
+        .concatMapDelayError(new Function<Song, ObservableSource<String>>() {
+          @Override
+          public ObservableSource<String> apply(Song song) throws Exception {
+            return getCoverObservable(getSearchRequestWithAlbumType(song));
+          }
+        });
 
-    return Observable.concat(getCustomThumbObservable(mRequest), coverObservable)
+    return Observable.concat(getCustomThumbObservable(mRequest), coverObservables)
         .firstOrError()
         .toObservable()
         .compose(RxUtil.applyScheduler())

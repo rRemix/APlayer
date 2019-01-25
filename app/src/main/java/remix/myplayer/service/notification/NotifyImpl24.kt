@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationCompat.PRIORITY_MAX
 
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
@@ -71,6 +72,7 @@ class NotifyImpl24(context: MusicService) : Notify(context) {
         .setLargeIcon(bitmap)
         .setShowWhen(false)
         .setOngoing(service.isPlaying)
+        .setPriority(PRIORITY_MAX)
         .setContentText(song.artist + " - " + song.album)
         .setStyle(android.support.v4.media.app.NotificationCompat.MediaStyle()
             .setShowActionsInCompactView(0, 1, 2)

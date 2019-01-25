@@ -108,17 +108,8 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         new RequestConfig.Builder(imageSize, imageSize).build()).load();
     holder.mImage.setTag(disposable);
     if (holder instanceof AlbumListHolder) {
-      if (album.getCount() > 0) {
-        holder.mText2.setText(
-            mContext.getString(R.string.song_count_2, album.getArtist(), album.getCount()));
-      } else {
-        try {
-          new AlbumSongCountLoader(Constants.ALBUM, holder, album)
-              .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, album.getAlbumID());
-        } catch (Exception e) {
-          CrashReport.postCatchedException(e);
-        }
-      }
+      holder.mText2
+          .setText(App.getContext().getString(R.string.song_count_2, album.getArtist(), album.getCount()));
     } else {
       holder.mText2.setText(album.getArtist());
     }
@@ -221,24 +212,4 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     }
   }
 
-  private static class AlbumSongCountLoader extends AsynLoadSongNum {
-
-    private final AlbumHolder mHolder;
-    private final Album mAlbum;
-
-    AlbumSongCountLoader(int type, AlbumHolder holder, Album album) {
-      super(type);
-      mHolder = holder;
-      mAlbum = album;
-    }
-
-    @Override
-    protected void onPostExecute(Integer num) {
-      if (mHolder.mText2 != null && num > 0) {
-        mAlbum.setCount(num);
-        mHolder.mText2
-            .setText(App.getContext().getString(R.string.song_count_2, mAlbum.getArtist(), num));
-      }
-    }
-  }
 }

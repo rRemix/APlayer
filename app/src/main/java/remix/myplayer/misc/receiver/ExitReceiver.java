@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import remix.myplayer.db.DBManager;
 import remix.myplayer.misc.manager.ActivityManager;
 import remix.myplayer.misc.manager.ServiceManager;
 import remix.myplayer.util.LogUtil;
@@ -26,8 +25,6 @@ public class ExitReceiver extends BroadcastReceiver {
 //        ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
     //停止摇一摇
 //        ShakeDetector.getInstance().stopListen();
-    //关闭数据库
-    DBManager.getInstance().closeIfNeed();
     //关闭所有activity
     ActivityManager.FinishAll();
     new Handler().postDelayed(() -> {

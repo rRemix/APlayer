@@ -20,7 +20,7 @@ data class Folder(val name: String?, val count: Int, val path: String?, val pare
     var result = name?.hashCode() ?: 0
     result = 31 * result + count
     result = 31 * result + (path?.hashCode() ?: 0)
-    result = 31 * result + (parentId ?: 0)
+    result = 31 * result + parentId
     return result
   }
 }

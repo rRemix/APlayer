@@ -13,11 +13,9 @@ import static remix.myplayer.util.Util.sendLocalBroadcast;
 import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -34,7 +32,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
-import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -65,11 +62,17 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
+import io.reactivex.Completable;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 import org.jetbrains.annotations.NotNull;
-import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
@@ -557,7 +560,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         MusicServiceRemote.setPlayModel(currentModel);
         mPlayModel.setImageDrawable(Theme.tintDrawable(currentModel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
             currentModel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                R.drawable.play_btn_loop_one,ThemeStore.getPlayerBtnColor()));
+                R.drawable.play_btn_loop_one, ThemeStore.getPlayerBtnColor()));
 
         String msg = currentModel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
             currentModel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random)
@@ -580,8 +583,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         break;
       //弹出窗口
       case R.id.top_more:
-        @SuppressLint("RestrictedApi")
-        final PopupMenu popupMenu = new PopupMenu(mContext, v, Gravity.TOP);
+        @SuppressLint("RestrictedApi") final PopupMenu popupMenu = new PopupMenu(mContext, v, Gravity.TOP);
         popupMenu.getMenuInflater().inflate(R.menu.menu_audio_item, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(new AudioPopupListener(this, mInfo));
         popupMenu.show();
@@ -589,22 +591,35 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     }
   }
 
+  @SuppressLint("CheckResult")
   @OnClick({R.id.volume_down, R.id.volume_up, R.id.next_song})
   void onVolumeClick(View view) {
     switch (view.getId()) {
       case R.id.volume_down:
-        if (mAudioManager != null) {
-          mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-              AudioManager.ADJUST_LOWER,
-              AudioManager.FLAG_PLAY_SOUND);
-        }
+        Completable
+            .fromAction(() -> {
+              if (mAudioManager != null) {
+                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_LOWER,
+                    AudioManager.FLAG_PLAY_SOUND);
+              }
+            })
+            .subscribeOn(Schedulers.io())
+            .subscribe();
+
         break;
       case R.id.volume_up:
-        if (mAudioManager != null) {
-          mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-              AudioManager.ADJUST_RAISE,
-              AudioManager.FLAG_PLAY_SOUND);
-        }
+        Completable
+            .fromAction(() -> {
+              if (mAudioManager != null) {
+                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_RAISE,
+                    AudioManager.FLAG_PLAY_SOUND);
+              }
+            })
+            .subscribeOn(Schedulers.io())
+            .subscribe();
+
         break;
       case R.id.next_song:
 //                mLyric.setVisibility(View.GONE);
@@ -618,9 +633,12 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         break;
     }
     if (view.getId() != R.id.next_song) {
-      final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-      final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-      mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));
+      Single.zip(Single.fromCallable(() -> mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)),
+          Single.fromCallable(() -> mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)),
+          (max, current) -> new long[]{max, current})
+          .subscribeOn(Schedulers.io())
+          .observeOn(AndroidSchedulers.mainThread())
+          .subscribe(longs -> mVolumeSeekbar.setProgress((int) (longs[1] * 1.0 / longs[1] * 100)));
     }
   }
 
@@ -689,6 +707,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   /**
    * 初始化seekbar
    */
+  @SuppressLint("CheckResult")
   private void setUpSeekBar() {
 //        RelativeLayout seekbarContainer = findViewById(R.id.seekbar_container);
 //        mProgressSeekBar = new SeekBar(mContext);
@@ -755,31 +774,42 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       }
     });
 
-    final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-    final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-    mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));
-    mVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-      @Override
-      public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (mBottomConfig == 2) {
-          mHandler.removeCallbacks(mVolumeRunnable);
-          mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
-        }
-        if (fromUser) {
-          mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-              (int) (seekBar.getProgress() / 100f * max),
-              AudioManager.FLAG_PLAY_SOUND);
-        }
-      }
 
-      @Override
-      public void onStartTrackingTouch(SeekBar seekBar) {
-      }
+    //音量的Seekbar
+    Single.zip(Single.fromCallable(() -> mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)),
+        Single.fromCallable(() -> mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)),
+        (max, current) -> new int[]{max, current})
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(ints -> {
+          final int current = ints[1];
+          final int max = ints[0];
+          mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));
+          mVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+              if (mBottomConfig == 2) {
+                mHandler.removeCallbacks(mVolumeRunnable);
+                mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
+              }
+              if (fromUser) {
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                    (int) (seekBar.getProgress() / 100f * max),
+                    AudioManager.FLAG_PLAY_SOUND);
+              }
+            }
 
-      @Override
-      public void onStopTrackingTouch(SeekBar seekBar) {
-      }
-    });
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+          });
+        });
+
+
     if (mBottomConfig == 2) {
       mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
     }

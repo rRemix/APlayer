@@ -14,6 +14,7 @@ import android.content.Loader;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -24,12 +25,16 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import io.reactivex.SingleSource;
+import io.reactivex.functions.Function;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.db.room.DatabaseRepository;
+import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.handler.MsgHandler;
@@ -49,7 +54,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 
 /**
@@ -63,7 +67,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     implements OnTagEditListener {
 
   public final static String TAG = ChildHolderActivity.class.getSimpleName();
-  public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
   //获得歌曲信息列表的参数
   private int mId;
   private int mType;
@@ -285,6 +288,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
    *
    * @return 对应歌曲信息列表
    */
+  @WorkerThread
   private List<Song> getMP3List() {
     if (mId < 0) {
       return null;
@@ -302,11 +306,12 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
       //播放列表名
       case Constants.PLAYLIST:
         /* 播放列表歌曲id列表 */
-        List<Integer> playListSongIDList = PlayListUtil.getSongIds(mId);
-        if (playListSongIDList == null) {
-          return new ArrayList<>();
-        }
-        return PlayListUtil.getMP3ListWithSort(playListSongIDList, mId,false);
+        return DatabaseRepository.getInstance()
+            .getPlayList(mId)
+            .flatMap((Function<PlayList, SingleSource<List<Song>>>) playList ->
+                DatabaseRepository.getInstance()
+                    .getPlayListSongs(mContext, playList, false))
+            .blockingGet();
     }
     return new ArrayList<>();
   }

@@ -1,13 +1,17 @@
 package remix.myplayer.ui.activity;
 
 import static remix.myplayer.service.MusicService.EXTRA_SONG;
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.MusicUtil.makeCmdIntent;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -23,21 +27,33 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.soundcloud.android.crop.Crop;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import remix.myplayer.App;
 import remix.myplayer.R;
+import remix.myplayer.bean.misc.CustomCover;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
+import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
+import remix.myplayer.request.SimpleUriRequest;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.Command;
 import remix.myplayer.ui.adapter.SearchAdapter;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by taeja on 16-1-22.
@@ -55,8 +71,6 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
   //搜索结果的listview
   @BindView(R.id.search_result_native)
   RecyclerView mSearchResRecyclerView;
-  //    @BindView(R.id.search_view)
-//    SearchView mSearchView;
   //无搜索结果
   @BindView(R.id.search_result_blank)
   TextView mSearchResBlank;
@@ -271,4 +285,8 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
     mSearchResBlank.setVisibility(flag ? View.GONE : View.VISIBLE);
   }
 
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+  }
 }

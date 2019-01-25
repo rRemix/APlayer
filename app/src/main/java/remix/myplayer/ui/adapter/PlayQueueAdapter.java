@@ -6,14 +6,16 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import butterknife.BindView;
-import remix.myplayer.Global;
+import io.reactivex.functions.Consumer;
+import java.util.Collections;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicServiceRemote;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.Command;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.Util;
 
 /**
@@ -55,12 +57,15 @@ public class PlayQueueAdapter extends BaseAdapter<Song, PlayQueueAdapter.PlayQue
     }
     //删除按钮
     holder.mDelete.setOnClickListener(v -> {
-      if (PlayListUtil.deleteSong(song.getId(), Global.PlayQueueID)) {
-        if (MusicServiceRemote.getCurrentSong().getId() == song.getId()) {
-          Util.sendCMDLocalBroadcast(Command.NEXT);
-        }
-      }
-
+      DatabaseRepository.getInstance()
+          .deleteFromPlayQueue(Collections.singletonList(song.getId()))
+          .compose(RxUtil.applySingleScheduler())
+          .subscribe(num -> {
+            //删除的是当前播放的歌曲
+            if(num > 0 && MusicServiceRemote.getCurrentSong().getId() == song.getId()){
+              Util.sendCMDLocalBroadcast(Command.NEXT);
+            }
+          });
     });
     if (mOnItemClickListener != null) {
       holder.mContainer.setOnClickListener(

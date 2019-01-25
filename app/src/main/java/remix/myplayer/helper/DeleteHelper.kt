@@ -1,11 +1,9 @@
 package remix.myplayer.helper
 
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import remix.myplayer.util.Constants
+import remix.myplayer.db.room.DatabaseRepository
+import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.util.MediaStoreUtil
-import remix.myplayer.util.PlayListUtil
 
 object DeleteHelper {
   /**
@@ -16,36 +14,41 @@ object DeleteHelper {
       Single<Boolean> {
     return Single
         .fromCallable {
-          if (deleteSource || !deletePlaylist) {
-            //如果删除的是播放列表
-            if (deletePlaylist) {
-              PlayListUtil.deletePlayList(playlistId)
-            }
-            MediaStoreUtil.delete(MediaStoreUtil.getSongsByIds(songIds), deleteSource) > 0
+          MediaStoreUtil.delete(MediaStoreUtil.getSongsByIds(songIds), deleteSource)
+        }
+        .flatMap {
+          if (deletePlaylist) {
+            DatabaseRepository.getInstance()
+                .deletePlayList(playlistId)
           } else {
-            PlayListUtil.deletePlayList(playlistId)
+            Single.just(it)
           }
         }
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribeOn(Schedulers.io())
+        .map {
+          it > 0
+        }
+
   }
 
   /**
    * 在列表内(如专辑、艺术家列表内删除歌曲)
    */
   @JvmStatic
-  fun deleteSong(songId: Int, deleteSource: Boolean, deleteFromPlayList: Boolean = false, playListName: String = ""): Single<Boolean> {
+  fun deleteSong(songId: Int, deleteSource: Boolean, deleteFromPlayList: Boolean = false, playListName: String = ""):
+      Single<Boolean> {
     return Single
         .fromCallable {
           if (!deleteFromPlayList)
             MediaStoreUtil
-                .delete(listOf(MediaStoreUtil.getSongById(songId)), deleteSource) > 0
+                .delete(listOf(MediaStoreUtil.getSongById(songId)), deleteSource)
           else
-            PlayListUtil.deleteSong(songId, playListName)
-
-          true
+            DatabaseRepository.getInstance()
+                .deleteFromPlayList(arrayListOf(songId), playListName)
+                .blockingGet()
         }
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
+        .map {
+          it > 0
+        }
+        .compose(applySingleScheduler())
   }
 }

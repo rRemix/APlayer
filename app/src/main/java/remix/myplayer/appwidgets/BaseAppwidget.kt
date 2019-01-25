@@ -28,7 +28,6 @@ import remix.myplayer.ui.activity.MainActivity
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import remix.myplayer.util.LogUtil
-import remix.myplayer.util.PlayListUtil
 
 /**
  * @ClassName
@@ -37,7 +36,8 @@ import remix.myplayer.util.PlayListUtil
  * @Date 2016/12/28 15:50
  */
 
-abstract class BaseAppwidget : AppWidgetProvider() {
+abstract class BaseAppwidget
+  : AppWidgetProvider() {
 
   protected lateinit var skin: AppWidgetSkin
   protected var bitmap: Bitmap? = null
@@ -99,7 +99,6 @@ abstract class BaseAppwidget : AppWidgetProvider() {
               LogUtil.d(TAG, "onSuccess --- 回收Bitmap: $bitmap")
               bitmap = null
             }
-//                        bitmap = MusicService.copy(result);
             bitmap = result
             LogUtil.d(TAG, "onSuccess --- 获取Bitmap: $bitmap")
             if (bitmap != null) {
@@ -149,7 +148,7 @@ abstract class BaseAppwidget : AppWidgetProvider() {
     updateArtist(remoteViews, song)
     //        updateSkin(remoteViews);
     updatePlayPause(service, remoteViews)
-    updateLove(remoteViews, song)
+    updateLove(service,remoteViews, song)
     updateModel(remoteViews)
     updateNextAndPrev(remoteViews)
     updateProgress(service, remoteViews, song)
@@ -172,9 +171,9 @@ abstract class BaseAppwidget : AppWidgetProvider() {
     remoteViews.setProgressBar(R.id.appwidget_seekbar, song.duration.toInt(), service.progress, false)
   }
 
-  private fun updateLove(remoteViews: RemoteViews, song: Song) {
-    //是否收藏
-    if (PlayListUtil.isLove(song.id) != PlayListUtil.EXIST) {
+  private fun updateLove(service: MusicService,remoteViews: RemoteViews, song: Song) {
+    val isLove = service.repository.isMyLove(song.Id).blockingGet()
+    if (!isLove) {
       remoteViews.setImageViewResource(R.id.appwidget_love, skin.loveRes)
     } else {
       remoteViews.setImageViewResource(R.id.appwidget_love, skin.lovedRes)

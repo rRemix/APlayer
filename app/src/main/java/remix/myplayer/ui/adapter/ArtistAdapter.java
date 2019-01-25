@@ -103,12 +103,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
       if (artist.getCount() > 0) {
         holder.mText2.setText(mContext.getString(R.string.song_count_1, artist.getCount()));
       } else {
-        try {
-          new ArtistSongCountLoader(Constants.ARTIST, holder, artist)
-              .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, artistId);
-        } catch (Exception e) {
-          CrashReport.postCatchedException(e);
-        }
+        holder.mText2.setText(App.getContext().getString(R.string.song_count_1, artist.getCount()));
       }
     }
     //设置封面
@@ -219,24 +214,5 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     }
   }
 
-  private static class ArtistSongCountLoader extends AsynLoadSongNum {
-
-    private final ArtistHolder mHolder;
-    private final Artist mArtist;
-
-    ArtistSongCountLoader(int type, ArtistHolder holder, Artist artist) {
-      super(type);
-      mHolder = holder;
-      mArtist = artist;
-    }
-
-    @Override
-    protected void onPostExecute(Integer num) {
-      if (mHolder.mText2 != null && num > 0) {
-        mArtist.setCount(num);
-        mHolder.mText2.setText(App.getContext().getString(R.string.song_count_1, num));
-      }
-    }
-  }
 
 }

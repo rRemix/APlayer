@@ -75,9 +75,9 @@
   <string name="play_queue">Playing queue</string>
   <string name="choose_song">Choose song</string>
   <string name="choose_no_song">No songs were selected</string>
-  <string name="set_album_cover_error">Set album cover success</string>
-  <string name="set_artist_cover_error">Set artist cover success</string>
-  <string name="set_playlist_cover_error">Set playlist cover success</string>
+  <string name="set_album_cover_error">Set album cover failed</string>
+  <string name="set_artist_cover_error">Set artist cover failed</string>
+  <string name="set_playlist_cover_error">Set playlist cover failed</string>
 
   <string name="new_folder">New folder</string>
   <string name="choose_folder">Choose </string>

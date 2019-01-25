@@ -6,6 +6,7 @@ import static remix.myplayer.helper.M3UHelper.exportPlayListToFile;
 import static remix.myplayer.helper.M3UHelper.importLocalPlayList;
 import static remix.myplayer.helper.M3UHelper.importM3UFile;
 import static remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM;
+import static remix.myplayer.request.network.RxUtil.applySingleScheduler;
 import static remix.myplayer.service.MusicService.EXTRA_FLOAT_LYRIC;
 import static remix.myplayer.theme.Theme.getBaseDialog;
 import static remix.myplayer.theme.ThemeStore.getThemeText;
@@ -47,19 +48,19 @@ import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import remix.myplayer.Global;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.Category;
 import remix.myplayer.bean.misc.Feedback;
-import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.db.room.DatabaseRepository;
+import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
@@ -69,7 +70,6 @@ import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.update.UpdateAgent;
 import remix.myplayer.misc.update.UpdateListener;
 import remix.myplayer.request.ImageUriRequest;
-import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -82,7 +82,6 @@ import remix.myplayer.ui.dialog.color.ColorChooserDialog;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.MusicUtil;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
@@ -376,7 +375,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
           return;
         }
         mDisposables
-            .add(exportPlayListToFile(playListName, new File(folder, playListName.concat(".m3u"))));
+            .add(exportPlayListToFile(this, playListName, new File(folder, playListName.concat(".m3u"))));
         break;
     }
   }
@@ -385,31 +384,49 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
   public void onFileSelection(@NonNull FileChooserDialog dialog, @NonNull File file) {
     switch (dialog.getTag()) {
       case "Import":
-        List<String> allPlayListsName = new ArrayList<>();
-        String newPlaylistName = file.getName().substring(0, file.getName().lastIndexOf("."));
-        //判断是否存在
-        boolean alreadyExist = false;
-        for (PlayList temp : Global.PlayList) {
-          allPlayListsName.add(temp.getName());
-          if (temp.getName().equalsIgnoreCase(newPlaylistName)) {
-            alreadyExist = true;
-          }
-        }
-        //已经存在不新建
-        if (!alreadyExist) {
-          allPlayListsName.add(0, newPlaylistName + "(" + getString(R.string.new_create) + ")");
-        }
-        Theme.getBaseDialog(mContext)
-            .title(R.string.import_playlist_to)
-            .items(allPlayListsName)
-            .itemsCallback((dialog1, itemView, position, text) -> {
-              final boolean chooseNew =
-                  position == 0 && text.toString().startsWith(newPlaylistName);
-              mDisposables.add(
-                  importM3UFile(file, chooseNew ? newPlaylistName : text.toString(), chooseNew));
+        final String newPlaylistName = file.getName().substring(0, file.getName().lastIndexOf("."));
+
+        DatabaseRepository.getInstance()
+            .getAllPlaylist()
+            .map(new Function<List<PlayList>, List<String>>() {
+              @Override
+              public List<String> apply(List<PlayList> playLists) throws Exception {
+                List<String> allPlayListsName = new ArrayList<>();
+                //判断是否存在
+                boolean alreadyExist = false;
+                for (PlayList playList : playLists) {
+                  allPlayListsName.add(playList.getName());
+                  if (playList.getName().equalsIgnoreCase(newPlaylistName)) {
+                    alreadyExist = true;
+                  }
+                }
+                //不存在则提示新建
+                if (!alreadyExist) {
+                  allPlayListsName.add(0, newPlaylistName + "(" + getString(R.string.new_create) + ")");
+                }
+
+                return allPlayListsName;
+              }
             })
-            .positiveText(R.string.confirm)
-            .show();
+            .compose(applySingleScheduler())
+            .subscribe(new Consumer<List<String>>() {
+              @Override
+              public void accept(List<String> allPlayListsName) throws Exception {
+                Theme.getBaseDialog(mContext)
+                    .title(R.string.import_playlist_to)
+                    .items(allPlayListsName)
+                    .itemsCallback((dialog1, itemView, position, text) -> {
+                      final boolean chooseNew =
+                          position == 0 && text.toString().endsWith(
+                              "(" + getString(R.string.new_create) + ")");
+                      mDisposables.add(
+                          importM3UFile(file, chooseNew ? newPlaylistName : text.toString(), chooseNew));
+                    })
+                    .positiveText(R.string.confirm)
+                    .show();
+              }
+            });
+
         break;
     }
 
@@ -669,21 +686,27 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
    * 播放列表导出
    */
   private void exportPlayList() {
-    List<String> allPlayListNames = new ArrayList<>();
-    for (PlayList playList : Global.PlayList) {
-      allPlayListNames.add(playList.getName());
-    }
-    getBaseDialog(mContext)
-        .title(R.string.choose_playlist_to_export)
-        .negativeText(R.string.cancel)
-        .items(allPlayListNames)
-        .itemsCallback((dialog, itemView, pos, text) ->
-            new FolderChooserDialog.Builder(SettingActivity.this)
-                .chooseButton(R.string.choose_folder)
-                .tag("ExportPlayList-" + text)
-                .allowNewFolder(true, R.string.new_folder)
-                .show())
-        .show();
+    mDisposables.add(DatabaseRepository.getInstance()
+        .getAllPlaylist()
+        .map(playLists -> {
+          List<String> allplayListNames = new ArrayList<>();
+          for (PlayList playList : playLists) {
+            allplayListNames.add(playList.getName());
+          }
+          return allplayListNames;
+        })
+        .compose(applySingleScheduler())
+        .subscribe(allPlayListNames -> getBaseDialog(mContext)
+            .title(R.string.choose_playlist_to_export)
+            .negativeText(R.string.cancel)
+            .items(allPlayListNames)
+            .itemsCallback((dialog, itemView, pos, text) ->
+                new FolderChooserDialog.Builder(SettingActivity.this)
+                    .chooseButton(R.string.choose_folder)
+                    .tag("ExportPlayList-" + text)
+                    .allowNewFolder(true, R.string.new_folder)
+                    .show())
+            .show()));
   }
 
   /**
@@ -696,39 +719,38 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         .negativeText(R.string.cancel)
         .items(new String[]{getString(R.string.import_from_external_storage),
             getString(R.string.import_from_others)})
-        .itemsCallback((dialog, itemView, position1, text) -> {
-          if (position1 == 0) {
+        .itemsCallback((dialog, itemView, select, text) -> {
+          if (select == 0) {
             new FileChooserDialog.Builder(SettingActivity.this)
                 .tag("Import")
                 .extensionsFilter(".m3u")
                 .show();
           } else {
-            Observable.create((ObservableOnSubscribe<Map<String, List<Integer>>>) e -> {
-              e.onNext(PlayListUtil.getPlaylistFromMediaStore());
-              e.onComplete();
-            }).compose(RxUtil.applyScheduler())
-                .subscribe(map -> {
-                  if (map == null || map.size() == 0) {
+            Single
+                .fromCallable(() -> DatabaseRepository.getInstance().getPlaylistFromMediaStore())
+                .compose(applySingleScheduler())
+                .subscribe(localPlayLists -> {
+                  if (localPlayLists == null || localPlayLists.size() == 0) {
                     ToastUtil.show(mContext, R.string.import_fail,
                         getString(R.string.no_playlist_can_import));
                     return;
                   }
                   List<Integer> selectedIndices = new ArrayList<>();
-                  for (int i = 0; i < map.size(); i++) {
+                  for (int i = 0; i < localPlayLists.size(); i++) {
                     selectedIndices.add(i);
                   }
                   getBaseDialog(mContext)
                       .title(R.string.choose_import_playlist)
                       .positiveText(R.string.choose)
-                      .items(map.keySet())
+                      .items(localPlayLists.keySet())
                       .itemsCallbackMultiChoice(
-                          selectedIndices.toArray(new Integer[selectedIndices.size()]),
-                          (dialog1, which, text1) -> {
-                            mDisposables.add(importLocalPlayList(map, text1));
+                          selectedIndices.toArray(new Integer[0]),
+                          (dialog1, which, allSelects) -> {
+                            mDisposables.add(importLocalPlayList(localPlayLists, allSelects));
                             return true;
                           }).show();
-                }, throwable -> ToastUtil
-                    .show(mContext, R.string.import_fail, throwable.toString()));
+
+                }, throwable -> ToastUtil.show(mContext, R.string.import_fail, throwable.toString()));
           }
         })
         .theme(ThemeStore.getMDDialogTheme())

@@ -10,9 +10,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.View;
 import butterknife.BindView;
+import io.reactivex.functions.Function;
+import java.util.Collections;
 import java.util.List;
 import remix.myplayer.R;
-import remix.myplayer.bean.mp3.PlayList;
+import remix.myplayer.db.room.DatabaseRepository;
+import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
@@ -21,9 +24,9 @@ import remix.myplayer.ui.adapter.HeaderAdapter;
 import remix.myplayer.ui.adapter.PlayListAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import timber.log.Timber;
 
 /**
  * @ClassName
@@ -50,14 +53,13 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
       @Override
       public void onItemClick(View view, int position) {
         final PlayList playList = getAdapter().getDatas().get(position);
-        String name = getPlayListName(position);
-        if (!TextUtils.isEmpty(name) && getUserVisibleHint() && !mChoice
+        if (!TextUtils.isEmpty(playList.getName()) && getUserVisibleHint() && !mChoice
             .click(position, playList)) {
-          if (getPlayListSongCount(position) == 0) {
+          if (playList.getAudioIds().isEmpty()) {
             ToastUtil.show(mContext, getStringSafely(R.string.list_is_empty));
             return;
           }
-          ChildHolderActivity.start(mContext, Constants.PLAYLIST, getPlayListId(position), name);
+          ChildHolderActivity.start(mContext, Constants.PLAYLIST, playList.getId(), playList.getName());
         }
       }
 
@@ -82,30 +84,6 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
     mRecyclerView.setHasFixedSize(true);
   }
 
-  private int getPlayListId(int position) {
-    int playListId = -1;
-    if (mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1) {
-      playListId = mAdapter.getDatas().get(position)._Id;
-    }
-    return playListId;
-  }
-
-  private String getPlayListName(int position) {
-    String playlistName = "";
-    if (mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1) {
-      playlistName = mAdapter.getDatas().get(position).Name;
-    }
-    return playlistName;
-  }
-
-  private int getPlayListSongCount(int position) {
-    int count = 0;
-    if (mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1) {
-      count = mAdapter.getDatas().get(position).Count;
-    }
-    return count;
-  }
-
   @Override
   public PlayListAdapter getAdapter() {
     return mAdapter;
@@ -126,15 +104,22 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
     return LoaderIds.PLAYLIST_FRAGMENT;
   }
 
-  private static class AsyncPlayListLoader extends WrappedAsyncTaskLoader<List<PlayList>> {
+  public static class AsyncPlayListLoader extends WrappedAsyncTaskLoader<List<PlayList>> {
 
-    private AsyncPlayListLoader(Context context) {
+    public AsyncPlayListLoader(Context context) {
       super(context);
     }
 
     @Override
     public List<PlayList> loadInBackground() {
-      return PlayListUtil.getAllPlayListInfo();
+      List<PlayList> playLists = DatabaseRepository.getInstance()
+          .getAllPlaylist()
+          .onErrorReturn(throwable -> {
+            Timber.v(throwable);
+            return Collections.emptyList();
+          })
+          .blockingGet();
+      return playLists;
     }
   }
 }
