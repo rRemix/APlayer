@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.reactivex.Observable
 import io.reactivex.functions.Function
+import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.App
 import remix.myplayer.bean.kugou.KLrcResponse
 import remix.myplayer.bean.kugou.KSearchResponse
@@ -144,8 +145,9 @@ class SearchLrc(private val song: Song) {
    * @return
    */
   private fun getEmbeddedObservable(): Observable<List<LrcRow>> {
+    val tagEditor = TagEditor(song.url)
     return Observable.create { e ->
-      val lyric = TagEditor(song.url).lyric
+      val lyric = tagEditor.getFieldValueSingle(FieldKey.LYRICS).blockingGet()
       if (!lyric.isNullOrEmpty()) {
         e.onNext(lrcParser.getLrcRows(getBufferReader(lyric!!.toByteArray(UTF_8)), true, cacheKey, searchKey))
         Timber.v("EmbeddedLyric")

@@ -8,8 +8,12 @@ import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import com.facebook.common.util.ByteConstants
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.dialog_song_detail.view.*
 import kotlinx.android.synthetic.main.dialog_song_edit.view.*
+import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
@@ -55,14 +59,30 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
       root.song_detail_name.text = song.displayname
       //歌曲大小
       root.song_detail_size.text = getString(R.string.cache_size, 1.0f * song.size / ByteConstants.MB)
-      //歌曲格式
-      root.song_detail_mime.text = tagEditor.format
       //歌曲时长
       root.song_detail_duration.text = Util.getTime(song.duration)
+      //歌曲格式
+      tagEditor.formatSingle()
+          .observeOn(AndroidSchedulers.mainThread())
+          .subscribeOn(Schedulers.io())
+          .subscribe(Consumer {
+            root.song_detail_mime.text = it
+          })
       //歌曲码率
-      root.song_detail_bit_rate.text = String.format("%s kb/s", tagEditor.bitrate)
+      tagEditor.bitrateSingle()
+          .observeOn(AndroidSchedulers.mainThread())
+          .subscribeOn(Schedulers.io())
+          .subscribe(Consumer {
+            root.song_detail_bit_rate.text = String.format("%s kb/s", it)
+          })
       //歌曲采样率
-      root.song_detail_sample_rate.text = String.format("%s Hz", tagEditor.samplingRate)
+      tagEditor.samplingSingle()
+          .observeOn(AndroidSchedulers.mainThread())
+          .subscribeOn(Schedulers.io())
+          .subscribe(Consumer {
+            root.song_detail_sample_rate.text = String.format("%s Hz", it)
+          })
+
     }
 
   }
@@ -126,11 +146,11 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
 
       TextInputLayoutUtil.setAccent(root.track_layout, textInputTintColor)
       TintHelper.setTintAuto(root.track_layout.editText!!, editTintColor, false)
-      root.track_layout.editText?.setText(tagEditor.trackNumber)
+      root.track_layout.editText?.setText(tagEditor.getFieldValueSingle(FieldKey.TRACK).blockingGet())
 
       TextInputLayoutUtil.setAccent(root.genre_layout, textInputTintColor)
       TintHelper.setTintAuto(root.genre_layout.editText!!, editTintColor, false)
-      root.genre_layout.editText?.setText(tagEditor.genreName)
+      root.genre_layout.editText?.setText(tagEditor.getFieldValueSingle(FieldKey.GENRE).blockingGet())
 
     }
 
