@@ -14,12 +14,11 @@ import android.os.Build
 import android.support.annotation.DrawableRes
 import android.widget.RemoteViews
 import com.tencent.bugly.crashreport.CrashReport
-import io.reactivex.functions.Consumer
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.appwidgets.AppWidgetSkin.WHITE_1F
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.misc.exception.MusicServiceException
+import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
 import remix.myplayer.request.network.RxUtil
@@ -68,7 +67,7 @@ abstract class BaseAppwidget
       val appIds = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, javaClass))
       return appIds != null && appIds.isNotEmpty()
     } catch (e: Exception) {
-      CrashReport.postCatchedException(MusicServiceException("hasInstance", e))
+      Timber.v(e)
     }
     return false
   }
@@ -98,11 +97,11 @@ abstract class BaseAppwidget
           } else {
             remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
           }
-
+          pushUpdate(service, appWidgetIds, remoteViews)
         } catch (e: Exception) {
           Timber.v("onSuccess --- 发生异常: $e")
         } finally {
-          pushUpdate(service, appWidgetIds, remoteViews)
+
         }
       }
     }.load()
@@ -165,18 +164,24 @@ abstract class BaseAppwidget
   }
 
   protected fun pushUpdate(context: Context, appWidgetId: IntArray?, remoteViews: RemoteViews) {
+    if (!hasInstances(context)) {
+      return
+    }
     val appWidgetManager = AppWidgetManager.getInstance(context)
     if (appWidgetId != null) {
       appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
-      return
+    } else {
+      appWidgetManager.updateAppWidget(ComponentName(context, javaClass), remoteViews)
     }
-    appWidgetManager.updateAppWidget(ComponentName(context, javaClass), remoteViews)
   }
 
-  protected fun pushPartiallyUpdate(context: Context,appWidgetId: IntArray?,remoteViews: RemoteViews){
+  protected fun pushPartiallyUpdate(context: Context, appWidgetId: IntArray?, remoteViews: RemoteViews) {
+    if(!hasInstances(context)){
+      return
+    }
     val appWidgetManager = AppWidgetManager.getInstance(context)
     if (appWidgetId != null) {
-      appWidgetManager.partiallyUpdateAppWidget(appWidgetId,remoteViews)
+      appWidgetManager.partiallyUpdateAppWidget(appWidgetId, remoteViews)
     }
   }
 
@@ -188,7 +193,7 @@ abstract class BaseAppwidget
     updateArtist(remoteViews, song)
     //        updateSkin(remoteViews);
     updatePlayPause(service, remoteViews)
-    updateLove(service,remoteViews, song)
+    updateLove(remoteViews, song)
     updateModel(remoteViews)
     updateNextAndPrev(remoteViews)
     updateProgress(service, remoteViews, song)
@@ -210,8 +215,9 @@ abstract class BaseAppwidget
     remoteViews.setProgressBar(R.id.appwidget_seekbar, song.duration.toInt(), service.progress, false)
   }
 
-  private fun updateLove(service: MusicService,remoteViews: RemoteViews, song: Song) {
-    service.repository.isMyLove(song.Id)
+  private fun updateLove(remoteViews: RemoteViews, song: Song) {
+    DatabaseRepository.getInstance()
+        .isMyLove(song.Id)
         .compose(RxUtil.applySingleScheduler())
         .subscribe { isLove ->
           if (!isLove) {
@@ -260,6 +266,10 @@ abstract class BaseAppwidget
   abstract fun partiallyUpdateWidget(service: MusicService)
 
   companion object {
+    const val EXTRA_WIDGET_NAME = "WidgetName"
+    const val EXTRA_WIDGET_IDS = "WidgetIds"
+
+
     val SKIN_WHITE_1F = 1//白色不带透明
     val SKIN_TRANSPARENT = 2//透明
     private val TAG = "桌面部件"

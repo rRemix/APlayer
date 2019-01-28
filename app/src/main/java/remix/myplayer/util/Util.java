@@ -82,14 +82,6 @@ public class Util {
     }
   }
 
-
-  /**
-   * 判断列表是否为空
-   */
-  public static boolean isEmptyList(List list) {
-    return list == null || list.size() == 0;
-  }
-
   /**
    * 判断app是否运行在前台
    */
@@ -98,8 +90,11 @@ public class Util {
         .getSystemService(Context.ACTIVITY_SERVICE);
     String packageName = App.getContext().getPackageName();
 
-    List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager
-        .getRunningAppProcesses();
+    List<ActivityManager.RunningAppProcessInfo> appProcesses = null;
+    if (activityManager != null) {
+      appProcesses = activityManager
+          .getRunningAppProcesses();
+    }
     if (appProcesses == null) {
       return false;
     }

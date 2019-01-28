@@ -8,6 +8,7 @@ import android.widget.RemoteViews
 import remix.myplayer.R
 import remix.myplayer.appwidgets.AppWidgetSkin
 import remix.myplayer.appwidgets.BaseAppwidget
+import remix.myplayer.bean.mp3.Song
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Util
 
@@ -23,8 +24,8 @@ class AppWidgetBig : BaseAppwidget() {
   override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
     defaultAppWidget(context, appWidgetIds)
     val intent = Intent(MusicService.ACTION_WIDGET_UPDATE)
-    intent.putExtra("WidgetName", "BigWidget")
-    intent.putExtra("WidgetIds", appWidgetIds)
+    intent.putExtra(EXTRA_WIDGET_NAME, this.javaClass.simpleName)
+    intent.putExtra(EXTRA_WIDGET_IDS, appWidgetIds)
     intent.flags = Intent.FLAG_RECEIVER_REGISTERED_ONLY
     context.sendBroadcast(intent)
   }
@@ -37,8 +38,12 @@ class AppWidgetBig : BaseAppwidget() {
 
   override fun updateWidget(service: MusicService, appWidgetIds: IntArray?, reloadCover: Boolean) {
     val song = service.currentSong
-    if (song == null || !hasInstances(service))
+    if(song == Song.EMPTY_SONG){
       return
+    }
+    if(!hasInstances(service)){
+      return
+    }
     val remoteViews = RemoteViews(service.packageName, R.layout.app_widget_big)
     buildAction(service, remoteViews)
     skin = AppWidgetSkin.WHITE_1F
@@ -54,8 +59,12 @@ class AppWidgetBig : BaseAppwidget() {
 
   override fun partiallyUpdateWidget(service: MusicService) {
     val song = service.currentSong
-    if (song == null || !hasInstances(service))
+    if(song == Song.EMPTY_SONG){
       return
+    }
+    if(!hasInstances(service)){
+      return
+    }
     val remoteViews = RemoteViews(service.packageName, R.layout.app_widget_big)
     buildAction(service, remoteViews)
     skin = AppWidgetSkin.WHITE_1F

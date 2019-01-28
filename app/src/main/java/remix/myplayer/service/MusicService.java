@@ -3,6 +3,7 @@ package remix.myplayer.service;
 import static remix.myplayer.lyric.UpdateLyricThread.LRC_INTERVAL;
 import static remix.myplayer.request.network.RxUtil.applySingleScheduler;
 import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS;
+import static remix.myplayer.util.Constants.PLAY_LOOP;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.Util.registerLocalReceiver;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
@@ -42,11 +43,9 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import com.tencent.bugly.crashreport.CrashReport;
-import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import java.lang.ref.WeakReference;
@@ -57,7 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
 import org.jetbrains.annotations.NotNull;
 import remix.myplayer.R;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
@@ -113,6 +111,21 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   public static final String EXTRA_SONG = "Song";
   public static final String EXTRA_POSITION = "Position";
 
+  //更新桌面部件
+  public final static int UPDATE_APPWIDGET = 0x100;
+  //更新正在播放歌曲
+  public final static int UPDATE_META_DATA = 0x102;
+  //更新播放状态
+  public final static int UPDATE_PLAY_STATE = 0x103;
+
+  //更新桌面歌词内容
+  public static final int UPDATE_FLOAT_LRC_CONTENT = 0x104;
+  //移除桌面歌词
+  public static final int REMOVE_FLOAT_LRC = 0x105;
+  //添加桌面歌词
+  public static final int CREATE_FLOAT_LRC = 0x106;
+
+
   /**
    * 所有歌曲id
    */
@@ -140,10 +153,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    */
   private boolean mLoadFinished = false;
 
+
   /**
    * 播放模式
    */
-  private int mPlayModel = Constants.PLAY_LOOP;
+  private int mPlayModel = PLAY_LOOP;
 
   /**
    * 当前是否正在播放
@@ -268,6 +282,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    * 监听锁屏
    */
   private ScreenReceiver mScreenReceiver;
+  private boolean mScreenOn = true;
 
   /**
    * shortcut
@@ -367,8 +382,6 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     Timber.tag(TAG_LIFECYCLE).v("onCreate");
     mService = this;
     setUp();
-
-
   }
 
   @Nullable
@@ -445,11 +458,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mAudioFocusListener = new AudioFocusChangeListener();
 
     //桌面部件
-    mAppWidgets.put("BigWidget", new AppWidgetBig());
-    mAppWidgets.put("MediumWidget", new AppWidgetMedium());
-    mAppWidgets.put("MediumWidgetTransparent", new AppWidgetMediumTransparent());
-    mAppWidgets.put("SmallWidget", new AppWidgetSmall());
-    mAppWidgets.put("SmallWidgetTransparent", new AppWidgetSmallTransparent());
+    mAppWidgets.put("AppWidgetBig", new AppWidgetBig());
+    mAppWidgets.put("AppWidgetMedium", new AppWidgetMedium());
+    mAppWidgets.put("AppWidgetMediumTransparent", new AppWidgetMediumTransparent());
+    mAppWidgets.put("AppWidgetSmall", new AppWidgetSmall());
+    mAppWidgets.put("AppWidgetSmallTransparent", new AppWidgetSmallTransparent());
 
     mWindowManager = (WindowManager) mService.getSystemService(Context.WINDOW_SERVICE);
 
@@ -570,7 +583,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mMediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
 
     mMediaPlayer.setOnCompletionListener(mp -> {
-      if (mPlayModel == Constants.PLAY_REPEATONE) {
+      if (mPlayModel == Constants.PLAY_REPEAT) {
         prepare(mCurrentSong.getUrl());
       } else {
         playNextOrPrev(true);
@@ -773,7 +786,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     //当前模式是随机播放 或者即将设置为随机播放 都要更新mRandomList
     boolean shuffle = intent.getBooleanExtra("shuffle", false) ||
         SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL,
-            Constants.PLAY_LOOP) == Constants.PLAY_SHUFFLE;
+            PLAY_LOOP) == Constants.PLAY_SHUFFLE;
     if (newQueueList == null || newQueueList.size() == 0) {
       return;
     }
@@ -804,7 +817,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
   public void setPlay(boolean isPlay) {
     mIsPlay = isPlay;
-    mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_PLAY_STATE);
+    mUpdateUIHandler.sendEmptyMessage(UPDATE_PLAY_STATE);
 //        sendLocalBroadcast(new Intent(PLAY_STATE_CHANGE));
   }
 
@@ -977,32 +990,32 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 //            final int skin = SPUtil.getValue(context,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
 //            SPUtil.putValue(context,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
 
-      String str = intent.getStringExtra("WidgetName");
-      int[] appIds = intent.getIntArrayExtra("WidgetIds");
-      switch (str) {
-        case "BigWidget":
-          if (mAppWidgets.get("BigWidget") != null) {
-            mAppWidgets.get("BigWidget").updateWidget(mService, appIds, true);
+      String name = intent.getStringExtra(BaseAppwidget.EXTRA_WIDGET_NAME);
+      int[] appIds = intent.getIntArrayExtra(BaseAppwidget.EXTRA_WIDGET_IDS);
+      switch (name) {
+        case "AppWidgetBig":
+          if (mAppWidgets.get("AppWidgetBig") != null) {
+            mAppWidgets.get("AppWidgetBig").updateWidget(mService, appIds, true);
           }
           break;
-        case "MediumWidget":
-          if (mAppWidgets.get("MediumWidget") != null) {
-            mAppWidgets.get("MediumWidget").updateWidget(mService, appIds, true);
+        case "AppWidgetMedium":
+          if (mAppWidgets.get("AppWidgetMedium") != null) {
+            mAppWidgets.get("AppWidgetMedium").updateWidget(mService, appIds, true);
           }
           break;
-        case "SmallWidget":
-          if (mAppWidgets.get("SmallWidget") != null) {
-            mAppWidgets.get("SmallWidget").updateWidget(mService, appIds, true);
+        case "AppWidgetSmall":
+          if (mAppWidgets.get("AppWidgetSmall") != null) {
+            mAppWidgets.get("AppWidgetSmall").updateWidget(mService, appIds, true);
           }
           break;
-        case "MediumWidgetTransparent":
-          if (mAppWidgets.get("MediumWidgetTransparent") != null) {
-            mAppWidgets.get("MediumWidgetTransparent").updateWidget(mService, appIds, true);
+        case "AppWidgetMediumTransparent":
+          if (mAppWidgets.get("AppWidgetMediumTransparent") != null) {
+            mAppWidgets.get("AppWidgetMediumTransparent").updateWidget(mService, appIds, true);
           }
           break;
-        case "SmallWidgetTransparent":
-          if (mAppWidgets.get("SmallWidgetTransparent") != null) {
-            mAppWidgets.get("SmallWidgetTransparent").updateWidget(mService, appIds, true);
+        case "AppWidgetSmallTransparent":
+          if (mAppWidgets.get("AppWidgetSmallTransparent") != null) {
+            mAppWidgets.get("AppWidgetSmallTransparent").updateWidget(mService, appIds, true);
           }
           break;
       }
@@ -1023,7 +1036,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       case ACTION_APPWIDGET_OPERATE:
         Intent appwidgetIntent = new Intent(ACTION_CMD);
         int control = commandIntent.getIntExtra("Control", -1);
-        if (control == Constants.UPDATE_APPWIDGET) {
+        if (control == UPDATE_APPWIDGET) {
 //                    int skin = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
 //                    SPUtil.putValue(this,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
           updateAppwidget();
@@ -1194,7 +1207,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           break;
         //改变播放模式
         case Command.CHANGE_MODEL:
-          mPlayModel = (mPlayModel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP
+          mPlayModel = (mPlayModel == Constants.PLAY_REPEAT ? PLAY_LOOP
               : ++mPlayModel);
           setPlayModel(mPlayModel);
           break;
@@ -1402,7 +1415,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    * 更新
    */
   private void update(int control) {
-    mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
+    mUpdateUIHandler.sendEmptyMessage(UPDATE_META_DATA);
 //        if (updateAllView(control)) {
 //            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
 //        } else if (!mMediaPlayer.playedOnce()) {
@@ -1753,7 +1766,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     } else {
       //播放模式
       mPlayModel = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL,
-          Constants.PLAY_LOOP);
+          PLAY_LOOP);
       //读取播放列表
       mPlayQueue = mDBRepository.getPlayQueue().blockingGet();
 
@@ -1873,16 +1886,16 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       return;
     }
     if (!mShowFloatLrc) { //移除桌面歌词
-      mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
+      mUpdateUIHandler.sendEmptyMessage(REMOVE_FLOAT_LRC);
     } else if (!updatePlayStateOnly(getOperation()) || force || mFirstUpdateLrc) { //更新
-      createFloatLrcThreadIfNeed();
-      if(mUpdateFloatLrcThread == null){
-        CrashReport.postCatchedException(
-            new RuntimeException("mShowFloatLrc: " + mShowFloatLrc + " isFloatLrcShowing: " + isFloatLrcShowing() + " Thread: " + mUpdateFloatLrcThread));
-      } else{
-        mUpdateFloatLrcThread.setSongAndGetLyricRows(mCurrentSong);
+      //屏幕点亮才更新
+      if (mScreenOn) {
+        createFloatLrcThreadIfNeed();
+        if (mUpdateFloatLrcThread != null) {
+          mUpdateFloatLrcThread.setSongAndGetLyricRows(mCurrentSong);
+        }
+        mFirstUpdateLrc = false;
       }
-      mFirstUpdateLrc = false;
     }
   }
 
@@ -1976,9 +1989,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
   private class UpdateFloatLrcThread extends UpdateLyricThread {
 
+    private final String TAG = UpdateFloatLrcThread.class.getSimpleName();
+
     UpdateFloatLrcThread() {
       super(MusicService.this);
-      Timber.v("创建线程");
+      Timber.tag(TAG).v("创建线程");
     }
 
     void quitByNotification() {
@@ -1999,34 +2014,33 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 //                    LogUtil.d("DesktopLrc","间隔:" + interval);
           Thread.sleep(LRC_INTERVAL);
         } catch (InterruptedException e) {
-          Timber.v("捕获异常,线程退出");
-          mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
+          Timber.tag(TAG).v("捕获异常,线程退出");
+          mUpdateUIHandler.sendEmptyMessage(REMOVE_FLOAT_LRC);
           return;
         }
-        Timber.v("Thread:%s", Thread.currentThread());
         //判断权限
         if (checkNoPermission()) {
           return;
         }
         if (mIsServiceStop) {
-          mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
+          mUpdateUIHandler.sendEmptyMessage(REMOVE_FLOAT_LRC);
           return;
         }
         //当前应用在前台
         if (Util.isAppOnForeground()) {
           if (isFloatLrcShowing()) {
-            mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
+            mUpdateUIHandler.sendEmptyMessage(REMOVE_FLOAT_LRC);
           }
 
         } else {
           if (!isFloatLrcShowing()) {
-            mUpdateUIHandler.removeMessages(Constants.CREATE_FLOAT_LRC);
-            Timber.v("请求创建桌面歌词");
-            mUpdateUIHandler.sendEmptyMessageDelayed(Constants.CREATE_FLOAT_LRC, 50);
+            mUpdateUIHandler.removeMessages(CREATE_FLOAT_LRC);
+            Timber.tag(TAG).v("请求创建桌面歌词");
+            mUpdateUIHandler.sendEmptyMessageDelayed(CREATE_FLOAT_LRC, 50);
           } else {
             mCurrentLrc = findCurrentLyric();
-            Timber.v("当前歌词: %s", mCurrentLrc);
-            mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
+            Timber.tag(TAG).v("当前歌词: %s", mCurrentLrc);
+            mUpdateUIHandler.obtainMessage(UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
           }
         }
       }
@@ -2099,8 +2113,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
     mShowFloatLrc = false;
     mUpdateFloatLrcThread = null;
-    mUpdateUIHandler.removeMessages(Constants.CREATE_FLOAT_LRC);
-    mUpdateUIHandler.sendEmptyMessageDelayed(Constants.REMOVE_FLOAT_LRC, LRC_INTERVAL);
+    mUpdateUIHandler.removeMessages(CREATE_FLOAT_LRC);
+    mUpdateUIHandler.sendEmptyMessageDelayed(REMOVE_FLOAT_LRC, LRC_INTERVAL);
   }
 
   /**
@@ -2113,6 +2127,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     @Override
     public void run() {
+      Timber.v("partiallyUpdateWidget");
       for (Map.Entry<String, BaseAppwidget> entry : mAppWidgets.entrySet()) {
         if (entry.getValue() != null) {
           entry.getValue().partiallyUpdateWidget(mService);
@@ -2203,14 +2218,14 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       }
       MusicService musicService = mRef.get();
       switch (msg.what) {
-        case Constants.UPDATE_PLAY_STATE:
+        case UPDATE_PLAY_STATE:
           musicService.handlePlayStateChange();
           break;
-        case Constants.UPDATE_META_DATA:
+        case UPDATE_META_DATA:
 //                    musicService.handlePlayStateChange();
           musicService.handleMetaChange();
           break;
-        case Constants.UPDATE_FLOAT_LRC_CONTENT:
+        case UPDATE_FLOAT_LRC_CONTENT:
           LyricRowWrapper wrapper = musicService.mCurrentLrc;
           if (musicService.mFloatLrcView != null) {
             if (wrapper == null) {
@@ -2228,10 +2243,10 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             }
           }
           break;
-        case Constants.REMOVE_FLOAT_LRC:
+        case REMOVE_FLOAT_LRC:
           musicService.removeFloatLrc();
           break;
-        case Constants.CREATE_FLOAT_LRC:
+        case CREATE_FLOAT_LRC:
           musicService.createFloatLrc();
           break;
       }
@@ -2244,6 +2259,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     public void onReceive(Context context, Intent intent) {
       final String action = intent.getAction();
       if (Intent.ACTION_SCREEN_ON.equals(action)) {
+        mScreenOn = true;
         //显示锁屏
         if (mIsPlay && SPUtil
             .getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN,
@@ -2254,6 +2270,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         //重新显示桌面歌词
         createFloatLrcThreadIfNeed();
       } else {
+        mScreenOn = false;
         //屏幕熄灭 关闭桌面歌词
         if (mShowFloatLrc && isFloatLrcShowing() && mUpdateFloatLrcThread != null) {
           mUpdateFloatLrcThread.quitImmediately();

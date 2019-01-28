@@ -14,7 +14,7 @@ import timber.log.Timber;
 
 public abstract class UpdateLyricThread extends Thread {
 
-  private final String TAG = getClass().getSimpleName();
+  public static final String TAG = UpdateLyricThread.class.getSimpleName();
   public static final LrcRow EMPTY_ROW = new LrcRow("", 0, "");
   public static final LrcRow NO_ROW = new LrcRow("", 0,
       App.getContext().getString(R.string.no_lrc));
@@ -53,7 +53,7 @@ public abstract class UpdateLyricThread extends Thread {
             mLrcRows = lrcRows;
           }
         }, throwable -> {
-          Timber.v(throwable);
+          Timber.tag(TAG).v(throwable);
           if (id == mSong.getId()) {
             mStatus = Status.ERROR;
             mLrcRows = null;
@@ -77,7 +77,7 @@ public abstract class UpdateLyricThread extends Thread {
   @Override
   public void interrupt() {
     super.interrupt();
-    Timber.v("interrupt");
+    Timber.tag(TAG).v("interrupt");
     if (mDisposable != null && !mDisposable.isDisposed()) {
       mDisposable.dispose();
     }
@@ -92,13 +92,13 @@ public abstract class UpdateLyricThread extends Thread {
     LyricRowWrapper wrapper = new LyricRowWrapper();
     wrapper.setStatus(mStatus);
 
-    Timber.v("Reference: %s", mReference);
+    Timber.tag(TAG).v("Reference: %s", mReference);
     if (mStatus == Status.SEARCHING) {
       return wrapper;
     }
 
     if (mStatus == Status.ERROR || mStatus == Status.NO) {
-      Timber.v("当前没有歌词");
+      Timber.tag(TAG).v("当前没有歌词");
       return wrapper;
     }
     final Song song = service.getCurrentSong();

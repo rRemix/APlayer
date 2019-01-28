@@ -144,7 +144,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
                     outputStream?.close()
                   }
                   .subscribe({
-                    ToastUtil.showLong(mContext, R.string.save_wechat_qrcode_success, it.absolutePath)
+                    ToastUtil.show(mContext, R.string.save_wechat_qrcode_success, it.absolutePath)
                   }, {
                     ToastUtil.show(mContext, R.string.save_error)
                   })
@@ -248,12 +248,9 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
   }
 
   override fun onDestroy() {
-    mBillingProcessor?.release()
     super.onDestroy()
-    mDisposable?.let {
-      if (!it.isDisposed)
-        it.dispose()
-    }
+    mBillingProcessor?.release()
+    mDisposable?.dispose()
     if (mLoading.isShowing)
       mLoading.dismiss()
   }

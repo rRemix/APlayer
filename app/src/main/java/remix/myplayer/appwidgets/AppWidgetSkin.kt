@@ -91,7 +91,7 @@ enum class AppWidgetSkin private constructor(@param:ColorInt var titleColor: Int
       val playModel = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL, Constants.PLAY_LOOP)
       return when (playModel) {
         Constants.PLAY_SHUFFLE -> modeShuffleRes
-        Constants.PLAY_REPEATONE -> modeRepeatRes
+        Constants.PLAY_REPEAT -> modeRepeatRes
         else -> modeNormalRes
       }
     }

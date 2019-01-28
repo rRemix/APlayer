@@ -35,15 +35,41 @@ import java.util.*
 
 @SuppressLint("Registered")
 open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
-  val TAG = "BaseMusicActivity"
-  private var mServiceToken: MusicServiceRemote.ServiceToken? = null
-  private val mMusicServiceEventListeners = ArrayList<MusicEventCallback>()
-  private var mMusicStateReceiver: MusicStateReceiver? = null
-  private var mReceiverRegistered: Boolean = false
+  private var serviceToken: MusicServiceRemote.ServiceToken? = null
+  private val serviceEventListeners = ArrayList<MusicEventCallback>()
+  private var musicStateReceiver: MusicStateReceiver? = null
+  private var receiverRegistered: Boolean = false
+  private var pendingBindService = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mServiceToken = MusicServiceRemote.bindToService(this, object : ServiceConnection {
+    bindToService()
+  }
+
+  override fun onRestart() {
+    super.onRestart()
+    if(pendingBindService){
+      bindToService()
+      pendingBindService = false
+    }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    MusicServiceRemote.unbindFromService(serviceToken)
+    mMusicStateHandler?.removeCallbacksAndMessages(null)
+    if (receiverRegistered) {
+      unregisterLocalReceiver(musicStateReceiver)
+      receiverRegistered = true
+    }
+  }
+
+  private fun bindToService(){
+    if(!Util.isAppOnForeground()){
+      pendingBindService = true
+      return
+    }
+    serviceToken = MusicServiceRemote.bindToService(this, object : ServiceConnection {
       override fun onServiceConnected(name: ComponentName, service: IBinder) {
         val musicService = (service as MusicService.MusicBinder).service
         this@BaseMusicActivity.onServiceConnected(musicService)
@@ -55,31 +81,21 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
     })
   }
 
-  override fun onDestroy() {
-    super.onDestroy()
-    MusicServiceRemote.unbindFromService(mServiceToken)
-    mMusicStateHandler?.removeCallbacksAndMessages(null)
-    if (mReceiverRegistered) {
-      unregisterLocalReceiver(mMusicStateReceiver)
-      mReceiverRegistered = true
-    }
-  }
-
   fun addMusicServiceEventListener(listener: MusicEventCallback?) {
     if (listener != null) {
-      mMusicServiceEventListeners.add(listener)
+      serviceEventListeners.add(listener)
     }
   }
 
   fun removeMusicServiceEventListener(listener: MusicEventCallback?) {
     if (listener != null) {
-      mMusicServiceEventListeners.remove(listener)
+      serviceEventListeners.remove(listener)
     }
   }
 
   override fun onMediaStoreChanged() {
     Timber.v("onMediaStoreChanged: ${this.javaClass.simpleName}")
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onMediaStoreChanged()
     }
   }
@@ -87,57 +103,57 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   override fun onPermissionChanged(has: Boolean) {
     Timber.v("onPermissionChanged: ${this.javaClass.simpleName}")
     mHasPermission = has
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onPermissionChanged(has)
     }
   }
 
   override fun onPlayListChanged() {
     Timber.v("onMediaStoreChanged: ${this.javaClass.simpleName}")
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onPlayListChanged()
     }
   }
 
   override fun onMetaChanged() {
     Timber.v("onMetaChange: ${this.javaClass.simpleName}")
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onMetaChanged()
     }
   }
 
   override fun onPlayStateChange() {
     Timber.v("onPlayStateChange: ${this.javaClass.simpleName}")
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onPlayStateChange()
     }
   }
 
   override fun onServiceConnected(service: MusicService) {
     Timber.v("onServiceConnected: ${this.javaClass.simpleName}")
-    if (!mReceiverRegistered) {
-      mMusicStateReceiver = MusicStateReceiver(this)
+    if (!receiverRegistered) {
+      musicStateReceiver = MusicStateReceiver(this)
       val filter = IntentFilter()
       filter.addAction(MusicService.PLAYLIST_CHANGE)
       filter.addAction(MusicService.PERMISSION_CHANGE)
       filter.addAction(MusicService.MEDIA_STORE_CHANGE)
       filter.addAction(MusicService.META_CHANGE)
       filter.addAction(MusicService.PLAY_STATE_CHANGE)
-      registerLocalReceiver(mMusicStateReceiver, filter)
-      mReceiverRegistered = true
+      registerLocalReceiver(musicStateReceiver, filter)
+      receiverRegistered = true
     }
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onServiceConnected(service)
     }
     mMusicStateHandler = MusicStateHandler(this)
   }
 
   override fun onServiceDisConnected() {
-    if (mReceiverRegistered) {
-      unregisterLocalReceiver(mMusicStateReceiver)
-      mReceiverRegistered = false
+    if (receiverRegistered) {
+      unregisterLocalReceiver(musicStateReceiver)
+      receiverRegistered = false
     }
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onServiceDisConnected()
     }
     mMusicStateHandler?.removeCallbacksAndMessages(null)
@@ -298,5 +314,12 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   companion object {
     private const val PERMISSION_GRANT = 1
     private const val PERMISSION_NOT_GRANT = 0
+
+    //更新适配器
+    const val UPDATE_ADAPTER = 100
+    //多选更新
+    const val CLEAR_MULTI = 101
+    //重建activity
+    const val RECREATE_ACTIVITY = 102
   }
 }

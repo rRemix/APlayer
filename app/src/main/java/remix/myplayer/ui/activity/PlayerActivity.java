@@ -6,6 +6,9 @@ import static remix.myplayer.theme.ThemeStore.getAccentColor;
 import static remix.myplayer.theme.ThemeStore.getPlayerNextSongBgColor;
 import static remix.myplayer.theme.ThemeStore.getPlayerProgressColor;
 import static remix.myplayer.theme.ThemeStore.isLightTheme;
+import static remix.myplayer.util.Constants.PLAY_LOOP;
+import static remix.myplayer.util.Constants.PLAY_REPEAT;
+import static remix.myplayer.util.Constants.PLAY_SHUFFLE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
 import static remix.myplayer.util.Util.registerLocalReceiver;
@@ -15,6 +18,7 @@ import static remix.myplayer.util.Util.unregisterLocalReceiver;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -100,7 +104,6 @@ import remix.myplayer.ui.fragment.RecordFragment;
 import remix.myplayer.ui.widget.AudioViewPager;
 import remix.myplayer.ui.widget.playpause.PlayPauseView;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.SPUtil;
@@ -323,7 +326,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
     mHandler = new MsgHandler(this);
     mTagReceiver = new TagReceiver(this);
-    registerLocalReceiver(mTagReceiver, new IntentFilter(Constants.TAG_EDIT));
+    registerLocalReceiver(mTagReceiver, new IntentFilter(TagReceiver.ACTION_EDIT_TAG));
 
     mInfo = MusicServiceRemote.getCurrentSong();
     mAnimUrl = getIntent().getParcelableExtra(EXTRA_ANIM_URL);
@@ -551,18 +554,17 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       //设置播放模式
       case R.id.playbar_model:
         int currentModel = MusicServiceRemote.getPlayModel();
-        currentModel = (currentModel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP
-            : ++currentModel);
+        currentModel = (currentModel == PLAY_REPEAT ? PLAY_LOOP : ++currentModel);
         MusicServiceRemote.setPlayModel(currentModel);
-        mPlayModel.setImageDrawable(Theme.tintDrawable(currentModel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-            currentModel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                R.drawable.play_btn_loop_one, ThemeStore.getPlayerBtnColor()));
+        mPlayModel.setImageDrawable(Theme.tintDrawable(currentModel == PLAY_LOOP ? R.drawable.play_btn_loop :
+                currentModel == PLAY_SHUFFLE ? R.drawable.play_btn_shuffle : R.drawable.play_btn_loop_one,
+            ThemeStore.getPlayerBtnColor()));
 
-        String msg = currentModel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
-            currentModel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random)
+        String msg = currentModel == PLAY_LOOP ? getString(R.string.model_normal)
+            : currentModel == PLAY_SHUFFLE ? getString(R.string.model_random)
                 : getString(R.string.model_repeat);
         //刷新下一首
-        if (currentModel != Constants.PLAY_SHUFFLE) {
+        if (currentModel != PLAY_SHUFFLE) {
           mNextSong
               .setText(getString(R.string.next_song, MusicServiceRemote.getNextSong().getTitle()));
         }
@@ -747,7 +749,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     mProgressSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if(fromUser){
+        if (fromUser) {
           updateProgressText(progress);
         }
         mHandler.sendEmptyMessage(UPDATE_TIME_ONLY);
@@ -1197,9 +1199,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     Theme.tintDrawable(mTopMore, R.drawable.icon_player_more, tintColor);
     //播放模式与播放队列
     int playMode = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL,
-        Constants.PLAY_LOOP);
-    Theme.tintDrawable(mPlayModel, playMode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-        playMode == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+        PLAY_LOOP);
+    Theme.tintDrawable(mPlayModel, playMode == PLAY_LOOP ? R.drawable.play_btn_loop :
+        playMode == PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
             R.drawable.play_btn_loop_one, tintColor);
     Theme.tintDrawable(mPlayQueue, R.drawable.play_btn_normal_list, tintColor);
 
@@ -1327,7 +1329,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
   }
 
-  private void updateProgressText(int current){
+  private void updateProgressText(int current) {
     if (mHasPlay != null
         && mRemainPlay != null
         && current > 0

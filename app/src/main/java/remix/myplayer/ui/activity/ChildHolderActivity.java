@@ -2,7 +2,6 @@ package remix.myplayer.ui.activity;
 
 import static remix.myplayer.helper.MusicServiceRemote.setPlayQueue;
 import static remix.myplayer.service.MusicService.EXTRA_POSITION;
-import static remix.myplayer.util.Constants.TAG_EDIT;
 import static remix.myplayer.util.MusicUtil.makeCmdIntent;
 import static remix.myplayer.util.Util.registerLocalReceiver;
 import static remix.myplayer.util.Util.unregisterLocalReceiver;
@@ -96,7 +95,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
 
     mRefreshHandler = new MsgHandler(this);
     mTagEditReceiver = new TagReceiver(this);
-    registerLocalReceiver(mTagEditReceiver, new IntentFilter(TAG_EDIT));
+    registerLocalReceiver(mTagEditReceiver, new IntentFilter(TagReceiver.ACTION_EDIT_TAG));
 
     //参数id，类型，标题
     mId = getIntent().getIntExtra(EXTRA_ID, -1);
@@ -339,7 +338,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
   @OnHandleMessage
   public void handleInternal(Message msg) {
     switch (msg.what) {
-      case Constants.CLEAR_MULTI:
+      case CLEAR_MULTI:
         mAdapter.notifyDataSetChanged();
         break;
 //            case START:
