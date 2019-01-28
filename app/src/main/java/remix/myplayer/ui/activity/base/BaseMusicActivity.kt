@@ -55,6 +55,13 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
     })
   }
 
+//  override fun onResume() {
+//    super.onResume()
+//    if(Util.isAppOnForeground()){
+//      startService(Intent(this, MusicService::class.java))
+//    }
+//  }
+
   override fun onDestroy() {
     super.onDestroy()
     MusicServiceRemote.unbindFromService(mServiceToken)
@@ -298,5 +305,12 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   companion object {
     private const val PERMISSION_GRANT = 1
     private const val PERMISSION_NOT_GRANT = 0
+
+    //更新适配器
+    const val UPDATE_ADAPTER = 100
+    //多选更新
+    const val CLEAR_MULTI = 101
+    //重建activity
+    const val RECREATE_ACTIVITY = 102
   }
 }

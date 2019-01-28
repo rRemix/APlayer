@@ -19,6 +19,7 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.misc.tageditor.TagEditor
+import remix.myplayer.misc.tageditor.TagReceiver
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.theme.TextInputLayoutUtil
@@ -114,7 +115,7 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
                 .compose(RxUtil.applyScheduler())
                 .subscribe({ song ->
                   sendCMDLocalBroadcast(Command.CHANGE_LYRIC)
-                  sendLocalBroadcast(Intent(Constants.TAG_EDIT)
+                  sendLocalBroadcast(Intent(TagReceiver.ACTION_EDIT_TAG)
                       .putExtra("newSong", song))
 //                                    setCurrentSong(song)
                   ToastUtil.show(this, R.string.save_success)

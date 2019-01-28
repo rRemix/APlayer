@@ -3,11 +3,13 @@ package remix.myplayer.helper
 import android.app.Activity
 import android.content.*
 import android.os.IBinder
+import com.tencent.bugly.crashreport.CrashReport
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Constants
 import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 import tv.danmaku.ijk.media.player.IMediaPlayer
 import java.util.*
 
@@ -21,6 +23,9 @@ object MusicServiceRemote {
 
   @JvmStatic
   fun bindToService(context: Context, callback: ServiceConnection): ServiceToken? {
+    if(!Util.isAppOnForeground()){
+      return null
+    }
     var realActivity: Activity? = (context as Activity).parent
     if (realActivity == null)
       realActivity = context
@@ -29,13 +34,9 @@ object MusicServiceRemote {
 
     val binder = ServiceBinder(callback)
 
-    try {
-      if (contextWrapper.bindService(Intent().setClass(contextWrapper, MusicService::class.java), binder, Context.BIND_AUTO_CREATE)) {
-        connectionMap[contextWrapper] = binder
-        return ServiceToken(contextWrapper)
-      }
-    } catch (e: IllegalStateException) {
-      ToastUtil.show(context, "start service failed")
+    if (contextWrapper.bindService(Intent().setClass(contextWrapper, MusicService::class.java), binder, Context.BIND_AUTO_CREATE)) {
+      connectionMap[contextWrapper] = binder
+      return ServiceToken(contextWrapper)
     }
 
     return null
@@ -161,12 +162,12 @@ object MusicServiceRemote {
   }
 
   @JvmStatic
-  fun setOperation(operation: Int){
+  fun setOperation(operation: Int) {
     service?.operation = operation
   }
 
   @JvmStatic
-  fun getOperation(): Int{
+  fun getOperation(): Int {
     return service?.operation ?: Command.NEXT
   }
 }

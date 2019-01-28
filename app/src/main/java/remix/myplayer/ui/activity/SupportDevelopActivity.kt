@@ -248,12 +248,9 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
   }
 
   override fun onDestroy() {
-    mBillingProcessor?.release()
     super.onDestroy()
-    mDisposable?.let {
-      if (!it.isDisposed)
-        it.dispose()
-    }
+    mBillingProcessor?.release()
+    mDisposable?.dispose()
     if (mLoading.isShowing)
       mLoading.dismiss()
   }

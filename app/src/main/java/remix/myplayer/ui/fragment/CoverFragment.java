@@ -22,7 +22,7 @@ import com.facebook.rebound.SpringSystem;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
-import remix.myplayer.misc.interfaces.OnFirstLoadFinishListener;
+import remix.myplayer.misc.interfaces.OnCoverFirstLoadFinishListener;
 import remix.myplayer.misc.interfaces.OnInflateFinishListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.theme.ThemeStore;
@@ -47,7 +47,7 @@ public class CoverFragment extends BaseMusicFragment {
   private int mWidth;
   private Uri mUri = Uri.EMPTY;
   private OnInflateFinishListener mInflateFinishListener;
-  private OnFirstLoadFinishListener mFirstLoadFinishListener;
+  private OnCoverFirstLoadFinishListener mFirstLoadFinishListener;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -180,7 +180,7 @@ public class CoverFragment extends BaseMusicFragment {
           @Override
           public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
             if (mFirstLoadFinishListener != null) {
-              mFirstLoadFinishListener.onFirstLoadFinish();
+              mFirstLoadFinishListener.onCoverFirstLoadFinish();
               mFirstLoadFinishListener = null;
             }
 //                        mShadow.setVisibility(View.VISIBLE);
@@ -199,7 +199,7 @@ public class CoverFragment extends BaseMusicFragment {
           @Override
           public void onFailure(String id, Throwable throwable) {
             if (mFirstLoadFinishListener != null) {
-              mFirstLoadFinishListener.onFirstLoadFinish();
+              mFirstLoadFinishListener.onCoverFirstLoadFinish();
               mFirstLoadFinishListener = null;
             }
 //                        mShadow.setVisibility(View.VISIBLE);
@@ -235,7 +235,7 @@ public class CoverFragment extends BaseMusicFragment {
     }
   }
 
-  public void setOnFirstLoadFinishListener(OnFirstLoadFinishListener onFirstLoadFinishListener) {
+  public void setOnFirstLoadFinishListener(OnCoverFirstLoadFinishListener onFirstLoadFinishListener) {
     mFirstLoadFinishListener = onFirstLoadFinishListener;
   }
 }

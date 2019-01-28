@@ -4,7 +4,7 @@ package remix.myplayer.misc.interfaces;
  * Created by Remix on 2017/12/18.
  */
 
-public interface OnFirstLoadFinishListener {
+public interface OnCoverFirstLoadFinishListener {
 
-  void onFirstLoadFinish();
+  void onCoverFirstLoadFinish();
 }

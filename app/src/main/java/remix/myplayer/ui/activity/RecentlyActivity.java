@@ -123,12 +123,12 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
   @OnHandleMessage
   public void handleMessage(Message msg) {
     switch (msg.what) {
-      case Constants.CLEAR_MULTI:
+      case CLEAR_MULTI:
         if (mAdapter != null) {
           mAdapter.notifyDataSetChanged();
         }
         break;
-      case Constants.UPDATE_ADAPTER:
+      case UPDATE_ADAPTER:
         if (mAdapter != null) {
           mAdapter.notifyDataSetChanged();
         }

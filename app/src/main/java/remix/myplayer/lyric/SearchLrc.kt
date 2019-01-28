@@ -194,7 +194,7 @@ class SearchLrc(private val song: Song) {
           .use { filesCursor ->
             while (filesCursor.moveToNext()) {
               val file = File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)))
-              Timber.v("file: " + file.absolutePath)
+              Timber.v("file: %s", file.absolutePath)
               if (file.exists() && file.isFile && file.canRead()) {
                 //非翻译文件只保留一个
                 if (results.isEmpty() || (results.size >= 1 && file.absolutePath.contains("translate")))
