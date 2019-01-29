@@ -818,7 +818,7 @@
               android:layout_height="wrap_content"
               android:textColor="?attr/text_color_secondary"
               android:textSize="@dimen/s14_size"
-              android:text="@string/opened_float_lrc"/>
+              android:text="@string/opened_desktop_lrc"/>
           </LinearLayout>
           <android.support.v7.widget.SwitchCompat
             android:layout_width="wrap_content"

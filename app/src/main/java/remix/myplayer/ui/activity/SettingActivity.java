@@ -7,7 +7,7 @@ import static remix.myplayer.helper.M3UHelper.importLocalPlayList;
 import static remix.myplayer.helper.M3UHelper.importM3UFile;
 import static remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM;
 import static remix.myplayer.request.network.RxUtil.applySingleScheduler;
-import static remix.myplayer.service.MusicService.EXTRA_FLOAT_LYRIC;
+import static remix.myplayer.service.MusicService.EXTRA_DESKTOP_LYRIC;
 import static remix.myplayer.theme.Theme.getBaseDialog;
 import static remix.myplayer.theme.ThemeStore.getThemeText;
 import static remix.myplayer.theme.ThemeStore.saveAccentColor;
@@ -180,7 +180,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     final String[] keyWord = new String[]{SPUtil.SETTING_KEY.COLOR_NAVIGATION,
         SPUtil.SETTING_KEY.SHAKE,
-        SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,
+        SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,
         SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, SPUtil.SETTING_KEY.IMMERSIVE_MODE,
         SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE,
         SPUtil.SETTING_KEY.SHOW_DISPLAYNAME};
@@ -230,9 +230,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                   return;
                 }
                 mFloatLrcTip
-                    .setText(isChecked ? R.string.opened_float_lrc : R.string.closed_float_lrc);
-                Intent intent = MusicUtil.makeCmdIntent(Command.TOGGLE_FLOAT_LRC);
-                intent.putExtra(EXTRA_FLOAT_LYRIC, mFloatLrcSwitch.isChecked());
+                    .setText(isChecked ? R.string.opened_desktop_lrc : R.string.closed_desktop_lrc);
+                Intent intent = MusicUtil.makeCmdIntent(Command.TOGGLE_DESKTOP_LYRIC);
+                intent.putExtra(EXTRA_DESKTOP_LYRIC, mFloatLrcSwitch.isChecked());
                 sendLocalBroadcast(intent);
                 break;
               //屏幕常亮
@@ -277,7 +277,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 //        }
     //桌面歌词
     mFloatLrcTip.setText(
-        mFloatLrcSwitch.isChecked() ? R.string.opened_float_lrc : R.string.closed_float_lrc);
+        mFloatLrcSwitch.isChecked() ? R.string.opened_desktop_lrc : R.string.closed_desktop_lrc);
 
     //主题颜色指示器
     ((GradientDrawable) mPrimaryColorSrc.getDrawable())

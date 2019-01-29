@@ -26,9 +26,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
   private var notifyMode = NOTIFY_MODE_BACKGROUND
 
-  //    Notification mNotification;
   internal var isStop: Boolean = false
-
 
   internal val contentIntent: PendingIntent
     get() {
@@ -70,11 +68,10 @@ abstract class Notify internal constructor(internal var service: MusicService) {
   abstract fun updateForPlaying()
 
   internal fun pushNotify(notification: Notification) {
-    val newNotifyMode: Int
-    if (service.isPlaying) {
-      newNotifyMode = NOTIFY_MODE_FOREGROUND
+    val newNotifyMode: Int = if (service.isPlaying) {
+      NOTIFY_MODE_FOREGROUND
     } else {
-      newNotifyMode = NOTIFY_MODE_BACKGROUND
+      NOTIFY_MODE_BACKGROUND
     }
 
     if (notifyMode != newNotifyMode && newNotifyMode == NOTIFY_MODE_BACKGROUND) {
@@ -111,7 +108,9 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
       return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     } else {
-      if (operation != Command.TOGGLE_FLOAT_LRC && operation != Command.CLOSE_NOTIFY) {
+      if (operation != Command.TOGGLE_DESKTOP_LYRIC &&
+          operation != Command.CLOSE_NOTIFY &&
+          operation != Command.UNLOCK_DESKTOP_LYRIC) {
         return PendingIntent.getForegroundService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)
       } else {
         PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)

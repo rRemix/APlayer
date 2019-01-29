@@ -72,9 +72,9 @@
   <color name="player_time_text_color">#6b6b6b</color>
   <color name="timer_text_color">#404040</color>
 
-  <color name="float_text_color">#d4d4d4</color>
-  <color name="float_control_color">#9f000000</color>
-  <color name="float_divider_color">#d4d4d4</color>
+  <color name="desktop_lyric_text_color">#d4d4d4</color>
+  <color name="desktop_lyric_control_color">#9f000000</color>
+  <color name="desktop_lyric_divider_color">#d4d4d4</color>
 
   <color name="default_model_button_color">#e2e4e8</color>
   <color name="select_model_button_color">#ffce64</color>

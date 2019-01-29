@@ -46,7 +46,6 @@ import com.tencent.bugly.crashreport.CrashReport;
 import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -85,7 +84,7 @@ import remix.myplayer.service.notification.Notify;
 import remix.myplayer.service.notification.NotifyImpl;
 import remix.myplayer.service.notification.NotifyImpl24;
 import remix.myplayer.ui.activity.LockScreenActivity;
-import remix.myplayer.ui.widget.floatwidget.FloatLrcView;
+import remix.myplayer.ui.widget.desktop.DesktopLyricView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
@@ -107,7 +106,7 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 public class MusicService extends BaseService implements Playback, MusicEventCallback {
 
   public static final String TAG_LIFECYCLE = "ServiceLifeCycle";
-  public static final String EXTRA_FLOAT_LYRIC = "FloatLrc";
+  public static final String EXTRA_DESKTOP_LYRIC = "DesktopLyric";
   public static final String EXTRA_SONG = "Song";
   public static final String EXTRA_POSITION = "Position";
 
@@ -119,11 +118,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   public final static int UPDATE_PLAY_STATE = 0x103;
 
   //更新桌面歌词内容
-  public static final int UPDATE_FLOAT_LRC_CONTENT = 0x104;
+  public static final int UPDATE_DESKTOP_LRC_CONTENT = 0x104;
   //移除桌面歌词
-  public static final int REMOVE_FLOAT_LRC = 0x105;
+  public static final int REMOVE_DESKTOP_LRC = 0x105;
   //添加桌面歌词
-  public static final int CREATE_FLOAT_LRC = 0x106;
+  public static final int CREATE_DESKTOP_LRC = 0x106;
 
 
   /**
@@ -263,11 +262,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   /**
    * 是否显示桌面歌词
    */
-  private boolean mShowFloatLrc = false;
+  private boolean mShowDesktopLyric = false;
   /**
    * 桌面歌词控件
    */
-  private FloatLrcView mFloatLrcView;
+  private DesktopLyricView mDesktopLyricView;
 
   /**
    * service是否停止运行
@@ -650,7 +649,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }
     prepare(mCurrentSong.getUrl(), false);
     //桌面歌词
-//        updateFloatLrc();
+//        updateDesktopLyric();
     //初始化下一首歌曲
 //        updateNextSong();
     if (mPlayModel == Constants.PLAY_SHUFFLE) {
@@ -693,13 +692,13 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mNotify.cancelPlayingNotify();
 
     updateAppwidget();
-    removeFloatLrc();
-    if (mUpdateFloatLrcThread != null) {
-      mUpdateFloatLrcThread.quitImmediately();
+    removeDesktopLyric();
+    if (mUpdateDesktopLyricThread != null) {
+      mUpdateDesktopLyricThread.quitImmediately();
     }
 
     mUpdateUIHandler.removeCallbacksAndMessages(null);
-    mShowFloatLrc = false;
+    mShowDesktopLyric = false;
 
     if (Build.VERSION.SDK_INT >= 18) {
       mPlaybackThread.quitSafely();
@@ -1110,11 +1109,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       return;
     }
     updateAppwidget();
-    if (mNeedShowFloatLrc) {
-      mShowFloatLrc = true;
-      mNeedShowFloatLrc = false;
+    if (mNeedShowDesktopLyric) {
+      mShowDesktopLyric = true;
+      mNeedShowDesktopLyric = false;
     }
-    updateFloatLrc(false);
+    updateDesktopLyric(false);
     updateNotification();
 
     updateMediaSession(getOperation());
@@ -1132,8 +1131,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       return;
     }
     //更新桌面歌词播放按钮
-    if (mFloatLrcView != null) {
-      mFloatLrcView.setPlayIcon(isPlaying());
+    if (mDesktopLyricView != null) {
+      mDesktopLyricView.setPlayIcon(isPlaying());
     }
     if (mShortcutManager != null) {
       mShortcutManager.updateContinueShortcut(this);
@@ -1171,13 +1170,12 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         //关闭通知栏
         case Command.CLOSE_NOTIFY:
           Notify.setNotifyShowing(false);
-          if (mNotify instanceof NotifyImpl24) { //仅仅只是设置标志位
-            return;
-          }
-          Notify.setNotifyShowing(false);
+//          if (mNotify instanceof NotifyImpl24) { //仅仅只是设置标志位
+//            return;
+//          }
           pause(false);
-          if (mUpdateFloatLrcThread != null) {
-            mUpdateFloatLrcThread.quitByNotification();
+          if (mUpdateDesktopLyricThread != null) {
+            mUpdateDesktopLyricThread.quitByNotification();
           }
           mUpdateUIHandler.postDelayed(() -> mNotify.cancelPlayingNotify(), 300);
           break;
@@ -1215,28 +1213,18 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         case Command.LOVE:
           mDBRepository.toggleMyLove(mCurrentId)
               .compose(applySingleScheduler())
-              .subscribe(new Consumer<Boolean>() {
-                @Override
-                public void accept(Boolean aBoolean) throws Exception {
-                  updateAppwidget();
-                }
-              }, new Consumer<Throwable>() {
-                @Override
-                public void accept(Throwable throwable) throws Exception {
-                  Timber.v(throwable);
-                }
-              });
+              .subscribe(aBoolean -> updateAppwidget(), Timber::v);
 
           break;
         //桌面歌词
-        case Command.TOGGLE_FLOAT_LRC:
+        case Command.TOGGLE_DESKTOP_LYRIC:
           boolean open;
-          if (intent.hasExtra(EXTRA_FLOAT_LYRIC)) {
-            open = intent.getBooleanExtra(EXTRA_FLOAT_LYRIC, false);
+          if (intent.hasExtra(EXTRA_DESKTOP_LYRIC)) {
+            open = intent.getBooleanExtra(EXTRA_DESKTOP_LYRIC, false);
           } else {
             open = !SPUtil.getValue(mService,
                 SPUtil.SETTING_KEY.NAME,
-                SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
+                SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW, false);
           }
           if (open && !FloatWindowManager.getInstance().checkPermission(mService)) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
@@ -1250,16 +1238,16 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             ToastUtil.show(mService, R.string.plz_give_float_permission);
             break;
           }
-          SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW,
+          SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW,
               open);
-          if (mShowFloatLrc != open) {
-            mShowFloatLrc = open;
+          if (mShowDesktopLyric != open) {
+            mShowDesktopLyric = open;
             ToastUtil.show(mService,
-                mShowFloatLrc ? R.string.opened_float_lrc : R.string.closed_float_lrc);
-            if (mShowFloatLrc) {
-              updateFloatLrc(false);
+                mShowDesktopLyric ? R.string.opened_desktop_lrc : R.string.closed_desktop_lrc);
+            if (mShowDesktopLyric) {
+              updateDesktopLyric(false);
             } else {
-              closeFloatLrc();
+              closeDesktopLyric();
             }
           }
           break;
@@ -1296,11 +1284,20 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             updateNotification();
           }
           break;
-        //解锁通知栏
+        //解锁桌面歌词
         case Command.UNLOCK_DESKTOP_LYRIC:
-          if (mFloatLrcView != null) {
-            mFloatLrcView.saveLock(false, true);
+          if (mDesktopLyricView != null) {
+            mDesktopLyricView.saveLock(false, true);
+          } else {
+            SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_LOCK, false);
           }
+          //更新通知栏
+          updateNotification();
+          break;
+        //锁定通知栏
+        case Command.LOCK_LYRIC:
+          //更新通知栏
+          updateNotification();
           break;
         //某一首歌曲添加至下一首播放
         case Command.ADD_TO_NEXT_SONG:
@@ -1352,8 +1349,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           break;
         //改变歌词源
         case Command.CHANGE_LYRIC:
-          if (mShowFloatLrc) {
-            updateFloatLrc(true);
+          if (mShowDesktopLyric) {
+            updateDesktopLyric(true);
           }
           break;
         //断点播放
@@ -1770,8 +1767,8 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       //读取播放列表
       mPlayQueue = mDBRepository.getPlayQueue().blockingGet();
 
-      mShowFloatLrc = SPUtil
-          .getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
+      mShowDesktopLyric = SPUtil
+          .getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW, false);
     }
 
     if (mPlayQueue == null || mPlayQueue.isEmpty()) {
@@ -1881,18 +1878,18 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    */
   private boolean mFirstUpdateLrc = true;
 
-  private void updateFloatLrc(boolean force) {
+  private void updateDesktopLyric(boolean force) {
     if (checkNoPermission()) { //没有权限
       return;
     }
-    if (!mShowFloatLrc) { //移除桌面歌词
-      mUpdateUIHandler.sendEmptyMessage(REMOVE_FLOAT_LRC);
+    if (!mShowDesktopLyric) { //移除桌面歌词
+      mUpdateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC);
     } else if (!updatePlayStateOnly(getOperation()) || force || mFirstUpdateLrc) { //更新
       //屏幕点亮才更新
       if (mScreenOn) {
-        createFloatLrcThreadIfNeed();
-        if (mUpdateFloatLrcThread != null) {
-          mUpdateFloatLrcThread.setSongAndGetLyricRows(mCurrentSong);
+        createDesktopLyricThreadIfNeed();
+        if (mUpdateDesktopLyricThread != null) {
+          mUpdateDesktopLyricThread.setSongAndGetLyricRows(mCurrentSong);
         }
         mFirstUpdateLrc = false;
       }
@@ -1902,11 +1899,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   /**
    * 创建更新桌面歌词的线程
    */
-  private boolean createFloatLrcThreadIfNeed() {
-    Timber.v("createFloatLrcThreadIfNeed() %s", isFloatLrcShowing());
-    if (mShowFloatLrc && mUpdateFloatLrcThread == null) {
-      mUpdateFloatLrcThread = new UpdateFloatLrcThread();
-      mUpdateFloatLrcThread.start();
+  private boolean createDesktopLyricThreadIfNeed() {
+    Timber.v("createDesktopLyricThreadIfNeed() %s", isDesktopLyricShowing());
+    if (mShowDesktopLyric && mUpdateDesktopLyricThread == null) {
+      mUpdateDesktopLyricThread = new UpdateDesktopLyricThread();
+      mUpdateDesktopLyricThread.start();
       return true;
     }
     return false;
@@ -1918,7 +1915,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   private boolean checkNoPermission() {
     try {
       if (!FloatWindowManager.getInstance().checkPermission(mService)) {
-        closeFloatLrc();
+        closeDesktopLyric();
         return true;
       }
       return false;
@@ -1983,23 +1980,23 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    * 更新桌面歌词
    */
 //    public String mCurrentLrc;
-  private UpdateFloatLrcThread mUpdateFloatLrcThread;
-  private boolean mNeedShowFloatLrc;
+  private UpdateDesktopLyricThread mUpdateDesktopLyricThread;
+  private boolean mNeedShowDesktopLyric;
   private LyricRowWrapper mCurrentLrc = new LyricRowWrapper();
 
-  private class UpdateFloatLrcThread extends UpdateLyricThread {
+  private class UpdateDesktopLyricThread extends UpdateLyricThread {
 
-    private final String TAG = UpdateFloatLrcThread.class.getSimpleName();
+    private final String TAG = UpdateDesktopLyricThread.class.getSimpleName();
 
-    UpdateFloatLrcThread() {
+    UpdateDesktopLyricThread() {
       super(MusicService.this);
       Timber.tag(TAG).v("创建线程");
     }
 
     void quitByNotification() {
       interrupt();
-      mNeedShowFloatLrc = true;
-      mShowFloatLrc = false;
+      mNeedShowDesktopLyric = true;
+      mShowDesktopLyric = false;
     }
 
     void quitDelay() {
@@ -2008,14 +2005,14 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     @Override
     public void run() {
-      while (mShowFloatLrc) {
+      while (mShowDesktopLyric) {
         try {
 //                    int interval = getInterval();
 //                    LogUtil.d("DesktopLrc","间隔:" + interval);
           Thread.sleep(LRC_INTERVAL);
         } catch (InterruptedException e) {
           Timber.tag(TAG).v("捕获异常,线程退出");
-          mUpdateUIHandler.sendEmptyMessage(REMOVE_FLOAT_LRC);
+          mUpdateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC);
           return;
         }
         //判断权限
@@ -2023,24 +2020,24 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           return;
         }
         if (mIsServiceStop) {
-          mUpdateUIHandler.sendEmptyMessage(REMOVE_FLOAT_LRC);
+          mUpdateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC);
           return;
         }
         //当前应用在前台
         if (Util.isAppOnForeground()) {
-          if (isFloatLrcShowing()) {
-            mUpdateUIHandler.sendEmptyMessage(REMOVE_FLOAT_LRC);
+          if (isDesktopLyricShowing()) {
+            mUpdateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC);
           }
 
         } else {
-          if (!isFloatLrcShowing()) {
-            mUpdateUIHandler.removeMessages(CREATE_FLOAT_LRC);
+          if (!isDesktopLyricShowing()) {
+            mUpdateUIHandler.removeMessages(CREATE_DESKTOP_LRC);
             Timber.tag(TAG).v("请求创建桌面歌词");
-            mUpdateUIHandler.sendEmptyMessageDelayed(CREATE_FLOAT_LRC, 50);
+            mUpdateUIHandler.sendEmptyMessageDelayed(CREATE_DESKTOP_LRC, 50);
           } else {
             mCurrentLrc = findCurrentLyric();
             Timber.tag(TAG).v("当前歌词: %s", mCurrentLrc);
-            mUpdateUIHandler.obtainMessage(UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
+            mUpdateUIHandler.obtainMessage(UPDATE_DESKTOP_LRC_CONTENT).sendToTarget();
           }
         }
       }
@@ -2051,16 +2048,16 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   /**
    * 创建桌面歌词悬浮窗
    */
-  private boolean mIsFloatLrcInitializing = false;
+  private boolean mIsDesktopLyricInitializing = false;
 
-  private void createFloatLrc() {
+  private void createDesktopLyric() {
     if (checkNoPermission()) {
       return;
     }
-    if (mIsFloatLrcInitializing) {
+    if (mIsDesktopLyricInitializing) {
       return;
     }
-    mIsFloatLrcInitializing = true;
+    mIsDesktopLyricInitializing = true;
 
     final WindowManager.LayoutParams param = new WindowManager.LayoutParams();
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -2074,47 +2071,56 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     param.width = mService.getResources().getDisplayMetrics().widthPixels;
     param.height = ViewGroup.LayoutParams.WRAP_CONTENT;
     param.x = 0;
-    param.y = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_Y, 0);
+    param.y = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_Y, 0);
 
-    if (mFloatLrcView != null) {
-      mWindowManager.removeView(mFloatLrcView);
-      mFloatLrcView = null;
+    if (mDesktopLyricView != null) {
+      mWindowManager.removeView(mDesktopLyricView);
+      mDesktopLyricView = null;
     }
 
-    mFloatLrcView = new FloatLrcView(mService);
-    mWindowManager.addView(mFloatLrcView, param);
-    mIsFloatLrcInitializing = false;
+    mDesktopLyricView = new DesktopLyricView(mService);
+    mWindowManager.addView(mDesktopLyricView, param);
+    mIsDesktopLyricInitializing = false;
     Timber.v("创建桌面歌词");
   }
 
   /**
    * 移除桌面歌词
    */
-  private void removeFloatLrc() {
-    if (mFloatLrcView != null) {
+  private void removeDesktopLyric() {
+    if (mDesktopLyricView != null) {
       Timber.v("移除桌面歌词");
-      mFloatLrcView.cancelNotify();
-      mWindowManager.removeView(mFloatLrcView);
-      mFloatLrcView = null;
+//      mDesktopLyricView.cancelNotify();
+      mWindowManager.removeView(mDesktopLyricView);
+      mDesktopLyricView = null;
     }
   }
 
   /**
    * 桌面歌词是否显示
    */
-  private boolean isFloatLrcShowing() {
-    return mFloatLrcView != null;
+  public boolean isDesktopLyricShowing() {
+    return mDesktopLyricView != null;
+  }
+
+  /**
+   * 桌面歌词是否锁定
+   */
+  public boolean isDesktopLyricLocked() {
+    return mDesktopLyricView == null ?
+        SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_LOCK, false) :
+        mDesktopLyricView.isLocked();
   }
 
   /**
    * 关闭桌面歌词
    */
-  private void closeFloatLrc() {
-    SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, false);
-    mShowFloatLrc = false;
-    mUpdateFloatLrcThread = null;
-    mUpdateUIHandler.removeMessages(CREATE_FLOAT_LRC);
-    mUpdateUIHandler.sendEmptyMessageDelayed(REMOVE_FLOAT_LRC, LRC_INTERVAL);
+  private void closeDesktopLyric() {
+    SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW, false);
+    mShowDesktopLyric = false;
+    mUpdateDesktopLyricThread = null;
+    mUpdateUIHandler.removeMessages(CREATE_DESKTOP_LRC);
+    mUpdateUIHandler.sendEmptyMessageDelayed(REMOVE_DESKTOP_LRC, LRC_INTERVAL);
   }
 
   /**
@@ -2127,7 +2133,6 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     @Override
     public void run() {
-      Timber.v("partiallyUpdateWidget");
       for (Map.Entry<String, BaseAppwidget> entry : mAppWidgets.entrySet()) {
         if (entry.getValue() != null) {
           entry.getValue().partiallyUpdateWidget(mService);
@@ -2225,29 +2230,29 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 //                    musicService.handlePlayStateChange();
           musicService.handleMetaChange();
           break;
-        case UPDATE_FLOAT_LRC_CONTENT:
+        case UPDATE_DESKTOP_LRC_CONTENT:
           LyricRowWrapper wrapper = musicService.mCurrentLrc;
-          if (musicService.mFloatLrcView != null) {
+          if (musicService.mDesktopLyricView != null) {
             if (wrapper == null) {
-              musicService.mFloatLrcView
+              musicService.mDesktopLyricView
                   .setText(UpdateLyricThread.NO_ROW, UpdateLyricThread.EMPTY_ROW);
             } else if (wrapper.getStatus() == UpdateLyricThread.Status.SEARCHING) {
-              musicService.mFloatLrcView
+              musicService.mDesktopLyricView
                   .setText(UpdateLyricThread.SEARCHING_ROW, UpdateLyricThread.EMPTY_ROW);
             } else if (wrapper.getStatus() == UpdateLyricThread.Status.ERROR ||
                 wrapper.getStatus() == UpdateLyricThread.Status.NO) {
-              musicService.mFloatLrcView
+              musicService.mDesktopLyricView
                   .setText(UpdateLyricThread.NO_ROW, UpdateLyricThread.EMPTY_ROW);
             } else {
-              musicService.mFloatLrcView.setText(wrapper.getLineOne(), wrapper.getLineTwo());
+              musicService.mDesktopLyricView.setText(wrapper.getLineOne(), wrapper.getLineTwo());
             }
           }
           break;
-        case REMOVE_FLOAT_LRC:
-          musicService.removeFloatLrc();
+        case REMOVE_DESKTOP_LRC:
+          musicService.removeDesktopLyric();
           break;
-        case CREATE_FLOAT_LRC:
-          musicService.createFloatLrc();
+        case CREATE_DESKTOP_LRC:
+          musicService.createDesktopLyric();
           break;
       }
     }
@@ -2268,13 +2273,13 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
               .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
         //重新显示桌面歌词
-        createFloatLrcThreadIfNeed();
+        createDesktopLyricThreadIfNeed();
       } else {
         mScreenOn = false;
         //屏幕熄灭 关闭桌面歌词
-        if (mShowFloatLrc && isFloatLrcShowing() && mUpdateFloatLrcThread != null) {
-          mUpdateFloatLrcThread.quitImmediately();
-          mUpdateFloatLrcThread = null;
+        if (mShowDesktopLyric && isDesktopLyricShowing() && mUpdateDesktopLyricThread != null) {
+          mUpdateDesktopLyricThread.quitImmediately();
+          mUpdateDesktopLyricThread = null;
         }
       }
     }

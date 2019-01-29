@@ -15,7 +15,6 @@ import remix.myplayer.misc.manager.ActivityManager;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -66,12 +65,8 @@ public class BaseActivity extends AppCompatActivity {
 
     setUpTheme();
     super.onCreate(savedInstanceState);
-//    //除PlayerActivity外静止横屏
-//    if (!this.getClass().getSimpleName().equals(PlayerActivity.class.getSimpleName())) {
-//      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-//    } else{
-//      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-//    }
+    //静止横屏
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     //将该activity添加到ActivityManager,用于退出程序时关闭
     ActivityManager.AddActivity(this);
     setNavigationBarColor();

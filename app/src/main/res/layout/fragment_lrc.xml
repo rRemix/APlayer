@@ -40,12 +40,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        android:src="@drawable/ic_lyric_reduce_offset"/>
+        android:src="@drawable/icon_lyric_reduce_offset"/>
 
       <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_lyric_reduce_offset_second"/>
+        android:src="@drawable/icon_lyric_reduce_offset_second"/>
     </LinearLayout>
 
     <ImageView
@@ -54,7 +54,7 @@
       android:layout_height="wrap_content"
       android:layout_marginBottom="8dp"
       android:layout_marginTop="8dp"
-      android:src="@drawable/ic_lyric_reset"
+      android:src="@drawable/icon_lyric_reset"
       android:background="@drawable/bg_oval_ripple_light"/>
 
     <LinearLayout
@@ -68,12 +68,12 @@
       <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_lyric_add_offset_second"
+        android:src="@drawable/icon_lyric_add_offset_second"
         android:layout_marginBottom="4dp"/>
       <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_lyric_add_offset"/>
+        android:src="@drawable/icon_lyric_add_offset"/>
     </LinearLayout>
   </LinearLayout>
 </FrameLayout>

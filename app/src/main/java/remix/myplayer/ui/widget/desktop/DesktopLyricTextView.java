@@ -1,4 +1,4 @@
-package remix.myplayer.ui.widget.floatwidget;
+package remix.myplayer.ui.widget.desktop;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -18,7 +18,7 @@ import remix.myplayer.lyric.bean.LrcRow;
  * @Date 2017/5/11 14:22
  */
 
-public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
+public class DesktopLyricTextView extends android.support.v7.widget.AppCompatTextView {
 
   private static final int DELAY_MAX = 100;
 
@@ -50,15 +50,15 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     }
   };
 
-  public FloatTextView(Context context) {
+  public DesktopLyricTextView(Context context) {
     this(context, null);
   }
 
-  public FloatTextView(Context context, @Nullable AttributeSet attrs) {
+  public DesktopLyricTextView(Context context, @Nullable AttributeSet attrs) {
     this(context, attrs, 0);
   }
 
-  public FloatTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+  public DesktopLyricTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     init();
   }
