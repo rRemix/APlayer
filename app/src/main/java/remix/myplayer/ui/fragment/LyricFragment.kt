@@ -146,8 +146,8 @@ class LyricFragment : BaseMusicFragment() {
   }
 
   @OnHandleMessage
-  fun handleInternal(msg: Message){
-    when(msg.what){
+  fun handleInternal(msg: Message) {
+    when (msg.what) {
       MESSAGE_HIDE -> {
         offsetContainer.visibility = View.GONE
       }

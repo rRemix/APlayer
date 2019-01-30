@@ -26,7 +26,6 @@ import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.ui.adapter.SongAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**

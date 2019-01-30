@@ -159,7 +159,8 @@ public class DesktopLyricView extends RelativeLayout {
         : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
     mIsLock = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_LOCK, false);
 
-    mTextSizeType = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_TEXT_SIZE, MEDIUM);
+    mTextSizeType = SPUtil
+        .getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_TEXT_SIZE, MEDIUM);
     setPlayIcon(mService.isPlaying());
 
     getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {

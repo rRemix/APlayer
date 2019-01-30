@@ -48,7 +48,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
 
   override fun onRestart() {
     super.onRestart()
-    if(pendingBindService){
+    if (pendingBindService) {
       bindToService()
       pendingBindService = false
     }
@@ -64,8 +64,8 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
     }
   }
 
-  private fun bindToService(){
-    if(!Util.isAppOnForeground()){
+  private fun bindToService() {
+    if (!Util.isAppOnForeground()) {
       pendingBindService = true
       return
     }

@@ -13,7 +13,6 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.support.annotation.DrawableRes
 import android.widget.RemoteViews
-import com.tencent.bugly.crashreport.CrashReport
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.appwidgets.AppWidgetSkin.WHITE_1F
@@ -176,7 +175,7 @@ abstract class BaseAppwidget
   }
 
   protected fun pushPartiallyUpdate(context: Context, appWidgetId: IntArray?, remoteViews: RemoteViews) {
-    if(!hasInstances(context)){
+    if (!hasInstances(context)) {
       return
     }
     val appWidgetManager = AppWidgetManager.getInstance(context)

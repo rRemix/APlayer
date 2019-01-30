@@ -37,7 +37,7 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
   public void onError(String errMsg) {
 //        mImage.setImageURI(Uri.EMPTY);
-    Timber.v("onError() %s",errMsg);
+    Timber.v("onError() %s", errMsg);
   }
 
   public void onSuccess(String result) {
@@ -49,7 +49,7 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
       onError("in blackList");
       return;
     }
-    Timber.v("onSuccess() %s",result);
+    Timber.v("onSuccess() %s", result);
     ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder
         .newBuilderWithSource(Uri.parse(result));
     if (mConfig.isResize()) {
@@ -76,12 +76,12 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
           @Override
           public void onIntermediateImageFailed(String s, Throwable throwable) {
-            Timber.v("onIntermediateImageFailed() %s",throwable.toString());
+            Timber.v("onIntermediateImageFailed() %s", throwable.toString());
           }
 
           @Override
           public void onFailure(String s, Throwable throwable) {
-            Timber.v("onFailure %s",throwable.toString());
+            Timber.v("onFailure %s", throwable.toString());
           }
 
           @Override

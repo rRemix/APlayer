@@ -65,10 +65,10 @@ public class NArtistSearchResponse implements Serializable {
     public static class ArtistsBean {
 
       /**
-       * id : 18355 name : AKB48 picUrl : http://p1.music.126.net/AjQKwXEp0VXXAkyISRl7Xw==/109951163016683093.jpg
-       * alias : ["エーケービー フォーティエイト"] albumSize : 200 picId : 109951163016683093 img1v1Url :
-       * http://p1.music.126.net/ybqv1sPl7l1J-inzlcMRRg==/109951163073222217.jpg img1v1 :
-       * 109951163073222217 mvSize : 217 followed : false alia : ["エーケービー フォーティエイト"] trans : null
+       * id : 18355 name : AKB48 picUrl : http://p1.music.126.net/AjQKwXEp0VXXAkyISRl7Xw==/109951163016683093.jpg alias
+       * : ["エーケービー フォーティエイト"] albumSize : 200 picId : 109951163016683093 img1v1Url :
+       * http://p1.music.126.net/ybqv1sPl7l1J-inzlcMRRg==/109951163073222217.jpg img1v1 : 109951163073222217 mvSize :
+       * 217 followed : false alia : ["エーケービー フォーティエイト"] trans : null
        */
 
       private int id;

@@ -104,9 +104,9 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
             }
             //删除
             R.id.menu_delete -> {
-              if(MyLove == key){
+              if (MyLove == key) {
                 //我的收藏不可删除
-                ToastUtil.show(context,R.string.mylove_cant_edit)
+                ToastUtil.show(context, R.string.mylove_cant_edit)
                 return@Consumer
               }
               Theme.getBaseDialog(context)
@@ -137,9 +137,9 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
             }
             //列表重命名
             R.id.menu_playlist_rename -> {
-              if(MyLove == key){
+              if (MyLove == key) {
                 //我的收藏不可删除
-                ToastUtil.show(context,R.string.mylove_cant_edit)
+                ToastUtil.show(context, R.string.mylove_cant_edit)
                 return@Consumer
               }
               Theme.getBaseDialog(context)

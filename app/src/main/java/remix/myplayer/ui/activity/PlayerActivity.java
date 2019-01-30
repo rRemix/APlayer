@@ -18,7 +18,6 @@ import static remix.myplayer.util.Util.unregisterLocalReceiver;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -775,7 +774,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       }
     });
 
-
     //音量的Seekbar
     Single.zip(Single.fromCallable(() -> mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)),
         Single.fromCallable(() -> mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)),
@@ -809,7 +807,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
             }
           });
         });
-
 
     if (mBottomConfig == 2) {
       mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);

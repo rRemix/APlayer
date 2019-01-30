@@ -38,8 +38,8 @@ android {
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
-//            abiFilters 'armeabi-v7a'
-            abiFilters 'armeabi-v7a', 'x86'
+            abiFilters 'armeabi-v7a'
+//            abiFilters 'armeabi-v7a', 'x86'
         }
         externalNativeBuild {
             cmake {
@@ -110,9 +110,9 @@ android {
 //        assistant91{}
 //        baidu{}
 //        anzhuomarket{}
+//        chuizi {}
+//        qihu360 {}
 
-        chuizi {}
-        qihu360 {}
         xiaomi {}
         kuan {}
         google {}

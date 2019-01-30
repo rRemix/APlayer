@@ -61,7 +61,7 @@ public class PlayQueueAdapter extends BaseAdapter<Song, PlayQueueAdapter.PlayQue
           .compose(RxUtil.applySingleScheduler())
           .subscribe(num -> {
             //删除的是当前播放的歌曲
-            if(num > 0 && MusicServiceRemote.getCurrentSong().getId() == song.getId()){
+            if (num > 0 && MusicServiceRemote.getCurrentSong().getId() == song.getId()) {
               Util.sendCMDLocalBroadcast(Command.NEXT);
             }
           });

@@ -44,6 +44,7 @@ public final class SortOrder {
   }
 
   public interface PlayListSortOrder {
+
     String PLAYLIST_A_Z = "name";
     String PLAYLIST_Z_A = PLAYLIST_A_Z + " desc ";
     String PLAYLIST_DATE = "date";

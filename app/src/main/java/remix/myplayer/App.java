@@ -3,6 +3,7 @@ package remix.myplayer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -10,6 +11,7 @@ import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.squareup.leakcanary.LeakCanary;
 import com.tencent.bugly.crashreport.CrashReport;
+import com.tencent.bugly.crashreport.CrashReport.UserStrategy;
 import io.reactivex.plugins.RxJavaPlugins;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.misc.cache.DiskCache;
@@ -26,6 +28,12 @@ public class App extends MultiDexApplication {
 
   //是否是googlePlay版本
   public static boolean IS_GOOGLEPLAY;
+
+  @Override
+  protected void attachBaseContext(Context base) {
+    super.attachBaseContext(base);
+    MultiDex.install(this);
+  }
 
   @Override
   public void onCreate() {
@@ -55,7 +63,7 @@ public class App extends MultiDexApplication {
     loadLibrary();
 
     //处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
-    if(!BuildConfig.DEBUG){
+    if (!BuildConfig.DEBUG) {
       RxJavaPlugins.setErrorHandler(throwable -> {
         Timber.v(throwable);
         CrashReport.postCatchedException(throwable);
@@ -75,17 +83,15 @@ public class App extends MultiDexApplication {
 
   private void loadLibrary() {
     //bugly
-//        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
-//        strategy.setCrashHandleCallback(new CrashReport.CrashHandleCallback() {
-//            public Map<String, String> onCrashHandleStart(int crashType, String errorType,
-//                                                          String errorMessage, String errorStack) {
-//                LinkedHashMap<String, String> map = new LinkedHashMap<>();
-//                map.put("Key", "Value");
-//                return map;
-//            }
-//
-//        });
-    CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG);
+    Context context = getApplicationContext();
+    // 获取当前包名
+    String packageName = context.getPackageName();
+    // 获取当前进程名
+    String processName = Util.getProcessName(android.os.Process.myPid());
+    // 设置是否为上报进程
+    UserStrategy strategy = new UserStrategy(context);
+    strategy.setUploadProcess(processName == null || processName.equals(packageName));
+    CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG, strategy);
     CrashReport.setIsDevelopmentDevice(this, BuildConfig.DEBUG);
 
     //fresco

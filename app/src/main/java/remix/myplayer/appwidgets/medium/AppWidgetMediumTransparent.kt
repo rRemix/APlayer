@@ -33,10 +33,10 @@ class AppWidgetMediumTransparent : BaseAppwidget() {
 
   override fun updateWidget(service: MusicService, appWidgetIds: IntArray?, reloadCover: Boolean) {
     val song = service.currentSong
-    if(song == Song.EMPTY_SONG){
+    if (song == Song.EMPTY_SONG) {
       return
     }
-    if(!hasInstances(service)){
+    if (!hasInstances(service)) {
       return
     }
     val remoteViews = RemoteViews(service.packageName, R.layout.app_widget_medium_transparent)
@@ -55,10 +55,10 @@ class AppWidgetMediumTransparent : BaseAppwidget() {
 
   override fun partiallyUpdateWidget(service: MusicService) {
     val song = service.currentSong
-    if(song == Song.EMPTY_SONG){
+    if (song == Song.EMPTY_SONG) {
       return
     }
-    if(!hasInstances(service)){
+    if (!hasInstances(service)) {
       return
     }
     val remoteViews = RemoteViews(service.packageName, R.layout.app_widget_medium_transparent)
@@ -73,7 +73,7 @@ class AppWidgetMediumTransparent : BaseAppwidget() {
     }
 
     val appIds = AppWidgetManager.getInstance(service).getAppWidgetIds(ComponentName(service, javaClass))
-    pushPartiallyUpdate(service,appIds,remoteViews)
+    pushPartiallyUpdate(service, appIds, remoteViews)
   }
 }
 

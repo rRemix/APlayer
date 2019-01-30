@@ -3,8 +3,6 @@ package remix.myplayer.misc.tageditor
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.misc.interfaces.OnTagEditListener
 

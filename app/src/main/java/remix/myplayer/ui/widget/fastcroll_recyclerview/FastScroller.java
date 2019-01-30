@@ -285,8 +285,7 @@ public class FastScroller extends LinearLayout {
   /**
    * Set the fast scroll state change listener.
    *
-   * @param fastScrollStateChangeListener The interface that will listen to fastscroll state change
-   * events
+   * @param fastScrollStateChangeListener The interface that will listen to fastscroll state change events
    */
   public void setFastScrollStateChangeListener(
       FastScrollStateChangeListener fastScrollStateChangeListener) {
