@@ -3,6 +3,8 @@ package remix.myplayer.service;
 import static remix.myplayer.lyric.UpdateLyricThread.LRC_INTERVAL;
 import static remix.myplayer.request.network.RxUtil.applySingleScheduler;
 import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS;
+import static remix.myplayer.ui.activity.base.BaseMusicActivity.EXTRA_PERMISSION;
+import static remix.myplayer.ui.activity.base.BaseMusicActivity.EXTRA_PLAYLIST;
 import static remix.myplayer.util.Constants.PLAY_LOOP;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.Util.registerLocalReceiver;
@@ -67,6 +69,7 @@ import remix.myplayer.appwidgets.small.AppWidgetSmall;
 import remix.myplayer.appwidgets.small.AppWidgetSmallTransparent;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.room.DatabaseRepository;
+import remix.myplayer.db.room.model.PlayQueue;
 import remix.myplayer.helper.MusicEventCallback;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.helper.SleepTimer;
@@ -81,6 +84,7 @@ import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
 import remix.myplayer.misc.receiver.MediaButtonReceiver;
 import remix.myplayer.request.RemoteUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.notification.Notify;
 import remix.myplayer.service.notification.NotifyImpl;
 import remix.myplayer.service.notification.NotifyImpl24;
@@ -416,7 +420,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
         .subscribe(action -> handleStartCommandIntent(commandIntent, action));
 
-//        if(!mLoadFinished && (mHasPermission = Util.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}))) {
+//        if(!mLoadFinished && (hasPermission = Util.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}))) {
 //            loadSync();
 //        }
 //
@@ -960,7 +964,19 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   }
 
   @Override
-  public void onPlayListChanged() {
+  public void onPlayListChanged(String name) {
+    if(name.equals(PlayQueue.TABLE_NAME)){
+      mDBRepository
+          .getPlayQueue()
+          .compose(applySingleScheduler())
+          .subscribe(new Consumer<List<Integer>>() {
+            @Override
+            public void accept(List<Integer> ids) throws Exception {
+              //todo 更新下一首
+              mPlayQueue = ids;
+            }
+          });
+    }
   }
 
   @Override
@@ -1099,9 +1115,9 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     if (MEDIA_STORE_CHANGE.equals(action)) {
       onMediaStoreChanged();
     } else if (PERMISSION_CHANGE.equals(action)) {
-      onPermissionChanged(intent.getBooleanExtra("permission", false));
+      onPermissionChanged(intent.getBooleanExtra(EXTRA_PERMISSION, false));
     } else if (PLAYLIST_CHANGE.equals(action)) {
-      onPlayListChanged();
+      onPlayListChanged(intent.getStringExtra(EXTRA_PLAYLIST));
     }
   }
 
@@ -2127,7 +2143,6 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     @Override
     public void run() {
-      Timber.v("partiallyUpdateWidget");
       for (Map.Entry<String, BaseAppwidget> entry : mAppWidgets.entrySet()) {
         if (entry.getValue() != null) {
           entry.getValue().partiallyUpdateWidget(mService);

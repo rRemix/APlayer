@@ -36,6 +36,7 @@ import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.adapter.AddtoPlayListAdapter;
+import remix.myplayer.ui.dialog.base.BaseMusicDialog;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.util.ToastUtil;
 
@@ -46,7 +47,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 将歌曲添加到播放列表的对话框
  */
-public class AddtoPlayListDialog extends BaseDialog implements
+public class AddtoPlayListDialog extends BaseMusicDialog implements
     LoaderManager.LoaderCallbacks<List<PlayList>> {
 
   public static final String EXTRA_SONG_LIST = "list";
@@ -82,11 +83,11 @@ public class AddtoPlayListDialog extends BaseDialog implements
 
     mList = (List<Integer>) getArguments().getSerializable(EXTRA_SONG_LIST);
     if (mList == null) {
-      ToastUtil.show(mContext, R.string.add_song_playlist_error);
+      ToastUtil.show(getContext(), R.string.add_song_playlist_error);
       dismiss();
     }
 
-    mAdapter = new AddtoPlayListAdapter(mContext, R.layout.item_playlist_addto);
+    mAdapter = new AddtoPlayListAdapter(getContext(), R.layout.item_playlist_addto);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @SuppressLint("CheckResult")
       @Override
@@ -96,8 +97,8 @@ public class AddtoPlayListDialog extends BaseDialog implements
             .insertToPlayList(mList, playList.getName(), playList.getId())
             .compose(RxUtil.applySingleScheduler())
             .doFinally(() -> dismiss())
-            .subscribe(num -> ToastUtil.show(mContext, R.string.add_song_playlist_success, num, playList.getName()),
-                throwable -> ToastUtil.show(mContext, R.string.add_song_playlist_error));
+            .subscribe(num -> ToastUtil.show(getContext(), R.string.add_song_playlist_success, num, playList.getName()),
+                throwable -> ToastUtil.show(getContext(), R.string.add_song_playlist_error));
       }
 
       @Override
@@ -108,7 +109,7 @@ public class AddtoPlayListDialog extends BaseDialog implements
 
     mRecyclerView.setAdapter(mAdapter);
     mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-    mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+    mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
     getLoaderManager().initLoader(LOADER_ID++, null, this);
 
@@ -137,14 +138,14 @@ public class AddtoPlayListDialog extends BaseDialog implements
         .subscribe(new Consumer<List<PlayList>>() {
           @Override
           public void accept(List<PlayList> playLists) throws Exception {
-            Theme.getBaseDialog(mContext)
+            Theme.getBaseDialog(getContext())
                 .title(R.string.new_playlist)
                 .positiveText(R.string.create)
                 .negativeText(R.string.cancel)
                 .inputRange(1, 15)
                 .input("", getString(R.string.local_list) + playLists.size(), (dialog, input) -> {
                   if (TextUtils.isEmpty(input)) {
-                    ToastUtil.show(mContext, R.string.add_error);
+                    ToastUtil.show(getContext(), R.string.add_error);
                     return;
                   }
 
@@ -157,10 +158,10 @@ public class AddtoPlayListDialog extends BaseDialog implements
                         }
                       })
                       .subscribe(num -> {
-                        ToastUtil.show(mContext, R.string.add_playlist_success);
+                        ToastUtil.show(getContext(), R.string.add_playlist_success);
                         ToastUtil
-                            .show(mContext, getString(R.string.add_song_playlist_success, num, input.toString()));
-                      }, throwable -> ToastUtil.show(mContext, R.string.add_error));
+                            .show(getContext(), getString(R.string.add_song_playlist_success, num, input.toString()));
+                      }, throwable -> ToastUtil.show(getContext(), R.string.add_error));
                 })
                 .dismissListener(dialog -> dismiss())
                 .show();
@@ -174,7 +175,7 @@ public class AddtoPlayListDialog extends BaseDialog implements
   @NonNull
   @Override
   public Loader<List<PlayList>> onCreateLoader(int id, @Nullable Bundle args) {
-    return new PlayListFragment.AsyncPlayListLoader(mContext);
+    return new PlayListFragment.AsyncPlayListLoader(getContext());
   }
 
   @Override

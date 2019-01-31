@@ -1,20 +1,24 @@
-package remix.myplayer.ui.fragment.base
+package remix.myplayer.ui.dialog.base
 
 import android.content.Context
 import android.os.Bundle
 import android.view.View
 import remix.myplayer.helper.MusicEventCallback
-
 import remix.myplayer.service.MusicService
+import remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS
 import remix.myplayer.ui.activity.base.BaseMusicActivity
+import remix.myplayer.util.Util
 
-open class BaseMusicFragment : BaseFragment(), MusicEventCallback {
-  private var mMusicActivity: BaseMusicActivity? = null
+/**
+ * Created by remix on 2019/1/31
+ */
+open class BaseMusicDialog : BaseDialog(), MusicEventCallback {
+  private var musicActivity: BaseMusicActivity? = null
 
   override fun onAttach(context: Context?) {
     super.onAttach(context)
     try {
-      mMusicActivity = context as BaseMusicActivity?
+      musicActivity = context as BaseMusicActivity?
     } catch (e: ClassCastException) {
       throw RuntimeException(context!!.javaClass.simpleName + " must be an instance of " + BaseMusicActivity::class.java.simpleName)
     }
@@ -23,19 +27,22 @@ open class BaseMusicFragment : BaseFragment(), MusicEventCallback {
 
   override fun onDetach() {
     super.onDetach()
-    mMusicActivity = null
+    musicActivity = null
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    hasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-//        MusicEventHelper.addCallback(this)
-    mMusicActivity?.addMusicServiceEventListener(this)
+    musicActivity?.addMusicServiceEventListener(this)
   }
 
   override fun onDestroyView() {
     super.onDestroyView()
-//        MusicEventHelper.removeCallback(this)
-    mMusicActivity?.removeMusicServiceEventListener(this)
+    musicActivity?.removeMusicServiceEventListener(this)
   }
 
   override fun onMediaStoreChanged() {
@@ -43,7 +50,7 @@ open class BaseMusicFragment : BaseFragment(), MusicEventCallback {
   }
 
   override fun onPermissionChanged(has: Boolean) {
-    mHasPermission = has
+    hasPermission = has
   }
 
   override fun onPlayListChanged(name: String) {

@@ -24,7 +24,7 @@
     android:background="?attr/divider_color"/>
 
   <remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView
-    android:id="@+id/bottom_actionbar_play_list"
+    android:id="@+id/playqueue_recyclerview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_below="@+id/divider"

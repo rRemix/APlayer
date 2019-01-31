@@ -109,10 +109,6 @@ public abstract class LibraryFragment<D, A extends BaseAdapter> extends BaseMusi
     }
   }
 
-  @Override
-  public void onPlayListChanged() {
-
-  }
 
   @Override
   public Loader<List<D>> onCreateLoader(int id, Bundle args) {

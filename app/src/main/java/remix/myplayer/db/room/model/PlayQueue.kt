@@ -14,4 +14,7 @@ data class PlayQueue(
     val audio_id: Int
 ) {
 
+  companion object {
+    const val TABLE_NAME = "PlayQueue"
+  }
 }

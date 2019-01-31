@@ -24,6 +24,7 @@ import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.theme.TintHelper;
+import remix.myplayer.ui.dialog.base.BaseDialog;
 import remix.myplayer.ui.widget.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
@@ -82,7 +83,7 @@ public class TimerDialog extends BaseDialog {
   @NonNull
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    MaterialDialog dialog = new MaterialDialog.Builder(mContext)
+    MaterialDialog dialog = new MaterialDialog.Builder(getContext())
         .customView(R.layout.dialog_timer, false)
         .theme(com.afollestad.materialdialogs.Theme.LIGHT)
         .build();
@@ -125,15 +126,15 @@ public class TimerDialog extends BaseDialog {
     });
 
     //初始化switch
-    mSwitch = new SwitchCompat(mContext);
+    mSwitch = new SwitchCompat(getContext());
     TintHelper.setTintAuto(mSwitch, ThemeStore.getAccentColor(), false);
     ((LinearLayout) root.findViewById(R.id.popup_timer_container)).addView(mSwitch);
 
     //读取保存的配置
     boolean hasDefault = SPUtil
-        .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
+        .getValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
     final int time = SPUtil
-        .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
+        .getValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
 
     //默认选项
     if (hasDefault && time > 0) {
@@ -148,19 +149,19 @@ public class TimerDialog extends BaseDialog {
     mSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
       if (isChecked) {
         if (mSaveTime > 0) {
-          ToastUtil.show(mContext, R.string.set_success);
+          ToastUtil.show(getContext(), R.string.set_success);
           SPUtil
-              .putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, true);
-          SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION,
+              .putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, true);
+          SPUtil.putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION,
               mSaveTime);
         } else {
-          ToastUtil.show(mContext, R.string.plz_set_correct_time);
+          ToastUtil.show(getContext(), R.string.plz_set_correct_time);
           mSwitch.setChecked(false);
         }
       } else {
-        ToastUtil.show(mContext, R.string.cancel_success);
-        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
-        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
+        ToastUtil.show(getContext(), R.string.cancel_success);
+        SPUtil.putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
+        SPUtil.putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
       }
     });
 
@@ -181,7 +182,7 @@ public class TimerDialog extends BaseDialog {
     //改变宽度
     Window window = dialog.getWindow();
     WindowManager.LayoutParams lp = window.getAttributes();
-    lp.width = DensityUtil.dip2px(mContext, 270);
+    lp.width = DensityUtil.dip2px(getContext(), 270);
     window.setAttributes(lp);
 
     return dialog;
@@ -193,7 +194,7 @@ public class TimerDialog extends BaseDialog {
    */
   private void toggle() {
     if (mTime <= 0 && !SleepTimer.isTicking()) {
-      ToastUtil.show(mContext, R.string.plz_set_correct_time);
+      ToastUtil.show(getContext(), R.string.plz_set_correct_time);
       return;
     }
 

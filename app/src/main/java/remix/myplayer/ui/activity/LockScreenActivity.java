@@ -212,10 +212,6 @@ public class LockScreenActivity extends BaseMusicActivity {
   @Override
   public void onServiceConnected(@NonNull MusicService service) {
     super.onServiceConnected(service);
-    if (mUpdateLyricThread == null) {
-      mUpdateLyricThread = new UpdateLockScreenLyricThread(this, service);
-      mUpdateLyricThread.start();
-    }
     onMetaChanged();
     onPlayStateChange();
   }
@@ -226,7 +222,13 @@ public class LockScreenActivity extends BaseMusicActivity {
     super.onMetaChanged();
     final Song song = MusicServiceRemote.getCurrentSong();
     //歌词
-    if (mUpdateLyricThread != null) {
+    if (mUpdateLyricThread == null) {
+      final MusicService service = MusicServiceRemote.getService();
+      if(service != null){
+        mUpdateLyricThread = new UpdateLockScreenLyricThread(this, service);
+        mUpdateLyricThread.start();
+      }
+    } else{
       mUpdateLyricThread.setSongAndGetLyricRows(song);
     }
     //标题
@@ -247,7 +249,7 @@ public class LockScreenActivity extends BaseMusicActivity {
     new ImageUriRequest<Palette>(CONFIG) {
       @Override
       public void onError(String errMsg) {
-//                ToastUtil.show(mContext,errMsg);
+//                ToastUtil.show(context,errMsg);
       }
 
       @Override
@@ -257,9 +259,9 @@ public class LockScreenActivity extends BaseMusicActivity {
 
       @Override
       public Disposable load() {
-        if (mDisposable != null) {
-          mDisposable.dispose();
-        }
+//        if (mDisposable != null) {
+//          mDisposable.dispose();
+//        }
         mDisposable = getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(song))
             .compose(RxUtil.applySchedulerToIO())
             .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette>) e -> {

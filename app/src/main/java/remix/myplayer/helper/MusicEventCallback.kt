@@ -7,7 +7,7 @@ interface MusicEventCallback {
 
   fun onPermissionChanged(has: Boolean)
 
-  fun onPlayListChanged()
+  fun onPlayListChanged(name: String)
 
   fun onServiceConnected(service: MusicService)
 

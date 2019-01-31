@@ -620,8 +620,6 @@ public class MainActivity extends MenuActivity {
   @Override
   public void onServiceConnected(@NotNull MusicService service) {
     super.onServiceConnected(service);
-    onMetaChanged();
-    onPlayStateChange();
   }
 
   @OnHandleMessage

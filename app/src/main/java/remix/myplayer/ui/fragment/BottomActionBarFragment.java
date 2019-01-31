@@ -28,6 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.facebook.drawee.view.SimpleDraweeView;
 import java.lang.ref.WeakReference;
+import org.jetbrains.annotations.NotNull;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.AnimationUrl;
@@ -36,6 +37,7 @@ import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.menu.CtrlButtonListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.PlayerActivity;
@@ -132,6 +134,13 @@ public class BottomActionBarFragment extends BaseMusicFragment {
   public void onPlayStateChange() {
     super.onPlayStateChange();
     updatePlayStatus();
+  }
+
+  @Override
+  public void onServiceConnected(@NotNull MusicService service) {
+    super.onServiceConnected(service);
+    onMetaChanged();
+    onPlayStateChange();
   }
 
   public void updatePlayStatus() {

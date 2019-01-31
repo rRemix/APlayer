@@ -256,14 +256,14 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
   @Override
   public void onServiceConnected(@NotNull MusicService service) {
     super.onServiceConnected(service);
-    onMetaChanged();
-    onPlayStateChange();
   }
 
   @Override
-  public void onPlayListChanged() {
-    super.onPlayListChanged();
-    onMediaStoreChanged();
+  public void onPlayListChanged(String name) {
+    super.onPlayListChanged(name);
+    if(name.equals(PlayList.TABLE_NAME)){
+      onMediaStoreChanged();
+    }
   }
 
   public void onTagEdit(Song newSong) {

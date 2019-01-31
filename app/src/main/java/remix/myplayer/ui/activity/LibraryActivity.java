@@ -48,7 +48,7 @@ public abstract class LibraryActivity<D, A extends BaseAdapter> extends MenuActi
   }
 
   @Override
-  public void onPlayListChanged() {
+  public void onPlayListChanged(String name) {
 
   }
 

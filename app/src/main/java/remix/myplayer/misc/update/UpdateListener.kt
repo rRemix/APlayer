@@ -51,7 +51,7 @@ class UpdateListener(val mContext: Context) : Listener {
       }
       UpdateStatus.IGNORED -> {
 //                if(showToast)
-//                    ToastUtil.show(mContext, message)
+//                    ToastUtil.show(context, message)
       }
       else -> {
         if (showToast)
@@ -61,7 +61,7 @@ class UpdateListener(val mContext: Context) : Listener {
   }
 
   override fun onUpdateError(throwable: Throwable) {
-//        ToastUtil.show(mContext, R.string.update_error, throwable)
+//        ToastUtil.show(context, R.string.update_error, throwable)
   }
 
   private fun isForce(release: Release?): Boolean {

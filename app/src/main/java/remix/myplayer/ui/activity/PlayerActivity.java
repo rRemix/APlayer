@@ -710,13 +710,13 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   @SuppressLint("CheckResult")
   private void setUpSeekBar() {
 //        RelativeLayout seekbarContainer = findViewById(R.id.seekbar_container);
-//        mProgressSeekBar = new SeekBar(mContext);
+//        mProgressSeekBar = new SeekBar(context);
 //        mProgressSeekBar.setProgressDrawable(getResources().getDrawable(R.drawable.bg_progress));
-//        mProgressSeekBar.setPadding(DensityUtil.dip2px(mContext,5),0,DensityUtil.dip2px(mContext,5),0);
-//        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
+//        mProgressSeekBar.setPadding(DensityUtil.dip2px(context,5),0,DensityUtil.dip2px(context,5),0);
+//        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(context,10),DensityUtil.dip2px(context,10)));
 //
-//        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, DensityUtil.dip2px(mContext,2));
-//        lp.setMargins(DensityUtil.dip2px(mContext,10),0,DensityUtil.dip2px(mContext,10),0);
+//        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, DensityUtil.dip2px(context,2));
+//        lp.setMargins(DensityUtil.dip2px(context,10),0,DensityUtil.dip2px(context,10),0);
 //
 //        lp.addRule(RelativeLayout.LEFT_OF,R.id.text_remain);
 //        lp.addRule(RelativeLayout.RIGHT_OF,R.id.text_hasplay);
@@ -1202,7 +1202,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         .color(accentColor)
         .make(),
         inset, inset, inset, inset));
-//        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
+//        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(context,10),DensityUtil.dip2px(context,10)));
 //        Drawable seekbarBackground = mProgressSeekBar.getBackground();
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && seekbarBackground instanceof RippleDrawable) {
 //            ((RippleDrawable)seekbarBackground).setColor(ColorStateList.valueOf( ColorUtil.adjustAlpha(ThemeStore.getAccentColor(),0.2f)));
@@ -1335,7 +1335,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //            for (String id : ignoreLrcId){
 //                if((mInfo.getID() + "").equals(id)){
 //                    ignoreLrcId.remove(mInfo.getID() + "");
-//                    SPUtil.putStringSet(mContext,SPUtil.SETTING_KEY.NAME,"IgnoreLrcID",ignoreLrcId);
+//                    SPUtil.putStringSet(context,SPUtil.SETTING_KEY.NAME,"IgnoreLrcID",ignoreLrcId);
 //                }
 //            }
 //        }

@@ -16,6 +16,7 @@ import remix.myplayer.db.room.model.PlayQueue
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.SPUtil
+import timber.log.Timber
 import java.util.*
 import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
@@ -247,14 +248,16 @@ class DatabaseRepository private constructor() {
                 it.audio_id
               }
         }
-        .flatMap {
-          val inStr = makeInStr(it)
+        .doOnSuccess {
           idsInQueue.addAll(it)
-          getSongsWithSort(inStr, "instr ('" + inStr + "'," + MediaStore.Audio.Media._ID + ")")
+        }
+        .flatMap {
+          getSongsWithSort(CUSTOMSORT, it)
         }
         .doOnSuccess { songs ->
           //删除不存在的歌曲
           if (songs.size < idsInQueue.size) {
+            Timber.v("删除播放队列中不存在的歌曲")
             val deleteIds = ArrayList<Int>()
             for (audioId in idsInQueue) {
               if (!songs.contains(Song(audioId))) {
@@ -304,28 +307,25 @@ class DatabaseRepository private constructor() {
    * @param force 是否强制启用自定义排序 即按照查询的顺序返回
    */
   fun getPlayListSongs(context: Context, playList: PlayList, force: Boolean = false): Single<List<Song>> {
-    val idsInPlayList = ArrayList<Int>()
 
     return Single
         .just(playList)
         .flatMap {
-          idsInPlayList.addAll(it.audioIds)
           val sort = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME,
               SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,
               SortOrder.PlayListSongSortOrder.SONG_A_Z)
           //强制或者设置了自定义排序
-          val customSort = force || sort == SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM
+          val actualSort = if (force || sort == SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)
+            CUSTOMSORT else sort
 
-          val inStr = makeInStr(it.audioIds.toList())
-          return@flatMap getSongsWithSort(inStr,
-              if (customSort) "instr ('" + inStr + "'," + MediaStore.Audio.Media._ID + ")"
-              else sort)
+          return@flatMap getSongsWithSort(actualSort, it.audioIds.toList())
         }
         .doOnSuccess { songs ->
           //移除不存在的歌曲
-          if (songs.size < idsInPlayList.size) {
+          if (songs.size < playList.audioIds.size) {
+            Timber.v("删除播放列表中不存在的歌曲")
             val deleteIds = ArrayList<Int>()
-            for (audioId in idsInPlayList) {
+            for (audioId in playList.audioIds) {
               if (!songs.contains(Song(audioId))) {
                 deleteIds.add(audioId)
               }
@@ -338,12 +338,23 @@ class DatabaseRepository private constructor() {
         }
   }
 
-  private fun getSongsWithSort(selection: String, sort: String): Single<List<Song>> {
+
+  private fun getSongsWithSort(sort: String, ids: List<Int>): Single<List<Song>> {
     return Single
         .fromCallable {
-          return@fromCallable MediaStoreUtil.getSongs(MediaStore.Audio.Media._ID + " in(" + selection + ")",
+          val customSort = sort == CUSTOMSORT
+          val inStr = makeInStr(ids)
+          val songs = MediaStoreUtil.getSongs(
+              MediaStore.Audio.Media._ID + " in(" + inStr + ")",
               null,
-              sort)
+              if (customSort) null else sort)
+          val tempArray = Array<Song>(ids.size) { Song.EMPTY_SONG }
+
+          songs.forEachIndexed { index, song ->
+            tempArray[if (CUSTOMSORT == sort) ids.indexOf(song.id) else index] = song
+          }
+          tempArray
+              .filter { it.id != Song.EMPTY_SONG.id }
         }
   }
 
@@ -428,8 +439,9 @@ class DatabaseRepository private constructor() {
           INSTANCE ?: DatabaseRepository()
         }
 
-
     @JvmStatic
     val MyLove = App.getContext().getString(R.string.my_favorite)
+
+    private const val CUSTOMSORT = "CUSTOMSORT"
   }
 }

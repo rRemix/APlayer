@@ -15,6 +15,7 @@ import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.db.room.model.PlayList;
+import remix.myplayer.db.room.model.PlayQueue;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
@@ -89,8 +90,10 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
   }
 
   @Override
-  public void onPlayListChanged() {
-    onMediaStoreChanged();
+  public void onPlayListChanged(String name) {
+    if(name.equals(PlayList.TABLE_NAME)){
+      onMediaStoreChanged();
+    }
   }
 
   @Override

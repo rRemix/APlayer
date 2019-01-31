@@ -181,6 +181,7 @@ abstract class BaseAppwidget
     }
     val appWidgetManager = AppWidgetManager.getInstance(context)
     if (appWidgetId != null) {
+      Timber.tag(javaClass.simpleName).v("pushPartiallyUpdate(), appWidgetId: $appWidgetId   remoteViews:$remoteViews")
       appWidgetManager.partiallyUpdateAppWidget(appWidgetId, remoteViews)
     }
   }

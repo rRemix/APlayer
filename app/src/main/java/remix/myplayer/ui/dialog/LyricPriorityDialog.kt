@@ -11,11 +11,13 @@ import remix.myplayer.R
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.adapter.LyricPriorityAdapter
+import remix.myplayer.ui.dialog.base.BaseDialog
+import remix.myplayer.ui.dialog.base.BaseMusicDialog
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import java.util.*
 
-class LyricPriorityDialog : BaseDialog() {
+class LyricPriorityDialog : BaseMusicDialog() {
   companion object {
     @JvmStatic
     fun newInstance(): LyricPriorityDialog {

@@ -32,12 +32,13 @@ import timber.log.Timber
 import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
+import kotlin.collections.LinkedHashSet
 
 @SuppressLint("Registered")
 open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   val TAG = "BaseMusicActivity"
   private var mServiceToken: MusicServiceRemote.ServiceToken? = null
-  private val mMusicServiceEventListeners = ArrayList<MusicEventCallback>()
+  private val mMusicServiceEventListeners = LinkedHashSet<MusicEventCallback>()
   private var mMusicStateReceiver: MusicStateReceiver? = null
   private var mReceiverRegistered: Boolean = false
 
@@ -99,10 +100,10 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
     }
   }
 
-  override fun onPlayListChanged() {
+  override fun onPlayListChanged(name: String) {
     Timber.v("onMediaStoreChanged: ${this.javaClass.simpleName}")
     for (listener in mMusicServiceEventListeners) {
-      listener.onPlayListChanged()
+      listener.onPlayListChanged(name)
     }
   }
 
@@ -167,7 +168,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
             activity.onPermissionChanged(msg.arg1 == PERMISSION_GRANT)
           }
           MusicService.PLAYLIST_CHANGE -> {
-            activity.onPlayListChanged()
+            activity.onPlayListChanged(msg.data.getString(EXTRA_PLAYLIST))
           }
           MusicService.META_CHANGE -> {
             activity.onMetaChanged()
@@ -189,7 +190,8 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
         val action = intent.action
         val msg = it.obtainMessage(action.hashCode())
         msg.obj = action
-        msg.arg1 = if (intent.getBooleanExtra("permission", false)) PERMISSION_GRANT else PERMISSION_NOT_GRANT
+        msg.arg1 = if (intent.getBooleanExtra(EXTRA_PERMISSION, false)) PERMISSION_GRANT else PERMISSION_NOT_GRANT
+        msg.data.putString(EXTRA_PLAYLIST,intent.getStringExtra(EXTRA_PLAYLIST))
         it.removeMessages(msg.what)
         it.sendMessageDelayed(msg, 200)
       }
@@ -305,6 +307,9 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   companion object {
     private const val PERMISSION_GRANT = 1
     private const val PERMISSION_NOT_GRANT = 0
+
+    const val EXTRA_PLAYLIST = "extra_playlist"
+    const val EXTRA_PERMISSION = "extra_permission"
 
     //更新适配器
     const val UPDATE_ADAPTER = 100
