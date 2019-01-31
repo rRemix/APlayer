@@ -1,5 +1,7 @@
 package remix.myplayer.ui.adapter;
 
+import static remix.myplayer.misc.ExtKt.isPortraitOrientation;
+
 import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,8 +33,8 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
   public final static int GRID_MODE = 2;
 
   //网格模式下水平和垂直的间距 以间距当作Divider
-  static final int GRID_MARGIN_VERTICAL = DensityUtil.dip2px(4);
-  static final int GRID_MARGIN_HORIZONTAL = DensityUtil.dip2px(6);
+  private static final int GRID_MARGIN_VERTICAL = DensityUtil.dip2px(4);
+  private static final int GRID_MARGIN_HORIZONTAL = DensityUtil.dip2px(6);
 
   static final int TYPE_HEADER = 0;
   static final int TYPE_NORMAL = 1;
@@ -155,13 +157,19 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
     if (mMode == GRID_MODE && holder.mRoot != null) {
       ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) holder.mRoot
           .getLayoutParams();
-      if (position % 2 == 1) {
-        lp.setMargins(GRID_MARGIN_HORIZONTAL, GRID_MARGIN_VERTICAL,
-            GRID_MARGIN_HORIZONTAL / 2, GRID_MARGIN_VERTICAL);
-      } else {
-        lp.setMargins(GRID_MARGIN_HORIZONTAL / 2, GRID_MARGIN_VERTICAL,
-            GRID_MARGIN_HORIZONTAL, GRID_MARGIN_VERTICAL);
+      if (isPortraitOrientation(mContext)) { //竖屏
+        if (position % 2 == 1) {
+          lp.setMargins(GRID_MARGIN_HORIZONTAL, GRID_MARGIN_VERTICAL,
+              GRID_MARGIN_HORIZONTAL / 2, GRID_MARGIN_VERTICAL);
+        } else {
+          lp.setMargins(GRID_MARGIN_HORIZONTAL / 2, GRID_MARGIN_VERTICAL,
+              GRID_MARGIN_HORIZONTAL, GRID_MARGIN_VERTICAL);
+        }
+      } else { //横屏
+        lp.setMargins(GRID_MARGIN_HORIZONTAL / 2, GRID_MARGIN_VERTICAL / 2,
+            GRID_MARGIN_HORIZONTAL / 2, GRID_MARGIN_VERTICAL / 2);
       }
+
       holder.mRoot.setLayoutParams(lp);
     }
   }

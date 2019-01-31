@@ -82,7 +82,7 @@ public class ArtistFragment extends LibraryFragment<Artist, ArtistAdapter> {
         .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ARTIST,
             HeaderAdapter.GRID_MODE);
     mRecyclerView.setLayoutManager(model == LIST_MODE ? new LinearLayoutManager(mContext)
-        : new GridLayoutManager(getActivity(), 2));
+        : new GridLayoutManager(getActivity(), getSpanCount()));
     mRecyclerView.setItemAnimator(new DefaultItemAnimator());
     mRecyclerView.setAdapter(mAdapter);
     mRecyclerView.setHasFixedSize(true);

@@ -132,7 +132,7 @@ public class BaseActivity extends AppCompatActivity {
         .subscribe(has -> {
           if (has != mHasPermission) {
             Intent intent = new Intent(MusicService.PERMISSION_CHANGE);
-            intent.putExtra("permission", has);
+            intent.putExtra(BaseMusicActivity.EXTRA_PERMISSION, has);
             sendLocalBroadcast(intent);
           }
         });

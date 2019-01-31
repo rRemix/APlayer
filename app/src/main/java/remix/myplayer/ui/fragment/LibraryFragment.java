@@ -1,8 +1,10 @@
 package remix.myplayer.ui.fragment;
 
+import static remix.myplayer.misc.ExtKt.isPortraitOrientation;
 import static remix.myplayer.util.ColorUtil.getColor;
 import static remix.myplayer.util.ColorUtil.isColorLight;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -125,6 +127,10 @@ public abstract class LibraryFragment<D, A extends BaseAdapter> extends BaseMusi
     if (mAdapter != null) {
       mAdapter.setData(null);
     }
+  }
+
+  protected int getSpanCount() {
+    return !isPortraitOrientation(requireContext()) ? 6 : 2;
   }
 
   protected abstract Loader<List<D>> getLoader();

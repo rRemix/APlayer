@@ -78,7 +78,7 @@ public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
         HeaderAdapter.GRID_MODE);
     mRecyclerView.setItemAnimator(new DefaultItemAnimator());
     mRecyclerView.setLayoutManager(
-        mode == LIST_MODE ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
+        mode == LIST_MODE ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, getSpanCount()));
     mRecyclerView.setAdapter(mAdapter);
     mRecyclerView.setHasFixedSize(true);
   }

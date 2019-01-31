@@ -79,7 +79,7 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
             HeaderAdapter.GRID_MODE);
     mRecyclerView.setItemAnimator(new DefaultItemAnimator());
     mRecyclerView.setLayoutManager(model == LIST_MODE ? new LinearLayoutManager(mContext)
-        : new GridLayoutManager(getActivity(), 2));
+        : new GridLayoutManager(getActivity(), getSpanCount()));
     mRecyclerView.setAdapter(mAdapter);
     mRecyclerView.setHasFixedSize(true);
   }

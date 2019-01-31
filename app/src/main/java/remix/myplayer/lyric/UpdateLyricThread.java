@@ -92,7 +92,6 @@ public abstract class UpdateLyricThread extends Thread {
     LyricRowWrapper wrapper = new LyricRowWrapper();
     wrapper.setStatus(mStatus);
 
-    Timber.tag(TAG).v("Reference: %s", mReference);
     if (mStatus == Status.SEARCHING) {
       return wrapper;
     }

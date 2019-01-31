@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity;
 
+import static remix.myplayer.misc.ExtKt.isPortraitOrientation;
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.service.MusicService.EXTRA_CONTROL;
 import static remix.myplayer.theme.ThemeStore.getAccentColor;
@@ -264,11 +265,10 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
    * 更新封面与背景的Handler
    */
   private Uri mUri;
-  private static final int UPDATE_BG = 101;
-  private static final int UPDATE_TIME_ONLY = 102;
-  private static final int UPDATE_TIME_ALL = 103;
+  private static final int UPDATE_BG = 1;
+  private static final int UPDATE_TIME_ONLY = 2;
+  private static final int UPDATE_TIME_ALL = 3;
   private Bitmap mRawBitMap;
-
   private Palette.Swatch mSwatch;
   private AudioManager mAudioManager;
 
@@ -347,19 +347,19 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         isLightTheme() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night,
         ScalingUtils.ScaleType.CENTER_CROP);
     //todo
-//    mContainer.addView(mAnimCover);
-//
-//    //设置封面
-//    if (mInfo != null) {
-//      if (mAnimUrl != null && !TextUtils.isEmpty(mAnimUrl.getUrl())
-//          && mAnimUrl.getAlbumId() == mInfo.getAlbumId()) {
-//        mAnimCover.setImageURI(mAnimUrl.getUrl());
-//      } else {
-//        new LibraryUriRequest(mAnimCover,
-//            getSearchRequestWithAlbumType(mInfo),
-//            new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
-//      }
-//    }
+    mContainer.addView(mAnimCover);
+
+    //设置封面
+    if (mInfo != null) {
+      if (mAnimUrl != null && !TextUtils.isEmpty(mAnimUrl.getUrl())
+          && mAnimUrl.getAlbumId() == mInfo.getAlbumId()) {
+        mAnimCover.setImageURI(mAnimUrl.getUrl());
+      } else {
+        new LibraryUriRequest(mAnimCover,
+            getSearchRequestWithAlbumType(mInfo),
+            new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
+      }
+    }
 
     //恢复位置信息
     if (savedInstanceState != null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
@@ -431,7 +431,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   @Override
   public void onBackPressed() {
     //从通知栏打开或者横屏直接退出
-    if(mFromNotify || !isPortraitOrientation()){
+    if(mFromNotify || !isPortraitOrientation(this)){
       finish();
       overridePendingTransition(0, R.anim.audio_out);
       return;
@@ -989,9 +989,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       mLrcView.setTimeLineColor(ThemeStore.getTextColorSecondary());
     });
 
-    Configuration configuration = this.getResources().getConfiguration(); //获取设置的配置信息
-    int orientation = configuration.orientation; //获取屏幕方向
-    if (!isPortraitOrientation()) {//横屏
+    if (!isPortraitOrientation(this)) {//横屏
       //歌词界面常亮
       if (SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,
           false)) {
@@ -1002,7 +1000,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
           .add(R.id.container_cover,mCoverFragment)
           .add(R.id.container_lyric,mLyricFragment)
           .commit();
-    } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {//竖屏
+    } else {//竖屏
       mAdapter = new PagerAdapter(getSupportFragmentManager());
       mAdapter.addFragment(mRecordFragment);
       mAdapter.addFragment(mCoverFragment);
@@ -1058,12 +1056,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         }
       });
     }
-  }
-
-  private boolean isPortraitOrientation(){
-    Configuration configuration = this.getResources().getConfiguration(); //获取设置的配置信息
-    int orientation = configuration.orientation; //获取屏幕方向
-    return orientation == Configuration.ORIENTATION_PORTRAIT;
   }
 
   @Override

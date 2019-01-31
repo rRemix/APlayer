@@ -1,7 +1,7 @@
 package remix.myplayer.ui.fragment;
 
 
-import static remix.myplayer.helper.MusicServiceRemote.setAllSongAsPlayQueue;
+import static remix.myplayer.helper.MusicServiceRemote.setPlayQueue;
 import static remix.myplayer.service.MusicService.EXTRA_POSITION;
 import static remix.myplayer.util.MusicUtil.makeCmdIntent;
 
@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
@@ -58,10 +57,18 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(View view, int position) {
-        final Song song = mAdapter.getDatas().get(position);
-        if (getUserVisibleHint() && !mChoice.click(position, song)) {
-          setAllSongAsPlayQueue(makeCmdIntent(Command.PLAYSELECTEDSONG)
+        if (getUserVisibleHint() && !mChoice.click(position, mAdapter.getDatas().get(position))) {
+          //设置正在播放列表
+          final List<Song> songs = mAdapter.getDatas();
+          ArrayList<Integer> ids = new ArrayList<>();
+          for (Song song : songs) {
+            if (song != null && song.getId() > 0) {
+              ids.add(song.getId());
+            }
+          }
+          setPlayQueue(ids, makeCmdIntent(Command.PLAYSELECTEDSONG)
               .putExtra(EXTRA_POSITION, position));
+
         }
       }
 
@@ -83,21 +90,6 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
     mRecyclerView.setHasFixedSize(true);
   }
 
-  /**
-   * 重新排序后需要重置全部歌曲列表
-   */
-  private synchronized void setAllSongList() {
-    if (mAdapter == null || mAdapter.getDatas() == null) {
-      return;
-    }
-    List<Integer> allSong = new ArrayList<>();
-    for (Song song : mAdapter.getDatas()) {
-      allSong.add(song.getId());
-    }
-    MusicServiceRemote.setAllSong(allSong);
-  }
-
-
   @Override
   protected Loader<List<Song>> getLoader() {
     return new AsyncSongLoader(mContext);
@@ -108,16 +100,6 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
     return LoaderIds.SONG_FRAGMENT;
   }
 
-  @Override
-  public void onLoadFinished(Loader<List<Song>> loader, List<Song> data) {
-    super.onLoadFinished(loader, data);
-    new Thread() {
-      @Override
-      public void run() {
-        setAllSongList();
-      }
-    }.start();
-  }
 
   @Override
   public SongAdapter getAdapter() {

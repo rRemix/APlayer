@@ -84,7 +84,6 @@ import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
 import remix.myplayer.misc.receiver.MediaButtonReceiver;
 import remix.myplayer.request.RemoteUriRequest;
 import remix.myplayer.request.RequestConfig;
-import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.notification.Notify;
 import remix.myplayer.service.notification.NotifyImpl;
 import remix.myplayer.service.notification.NotifyImpl24;
@@ -1967,6 +1966,10 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    * 更新桌面部件
    */
   private void updateAppwidget() {
+    //屏幕没点亮就不更新了
+    if(!mScreenOn){
+      return;
+    }
     for (Map.Entry<String, BaseAppwidget> entry : mAppWidgets.entrySet()) {
       if (entry.getValue() != null) {
         entry.getValue().updateWidget(mService, null, true);
@@ -1975,25 +1978,32 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
 
     //暂停停止更新进度条和时间
     if (!isPlaying()) {
-      if (mWidgetTimer != null) {
-        mWidgetTimer.cancel();
-        mWidgetTimer = null;
-      }
-      if (mWidgetTask != null) {
-        mWidgetTask.cancel();
-        mWidgetTask = null;
-      }
+      stopUpdateAppWidget();
     } else {
       //开始播放后持续更新进度条和时间
-      if (mWidgetTimer != null) {
-        return;
-      }
-      mWidgetTimer = new Timer();
-      mWidgetTask = new WidgetTask();
-      mWidgetTimer.schedule(mWidgetTask, 1000, 1000);
+      startUpdateAppWidget();
     }
   }
 
+  private void stopUpdateAppWidget(){
+    if (mWidgetTimer != null) {
+      mWidgetTimer.cancel();
+      mWidgetTimer = null;
+    }
+    if (mWidgetTask != null) {
+      mWidgetTask.cancel();
+      mWidgetTask = null;
+    }
+  }
+
+  private void startUpdateAppWidget(){
+    if (mWidgetTimer != null || !mScreenOn) {
+      return;
+    }
+    mWidgetTimer = new Timer();
+    mWidgetTask = new WidgetTask();
+    mWidgetTimer.schedule(mWidgetTask, 1000, 1000);
+  }
 
   /**
    * 更新桌面歌词
@@ -2145,7 +2155,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     public void run() {
       for (Map.Entry<String, BaseAppwidget> entry : mAppWidgets.entrySet()) {
         if (entry.getValue() != null) {
-          entry.getValue().partiallyUpdateWidget(mService);
+          mUpdateUIHandler.post(() -> entry.getValue().partiallyUpdateWidget(mService));
         }
       }
       if (mPlayAtBreakPoint) {
@@ -2276,22 +2286,27 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
       if (Intent.ACTION_SCREEN_ON.equals(action)) {
         mScreenOn = true;
         //显示锁屏
-        if (mIsPlay && SPUtil
-            .getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN,
-                Constants.APLAYER_LOCKSCREEN) == Constants.APLAYER_LOCKSCREEN) {
+        if (mIsPlay && SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN,
+            Constants.APLAYER_LOCKSCREEN) == Constants.APLAYER_LOCKSCREEN) {
           context.startActivity(new Intent(context, LockScreenActivity.class)
               .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
         //重新显示桌面歌词
         createFloatLrcThreadIfNeed();
+        //重新开始更新桌面部件
+        startUpdateAppWidget();
       } else {
         mScreenOn = false;
+        //停止更新桌面部件
+        stopUpdateAppWidget();
         //屏幕熄灭 关闭桌面歌词
         if (mShowFloatLrc && isFloatLrcShowing() && mUpdateFloatLrcThread != null) {
           mUpdateFloatLrcThread.quitImmediately();
           mUpdateFloatLrcThread = null;
         }
       }
+
+      Timber.v("screenOn: %s", mScreenOn);
     }
   }
 }

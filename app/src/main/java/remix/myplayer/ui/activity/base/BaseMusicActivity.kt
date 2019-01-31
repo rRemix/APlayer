@@ -36,7 +36,6 @@ import kotlin.collections.LinkedHashSet
 
 @SuppressLint("Registered")
 open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
-  val TAG = "BaseMusicActivity"
   private var mServiceToken: MusicServiceRemote.ServiceToken? = null
   private val mMusicServiceEventListeners = LinkedHashSet<MusicEventCallback>()
   private var mMusicStateReceiver: MusicStateReceiver? = null
@@ -165,7 +164,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
             activity.onMediaStoreChanged()
           }
           MusicService.PERMISSION_CHANGE -> {
-            activity.onPermissionChanged(msg.arg1 == PERMISSION_GRANT)
+            activity.onPermissionChanged(msg.data.getBoolean(EXTRA_PERMISSION))
           }
           MusicService.PLAYLIST_CHANGE -> {
             activity.onPlayListChanged(msg.data.getString(EXTRA_PLAYLIST))
@@ -190,8 +189,8 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
         val action = intent.action
         val msg = it.obtainMessage(action.hashCode())
         msg.obj = action
-        msg.arg1 = if (intent.getBooleanExtra(EXTRA_PERMISSION, false)) PERMISSION_GRANT else PERMISSION_NOT_GRANT
         msg.data.putString(EXTRA_PLAYLIST,intent.getStringExtra(EXTRA_PLAYLIST))
+        msg.data.putBoolean(EXTRA_PERMISSION,intent.getBooleanExtra(EXTRA_PERMISSION,false))
         it.removeMessages(msg.what)
         it.sendMessageDelayed(msg, 200)
       }
@@ -305,11 +304,11 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   companion object {
-    private const val PERMISSION_GRANT = 1
-    private const val PERMISSION_NOT_GRANT = 0
+    private const val TAG = "BaseMusicActivity"
 
     const val EXTRA_PLAYLIST = "extra_playlist"
     const val EXTRA_PERMISSION = "extra_permission"
+
 
     //更新适配器
     const val UPDATE_ADAPTER = 100

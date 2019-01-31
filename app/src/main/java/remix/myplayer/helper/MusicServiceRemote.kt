@@ -91,10 +91,10 @@ object MusicServiceRemote {
     return service?.allSong
   }
 
-  @JvmStatic
-  fun setAllSongAsPlayQueue(intent: Intent) {
-    service?.setPlayQueue(service?.allSong, intent)
-  }
+//  @JvmStatic
+//  fun setAllSongAsPlayQueue(intent: Intent) {
+//    service?.setPlayQueue(service?.allSong, intent)
+//  }
 
   @JvmStatic
   fun setPlayModel(model: Int) {
