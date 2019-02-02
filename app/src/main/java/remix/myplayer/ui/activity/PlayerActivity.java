@@ -19,7 +19,6 @@ import static remix.myplayer.util.Util.unregisterLocalReceiver;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -74,6 +73,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.AnimationUrl;
@@ -136,7 +136,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   public boolean mIsDragSeekBarFromUser = false;
 
   //入场动画封面
-  SimpleDraweeView mAnimCover;
+  SimpleDraweeView mAnimationCover;
   //顶部信息
   @BindView(R.id.top_title)
   TextView mTopTitle;
@@ -336,34 +336,37 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     setUpSize();
     setUpTop();
     setUpGuide();
-    setUpViewPager();
+    setUpFragments();
     setUpSeekBar();
     setUpViewColor();
 
     //设置失败加载的图片和缩放类型
-    mAnimCover = new SimpleDraweeView(this);
-    mAnimCover.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
-    mAnimCover.getHierarchy().setFailureImage(
+    mAnimationCover = new SimpleDraweeView(this);
+    mAnimationCover.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
+    mAnimationCover.getHierarchy().setFailureImage(
         isLightTheme() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night,
         ScalingUtils.ScaleType.CENTER_CROP);
-    //todo
-    mContainer.addView(mAnimCover);
+    mContainer.addView(mAnimationCover);
 
     //设置封面
     if (mInfo != null) {
       if (mAnimUrl != null && !TextUtils.isEmpty(mAnimUrl.getUrl())
           && mAnimUrl.getAlbumId() == mInfo.getAlbumId()) {
-        mAnimCover.setImageURI(mAnimUrl.getUrl());
+        mAnimationCover.setImageURI(mAnimUrl.getUrl());
       } else {
-        new LibraryUriRequest(mAnimCover,
+        new LibraryUriRequest(mAnimationCover,
             getSearchRequestWithAlbumType(mInfo),
             new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
       }
     }
 
     //恢复位置信息
-    if (savedInstanceState != null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
-      mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
+    if (savedInstanceState != null) {
+      if (mOriginRect == null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
+        mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
+      }
+      //todo 暂时先屏幕横竖屏切换后的动画
+      mFromNotify = savedInstanceState.getBoolean(EXTRA_FROM_NOTIFY, false);
     }
   }
 
@@ -394,13 +397,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   @Override
   public void onResume() {
     super.onResume();
-//        if(mFirstStart)
-//            UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlaying());
-//        if (mNeedUpdateUI) {
-//            onMetaChanged();
-//            onPlayStateChange();
-//            mNeedUpdateUI = false;
-//        }
+    if (isPortraitOrientation(this)) {
+      mPager.setCurrentItem(1);
+    }
     //更新进度条
     new ProgressThread().start();
   }
@@ -417,27 +416,32 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     outState.putParcelable(EXTRA_RECT, mOriginRect);
+    //todo 暂时这样处理
+    outState.putBoolean(EXTRA_FROM_NOTIFY, true);
   }
 
   @Override
   protected void onRestoreInstanceState(Bundle savedInstanceState) {
     super.onRestoreInstanceState(savedInstanceState);
-    if (mOriginRect == null && savedInstanceState != null
-        && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
-      mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
+    if (savedInstanceState != null) {
+      if (mOriginRect == null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
+        mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
+      }
+      //todo 暂时先屏幕横竖屏切换后的动画
+      mFromNotify = savedInstanceState.getBoolean(EXTRA_FROM_NOTIFY, false);
     }
   }
 
   @Override
   public void onBackPressed() {
     //从通知栏打开或者横屏直接退出
-    if(mFromNotify || !isPortraitOrientation(this)){
+    if (mFromNotify) {
       finish();
       overridePendingTransition(0, R.anim.audio_out);
       return;
     }
     if (mPager.getCurrentItem() == 1) {
-      if (mIsBacking || mAnimCover == null) {
+      if (mIsBacking || mAnimationCover == null) {
         return;
       }
       mIsBacking = true;
@@ -447,7 +451,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
           .newBuilderWithSource(mUri == null ? Uri.EMPTY : mUri);
       DraweeController controller = Fresco.newDraweeControllerBuilder()
           .setImageRequest(imageRequestBuilder.build())
-          .setOldController(mAnimCover.getController())
+          .setOldController(mAnimationCover.getController())
 //                    .setControllerListener(new ControllerListener<ImageInfo>() {
 //                        @Override
 //                        public void onSubmit(String id, Object callerContext) {
@@ -480,8 +484,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //                        }
 //                    })
           .build();
-      mAnimCover.setController(controller);
-      mAnimCover.setVisibility(View.VISIBLE);
+      mAnimationCover.setController(controller);
+      mAnimationCover.setVisibility(View.VISIBLE);
       playBackAnimation();
     } else {
       finish();
@@ -500,14 +504,14 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     coverSpring.addListener(new SimpleSpringListener() {
       @Override
       public void onSpringUpdate(Spring spring) {
-        if (mAnimCover == null) {
+        if (mAnimationCover == null) {
           return;
         }
         final double currentVal = spring.getCurrentValue();
-        mAnimCover.setTranslationX((float) (transitionX * currentVal));
-        mAnimCover.setTranslationY((float) (transitionY * currentVal));
-        mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
-        mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
+        mAnimationCover.setTranslationX((float) (transitionX * currentVal));
+        mAnimationCover.setTranslationY((float) (transitionY * currentVal));
+        mAnimationCover.setScaleX((float) (1 + scaleX * currentVal));
+        mAnimationCover.setScaleY((float) (1 + scaleY * currentVal));
       }
 
       @Override
@@ -860,147 +864,33 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
    * 初始化viewpager
    */
   @SuppressLint("ClickableViewAccessibility")
-  private void setUpViewPager() {
+  private void setUpFragments() {
+    final FragmentManager fragmentManager = getSupportFragmentManager();
+
+    //todo 暂时先这样处理
+    fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    fragmentManager.executePendingTransactions();
     //activity重启后复用以前的fragment
-    FragmentManager fragmentManager = getSupportFragmentManager();
-    if (fragmentManager.getFragments() != null && fragmentManager.getFragments().size() > 0) {
-      for (Fragment fragment : fragmentManager.getFragments()) {
-        if (fragment instanceof RecordFragment) {
-          mRecordFragment = (RecordFragment) fragment;
-        } else if (fragment instanceof CoverFragment) {
-          mCoverFragment = (CoverFragment) fragment;
-        } else if (fragment instanceof LyricFragment) {
-          mLyricFragment = (LyricFragment) fragment;
+    final List<Fragment> fragments = fragmentManager.getFragments();
+    if (fragments != null) {
+      for (Fragment fragment : fragments) {
+        if (fragment instanceof LyricFragment ||
+            fragment instanceof CoverFragment ||
+            fragment instanceof RecordFragment) {
+          fragmentManager.beginTransaction().remove(fragment).commitNow();
         }
       }
     }
 
-    //初始化所有fragment
-    if (mRecordFragment == null) {
+    mCoverFragment = new CoverFragment();
+    setUpCoverFragment();
+    mLyricFragment = new LyricFragment();
+    setUpLyricFragment();
+
+    if (isPortraitOrientation(this)) {
+
       mRecordFragment = new RecordFragment();
-    }
-    if (mCoverFragment == null) {
-      mCoverFragment = new CoverFragment();
-    }
-    mCoverFragment.setOnFirstLoadFinishListener(() -> mAnimCover.setVisibility(View.INVISIBLE));
 
-    mCoverFragment.setInflateFinishListener(view -> {
-      //从通知栏启动只设置位置信息并隐藏
-      //不用启动动画
-      if (mFromNotify) {
-        mCoverFragment.showImage();
-        //隐藏动画用的封面并设置位置信息
-        mAnimCover.setVisibility(View.GONE);
-        return;
-      }
-
-      if (mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
-        //获取传入的界面信息
-        mOriginRect = getIntent().getParcelableExtra(EXTRA_RECT);
-      }
-
-      if (mOriginRect == null) {
-        return;
-      }
-      // 获取上一个界面中，图片的宽度和高度
-      mOriginWidth = mOriginRect.width();
-      mOriginHeight = mOriginRect.height();
-
-      // 设置 view 的位置，使其和上一个界面中图片的位置重合
-      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
-      params.setMargins(mOriginRect.left,
-          mOriginRect.top - StatusBarUtil.getStatusBarHeight(mContext), mOriginRect.right,
-          mOriginRect.bottom);
-      mAnimCover.setLayoutParams(params);
-
-      //获得终点控件的位置信息
-      view.getGlobalVisibleRect(mDestRect);
-      // 计算图片缩放比例和位移距离
-      getMoveInfo(mDestRect);
-
-      mAnimCover.setPivotX(0);
-      mAnimCover.setPivotY(0);
-
-      final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-      final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-      final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-      final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-
-      final Spring spring = SpringSystem.create().createSpring();
-      spring.setSpringConfig(COVER_IN_SPRING_CONFIG);
-      spring.addListener(new SimpleSpringListener() {
-        @Override
-        public void onSpringUpdate(Spring spring) {
-          if (mAnimCover == null) {
-            return;
-          }
-          final double currentVal = spring.getCurrentValue();
-          mAnimCover.setTranslationX((float) (transitionX * currentVal));
-          mAnimCover.setTranslationY((float) (transitionY * currentVal));
-          mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
-          mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
-        }
-
-        @Override
-        public void onSpringAtRest(Spring spring) {
-          //入场动画结束时显示fragment中的封面
-          mCoverFragment.showImage();
-//                    mHandler.postDelayed(() -> {
-//                        //隐藏动画用的封面
-//                        mAnimCover.setVisibility(View.INVISIBLE);
-//                    },24);
-
-        }
-
-        @Override
-        public void onSpringActivate(Spring spring) {
-          overridePendingTransition(0, 0);
-        }
-      });
-      spring.setOvershootClampingEnabled(true);
-      spring.setCurrentValue(0);
-      spring.setEndValue(1);
-
-    });
-
-    if (mLyricFragment == null) {
-      mLyricFragment = new LyricFragment();
-    }
-    mLyricFragment.setOnInflateFinishListener(view -> {
-      mLrcView = (LrcView) view;
-      mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
-        @Override
-        public void onClick() {
-        }
-
-        @Override
-        public void onLongClick() {
-        }
-      });
-      mLrcView.setOnSeekToListener(progress -> {
-        if (progress > 0 && progress < MusicServiceRemote.getDuration()) {
-          MusicServiceRemote.setProgress(progress);
-          mCurrentTime = progress;
-          mHandler.sendEmptyMessage(UPDATE_TIME_ALL);
-        }
-      });
-      mLrcView.setHighLightColor(ThemeStore.getTextColorPrimary());
-      mLrcView.setOtherColor(ThemeStore.getTextColorSecondary());
-      mLrcView.setTimeLineColor(ThemeStore.getTextColorSecondary());
-    });
-
-    if (!isPortraitOrientation(this)) {//横屏
-      //歌词界面常亮
-      if (SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,
-          false)) {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-      }
-      getSupportFragmentManager()
-          .beginTransaction()
-          .add(R.id.container_cover,mCoverFragment)
-          .add(R.id.container_lyric,mLyricFragment)
-          .commit();
-    } else {//竖屏
       mAdapter = new PagerAdapter(getSupportFragmentManager());
       mAdapter.addFragment(mRecordFragment);
       mAdapter.addFragment(mCoverFragment);
@@ -1008,7 +898,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
       mPager.setAdapter(mAdapter);
       mPager.setOffscreenPageLimit(mAdapter.getCount() - 1);
-      mPager.setCurrentItem(1);
 
       final int THRESHOLD_Y = DensityUtil.dip2px(mContext, 40);
       final int THRESHOLD_X = DensityUtil.dip2px(mContext, 60);
@@ -1045,8 +934,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
           }
           //歌词界面常亮
           if (position == 2 && SPUtil
-              .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,
-                  false)) {
+              .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON, false)) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
           }
         }
@@ -1055,7 +943,142 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         public void onPageScrollStateChanged(int state) {
         }
       });
+    } else {
+      //歌词界面常亮
+      if (SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,
+          false)) {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+      }
+      mCoverFragment = new CoverFragment();
+      setUpCoverFragment();
+      mLyricFragment = new LyricFragment();
+      setUpLyricFragment();
+      fragmentManager
+          .beginTransaction()
+          .replace(R.id.container_cover, mCoverFragment)
+          .replace(R.id.container_lyric, mLyricFragment)
+          .commit();
     }
+
+  }
+
+  private void setUpLyricFragment() {
+    mLyricFragment.setOnInflateFinishListener(view -> {
+      mLrcView = (LrcView) view;
+      mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
+        @Override
+        public void onClick() {
+        }
+
+        @Override
+        public void onLongClick() {
+        }
+      });
+      mLrcView.setOnSeekToListener(progress -> {
+        if (progress > 0 && progress < MusicServiceRemote.getDuration()) {
+          MusicServiceRemote.setProgress(progress);
+          mCurrentTime = progress;
+          mHandler.sendEmptyMessage(UPDATE_TIME_ALL);
+        }
+      });
+      mLrcView.setHighLightColor(ThemeStore.getTextColorPrimary());
+      mLrcView.setOtherColor(ThemeStore.getTextColorSecondary());
+      mLrcView.setTimeLineColor(ThemeStore.getTextColorSecondary());
+    });
+  }
+
+  private void setUpCoverFragment() {
+    mCoverFragment.setOnFirstLoadFinishListener(() -> mAnimationCover.setVisibility(View.INVISIBLE));
+    mCoverFragment.setInflateFinishListener(view -> {
+      //从通知栏启动只设置位置信息并隐藏
+      //不用启动动画
+      if (mFromNotify) {
+        mCoverFragment.showImage();
+        //隐藏动画用的封面并设置位置信息
+        mAnimationCover.setVisibility(View.GONE);
+        return;
+      }
+
+      if (mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
+        //获取传入的界面信息
+        mOriginRect = getIntent().getParcelableExtra(EXTRA_RECT);
+      }
+
+      if (mOriginRect == null) {
+        return;
+      }
+      // 获取上一个界面中，图片的宽度和高度
+      mOriginWidth = mOriginRect.width();
+      mOriginHeight = mOriginRect.height();
+
+      // 设置 view 的位置，使其和上一个界面中图片的位置重合
+      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
+      params.setMargins(mOriginRect.left,
+          mOriginRect.top - StatusBarUtil.getStatusBarHeight(mContext), mOriginRect.right,
+          mOriginRect.bottom);
+      mAnimationCover.setLayoutParams(params);
+
+      //获得终点控件的位置信息
+      view.getGlobalVisibleRect(mDestRect);
+      // 计算图片缩放比例和位移距离
+      getMoveInfo(mDestRect);
+
+      mAnimationCover.setPivotX(0);
+      mAnimationCover.setPivotY(0);
+
+      final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
+      final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
+      final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
+      final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
+
+      final Spring spring = SpringSystem.create().createSpring();
+      spring.setSpringConfig(COVER_IN_SPRING_CONFIG);
+      spring.addListener(new SimpleSpringListener() {
+        @Override
+        public void onSpringUpdate(Spring spring) {
+          if (mAnimationCover == null) {
+            return;
+          }
+          final double currentVal = spring.getCurrentValue();
+          mAnimationCover.setTranslationX((float) (transitionX * currentVal));
+          mAnimationCover.setTranslationY((float) (transitionY * currentVal));
+          mAnimationCover.setScaleX((float) (1 + scaleX * currentVal));
+          mAnimationCover.setScaleY((float) (1 + scaleY * currentVal));
+        }
+
+        @Override
+        public void onSpringAtRest(Spring spring) {
+          //入场动画结束时显示fragment中的封面
+          mCoverFragment.showImage();
+//                    mHandler.postDelayed(() -> {
+//                        //隐藏动画用的封面
+//                        mAnimationCover.setVisibility(View.INVISIBLE);
+//                    },24);
+
+        }
+
+        @Override
+        public void onSpringActivate(Spring spring) {
+          overridePendingTransition(0, 0);
+        }
+      });
+      spring.setOvershootClampingEnabled(true);
+      spring.setCurrentValue(0);
+      spring.setEndValue(1);
+
+    });
+  }
+
+  @Override
+  public void recreate() {
+    super.recreate();
+
+//    getSupportFragmentManager()
+//        .beginTransaction()
+//        .remove(mLyricFragment)
+//        .remove(mCoverFragment)
+//        .remove(mRecordFragment)
+//        .commitNowAllowingStateLoss();
   }
 
   @Override
