@@ -144,8 +144,4 @@ public class BaseActivity extends AppCompatActivity {
     mIsForeground = false;
   }
 
-  @Override
-  protected void onStop() {
-    super.onStop();
-  }
 }

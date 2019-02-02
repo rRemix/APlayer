@@ -127,7 +127,7 @@ class DownloadService : IntentService("DownloadService") {
         .setContentTitle(getString(R.string.downloading))
 //                .setContentText(getString(if(isFinish) R.string.download_complete_to_do else R.string.please_wait))
         .setProgress(targetSize.toInt(), downloadSize.toInt(), false)
-        .setSmallIcon(R.drawable.notifbar_icon)
+        .setSmallIcon(R.drawable.icon_notifbar)
         .setAutoCancel(false)
         .setShowWhen(false)
         .setOngoing(true)

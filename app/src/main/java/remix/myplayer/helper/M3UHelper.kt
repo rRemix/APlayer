@@ -110,7 +110,7 @@ object M3UHelper {
     return databaseRepository
         .getPlayList(playlistName)
         .flatMap {
-          databaseRepository.getPlayListSongs(context,it)
+          databaseRepository.getPlayListSongs(context, it)
         }
         .flatMapCompletable { songs ->
           CompletableSource {

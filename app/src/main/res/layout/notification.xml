@@ -63,21 +63,21 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
-        android:src="@drawable/notify_play"/>
+        android:src="@drawable/icon_notify_play"/>
       <ImageButton
         android:id="@+id/notify_next"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
-        android:src="@drawable/notify_next"/>
+        android:src="@drawable/icon_notify_next"/>
 
       <ImageButton
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:id="@+id/notify_close"
-        android:src="@drawable/notify_btn_close_white"
+        android:src="@drawable/icon_notify_btn_close_white"
         android:background="?android:attr/selectableItemBackground"/>
     </LinearLayout>
   </LinearLayout>

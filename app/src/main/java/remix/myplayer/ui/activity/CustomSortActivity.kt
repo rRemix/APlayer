@@ -115,7 +115,7 @@ class CustomSortActivity : ToolbarActivity() {
 
       Thread.sleep(500)
       val result = DatabaseRepository.getInstance()
-          .updatePlayListAudios(playlistId,songs.map { it.id })
+          .updatePlayListAudios(playlistId, songs.map { it.id })
           .blockingGet()
 
       uiThread {

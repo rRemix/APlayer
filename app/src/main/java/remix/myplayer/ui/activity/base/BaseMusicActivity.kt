@@ -32,18 +32,44 @@ import timber.log.Timber
 import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
-import kotlin.collections.LinkedHashSet
 
 @SuppressLint("Registered")
 open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
-  private var mServiceToken: MusicServiceRemote.ServiceToken? = null
-  private val mMusicServiceEventListeners = LinkedHashSet<MusicEventCallback>()
-  private var mMusicStateReceiver: MusicStateReceiver? = null
-  private var mReceiverRegistered: Boolean = false
+  private var serviceToken: MusicServiceRemote.ServiceToken? = null
+  private val serviceEventListeners = ArrayList<MusicEventCallback>()
+  private var musicStateReceiver: MusicStateReceiver? = null
+  private var receiverRegistered: Boolean = false
+  private var pendingBindService = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mServiceToken = MusicServiceRemote.bindToService(this, object : ServiceConnection {
+    bindToService()
+  }
+
+  override fun onRestart() {
+    super.onRestart()
+    if (pendingBindService) {
+      bindToService()
+      pendingBindService = false
+    }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    MusicServiceRemote.unbindFromService(serviceToken)
+    mMusicStateHandler?.removeCallbacksAndMessages(null)
+    if (receiverRegistered) {
+      unregisterLocalReceiver(musicStateReceiver)
+      receiverRegistered = true
+    }
+  }
+
+  private fun bindToService() {
+    if (!Util.isAppOnForeground()) {
+      pendingBindService = true
+      return
+    }
+    serviceToken = MusicServiceRemote.bindToService(this, object : ServiceConnection {
       override fun onServiceConnected(name: ComponentName, service: IBinder) {
         val musicService = (service as MusicService.MusicBinder).service
         this@BaseMusicActivity.onServiceConnected(musicService)
@@ -55,38 +81,21 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
     })
   }
 
-//  override fun onResume() {
-//    super.onResume()
-//    if(Util.isAppOnForeground()){
-//      startService(Intent(this, MusicService::class.java))
-//    }
-//  }
-
-  override fun onDestroy() {
-    super.onDestroy()
-    MusicServiceRemote.unbindFromService(mServiceToken)
-    mMusicStateHandler?.removeCallbacksAndMessages(null)
-    if (mReceiverRegistered) {
-      unregisterLocalReceiver(mMusicStateReceiver)
-      mReceiverRegistered = true
-    }
-  }
-
   fun addMusicServiceEventListener(listener: MusicEventCallback?) {
     if (listener != null) {
-      mMusicServiceEventListeners.add(listener)
+      serviceEventListeners.add(listener)
     }
   }
 
   fun removeMusicServiceEventListener(listener: MusicEventCallback?) {
     if (listener != null) {
-      mMusicServiceEventListeners.remove(listener)
+      serviceEventListeners.remove(listener)
     }
   }
 
   override fun onMediaStoreChanged() {
     Timber.v("onMediaStoreChanged: ${this.javaClass.simpleName}")
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onMediaStoreChanged()
     }
   }
@@ -94,57 +103,57 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   override fun onPermissionChanged(has: Boolean) {
     Timber.v("onPermissionChanged: ${this.javaClass.simpleName}")
     mHasPermission = has
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onPermissionChanged(has)
     }
   }
 
   override fun onPlayListChanged(name: String) {
     Timber.v("onMediaStoreChanged: ${this.javaClass.simpleName}")
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onPlayListChanged(name)
     }
   }
 
   override fun onMetaChanged() {
     Timber.v("onMetaChange: ${this.javaClass.simpleName}")
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onMetaChanged()
     }
   }
 
   override fun onPlayStateChange() {
     Timber.v("onPlayStateChange: ${this.javaClass.simpleName}")
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onPlayStateChange()
     }
   }
 
   override fun onServiceConnected(service: MusicService) {
     Timber.v("onServiceConnected: ${this.javaClass.simpleName}")
-    if (!mReceiverRegistered) {
-      mMusicStateReceiver = MusicStateReceiver(this)
+    if (!receiverRegistered) {
+      musicStateReceiver = MusicStateReceiver(this)
       val filter = IntentFilter()
       filter.addAction(MusicService.PLAYLIST_CHANGE)
       filter.addAction(MusicService.PERMISSION_CHANGE)
       filter.addAction(MusicService.MEDIA_STORE_CHANGE)
       filter.addAction(MusicService.META_CHANGE)
       filter.addAction(MusicService.PLAY_STATE_CHANGE)
-      registerLocalReceiver(mMusicStateReceiver, filter)
-      mReceiverRegistered = true
+      registerLocalReceiver(musicStateReceiver, filter)
+      receiverRegistered = true
     }
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onServiceConnected(service)
     }
     mMusicStateHandler = MusicStateHandler(this)
   }
 
   override fun onServiceDisConnected() {
-    if (mReceiverRegistered) {
-      unregisterLocalReceiver(mMusicStateReceiver)
-      mReceiverRegistered = false
+    if (receiverRegistered) {
+      unregisterLocalReceiver(musicStateReceiver)
+      receiverRegistered = false
     }
-    for (listener in mMusicServiceEventListeners) {
+    for (listener in serviceEventListeners) {
       listener.onServiceDisConnected()
     }
     mMusicStateHandler?.removeCallbacksAndMessages(null)
@@ -189,8 +198,8 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
         val action = intent.action
         val msg = it.obtainMessage(action.hashCode())
         msg.obj = action
-        msg.data.putString(EXTRA_PLAYLIST,intent.getStringExtra(EXTRA_PLAYLIST))
-        msg.data.putBoolean(EXTRA_PERMISSION,intent.getBooleanExtra(EXTRA_PERMISSION,false))
+        msg.data.putString(EXTRA_PLAYLIST, intent.getStringExtra(EXTRA_PLAYLIST))
+        msg.data.putBoolean(EXTRA_PERMISSION, intent.getBooleanExtra(EXTRA_PERMISSION, false))
         it.removeMessages(msg.what)
         it.sendMessageDelayed(msg, 200)
       }

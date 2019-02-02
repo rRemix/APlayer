@@ -29,8 +29,7 @@ public class AlipayUtil {
       "scheme=alipayqr;package=com.eg.android.AlipayGphone;end";
 
   /**
-   * 打开转账窗口 旧版支付宝二维码方法，需要使用 https://fama.alipay.com/qrcode/index.htm 网站生成的二维码 这个方法最好，但在 2016 年 8
-   * 月发现新用户可能无法使用
+   * 打开转账窗口 旧版支付宝二维码方法，需要使用 https://fama.alipay.com/qrcode/index.htm 网站生成的二维码 这个方法最好，但在 2016 年 8 月发现新用户可能无法使用
    *
    * @param activity Parent Activity
    * @return 是否成功调用

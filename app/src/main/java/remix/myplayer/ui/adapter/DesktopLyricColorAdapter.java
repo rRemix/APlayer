@@ -24,7 +24,7 @@ import remix.myplayer.util.DensityUtil;
  * Created by Remix on 2017/8/15.
  */
 
-public class FloatColorAdapter extends BaseAdapter<Integer, FloatColorAdapter.FloatColorHolder> {
+public class DesktopLyricColorAdapter extends BaseAdapter<Integer, DesktopLyricColorAdapter.FloatColorHolder> {
 
   //当前桌面歌词的字体颜色 默认为当前主题颜色
   private int mCurrentColor;
@@ -39,7 +39,7 @@ public class FloatColorAdapter extends BaseAdapter<Integer, FloatColorAdapter.Fl
       R.color.md_white_primary, R.color.md_pink_primary
   );
 
-  public FloatColorAdapter(Context Context, int layoutId, int width) {
+  public DesktopLyricColorAdapter(Context Context, int layoutId, int width) {
     super(Context, layoutId);
     setData(COLORS);
     mItemWidth = width / COLORS.size();

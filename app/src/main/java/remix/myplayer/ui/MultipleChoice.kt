@@ -170,7 +170,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
 
               checkParam.forEach {
                 val playlist = it as PlayList
-                if(playlist.name != DatabaseRepository.MyLove){
+                if (playlist.name != DatabaseRepository.MyLove) {
                   databaseRepository.deletePlayList((it as PlayList).id).subscribe()
                 }
               }

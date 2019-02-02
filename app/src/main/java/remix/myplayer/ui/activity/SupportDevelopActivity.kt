@@ -144,7 +144,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
                     outputStream?.close()
                   }
                   .subscribe({
-                    ToastUtil.showLong(mContext, R.string.save_wechat_qrcode_success, it.absolutePath)
+                    ToastUtil.show(mContext, R.string.save_wechat_qrcode_success, it.absolutePath)
                   }, {
                     ToastUtil.show(mContext, R.string.save_error)
                   })

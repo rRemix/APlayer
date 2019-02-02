@@ -359,7 +359,6 @@ public class EQSeekBar extends View {
       mDBText = "0";
     }
 
-
     invalidate();
   }
 

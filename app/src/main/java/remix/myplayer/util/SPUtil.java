@@ -122,11 +122,11 @@ public class SPUtil {
     //第一次读取数据
     String FIRST_LOAD = "first_load";
     //桌面歌词是否可移动
-    String FLOAT_LYRIC_LOCK = "float_lyric_lock";
+    String DESKTOP_LYRIC_LOCK = "desktop_lyric_lock";
     //桌面歌词字体大小
-    String FLOAT_TEXT_SIZE = "float_text_size";
+    String DESKTOP_LYRIC_TEXT_SIZE = "desktop_lyric_text_size";
     //桌面歌词y坐标
-    String FLOAT_Y = "float_y";
+    String DESKTOP_LYRIC_Y = "desktop_lyric_y";
     //是否开启屏幕常亮
     String SCREEN_ALWAYS_ON = "key_screen_always_on";
     //通知栏是否启用经典样式
@@ -146,7 +146,7 @@ public class SPUtil {
     //优先搜索在线歌词
     String ONLINE_LYRIC_FIRST = "online_lyric_first";
     //是否开启桌面歌词
-    String FLOAT_LYRIC_SHOW = "float_lyric_show";
+    String DESKTOP_LYRIC_SHOW = "desktop_lyric_show";
     //沉浸式状态栏
     String IMMERSIVE_MODE = "immersive_mode";
     //过滤大小

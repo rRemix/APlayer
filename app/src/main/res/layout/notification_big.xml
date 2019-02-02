@@ -44,7 +44,7 @@
           android:layout_height="wrap_content"
           android:background="?android:attr/selectableItemBackground"
           android:padding="@dimen/d6_size"
-          android:src="@drawable/notify_btn_close_white"/>
+          android:src="@drawable/icon_notify_btn_close_white"/>
         <TextView
           style="@android:style/TextAppearance.StatusBar.EventContent.Title"
           android:id="@+id/notify_song"
@@ -83,14 +83,14 @@
           android:layout_width="0dp"
           android:layout_height="match_parent"
           android:background="?android:attr/selectableItemBackground"
-          android:src="@drawable/notify_prev"/>
+          android:src="@drawable/icon_notify_prev"/>
         <ImageButton
           android:id="@+id/notify_play"
           android:layout_weight="1"
           android:layout_width="0dp"
           android:layout_height="match_parent"
           android:background="?android:attr/selectableItemBackground"
-          android:src="@drawable/notify_play"/>
+          android:src="@drawable/icon_notify_play"/>
 
         <ImageButton
           android:id="@+id/notify_next"
@@ -98,14 +98,14 @@
           android:layout_width="0dp"
           android:layout_height="match_parent"
           android:background="?android:attr/selectableItemBackground"
-          android:src="@drawable/notify_next"/>
+          android:src="@drawable/icon_notify_next"/>
         <ImageButton
           android:id="@+id/notify_lyric"
           android:layout_weight="1"
           android:layout_width="0dp"
           android:layout_height="match_parent"
           android:background="?android:attr/selectableItemBackground"
-          android:src="@drawable/notify_lyric"/>
+          android:src="@drawable/icon_notify_lyric"/>
       </LinearLayout>
     </LinearLayout>
   </LinearLayout>

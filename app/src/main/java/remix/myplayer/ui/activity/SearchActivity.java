@@ -123,8 +123,8 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
     searchItem.expandActionView();
 
     SearchView searchView = (SearchView) searchItem.getActionView();
-    if(searchView == null){
-      ToastUtil.show(this,R.string.init_failed);
+    if (searchView == null) {
+      ToastUtil.show(this, R.string.init_failed);
       finish();
       return true;
     }

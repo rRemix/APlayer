@@ -3,12 +3,10 @@ package remix.myplayer.helper
 import android.app.Activity
 import android.content.*
 import android.os.IBinder
-import com.tencent.bugly.crashreport.CrashReport
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Constants
-import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import tv.danmaku.ijk.media.player.IMediaPlayer
 import java.util.*
@@ -23,7 +21,7 @@ object MusicServiceRemote {
 
   @JvmStatic
   fun bindToService(context: Context, callback: ServiceConnection): ServiceToken? {
-    if(!Util.isAppOnForeground()){
+    if (!Util.isAppOnForeground()) {
       return null
     }
     var realActivity: Activity? = (context as Activity).parent
@@ -41,6 +39,7 @@ object MusicServiceRemote {
 
     return null
   }
+
 
   @JvmStatic
   fun unbindFromService(token: ServiceToken?) {

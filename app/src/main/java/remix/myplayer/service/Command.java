@@ -20,6 +20,7 @@ public interface Command {
   int CHANGE_LYRIC = 14;
   int PLAY_AT_BREAKPOINT = 15;
   int TOGGLE_TIMER = 16;
-  int TOGGLE_FLOAT_LRC = 17;
+  int TOGGLE_DESKTOP_LYRIC = 17;
   int HEADSET_CHANGE = 18;
+  int LOCK_LYRIC = 19;
 }

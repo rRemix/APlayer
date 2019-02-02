@@ -36,7 +36,7 @@ public class Category implements Serializable {
   }
 
   public boolean isPlayList() {
-    if(TextUtils.isEmpty(mClassName)){
+    if (TextUtils.isEmpty(mClassName)) {
       mClassName = mTag == TAG_SONG ? SongFragment.class.getName() :
           mTag == TAG_ALBUM ? AlbumFragment.class.getName() :
               mTag == TAG_ARTIST ? ArtistFragment.class.getName() :

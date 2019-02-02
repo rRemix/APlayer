@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import remix.myplayer.R;
-import remix.myplayer.theme.ThemeStore;
 
 /**
  * @author Aidan Follestad (afollestad)

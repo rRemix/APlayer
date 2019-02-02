@@ -98,7 +98,7 @@ public class MediaStoreUtil {
         MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
         null,
         SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
-            SortOrder.ArtistSortOrder.ARTIST_A_Z))){
+            SortOrder.ArtistSortOrder.ARTIST_A_Z))) {
       if (cursor != null) {
         while (cursor.moveToNext()) {
           artists.add(new Artist(cursor.getInt(0),
@@ -116,7 +116,7 @@ public class MediaStoreUtil {
       return new ArrayList<>();
     }
     ArrayList<Album> albums = new ArrayList<>();
-    try(Cursor cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+    try (Cursor cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
         new String[]{MediaStore.Audio.Media.ALBUM_ID,
             MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.ARTIST_ID,
@@ -342,7 +342,7 @@ public class MediaStoreUtil {
       selection.append(ids.get(i)).append(i == ids.size() - 1 ? ") " : ",");
     }
 
-    return getSongs(selection.toString(),null);
+    return getSongs(selection.toString(), null);
   }
 
 
@@ -366,7 +366,7 @@ public class MediaStoreUtil {
   }
 
   @WorkerThread
-  public static void saveArtwork(Context context,int albumId, File artFile)
+  public static void saveArtwork(Context context, int albumId, File artFile)
       throws TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException, IOException, CannotWriteException {
     Song song = MediaStoreUtil.getSongByAlbumId(albumId);
     if (song == null) {

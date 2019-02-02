@@ -54,13 +54,17 @@ class NotifyImpl(context: MusicService) : Notify(context) {
         remoteView.setImageViewResource(R.id.notify_bg, R.drawable.bg_notification_black)
         remoteView.setViewVisibility(R.id.notify_bg, View.VISIBLE)
       }
+      //桌面歌词
+      remoteBigView.setImageViewResource(R.id.notify_lyric,
+          if (service.isDesktopLyricLocked) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)
+
       //设置播放按钮
       if (!isPlay) {
-        remoteBigView.setImageViewResource(R.id.notify_play, R.drawable.notify_play)
-        remoteView.setImageViewResource(R.id.notify_play, R.drawable.notify_play)
+        remoteBigView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_play)
+        remoteView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_play)
       } else {
-        remoteBigView.setImageViewResource(R.id.notify_play, R.drawable.notify_pause)
-        remoteView.setImageViewResource(R.id.notify_play, R.drawable.notify_pause)
+        remoteBigView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_pause)
+        remoteView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_pause)
       }
       //设置封面
       val size = DensityUtil.dip2px(service, 128f)
@@ -103,7 +107,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
         .setPriority(NotificationCompat.PRIORITY_MAX)
         .setOngoing(service.isPlaying)
         .setContentIntent(contentIntent)
-        .setSmallIcon(R.drawable.notifbar_icon)
+        .setSmallIcon(R.drawable.icon_notifbar)
     builder.setCustomBigContentView(remoteBigView)
     builder.setCustomContentView(remoteView)
     return builder.build()
@@ -129,7 +133,8 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     remoteView.setOnClickPendingIntent(R.id.notify_close, closeIntent)
 
     //桌面歌词
-    val lyricIntent = buildPendingIntent(context, Command.TOGGLE_FLOAT_LRC)
+    val lyricIntent = buildPendingIntent(context,
+        if (service.isDesktopLyricLocked) Command.UNLOCK_DESKTOP_LYRIC else Command.TOGGLE_DESKTOP_LYRIC)
     remoteBigView.setOnClickPendingIntent(R.id.notify_lyric, lyricIntent)
     remoteView.setOnClickPendingIntent(R.id.notify_lyric, lyricIntent)
   }

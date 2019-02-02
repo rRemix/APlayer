@@ -1,235 +1,247 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="remix.myplayer">
+<manifest
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  package="remix.myplayer">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE" /> -->
-    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
-    <uses-permission android:name="android.hardware.sensor.accelerometer"/>
-    <uses-permission android:name="com.android.vending.BILLING" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE" /> -->
+  <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+  <uses-permission android:name="android.permission.VIBRATE"/>
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+  <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+  <uses-permission android:name="android.permission.READ_LOGS"/>
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+  <uses-permission android:name="android.hardware.sensor.accelerometer"/>
+  <uses-permission android:name="com.android.vending.BILLING"/>
 
-    <application
-        android:name=".App"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+  <application
+    android:allowBackup="true"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:name=".App"
+    android:supportsRtl="true"
+    android:theme="@style/AppTheme">
 
-        <meta-data
-            android:name="BUGLY_APP_CHANNEL"
-            android:value="${CHANNEL_VALUE}" />
+    <meta-data
+      android:name="BUGLY_APP_CHANNEL"
+      android:value="${CHANNEL_VALUE}"/>
 
-        <!-- 主页面 -->
-        <activity
-            android:name=".ui.activity.MainActivity"
-            android:theme="@style/ActivityStyle">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.MUSIC_PLAYER" />
+    <!-- 主页面 -->
+    <activity
+      android:name=".ui.activity.MainActivity"
+      android:theme="@style/ActivityStyle">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
+        <action android:name="android.intent.action.MUSIC_PLAYER"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.APP_MUSIC" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+        <category android:name="android.intent.category.LAUNCHER"/>
+        <category android:name="android.intent.category.APP_MUSIC"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+      </intent-filter>
 
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.DEFAULT"/>
 
-                <data android:scheme="content" />
-                <data android:mimeType="audio/*" />
-                <data android:mimeType="application/ogg" />
-                <data android:mimeType="application/x-ogg" />
-                <data android:mimeType="application/itunes" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="content"/>
+        <data android:mimeType="audio/*"/>
+        <data android:mimeType="application/ogg"/>
+        <data android:mimeType="application/x-ogg"/>
+        <data android:mimeType="application/itunes"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.DEFAULT"/>
 
-                <data android:scheme="file" />
-                <data android:mimeType="audio/*" />
-                <data android:mimeType="application/ogg" />
-                <data android:mimeType="application/x-ogg" />
-                <data android:mimeType="application/itunes" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.cyanogenmod.eleven.AUDIO_PLAYER" />
+        <data android:scheme="file"/>
+        <data android:mimeType="audio/*"/>
+        <data android:mimeType="application/ogg"/>
+        <data android:mimeType="application/x-ogg"/>
+        <data android:mimeType="application/itunes"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="com.cyanogenmod.eleven.AUDIO_PLAYER"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.PICK" />
+        <category android:name="android.intent.category.DEFAULT"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.PICK"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.OPENABLE" />
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="android.intent.category.OPENABLE"/>
 
-                <data android:mimeType="vnd.android.cursor.dir/audio" />
-            </intent-filter>
-        </activity>
-        <!-- 播放界面 -->
-        <activity
-            android:name=".ui.activity.PlayerActivity"
-            android:parentActivityName=".ui.activity.MainActivity"
-            android:theme="@style/PlayerActivityStyle"
-            android:windowSoftInputMode="adjustPan">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activity.MainActivity" />
-        </activity>
-        <!-- 搜索 -->
-        <activity
-            android:name=".ui.activity.SearchActivity"
-            android:theme="@style/ActivityStyle" />
-        <!-- 子目录列表 -->
-        <activity
-            android:name=".ui.activity.ChildHolderActivity"
-            android:theme="@style/ActivityStyle" />
-        <!--手动排序-->
-        <activity android:name=".ui.activity.CustomSortActivity"
-            android:theme="@style/ActivityStyle"/>
-        <!-- 海报分享 -->
-        <activity
-            android:name=".ui.activity.RecordShareActivity"
-            android:theme="@style/ActivityStyle" />
-        <!-- 关于 -->
-        <activity
-            android:name=".ui.activity.AboutActivity"
-            android:theme="@style/ActivityStyle" />
-        <!-- 最近添加 -->
-        <activity
-            android:name=".ui.activity.RecentlyActivity"
-            android:theme="@style/ActivityStyle" />
-        <!-- 反馈 -->
-        <!-- 扫描大小设置 -->
-        <activity
-            android:name=".ui.activity.ScanActivity"
-            android:theme="@style/ActivityStyle" />
-        <!-- 均衡器 -->
-        <activity
-            android:name=".ui.activity.EQActivity"
-            android:theme="@style/ActivityStyle" />
-        <activity android:name=".ui.activity.SupportDevelopActivity"
-            android:theme="@style/ActivityStyle"/>
-        <!-- 设置 -->
-        <activity
-            android:name=".ui.activity.SettingActivity"
-            android:theme="@style/ActivityStyle" />
-        <!-- 播放列表歌曲选择 -->
-        <activity
-            android:name=".ui.activity.SongChooseActivity"
-            android:theme="@style/ActivityStyle" />
-        <!-- 锁屏页 -->
-        <activity
-            android:name=".ui.activity.LockScreenActivity"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:launchMode="singleInstance"
-            android:theme="@style/LockScreenActivity" />
-        <!-- shortcut过渡 -->
-        <activity
-            android:name=".appshortcuts.AppShortcutActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleInstance"
-            android:theme="@style/AppShortcut" />
+        <data android:mimeType="vnd.android.cursor.dir/audio"/>
+      </intent-filter>
+    </activity>
+    <!-- 播放界面 -->
+    <activity
+      android:name=".ui.activity.PlayerActivity"
+      android:parentActivityName=".ui.activity.MainActivity"
+      android:theme="@style/PlayerActivityStyle"
+      android:windowSoftInputMode="adjustPan">
+      <meta-data
+        android:name="android.support.PARENT_ACTIVITY"
+        android:value=".ui.activity.MainActivity"/>
+    </activity>
+    <!-- 搜索 -->
+    <activity
+      android:name=".ui.activity.SearchActivity"
+      android:theme="@style/ActivityStyle"/>
+    <!-- 子目录列表 -->
+    <activity
+      android:name=".ui.activity.ChildHolderActivity"
+      android:theme="@style/ActivityStyle"/>
+    <!--手动排序-->
+    <activity
+      android:name=".ui.activity.CustomSortActivity"
+      android:theme="@style/ActivityStyle"/>
+    <!-- 海报分享 -->
+    <activity
+      android:name=".ui.activity.RecordShareActivity"
+      android:theme="@style/ActivityStyle"/>
+    <!-- 关于 -->
+    <activity
+      android:name=".ui.activity.AboutActivity"
+      android:theme="@style/ActivityStyle"/>
+    <!-- 最近添加 -->
+    <activity
+      android:name=".ui.activity.RecentlyActivity"
+      android:theme="@style/ActivityStyle"/>
+    <!-- 反馈 -->
+    <!-- 扫描大小设置 -->
+    <activity
+      android:name=".ui.activity.ScanActivity"
+      android:theme="@style/ActivityStyle"/>
+    <!-- 均衡器 -->
+    <activity
+      android:name=".ui.activity.EQActivity"
+      android:theme="@style/ActivityStyle"/>
+    <activity
+      android:name=".ui.activity.SupportDevelopActivity"
+      android:theme="@style/ActivityStyle"/>
+    <!-- 设置 -->
+    <activity
+      android:name=".ui.activity.SettingActivity"
+      android:theme="@style/ActivityStyle"/>
+    <!-- 播放列表歌曲选择 -->
+    <activity
+      android:name=".ui.activity.SongChooseActivity"
+      android:theme="@style/ActivityStyle"/>
+    <!-- 锁屏页 -->
+    <activity
+      android:excludeFromRecents="true"
+      android:exported="false"
+      android:launchMode="singleInstance"
+      android:name=".ui.activity.LockScreenActivity"
+      android:theme="@style/LockScreenActivity"/>
+    <!-- shortcut过渡 -->
+    <activity
+      android:excludeFromRecents="true"
+      android:launchMode="singleInstance"
+      android:name=".appshortcuts.AppShortcutActivity"
+      android:theme="@style/AppShortcut"/>
 
-        <!-- 图片裁剪 -->
-        <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
+    <!-- 图片裁剪 -->
+    <activity android:name="com.soundcloud.android.crop.CropImageActivity"/>
 
 
-        <!-- 线控 -->
-        <receiver android:name=".misc.receiver.MediaButtonReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
+    <!-- 线控 -->
+    <receiver android:name=".misc.receiver.MediaButtonReceiver">
+      <intent-filter>
+        <action android:name="android.intent.action.MEDIA_BUTTON"/>
+      </intent-filter>
+    </receiver>
 
-        <receiver android:name=".misc.receiver.ExitReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="remix.music.EXIT" />
-            </intent-filter>
-        </receiver>
+    <receiver
+      android:exported="false"
+      android:name=".misc.receiver.ExitReceiver">
+      <intent-filter>
+        <action android:name="remix.music.EXIT"/>
+      </intent-filter>
+    </receiver>
 
-        <service android:name=".service.MusicService"
-            android:exported="false"/>
-        <service android:name=".misc.update.DownloadService"
-            android:exported="false"/>
+    <service
+      android:exported="false"
+      android:name=".service.MusicService"/>
+    <service
+      android:exported="false"
+      android:name=".misc.update.DownloadService"/>
 
-        <!-- 桌面部件 -->
-        <receiver android:name=".appwidgets.big.AppWidgetBig"
-            android:label="@string/app_widget_big_name">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
+    <!-- 桌面部件 -->
+    <receiver
+      android:label="@string/app_widget_big_name"
+      android:name=".appwidgets.big.AppWidgetBig">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+      </intent-filter>
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/appwidget_big_info" />
-        </receiver>
-        <receiver android:name=".appwidgets.medium.AppWidgetMedium"
-            android:label="@string/app_widget_medium_name">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
+      <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/appwidget_big_info"/>
+    </receiver>
+    <receiver
+      android:label="@string/app_widget_medium_name"
+      android:name=".appwidgets.medium.AppWidgetMedium">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+      </intent-filter>
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/appwidget_medium_info" />
-        </receiver>
-        <receiver android:name=".appwidgets.small.AppWidgetSmall"
-            android:label="@string/app_widget_small_name">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
+      <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/appwidget_medium_info"/>
+    </receiver>
+    <receiver
+      android:label="@string/app_widget_small_name"
+      android:name=".appwidgets.small.AppWidgetSmall">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+      </intent-filter>
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/appwidget_small_info" />
-        </receiver>
-        <!--透明桌面部件-->
-        <receiver android:name=".appwidgets.medium.AppWidgetMediumTransparent"
-            android:label="@string/app_widget_medium_transparent_name">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
+      <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/appwidget_small_info"/>
+    </receiver>
+    <!--透明桌面部件-->
+    <receiver
+      android:label="@string/app_widget_medium_transparent_name"
+      android:name=".appwidgets.medium.AppWidgetMediumTransparent">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+      </intent-filter>
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/appwidget_medium_transparent_info" />
-        </receiver>
-        <receiver android:name=".appwidgets.small.AppWidgetSmallTransparent"
-            android:label="@string/app_widget_small_transparent_name">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
+      <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/appwidget_medium_transparent_info"/>
+    </receiver>
+    <receiver
+      android:label="@string/app_widget_small_transparent_name"
+      android:name=".appwidgets.small.AppWidgetSmallTransparent">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+      </intent-filter>
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/appwidget_small_transparent_info" />
-        </receiver>
+      <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/appwidget_small_transparent_info"/>
+    </receiver>
 
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
-        </provider>
+    <provider
+      android:authorities="${applicationId}.fileprovider"
+      android:exported="false"
+      android:grantUriPermissions="true"
+      android:name="android.support.v4.content.FileProvider">
+      <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/provider_paths"/>
+    </provider>
 
-    </application>
+  </application>
 
 </manifest>
