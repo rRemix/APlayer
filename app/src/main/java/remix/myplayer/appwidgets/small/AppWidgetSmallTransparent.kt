@@ -14,6 +14,7 @@ import remix.myplayer.service.MusicService
 class AppWidgetSmallTransparent : BaseAppwidget() {
 
   override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+    super.onUpdate(context,appWidgetManager,appWidgetIds)
     defaultAppWidget(context, appWidgetIds)
     val intent = Intent(MusicService.ACTION_WIDGET_UPDATE)
     intent.putExtra(EXTRA_WIDGET_NAME, this.javaClass.simpleName)
@@ -59,5 +60,16 @@ class AppWidgetSmallTransparent : BaseAppwidget() {
 
     val appIds = AppWidgetManager.getInstance(service).getAppWidgetIds(ComponentName(service, javaClass))
     pushPartiallyUpdate(service,appIds,remoteViews)
+  }
+
+  companion object {
+    @Volatile
+    private var INSTANCE: AppWidgetSmallTransparent? = null
+
+    @JvmStatic
+    fun getInstance(): AppWidgetSmallTransparent =
+        INSTANCE ?: synchronized(this) {
+          INSTANCE ?: AppWidgetSmallTransparent()
+        }
   }
 }

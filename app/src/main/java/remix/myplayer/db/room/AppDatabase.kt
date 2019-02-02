@@ -1,7 +1,9 @@
 package remix.myplayer.db.room
 
-import android.arch.persistence.db.SupportSQLiteDatabase
-import android.arch.persistence.room.*
+import android.arch.persistence.room.Database
+import android.arch.persistence.room.InvalidationTracker
+import android.arch.persistence.room.Room
+import android.arch.persistence.room.RoomDatabase
 import android.content.Context
 import android.content.Intent
 import remix.myplayer.db.room.AppDatabase.Companion.VERSION
@@ -15,7 +17,6 @@ import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
-import java.util.*
 
 /**
  * Created by remix on 2019/1/12

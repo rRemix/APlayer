@@ -13,10 +13,10 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.support.annotation.DrawableRes
 import android.widget.RemoteViews
-import com.tencent.bugly.crashreport.CrashReport
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.appwidgets.AppWidgetSkin.WHITE_1F
+import remix.myplayer.appwidgets.big.AppWidgetBig
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.request.RemoteUriRequest
@@ -74,7 +74,7 @@ abstract class BaseAppwidget
 
   protected fun updateCover(service: MusicService, remoteViews: RemoteViews, appWidgetIds: IntArray?, reloadCover: Boolean) {
     val song = service.currentSong ?: return
-    val size = if (this.javaClass.simpleName.contains("Big")) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
+    val size = if (this.javaClass.simpleName == AppWidgetBig::class.java.simpleName) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
     object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
       override fun onError(errMsg: String) {
         Timber.v("onError: $errMsg")
@@ -85,12 +85,6 @@ abstract class BaseAppwidget
 
       override fun onSuccess(result: Bitmap?) {
         try {
-//          if (result != bitmap && bitmap != null) {
-//            Timber.v("onSuccess")
-//            bitmap = null
-//          }
-//          bitmap = result
-//          Timber.v("onSuccess --- 获取Bitmap: $bitmap")
           val bitmap = MusicService.copy(result)
           if (bitmap != null) {
             remoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap)
@@ -105,48 +99,6 @@ abstract class BaseAppwidget
         }
       }
     }.load()
-//    //设置封面
-//    if (!reloadCover) {
-//      if (bitmap != null && !bitmap!!.isRecycled) {
-//        Timber.v("复用Bitmao: $bitmap")
-//        remoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap)
-//      } else {
-//        Timber.v("Bitmap复用失败: $bitmap")
-//        remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
-//      }
-//      pushUpdate(service, appWidgetIds, remoteViews)
-//    } else {
-//      val size = if (this.javaClass.simpleName.contains("Big")) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
-//      object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
-//        override fun onError(errMsg: String) {
-//          Timber.v("onError: $errMsg --- 清空bitmap: $bitmap")
-//          bitmap = null
-//          remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
-//          pushUpdate(service, appWidgetIds, remoteViews)
-//        }
-//
-//        override fun onSuccess(result: Bitmap?) {
-//          try {
-//            if (result != bitmap && bitmap != null) {
-//              Timber.v("onSuccess --- 回收Bitmap: $bitmap")
-//              bitmap = null
-//            }
-//            bitmap = result
-//            Timber.v("onSuccess --- 获取Bitmap: $bitmap")
-//            if (bitmap != null) {
-//              remoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap)
-//            } else {
-//              remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
-//            }
-//
-//          } catch (e: Exception) {
-//            Timber.v("onSuccess --- 发生异常: $e")
-//          } finally {
-//            pushUpdate(service, appWidgetIds, remoteViews)
-//          }
-//        }
-//      }.load()
-//    }
   }
 
   protected fun buildAction(context: Context, views: RemoteViews) {
@@ -204,10 +156,6 @@ abstract class BaseAppwidget
   private fun updateTimer(remoteViews: RemoteViews) {
     remoteViews.setImageViewResource(R.id.appwidget_timer, skin.timerRes)
   }
-  //    protected void updateSkin(RemoteViews remoteViews){
-  //        Drawable skinDrawable = Theme.tintDrawable(R.drawable.widget_btn_skin, skin.getBtnColor());
-  //        remoteViews.setImageViewBitmap(R.id.appwidget_skin,drawableToBitmap(skinDrawable));
-  //    }
 
   private fun updateProgress(service: MusicService, remoteViews: RemoteViews, song: Song) {
     //设置时间

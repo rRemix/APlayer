@@ -8,6 +8,7 @@ import static remix.myplayer.ui.activity.base.BaseMusicActivity.EXTRA_PLAYLIST;
 import static remix.myplayer.util.Constants.PLAY_LOOP;
 import static remix.myplayer.util.Constants.PLAY_REPEAT;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
+import static remix.myplayer.util.Util.isAppOnForeground;
 import static remix.myplayer.util.Util.registerLocalReceiver;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
 import static remix.myplayer.util.Util.unregisterLocalReceiver;
@@ -461,11 +462,11 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mAudioFocusListener = new AudioFocusChangeListener();
 
     //桌面部件
-    mAppWidgets.put("AppWidgetBig", new AppWidgetBig());
-    mAppWidgets.put("AppWidgetMedium", new AppWidgetMedium());
-    mAppWidgets.put("AppWidgetMediumTransparent", new AppWidgetMediumTransparent());
-    mAppWidgets.put("AppWidgetSmall", new AppWidgetSmall());
-    mAppWidgets.put("AppWidgetSmallTransparent", new AppWidgetSmallTransparent());
+    mAppWidgets.put("AppWidgetBig", AppWidgetBig.getInstance());
+    mAppWidgets.put("AppWidgetMedium", AppWidgetMedium.getInstance());
+    mAppWidgets.put("AppWidgetMediumTransparent", AppWidgetMediumTransparent.getInstance());
+    mAppWidgets.put("AppWidgetSmall", AppWidgetSmall.getInstance());
+    mAppWidgets.put("AppWidgetSmallTransparent", AppWidgetSmallTransparent.getInstance());
 
     mWindowManager = (WindowManager) mService.getSystemService(Context.WINDOW_SERVICE);
 
@@ -1964,21 +1965,16 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
    * 更新桌面部件
    */
   private void updateAppwidget() {
-    //屏幕没点亮就不更新了
-    if (!mScreenOn) {
-      return;
-    }
-    for (Map.Entry<String, BaseAppwidget> entry : mAppWidgets.entrySet()) {
-      if (entry.getValue() != null) {
-        entry.getValue().updateWidget(mService, null, true);
-      }
-    }
-
     //暂停停止更新进度条和时间
     if (!isPlaying()) {
       stopUpdateAppWidget();
     } else {
-      //开始播放后持续更新进度条和时间
+      for (Map.Entry<String, BaseAppwidget> entry : mAppWidgets.entrySet()) {
+        if (entry.getValue() != null) {
+          entry.getValue().updateWidget(mService, null, true);
+        }
+      }
+      //开始播放后更新进度条和时间
       startUpdateAppWidget();
     }
   }
@@ -1995,13 +1991,44 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
   }
 
   private void startUpdateAppWidget() {
-    if (mWidgetTimer != null || !mScreenOn) {
+    if (mWidgetTimer != null) {
       return;
     }
     mWidgetTimer = new Timer();
     mWidgetTask = new WidgetTask();
     mWidgetTimer.schedule(mWidgetTask, 1000, 1000);
   }
+
+  /**
+   * 更新桌面部件进度
+   */
+  private Timer mWidgetTimer;
+  private TimerTask mWidgetTask;
+
+  private class WidgetTask extends TimerTask {
+
+    @Override
+    public void run() {
+      final boolean isAppOnForeground = isAppOnForeground();
+      if (!isAppOnForeground) { //app在前台也不用更新
+        for (Map.Entry<String, BaseAppwidget> entry : mAppWidgets.entrySet()) {
+          final BaseAppwidget appwidget = entry.getValue();
+          if (appwidget != null) {
+            mUpdateUIHandler.post(() -> appwidget.partiallyUpdateWidget(mService));
+          }
+        }
+      } else {
+        Timber.v("app在前台不用更新");
+      }
+      if (mPlayAtBreakPoint) {
+        final int progress = getProgress();
+        if (progress > 0) {
+          SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS, progress);
+        }
+      }
+    }
+  }
+
 
   /**
    * 更新桌面歌词
@@ -2034,11 +2061,10 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     public void run() {
       while (mShowDesktopLyric) {
         try {
-//                    int interval = getInterval();
-//                    LogUtil.d("DesktopLrc","间隔:" + interval);
           Thread.sleep(LRC_INTERVAL);
         } catch (InterruptedException e) {
           Timber.tag(TAG).v("捕获异常,线程退出");
+
           mUpdateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC);
           return;
         }
@@ -2051,7 +2077,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           return;
         }
         //当前应用在前台
-        if (Util.isAppOnForeground()) {
+        if (isAppOnForeground()) {
           if (isDesktopLyricShowing()) {
             mUpdateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC);
           }
@@ -2063,7 +2089,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
             mUpdateUIHandler.sendEmptyMessageDelayed(CREATE_DESKTOP_LRC, 50);
           } else {
             mCurrentLrc = findCurrentLyric();
-            Timber.tag(TAG).v("当前歌词: %s", mCurrentLrc);
+//            Timber.tag(TAG).v("当前歌词: %s", mCurrentLrc);
             mUpdateUIHandler.obtainMessage(UPDATE_DESKTOP_LRC_CONTENT).sendToTarget();
           }
         }
@@ -2150,30 +2176,6 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     mUpdateUIHandler.sendEmptyMessageDelayed(REMOVE_DESKTOP_LRC, LRC_INTERVAL);
   }
 
-  /**
-   * 更新桌面部件进度
-   */
-  private Timer mWidgetTimer;
-  private TimerTask mWidgetTask;
-
-  private class WidgetTask extends TimerTask {
-
-    @Override
-    public void run() {
-      for (Map.Entry<String, BaseAppwidget> entry : mAppWidgets.entrySet()) {
-        if (entry.getValue() != null) {
-          entry.getValue().partiallyUpdateWidget(mService);
-        }
-      }
-      if (mPlayAtBreakPoint) {
-        final int progress = getProgress();
-        if (progress > 0) {
-          SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,
-              progress);
-        }
-      }
-    }
-  }
 
   private class AudioFocusChangeListener implements AudioManager.OnAudioFocusChangeListener {
 
@@ -2290,6 +2292,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
     @Override
     public void onReceive(Context context, Intent intent) {
       final String action = intent.getAction();
+      Timber.tag("ScreenReceiver").v(action);
       if (Intent.ACTION_SCREEN_ON.equals(action)) {
         mScreenOn = true;
         //显示锁屏
@@ -2301,12 +2304,12 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
         //重新显示桌面歌词
         createDesktopLyricThreadIfNeed();
         //重新开始更新桌面部件
-        startUpdateAppWidget();
+        updateAppwidget();
       } else {
         mScreenOn = false;
         //停止更新桌面部件
         stopUpdateAppWidget();
-        //屏幕熄灭 关闭桌面歌词
+        //关闭桌面歌词
         if (mShowDesktopLyric && isDesktopLyricShowing() && mUpdateDesktopLyricThread != null) {
           mUpdateDesktopLyricThread.quitImmediately();
           mUpdateDesktopLyricThread = null;
