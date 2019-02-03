@@ -15,7 +15,7 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.EXTRA_CONTROL
 import remix.myplayer.ui.activity.PlayerActivity
-import remix.myplayer.ui.activity.PlayerActivity.EXTRA_FROM_NOTIFY
+import remix.myplayer.ui.activity.PlayerActivity.EXTRA_SHOW_ANIMATION
 
 /**
  * Created by Remix on 2017/11/22.
@@ -36,8 +36,8 @@ abstract class Notify internal constructor(internal var service: MusicService) {
       stackBuilder.addParentStack(PlayerActivity::class.java)
       stackBuilder.addNextIntent(result)
 
-      stackBuilder.editIntentAt(1)?.putExtra(EXTRA_FROM_NOTIFY, true)
-      stackBuilder.editIntentAt(0)?.putExtra(EXTRA_FROM_NOTIFY, true)
+      stackBuilder.editIntentAt(1)?.putExtra(EXTRA_SHOW_ANIMATION, false)
+      stackBuilder.editIntentAt(0)?.putExtra(EXTRA_SHOW_ANIMATION, false)
       return stackBuilder.getPendingIntent(
           0,
           PendingIntent.FLAG_UPDATE_CURRENT
@@ -103,7 +103,6 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     val intent = Intent(MusicService.ACTION_CMD)
     intent.putExtra(EXTRA_CONTROL, operation)
     intent.component = ComponentName(context, MusicService::class.java)
-    intent.putExtra(EXTRA_FROM_NOTIFY, true)
 
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
       return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT)

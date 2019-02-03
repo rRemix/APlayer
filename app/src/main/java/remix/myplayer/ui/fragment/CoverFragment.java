@@ -69,16 +69,6 @@ public class CoverFragment extends BaseMusicFragment {
       @Override
       public boolean onPreDraw() {
         mImage.getViewTreeObserver().removeOnPreDrawListener(this);
-
-//                int imageWidth = mCoverContainer.getWidth();
-//                int imageHeight = mCoverContainer.getHeight();
-//                //如果封面宽度大于高度 需要处理下
-//                if(imageWidth > imageHeight){
-//                    ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mCoverContainer.getLayoutParams();
-//                    lp.width = lp.height = imageHeight;
-//                    mCoverContainer.setLayoutParams(lp);
-//                }
-
         if (mInflateFinishListener != null) {
           mInflateFinishListener.onViewInflateFinish(mImage);
         }

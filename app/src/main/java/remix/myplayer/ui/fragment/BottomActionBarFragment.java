@@ -2,8 +2,8 @@ package remix.myplayer.ui.fragment;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.ui.activity.PlayerActivity.EXTRA_ANIM_URL;
-import static remix.myplayer.ui.activity.PlayerActivity.EXTRA_FROM_ACTIVITY;
 import static remix.myplayer.ui.activity.PlayerActivity.EXTRA_RECT;
+import static remix.myplayer.ui.activity.PlayerActivity.EXTRA_SHOW_ANIMATION;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 import android.annotation.SuppressLint;
@@ -201,7 +201,7 @@ public class BottomActionBarFragment extends BaseMusicFragment {
     Intent intent = new Intent(mContext, PlayerActivity.class);
     Bundle bundle = new Bundle();
     intent.putExtras(bundle);
-    intent.putExtra(EXTRA_FROM_ACTIVITY, true);
+    intent.putExtra(EXTRA_SHOW_ANIMATION, true);
     intent.putExtra(EXTRA_RECT, mCoverRect);
     intent.putExtra(EXTRA_ANIM_URL, mAnimUrl);
 

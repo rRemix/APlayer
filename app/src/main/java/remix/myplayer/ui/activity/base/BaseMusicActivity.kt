@@ -21,6 +21,7 @@ import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.request.SimpleUriRequest
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.MusicService
+import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.util.Constants
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import remix.myplayer.util.MediaStoreUtil
@@ -41,21 +42,41 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   private var receiverRegistered: Boolean = false
   private var pendingBindService = false
 
+//  private val TAG = this.javaClass.simpleName
+  private val TAG = "MusicLife"
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    Timber.tag(TAG).v("onCreate")
     bindToService()
+  }
+
+  override fun onStart() {
+    super.onStart()
+    Timber.tag(TAG).v("onStart(), $pendingBindService")
+    if (pendingBindService) {
+      bindToService()
+    }
   }
 
   override fun onRestart() {
     super.onRestart()
-    if (pendingBindService) {
-      bindToService()
-      pendingBindService = false
-    }
+    Timber.tag(TAG).v("onRestart")
+  }
+
+  override fun onResume() {
+    super.onResume()
+    Timber.tag(TAG).v("onResume")
+  }
+
+  override fun onPause() {
+    super.onPause()
+    Timber.tag(TAG).v("onPause")
   }
 
   override fun onDestroy() {
     super.onDestroy()
+    Timber.tag(TAG).v("onDestroy")
     MusicServiceRemote.unbindFromService(serviceToken)
     mMusicStateHandler?.removeCallbacksAndMessages(null)
     if (receiverRegistered) {
@@ -66,6 +87,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
 
   private fun bindToService() {
     if (!Util.isAppOnForeground()) {
+      Timber.tag(TAG).v("bindToService(),app isn't on foreground")
       pendingBindService = true
       return
     }
@@ -79,6 +101,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
         this@BaseMusicActivity.onServiceDisConnected()
       }
     })
+    pendingBindService = false
   }
 
   fun addMusicServiceEventListener(listener: MusicEventCallback?) {
@@ -94,14 +117,14 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   override fun onMediaStoreChanged() {
-    Timber.v("onMediaStoreChanged: ${this.javaClass.simpleName}")
+    Timber.tag(TAG).v("onMediaStoreChanged")
     for (listener in serviceEventListeners) {
       listener.onMediaStoreChanged()
     }
   }
 
   override fun onPermissionChanged(has: Boolean) {
-    Timber.v("onPermissionChanged: ${this.javaClass.simpleName}")
+    Timber.tag(TAG).v("onPermissionChanged(), $has")
     mHasPermission = has
     for (listener in serviceEventListeners) {
       listener.onPermissionChanged(has)
@@ -109,28 +132,28 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   override fun onPlayListChanged(name: String) {
-    Timber.v("onMediaStoreChanged: ${this.javaClass.simpleName}")
+    Timber.tag(TAG).v("onMediaStoreChanged(), $name")
     for (listener in serviceEventListeners) {
       listener.onPlayListChanged(name)
     }
   }
 
   override fun onMetaChanged() {
-    Timber.v("onMetaChange: ${this.javaClass.simpleName}")
+    Timber.tag(TAG).v("onMetaChange")
     for (listener in serviceEventListeners) {
       listener.onMetaChanged()
     }
   }
 
   override fun onPlayStateChange() {
-    Timber.v("onPlayStateChange: ${this.javaClass.simpleName}")
+    Timber.tag(TAG).v("onPlayStateChange")
     for (listener in serviceEventListeners) {
       listener.onPlayStateChange()
     }
   }
 
   override fun onServiceConnected(service: MusicService) {
-    Timber.v("onServiceConnected: ${this.javaClass.simpleName}")
+    Timber.tag(TAG).v("onServiceConnected(), $service")
     if (!receiverRegistered) {
       musicStateReceiver = MusicStateReceiver(this)
       val filter = IntentFilter()
@@ -313,8 +336,6 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   companion object {
-    private const val TAG = "BaseMusicActivity"
-
     const val EXTRA_PLAYLIST = "extra_playlist"
     const val EXTRA_PERMISSION = "extra_permission"
 

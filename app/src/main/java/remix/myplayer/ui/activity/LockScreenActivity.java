@@ -50,7 +50,7 @@ import remix.myplayer.util.StatusBarUtil;
  */
 
 /**
- * 锁屏界面 实际为将手机解锁并对Activity进行处理，使其看起来像锁屏界面
+ * 锁屏界面
  */
 
 public class LockScreenActivity extends BaseMusicActivity {
@@ -259,9 +259,9 @@ public class LockScreenActivity extends BaseMusicActivity {
 
       @Override
       public Disposable load() {
-//        if (mDisposable != null) {
-//          mDisposable.dispose();
-//        }
+        if (mDisposable != null) {
+          mDisposable.dispose();
+        }
         mDisposable = getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(song))
             .compose(RxUtil.applySchedulerToIO())
             .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette>) e -> {

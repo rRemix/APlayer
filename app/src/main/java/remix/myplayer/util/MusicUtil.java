@@ -97,8 +97,7 @@ public class MusicUtil {
       setPlayQueue(songs, makeCmdIntent(Command.PLAYSELECTEDSONG)
           .putExtra(EXTRA_POSITION, 0));
     } else {
-      Util.writeLogToExternalStorage("exception", "Unknown Uri: " + uri);
-//            CrashReport.postCatchedException(new Throwable("Unknown Uri: " + uri));
+      Timber.v("unknown uri");
     }
   }
 

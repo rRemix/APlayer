@@ -4,7 +4,6 @@ import static remix.myplayer.misc.ExtKt.isPortraitOrientation;
 import static remix.myplayer.util.ColorUtil.getColor;
 import static remix.myplayer.util.ColorUtil.isColorLight;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -23,6 +22,7 @@ import remix.myplayer.ui.adapter.BaseAdapter;
 import remix.myplayer.ui.fragment.base.BaseMusicFragment;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 
 /**
  * Created by Remix on 2016/12/23.
@@ -129,8 +129,17 @@ public abstract class LibraryFragment<D, A extends BaseAdapter> extends BaseMusi
     }
   }
 
+  private static final int PORTRAIT_ORIENTATION_COUNT = 2;
+  private static final int LANDSCAPE_ORIENTATION_ITEM_WIDTH = DensityUtil.dip2px(180);
+  private static final int PORTRAIT_ORIENTATION_MAX_ITEM_COUNT = 6;
   protected int getSpanCount() {
-    return !isPortraitOrientation(requireContext()) ? 6 : 2;
+    final boolean portraitOrientation = isPortraitOrientation(requireContext());
+    if(portraitOrientation){
+      return PORTRAIT_ORIENTATION_COUNT;
+    } else{
+      int count = getResources().getDisplayMetrics().widthPixels / LANDSCAPE_ORIENTATION_ITEM_WIDTH;
+      return count > PORTRAIT_ORIENTATION_MAX_ITEM_COUNT ? PORTRAIT_ORIENTATION_MAX_ITEM_COUNT : count;
+    }
   }
 
   protected abstract Loader<List<D>> getLoader();

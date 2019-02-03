@@ -44,6 +44,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -111,6 +112,7 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -123,8 +125,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     OnTagEditListener {
 
   private static final String TAG = "PlayerActivity";
-  public static final String EXTRA_FROM_NOTIFY = "FromNotify";
-  public static final String EXTRA_FROM_ACTIVITY = "FromActivity";
+  public static final String EXTRA_SHOW_ANIMATION = "ShowAnimation";
+//  public static final String EXTRA_FROM_NOTIFY = "FromNotify";
+//  public static final String EXTRA_FROM_ACTIVITY = "FromActivity";
   public static final String EXTRA_ANIM_URL = "AnimUrl";
   public static final String EXTRA_RECT = "Rect";
 
@@ -205,12 +208,11 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   public int mWidth;
   public int mHeight;
   //是否从通知栏启动
-  private boolean mFromNotify = false;
+//  private boolean mFromNotify = false;
   //是否从Activity启动
-  private boolean mFromActivity = false;
-
-  //动画图片信息
-  private AnimationUrl mAnimUrl;
+//  private boolean mFromActivity = false;
+  //是否显示过场动画
+  private boolean mShowAnimation = false;
 
   //Fragment
   private LyricFragment mLyricFragment;
@@ -274,6 +276,10 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
   //底部显示控制
   private int mBottomConfig;
+  public static final int BOTTOM_SHOW_NEXT = 0;
+  public static final int BOTTOM_SHOW_VOLUME = 1;
+  public static final int BOTTOM_SHOW_BOTH = 2;
+  public static final int BOTTOM_SHOW_NONE = 3;
 
   private static final int DELAY_SHOW_NEXT_SONG = 3000;
   private Runnable mVolumeRunnable = () -> {
@@ -317,8 +323,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   @SuppressLint("ClickableViewAccessibility")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    mFromNotify = getIntent().getBooleanExtra(EXTRA_FROM_NOTIFY, false);
-    mFromActivity = getIntent().getBooleanExtra(EXTRA_FROM_ACTIVITY, false);
 
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_player);
@@ -328,8 +332,10 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     mTagReceiver = new TagReceiver(this);
     registerLocalReceiver(mTagReceiver, new IntentFilter(TagReceiver.ACTION_EDIT_TAG));
 
+    mShowAnimation = getIntent().getBooleanExtra(EXTRA_SHOW_ANIMATION,false);
     mInfo = MusicServiceRemote.getCurrentSong();
-    mAnimUrl = getIntent().getParcelableExtra(EXTRA_ANIM_URL);
+    //动画图片信息
+    AnimationUrl animUrl = getIntent().getParcelableExtra(EXTRA_ANIM_URL);
     mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
     setUpBottom();
@@ -350,9 +356,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
     //设置封面
     if (mInfo != null) {
-      if (mAnimUrl != null && !TextUtils.isEmpty(mAnimUrl.getUrl())
-          && mAnimUrl.getAlbumId() == mInfo.getAlbumId()) {
-        mAnimationCover.setImageURI(mAnimUrl.getUrl());
+      if (animUrl != null && !TextUtils.isEmpty(animUrl.getUrl())
+          && animUrl.getAlbumId() == mInfo.getAlbumId()) {
+        mAnimationCover.setImageURI(animUrl.getUrl());
       } else {
         new LibraryUriRequest(mAnimationCover,
             getSearchRequestWithAlbumType(mInfo),
@@ -365,8 +371,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       if (mOriginRect == null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
         mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
       }
-      //todo 暂时先屏幕横竖屏切换后的动画
-      mFromNotify = savedInstanceState.getBoolean(EXTRA_FROM_NOTIFY, false);
+      mShowAnimation = savedInstanceState.getBoolean(EXTRA_SHOW_ANIMATION, false);
     }
   }
 
@@ -388,9 +393,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   protected void onStart() {
     super.onStart();
     //只有从Activity启动，才使用动画
-    if (!mFromNotify && mFromActivity) {
+    if (mShowAnimation) {
       overridePendingTransition(0, 0);
-      mFromActivity = false;
     }
   }
 
@@ -416,8 +420,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     outState.putParcelable(EXTRA_RECT, mOriginRect);
-    //todo 暂时这样处理
-    outState.putBoolean(EXTRA_FROM_NOTIFY, true);
+    //activity重启后就不用动画了
+    outState.putBoolean(EXTRA_SHOW_ANIMATION, false);
   }
 
   @Override
@@ -427,15 +431,14 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       if (mOriginRect == null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
         mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
       }
-      //todo 暂时先屏幕横竖屏切换后的动画
-      mFromNotify = savedInstanceState.getBoolean(EXTRA_FROM_NOTIFY, false);
+      mShowAnimation = savedInstanceState.getBoolean(EXTRA_SHOW_ANIMATION,false);
     }
   }
 
   @Override
   public void onBackPressed() {
     //从通知栏打开或者横屏直接退出
-    if (mFromNotify) {
+    if (!mShowAnimation) {
       finish();
       overridePendingTransition(0, R.anim.audio_out);
       return;
@@ -713,19 +716,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
    */
   @SuppressLint("CheckResult")
   private void setUpSeekBar() {
-//        RelativeLayout seekbarContainer = findViewById(R.id.seekbar_container);
-//        mProgressSeekBar = new SeekBar(context);
-//        mProgressSeekBar.setProgressDrawable(getResources().getDrawable(R.drawable.bg_progress));
-//        mProgressSeekBar.setPadding(DensityUtil.dip2px(context,5),0,DensityUtil.dip2px(context,5),0);
-//        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(context,10),DensityUtil.dip2px(context,10)));
-//
-//        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, DensityUtil.dip2px(context,2));
-//        lp.setMargins(DensityUtil.dip2px(context,10),0,DensityUtil.dip2px(context,10),0);
-//
-//        lp.addRule(RelativeLayout.LEFT_OF,R.id.text_remain);
-//        lp.addRule(RelativeLayout.RIGHT_OF,R.id.text_hasplay);
-//        lp.addRule(RelativeLayout.CENTER_VERTICAL);
-//        seekbarContainer.addView(mProgressSeekBar,lp);
     if (mInfo == null) {
       return;
     }
@@ -794,7 +784,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
           mVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-              if (mBottomConfig == 2) {
+              if (mBottomConfig == BOTTOM_SHOW_BOTH) {
                 mHandler.removeCallbacks(mVolumeRunnable);
                 mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
               }
@@ -815,7 +805,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
           });
         });
 
-    if (mBottomConfig == 2) {
+    if (mBottomConfig == BOTTOM_SHOW_BOTH) {
       mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
     }
   }
@@ -867,10 +857,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   private void setUpFragments() {
     final FragmentManager fragmentManager = getSupportFragmentManager();
 
-    //todo 暂时先这样处理
     fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     fragmentManager.executePendingTransactions();
-    //activity重启后复用以前的fragment
     final List<Fragment> fragments = fragmentManager.getFragments();
     if (fragments != null) {
       for (Fragment fragment : fragments) {
@@ -888,7 +876,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     setUpLyricFragment();
 
     if (isPortraitOrientation(this)) {
-
       mRecordFragment = new RecordFragment();
 
       mAdapter = new PagerAdapter(getSupportFragmentManager());
@@ -990,9 +977,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   private void setUpCoverFragment() {
     mCoverFragment.setOnFirstLoadFinishListener(() -> mAnimationCover.setVisibility(View.INVISIBLE));
     mCoverFragment.setInflateFinishListener(view -> {
-      //从通知栏启动只设置位置信息并隐藏
-      //不用启动动画
-      if (mFromNotify) {
+      //不启动动画 直接显示
+      if (!mShowAnimation) {
         mCoverFragment.showImage();
         //隐藏动画用的封面并设置位置信息
         mAnimationCover.setVisibility(View.GONE);
@@ -1069,17 +1055,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     });
   }
 
-  @Override
-  public void recreate() {
-    super.recreate();
-
-//    getSupportFragmentManager()
-//        .beginTransaction()
-//        .remove(mLyricFragment)
-//        .remove(mCoverFragment)
-//        .remove(mRecordFragment)
-//        .commitNowAllowingStateLoss();
-  }
 
   @Override
   public void onMetaChanged() {
@@ -1160,14 +1135,17 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
    */
   private void setUpBottom() {
     mBottomConfig = SPUtil
-        .getValue(mContext, SPUtil.SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, 2);
-    if (mBottomConfig == 0) {//仅显示下一首
+        .getValue(mContext, SPUtil.SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, BOTTOM_SHOW_BOTH);
+    if(!isPortraitOrientation(this)){//横屏不显示底部
+      mBottomConfig = BOTTOM_SHOW_NONE;
+    }
+    if (mBottomConfig == BOTTOM_SHOW_NEXT) {//仅显示下一首
       mVolumeContainer.setVisibility(View.GONE);
       mNextSong.setVisibility(View.VISIBLE);
-    } else if (mBottomConfig == 1) {//仅显示音量控制
+    } else if (mBottomConfig == BOTTOM_SHOW_VOLUME) {//仅显示音量控制
       mVolumeContainer.setVisibility(View.VISIBLE);
       mNextSong.setVisibility(View.GONE);
-    } else if (mBottomConfig == 3) {//关闭
+    } else if (mBottomConfig == BOTTOM_SHOW_NONE) {//关闭
       View volumeLayout = findViewById(R.id.layout_player_volume);
       volumeLayout.setVisibility(View.INVISIBLE);
       LinearLayout.LayoutParams volumelLp = (LinearLayout.LayoutParams) volumeLayout

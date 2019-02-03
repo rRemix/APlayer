@@ -54,6 +54,7 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
+import timber.log.Timber;
 
 /**
  * Created by taeja on 16-2-17.
@@ -205,8 +206,7 @@ public class MediaStoreUtil {
 
       }
     } catch (Exception e) {
-      Util.writeLogToExternalStorage("folder",
-          "folderSize: " + folderMap.size() + " \nfolderMap: " + folderMap + "\nException: " + e);
+      Timber.v(e);
     }
 
     return folders;

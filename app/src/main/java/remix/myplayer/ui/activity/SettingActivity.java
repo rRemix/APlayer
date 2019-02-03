@@ -1002,7 +1002,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
   private void changeBottomOfPlayingScreen() {
     final int position = SPUtil
-        .getValue(mContext, SPUtil.SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, 2);
+        .getValue(mContext, SPUtil.SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, PlayerActivity.BOTTOM_SHOW_BOTH);
     getBaseDialog(mContext)
         .title(R.string.show_on_bottom)
         .items(new String[]{getString(R.string.show_next_song_only),

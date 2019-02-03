@@ -1198,7 +1198,7 @@ public class MusicService extends BaseService implements Playback, MusicEventCal
           break;
         //播放选中的歌曲
         case Command.PLAYSELECTEDSONG:
-          playSelectSong(intent.getIntExtra("Position", -1));
+          playSelectSong(intent.getIntExtra(EXTRA_POSITION, -1));
           break;
         //播放上一首
         case Command.PREV:
