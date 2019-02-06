@@ -191,8 +191,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   //高亮与非高亮指示器
   private Drawable mHighLightIndicator;
   private Drawable mNormalIndicator;
-  //Viewpager
-  private PagerAdapter mAdapter;
   private ArrayList<ImageView> mDotList;
 
   //当前播放的歌曲
@@ -878,13 +876,14 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     if (isPortraitOrientation(this)) {
       mRecordFragment = new RecordFragment();
 
-      mAdapter = new PagerAdapter(getSupportFragmentManager());
-      mAdapter.addFragment(mRecordFragment);
-      mAdapter.addFragment(mCoverFragment);
-      mAdapter.addFragment(mLyricFragment);
+      //Viewpager
+      PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager());
+      adapter.addFragment(mRecordFragment);
+      adapter.addFragment(mCoverFragment);
+      adapter.addFragment(mLyricFragment);
 
-      mPager.setAdapter(mAdapter);
-      mPager.setOffscreenPageLimit(mAdapter.getCount() - 1);
+      mPager.setAdapter(adapter);
+      mPager.setOffscreenPageLimit(adapter.getCount() - 1);
 
       final int THRESHOLD_Y = DensityUtil.dip2px(mContext, 40);
       final int THRESHOLD_X = DensityUtil.dip2px(mContext, 60);

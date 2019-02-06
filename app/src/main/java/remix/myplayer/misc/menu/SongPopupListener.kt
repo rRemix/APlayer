@@ -14,7 +14,7 @@ import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
-import remix.myplayer.service.MusicService.EXTRA_SONG
+import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.Tag
 import remix.myplayer.ui.dialog.AddtoPlayListDialog

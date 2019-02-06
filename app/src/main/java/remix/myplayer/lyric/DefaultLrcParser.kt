@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken
 import remix.myplayer.App
 import remix.myplayer.lyric.bean.LrcRow
 import remix.myplayer.misc.cache.DiskCache
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.util.*
@@ -57,7 +58,7 @@ class DefaultLrcParser : ILrcParser {
             strBuilder.append("]")
             strBuilder.append(lrcRow.content)
             strBuilder.append(if (!TextUtils.isEmpty(lrcRow.translate)) "\r\n" + lrcRow.translate + "\r\n" else "\r\n")
-            Log.d(TAG, strBuilder.toString())
+            Timber.d(strBuilder.toString())
             appendText(strBuilder.toString())
           }
         }

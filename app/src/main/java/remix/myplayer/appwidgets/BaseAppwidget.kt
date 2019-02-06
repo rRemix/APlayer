@@ -24,7 +24,7 @@ import remix.myplayer.request.RequestConfig
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.service.MusicService.EXTRA_CONTROL
+import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
 import remix.myplayer.ui.activity.MainActivity
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType

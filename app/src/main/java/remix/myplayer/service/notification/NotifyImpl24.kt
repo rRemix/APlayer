@@ -8,16 +8,14 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationCompat.PRIORITY_MAX
-
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.service.MusicService.EXTRA_CONTROL
+import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
 import remix.myplayer.util.DensityUtil
-
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 
 /**

@@ -20,7 +20,7 @@ import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
-import remix.myplayer.service.MusicService.EXTRA_POSITION
+import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.base.BaseActivity

@@ -42,8 +42,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   private var receiverRegistered: Boolean = false
   private var pendingBindService = false
 
-//  private val TAG = this.javaClass.simpleName
-  private val TAG = "MusicLife"
+  private val TAG = this.javaClass.simpleName
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

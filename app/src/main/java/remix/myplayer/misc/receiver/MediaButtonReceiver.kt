@@ -6,8 +6,8 @@ import android.content.Intent
 import android.view.KeyEvent
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.service.MusicService.ACTION_CMD
-import remix.myplayer.service.MusicService.EXTRA_CONTROL
+import remix.myplayer.service.MusicService.Companion.ACTION_CMD
+import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
 

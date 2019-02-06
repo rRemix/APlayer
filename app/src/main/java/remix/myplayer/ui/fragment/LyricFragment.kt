@@ -14,7 +14,7 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.lyric.LrcView
-import remix.myplayer.lyric.SearchLrc
+import remix.myplayer.lyric.LyricSearcher
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
 import remix.myplayer.misc.interfaces.OnInflateFinishListener
@@ -41,6 +41,8 @@ class LyricFragment : BaseMusicFragment() {
 
   private var disposable: Disposable? = null
   private val msgHandler = MsgHandler(this)
+
+  private val lyricSearcher = LyricSearcher()
 
   fun setOnInflateFinishListener(l: OnInflateFinishListener) {
     onFindListener = l
@@ -89,8 +91,10 @@ class LyricFragment : BaseMusicFragment() {
       lrcView.setOffset(0)
     }
     val id = info?.id
+
     disposable?.dispose()
-    disposable = SearchLrc(info!!).getLyric(manualPath, clearCache)
+    disposable = lyricSearcher.setSong(info ?: return)
+        .getLyricObservable(manualPath,clearCache)
         .doOnSubscribe { lrcView.setText(getStringSafely(R.string.searching)) }
         .subscribe(Consumer {
           if (id == info?.id) {
@@ -108,6 +112,7 @@ class LyricFragment : BaseMusicFragment() {
             lrcView.setText(getStringSafely(R.string.no_lrc))
           }
         })
+
   }
 
   @OnClick(R.id.offsetReduce, R.id.offsetAdd, R.id.offsetReset)

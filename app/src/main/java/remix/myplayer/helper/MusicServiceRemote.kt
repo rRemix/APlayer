@@ -72,7 +72,7 @@ object MusicServiceRemote {
 
   @JvmStatic
   fun setPlayQueue(newQueue: List<Int>) {
-    service?.playQueue = newQueue
+    service?.setPlayQueue(newQueue)
   }
 
   @JvmStatic
@@ -82,7 +82,7 @@ object MusicServiceRemote {
 
   @JvmStatic
   fun setAllSong(allSong: List<Int>?) {
-    service?.allSong = allSong
+    service?.setAllSong(allSong)
   }
 
   @JvmStatic

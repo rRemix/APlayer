@@ -32,8 +32,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 1482
-        versionName "1.4.8.2"
+        versionCode 1490
+        versionName "1.4.9.0-debug"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true

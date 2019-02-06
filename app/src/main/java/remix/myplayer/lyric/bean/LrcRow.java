@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
+import timber.log.Timber;
 
 /**
  * 每行歌词的实体类，实现了Comparable接口，方便List<LrcRow>的sort排序
@@ -168,7 +169,7 @@ public class LrcRow implements Comparable<LrcRow> {
         LrcRow lrcRow = new LrcRow(tem, formatTime(tem) - offset, content);
         lrcRows.add(lrcRow);
       } catch (Exception e) {
-        Log.d("LrcRow", e.getMessage());
+        Timber.v(e);
       }
     }
     return lrcRows;

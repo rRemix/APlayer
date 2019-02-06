@@ -20,7 +20,7 @@ class MediaStoreObserver
 
   internal override fun onAccept(uri: Uri) {
     //        MusicServiceRemote.setAllSong(MediaStoreUtil.getAllSongsId());
-    mService.get()?.allSong = MediaStoreUtil.getAllSongsId()
+    mService.get()?.setAllSong(MediaStoreUtil.getAllSongsId())
     sendLocalBroadcast(Intent(MusicService.MEDIA_STORE_CHANGE))
 //        mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER)
   }

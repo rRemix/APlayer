@@ -36,15 +36,19 @@ import java.util.*
 /**
  * 根据歌曲名和歌手名 搜索歌词并解析成固定格式
  */
-class SearchLrc(private val song: Song) {
+class LyricSearcher {
+  private var song: Song = Song.EMPTY_SONG
   private val lrcParser: ILrcParser
   private var displayName: String? = null
   private var cacheKey: String? = null
   private var searchKey: String? = null
   private var localLyricPath: String = ""
 
-
   init {
+    lrcParser = DefaultLrcParser()
+  }
+
+  private fun parse() {
     try {
       if (!TextUtils.isEmpty(song.displayname)) {
         val temp = song.displayname
@@ -55,16 +59,23 @@ class SearchLrc(private val song: Song) {
       Timber.v(e)
       displayName = song.title
     }
+  }
 
-    lrcParser = DefaultLrcParser()
+  fun setSong(song: Song): LyricSearcher {
+    this.song = song
+    parse()
+    return this
   }
 
   /**
-   * 根据歌词id,发送请求并解析歌词
+   * 发送请求并解析歌词
    *
    * @return 歌词
    */
-  fun getLyric(manualPath: String, clearCache: Boolean): Observable<List<LrcRow>> {
+  fun getLyricObservable(manualPath: String, clearCache: Boolean): Observable<List<LrcRow>> {
+    if (song == Song.EMPTY_SONG) {
+      throw IllegalArgumentException("")
+    }
     val type = SPUtil.getValue(App.getContext(), SPUtil.LYRIC_KEY.NAME, song.id, SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
 
     val observable = when (type) {
@@ -135,8 +146,8 @@ class SearchLrc(private val song: Song) {
    *
    * @return 歌词
    */
-  fun getLyric(): Observable<List<LrcRow>> {
-    return getLyric("", false)
+  fun getLyricObservable(): Observable<List<LrcRow>> {
+    return getLyricObservable("", false)
   }
 
   /**
@@ -445,7 +456,7 @@ class SearchLrc(private val song: Song) {
   }
 
   companion object {
-    private const val TAG = "SearchLrc"
+    private const val TAG = "LyricSearcher"
     private const val SUFFIX_LYRIC = ".lrc"
     private val UTF_8 = Charset.forName("UTF-8")
   }

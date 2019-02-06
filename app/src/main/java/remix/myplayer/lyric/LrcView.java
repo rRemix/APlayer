@@ -27,6 +27,7 @@ import remix.myplayer.R;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.util.DensityUtil;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2018/1/3.
@@ -693,7 +694,7 @@ public class LrcView extends View implements ILrcView {
   }
 
   public void log(Object o) {
-    Log.d("LrcView", o + "");
+    Timber.v("%s", o);
   }
 
   /**

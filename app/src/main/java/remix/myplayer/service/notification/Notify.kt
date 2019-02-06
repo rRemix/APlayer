@@ -13,7 +13,7 @@ import android.support.v4.app.TaskStackBuilder
 import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.service.MusicService.EXTRA_CONTROL
+import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
 import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.activity.PlayerActivity.EXTRA_SHOW_ANIMATION
 

@@ -28,6 +28,7 @@ public abstract class UpdateLyricThread extends Thread {
   private Song mSong;
   private Status mStatus = Status.SEARCHING;
   private int mOffset = 0;
+  private LyricSearcher mLyricSearcher = new LyricSearcher();
 
   public UpdateLyricThread(MusicService service) {
     mReference = new WeakReference<>(service);
@@ -44,7 +45,8 @@ public abstract class UpdateLyricThread extends Thread {
     if (mDisposable != null && !mDisposable.isDisposed()) {
       mDisposable.dispose();
     }
-    mDisposable = new SearchLrc(mSong).getLyric()
+    mDisposable = mLyricSearcher.setSong(mSong)
+        .getLyricObservable()
         .doOnSubscribe(disposable -> mStatus = Status.SEARCHING)
         .subscribe(lrcRows -> {
           if (id == mSong.getId()) {
