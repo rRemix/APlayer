@@ -146,7 +146,7 @@ abstract class BaseAppwidget
     updateArtist(remoteViews, song)
     //        updateSkin(remoteViews);
     updatePlayPause(service, remoteViews)
-    updateLove(remoteViews, song)
+    updateLove(service,remoteViews, song)
     updateModel(remoteViews)
     updateNextAndPrev(remoteViews)
     updateProgress(service, remoteViews, song)
@@ -164,18 +164,9 @@ abstract class BaseAppwidget
     remoteViews.setProgressBar(R.id.appwidget_seekbar, song.duration.toInt(), service.progress, false)
   }
 
-  private fun updateLove(remoteViews: RemoteViews, song: Song) {
-    DatabaseRepository.getInstance()
-        .isMyLove(song.Id)
-        .compose(RxUtil.applySingleScheduler())
-        .subscribe { isLove ->
-          if (!isLove) {
-            remoteViews.setImageViewResource(R.id.appwidget_love, skin.loveRes)
-          } else {
-            remoteViews.setImageViewResource(R.id.appwidget_love, skin.lovedRes)
-          }
-        }
-
+  private fun updateLove(service: MusicService,remoteViews: RemoteViews, song: Song) {
+    Timber.v("loved: " + service.isLove)
+    remoteViews.setImageViewResource(R.id.appwidget_love,if(service.isLove) skin.lovedRes else skin.loveRes)
   }
 
   private fun updateNextAndPrev(remoteViews: RemoteViews) {

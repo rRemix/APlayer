@@ -247,6 +247,7 @@ public class MediaStoreUtil {
    * @param cursor 记录集
    * @return 拼装后的歌曲信息
    */
+  @WorkerThread
   public static Song getSongInfo(Cursor cursor) {
     if (cursor == null || cursor.getColumnCount() <= 0) {
       return Song.EMPTY_SONG;
@@ -255,7 +256,8 @@ public class MediaStoreUtil {
     long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
     final String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
     final int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-    return new Song(
+
+    Song song = new Song(
         id,
         processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
             TYPE_DISPLAYNAME),
@@ -274,6 +276,7 @@ public class MediaStoreUtil {
         cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR)),
         cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE_KEY)),
         cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)));
+    return song;
   }
 
   public static List<Integer> getSongIdsByParentId(int parentId) {
@@ -628,7 +631,7 @@ public class MediaStoreUtil {
         }
       }
     } catch (Exception ignore) {
-
+      Timber.v(ignore);
     }
     return songs;
   }

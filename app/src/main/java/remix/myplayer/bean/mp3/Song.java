@@ -40,6 +40,7 @@ public class Song implements Cloneable, Parcelable {
   public String Year = "";
   public String TitleKey;
   public long AddTime;
+  private boolean isLove;
 
   public Song() {
   }
@@ -255,6 +256,14 @@ public class Song implements Cloneable, Parcelable {
 
   public String getShowName() {
     return !SHOW_DISPLAYNAME ? Title : Displayname;
+  }
+
+  public boolean isLove() {
+    return isLove;
+  }
+
+  public void setIsLove(boolean love) {
+    isLove = love;
   }
 
   @Override

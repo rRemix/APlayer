@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
+import remix.myplayer.App;
+import remix.myplayer.R;
 import timber.log.Timber;
 
 /**
@@ -208,4 +210,10 @@ public class LrcRow implements Comparable<LrcRow> {
   public static int getOffset() {
     return 0;
   }
+
+  public static LrcRow LYRIC_EMPTY_ROW = new LrcRow("", 0, "");
+  public static LrcRow LYRIC_NO_ROW = new LrcRow("", 0,
+      App.getContext().getString(R.string.no_lrc));
+  public static LrcRow LYRIC_SEARCHING_ROW = new LrcRow("", 0,
+      App.getContext().getString(R.string.searching));
 }

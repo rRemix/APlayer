@@ -1,5 +1,8 @@
 package remix.myplayer.ui.activity;
 
+import static remix.myplayer.lyric.LyricHolder.LYRIC_FIND_INTERVAL;
+import static remix.myplayer.lyric.bean.LyricRowWrapper.LYRIC_WRAPPER_NO;
+import static remix.myplayer.lyric.bean.LyricRowWrapper.LYRIC_WRAPPER_SEARCHING;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 import android.graphics.Bitmap;
@@ -29,7 +32,7 @@ import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
-import remix.myplayer.lyric.UpdateLyricThread;
+import remix.myplayer.lyric.LyricHolder;
 import remix.myplayer.lyric.bean.LyricRowWrapper;
 import remix.myplayer.misc.menu.CtrlButtonListener;
 import remix.myplayer.request.ImageUriRequest;
@@ -92,7 +95,7 @@ public class LockScreenActivity extends BaseMusicActivity {
   //是否正在播放
   private Disposable mDisposable;
   private volatile LyricRowWrapper mCurLyric;
-  private UpdateLyricThread mUpdateLyricThread;
+  private UpdateLockScreenLyricThread mUpdateLyricThread;
 
 
   @Override
@@ -224,13 +227,12 @@ public class LockScreenActivity extends BaseMusicActivity {
     //歌词
     if (mUpdateLyricThread == null) {
       final MusicService service = MusicServiceRemote.getService();
-      if(service != null){
+      if (service != null) {
         mUpdateLyricThread = new UpdateLockScreenLyricThread(this, service);
         mUpdateLyricThread.start();
       }
-    } else{
-      mUpdateLyricThread.setSongAndGetLyricRows(song);
     }
+
     //标题
     if (mSong != null) {
       mSong.setText(song.getTitle());
@@ -321,40 +323,54 @@ public class LockScreenActivity extends BaseMusicActivity {
   private void setCurrentLyric(LyricRowWrapper wrapper) {
     runOnUiThread(() -> {
       mCurLyric = wrapper;
-      if (mCurLyric == null) {
+      if (mCurLyric == null || mCurLyric == LYRIC_WRAPPER_NO) {
         mLyric.setTextWithAnimation(R.string.no_lrc);
-      } else if (mCurLyric.getStatus() == UpdateLyricThread.Status.SEARCHING) {
+      } else if (mCurLyric == LYRIC_WRAPPER_SEARCHING) {
         mLyric.setText("");
-      } else if (mCurLyric.getStatus() == UpdateLyricThread.Status.ERROR ||
-          mCurLyric.getStatus() == UpdateLyricThread.Status.NO) {
-        mLyric.setTextWithAnimation(R.string.no_lrc);
       } else {
         mLyric.setTextWithAnimation(String.format("%s\n%s", mCurLyric.getLineOne().getContent(),
             mCurLyric.getLineTwo().getContent()));
       }
+
     });
   }
 
-  private static class UpdateLockScreenLyricThread extends UpdateLyricThread {
+  private static class UpdateLockScreenLyricThread extends Thread {
 
     private final WeakReference<LockScreenActivity> mRef;
+    private final LyricHolder mLyricHolder;
+    private Song mSongInThread = Song.EMPTY_SONG;
 
     private UpdateLockScreenLyricThread(LockScreenActivity activity, MusicService service) {
-      super(service);
       mRef = new WeakReference<>(activity);
+      mLyricHolder = new LyricHolder(service);
+    }
+
+    @Override
+    public void interrupt() {
+      super.interrupt();
+      mLyricHolder.dispose();
     }
 
     @Override
     public void run() {
       while (true) {
         try {
-          Thread.sleep(LRC_INTERVAL);
+          Thread.sleep(LYRIC_FIND_INTERVAL);
         } catch (InterruptedException e) {
           return;
         }
+
+        final Song song = MusicServiceRemote.getCurrentSong();
+        if(mSongInThread != song){
+          mSongInThread = song;
+          mLyricHolder.updateLyricRows(mSongInThread);
+          continue;
+        }
+
         final LockScreenActivity activity = mRef.get();
         if (activity != null) {
-          activity.setCurrentLyric(findCurrentLyric());
+          activity.setCurrentLyric(mLyricHolder.findCurrentLyric());
         }
       }
     }

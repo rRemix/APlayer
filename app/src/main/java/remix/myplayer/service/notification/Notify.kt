@@ -22,7 +22,9 @@ import remix.myplayer.ui.activity.PlayerActivity.EXTRA_SHOW_ANIMATION
  */
 
 abstract class Notify internal constructor(internal var service: MusicService) {
-  private var notificationManager: NotificationManager? = null
+  private val notificationManager: NotificationManager by lazy {
+    service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+  }
 
   private var notifyMode = NOTIFY_MODE_BACKGROUND
 
@@ -45,11 +47,6 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     }
 
   init {
-    init()
-  }
-
-  private fun init() {
-    notificationManager = service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       createNotificationChannel()
     }
@@ -62,7 +59,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     playingNotificationChannel.enableLights(false)
     playingNotificationChannel.enableVibration(false)
     playingNotificationChannel.description = service.getString(R.string.playing_notification_description)
-    notificationManager?.createNotificationChannel(playingNotificationChannel)
+    notificationManager.createNotificationChannel(playingNotificationChannel)
   }
 
   abstract fun updateForPlaying()
@@ -81,7 +78,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
       service.startForeground(PLAYING_NOTIFICATION_ID, notification)
     } else {
-      notificationManager?.notify(PLAYING_NOTIFICATION_ID, notification)
+      notificationManager.notify(PLAYING_NOTIFICATION_ID, notification)
     }
 
     notifyMode = newNotifyMode
@@ -93,7 +90,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
    */
   fun cancelPlayingNotify() {
     service.stopForeground(true)
-    notificationManager?.cancel(PLAYING_NOTIFICATION_ID)
+    notificationManager.cancel(PLAYING_NOTIFICATION_ID)
     isStop = true
     isNotifyShowing = false
     //        notifyMode = NOTIFY_MODE_NONE;

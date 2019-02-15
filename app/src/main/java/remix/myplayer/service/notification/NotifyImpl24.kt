@@ -25,6 +25,8 @@ import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 class NotifyImpl24(context: MusicService) : Notify(context) {
 
   override fun updateForPlaying() {
+    isStop = false
+
     val song = service.currentSong
 
     //设置封面

@@ -26,6 +26,8 @@ class NotifyImpl(context: MusicService) : Notify(context) {
   private lateinit var remoteBigView: RemoteViews
 
   override fun updateForPlaying() {
+    isStop = false
+
     remoteBigView = RemoteViews(service.packageName, R.layout.notification_big)
     remoteView = RemoteViews(service.packageName, R.layout.notification)
     val isPlay = service.isPlaying
@@ -34,67 +36,65 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     val notification = buildNotification(service)
 
     val song = service.currentSong
-    if (song != null) {
-      val isSystemColor = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true)
+    val isSystemColor = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true)
 
-      //设置歌手，歌曲名
-      remoteBigView.setTextViewText(R.id.notify_song, song.title)
-      remoteBigView.setTextViewText(R.id.notify_artist_album, song.artist + " - " + song.album)
+    //设置歌手，歌曲名
+    remoteBigView.setTextViewText(R.id.notify_song, song.title)
+    remoteBigView.setTextViewText(R.id.notify_artist_album, song.artist + " - " + song.album)
 
-      remoteView.setTextViewText(R.id.notify_song, song.title)
-      remoteView.setTextViewText(R.id.notify_artist_album, song.artist + " - " + song.album)
+    remoteView.setTextViewText(R.id.notify_song, song.title)
+    remoteView.setTextViewText(R.id.notify_artist_album, song.artist + " - " + song.album)
 
-      //设置了黑色背景
-      if (!isSystemColor) {
-        remoteBigView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))
-        remoteView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))
-        //背景
-        remoteBigView.setImageViewResource(R.id.notify_bg, R.drawable.bg_notification_black)
-        remoteBigView.setViewVisibility(R.id.notify_bg, View.VISIBLE)
-        remoteView.setImageViewResource(R.id.notify_bg, R.drawable.bg_notification_black)
-        remoteView.setViewVisibility(R.id.notify_bg, View.VISIBLE)
+    //设置了黑色背景
+    if (!isSystemColor) {
+      remoteBigView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))
+      remoteView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))
+      //背景
+      remoteBigView.setImageViewResource(R.id.notify_bg, R.drawable.bg_notification_black)
+      remoteBigView.setViewVisibility(R.id.notify_bg, View.VISIBLE)
+      remoteView.setImageViewResource(R.id.notify_bg, R.drawable.bg_notification_black)
+      remoteView.setViewVisibility(R.id.notify_bg, View.VISIBLE)
+    }
+    //桌面歌词
+    remoteBigView.setImageViewResource(R.id.notify_lyric,
+        if (service.isDesktopLyricLocked) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)
+
+    //设置播放按钮
+    if (!isPlay) {
+      remoteBigView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_play)
+      remoteView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_play)
+    } else {
+      remoteBigView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_pause)
+      remoteView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_pause)
+    }
+    //设置封面
+    val size = DensityUtil.dip2px(service, 128f)
+
+    object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
+      override fun onError(errMsg: String) {
+        remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+        remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+        pushNotify(notification)
       }
-      //桌面歌词
-      remoteBigView.setImageViewResource(R.id.notify_lyric,
-          if (service.isDesktopLyricLocked) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)
 
-      //设置播放按钮
-      if (!isPlay) {
-        remoteBigView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_play)
-        remoteView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_play)
-      } else {
-        remoteBigView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_pause)
-        remoteView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_pause)
-      }
-      //设置封面
-      val size = DensityUtil.dip2px(service, 128f)
-
-      object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
-        override fun onError(errMsg: String) {
-          remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-          remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+      override fun onSuccess(result: Bitmap?) {
+        try {
+          //                        Bitmap result = copy(bitmap);
+          if (result != null) {
+            remoteBigView.setImageViewBitmap(R.id.notify_image, result)
+            remoteView.setImageViewBitmap(R.id.notify_image, result)
+          } else {
+            remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+            remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+          }
+        } catch (e: Exception) {
+          Timber.v(e)
+        } finally {
           pushNotify(notification)
         }
+      }
 
-        override fun onSuccess(result: Bitmap?) {
-          try {
-            //                        Bitmap result = copy(bitmap);
-            if (result != null) {
-              remoteBigView.setImageViewBitmap(R.id.notify_image, result)
-              remoteView.setImageViewBitmap(R.id.notify_image, result)
-            } else {
-              remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-              remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            }
-          } catch (e: Exception) {
-            Timber.v(e)
-          } finally {
-            pushNotify(notification)
-          }
-        }
-
-      }.load()
-    }
+    }.load()
   }
 
   private fun buildNotification(context: Context): Notification {

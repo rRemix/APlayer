@@ -32,6 +32,7 @@ import remix.myplayer.ui.adapter.DesktopLyricColorAdapter;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.SPUtil.SETTING_KEY;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 import timber.log.Timber;
@@ -241,7 +242,7 @@ public class DesktopLyricView extends RelativeLayout {
           }
           //保存y坐标
           WindowManager.LayoutParams params = (WindowManager.LayoutParams) getLayoutParams();
-          SPUtil.putValue(mService, "Setting", SPUtil.SETTING_KEY.DESKTOP_LYRIC_Y, params.y);
+          SPUtil.putValue(mService, SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_Y, params.y);
         } else {
 //                    mUIHandler.removeCallbacks(mLongClickRunnable);
         }
