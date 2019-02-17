@@ -469,7 +469,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
       R.id.setting_cover_source_container,
       R.id.setting_player_bottom_container, R.id.setting_restore_delete_container,
       R.id.setting_displayname_container,
-      R.id.setting_general_theme_container, R.id.setting_accent_color_container})
+      R.id.setting_general_theme_container, R.id.setting_accent_color_container,
+      R.id.setting_language_container})
   public void onClick(View v) {
     switch (v.getId()) {
       //文件过滤
@@ -620,7 +621,24 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
       case R.id.setting_general_theme_container:
         configGeneralTheme();
         break;
+      //语言
+      case R.id.setting_language_container:
+        changeLanguage();
+        break;
     }
+  }
+
+  private void changeLanguage() {
+    final String zh = getString(R.string.zh);
+    final String english = getString(R.string.english);
+    final String auto = getString(R.string.auto);
+
+    getBaseDialog(this)
+        .items(new String[]{auto, zh, english})
+        .itemsCallback((dialog, itemView, position, text) -> {
+
+        })
+        .show();
   }
 
   private void gotoEmail() {

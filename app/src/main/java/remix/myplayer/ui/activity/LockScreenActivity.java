@@ -261,9 +261,9 @@ public class LockScreenActivity extends BaseMusicActivity {
 
       @Override
       public Disposable load() {
-        if (mDisposable != null) {
-          mDisposable.dispose();
-        }
+//        if (mDisposable != null) {
+//          mDisposable.dispose();
+//        }
         mDisposable = getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(song))
             .compose(RxUtil.applySchedulerToIO())
             .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette>) e -> {

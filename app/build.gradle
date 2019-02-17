@@ -30,16 +30,16 @@ android {
 
     defaultConfig {
         applicationId "remix.myplayer"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 26
-        versionCode 1490
-        versionName "1.4.9.0-debug"
+        versionCode 1491
+        versionName "1.4.9.1"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
-//            abiFilters 'armeabi-v7a'
-            abiFilters 'armeabi-v7a', 'x86'
+            abiFilters 'armeabi-v7a'
+//            abiFilters 'armeabi-v7a', 'x86'
         }
         externalNativeBuild {
             cmake {

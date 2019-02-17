@@ -215,6 +215,8 @@ public class SPUtil {
     String MIGRATION_THEME = "migration_theme";
     //迁移数据库
     String MIGRATION_DATABASE = "migration_database";
+    //语言
+    String LANGUAGE = "language";
   }
 
   public interface LYRIC_OFFSET_KEY {

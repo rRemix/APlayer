@@ -53,9 +53,9 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   override fun onStart() {
     super.onStart()
     Timber.tag(TAG).v("onStart(), $pendingBindService")
-    if (pendingBindService) {
-      bindToService()
-    }
+//    if (pendingBindService) {
+//      bindToService()
+//    }
   }
 
   override fun onRestart() {
@@ -85,11 +85,11 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   private fun bindToService() {
-    if (!Util.isAppOnForeground()) {
-      Timber.tag(TAG).v("bindToService(),app isn't on foreground")
-      pendingBindService = true
-      return
-    }
+//    if (!Util.isAppOnForeground()) {
+//      Timber.tag(TAG).v("bindToService(),app isn't on foreground")
+//      pendingBindService = true
+//      return
+//    }
     serviceToken = MusicServiceRemote.bindToService(this, object : ServiceConnection {
       override fun onServiceConnected(name: ComponentName, service: IBinder) {
         val musicService = (service as MusicService.MusicBinder).service
@@ -100,7 +100,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
         this@BaseMusicActivity.onServiceDisConnected()
       }
     })
-    pendingBindService = false
+//    pendingBindService = false
   }
 
   fun addMusicServiceEventListener(listener: MusicEventCallback?) {

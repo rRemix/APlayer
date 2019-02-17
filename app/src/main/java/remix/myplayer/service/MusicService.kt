@@ -53,7 +53,6 @@ import remix.myplayer.misc.receiver.HeadsetPlugReceiver
 import remix.myplayer.misc.receiver.MediaButtonReceiver
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.network.RxUtil
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
@@ -437,7 +436,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   override fun onBind(intent: Intent): IBinder? {
     return musicBinder
   }
-
 
   inner class MusicBinder : Binder() {
     val service: MusicService
@@ -1723,6 +1721,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   }
 
   private fun updateDesktopLyric(force: Boolean) {
+    if(!showDesktopLyric){
+      return
+    }
     if (checkNoPermission()) { //没有权限
       return
     }
@@ -1731,6 +1732,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     } else {
       //屏幕点亮才更新
       if (screenOn) {
+        desktopLyricTask?.force = force
         startUpdateLyric()
       }
     }
@@ -1834,6 +1836,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     private var songInLyricTask = Song.EMPTY_SONG
     private val lyricHolder = LyricHolder(this@MusicService)
     private val tag = LyricTask::class.java.simpleName
+    var force = false
 
     override fun run() {
       if (songInLyricTask != currentSong) {
@@ -1842,7 +1845,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         Timber.tag(tag).v("重新获取歌词")
         return
       }
-      Timber.tag(tag).v("更新桌面歌词")
+      if(force){
+        force = false
+        lyricHolder.updateLyricRows(songInLyricTask)
+        Timber.tag(tag).v("强制重新获取歌词")
+        return
+      }
+//      Timber.tag(tag).v("更新桌面歌词")
       //判断权限
       if (checkNoPermission()) {
         return
