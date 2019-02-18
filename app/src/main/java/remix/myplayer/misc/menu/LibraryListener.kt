@@ -15,7 +15,6 @@ import io.reactivex.schedulers.Schedulers
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.db.room.DatabaseRepository.Companion.MyLove
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
@@ -104,7 +103,8 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
             }
             //删除
             R.id.menu_delete -> {
-              if (MyLove == key) {
+              R.string.my_favorite
+              if (key == context.getString(R.string.my_favorite)) {
                 //我的收藏不可删除
                 ToastUtil.show(context, R.string.mylove_cant_edit)
                 return@Consumer
@@ -137,7 +137,7 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
             }
             //列表重命名
             R.id.menu_playlist_rename -> {
-              if (MyLove == key) {
+              if (key == context.getString(R.string.my_favorite)) {
                 //我的收藏不可删除
                 ToastUtil.show(context, R.string.mylove_cant_edit)
                 return@Consumer

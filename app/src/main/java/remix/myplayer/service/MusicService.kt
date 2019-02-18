@@ -482,11 +482,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
 
 
     //桌面部件
-    appWidgets["AppWidgetBig"] = AppWidgetBig.getInstance()
-    appWidgets["AppWidgetMedium"] = AppWidgetMedium.getInstance()
-    appWidgets["AppWidgetMediumTransparent"] = AppWidgetMediumTransparent.getInstance()
-    appWidgets["AppWidgetSmall"] = AppWidgetSmall.getInstance()
-    appWidgets["AppWidgetSmallTransparent"] = AppWidgetSmallTransparent.getInstance()
+    appWidgets[APPWIDGET_BIG] = AppWidgetBig.getInstance()
+    appWidgets[APPWIDGET_MEDIUM] = AppWidgetMedium.getInstance()
+    appWidgets[APPWIDGET_MEDIUM_TRANSPARENT] = AppWidgetMediumTransparent.getInstance()
+    appWidgets[APPWIDGET_SMALL] = AppWidgetSmall.getInstance()
+    appWidgets[APPWIDGET_SMALL_TRANSPARENT] = AppWidgetSmallTransparent.getInstance()
 
     //初始化Receiver
     val eventFilter = IntentFilter()
@@ -521,7 +521,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     if (Util.isIntentAvailable(this, i)) {
       openAudioEffectSession()
     } else {
-      //            EQActivity.Init();
+//      EQActivity.Init()
     }
 
   }
@@ -845,7 +845,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     //倍速播放
     setSpeed(speed)
     //更新所有界面
-    update(operation)
+    updateUIHandler.sendEmptyMessage(UPDATE_META_DATA)
     mediaPlayer.start()
     if (fadeIn) {
       volumeController.fadeIn()
@@ -884,7 +884,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         return
       }
       setPlay(false)
-      update(operation)
+      updateUIHandler.sendEmptyMessage(UPDATE_META_DATA)
       volumeController.fadeOut()
     }
   }
@@ -1176,7 +1176,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         }
         //改变播放模式
         Command.CHANGE_MODEL -> {
-          playModel = if(playModel == PLAY_REPEAT) PLAY_LOOP else playModel + 1
+          playModel = if (playModel == PLAY_REPEAT) PLAY_LOOP else playModel + 1
         }
         //取消或者添加收藏
         Command.LOVE -> {
@@ -1361,19 +1361,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
   }
 
-  /**
-   * 更新
-   */
-  private fun update(control: Int) {
-    updateUIHandler.sendEmptyMessage(UPDATE_META_DATA)
-    //        if (updateAllView(control)) {
-    //            updateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
-    //        } else if (!mediaPlayer.playedOnce()) {
-    //            updateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
-    //        } else if (updatePlayStateOnly(control)) {
-    //            updateUIHandler.sendEmptyMessage(Constants.UPDATE_PLAY_STATE);
-    //        }
-  }
 
   /**
    * 更新锁屏
@@ -1441,9 +1428,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
     if (requestFocus) {
-      audioFocus = audioManager
-          .requestAudioFocus(audioFocusListener, AudioManager.STREAM_MUSIC,
-              AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+      audioFocus = audioManager.requestAudioFocus(audioFocusListener, AudioManager.STREAM_MUSIC,
+          AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
       if (!audioFocus) {
         ToastUtil.show(service, getString(R.string.cant_request_audio_focus))
         return
@@ -1457,7 +1443,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
 
     playbackHandler.post {
       try {
-        isLove = repository.isMyLove(currentId).blockingGet()
+        isLove = repository.isMyLove(currentId)
+            .onErrorReturn {
+              false
+            }
+            .blockingGet()
         mediaPlayer.reset()
         mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0)
         mediaPlayer.dataSource = path
@@ -1597,7 +1587,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     //第一次启动软件
     if (isFirst) {
       //新建我的收藏
-      repository.insertPlayList(DatabaseRepository.MyLove).subscribe(object : LogObserver() {
+      repository.insertPlayList(getString(R.string.my_favorite)).subscribe(object : LogObserver() {
         override fun onSuccess(value: Any) {
           super.onSuccess(value)
         }
@@ -1721,7 +1711,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   }
 
   private fun updateDesktopLyric(force: Boolean) {
-    if(!showDesktopLyric){
+    if (!showDesktopLyric) {
       return
     }
     if (checkNoPermission()) { //没有权限
@@ -1845,7 +1835,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         Timber.tag(tag).v("重新获取歌词")
         return
       }
-      if(force){
+      if (force) {
         force = false
         lyricHolder.updateLyricRows(songInLyricTask)
         Timber.tag(tag).v("强制重新获取歌词")
@@ -1963,7 +1953,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         AudioManager.AUDIOFOCUS_GAIN -> {
           audioFocus = true
           if (!initialized) {
-            setUp()
+            setUpPlayer()
           } else if (mNeedContinue) {
             play(true)
             mNeedContinue = false

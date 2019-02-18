@@ -248,7 +248,10 @@ public class LockScreenActivity extends BaseMusicActivity {
           new RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load();
     }
 
-    new ImageUriRequest<Palette>(CONFIG) {
+    if (mDisposable != null) {
+      mDisposable.dispose();
+    }
+    mDisposable = new ImageUriRequest<Palette>(CONFIG) {
       @Override
       public void onError(String errMsg) {
 //                ToastUtil.show(context,errMsg);
@@ -261,10 +264,7 @@ public class LockScreenActivity extends BaseMusicActivity {
 
       @Override
       public Disposable load() {
-//        if (mDisposable != null) {
-//          mDisposable.dispose();
-//        }
-        mDisposable = getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(song))
+        return getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(song))
             .compose(RxUtil.applySchedulerToIO())
             .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette>) e -> {
               if (bitmap == null) {
@@ -276,7 +276,6 @@ public class LockScreenActivity extends BaseMusicActivity {
             .onErrorResumeNext(Observable.create(e -> processBitmap(e, DEFAULT_BITMAP)))
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
-        return mDisposable;
       }
     }.load();
   }

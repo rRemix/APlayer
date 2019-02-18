@@ -629,7 +629,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       case R.id.next_song:
 //                mLyric.setVisibility(View.GONE);
 //                mVolumeContainer.setVisibility(View.VISIBLE);
-        if (mBottomConfig == 2) {
+        if (mBottomConfig == BOTTOM_SHOW_BOTH) {
           mNextSong.startAnimation(makeAnimation(mNextSong, false));
           mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer, true));
           mHandler.removeCallbacks(mVolumeRunnable);

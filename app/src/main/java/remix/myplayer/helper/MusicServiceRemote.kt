@@ -21,9 +21,9 @@ object MusicServiceRemote {
 
   @JvmStatic
   fun bindToService(context: Context, callback: ServiceConnection): ServiceToken? {
-    if (!Util.isAppOnForeground()) {
-      return null
-    }
+//    if (!Util.isAppOnForeground()) {
+//      return null
+//    }
     var realActivity: Activity? = (context as Activity).parent
     if (realActivity == null)
       realActivity = context

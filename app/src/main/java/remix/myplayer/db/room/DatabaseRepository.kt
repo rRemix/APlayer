@@ -8,7 +8,6 @@ import io.reactivex.Completable
 import io.reactivex.CompletableSource
 import io.reactivex.Single
 import remix.myplayer.App
-import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.model.History
 import remix.myplayer.db.room.model.PlayList
@@ -30,6 +29,14 @@ class DatabaseRepository private constructor() {
   private val db = AppDatabase.getInstance(App.getContext().applicationContext)
 
   private val executors = Executors.newSingleThreadExecutor()
+
+  private var myLoveId: Int = 0
+    get() {
+      if (field <= 0) {
+        field = db.playListDao().selectAll().getOrNull(0)?.id ?: 0
+      }
+      return field
+    }
 
   fun runInTransaction(body: Runnable) {
     executors.execute {
@@ -67,11 +74,28 @@ class DatabaseRepository private constructor() {
   /**
    * 插入多首歌曲到播放列表
    */
-  fun insertToPlayList(audioIds: List<Int>, name: String = "", playlistId: Int = -1): Single<Int> {
+  fun insertToPlayList(audioIds: List<Int>, playlistId: Int = -1): Single<Int> {
     return Single
         .fromCallable {
-          db.playListDao().selectByName(name) ?: db.playListDao().selectById(playlistId)
-          ?: throw IllegalArgumentException("No Playlist Found")
+          db.playListDao().selectById(playlistId) ?: throw IllegalArgumentException("No Playlist Found")
+        }
+        .map {
+          //不重复添加
+          val old = it.audioIds.size
+          it.audioIds.addAll(audioIds)
+          val count = it.audioIds.size - old
+          db.playListDao().update(it)
+          count
+        }
+  }
+
+  /**
+   * 插入多首歌曲到播放列表
+   */
+  fun insertToPlayList(audioIds: List<Int>, name: String): Single<Int> {
+    return Single
+        .fromCallable {
+          db.playListDao().selectByName(name) ?: throw IllegalArgumentException("No Playlist Found")
         }
         .map {
           //不重复添加
@@ -87,11 +111,12 @@ class DatabaseRepository private constructor() {
   /**
    * 从播放列表移除
    */
-  fun deleteFromPlayList(audioIds: List<Int>, name: String = "", playlistId: Int = -1): Single<Int> {
+  fun deleteFromPlayList(audioIds: List<Int>, name: String): Single<Int> {
     return Single
         .fromCallable {
-          db.playListDao().selectByName(name) ?: db.playListDao().selectById(playlistId)
-          ?: throw IllegalArgumentException()
+          db.playListDao().selectByName(name)
+          /**?: db.playListDao().selectById(playlistId)*/
+              ?: throw IllegalArgumentException()
         }
         .map {
           val old = it.audioIds.size
@@ -101,6 +126,24 @@ class DatabaseRepository private constructor() {
           count
         }
   }
+
+  /**
+   * 从播放列表移除
+   */
+  fun deleteFromPlayList(audioIds: List<Int>, playlistId: Int): Single<Int> {
+    return Single
+        .fromCallable {
+          db.playListDao().selectById(playlistId) ?: throw IllegalArgumentException()
+        }
+        .map {
+          val old = it.audioIds.size
+          it.audioIds.removeAll(audioIds)
+          val count = old - it.audioIds.size
+          db.playListDao().update(it)
+          count
+        }
+  }
+
 
   /**
    * 从所有播放列表移除
@@ -136,7 +179,7 @@ class DatabaseRepository private constructor() {
   fun getMyLoveList(): Single<List<Int>> {
     return Single
         .fromCallable {
-          db.playListDao().selectByName(MyLove)
+          db.playListDao().selectById(myLoveId)
         }
         .map {
           it.audioIds.toList()
@@ -198,7 +241,7 @@ class DatabaseRepository private constructor() {
    * 是否是收藏的歌曲
    */
   fun isMyLove(audioId: Int): Single<Boolean> {
-    return getPlayList(MyLove)
+    return getPlayList(myLoveId)
         .map { playList ->
           playList.audioIds.contains(audioId)
         }
@@ -211,10 +254,10 @@ class DatabaseRepository private constructor() {
     return isMyLove(audioId)
         .flatMap {
           if (it) {
-            deleteFromPlayList(arrayListOf(audioId), MyLove)
+            deleteFromPlayList(arrayListOf(audioId), myLoveId)
 
           } else {
-            insertToPlayList(arrayListOf(audioId), MyLove)
+            insertToPlayList(arrayListOf(audioId), myLoveId)
           }
         }
         .map {
@@ -438,9 +481,6 @@ class DatabaseRepository private constructor() {
         INSTANCE ?: synchronized(this) {
           INSTANCE ?: DatabaseRepository()
         }
-
-    @JvmStatic
-    val MyLove = App.getContext().getString(R.string.my_favorite)
 
     private const val CUSTOMSORT = "CUSTOMSORT"
   }

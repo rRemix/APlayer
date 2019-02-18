@@ -94,7 +94,7 @@ public class AddtoPlayListDialog extends BaseMusicDialog implements
       public void onItemClick(View view, int position) {
         PlayList playList = mAdapter.getDatas().get(position);
         DatabaseRepository.getInstance()
-            .insertToPlayList(mList, playList.getName(), playList.getId())
+            .insertToPlayList(mList, playList.getId())
             .compose(RxUtil.applySingleScheduler())
             .doFinally(() -> dismiss())
             .subscribe(num -> ToastUtil.show(getContext(), R.string.add_song_playlist_success, num, playList.getName()),
@@ -154,7 +154,7 @@ public class AddtoPlayListDialog extends BaseMusicDialog implements
                       .flatMap(new Function<Integer, SingleSource<Integer>>() {
                         @Override
                         public SingleSource<Integer> apply(Integer newId) throws Exception {
-                          return DatabaseRepository.getInstance().insertToPlayList(mList, input.toString(), newId);
+                          return DatabaseRepository.getInstance().insertToPlayList(mList, newId);
                         }
                       })
                       .subscribe(num -> {

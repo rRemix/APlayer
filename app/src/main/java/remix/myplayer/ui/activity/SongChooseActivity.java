@@ -109,7 +109,7 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> 
           return;
         }
         DatabaseRepository.getInstance()
-            .insertToPlayList(mAdapter.getCheckedSong(), mPlayListName, mPlayListID)
+            .insertToPlayList(mAdapter.getCheckedSong(), mPlayListID)
             .compose(RxUtil.applySingleScheduler())
             .subscribe(num -> {
               ToastUtil.show(mContext, getString(R.string.add_song_playlist_success, num, mPlayListName));

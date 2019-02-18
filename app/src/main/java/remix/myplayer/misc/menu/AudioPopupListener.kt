@@ -123,10 +123,10 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
       }
       R.id.menu_collect -> {
         DatabaseRepository.getInstance()
-            .insertToPlayList(listOf(song.id), DatabaseRepository.MyLove, -1)
+            .insertToPlayList(listOf(song.id), getString(R.string.my_favorite))
             .compose<Int>(applySingleScheduler<Int>())
             .subscribe(
-                { count -> ToastUtil.show(activity, getString(R.string.add_song_playlist_success, 1, DatabaseRepository.MyLove)) },
+                { count -> ToastUtil.show(activity, getString(R.string.add_song_playlist_success, 1, getString(R.string.my_favorite))) },
                 { throwable -> ToastUtil.show(activity, R.string.add_song_playlist_error) })
       }
       R.id.menu_add_to_playlist -> {

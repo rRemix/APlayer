@@ -74,7 +74,7 @@ class LyricSearcher {
    */
   fun getLyricObservable(manualPath: String, clearCache: Boolean): Observable<List<LrcRow>> {
     if (song == Song.EMPTY_SONG) {
-      throw IllegalArgumentException("")
+      return Observable.error(Throwable("empty song"))
     }
     val type = SPUtil.getValue(App.getContext(), SPUtil.LYRIC_KEY.NAME, song.id, SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
 
