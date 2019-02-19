@@ -165,7 +165,6 @@ abstract class BaseAppwidget
   }
 
   private fun updateLove(service: MusicService,remoteViews: RemoteViews, song: Song) {
-    Timber.v("loved: " + service.isLove)
     remoteViews.setImageViewResource(R.id.appwidget_love,if(service.isLove) skin.lovedRes else skin.loveRes)
   }
 

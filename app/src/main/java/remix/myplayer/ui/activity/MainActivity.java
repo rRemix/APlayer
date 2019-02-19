@@ -2,7 +2,6 @@ package remix.myplayer.ui.activity;
 
 
 import static remix.myplayer.App.IS_GOOGLEPLAY;
-import static remix.myplayer.bean.misc.Category.DEFAULT_LIBRARY;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DISMISS_DIALOG;
 import static remix.myplayer.misc.update.DownloadService.ACTION_DOWNLOAD_COMPLETE;
 import static remix.myplayer.misc.update.DownloadService.ACTION_SHOW_DIALOG;
@@ -264,9 +263,10 @@ public class MainActivity extends MenuActivity {
         : new Gson().fromJson(categoryJson, new TypeToken<List<Category>>() {
         }.getType());
     if (categories.size() == 0) {
-      categories.addAll(DEFAULT_LIBRARY);
+      final List<Category> defaultCategories = Category.getDefaultLibrary(this);
+      categories.addAll(defaultCategories);
       SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,
-          new Gson().toJson(DEFAULT_LIBRARY, new TypeToken<List<Category>>() {
+          new Gson().toJson(defaultCategories, new TypeToken<List<Category>>() {
           }.getType()));
     }
     mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
@@ -278,7 +278,7 @@ public class MainActivity extends MenuActivity {
         showViewWithAnim(mAddButton, true);
       }
       mTablayout.setVisibility(View.GONE);
-    } else{
+    } else {
       mTablayout.setVisibility(View.VISIBLE);
     }
 
@@ -552,9 +552,9 @@ public class MainActivity extends MenuActivity {
                 .getFragment(mViewPager.getCurrentItem());
             invalidateOptionsMenu();
             //如果只有一个Library,隐藏标签栏
-            if(categories.size() == 1){
+            if (categories.size() == 1) {
               mTablayout.setVisibility(View.GONE);
-            } else{
+            } else {
               mTablayout.setVisibility(View.VISIBLE);
             }
           }

@@ -7,10 +7,16 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.LocaleList;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+import java.util.Locale;
+import remix.myplayer.helper.LanguageHelper;
 import remix.myplayer.misc.manager.ActivityManager;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -142,6 +148,12 @@ public class BaseActivity extends AppCompatActivity {
   protected void onPause() {
     super.onPause();
     mIsForeground = false;
+  }
+
+  @Override
+  protected void attachBaseContext(Context newBase) {
+    super.attachBaseContext(LanguageHelper.setLocal(newBase));
+
   }
 
 }

@@ -1,7 +1,7 @@
 package remix.myplayer.ui.activity;
 
 import static remix.myplayer.App.IS_GOOGLEPLAY;
-import static remix.myplayer.bean.misc.Category.ALL_LIBRARY_STRING;
+import static remix.myplayer.helper.LanguageHelper.AUTO;
 import static remix.myplayer.helper.M3UHelper.exportPlayListToFile;
 import static remix.myplayer.helper.M3UHelper.importLocalPlayList;
 import static remix.myplayer.helper.M3UHelper.importM3UFile;
@@ -44,6 +44,8 @@ import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.MaterialDialog.ListCallbackSingleChoice;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.gson.Gson;
@@ -61,6 +63,7 @@ import remix.myplayer.bean.misc.Feedback;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.db.room.model.PlayList;
+import remix.myplayer.helper.LanguageHelper;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
@@ -83,6 +86,7 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.SPUtil.SETTING_KEY;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
@@ -635,9 +639,17 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     getBaseDialog(this)
         .items(new String[]{auto, zh, english})
-        .itemsCallback((dialog, itemView, position, text) -> {
+        .itemsCallbackSingleChoice(SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO),
+            (dialog, itemView, which, text) -> {
+              LanguageHelper.saveSelectLanguage(mContext,which);
 
-        })
+              Intent intent = new Intent(mContext, MainActivity.class);
+              intent.setAction(Intent.ACTION_MAIN);
+              intent.addCategory(Intent.CATEGORY_LAUNCHER);
+              intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+              startActivity(intent);
+              return true;
+            })
         .show();
   }
 
@@ -968,10 +980,12 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     for (Category temp : oldCategories) {
       selected.add(temp.getOrder());
     }
+
+    final List<String> allLibraryStrings = Category.getAllLibraryString(this);
     getBaseDialog(mContext)
         .title(R.string.library_category)
         .positiveText(R.string.confirm)
-        .items(ALL_LIBRARY_STRING)
+        .items(allLibraryStrings)
         .itemsCallbackMultiChoice(selected.toArray(new Integer[selected.size()]),
             (dialog, which, text) -> {
               if (text.length == 0) {
@@ -980,7 +994,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
               }
               ArrayList<Category> newCategories = new ArrayList<>();
               for (Integer choose : which) {
-                newCategories.add(new Category(ALL_LIBRARY_STRING.get(choose)));
+                newCategories.add(new Category(choose));
               }
               if (!newCategories.equals(oldCategories)) {
                 mNeedRefreshLibrary = true;

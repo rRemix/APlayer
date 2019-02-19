@@ -25,10 +25,10 @@ object Migration {
   fun migrationTheme(context: Context) {
     thread {
       //已经迁移过
-      if (SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MIGRATION_THEME, false)) {
+      if (SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "migration_theme", false)) {
         return@thread
       }
-      SPUtil.putValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MIGRATION_THEME, true)
+      SPUtil.putValue(context, SPUtil.SETTING_KEY.NAME, "migration_theme", true)
 
       //先判断是不是夜间模式
       if (SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "ThemeMode", 0) == 1) {
@@ -69,11 +69,11 @@ object Migration {
     thread(priority = Thread.MAX_PRIORITY) {
       Timber.v("开始迁移")
       //已经迁移过
-      if (SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MIGRATION_DATABASE, false)) {
+      if (SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "migration_database", false)) {
         Timber.v("已经迁移过")
         return@thread
       }
-      SPUtil.putValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MIGRATION_DATABASE, true)
+      SPUtil.putValue(context, SPUtil.SETTING_KEY.NAME, "migration_database", true)
 
       val db = DBOpenHelper(context).writableDatabase
       //读取所有播放列表
@@ -135,6 +135,22 @@ object Migration {
             })
       }
 
+    }
+  }
+
+  /**
+   * 迁移数据库
+   */
+  @JvmStatic
+  fun migrationLibrary(context: Context){
+    thread {
+      //已经迁移过
+      if (SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "migration_library", false)) {
+        return@thread
+      }
+      //清除以前保存的
+      SPUtil.deleteValue(context,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.LIBRARY_CATEGORY)
+      SPUtil.putValue(context, SPUtil.SETTING_KEY.NAME, "migration_library", true)
     }
   }
 }

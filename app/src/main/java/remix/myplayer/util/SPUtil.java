@@ -211,10 +211,6 @@ public class SPUtil {
     String MODE_FOR_ARTIST = "mode_for_artist";
     //播放列表的显示模式
     String MODE_FOR_PLAYLIST = "mode_for_playlist";
-    //迁移主题
-    String MIGRATION_THEME = "migration_theme";
-    //迁移数据库
-    String MIGRATION_DATABASE = "migration_database";
     //语言
     String LANGUAGE = "language";
   }

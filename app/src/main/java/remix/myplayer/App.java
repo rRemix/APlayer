@@ -1,6 +1,7 @@
 package remix.myplayer;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.multidex.MultiDex;
@@ -14,6 +15,8 @@ import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy;
 import io.reactivex.plugins.RxJavaPlugins;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
+import remix.myplayer.helper.LanguageHelper;
+import remix.myplayer.misc.Migration;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.util.Util;
 import timber.log.Timber;
@@ -31,7 +34,8 @@ public class App extends MultiDexApplication {
 
   @Override
   protected void attachBaseContext(Context base) {
-    super.attachBaseContext(base);
+    LanguageHelper.saveSystemCurrentLanguage();
+    super.attachBaseContext(LanguageHelper.setLocal(base));
     MultiDex.install(this);
   }
 
@@ -49,20 +53,20 @@ public class App extends MultiDexApplication {
 //    //异常捕获
 //    CrashHandler.getInstance().init(this);
 
-    //检测内存泄漏
+    // 检测内存泄漏
     if (!LeakCanary.isInAnalyzerProcess(this)) {
       LeakCanary.install(this);
     }
 
-    //AppShortcut
+    // AppShortcut
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
       new DynamicShortcutManager(this).setUpShortcut();
     }
 
-    //加载第三方库
+    // 加载第三方库
     loadLibrary();
 
-    //处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
+    // 处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
     if (!BuildConfig.DEBUG) {
       RxJavaPlugins.setErrorHandler(throwable -> {
         Timber.v(throwable);
@@ -74,6 +78,14 @@ public class App extends MultiDexApplication {
 
   private void setUp() {
     DiskCache.init(this);
+    LanguageHelper.setApplicationLanguage(this);
+    Migration.migrationLibrary(this);
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    LanguageHelper.onConfigurationChanged(getApplicationContext());
   }
 
 
@@ -82,7 +94,7 @@ public class App extends MultiDexApplication {
   }
 
   private void loadLibrary() {
-    //bugly
+    // bugly
     Context context = getApplicationContext();
     // 获取当前包名
     String packageName = context.getPackageName();
@@ -94,7 +106,7 @@ public class App extends MultiDexApplication {
     CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG, strategy);
     CrashReport.setIsDevelopmentDevice(this, BuildConfig.DEBUG);
 
-    //fresco
+    // fresco
     final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
     ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
         .setBitmapMemoryCacheParamsSupplier(
@@ -105,7 +117,7 @@ public class App extends MultiDexApplication {
         .build();
     Fresco.initialize(this, config);
 
-    //timer
+    // timer
     Timber.plant(new Timber.DebugTree());
   }
 }

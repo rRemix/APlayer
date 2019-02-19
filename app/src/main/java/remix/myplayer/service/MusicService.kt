@@ -38,6 +38,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.bean.mp3.Song.EMPTY_SONG
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayQueue
+import remix.myplayer.helper.LanguageHelper
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.helper.ShakeDetector
 import remix.myplayer.helper.SleepTimer
@@ -424,6 +425,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     super.onDestroy()
     isServiceStop = true
     unInit()
+  }
+
+  override fun attachBaseContext(base: Context) {
+    super.attachBaseContext(LanguageHelper.setLocal(base))
   }
 
   override fun onCreate() {
@@ -1581,7 +1586,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
 
     val isFirst = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, true)
     SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, false)
-    //读取sd卡歌曲id
+    //读取歌曲id
     allSong.clear()
     allSong.addAll(MediaStoreUtil.getAllSongsId())
     //第一次启动软件
