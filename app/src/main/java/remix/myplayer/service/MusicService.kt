@@ -116,18 +116,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   /**
    * 设置播放模式并更新下一首歌曲
    */
-  //保存正在播放和下一首歌曲
   var playModel: Int = PLAY_LOOP
     set(newPlayModel) {
-      if (newPlayModel == field) {
-        return
-      }
-      updateAppwidget()
+      desktopWidgetTask?.run()
       SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL, newPlayModel)
       SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NEXT_SONG_ID, nextId)
       SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, currentId)
-      if (playModel == PLAY_SHUFFLE) {
-        randomQueue.clear()
+      if (newPlayModel == PLAY_SHUFFLE) {
         makeShuffleList(currentId)
       }
       field = newPlayModel
@@ -1601,8 +1596,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           super.onError(e)
         }
       })
-      //默认全部歌曲为播放列表
-      playQueue.addAll(allSong)
+
       //通知栏样式
       SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,
           Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
@@ -1618,7 +1612,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
 
     if (playQueue.isEmpty()) {
-      playQueue.addAll(allSong)
+      //默认全部歌曲为播放列表
+      setPlayQueue(allSong)
     }
 
     //摇一摇

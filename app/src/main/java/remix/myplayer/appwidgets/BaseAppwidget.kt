@@ -147,7 +147,7 @@ abstract class BaseAppwidget
     //        updateSkin(remoteViews);
     updatePlayPause(service, remoteViews)
     updateLove(service,remoteViews, song)
-    updateModel(remoteViews)
+    updateModel(service,remoteViews)
     updateNextAndPrev(remoteViews)
     updateProgress(service, remoteViews, song)
     updateTimer(remoteViews)
@@ -174,9 +174,9 @@ abstract class BaseAppwidget
     remoteViews.setImageViewResource(R.id.appwidget_prev, skin.prevRes)
   }
 
-  private fun updateModel(remoteViews: RemoteViews) {
+  private fun updateModel(service: MusicService,remoteViews: RemoteViews) {
     //播放模式
-    remoteViews.setImageViewResource(R.id.appwidget_model, skin.modeRes)
+    remoteViews.setImageViewResource(R.id.appwidget_model, skin.getModeRes(service))
   }
 
   private fun updatePlayPause(service: MusicService, remoteViews: RemoteViews) {
