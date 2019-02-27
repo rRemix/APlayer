@@ -364,13 +364,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       }
     }
 
-    //恢复位置信息
-    if (savedInstanceState != null) {
-      if (mOriginRect == null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
-        mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
-      }
-      mShowAnimation = savedInstanceState.getBoolean(EXTRA_SHOW_ANIMATION, false);
-    }
   }
 
 

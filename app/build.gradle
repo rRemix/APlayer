@@ -32,8 +32,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 1501
-        versionName "1.5.0.1-debug"
+        versionCode 1502
+        versionName "1.5.0.2"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
@@ -56,7 +56,7 @@ android {
 
     signingConfigs {
         debug {
-            storeFile file("./Debug.jks")
+            storeFile file("/Users/remix/Android/Development/Debug.jks")
             storePassword "123456"
             keyAlias "Debug"
             keyPassword "123456"

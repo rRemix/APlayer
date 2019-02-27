@@ -111,17 +111,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   private var loadFinished = false
 
   /**
-   * 获得播放模式
-   */
-  /**
    * 设置播放模式并更新下一首歌曲
    */
   var playModel: Int = PLAY_LOOP
     set(newPlayModel) {
       desktopWidgetTask?.run()
       SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL, newPlayModel)
-      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NEXT_SONG_ID, nextId)
-      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, currentId)
+//      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NEXT_SONG_ID, nextId)
+//      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, currentId)
       if (newPlayModel == PLAY_SHUFFLE) {
         makeShuffleList(currentId)
       }
@@ -319,6 +316,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
    * 是否开启断点播放
    */
   private var playAtBreakPoint: Boolean = false
+  private var progressTask: ProgressTask? = null
 
   /**
    * 操作类型
@@ -379,7 +377,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   /**
    * 更新桌面歌词与桌面部件
    */
-  private var desktopTimer: Timer = Timer()
+  private var timer: Timer = Timer()
   private var desktopLyricTask: LyricTask? = null
   private var desktopWidgetTask: WidgetTask? = null
 
@@ -406,6 +404,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
     else
       desktopLyricView?.isLocked == true
+
 
   override fun onTaskRemoved(rootIntent: Intent) {
     super.onTaskRemoved(rootIntent)
@@ -689,7 +688,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     initialized = false
     shortcutManager.updateContinueShortcut(this)
 
-    desktopTimer.cancel()
+    timer.cancel()
     notify.cancelPlayingNotify()
 
     removeDesktopLyric()
@@ -1089,8 +1088,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
     updateDesktopLyric(false)
     updateNotification()
-
     updateMediaSession(operation)
+    // 是否需要保存进度
+    if(playAtBreakPoint){
+      startSaveProgress()
+    }
+
     sendLocalBroadcast(Intent(MusicService.META_CHANGE))
   }
 
@@ -1317,6 +1320,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           playAtBreakPoint = intent.getBooleanExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, false)
           if (!playAtBreakPoint) {
             SPUtil.putValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS, 0)
+            stopSaveProgress()
+          } else {
+            startSaveProgress()
           }
         }
         //切换定时器
@@ -1777,7 +1783,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
     desktopWidgetTask = WidgetTask()
-    desktopTimer.schedule(desktopWidgetTask, 1000, 1000)
+    timer.schedule(desktopWidgetTask, 1000, 1000)
   }
 
 
@@ -1786,7 +1792,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
     desktopLyricTask = LyricTask()
-    desktopTimer.schedule(desktopLyricTask, 1000, LYRIC_FIND_INTERVAL)
+    timer.schedule(desktopLyricTask, 1000, LYRIC_FIND_INTERVAL)
   }
 
   private fun stopUpdateLyric() {
@@ -1807,12 +1813,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         }
       } else {
         Timber.v("app在前台不用更新")
-      }
-      if (playAtBreakPoint) {
-        val progress = progress
-        if (progress > 0) {
-          SPUtil.putValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS, progress)
-        }
       }
     }
 
@@ -1939,6 +1939,33 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     stopUpdateLyric()
     updateUIHandler.removeMessages(CREATE_DESKTOP_LRC)
     updateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
+  }
+
+  private fun startSaveProgress() {
+    if (progressTask != null) {
+      return
+    }
+    progressTask = ProgressTask()
+    timer.schedule(progressTask, 1000, LYRIC_FIND_INTERVAL)
+  }
+
+  private fun stopSaveProgress() {
+    progressTask?.cancel()
+    progressTask = null
+  }
+
+
+  /**
+   * 保存当前播放的进度
+   */
+  private inner class ProgressTask : TimerTask() {
+    override fun run() {
+      val progress = progress
+      if (progress > 0) {
+        SPUtil.putValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS, progress)
+      }
+    }
+
   }
 
 

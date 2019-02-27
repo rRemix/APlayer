@@ -139,7 +139,7 @@ object Migration {
   }
 
   /**
-   * 迁移数据库
+   * 迁移
    */
   @JvmStatic
   fun migrationLibrary(context: Context){
@@ -151,6 +151,22 @@ object Migration {
       //清除以前保存的
       SPUtil.deleteValue(context,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.LIBRARY_CATEGORY)
       SPUtil.putValue(context, SPUtil.SETTING_KEY.NAME, "migration_library", true)
+    }
+  }
+
+  @JvmStatic
+  fun migrationPlayModel(context: Context){
+    thread {
+      //已经迁移过
+      if (SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, "migration_play_model", false)) {
+        return@thread
+      }
+      SPUtil.putValue(context, SPUtil.SETTING_KEY.NAME, "migration_play_model", true)
+      //根据以前保存的设置现在的播放模式
+      val oldPlayModel = SPUtil.getValue(context,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.PLAY_MODEL,-1)
+      if(oldPlayModel in 50..52){
+        SPUtil.putValue(context,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.PLAY_MODEL,oldPlayModel - 49)
+      }
     }
   }
 }

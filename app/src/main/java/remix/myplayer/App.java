@@ -80,6 +80,7 @@ public class App extends MultiDexApplication {
     DiskCache.init(this);
     LanguageHelper.setApplicationLanguage(this);
     Migration.migrationLibrary(this);
+    Migration.migrationPlayModel(this);
   }
 
   @Override
