@@ -37,12 +37,14 @@
       android:gravity="center"
       android:padding="12dp">
       <ImageView
+        android:id="@+id/iv_offset_reduce_arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         android:src="@drawable/icon_lyric_reduce_offset"/>
 
       <ImageView
+        android:id="@+id/iv_offset_reduce_second"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/icon_lyric_reduce_offset_second"/>
@@ -66,11 +68,13 @@
       android:padding="12dp"
       android:gravity="center">
       <ImageView
+        android:id="@+id/iv_offset_add_second"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/icon_lyric_add_offset_second"
         android:layout_marginBottom="4dp"/>
       <ImageView
+        android:id="@+id/iv_offset_add_arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/icon_lyric_add_offset"/>

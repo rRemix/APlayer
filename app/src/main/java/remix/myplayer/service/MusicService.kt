@@ -103,7 +103,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   /**
    * 是否正在设置mediapplayer的datasource
    */
-  private var initialized = false
+  private var prepared = false
 
   /**
    * 数据是否加载完成
@@ -359,7 +359,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   val progress: Int
     get() {
       try {
-        if (initialized) {
+        if (prepared) {
           return mediaPlayer.currentPosition.toInt()
         }
       } catch (e: IllegalStateException) {
@@ -370,7 +370,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
 
   val duration: Long
-    get() = if (initialized) {
+    get() = if (prepared) {
       mediaPlayer.duration
     } else 0
 
@@ -612,7 +612,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
 
     mediaPlayer.setOnErrorListener { mp, what, extra ->
       try {
-        initialized = false
+        prepared = false
         mediaPlayer.release()
         setUpPlayer()
         ToastUtil.show(service, R.string.mediaplayer_error, what, extra)
@@ -685,7 +685,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
     mediaPlayer.release()
     loadFinished = false
-    initialized = false
+    prepared = false
     shortcutManager.updateContinueShortcut(this)
 
     timer.cancel()
@@ -1444,7 +1444,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     if (isPlaying) {
       pause(true)
     }
-    initialized = false
+    prepared = false
     //    openAudioEffectSession();
 
     playbackHandler.post {
@@ -1458,10 +1458,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0)
         mediaPlayer.dataSource = path
         mediaPlayer.prepareAsync()
-        initialized = true
+        prepared = true
       } catch (e: Exception) {
         ToastUtil.show(service, getString(R.string.play_failed) + e.toString())
-        initialized = false
+        prepared = false
       }
     }
   }
@@ -1560,13 +1560,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
    * 设置MediaPlayer播放进度
    */
   fun setProgress(current: Long) {
-    if (initialized) {
+    if (prepared) {
       mediaPlayer.seekTo(current)
     }
   }
 
   fun setSpeed(speed: Float) {
-    if (initialized) {
+    if (prepared) {
       this.speed = speed
       mediaPlayer.setSpeed(this.speed)
     }
@@ -1979,7 +1979,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         //获得AudioFocus
         AudioManager.AUDIOFOCUS_GAIN -> {
           audioFocus = true
-          if (!initialized) {
+          if (!prepared) {
             setUpPlayer()
           } else if (mNeedContinue) {
             play(true)
@@ -1991,7 +1991,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         //短暂暂停
         AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
           mNeedContinue = isPlay
-          if (isPlay && initialized) {
+          if (isPlay && prepared) {
             operation = Command.TOGGLE
             pause(false)
           }
@@ -2003,7 +2003,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         //暂停
         AudioManager.AUDIOFOCUS_LOSS -> {
           audioFocus = false
-          if (isPlay && initialized) {
+          if (isPlay && prepared) {
             operation = Command.TOGGLE
             pause(false)
           }

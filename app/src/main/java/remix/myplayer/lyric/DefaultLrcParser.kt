@@ -2,7 +2,6 @@ package remix.myplayer.lyric
 
 import android.os.Environment
 import android.text.TextUtils
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import remix.myplayer.App
@@ -11,7 +10,7 @@ import remix.myplayer.misc.cache.DiskCache
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
-import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @ClassName
@@ -65,6 +64,7 @@ class DefaultLrcParser : ILrcParser {
   }
 
   override fun getLrcRows(bufferedReader: BufferedReader?, needCache: Boolean, cacheKey: String, searchKey: String): List<LrcRow>? {
+
     //解析歌词
     val lrcRows = ArrayList<LrcRow>()
     val allLine = ArrayList<String>()
@@ -94,6 +94,30 @@ class DefaultLrcParser : ILrcParser {
         lrcRows.addAll(rows)
     }
 
+    //合并翻译
+    val combineLrcRows = ArrayList<LrcRow>()
+    var index = 0
+    while (index < lrcRows.size - 1){
+      //判断下一句歌词和当前歌词的时间是否一致，一致则认为下一句是当前歌词的翻译
+      val currentRow = lrcRows[index]
+      val nextRow = lrcRows[index + 1]
+      if(currentRow.time == nextRow.time){
+        val tmp = LrcRow()
+        tmp.content = currentRow.content
+        tmp.time = currentRow.time
+        tmp.timeStr = currentRow.timeStr
+        tmp.translate = nextRow.content
+        combineLrcRows.add(tmp)
+        index++
+      }
+      index++
+    }
+    if(combineLrcRows.size.toFloat() / lrcRows.size >= THRESHOLD_PROPORTION){
+      lrcRows.clear()
+      lrcRows.addAll(combineLrcRows)
+    }
+
+
     if (lrcRows.size == 0)
       return lrcRows
     //为歌词排序
@@ -113,5 +137,6 @@ class DefaultLrcParser : ILrcParser {
 
   companion object {
     const val TAG = "DefaultLrcParser"
+    const val THRESHOLD_PROPORTION = 0.3
   }
 }

@@ -115,11 +115,64 @@
           android:layout_toLeftOf="@id/widget_lrc_smaller"
           android:background="@drawable/bg_oval_ripple_light"
           android:src="@drawable/widget_btn_lrc_bigger"/>
+
+        <TextView
+          android:id="@+id/widget_text_r"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignBottom="@id/widget_seekbar_r"
+          android:layout_alignTop="@id/widget_seekbar_r"
+          android:gravity="center"
+          android:text="R"/>
+        <SeekBar
+          android:id="@+id/widget_seekbar_r"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_toLeftOf="@id/widget_lrc_bigger"
+          android:layout_toRightOf="@id/widget_text_r"/>
+
+        <TextView
+          android:id="@+id/widget_text_g"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignBottom="@id/widget_seekbar_g"
+          android:layout_alignTop="@id/widget_seekbar_g"
+          android:layout_below="@id/widget_text_r"
+          android:gravity="center"
+          android:text="G"/>
+        <SeekBar
+          android:id="@+id/widget_seekbar_g"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="2dp"
+          android:layout_below="@id/widget_seekbar_r"
+          android:layout_toLeftOf="@id/widget_lrc_bigger"
+          android:layout_toRightOf="@id/widget_text_g"/>
+
+        <TextView
+          android:id="@+id/widget_text_b"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignBottom="@id/widget_seekbar_b"
+          android:layout_alignTop="@id/widget_seekbar_b"
+          android:layout_below="@id/widget_text_g"
+          android:gravity="center"
+          android:text="B"/>
+        <SeekBar
+          android:id="@+id/widget_seekbar_b"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="2dp"
+          android:layout_below="@id/widget_seekbar_g"
+          android:layout_toLeftOf="@id/widget_lrc_bigger"
+          android:layout_toRightOf="@id/widget_text_b"/>
+
         <android.support.v7.widget.RecyclerView
           android:id="@+id/widget_color_recyclerview"
           android:layout_width="match_parent"
           android:layout_height="@dimen/d30_size"
-          android:layout_toLeftOf="@id/widget_lrc_bigger"/>
+          android:layout_toLeftOf="@id/widget_lrc_bigger"
+          android:visibility="gone"/>
       </RelativeLayout>
     </RelativeLayout>
   </RelativeLayout>

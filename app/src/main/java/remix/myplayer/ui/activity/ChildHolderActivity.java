@@ -54,6 +54,7 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -101,6 +102,10 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     mId = getIntent().getIntExtra(EXTRA_ID, -1);
     mType = getIntent().getIntExtra(EXTRA_TYPE, -1);
     mArg = getIntent().getStringExtra(EXTRA_TITLE);
+    if(mId == -1 || mType == -1 || TextUtils.isEmpty(mArg)){
+      ToastUtil.show(this,R.string.illegal_arg);
+      finish();
+    }
 
     mChoice = new MultipleChoice<>(this,
         mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);

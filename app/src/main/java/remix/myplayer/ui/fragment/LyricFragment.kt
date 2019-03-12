@@ -1,15 +1,19 @@
 package remix.myplayer.ui.fragment
 
+import android.graphics.Color
+import android.graphics.ColorFilter
 import android.os.Bundle
 import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
+import kotlinx.android.synthetic.main.fragment_lrc.*
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
@@ -18,6 +22,8 @@ import remix.myplayer.lyric.LyricSearcher
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
 import remix.myplayer.misc.interfaces.OnInflateFinishListener
+import remix.myplayer.theme.ThemeStore
+import remix.myplayer.theme.TintHelper
 import remix.myplayer.ui.fragment.base.BaseMusicFragment
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
@@ -59,7 +65,21 @@ class LyricFragment : BaseMusicFragment() {
 
     onFindListener?.onViewInflateFinish(lrcView)
 
+
     return rootView
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    //黑色主题着色按钮
+    val themeRes = ThemeStore.getThemeRes()
+    if(themeRes == R.style.Theme_APlayer_Black || themeRes == R.style.Theme_APlayer_Dark){
+      iv_offset_reduce_arrow.setColorFilter(Color.WHITE)
+      iv_offset_reduce_second.setColorFilter(Color.WHITE)
+      offsetReset.setColorFilter(Color.WHITE)
+      iv_offset_add_arrow.setColorFilter(Color.WHITE)
+      iv_offset_add_second.setColorFilter(Color.WHITE)
+    }
   }
 
   override fun onDestroyView() {
@@ -94,7 +114,7 @@ class LyricFragment : BaseMusicFragment() {
 
     disposable?.dispose()
     disposable = lyricSearcher.setSong(info ?: return)
-        .getLyricObservable(manualPath,clearCache)
+        .getLyricObservable(manualPath, clearCache)
         .doOnSubscribe { lrcView.setText(getStringSafely(R.string.searching)) }
         .subscribe(Consumer {
           if (id == info?.id) {

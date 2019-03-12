@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.provider.CalendarContract.CalendarAlerts;
 import android.support.annotation.ColorInt;
 import android.support.annotation.StringRes;
 import android.text.Layout;
@@ -282,13 +283,33 @@ public class LrcView extends View implements ILrcView {
    * 分割绘制歌词
    */
   private void drawLrcRow(Canvas canvas, TextPaint textPaint, int availableWidth, LrcRow lrcRow) {
-    drawText(canvas, textPaint, availableWidth, lrcRow.getContent());
     if (lrcRow.hasTranslate()) {
-//            mRowY += DEFAULT_SPACING_PADDING;
-      drawText(canvas, textPaint, availableWidth, lrcRow.getTranslate());
+      drawTextWithTranslate(canvas, textPaint, availableWidth, lrcRow.getContent());
+      if (lrcRow.hasTranslate()) {
+        drawTextWithTranslate(canvas, textPaint, availableWidth, lrcRow.getTranslate());
+      }
+    } else {
+      drawText(canvas, textPaint, availableWidth, lrcRow.getContent());
     }
+
     mRowY += mLinePadding;
   }
+
+  /**
+   * 分割绘制歌词
+   */
+  private void drawTextTemp(Canvas canvas, TextPaint textPaint, int availableWidth, String text) {
+    StaticLayout staticLayout = new StaticLayout(text, textPaint, availableWidth,
+        Layout.Alignment.ALIGN_CENTER,
+        DEFAULT_SPACING_MULTI, 0, true);
+    final int extra = staticLayout.getLineCount() > 1 ? DensityUtil.dip2px(getContext(), 10) : 0;
+    canvas.save();
+    canvas.translate(getPaddingLeft(), mRowY - staticLayout.getHeight() / 2 + extra);
+    staticLayout.draw(canvas);
+    canvas.restore();
+    mRowY += staticLayout.getHeight();
+  }
+
 
   /**
    * 分割绘制歌词
@@ -300,6 +321,21 @@ public class LrcView extends View implements ILrcView {
     final int extra = staticLayout.getLineCount() > 1 ? DensityUtil.dip2px(getContext(), 10) : 0;
     canvas.save();
     canvas.translate(getPaddingLeft(), mRowY - staticLayout.getHeight() / 2 + extra);
+    staticLayout.draw(canvas);
+    canvas.restore();
+    mRowY += staticLayout.getHeight();
+  }
+
+  /**
+   * 分割绘制歌词
+   */
+  private void drawTextWithTranslate(Canvas canvas, TextPaint textPaint, int availableWidth, String text) {
+    StaticLayout staticLayout = new StaticLayout(text, textPaint, availableWidth,
+        Layout.Alignment.ALIGN_CENTER,
+        DEFAULT_SPACING_MULTI, 0, true);
+    final int extra = staticLayout.getLineCount() > 1 ? DensityUtil.dip2px(getContext(), 10) : 0;
+    canvas.save();
+    canvas.translate(getPaddingLeft(), mRowY - staticLayout.getHeight() + extra);
     staticLayout.draw(canvas);
     canvas.restore();
     mRowY += staticLayout.getHeight();

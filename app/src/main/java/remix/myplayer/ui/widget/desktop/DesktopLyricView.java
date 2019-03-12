@@ -1,12 +1,18 @@
 package remix.myplayer.ui.widget.desktop;
 
 import static remix.myplayer.service.MusicService.EXTRA_DESKTOP_LYRIC;
+import static remix.myplayer.theme.ThemeStore.getFloatLyricTextColor;
+import static remix.myplayer.theme.ThemeStore.saveFloatLyricTextColor;
 import static remix.myplayer.ui.adapter.DesktopLyricColorAdapter.COLORS;
+import static remix.myplayer.util.MusicUtil.makeCmdIntent;
+import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PointF;
-import android.os.Handler;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
+import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -15,22 +21,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.afollestad.materialdialogs.internal.MDTintHelper;
 import remix.myplayer.R;
 import remix.myplayer.lyric.bean.LrcRow;
-import remix.myplayer.lyric.bean.LyricRowWrapper;
+import remix.myplayer.misc.handler.MsgHandler;
+import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.DesktopLyricColorAdapter;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.SPUtil.SETTING_KEY;
 import remix.myplayer.util.ToastUtil;
@@ -51,8 +60,7 @@ public class DesktopLyricView extends RelativeLayout {
   private MusicService mService;
   private PointF mLastPoint = new PointF();
   private boolean mIsLock = false;
-  private LyricRowWrapper mLrcContent;
-  private Handler mUIHandler = new Handler();
+  private MsgHandler mUIHandler = new MsgHandler(this);
   @BindView(R.id.widget_line1)
   DesktopLyricTextView mText1;
   @BindView(R.id.widget_line2)
@@ -77,6 +85,19 @@ public class DesktopLyricView extends RelativeLayout {
   View mLrcSettingContainer;
   @BindView(R.id.widget_root)
   ViewGroup mRoot;
+  @BindView(R.id.widget_seekbar_r)
+  SeekBar mSeekBarR;
+  @BindView(R.id.widget_seekbar_g)
+  SeekBar mSeekBarG;
+  @BindView(R.id.widget_seekbar_b)
+  SeekBar mSeekBarB;
+  @BindView(R.id.widget_text_r)
+  TextView mTextR;
+  @BindView(R.id.widget_text_g)
+  TextView mTextG;
+  @BindView(R.id.widget_text_b)
+  TextView mTextB;
+
 
   private DesktopLyricColorAdapter mColorAdapter;
 
@@ -102,6 +123,35 @@ public class DesktopLyricView extends RelativeLayout {
     public void run() {
       mPanel.setVisibility(GONE);
       mLrcSettingContainer.setVisibility(GONE);
+    }
+  };
+
+  private SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener = new OnSeekBarChangeListener() {
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+      final int temp = Color.rgb(mSeekBarR.getProgress(), mSeekBarG.getProgress(), mSeekBarB.getProgress());
+      final int color = ColorUtil.isColorCloseToWhite(temp) ? Color.parseColor("#F9F9F9") : temp;
+      mText1.setTextColor(color);
+      MDTintHelper.setTint(mSeekBarR, color);
+      MDTintHelper.setTint(mSeekBarG, color);
+      MDTintHelper.setTint(mSeekBarB, color);
+      mTextR.setTextColor(color);
+      mTextG.setTextColor(color);
+      mTextB.setTextColor(color);
+      resetHide();
+
+      mUIHandler.removeMessages(MESSAGE_SAVE_COLOR);
+      mUIHandler.sendMessageDelayed(Message.obtain(mUIHandler, MESSAGE_SAVE_COLOR, color, 0), 100);
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
   };
 
@@ -153,7 +203,28 @@ public class DesktopLyricView extends RelativeLayout {
   }
 
   private void setUpView() {
-    mText1.setTextColor(ThemeStore.getFloatLyricTextColor());
+    final int temp = getFloatLyricTextColor();
+    final int color = ColorUtil.isColorCloseToWhite(temp) ? Color.parseColor("#F9F9F9") : temp;
+    final int red = (color & 0xff0000) >> 16;
+    final int green = (color & 0x00ff00) >> 8;
+    final int blue = (color & 0x0000ff);
+    mSeekBarR.setMax(255);
+    mSeekBarR.setProgress(red);
+    mSeekBarG.setMax(255);
+    mSeekBarG.setProgress(green);
+    mSeekBarB.setMax(255);
+    mSeekBarB.setProgress(blue);
+    mTextR.setTextColor(color);
+    mTextG.setTextColor(color);
+    mTextB.setTextColor(color);
+    mSeekBarR.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
+    mSeekBarG.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
+    mSeekBarB.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
+    MDTintHelper.setTint(mSeekBarR, color);
+    MDTintHelper.setTint(mSeekBarG, color);
+    MDTintHelper.setTint(mSeekBarB, color);
+
+    mText1.setTextColor(color);
     mText1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL
         : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
     mText2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL
@@ -216,8 +287,10 @@ public class DesktopLyricView extends RelativeLayout {
 
           if (Math.abs(event.getRawY() - mLastPoint.y) > DISTANCE_THRESHOLD) {
             params.y += (int) (event.getRawY() - mLastPoint.y);
-            mWindowManager.updateViewLayout(this, params);
             mIsDragging = true;
+            if (VERSION.SDK_INT >= VERSION_CODES.KITKAT && isAttachedToWindow()) {
+              mWindowManager.updateViewLayout(this, params);
+            }
           }
           mLastPoint.set(event.getRawX(), event.getRawY());
         }
@@ -242,7 +315,7 @@ public class DesktopLyricView extends RelativeLayout {
           }
           //保存y坐标
           WindowManager.LayoutParams params = (WindowManager.LayoutParams) getLayoutParams();
-          SPUtil.putValue(mService, SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_Y, params.y);
+          SPUtil.putValue(mService, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_Y, params.y);
         } else {
 //                    mUIHandler.removeCallbacks(mLongClickRunnable);
         }
@@ -268,8 +341,8 @@ public class DesktopLyricView extends RelativeLayout {
       case R.id.widget_close:
         SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW,
             false);
-        Util.sendLocalBroadcast(
-            MusicUtil.makeCmdIntent(Command.TOGGLE_DESKTOP_LYRIC).putExtra(EXTRA_DESKTOP_LYRIC, false));
+        sendLocalBroadcast(
+            makeCmdIntent(Command.TOGGLE_DESKTOP_LYRIC).putExtra(EXTRA_DESKTOP_LYRIC, false));
         break;
       //锁定
       case R.id.widget_lock:
@@ -288,10 +361,8 @@ public class DesktopLyricView extends RelativeLayout {
       case R.id.widget_next:
       case R.id.widget_play:
       case R.id.widget_prev:
-        Intent ctlIntent = new Intent(MusicService.ACTION_CMD);
-        ctlIntent.putExtra("Control", view.getId() == R.id.widget_next ? Command.NEXT
-            : view.getId() == R.id.widget_prev ? Command.PREV : Command.TOGGLE);
-        Util.sendLocalBroadcast(ctlIntent);
+        sendLocalBroadcast(makeCmdIntent(view.getId() == R.id.widget_next ? Command.NEXT
+            : view.getId() == R.id.widget_prev ? Command.PREV : Command.TOGGLE));
         mUIHandler.postDelayed(() -> mPlay.setImageResource(
             mService.isPlaying() ? R.drawable.widget_btn_stop_normal
                 : R.drawable.widget_btn_play_normal), 100);
@@ -351,7 +422,9 @@ public class DesktopLyricView extends RelativeLayout {
         params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
             | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
       }
-      mWindowManager.updateViewLayout(this, params);
+      if (VERSION.SDK_INT >= VERSION_CODES.KITKAT && isAttachedToWindow()) {
+        mWindowManager.updateViewLayout(this, params);
+      }
     }
   }
 
@@ -377,6 +450,9 @@ public class DesktopLyricView extends RelativeLayout {
   protected void onDetachedFromWindow() {
     super.onDetachedFromWindow();
     mUIHandler.removeCallbacksAndMessages(null);
+    mSeekBarR.setOnSeekBarChangeListener(null);
+    mSeekBarG.setOnSeekBarChangeListener(null);
+    mSeekBarB.setOnSeekBarChangeListener(null);
     Timber.v("onDetachedFromWindow");
   }
 
@@ -388,6 +464,18 @@ public class DesktopLyricView extends RelativeLayout {
 
   public boolean isLocked() {
     return mIsLock;
+  }
+
+
+  private static final int MESSAGE_SAVE_COLOR = 1;
+
+  @OnHandleMessage
+  public void handleMsg(Message msg) {
+    switch (msg.what) {
+      case MESSAGE_SAVE_COLOR:
+        saveFloatLyricTextColor(msg.arg1);
+        break;
+    }
   }
 
 //  private static class UnLockNotify {

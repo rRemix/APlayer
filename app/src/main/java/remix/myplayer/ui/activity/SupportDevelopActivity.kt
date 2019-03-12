@@ -212,7 +212,9 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
           }
 
           override fun onStart() {
-            mLoading.show()
+            if (hasWindowFocus()){
+              mLoading.show()
+            }
           }
         })
   }

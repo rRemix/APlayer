@@ -54,8 +54,8 @@ public class DesktopLyricColorAdapter extends BaseAdapter<Integer, DesktopLyricC
   /**
    * 判断是否是选中的颜色
    */
-  private boolean isColorChoose(int color) {
-    return color == mCurrentColor;
+  private boolean isColorChoose(int colorRes) {
+    return mContext.getResources().getColor(colorRes) == mCurrentColor;
   }
 
   public void setCurrentColor(int color) {
@@ -85,9 +85,12 @@ public class DesktopLyricColorAdapter extends BaseAdapter<Integer, DesktopLyricC
 
   @Override
   protected void convert(FloatColorHolder holder, Integer colorRes, final int position) {
-    final int color = ColorUtil.getColor(colorRes);
+    final int color = colorRes != R.color.md_white_primary ?
+        ColorUtil.getColor(colorRes) : Color.parseColor("#F9F9F9");
+
     if (isColorChoose(colorRes)) {
       holder.mColor.setBackground(new GradientDrawableMaker()
+          .shape(GradientDrawable.OVAL)
           .color(color)
           .strokeSize(DensityUtil.dip2px(1))
           .strokeColor(Color.BLACK)

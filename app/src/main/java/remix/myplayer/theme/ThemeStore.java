@@ -233,8 +233,10 @@ public class ThemeStore {
 
   @ColorInt
   public static int getFloatLyricTextColor() {
-    return SPUtil
+    final int temp = SPUtil
         .getValue(App.getContext(), NAME, KEY_FLOAT_LYRIC_TEXT_COLOR, getMaterialPrimaryColor());
+
+    return ColorUtil.isColorCloseToWhite(temp) ? Color.parseColor("#F9F9F9") : temp;
   }
 
   public static void saveFloatLyricTextColor(@ColorInt int color) {
