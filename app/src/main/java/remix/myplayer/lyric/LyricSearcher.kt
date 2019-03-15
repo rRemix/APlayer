@@ -6,6 +6,7 @@ import android.util.Base64
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.functions.Function
 import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.App
@@ -42,7 +43,6 @@ class LyricSearcher {
   private var displayName: String? = null
   private var cacheKey: String? = null
   private var searchKey: String? = null
-  private var localLyricPath: String = ""
 
   init {
     lrcParser = DefaultLrcParser()
@@ -80,8 +80,8 @@ class LyricSearcher {
 
     val observable = when (type) {
       SPUtil.LYRIC_KEY.LYRIC_IGNORE -> {
-        Timber.v("Ignore Lyric")
-        Observable.error(Throwable("Ignore Lyric"))
+        Timber.v("ignore lyric")
+        Observable.error(Throwable("ignore lyric"))
       }
       SPUtil.LYRIC_KEY.LYRIC_EMBEDDED -> {
         getEmbeddedObservable()
@@ -115,7 +115,7 @@ class LyricSearcher {
         Observable.concat(observables).firstOrError().toObservable()
       }
       else -> {
-        Observable.error<List<LrcRow>>(Throwable("Not support type"))
+        Observable.error<List<LrcRow>>(Throwable("unknown type"))
       }
     }
 
@@ -123,7 +123,6 @@ class LyricSearcher {
         .firstOrError()
         .toObservable()
         .doOnSubscribe { disposable ->
-          localLyricPath = ""
           cacheKey = Util.hashKeyForDisk(song.id.toString() + "-" +
               (if (!TextUtils.isEmpty(song.artist)) song.artist else "") + "-" +
               if (!TextUtils.isEmpty(song.title)) song.title else "")
@@ -160,7 +159,8 @@ class LyricSearcher {
     return Observable.create { e ->
       val lyric = tagEditor.getFieldValueSingle(FieldKey.LYRICS).blockingGet()
       if (!lyric.isNullOrEmpty()) {
-        e.onNext(lrcParser.getLrcRows(getBufferReader(lyric!!.toByteArray(UTF_8)), true, cacheKey, searchKey))
+        e.onNext(lrcParser.getLrcRows(getBufferReader(lyric?.toByteArray(UTF_8) ?: return@create),
+            true, cacheKey, searchKey))
         Timber.v("EmbeddedLyric")
       }
       e.onComplete()
@@ -190,59 +190,28 @@ class LyricSearcher {
   /**
    * 搜索本地所有歌词文件
    */
-  private val allLocalLrcPath: List<String>
-    get() {
-      val results = ArrayList<String>()
-//            val searchPath = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")
-      //没有设置歌词路径 搜索所有可能的歌词文件
-      App.getContext().contentResolver.query(MediaStore.Files.getContentUri("external"), null,
-          MediaStore.Files.FileColumns.DATA + " like ? or " +
-              MediaStore.Files.FileColumns.DATA + " like ? or " +
-              MediaStore.Files.FileColumns.DATA + " like ? or " +
-              MediaStore.Files.FileColumns.DATA + " like ? ",
-          getLocalSearchKey(),
-          null)
-          .use { filesCursor ->
-            while (filesCursor.moveToNext()) {
-              val file = File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)))
-              Timber.v("file: %s", file.absolutePath)
-              if (file.exists() && file.isFile && file.canRead()) {
-                //非翻译文件只保留一个
-                if (results.isEmpty() || (results.size >= 1 && file.absolutePath.contains("translate")))
-                  results.add(file.absolutePath)
-              }
-              if (results.size == 2)
-                break
+  private fun getLocalLyricPath(): String? {
+    var path = ""
+    //没有设置歌词路径 搜索所有可能的歌词文件
+    App.getContext().contentResolver.query(MediaStore.Files.getContentUri("external"), null,
+        MediaStore.Files.FileColumns.DATA + " like ? or " +
+            MediaStore.Files.FileColumns.DATA + " like ? or " +
+            MediaStore.Files.FileColumns.DATA + " like ? or " +
+            MediaStore.Files.FileColumns.DATA + " like ? ",
+        getLocalSearchKey(),
+        null)
+        .use { filesCursor ->
+          while (filesCursor.moveToNext()) {
+            val file = File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)))
+            Timber.v("file: %s", file.absolutePath)
+            if (file.exists() && file.isFile && file.canRead()) {
+              path = file.absolutePath
             }
-            return results
-          }
-//            if (!TextUtils.isEmpty(searchPath)) {//已设置歌词搜索路径
-//                localLyricPath = LyricUtil.searchLyric(displayName, song.title, song.artist, File(searchPath))
-//                if (!TextUtils.isEmpty(localLyricPath))
-//                    results.add(localLyricPath)
-//                return results
-//            } else {
-//                //没有设置歌词路径 搜索所有可能的歌词文件
-//                App.getContext().contentResolver.query(MediaStore.Files.getContentUri("external"), null,
-//                        MediaStore.Files.FileColumns.DATA + " like ? or " +
-//                                MediaStore.Files.FileColumns.DATA + " like ? or " +
-//                                MediaStore.Files.FileColumns.DATA + " like ? or " +
-//                                MediaStore.Files.FileColumns.DATA + " like ? ",
-//                        getLocalSearchKey(),
-//                        null)
-//                        .use { filesCursor ->
-//                            while (filesCursor.moveToNext()) {
-//                                val file = File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)))
-//                                LogUtil.d(TAG,"file: " + file.absolutePath)
-//                                if (file.exists() && file.isFile && file.canRead()) {
-//                                    results.add(file.absolutePath)
-//                                }
-//                            }
-//                            return results
-//                        }
-//            }
 
-    }
+          }
+          return path
+        }
+  }
 
   /**
    * @param searchPath 设置的本地歌词搜索路径
@@ -253,10 +222,10 @@ class LyricSearcher {
    * aritst-displayName.lrc
    */
   private fun getLocalSearchKey(searchPath: String? = null): Array<String> {
-    return arrayOf("%$displayName%$SUFFIX_LYRIC",
-        "%" + song.title + "%" + SUFFIX_LYRIC,
-        "%" + song.Artist + "%" + song.Title + "%" + SUFFIX_LYRIC,
-        "%" + song.Artist + "%" + displayName + "%" + SUFFIX_LYRIC)
+    return arrayOf("%$displayName$SUFFIX_LYRIC",
+        "%${song.title}$SUFFIX_LYRIC",
+        "%${song.artist}%${song.title}$SUFFIX_LYRIC",
+        "%${song.artist}$displayName$SUFFIX_LYRIC")
   }
 
   /**
@@ -295,47 +264,15 @@ class LyricSearcher {
    * @return
    */
   private fun getLocalObservable(): Observable<List<LrcRow>> {
-    return Observable.create { e ->
-      val localPaths = ArrayList<String>(allLocalLrcPath)
-      if (localPaths.isEmpty()) {
-        e.onComplete()
-        return@create
-      }
-      if (localPaths.size > 1 && isCN) {
-        var localPath = ""
-        var translatePath: String? = null
-        for (path in localPaths) {
-          if (path.contains("translate") && path != localPath) {
-            translatePath = path
-          } else {
-            localPath = path
+    return Observable
+        .create<List<LrcRow>> { emitter ->
+          val path = getLocalLyricPath()
+          if (path != null && path.isNotEmpty()) {
+            Timber.v("LocalLyric")
+            emitter.onNext(lrcParser.getLrcRows(getBufferReader(path), true, cacheKey, searchKey))
           }
+          emitter.onComplete()
         }
-        Timber.v("LocalLyric")
-        if (translatePath == null) {
-          e.onNext(lrcParser.getLrcRows(getBufferReader(localPath), true, cacheKey, searchKey))
-        } else {
-          //合并歌词
-          val source = lrcParser.getLrcRows(getBufferReader(localPath), false, cacheKey, searchKey)
-          val translate = lrcParser.getLrcRows(getBufferReader(translatePath), false, cacheKey, searchKey)
-          if (translate != null && translate.size > 0) {
-            for (i in translate.indices) {
-              for (j in source.indices) {
-                if (isTranslateCanUse(translate[i].content) && translate[i].time == source[j].time) {
-                  source[j].translate = translate[i].content
-                  break
-                }
-              }
-            }
-            lrcParser.saveLrcRows(source, cacheKey, searchKey)
-            e.onNext(source)
-          }
-        }
-      } else {
-        e.onNext(lrcParser.getLrcRows(getBufferReader(localPaths[0]), true, cacheKey, searchKey))
-      }
-      e.onComplete()
-    }
   }
 
   /**
@@ -344,7 +281,7 @@ class LyricSearcher {
   private fun getNeteaseObservable(): Observable<List<LrcRow>> {
     return HttpClient.getNeteaseApiservice()
         .getNeteaseSearch(searchKey, 0, 1, 1)
-        .flatMap { it ->
+        .flatMap {
           HttpClient.getInstance()
               .getNeteaseLyric(Gson().fromJson(it.string(), NSongSearchResponse::class.java).result.songs[0].id)
               .map {
@@ -409,12 +346,12 @@ class LyricSearcher {
     }
     if (newType == SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
       newType = SPUtil.LYRIC_KEY.LYRIC_NETEASE
-    if (newType == SPUtil.LYRIC_KEY.LYRIC_KUGOU) {
+    return if (newType == SPUtil.LYRIC_KEY.LYRIC_KUGOU) {
       //酷狗歌词
-      return getKuGouObservable()
+      getKuGouObservable()
     } else {
       //网易歌词
-      return getNeteaseObservable()
+      getNeteaseObservable()
     }
   }
 

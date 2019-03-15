@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import java.io.File;
 import remix.myplayer.App;
 import remix.myplayer.util.SPUtil;
 import timber.log.Timber;
@@ -204,6 +205,10 @@ public class Song implements Cloneable, Parcelable {
     if (Duration <= 0) {
       IjkMediaPlayer ijkMediaPlayer = new IjkMediaPlayer();
       try {
+        File file = new File(Url);
+        if(!file.exists()){
+          return Duration;
+        }
         ijkMediaPlayer.setDataSource(Url);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
         ijkMediaPlayer.prepareAsync();
@@ -220,7 +225,6 @@ public class Song implements Cloneable, Parcelable {
         }
       } catch (Exception e) {
         Timber.v(e);
-        e.printStackTrace();
       }
     }
     return Duration;

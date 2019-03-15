@@ -97,11 +97,11 @@ class DefaultLrcParser : ILrcParser {
     //合并翻译
     val combineLrcRows = ArrayList<LrcRow>()
     var index = 0
-    while (index < lrcRows.size - 1){
-      //判断下一句歌词和当前歌词的时间是否一致，一致则认为下一句是当前歌词的翻译
+    while (index < lrcRows.size - 1) {
+      // 判断下一句歌词和当前歌词的时间是否一致，一致则认为下一句是当前歌词的翻译
       val currentRow = lrcRows[index]
       val nextRow = lrcRows[index + 1]
-      if(currentRow.time == nextRow.time){
+      if (currentRow.time == nextRow.time) { // 带翻译的歌词
         val tmp = LrcRow()
         tmp.content = currentRow.content
         tmp.time = currentRow.time
@@ -109,13 +109,15 @@ class DefaultLrcParser : ILrcParser {
         tmp.translate = nextRow.content
         combineLrcRows.add(tmp)
         index++
+      } else { // 普通歌词
+        combineLrcRows.add(currentRow)
       }
       index++
     }
-    if(combineLrcRows.size.toFloat() / lrcRows.size >= THRESHOLD_PROPORTION){
-      lrcRows.clear()
-      lrcRows.addAll(combineLrcRows)
-    }
+//    if(combineLrcRows.size.toFloat() / lrcRows.size >= THRESHOLD_PROPORTION){
+    lrcRows.clear()
+    lrcRows.addAll(combineLrcRows)
+//    }
 
 
     if (lrcRows.size == 0)
