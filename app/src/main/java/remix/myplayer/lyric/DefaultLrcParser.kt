@@ -55,9 +55,13 @@ class DefaultLrcParser : ILrcParser {
             strBuilder.append("[")
             strBuilder.append(lrcRow.timeStr)
             strBuilder.append("]")
-            strBuilder.append(lrcRow.content)
-            strBuilder.append(if (!TextUtils.isEmpty(lrcRow.translate)) "\r\n" + lrcRow.translate + "\r\n" else "\r\n")
-            Timber.d(strBuilder.toString())
+            strBuilder.append(lrcRow.content).append("\n")
+            if (lrcRow.hasTranslate()) {
+              strBuilder.append("[")
+              strBuilder.append(lrcRow.timeStr)
+              strBuilder.append("]")
+              strBuilder.append(lrcRow.translate).append("\n")
+            }
             appendText(strBuilder.toString())
           }
         }
@@ -94,14 +98,15 @@ class DefaultLrcParser : ILrcParser {
         lrcRows.addAll(rows)
     }
 
+    lrcRows.sort()
     //合并翻译
     val combineLrcRows = ArrayList<LrcRow>()
     var index = 0
-    while (index < lrcRows.size - 1) {
+    while (index < lrcRows.size) {
       // 判断下一句歌词和当前歌词的时间是否一致，一致则认为下一句是当前歌词的翻译
       val currentRow = lrcRows[index]
-      val nextRow = lrcRows[index + 1]
-      if (currentRow.time == nextRow.time) { // 带翻译的歌词
+      val nextRow = lrcRows.getOrNull(index + 1)
+      if (currentRow.time == nextRow?.time && !currentRow.content.isNullOrBlank()) { // 带翻译的歌词
         val tmp = LrcRow()
         tmp.content = currentRow.content
         tmp.time = currentRow.time
@@ -114,15 +119,13 @@ class DefaultLrcParser : ILrcParser {
       }
       index++
     }
-//    if(combineLrcRows.size.toFloat() / lrcRows.size >= THRESHOLD_PROPORTION){
+
     lrcRows.clear()
     lrcRows.addAll(combineLrcRows)
-//    }
 
 
     if (lrcRows.size == 0)
       return lrcRows
-    //为歌词排序
     lrcRows.sort()
     //每行歌词的时间
     for (i in 0 until lrcRows.size - 1) {

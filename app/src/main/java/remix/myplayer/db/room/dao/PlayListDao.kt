@@ -2,6 +2,10 @@ package remix.myplayer.db.room.dao
 
 import android.arch.persistence.room.*
 import remix.myplayer.db.room.model.PlayList
+import android.arch.persistence.db.SupportSQLiteQuery
+import android.arch.persistence.room.RawQuery
+
+
 
 /**
  * Created by remix on 2019/1/12
@@ -15,6 +19,9 @@ interface PlayListDao {
     SELECT * FROM PlayList
   """)
   fun selectAll(): List<PlayList>
+
+  @RawQuery
+  fun runtimeQuery(sortQuery: SupportSQLiteQuery): List<PlayList>
 
 
   @Query("""

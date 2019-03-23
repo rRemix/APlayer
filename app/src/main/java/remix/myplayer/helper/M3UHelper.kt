@@ -1,6 +1,8 @@
 package remix.myplayer.helper
 
+import android.app.Activity
 import android.content.Context
+import android.provider.MediaStore
 import io.reactivex.CompletableSource
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -11,11 +13,13 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.theme.Theme
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.ToastUtil
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
+import java.lang.ref.WeakReference
 
 object M3UHelper {
   private val databaseRepository = DatabaseRepository.getInstance()
@@ -29,7 +33,16 @@ object M3UHelper {
    * 导入歌单
    */
   @JvmStatic
-  fun importM3UFile(file: File, playlistName: String, newCreate: Boolean): Disposable? {
+  fun importM3UFile(activity: Activity, file: File, playlistName: String, newCreate: Boolean): Disposable? {
+    val activityRef = WeakReference<Activity>(activity)
+    val dialog = Theme.getBaseDialog(activity)
+        .title(R.string.saveing)
+        .content(R.string.please_wait)
+        .cancelable(false)
+        .progress(true, 0)
+        .progressIndeterminateStyle(false).build()
+    dialog.show()
+
     return Single
         .just(file)
         .filter {
@@ -39,7 +52,7 @@ object M3UHelper {
           if (newCreate) {
             val newId = databaseRepository.insertPlayList(playlistName).blockingGet()
             if (newId <= 0) {
-              throw RuntimeException("unknown error")
+              throw Exception("insert $playlistName failed")
             }
           }
         }
@@ -47,13 +60,22 @@ object M3UHelper {
           val audioIds = ArrayList<Int>()
           file.readLines().forEachWithIndex { i: Int, path: String ->
             if (i != 0 && !path.startsWith(ENTRY)) {
+              val id: Int
+              // 先直接判断本地文件是否存在
               val song = File(path)
-              if (song.exists() && song.isFile) {
-                audioIds.add(MediaStoreUtil.getSongIdByUrl(path))
+              id = if (song.exists() && song.isFile) {
+                MediaStoreUtil.getSongIdByUrl(path)
+              } else {
+                // 再根据歌曲名去查找
+                MediaStoreUtil.getSongId(MediaStore.Audio.Media.DATA + " like ?",
+                    arrayOf("%" + path.replace("\\", "/")))
+              }
+              if (id > 0) {
+                audioIds.add(id)
               }
             }
           }
-          audioIds
+          return@map audioIds
               .filter { audioId ->
                 audioId > 0
               }
@@ -64,9 +86,15 @@ object M3UHelper {
         .compose(applySingleScheduler())
         .subscribe(
             {
+              activityRef.get()?.runOnUiThread {
+                dialog.dismiss()
+              }
               ToastUtil.show(App.getContext(), App.getContext().getString(R.string.import_playlist_to_count, playlistName, it))
             },
             {
+              activityRef.get()?.runOnUiThread {
+                dialog.dismiss()
+              }
               ToastUtil.show(App.getContext(), R.string.import_fail, it.toString())
             })
   }
@@ -80,7 +108,7 @@ object M3UHelper {
         .map {
           Single
               .fromCallable {
-                databaseRepository.insertPlayList(it.key)
+                databaseRepository.insertPlayList(it.key).subscribe()
                 databaseRepository.insertToPlayList(it.value, it.key).blockingGet()
               }
               .onErrorResumeNext(Single.just(0))

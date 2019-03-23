@@ -2,7 +2,9 @@ package remix.myplayer.ui.fragment;
 
 import static remix.myplayer.ui.adapter.HeaderAdapter.LIST_MODE;
 
+import android.arch.persistence.db.SimpleSQLiteQuery;
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,12 +12,21 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.View;
 import butterknife.BindView;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.functions.Function;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
+import remix.myplayer.App;
 import remix.myplayer.R;
+import remix.myplayer.db.room.AppDatabase;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.db.room.model.PlayQueue;
+import remix.myplayer.helper.SortOrder;
+import remix.myplayer.helper.SortOrder.PlayListSortOrder;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
@@ -25,6 +36,7 @@ import remix.myplayer.ui.adapter.PlayListAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.SPUtil.SETTING_KEY;
 import remix.myplayer.util.ToastUtil;
 import timber.log.Timber;
 
@@ -91,7 +103,7 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
 
   @Override
   public void onPlayListChanged(String name) {
-    if(name.equals(PlayList.TABLE_NAME)){
+    if (name.equals(PlayList.TABLE_NAME)) {
       onMediaStoreChanged();
     }
   }
@@ -114,14 +126,10 @@ public class PlayListFragment extends LibraryFragment<PlayList, PlayListAdapter>
 
     @Override
     public List<PlayList> loadInBackground() {
-      List<PlayList> playLists = DatabaseRepository.getInstance()
-          .getAllPlaylist()
-          .onErrorReturn(throwable -> {
-            Timber.v(throwable);
-            return Collections.emptyList();
-          })
-          .blockingGet();
-      return playLists;
+      final String sort = SPUtil.getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.PLAYLIST_SORT_ORDER,
+          PlayListSortOrder.PLAYLIST_A_Z);
+      return DatabaseRepository.getInstance()
+          .getSortPlayList("SELECT * FROM PlayList ORDER BY " + sort).blockingGet();
     }
   }
 }

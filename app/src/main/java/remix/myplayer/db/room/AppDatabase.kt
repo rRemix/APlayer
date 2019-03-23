@@ -40,6 +40,7 @@ abstract class AppDatabase : RoomDatabase() {
     @Volatile
     private var INSTANCE: AppDatabase? = null
 
+    @JvmStatic
     fun getInstance(context: Context): AppDatabase =
         INSTANCE ?: synchronized(this) {
           INSTANCE ?: buildDatabase(context).also { INSTANCE = it }

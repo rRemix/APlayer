@@ -1,5 +1,6 @@
 package remix.myplayer.db.room
 
+import android.arch.persistence.db.SimpleSQLiteQuery
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
@@ -213,6 +214,16 @@ class DatabaseRepository private constructor() {
     return Single
         .fromCallable {
           db.playListDao().selectAll()
+        }
+  }
+
+  /**
+   * 获取所有播放列表
+   */
+  fun getSortPlayList(sortQuery: String): Single<List<PlayList>> {
+    return Single
+        .fromCallable {
+          db.playListDao().runtimeQuery(SimpleSQLiteQuery(sortQuery))
         }
   }
 

@@ -19,6 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.room.DatabaseRepository;
@@ -127,6 +128,11 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> 
   @Override
   protected Loader<List<Song>> getLoader() {
     return new AsyncSongLoader(mContext);
+  }
+
+  @Override
+  public void saveSortOrder(@Nullable String sortOrder) {
+
   }
 
   private static class AsyncSongLoader extends AppWrappedAsyncTaskLoader<List<Song>> {

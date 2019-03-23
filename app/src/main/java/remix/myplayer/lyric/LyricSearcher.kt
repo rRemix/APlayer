@@ -6,7 +6,6 @@ import android.util.Base64
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.functions.Function
 import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.App
@@ -197,7 +196,7 @@ class LyricSearcher {
         MediaStore.Files.FileColumns.DATA + " like ? or " +
             MediaStore.Files.FileColumns.DATA + " like ? or " +
             MediaStore.Files.FileColumns.DATA + " like ? or " +
-            MediaStore.Files.FileColumns.DATA + " like ? ",
+            MediaStore.Files.FileColumns.DATA + " like ?",
         getLocalSearchKey(),
         null)
         .use { filesCursor ->
@@ -206,8 +205,8 @@ class LyricSearcher {
             Timber.v("file: %s", file.absolutePath)
             if (file.exists() && file.isFile && file.canRead()) {
               path = file.absolutePath
+              break
             }
-
           }
           return path
         }

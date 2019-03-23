@@ -424,9 +424,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                           position == 0 && text.toString().endsWith(
                               "(" + getString(R.string.new_create) + ")");
                       mDisposables.add(
-                          importM3UFile(file, chooseNew ? newPlaylistName : text.toString(), chooseNew));
+                          importM3UFile(SettingActivity.this,file, chooseNew ? newPlaylistName : text.toString(), chooseNew));
                     })
-                    .positiveText(R.string.confirm)
                     .show();
               }
             });
