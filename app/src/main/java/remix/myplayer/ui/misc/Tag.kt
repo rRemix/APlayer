@@ -1,4 +1,4 @@
-package remix.myplayer.ui
+package remix.myplayer.ui.misc
 
 import android.content.Context
 import android.content.ContextWrapper

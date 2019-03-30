@@ -16,7 +16,7 @@ import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.theme.Theme
-import remix.myplayer.ui.Tag
+import remix.myplayer.ui.misc.Tag
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.util.*
 import remix.myplayer.util.SPUtil.SETTING_KEY

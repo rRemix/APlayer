@@ -46,7 +46,7 @@ import remix.myplayer.request.UriRequest;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultipleChoice;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.ChildHolderAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.ColorUtil;

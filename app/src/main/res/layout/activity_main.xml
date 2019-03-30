@@ -56,14 +56,6 @@
         android:layout_marginBottom="@dimen/d80_size"
         android:visibility="gone"/>
 
-      <ImageView
-        android:id="@+id/location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginRight="48dp"
-        android:layout_marginBottom="92dp"
-        android:visibility="gone"/>
     </android.support.design.widget.CoordinatorLayout>
 
   </LinearLayout>

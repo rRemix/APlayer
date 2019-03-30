@@ -19,7 +19,7 @@ import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme.getBaseDialog
-import remix.myplayer.ui.Tag
+import remix.myplayer.ui.misc.Tag
 import remix.myplayer.ui.activity.EQActivity
 import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog

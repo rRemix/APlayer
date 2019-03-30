@@ -49,6 +49,7 @@ import com.facebook.rebound.SpringSystem;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -71,7 +72,8 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultipleChoice;
+import remix.myplayer.ui.misc.DoubleClickListener;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.DrawerAdapter;
 import remix.myplayer.ui.adapter.MainPagerAdapter;
 import remix.myplayer.ui.fragment.AlbumFragment;
@@ -80,7 +82,6 @@ import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
-import remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -111,8 +112,6 @@ public class MainActivity extends MenuActivity {
   DrawerLayout mDrawerLayout;
   @BindView(R.id.add)
   ImageView mAddButton;
-  @BindView(R.id.location)
-  ImageView mLocation;
   @BindView(R.id.header_txt)
   TextView mHeadText;
   @BindView(R.id.header_img)
@@ -134,23 +133,6 @@ public class MainActivity extends MenuActivity {
 
   //当前选中的fragment
   private LibraryFragment mCurrentFragment;
-  private RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
-    @Override
-    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-      super.onScrolled(recyclerView, dx, dy);
-      if (Math.abs(dy) > 1) {
-        showViewWithAnim(mLocation, true);
-        mLocation.removeCallbacks(mLocationRunnable);
-        mLocation.postDelayed(mLocationRunnable, DELAY_HIDE_LOCATION);
-      }
-    }
-  };
-  private Runnable mLocationRunnable = new Runnable() {
-    @Override
-    public void run() {
-      mLocation.setVisibility(View.GONE);
-    }
-  };
 
   @Override
   protected void onResume() {
@@ -214,7 +196,7 @@ public class MainActivity extends MenuActivity {
   /**
    * 新建播放列表
    */
-  @OnClick({R.id.add, R.id.location})
+  @OnClick({R.id.add})
   public void onClick(View v) {
     switch (v.getId()) {
       case R.id.add:
@@ -244,13 +226,7 @@ public class MainActivity extends MenuActivity {
                 })
                 .show());
         break;
-      case R.id.location:
-        List<Fragment> fragments = getSupportFragmentManager().getFragments();
-        for (Fragment fragment : fragments) {
-          if (fragment instanceof SongFragment) {
-            ((SongFragment) fragment).scrollToCurrent();
-          }
-        }
+      default:
         break;
     }
   }
@@ -294,16 +270,11 @@ public class MainActivity extends MenuActivity {
       public void onPageSelected(int position) {
         final Category category = mPagerAdapter.getList().get(position);
         showViewWithAnim(mAddButton, category.isPlayList());
-        if (!category.isSongList()) { //滑动到其他tab时隐藏歌曲列表的定位按钮
-          showViewWithAnim(mLocation, false);
-        }
 
         mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getTag());
         mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(position);
 
         invalidateOptionsMenu();
-
-        addScrollListener();
       }
 
 
@@ -312,10 +283,6 @@ public class MainActivity extends MenuActivity {
       }
     });
     mCurrentFragment = (LibraryFragment) mPagerAdapter.getFragment(0);
-
-    mLocation.setImageDrawable(Theme.tintVectorDrawable(this, R.drawable.ic_my_location_black_24dp,
-        ThemeStore.getAccentColor()));
-    mLocation.postDelayed(this::addScrollListener, 500);
   }
 
   private int mMenuLayoutId = R.menu.menu_main;
@@ -384,15 +351,6 @@ public class MainActivity extends MenuActivity {
     mCurrentFragment.onMediaStoreChanged();
   }
 
-  private void addScrollListener() {
-    RecyclerView recyclerView = findViewById(R.id.location_recyclerView);
-    if (recyclerView instanceof LocationRecyclerView) {
-      LocationRecyclerView locationRecyclerView = (LocationRecyclerView) recyclerView;
-      locationRecyclerView.removeOnScrollListener(mScrollListener);
-      locationRecyclerView.addOnScrollListener(mScrollListener);
-    }
-  }
-
   private void showViewWithAnim(View view, boolean show) {
     if (show) {
       if (view.getVisibility() != View.VISIBLE) {
@@ -436,6 +394,45 @@ public class MainActivity extends MenuActivity {
         isPrimaryColorCloseToWhite ? R.color.dark_normal_tab_text_color
             : R.color.light_normal_tab_text_color),
         ColorUtil.getColor(isPrimaryColorCloseToWhite ? R.color.black : R.color.white));
+
+    setTabClickListener();
+  }
+
+  private void setTabClickListener() {
+
+    for (int i = 0; i < mTablayout.getTabCount(); i++) {
+      TabLayout.Tab tab = mTablayout.getTabAt(i);
+      if (tab == null) {
+        return;
+      }
+      //这里使用到反射，拿到Tab对象后获取Class
+      Class c = tab.getClass();
+      try {
+        Field field = c.getDeclaredField("mView");
+        field.setAccessible(true);
+        final View view = (View) field.get(tab);
+        if (view == null) {
+          return;
+        }
+        view.setOnClickListener(new DoubleClickListener() {
+          @Override
+          public void onDoubleClick(@NotNull View v) {
+            // 只有第一个标签可能是"歌曲"
+            if (mCurrentFragment instanceof SongFragment) {
+              // 滚动到当前的歌曲
+              List<Fragment> fragments = getSupportFragmentManager().getFragments();
+              for (Fragment fragment : fragments) {
+                if (fragment instanceof SongFragment) {
+                  ((SongFragment) fragment).scrollToCurrent();
+                }
+              }
+            }
+          }
+        });
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
   }
 
 

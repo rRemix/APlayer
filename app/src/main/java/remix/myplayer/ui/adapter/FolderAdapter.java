@@ -17,7 +17,7 @@ import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultipleChoice;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;

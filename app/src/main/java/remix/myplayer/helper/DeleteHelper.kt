@@ -14,15 +14,17 @@ object DeleteHelper {
       Single<Boolean> {
     return Single
         .fromCallable {
-          MediaStoreUtil.delete(MediaStoreUtil.getSongsByIds(songIds), deleteSource)
-        }
-        .flatMap {
-          if (deletePlaylist) {
-            DatabaseRepository.getInstance()
-                .deletePlayList(playlistId)
+          return@fromCallable if (deletePlaylist) {
+            if (deleteSource) {
+              MediaStoreUtil.delete(MediaStoreUtil.getSongsByIds(songIds), deleteSource)
+            } else {
+              DatabaseRepository.getInstance()
+                  .deletePlayList(playlistId).blockingGet()
+            }
           } else {
-            Single.just(it)
+            MediaStoreUtil.delete(MediaStoreUtil.getSongsByIds(songIds), deleteSource)
           }
+
         }
         .map {
           it > 0

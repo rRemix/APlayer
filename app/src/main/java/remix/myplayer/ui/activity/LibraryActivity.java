@@ -2,7 +2,7 @@ package remix.myplayer.ui.activity;
 
 import android.os.Bundle;
 import java.util.List;
-import remix.myplayer.ui.MultipleChoice;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.BaseAdapter;
 import remix.myplayer.util.Constants;
 

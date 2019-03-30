@@ -33,7 +33,7 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.Command;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultipleChoice;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.widget.ColumnView;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;

@@ -127,7 +127,6 @@ class LyricFragment : BaseMusicFragment() {
           }
         }, Consumer {
           Timber.v(it)
-          ToastUtil.show(requireContext(), "读取歌词失败: $it")
           if (id == info?.id) {
             lrcView.lrcRows = null
             lrcView.setText(getStringSafely(R.string.no_lrc))

@@ -17,7 +17,7 @@ import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.helper.MusicEventCallback;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultipleChoice;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.BaseAdapter;
 import remix.myplayer.ui.fragment.base.BaseMusicFragment;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
