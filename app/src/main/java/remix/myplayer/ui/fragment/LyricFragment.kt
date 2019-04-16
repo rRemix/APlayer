@@ -1,13 +1,11 @@
 package remix.myplayer.ui.fragment
 
 import android.graphics.Color
-import android.graphics.ColorFilter
 import android.os.Bundle
 import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
@@ -17,13 +15,13 @@ import kotlinx.android.synthetic.main.fragment_lrc.*
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.lyric.LrcView
 import remix.myplayer.lyric.LyricSearcher
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
 import remix.myplayer.misc.interfaces.OnInflateFinishListener
 import remix.myplayer.theme.ThemeStore
-import remix.myplayer.theme.TintHelper
 import remix.myplayer.ui.fragment.base.BaseMusicFragment
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
@@ -157,6 +155,7 @@ class LyricFragment : BaseMusicFragment() {
       msgHandler.removeMessages(MESSAGE_SHOW_TOAST)
       msgHandler.sendMessageDelayed(toastMsg, DELAY_SHOW_TOAST)
       lrcView.setOffset(newOffset)
+      MusicServiceRemote.setLyricOffset(newOffset)
     }
 
   }

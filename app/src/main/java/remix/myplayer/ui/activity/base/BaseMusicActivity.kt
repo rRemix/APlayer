@@ -21,7 +21,6 @@ import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.request.SimpleUriRequest
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.MusicService
-import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.util.Constants
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import remix.myplayer.util.MediaStoreUtil
@@ -303,8 +302,8 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
                 if (customCover.type == Constants.ALBUM) {
                   object : SimpleUriRequest(getSearchRequestWithAlbumType(
                       MediaStoreUtil.getSongByAlbumId(customCover.id))) {
-                    override fun onError(errMsg: String) {
-                      emitter.onError(Throwable(errMsg))
+                    override fun onError(throwable: Throwable) {
+                      emitter.onError(throwable)
                     }
 
                     override fun onSuccess(result: Uri?) {

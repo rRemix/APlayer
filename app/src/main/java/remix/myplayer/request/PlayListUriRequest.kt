@@ -1,12 +1,8 @@
 package remix.myplayer.request
 
-import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
-
 import android.net.Uri
 import com.facebook.drawee.view.SimpleDraweeView
 import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.ObservableOnSubscribe
 import io.reactivex.ObservableSource
 import io.reactivex.SingleSource
 import io.reactivex.disposables.Disposable
@@ -17,16 +13,17 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 
 /**
  * Created by Remix on 2017/11/30.
  */
 
-class PlayListUriRequest(image: SimpleDraweeView, request: UriRequest, config: RequestConfig) : LibraryUriRequest(image, request, config) {
+open class PlayListUriRequest(image: SimpleDraweeView, request: UriRequest, config: RequestConfig) : LibraryUriRequest(image, request, config) {
 
-  override fun onError(errMsg: String?) {
-    super.onError(errMsg)
-//    mImage.setImageURI(Uri.EMPTY);
+  override fun onError(throwable: Throwable?) {
+    super.onError(throwable)
+//    mImageRef.get()?.setImageURI(Uri.EMPTY)
   }
 
   override fun load(): Disposable {
@@ -61,7 +58,7 @@ class PlayListUriRequest(image: SimpleDraweeView, request: UriRequest, config: R
           }
 
           override fun onError(e: Throwable) {
-            this@PlayListUriRequest.onError(e.toString())
+            this@PlayListUriRequest.onError(e)
           }
 
           override fun onComplete() {

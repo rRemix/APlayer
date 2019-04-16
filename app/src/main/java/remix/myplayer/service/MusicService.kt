@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.app.Service
 import android.content.*
+import android.database.ContentObserver
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.media.AudioManager
@@ -383,7 +384,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
 
 
   private var needShowDesktopLyric: Boolean = false
-  private var currentLrc: LyricRowWrapper = LyricRowWrapper()
 
   /**
    * 创建桌面歌词悬浮窗
@@ -510,6 +510,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
 
     //监听数据库变化
     contentResolver.registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mediaStoreObserver)
+    contentResolver.registerContentObserver(Uri.parse("content://media/external/images/media"), true,
+        object : ContentObserver(null) {
+          override fun onChange(selfChange: Boolean, uri: Uri?) {
+            Timber.v("onChange, selfChange: $selfChange uri:$uri")
+          }
+        })
 
     setUpPlayer()
     setUpSession()
@@ -1090,7 +1096,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     updateNotification()
     updateMediaSession(operation)
     // 是否需要保存进度
-    if(playAtBreakPoint){
+    if (playAtBreakPoint) {
       startSaveProgress()
     }
 
@@ -1401,7 +1407,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     } else {
       object : RemoteUriRequest(getSearchRequestWithAlbumType(currentSong),
           RequestConfig.Builder(400, 400).build()) {
-        override fun onError(errMsg: String) {
+        override fun onError(throwable: Throwable) {
           setMediaSessionData(null)
         }
 
@@ -1822,10 +1828,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
   }
 
+  fun setLyricOffset(offset: Int) {
+    desktopLyricTask?.lyricHolder?.offset = offset
+  }
+
   private inner class LyricTask : TimerTask() {
     private var songInLyricTask = Song.EMPTY_SONG
-    private val lyricHolder = LyricHolder(this@MusicService)
     private val tag = LyricTask::class.java.simpleName
+    val lyricHolder = LyricHolder(this@MusicService)
     var force = false
 
     override fun run() {
@@ -1862,8 +1872,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           Timber.tag(tag).v("请求创建桌面歌词")
           updateUIHandler.sendEmptyMessageDelayed(CREATE_DESKTOP_LRC, 50)
         } else {
-          currentLrc = lyricHolder.findCurrentLyric()
-          updateUIHandler.obtainMessage(UPDATE_DESKTOP_LRC_CONTENT).sendToTarget()
+          updateUIHandler.obtainMessage(UPDATE_DESKTOP_LRC_CONTENT, lyricHolder.findCurrentLyric()).sendToTarget()
         }
       }
     }
@@ -2041,8 +2050,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           musicService.handleMetaChange()
         }
         UPDATE_DESKTOP_LRC_CONTENT -> {
-          val wrapper = musicService.currentLrc
-          musicService.desktopLyricView?.setText(wrapper.lineOne, wrapper.lineTwo)
+          if (msg.obj is LyricRowWrapper) {
+            val wrapper = msg.obj as LyricRowWrapper
+            musicService.desktopLyricView?.setText(wrapper.lineOne, wrapper.lineTwo)
+          }
         }
         REMOVE_DESKTOP_LRC -> {
           musicService.removeDesktopLyric()

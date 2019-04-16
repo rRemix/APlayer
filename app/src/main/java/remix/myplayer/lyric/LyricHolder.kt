@@ -24,7 +24,7 @@ class LyricHolder(service: MusicService) {
   private var disposable: Disposable? = null
   private var song: Song = Song.EMPTY_SONG
   private var status = Status.SEARCHING
-  private var offset = 0
+  var offset = 0
   private val lyricSearcher = LyricSearcher()
 
 

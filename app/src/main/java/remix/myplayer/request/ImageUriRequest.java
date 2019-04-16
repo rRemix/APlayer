@@ -99,7 +99,7 @@ public abstract class ImageUriRequest<T> {
   public ImageUriRequest() {
   }
 
-  public abstract void onError(String errMsg);
+  public abstract void onError(Throwable throwable);
 
   public abstract void onSuccess(@Nullable T result);
 

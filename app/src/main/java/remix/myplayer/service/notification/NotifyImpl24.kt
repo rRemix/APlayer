@@ -32,7 +32,7 @@ class NotifyImpl24(context: MusicService) : Notify(context) {
     //设置封面
     val size = DensityUtil.dip2px(service, 128f)
     object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
-      override fun onError(errMsg: String) {
+      override fun onError(throwable: Throwable) {
         val result = BitmapFactory.decodeResource(service.resources, R.drawable.album_empty_bg_night)
         updateWithBitmap(result, song)
       }

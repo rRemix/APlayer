@@ -81,18 +81,6 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
     setUpToolbar(getString(R.string.recently));
   }
 
-  /**
-   * 获得歌曲id
-   */
-  private int getSongId(int position) {
-    int id = -1;
-    if (mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1) {
-      id = mAdapter.getDatas().get(position).getId();
-    }
-    return id;
-  }
-
-
   @Override
   public void onLoadFinished(android.content.Loader<List<Song>> loader, List<Song> data) {
     super.onLoadFinished(loader, data);
@@ -131,6 +119,20 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
         if (mAdapter != null) {
           mAdapter.notifyDataSetChanged();
         }
+    }
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mHandler.remove();
+  }
+
+  @Override
+  public void onMediaStoreChanged() {
+    super.onMediaStoreChanged();
+    if(mAdapter != null){
+      mAdapter.clearUriCache();
     }
   }
 

@@ -7,7 +7,6 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Constants
-import remix.myplayer.util.Util
 import tv.danmaku.ijk.media.player.IMediaPlayer
 import java.util.*
 
@@ -168,5 +167,10 @@ object MusicServiceRemote {
   @JvmStatic
   fun getOperation(): Int {
     return service?.operation ?: Command.NEXT
+  }
+
+  @JvmStatic
+  fun setLyricOffset(offset: Int){
+    service?.setLyricOffset(offset)
   }
 }

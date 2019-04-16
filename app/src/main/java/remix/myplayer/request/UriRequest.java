@@ -55,7 +55,7 @@ public class UriRequest implements Serializable {
   }
 
   public String getNeteaseCacheKey() {
-    return mSearchType + "-" + mId;
+    return "netease " + hashCode();
   }
 
   public String getNeteaseSearchKey() {
@@ -89,9 +89,7 @@ public class UriRequest implements Serializable {
   }
 
   public String getLastFMKey() {
-    return mSearchType * mSearchType + mId * mId + mSearchType == ImageUriRequest.URL_ALBUM
-        ? mAlbumName : mArtistName;
-//        return (mSearchType >> 2  + mId >> 4) + "";
+    return "lastfm " + hashCode();
   }
 
   public int getID() {
@@ -136,5 +134,41 @@ public class UriRequest implements Serializable {
 
   public int getNeteaseType() {
     return mNeteaseType;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof UriRequest)) {
+      return false;
+    }
+
+    UriRequest that = (UriRequest) o;
+
+    if (mId != that.mId) {
+      return false;
+    }
+    if (mSearchType != that.mSearchType) {
+      return false;
+    }
+    if (mNeteaseType != that.mNeteaseType) {
+      return false;
+    }
+    if (mTitle != null ? !mTitle.equals(that.mTitle) : that.mTitle != null) {
+      return false;
+    }
+    if (mAlbumName != null ? !mAlbumName.equals(that.mAlbumName) : that.mAlbumName != null) {
+      return false;
+    }
+    return mArtistName != null ? mArtistName.equals(that.mArtistName) : that.mArtistName == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = mId;
+    result = 31 * result + mSearchType;
+    return result;
   }
 }

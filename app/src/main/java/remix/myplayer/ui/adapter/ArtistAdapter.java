@@ -5,7 +5,6 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
@@ -19,18 +18,15 @@ import android.widget.TextView;
 import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
-import io.reactivex.disposables.Disposable;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Artist;
 import remix.myplayer.misc.menu.LibraryListener;
-import remix.myplayer.request.LibraryUriRequest;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.adapter.holder.HeaderHolder;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.Constants;
@@ -68,15 +64,16 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
   @Override
   public void onViewRecycled(BaseViewHolder holder) {
     super.onViewRecycled(holder);
-    if (holder instanceof ArtistHolder) {
-      if (((ArtistHolder) holder).mImage.getTag() != null) {
-        Disposable disposable = (Disposable) ((ArtistHolder) holder).mImage.getTag();
-        if (!disposable.isDisposed()) {
-          disposable.dispose();
-        }
-      }
-      ((ArtistHolder) holder).mImage.setImageURI(Uri.EMPTY);
-    }
+    disposeLoad(holder);
+//    if (holder instanceof ArtistHolder) {
+//      if (((ArtistHolder) holder).mImage.getTag() != null) {
+//        Disposable disposable = (Disposable) ((ArtistHolder) holder).mImage.getTag();
+//        if (!disposable.isDisposed()) {
+//          disposable.dispose();
+//        }
+//      }
+//      ((ArtistHolder) holder).mImage.setImageURI(Uri.EMPTY);
+//    }
   }
 
   @SuppressLint({"RestrictedApi", "CheckResult"})
@@ -104,10 +101,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     }
     //设置封面
     final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
-    Disposable disposable = new LibraryUriRequest(holder.mImage,
-        ImageUriUtil.getSearchRequest(artist),
-        new RequestConfig.Builder(imageSize, imageSize).build()).load();
-    holder.mImage.setTag(disposable);
+    holder.mImage.setTag(setImage(holder.mImage,ImageUriUtil.getSearchRequest(artist),imageSize,position));
 
     holder.mContainer.setOnClickListener(v -> {
       if (holder.getAdapterPosition() - 1 < 0) {

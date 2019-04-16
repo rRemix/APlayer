@@ -12,11 +12,11 @@
     <attr format="integer|reference" name="progress_max"/>
   </declare-styleable>
 
-  <declare-styleable name="ColumnView">
-    <attr format="color" name="columncolor"/>
-    <attr format="dimension|integer|reference" name="columnwidth"/>
-    <attr format="integer" name="columnnum"/>
-  </declare-styleable>
+  <!--<declare-styleable name="ColumnView">-->
+    <!--<attr format="color" name="columncolor"/>-->
+    <!--<attr format="dimension|integer|reference" name="columnwidth"/>-->
+    <!--<attr format="integer" name="columnnum"/>-->
+  <!--</declare-styleable>-->
 
   <declare-styleable name="FilterSizeSeekBar">
     <attr format="dimension|reference" name="trackheight"/>

@@ -183,8 +183,8 @@ public class BottomActionBarFragment extends BaseMusicFragment {
         }
 
         @Override
-        public void onError(String errMsg) {
-          super.onError(errMsg);
+        public void onError(Throwable throwable) {
+          super.onError(throwable);
           mAnimUrl.setAlbumId(-1);
           mAnimUrl.setUrl("");
         }

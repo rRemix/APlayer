@@ -84,7 +84,14 @@ public class ThemeStore {
 
   @ColorInt
   public static int getMaterialPrimaryColor() {
-    return SPUtil.getValue(App.getContext(), NAME, KEY_PRIMARY_COLOR, Color.parseColor("#698cf6"));
+    //纯白需要处理下
+    int primaryColor = SPUtil
+        .getValue(App.getContext(), NAME, KEY_PRIMARY_COLOR, Color.parseColor("#698cf6"));
+    if (ColorUtil.isColorCloseToWhite(primaryColor)) {
+      primaryColor = ColorUtil.getColor(R.color.accent_gray_color);
+    }
+    return primaryColor;
+
   }
 
   @ColorInt

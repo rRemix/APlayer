@@ -8,6 +8,16 @@
   android:layout_height="@dimen/d64_size"
   android:background="?attr/background_list">
 
+  <View
+    android:id="@+id/indicator"
+    android:layout_width="4dp"
+    android:layout_height="match_parent"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"/>
+
   <com.facebook.drawee.view.SimpleDraweeView
     android:id="@+id/song_head_image"
     android:layout_width="@dimen/d40_size"
@@ -104,11 +114,11 @@
       tools:text="周杰伦"/>
   </android.support.constraint.ConstraintLayout>
 
-  <remix.myplayer.ui.widget.ColumnView
-    android:id="@+id/song_columnview"
-    android:layout_width="@dimen/d18_size"
-    android:layout_height="@dimen/d16_size"
-    android:visibility="gone"
-    app:columnnum="4"
-    app:columnwidth="@dimen/d2_size"/>
+  <!--<remix.myplayer.ui.widget.ColumnView-->
+    <!--android:id="@+id/song_columnview"-->
+    <!--android:layout_width="@dimen/d18_size"-->
+    <!--android:layout_height="@dimen/d16_size"-->
+    <!--android:visibility="gone"-->
+    <!--app:columnnum="4"-->
+    <!--app:columnwidth="@dimen/d2_size"/>-->
 </android.support.constraint.ConstraintLayout>

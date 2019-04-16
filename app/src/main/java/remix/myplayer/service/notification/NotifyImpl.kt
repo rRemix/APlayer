@@ -71,7 +71,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     val size = DensityUtil.dip2px(service, 128f)
 
     object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
-      override fun onError(errMsg: String) {
+      override fun onError(throwable: Throwable) {
         remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
         remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
         pushNotify(notification)

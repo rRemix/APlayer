@@ -17,9 +17,9 @@ import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.helper.MusicEventCallback;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.BaseAdapter;
 import remix.myplayer.ui.fragment.base.BaseMusicFragment;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -132,11 +132,12 @@ public abstract class LibraryFragment<D, A extends BaseAdapter> extends BaseMusi
   private static final int PORTRAIT_ORIENTATION_COUNT = 2;
   private static final int LANDSCAPE_ORIENTATION_ITEM_WIDTH = DensityUtil.dip2px(180);
   private static final int PORTRAIT_ORIENTATION_MAX_ITEM_COUNT = 6;
+
   protected int getSpanCount() {
     final boolean portraitOrientation = isPortraitOrientation(requireContext());
-    if(portraitOrientation){
+    if (portraitOrientation) {
       return PORTRAIT_ORIENTATION_COUNT;
-    } else{
+    } else {
       int count = getResources().getDisplayMetrics().widthPixels / LANDSCAPE_ORIENTATION_ITEM_WIDTH;
       return count > PORTRAIT_ORIENTATION_MAX_ITEM_COUNT ? PORTRAIT_ORIENTATION_MAX_ITEM_COUNT : count;
     }

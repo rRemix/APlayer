@@ -28,12 +28,12 @@ import remix.myplayer.ui.adapter.holder.BaseViewHolder;
  * @Date 2016/10/21 10:02
  */
 
-public class SongChooseAdaper extends BaseAdapter<Song, SongChooseAdaper.SongChooseHolder> {
+public class SongChooseAdapter extends BaseAdapter<Song, SongChooseAdapter.SongChooseHolder> {
 
   private OnSongChooseListener mCheckListener;
   private ArrayList<Integer> mCheckSongIdList = new ArrayList<>();
 
-  public SongChooseAdaper(Context context, int layoutID, OnSongChooseListener l) {
+  public SongChooseAdapter(Context context, int layoutID, OnSongChooseListener l) {
     super(context, layoutID);
     mCheckListener = l;
   }

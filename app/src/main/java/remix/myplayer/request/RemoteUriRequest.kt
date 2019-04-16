@@ -13,7 +13,7 @@ abstract class RemoteUriRequest(private val request: UriRequest, config: Request
   override fun load(): Disposable {
     return getThumbBitmapObservable(request)
         .compose(RxUtil.applySchedulerToIO())
-        .subscribe({ bitmap -> onSuccess(bitmap) }, { throwable -> onError(throwable.toString()) })
+        .subscribe({ bitmap -> onSuccess(bitmap) }, { throwable -> onError(throwable) })
   }
 
 

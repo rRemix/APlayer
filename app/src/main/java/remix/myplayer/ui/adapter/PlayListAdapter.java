@@ -5,7 +5,6 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.Uri;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -18,7 +17,8 @@ import android.widget.TextView;
 import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
-import io.reactivex.disposables.Disposable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import remix.myplayer.R;
 import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.misc.menu.LibraryListener;
@@ -28,9 +28,9 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.UriRequest;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.adapter.holder.HeaderHolder;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.ToastUtil;
@@ -66,17 +66,17 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
   @Override
   public void onViewRecycled(BaseViewHolder holder) {
     super.onViewRecycled(holder);
-    if (holder instanceof PlayListHolder) {
-      if (((PlayListHolder) holder).mImage.getTag() != null) {
-        Disposable disposable = (Disposable) ((PlayListHolder) holder).mImage.getTag();
-        if (!disposable.isDisposed()) {
-          disposable.dispose();
-        }
-      }
-      ((PlayListHolder) holder).mImage.setImageURI(Uri.EMPTY);
-    }
+    disposeLoad(holder);
+//    if (holder instanceof PlayListHolder) {
+//      if (((PlayListHolder) holder).mImage.getTag() != null) {
+//        Disposable disposable = (Disposable) ((PlayListHolder) holder).mImage.getTag();
+//        if (!disposable.isDisposed()) {
+//          disposable.dispose();
+//        }
+//      }
+//      ((PlayListHolder) holder).mImage.setImageURI(Uri.EMPTY);
+//    }
   }
-
 
   @SuppressLint("RestrictedApi")
   @Override
@@ -96,12 +96,24 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
     }
     holder.mName.setText(info.getName());
     holder.mOther.setText(mContext.getString(R.string.song_count, info.getAudioIds().size()));
+
     //设置专辑封面
     final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
-    Disposable disposable = new PlayListUriRequest(holder.mImage,
+
+    new PlayListUriRequest(holder.mImage,
         new UriRequest(info.getId(), UriRequest.TYPE_NETEASE_SONG, ImageUriRequest.URL_PLAYLIST),
-        new RequestConfig.Builder(imageSize, imageSize).build()).load();
-    holder.mImage.setTag(disposable);
+        new RequestConfig.Builder(imageSize, imageSize).build()) {
+      @Override
+      public void onSave(@NotNull String result) {
+        mUriCache.put(position, result);
+      }
+
+      @Override
+      public void onError(@Nullable Throwable throwable) {
+        mUriCache.put(position, "");
+      }
+    }.load();
+
     holder.mContainer.setOnClickListener(v -> {
       if (holder.getAdapterPosition() - 1 < 0) {
         ToastUtil.show(mContext, R.string.illegal_arg);
@@ -109,6 +121,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
       }
       mOnItemClickListener.onItemClick(holder.mContainer, holder.getAdapterPosition() - 1);
     });
+
     //多选菜单
     holder.mContainer.setOnLongClickListener(v -> {
       if (holder.getAdapterPosition() - 1 < 0) {

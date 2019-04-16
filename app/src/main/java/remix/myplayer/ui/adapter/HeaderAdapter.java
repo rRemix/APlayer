@@ -6,14 +6,26 @@ import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+import com.facebook.drawee.view.SimpleDraweeView;
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import java.net.UnknownHostException;
+import java.util.NoSuchElementException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import remix.myplayer.R;
+import remix.myplayer.request.LibraryUriRequest;
+import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.UriRequest;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.adapter.holder.HeaderHolder;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
@@ -27,6 +39,9 @@ import remix.myplayer.util.SPUtil;
 
 public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extends
     BaseAdapter<M, BaseViewHolder> {
+
+  // 封面uri缓存
+  SparseArray<String> mUriCache = new SparseArray<>();
 
   //显示模式 1:列表 2:网格
   public final static int LIST_MODE = 1;
@@ -115,7 +130,7 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
   /**
    * 列表模式切换
    */
-  void switchMode(HeaderHolder headerHolder, View v) {
+  private void switchMode(HeaderHolder headerHolder, View v) {
     int newModel = v.getId() == R.id.list_model ? LIST_MODE : GRID_MODE;
     if (newModel == mMode) {
       return;
@@ -171,6 +186,70 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
       }
 
       holder.mRoot.setLayoutParams(lp);
+    }
+  }
+
+  Disposable setImage(final SimpleDraweeView simpleDraweeView,
+      final UriRequest uriRequest,
+      final int imageSize,
+      final int position) {
+    final String cacheUri = mUriCache.get(position);
+    if (cacheUri != null) {
+      simpleDraweeView.setImageURI(mUriCache.get(position));
+      return Observable.just("").subscribe();
+    } else {
+      return new LibraryUriRequest(simpleDraweeView,
+          uriRequest,
+          new RequestConfig.Builder(imageSize, imageSize).build()) {
+        @Override
+        public void onSave(@NotNull String result) {
+          super.onSave(result);
+          mUriCache.put(position, result);
+        }
+
+        @Override
+        public void onError(@Nullable Throwable throwable) {
+          super.onError(throwable);
+          if (throwable == null) {
+            // 没有错误类型 忽略
+          } else if (throwable instanceof UnknownHostException) {
+            // 没有网络 忽略
+          } else if(throwable instanceof NoSuchElementException){
+            // 没有结果不再查找
+            mUriCache.put(position,"");
+          } else if (ERROR_NO_RESULT.equals(throwable.getMessage()) ||
+              ERROR_BLACKLIST.equals(throwable.getMessage())) {
+            // 黑名单或者没有结果 不再查找
+            mUriCache.put(position, "");
+          } else {
+            // 默认不处理
+          }
+        }
+      }.load();
+    }
+  }
+
+  public void clearUriCache() {
+    mUriCache.clear();
+  }
+
+  void disposeLoad(final ViewHolder holder) {
+    //
+    final ViewGroup parent = holder.itemView instanceof ViewGroup ? (ViewGroup) holder.itemView : null;
+    if (parent != null) {
+      for (int i = 0; i < parent.getChildCount(); i++) {
+        final View childView = parent.getChildAt(i);
+        if (childView instanceof SimpleDraweeView) {
+          final Object tag = childView.getTag();
+          if (tag != null && tag instanceof Disposable) {
+            Disposable disposable = (Disposable) tag;
+            if (!disposable.isDisposed()) {
+              disposable.dispose();
+            }
+            childView.setTag(null);
+          }
+        }
+      }
     }
   }
 }

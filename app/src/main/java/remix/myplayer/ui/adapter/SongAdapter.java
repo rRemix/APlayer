@@ -1,6 +1,8 @@
 package remix.myplayer.ui.adapter;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
+import static remix.myplayer.theme.ThemeStore.getTextColorPrimary;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 import android.annotation.SuppressLint;
@@ -20,22 +22,17 @@ import android.widget.TextView;
 import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
-import io.reactivex.disposables.Disposable;
 import java.util.ArrayList;
 import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
-import remix.myplayer.misc.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.misc.menu.SongPopupListener;
-import remix.myplayer.request.LibraryUriRequest;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.Command;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
-import remix.myplayer.ui.widget.ColumnView;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.ToastUtil;
@@ -47,14 +44,13 @@ import remix.myplayer.util.ToastUtil;
 /**
  * Created by Remix on 2016/4/11.
  */
-public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements
-    FastScroller.SectionIndexer, OnUpdateHighLightListener {
+public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements FastScroller.SectionIndexer {
 
   private int mType;
   public static final int ALLSONG = 0;
   public static final int RECENTLY = 1;
 
-  private int mLastIndex = 1;
+  private Song mLastPlaySong = MusicServiceRemote.getCurrentSong();
 
   public SongAdapter(Context context, int layoutId, MultipleChoice multiChoice, int type,
       RecyclerView recyclerView) {
@@ -75,15 +71,17 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements
   @Override
   public void onViewRecycled(BaseViewHolder holder) {
     super.onViewRecycled(holder);
-    if (holder instanceof SongViewHolder) {
-      if (((SongViewHolder) holder).mImage.getTag() != null) {
-        Disposable disposable = (Disposable) ((SongViewHolder) holder).mImage.getTag();
-        if (!disposable.isDisposed()) {
-          disposable.dispose();
-        }
-      }
-//            ((SongViewHolder) holder).mImage.setImageURI(Uri.EMPTY);
-    }
+    disposeLoad(holder);
+//    if (holder instanceof SongViewHolder) {
+//      final SongViewHolder songViewHolder = (SongViewHolder) holder;
+//      if (songViewHolder.mImage.getTag() != null) {
+//        Disposable disposable = (Disposable) songViewHolder.mImage.getTag();
+//        if (!disposable.isDisposed()) {
+//          disposable.dispose();
+//        }
+//        songViewHolder.mImage.setTag(null);
+//      }
+//    }
   }
 
   @SuppressLint("RestrictedApi")
@@ -133,41 +131,26 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements
     }
     final SongViewHolder holder = (SongViewHolder) baseHolder;
 
-//        if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ShowHighLight",true)){
-//            //获得当前播放的歌曲
-//            final Song currentMP3 = MusicService.getCurrentSong();
-//            //判断该歌曲是否是正在播放的歌曲
-//            //如果是,高亮该歌曲，并显示动画
-//            if(currentMP3 != null){
-//                boolean highlight = song.getID() == MusicService.getCurrentSong().getID();
-//                if(highlight)
-//                    mLastIndex = position;
-//                holder.mName.setTextColor(highlight ?
-//                        ThemeStore.getAccentColor():
-//                        ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-//                holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
-//                //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
-//                if(MusicService.isPlaying() && !holder.mColumnView.getStatus() && highlight){
-//                    holder.mColumnView.startAnim();
-//                }
-//                else if(!MusicService.isPlaying() && holder.mColumnView.getStatus()){
-//                    holder.mColumnView.stopAnim();
-//                }
-//            }
-//        }
-
     //封面
-    Disposable disposable = new LibraryUriRequest(holder.mImage,
-        getSearchRequestWithAlbumType(song),
-        new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
-    holder.mImage.setTag(disposable);
+    holder.mImage.setTag(setImage(holder.mImage,getSearchRequestWithAlbumType(song),SMALL_IMAGE_SIZE, position));
+
 //        //是否为无损
 //        if(!TextUtils.isEmpty(song.getDisplayname())){
 //            String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
 //            holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
 //        }
 
-    //设置歌曲名
+    //高亮
+    final int primaryColor = getMaterialPrimaryColor();
+    if (MusicServiceRemote.getCurrentSong().getId() == song.getId()) {
+      mLastPlaySong = song;
+      holder.mName.setTextColor(primaryColor);
+      holder.mIndicator.setVisibility(View.VISIBLE);
+    } else {
+      holder.mName.setTextColor(getTextColorPrimary());
+      holder.mIndicator.setVisibility(View.GONE);
+    }
+    holder.mIndicator.setBackgroundColor(primaryColor);
     holder.mName.setText(song.getShowName());
 
     //艺术家与专辑
@@ -223,60 +206,54 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements
   /**
    * 更新高亮歌曲
    */
-  @Override
-  public void onUpdateHighLight() {
-    Song currentSong = MusicServiceRemote.getCurrentSong();
-    if (mDatas != null && mDatas.indexOf(currentSong) >= 0) {
-      int index = mDatas.indexOf(currentSong) + 1;
+  public void updatePlayingSong() {
+    final Song currentSong = MusicServiceRemote.getCurrentSong();
+    if (currentSong.getId() == -1 || currentSong.getId() == mLastPlaySong.getId()) {
+      return;
+    }
 
-      //播放的是同一首歌曲
-      if (index == mLastIndex) {
-        return;
-      }
+    if (mDatas != null && mDatas.indexOf(currentSong) >= 0) {
+      // 找到新的高亮歌曲
+      final int index = mDatas.indexOf(currentSong) + 1;
+      final int lastIndex = mDatas.indexOf(mLastPlaySong) + 1;
+
       SongViewHolder newHolder = null;
       if (mRecyclerView.findViewHolderForAdapterPosition(index) instanceof SongViewHolder) {
         newHolder = (SongViewHolder) mRecyclerView.findViewHolderForAdapterPosition(index);
       }
       SongViewHolder oldHolder = null;
-      if (mRecyclerView.findViewHolderForAdapterPosition(mLastIndex) instanceof SongViewHolder) {
-        oldHolder = (SongViewHolder) mRecyclerView.findViewHolderForAdapterPosition(mLastIndex);
+      if (mRecyclerView.findViewHolderForAdapterPosition(lastIndex) instanceof SongViewHolder) {
+        oldHolder = (SongViewHolder) mRecyclerView.findViewHolderForAdapterPosition(lastIndex);
       }
 
       if (newHolder != null) {
-        newHolder.mName.setTextColor(ThemeStore.getAccentColor());
-        newHolder.mColumnView.setVisibility(View.VISIBLE);
-        //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
-        if (MusicServiceRemote.isPlaying() && !newHolder.mColumnView.getStatus()) {
-          newHolder.mColumnView.startAnim();
-        } else if (!MusicServiceRemote.isPlaying() && newHolder.mColumnView.getStatus()) {
-          newHolder.mColumnView.stopAnim();
-        }
+        newHolder.mName.setTextColor(getMaterialPrimaryColor());
+        newHolder.mIndicator.setVisibility(View.VISIBLE);
       }
+
       if (oldHolder != null) {
-        oldHolder.mName.setTextColor(ThemeStore.getTextColorPrimary());
-        oldHolder.mColumnView.stopAnim();
-        oldHolder.mColumnView.setVisibility(View.GONE);
+        oldHolder.mName.setTextColor(getTextColorPrimary());
+        oldHolder.mIndicator.setVisibility(View.GONE);
       }
-      mLastIndex = index;
+      mLastPlaySong = currentSong;
     }
   }
 
   static class SongViewHolder extends BaseViewHolder {
 
-    @BindView(R.id.sq)
-    View mSQ;
     @BindView(R.id.song_title)
     TextView mName;
     @BindView(R.id.song_other)
     TextView mOther;
     @BindView(R.id.song_head_image)
     SimpleDraweeView mImage;
-    @BindView(R.id.song_columnview)
-    ColumnView mColumnView;
     @BindView(R.id.song_button)
     ImageButton mButton;
     @BindView(R.id.item_root)
     View mContainer;
+    @BindView(R.id.indicator)
+    View mIndicator;
+
 
     SongViewHolder(View itemView) {
       super(itemView);

@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicServiceRemote
+import remix.myplayer.ui.activity.MainActivity
 
 class LocationRecyclerView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -53,6 +54,10 @@ class LocationRecyclerView @JvmOverloads constructor(
         break
       }
     }
+    // 第一个holder是随机播放 忽略
+    if(context is MainActivity){
+      pos += 1
+    }
     val layoutManager = layoutManager as LinearLayoutManager
     val firstItem = layoutManager.findFirstVisibleItemPosition()
     val lastItem = layoutManager.findLastVisibleItemPosition()
@@ -62,7 +67,7 @@ class LocationRecyclerView @JvmOverloads constructor(
         scrollToPosition(pos)
       pos <= lastItem -> {
         //当要置顶的项已经在屏幕上显示时
-        val top = getChildAt(pos - firstItem).getTop()
+        val top = getChildAt(pos - firstItem).top
         scrollBy(0, top)
       }
       else -> {

@@ -18,10 +18,8 @@ import remix.myplayer.R
 import remix.myplayer.appwidgets.AppWidgetSkin.WHITE_1F
 import remix.myplayer.appwidgets.big.AppWidgetBig
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
@@ -76,8 +74,8 @@ abstract class BaseAppwidget
     val song = service.currentSong ?: return
     val size = if (this.javaClass.simpleName == AppWidgetBig::class.java.simpleName) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
     object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
-      override fun onError(errMsg: String) {
-        Timber.v("onError: $errMsg")
+      override fun onError(throwable: Throwable) {
+        Timber.v("onError: $throwable")
 //        bitmap = null
         remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
         pushUpdate(service, appWidgetIds, remoteViews)

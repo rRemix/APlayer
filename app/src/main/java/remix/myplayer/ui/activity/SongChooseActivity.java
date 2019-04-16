@@ -27,7 +27,7 @@ import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.adapter.SongChooseAdaper;
+import remix.myplayer.ui.adapter.SongChooseAdapter;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -38,7 +38,7 @@ import remix.myplayer.util.ToastUtil;
  * @Date 2016/10/21 09:34
  */
 
-public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> {
+public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdapter> {
 
   public static final String TAG = SongChooseActivity.class.getSimpleName();
   public static final String EXTRA_NAME = "PlayListName";
@@ -78,7 +78,7 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdaper> 
     TextView cancel = findViewById(R.id.cancel);
     cancel.setTextColor(getTextColorPrimary());
     mConfirm.setTextColor(getTextColorSecondary());
-    mAdapter = new SongChooseAdaper(this, R.layout.item_song_choose, isValid -> {
+    mAdapter = new SongChooseAdapter(this, R.layout.item_song_choose, isValid -> {
       mConfirm.setAlpha(isValid ? 1.0f : 0.6f);
       mConfirm.setClickable(isValid);
     });

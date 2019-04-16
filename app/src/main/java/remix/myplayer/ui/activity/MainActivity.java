@@ -33,6 +33,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.Adapter;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
@@ -72,9 +73,8 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.misc.DoubleClickListener;
-import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.DrawerAdapter;
+import remix.myplayer.ui.adapter.HeaderAdapter;
 import remix.myplayer.ui.adapter.MainPagerAdapter;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
@@ -82,6 +82,8 @@ import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
+import remix.myplayer.ui.misc.DoubleClickListener;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -405,7 +407,6 @@ public class MainActivity extends MenuActivity {
       if (tab == null) {
         return;
       }
-      //这里使用到反射，拿到Tab对象后获取Class
       Class c = tab.getClass();
       try {
         Field field = c.getDeclaredField("mView");
@@ -536,6 +537,7 @@ public class MainActivity extends MenuActivity {
         if (data.getBooleanExtra(EXTRA_RECREATE, false)) { //设置后需要重启activity
           mRefreshHandler.sendEmptyMessage(RECREATE_ACTIVITY);
         } else if (data.getBooleanExtra(EXTRA_REFRESH_ADAPTER, false)) { //刷新adapter
+          clearUriCache();
           mRefreshHandler.sendEmptyMessage(UPDATE_ADAPTER);
         } else if (data.getBooleanExtra(EXTRA_REFRESH_LIBRARY, false)) { //刷新Library
           List<Category> categories = (List<Category>) data.getSerializableExtra(EXTRA_CATEGORY);
@@ -566,6 +568,19 @@ public class MainActivity extends MenuActivity {
           installApk(mContext, mInstallPath);
         }
         break;
+    }
+  }
+
+  private void clearUriCache() {
+    // 清除uriCache
+    for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+      if (fragment instanceof LibraryFragment) {
+        final LibraryFragment libraryFragment = (LibraryFragment) fragment;
+        final Adapter adapter = libraryFragment.getAdapter();
+        if (adapter instanceof HeaderAdapter) {
+          ((HeaderAdapter) adapter).clearUriCache();
+        }
+      }
     }
   }
 

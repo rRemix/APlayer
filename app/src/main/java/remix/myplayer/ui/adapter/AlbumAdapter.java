@@ -5,7 +5,6 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -21,18 +20,15 @@ import android.widget.TextView;
 import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
-import io.reactivex.disposables.Disposable;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Album;
 import remix.myplayer.misc.menu.LibraryListener;
-import remix.myplayer.request.LibraryUriRequest;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.adapter.holder.HeaderHolder;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.ImageUriUtil;
@@ -69,15 +65,17 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
   @Override
   public void onViewRecycled(BaseViewHolder holder) {
     super.onViewRecycled(holder);
-    if (holder instanceof AlbumHolder) {
-      if (((AlbumHolder) holder).mImage.getTag() != null) {
-        Disposable disposable = (Disposable) ((AlbumHolder) holder).mImage.getTag();
-        if (!disposable.isDisposed()) {
-          disposable.dispose();
-        }
-      }
-      ((AlbumHolder) holder).mImage.setImageURI(Uri.EMPTY);
-    }
+    disposeLoad(holder);
+//    if (holder instanceof AlbumHolder) {
+//      final AlbumHolder albumHolder = (AlbumHolder) holder;
+//      if (albumHolder.mImage.getTag() != null) {
+//        Disposable disposable = (Disposable) albumHolder.mImage.getTag();
+//        if (!disposable.isDisposed()) {
+//          disposable.dispose();
+//        }
+//      }
+//      albumHolder.mImage.setImageURI(Uri.EMPTY);
+//    }
   }
 
   @SuppressLint("RestrictedApi")
@@ -98,11 +96,8 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     //设置封面
     final int albumId = album.getAlbumID();
     final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
+    holder.mImage.setTag(setImage(holder.mImage, ImageUriUtil.getSearchRequest(album), imageSize, position));
 
-    Disposable disposable = new LibraryUriRequest(holder.mImage,
-        ImageUriUtil.getSearchRequest(album),
-        new RequestConfig.Builder(imageSize, imageSize).build()).load();
-    holder.mImage.setTag(disposable);
     if (holder instanceof AlbumListHolder) {
       holder.mText2
           .setText(App.getContext().getString(R.string.song_count_2, album.getArtist(), album.getCount()));

@@ -22,22 +22,27 @@ import java.lang.ref.WeakReference
 open class LibraryUriRequest(image: SimpleDraweeView, protected val mRequest: UriRequest,
                              config: RequestConfig) : ImageUriRequest<String>(config) {
 
-  protected val mImageRef = WeakReference<SimpleDraweeView>(image)
+  val mImageRef = WeakReference<SimpleDraweeView>(image)
 
-  override fun onError(errMsg: String?) {
-    //        mImage.setImageURI(Uri.EMPTY);
-    Timber.v("onError() %s", errMsg)
+  override fun onError(throwable: Throwable?) {
+//    mImageRef.get()?.setImageURI(Uri.EMPTY)
+    Timber.v("onError() %s", throwable?.message)
+  }
+
+  open fun onSave(result: String) {
+
   }
 
   override fun onSuccess(result: String?) {
-    if (TextUtils.isEmpty(result)) {
-      onError("empty result")
+    if (TextUtils.isEmpty(result) || result == null) {
+      onError(Throwable(ERROR_NO_RESULT))
       return
     }
     if (ImageUriRequest.BLACKLIST.contains(result)) {
-      onError("in blackList")
+      onError(Throwable(ERROR_BLACKLIST))
       return
     }
+    onSave(result)
     Timber.v("onSuccess() %s", result)
     val imageRequestBuilder = ImageRequestBuilder
         .newBuilderWithSource(Uri.parse(result))
@@ -90,7 +95,7 @@ open class LibraryUriRequest(image: SimpleDraweeView, protected val mRequest: Ur
           }
 
           override fun onError(e: Throwable) {
-            this@LibraryUriRequest.onError(e.toString())
+            this@LibraryUriRequest.onError(e)
           }
 
           override fun onComplete() {
@@ -101,7 +106,8 @@ open class LibraryUriRequest(image: SimpleDraweeView, protected val mRequest: Ur
   }
 
   companion object {
-
     private val TAG = LibraryUriRequest::class.java.simpleName
+    const val ERROR_NO_RESULT = "empty result"
+    const val ERROR_BLACKLIST = "blacklist"
   }
 }

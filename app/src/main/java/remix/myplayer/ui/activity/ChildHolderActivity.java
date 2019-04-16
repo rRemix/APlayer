@@ -46,8 +46,8 @@ import remix.myplayer.request.UriRequest;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.ChildHolderAdapter;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -102,8 +102,8 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     mId = getIntent().getIntExtra(EXTRA_ID, -1);
     mType = getIntent().getIntExtra(EXTRA_TYPE, -1);
     mArg = getIntent().getStringExtra(EXTRA_TITLE);
-    if(mId == -1 || mType == -1 || TextUtils.isEmpty(mArg)){
-      ToastUtil.show(this,R.string.illegal_arg);
+    if (mId == -1 || mType == -1 || TextUtils.isEmpty(mArg)) {
+      ToastUtil.show(this, R.string.illegal_arg);
       finish();
     }
 
@@ -266,7 +266,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
   @Override
   public void onPlayListChanged(String name) {
     super.onPlayListChanged(name);
-    if(name.equals(PlayList.TABLE_NAME)){
+    if (name.equals(PlayList.TABLE_NAME)) {
       onMediaStoreChanged();
     }
   }
@@ -323,9 +323,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
   @Override
   protected void onPause() {
     super.onPause();
-//        if (mChoice.isActive()) {
-//            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI, 500);
-//        }
   }
 
   @Override
@@ -370,13 +367,19 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     return new AsyncChildSongLoader(this);
   }
 
+  @Override
+  public void onMetaChanged() {
+    if (mAdapter != null) {
+      mAdapter.updatePlayingSong();
+    }
+  }
 
   private static final String EXTRA_ID = "id";
   private static final String EXTRA_TYPE = "type";
   private static final String EXTRA_TITLE = "title";
 
-  public static void start(Context contex, int type, int id, String title) {
-    contex.startActivity(new Intent(contex, ChildHolderActivity.class)
+  public static void start(Context context, int type, int id, String title) {
+    context.startActivity(new Intent(context, ChildHolderActivity.class)
         .putExtra(EXTRA_ID, id)
         .putExtra(EXTRA_TYPE, type)
         .putExtra(EXTRA_TITLE, title));

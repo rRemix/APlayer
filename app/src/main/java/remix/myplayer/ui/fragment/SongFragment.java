@@ -106,6 +106,13 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
     return mAdapter;
   }
 
+  @Override
+  public void onMetaChanged() {
+    if (mAdapter != null) {
+      mAdapter.updatePlayingSong();
+    }
+  }
+
   public void scrollToCurrent() {
     mRecyclerView.smoothScrollToCurrentSong(mAdapter.getDatas());
   }

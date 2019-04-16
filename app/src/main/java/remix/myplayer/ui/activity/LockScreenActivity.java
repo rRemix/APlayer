@@ -253,8 +253,8 @@ public class LockScreenActivity extends BaseMusicActivity {
     }
     mDisposable = new ImageUriRequest<Palette>(CONFIG) {
       @Override
-      public void onError(String errMsg) {
-//                ToastUtil.show(context,errMsg);
+      public void onError(Throwable throwable) {
+//                ToastUtil.show(mContext,throwable.getMessage());
       }
 
       @Override
@@ -275,7 +275,7 @@ public class LockScreenActivity extends BaseMusicActivity {
             }))
             .onErrorResumeNext(Observable.create(e -> processBitmap(e, DEFAULT_BITMAP)))
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
+            .subscribe(this::onSuccess, this::onError);
       }
     }.load();
   }

@@ -44,7 +44,6 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -112,7 +111,6 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
-import timber.log.Timber;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -1280,7 +1278,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     } else {
       new ImageUriRequest<String>() {
         @Override
-        public void onError(String errMsg) {
+        public void onError(Throwable throwable) {
           mUri = Uri.EMPTY;
           updateCover(withAnimation);
         }
@@ -1295,7 +1293,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         public Disposable load() {
           return getCoverObservable(getSearchRequestWithAlbumType(mInfo))
               .compose(RxUtil.applyScheduler())
-              .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
+              .subscribe(this::onSuccess, this::onError);
         }
       }.load();
     }
