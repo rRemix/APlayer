@@ -64,10 +64,13 @@ import remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
 import remix.myplayer.ui.widget.desktop.DesktopLyricView
-import remix.myplayer.util.*
 import remix.myplayer.util.Constants.*
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
+import remix.myplayer.util.MediaStoreUtil
+import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
+import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 import remix.myplayer.util.Util.*
 import timber.log.Timber
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
@@ -658,7 +661,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     //        updateDesktopLyric();
     //初始化下一首歌曲
     //        updateNextSong();
-    if (playModel == Constants.PLAY_SHUFFLE) {
+    if (playModel == PLAY_SHUFFLE) {
       makeShuffleList(currentId)
     }
     //查找上次退出时保存的下一首歌曲是否还存在
@@ -669,7 +672,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       nextIndex = currentIndex
       updateNextSong()
     } else {
-      nextIndex = if (playModel != Constants.PLAY_SHUFFLE)
+      nextIndex = if (playModel != PLAY_SHUFFLE)
         playQueue.indexOf(nextId)
       else
         randomQueue.indexOf(nextId)
@@ -780,7 +783,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   fun setPlayQueue(newQueueList: List<Int>?, intent: Intent) {
     //当前模式是随机播放 或者即将设置为随机播放 都要更新mRandomList
     val shuffle = intent.getBooleanExtra("shuffle", false) || SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL,
-        PLAY_LOOP) == Constants.PLAY_SHUFFLE
+        PLAY_LOOP) == PLAY_SHUFFLE
     if (newQueueList == null || newQueueList.isEmpty()) {
       return
     }
@@ -792,7 +795,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
 
     if (shuffle) {
-      playModel = Constants.PLAY_SHUFFLE
+      playModel = PLAY_SHUFFLE
       updateNextSong()
     }
     controlReceiver.onReceive(this, intent)
@@ -918,7 +921,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       //如果是随机播放 需要调整下RandomQueue
       //保证正常播放队列和随机播放队列中当前歌曲的索引一致
       val index = randomQueue.indexOf(currentId)
-      if (playModel == Constants.PLAY_SHUFFLE &&
+      if (playModel == PLAY_SHUFFLE &&
           index != currentIndex &&
           index > 0) {
         Collections.swap(randomQueue, currentIndex, index)
@@ -953,9 +956,21 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           .getPlayQueue()
           .compose(applySingleScheduler())
           .subscribe { ids ->
-            //todo 更新下一首
             playQueue.clear()
             playQueue.addAll(ids)
+
+            // 如果下一首歌曲不在队列里面 重新设置下一首歌曲
+            if (!playQueue.contains(nextId)) {
+              Timber.v("播放队列改变后重新设置下一首歌曲")
+              updateNextSong()
+              //todo 更新播放界面下一首
+            }
+
+            // 随机播放模式下重新设置下RandomQueue
+            if (playModel == PLAY_SHUFFLE) {
+              Timber.v("播放队列改变后重新设置随机队列")
+              makeShuffleList(currentId)
+            }
           }
     }
   }
@@ -1032,8 +1047,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         controlReceiver.onReceive(this, continueIntent)
       }
       ACTION_SHORTCUT_SHUFFLE -> {
-        if (playModel != Constants.PLAY_SHUFFLE) {
-          playModel = Constants.PLAY_SHUFFLE
+        if (playModel != PLAY_SHUFFLE) {
+          playModel = PLAY_SHUFFLE
         }
         val shuffleIntent = Intent(ACTION_CMD)
         shuffleIntent.putExtra(EXTRA_CONTROL, Command.NEXT)
@@ -1233,11 +1248,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
             }
           }
         }
-        Command.TOGGLE_MEDIASESSION -> when (SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN,
-            Constants.APLAYER_LOCKSCREEN)) {
-          Constants.APLAYER_LOCKSCREEN, Constants.CLOSE_LOCKSCREEN -> cleanMetaData()
-          Constants.SYSTEM_LOCKSCREEN -> updateMediaSession(Command.NEXT)
-        }
+        Command.TOGGLE_MEDIASESSION ->
+          when (SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)) {
+            APLAYER_LOCKSCREEN, CLOSE_LOCKSCREEN -> cleanMetaData()
+            SYSTEM_LOCKSCREEN -> updateMediaSession(Command.NEXT)
+          }
         //临时播放一首歌曲
         Command.PLAY_TEMP -> {
           intent.getParcelableExtra<Song>(EXTRA_SONG)?.let {
@@ -1281,7 +1296,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
             return
           }
           //根据当前播放模式，添加到队列
-          if (playModel == Constants.PLAY_SHUFFLE) {
+          if (playModel == PLAY_SHUFFLE) {
             if (randomQueue.contains(nextSong.id)) {
               randomQueue.remove(Integer.valueOf(nextSong.id))
               randomQueue.add(if (currentIndex + 1 < randomQueue.size) currentIndex + 1 else 0,
@@ -1303,7 +1318,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           nextIndex = currentIndex
           updateNextSong()
           //保存到数据库
-          if (playModel != Constants.PLAY_SHUFFLE) {
+          if (playModel != PLAY_SHUFFLE) {
             Single
                 .fromCallable {
                   repository.runInTransaction(Runnable {
@@ -1383,9 +1398,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
     val isSmartisan = Build.MANUFACTURER.equals("smartisan", ignoreCase = true)
-    if (!isSmartisan && SPUtil
-            .getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN,
-                Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN) {
+    if (!isSmartisan && SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == CLOSE_LOCKSCREEN) {
       mediaSession.setMetadata(null)
       return
     }
@@ -1489,7 +1502,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       currentIndex = nextIndex
       currentSong = Song(nextSong)
     } else {
-      val queue = ArrayList(if (playModel == Constants.PLAY_SHUFFLE)
+      val queue = ArrayList(if (playModel == PLAY_SHUFFLE)
         randomQueue
       else
         playQueue)
@@ -1525,7 +1538,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
 
-    if (playModel == Constants.PLAY_SHUFFLE) {
+    if (playModel == PLAY_SHUFFLE) {
       if (randomQueue.size == 0) {
         makeShuffleList(currentId)
       }
@@ -2073,8 +2086,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       if (Intent.ACTION_SCREEN_ON == action) {
         screenOn = true
         //显示锁屏
-        if (isPlay && SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN,
-                Constants.APLAYER_LOCKSCREEN) == Constants.APLAYER_LOCKSCREEN) {
+        if (isPlay && SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == APLAYER_LOCKSCREEN) {
           context.startActivity(Intent(context, LockScreenActivity::class.java)
               .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         }

@@ -42,16 +42,16 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
   private fun getSongIdSingle(): Single<List<Int>> {
     return Single.fromCallable {
       when (type) {
-        Constants.ALBUM, Constants.ARTIST //专辑或者艺术家
-        -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + id, null)
-        Constants.PLAYLIST //播放列表
-        -> DatabaseRepository.getInstance().getPlayList(id)
+        //专辑或者艺术家
+        Constants.ALBUM, Constants.ARTIST -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + id, null)
+        //播放列表
+        Constants.PLAYLIST -> DatabaseRepository.getInstance().getPlayList(id)
             .map {
               it.audioIds.toList()
             }
             .blockingGet()
-        Constants.FOLDER //文件夹
-        -> getSongIdsByParentId(id)
+        //文件夹
+        Constants.FOLDER -> getSongIdsByParentId(id)
         else -> emptyList<Int>()
       }
     }

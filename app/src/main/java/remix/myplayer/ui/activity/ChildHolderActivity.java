@@ -369,6 +369,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
 
   @Override
   public void onMetaChanged() {
+    super.onMetaChanged();
     if (mAdapter != null) {
       mAdapter.updatePlayingSong();
     }
