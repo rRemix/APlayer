@@ -33,14 +33,15 @@ https://play.google.com/store/apps/details?id=remix.myplayer
 ## 感谢
 - [RxJava](https://github.com/ReactiveX/RxJava)
 - [RxAndroid](https://github.com/ReactiveX/RxAndroid)
+- [Rxpermissions](https://github.com/tbruyelle/RxPermissions)
 - [Retrofit](https://github.com/square/retrofit)
 - [Butter Knife](https://github.com/JakeWharton/butterknife)
-- [Material-dialogs](https://github.com/afollestad/material-dialogs)
-- [Rxpermissions](https://github.com/tbruyelle/RxPermissions)
-- [Android-crop](https://github.com/jdamcd/android-crop)
-- [TinyPinyin](https://github.com/promeG/TinyPinyin)
 - [Timber](https://github.com/JakeWharton/timber)
 - [Leakcanary](https://github.com/square/leakcanary)
+- [Rebound](https://github.com/facebook/rebound)
+- [Material-dialogs](https://github.com/afollestad/material-dialogs)
+- [Android-crop](https://github.com/jdamcd/android-crop)
+- [TinyPinyin](https://github.com/promeG/TinyPinyin)
 
 
 ## 最后 
