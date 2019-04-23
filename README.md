@@ -26,17 +26,20 @@ https://play.google.com/store/apps/details?id=remix.myplayer
 - 锁屏控制,可选择原生或者软件实现
 - 心情可生成海报分享
 - 动态主题颜色
-- 监测媒体库变化自动刷新，并且可以手动扫描指定目录
+- 监测媒体库变化自动刷新，或者手动扫描指定目录
 - 其他必备和便捷操作如歌曲信息编辑、睡眠定时、均衡器等
 
 
 ## 感谢
 - [RxJava](https://github.com/ReactiveX/RxJava)
 - [RxAndroid](https://github.com/ReactiveX/RxAndroid)
+- [Rxpermissions](https://github.com/tbruyelle/RxPermissions)
 - [Retrofit](https://github.com/square/retrofit)
 - [Butter Knife](https://github.com/JakeWharton/butterknife)
+- [Timber](https://github.com/JakeWharton/timber)
+- [Leakcanary](https://github.com/square/leakcanary)
+- [Rebound](https://github.com/facebook/rebound)
 - [Material-dialogs](https://github.com/afollestad/material-dialogs)
-- [Rxpermissions](https://github.com/tbruyelle/RxPermissions)
 - [Android-crop](https://github.com/jdamcd/android-crop)
 - [TinyPinyin](https://github.com/promeG/TinyPinyin)
 
