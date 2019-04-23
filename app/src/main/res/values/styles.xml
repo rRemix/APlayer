@@ -35,8 +35,27 @@
 
   <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
-  <style name="PlayerActivityStyle" parent="ActivityStyle">
+  <style name="PlayerActivityStyle" parent="@style/AppTheme">
     <item name="android:windowIsTranslucent">true</item>
+    <item name="android:windowBackground">@color/transparent</item>
+    <item name="android:windowAnimationStyle">@style/PlayerActivityAnim</item>
+  </style>
+
+  <style name="PlayerActivityStyle.Black" parent="@style/Theme.APlayer.Black">
+    <item name="android:windowIsTranslucent">true</item>
+    <item name="android:windowBackground">@color/transparent</item>
+    <item name="android:windowAnimationStyle">@style/PlayerActivityAnim</item>
+  </style>
+
+  <style name="PlayerActivityStyle.Dark" parent="@style/Theme.APlayer.Dark">
+    <item name="android:windowIsTranslucent">true</item>
+    <item name="android:windowBackground">@color/transparent</item>
+    <item name="android:windowAnimationStyle">@style/PlayerActivityAnim</item>
+  </style>
+
+  <style name="PlayerActivityAnim" >
+    <item name="android:windowEnterAnimation">@anim/audio_in</item>
+    <item name="android:windowExitAnimation">@anim/audio_out</item>
   </style>
 
   <style name="DialogAnimBottom" parent="@android:style/Animation">

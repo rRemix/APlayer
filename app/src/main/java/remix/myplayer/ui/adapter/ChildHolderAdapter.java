@@ -1,8 +1,10 @@
 package remix.myplayer.ui.adapter;
 
 import static remix.myplayer.helper.MusicServiceRemote.setPlayQueue;
+import static remix.myplayer.theme.ThemeStore.getHighLightTextColor;
 import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
 import static remix.myplayer.theme.ThemeStore.getTextColorPrimary;
+import static remix.myplayer.theme.ThemeStore.isLightTheme;
 import static remix.myplayer.util.MusicUtil.makeCmdIntent;
 
 import android.annotation.SuppressLint;
@@ -30,6 +32,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.ToastUtil;
 
@@ -100,17 +103,15 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
       holder.mButton.setVisibility(View.VISIBLE);
 
       //高亮
-      final int primaryColor = getMaterialPrimaryColor();
       if (MusicServiceRemote.getCurrentSong().getId() == song.getId()) {
         mLastPlaySong = song;
-        holder.mTitle.setTextColor(primaryColor);
+        holder.mTitle.setTextColor(getHighLightTextColor());
         holder.mIndicator.setVisibility(View.VISIBLE);
       } else {
         holder.mTitle.setTextColor(getTextColorPrimary());
         holder.mIndicator.setVisibility(View.GONE);
       }
-      holder.mIndicator.setBackgroundColor(primaryColor);
-      holder.mTitle.setText(song.getShowName());
+      holder.mIndicator.setBackgroundColor(getHighLightTextColor());
 
       //设置标题
       holder.mTitle.setText(song.getShowName());
@@ -192,7 +193,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
       }
 
       if (newHolder != null) {
-        newHolder.mTitle.setTextColor(getMaterialPrimaryColor());
+        newHolder.mTitle.setTextColor(getHighLightTextColor());
         newHolder.mIndicator.setVisibility(View.VISIBLE);
       }
 

@@ -78,6 +78,17 @@ public class ThemeStore {
     }
   }
 
+  public static int getHighLightTextColor(){
+    int primaryColor = getMaterialPrimaryColor();
+    if (ColorUtil.isColorCloseToWhite(primaryColor) && isLightTheme()) {
+      primaryColor = ColorUtil.getColor(R.color.accent_gray_color);
+    }
+    if(ColorUtil.isColorCloseToBlack(primaryColor) && isBlackTheme()){
+      primaryColor = getTextColorPrimary();
+    }
+    return primaryColor;
+  }
+
   public static void saveMaterialPrimaryColor(@ColorInt int color) {
     SPUtil.putValue(App.getContext(), NAME, KEY_PRIMARY_COLOR, color);
   }
@@ -87,9 +98,9 @@ public class ThemeStore {
     //纯白需要处理下
     int primaryColor = SPUtil
         .getValue(App.getContext(), NAME, KEY_PRIMARY_COLOR, Color.parseColor("#698cf6"));
-    if (ColorUtil.isColorCloseToWhite(primaryColor)) {
-      primaryColor = ColorUtil.getColor(R.color.accent_gray_color);
-    }
+//    if (ColorUtil.isColorCloseToWhite(primaryColor)) {
+//      primaryColor = ColorUtil.getColor(R.color.accent_gray_color);
+//    }
     return primaryColor;
 
   }

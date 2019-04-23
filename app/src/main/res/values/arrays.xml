@@ -2,6 +2,7 @@
 <resources>
   <integer name="ActivityAnimDuration">330</integer>
   <integer name="PlayerActivityAnimDuration">200</integer>
+  <integer name="PlayerActivityAnimInDuration_v19">100</integer>
   <integer name="FadeDuration">300</integer>
   <integer name="DialogAnimDuration">300</integer>
   <integer name="LockScreenRightOutDuration">250</integer>

@@ -7,14 +7,15 @@
   android:id="@+id/item_root">
 
   <ImageView
-    android:layout_width="@dimen/d24_size"
-    android:layout_height="@dimen/d24_size"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_alignParentRight="true"
     android:layout_centerVertical="true"
     android:id="@+id/playqueue_delete"
     android:layout_centerInParent="true"
     android:src="@drawable/icon_playqueue_delete"
-    android:layout_marginRight="@dimen/d8_size"/>
+    android:background="?attr/background_oval_ripple"
+    android:padding="8dp"/>
 
   <LinearLayout
     android:layout_width="match_parent"

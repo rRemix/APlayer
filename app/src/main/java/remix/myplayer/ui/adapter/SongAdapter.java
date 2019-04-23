@@ -1,8 +1,10 @@
 package remix.myplayer.ui.adapter;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.theme.ThemeStore.getHighLightTextColor;
 import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
 import static remix.myplayer.theme.ThemeStore.getTextColorPrimary;
+import static remix.myplayer.theme.ThemeStore.isLightTheme;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 import android.annotation.SuppressLint;
@@ -34,6 +36,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -141,16 +144,17 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
 //        }
 
     //高亮
-    final int primaryColor = getMaterialPrimaryColor();
     if (MusicServiceRemote.getCurrentSong().getId() == song.getId()) {
       mLastPlaySong = song;
-      holder.mName.setTextColor(primaryColor);
+      holder.mName.setTextColor(getHighLightTextColor());
       holder.mIndicator.setVisibility(View.VISIBLE);
     } else {
       holder.mName.setTextColor(getTextColorPrimary());
       holder.mIndicator.setVisibility(View.GONE);
     }
-    holder.mIndicator.setBackgroundColor(primaryColor);
+    holder.mIndicator.setBackgroundColor(getHighLightTextColor());
+
+    //标题
     holder.mName.setText(song.getShowName());
 
     //艺术家与专辑
@@ -227,7 +231,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
       }
 
       if (newHolder != null) {
-        newHolder.mName.setTextColor(getMaterialPrimaryColor());
+        newHolder.mName.setTextColor(getHighLightTextColor());
         newHolder.mIndicator.setVisibility(View.VISIBLE);
       }
 

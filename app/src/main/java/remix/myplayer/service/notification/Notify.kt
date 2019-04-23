@@ -15,7 +15,6 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
 import remix.myplayer.ui.activity.PlayerActivity
-import remix.myplayer.ui.activity.PlayerActivity.EXTRA_SHOW_ANIMATION
 
 /**
  * Created by Remix on 2017/11/22.
@@ -38,8 +37,8 @@ abstract class Notify internal constructor(internal var service: MusicService) {
       stackBuilder.addParentStack(PlayerActivity::class.java)
       stackBuilder.addNextIntent(result)
 
-      stackBuilder.editIntentAt(1)?.putExtra(EXTRA_SHOW_ANIMATION, false)
-      stackBuilder.editIntentAt(0)?.putExtra(EXTRA_SHOW_ANIMATION, false)
+//      stackBuilder.editIntentAt(1)?.putExtra(EXTRA_SHOW_ANIMATION, false)
+//      stackBuilder.editIntentAt(0)?.putExtra(EXTRA_SHOW_ANIMATION, false)
       return stackBuilder.getPendingIntent(
           0,
           PendingIntent.FLAG_UPDATE_CURRENT

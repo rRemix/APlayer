@@ -1,9 +1,6 @@
 package remix.myplayer.ui.fragment;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
-import static remix.myplayer.ui.activity.PlayerActivity.EXTRA_ANIM_URL;
-import static remix.myplayer.ui.activity.PlayerActivity.EXTRA_RECT;
-import static remix.myplayer.ui.activity.PlayerActivity.EXTRA_SHOW_ANIMATION;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 import android.annotation.SuppressLint;
@@ -72,10 +69,10 @@ public class BottomActionBarFragment extends BaseMusicFragment {
   @BindView(R.id.bottom_action_bar_cover)
   SimpleDraweeView mCover;
 
-  //保存封面位置信息
-  private Rect mCoverRect;
-  //图片路径
-  private AnimationUrl mAnimUrl = new AnimationUrl();
+//  //保存封面位置信息
+//  private Rect mCoverRect;
+//  //图片路径
+//  private AnimationUrl mAnimUrl = new AnimationUrl();
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -107,19 +104,19 @@ public class BottomActionBarFragment extends BaseMusicFragment {
     mPlayButton.setOnClickListener(listener);
     mPlayNext.setOnClickListener(listener);
 
-    //获取封面位置信息
-    mCover.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-      @Override
-      public boolean onPreDraw() {
-        mCover.getViewTreeObserver().removeOnPreDrawListener(this);
-        //数据失效重新获取位置信息
-        if (mCoverRect == null || mCoverRect.width() <= 0 || mCoverRect.height() <= 0) {
-          mCoverRect = new Rect();
-          mCover.getGlobalVisibleRect(mCoverRect);
-        }
-        return true;
-      }
-    });
+//    //获取封面位置信息
+//    mCover.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+//      @Override
+//      public boolean onPreDraw() {
+//        mCover.getViewTreeObserver().removeOnPreDrawListener(this);
+//        //数据失效重新获取位置信息
+//        if (mCoverRect == null || mCoverRect.width() <= 0 || mCoverRect.height() <= 0) {
+//          mCoverRect = new Rect();
+//          mCover.getGlobalVisibleRect(mCoverRect);
+//        }
+//        return true;
+//      }
+//    });
 
     return rootView;
   }
@@ -178,15 +175,15 @@ public class BottomActionBarFragment extends BaseMusicFragment {
         @Override
         public void onSuccess(String result) {
           super.onSuccess(result);
-          mAnimUrl.setAlbumId(song.getAlbumId());
-          mAnimUrl.setUrl(result);
+//          mAnimUrl.setAlbumId(song.getAlbumId());
+//          mAnimUrl.setUrl(result);
         }
 
         @Override
         public void onError(Throwable throwable) {
           super.onError(throwable);
-          mAnimUrl.setAlbumId(-1);
-          mAnimUrl.setUrl("");
+//          mAnimUrl.setAlbumId(-1);
+//          mAnimUrl.setUrl("");
         }
       }.load();
     }
@@ -201,15 +198,16 @@ public class BottomActionBarFragment extends BaseMusicFragment {
     Intent intent = new Intent(mContext, PlayerActivity.class);
     Bundle bundle = new Bundle();
     intent.putExtras(bundle);
-    intent.putExtra(EXTRA_SHOW_ANIMATION, true);
-    intent.putExtra(EXTRA_RECT, mCoverRect);
-    intent.putExtra(EXTRA_ANIM_URL, mAnimUrl);
+//    intent.putExtra(EXTRA_SHOW_ANIMATION, true);
+//    intent.putExtra(EXTRA_RECT, mCoverRect);
+//    intent.putExtra(EXTRA_ANIM_URL, mAnimUrl);
 
     Activity activity = getActivity();
     if (activity != null && !((BaseActivity) activity).isDestroyed()) {
-      ActivityOptionsCompat options = ActivityOptionsCompat
-          .makeSceneTransitionAnimation(getActivity(), mCover, "image");
-      ActivityCompat.startActivity(mContext, intent, options.toBundle());
+//      ActivityOptionsCompat options = ActivityOptionsCompat
+//          .makeSceneTransitionAnimation(getActivity(), mCover, "image");
+//      ActivityCompat.startActivity(mContext, intent, options.toBundle());
+      mContext.startActivity(intent);
     }
   }
 

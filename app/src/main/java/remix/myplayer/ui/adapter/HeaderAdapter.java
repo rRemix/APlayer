@@ -1,6 +1,8 @@
 package remix.myplayer.ui.adapter;
 
 import static remix.myplayer.misc.ExtKt.isPortraitOrientation;
+import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
+import static remix.myplayer.theme.ThemeStore.isLightTheme;
 
 import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
@@ -252,4 +254,5 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
       }
     }
   }
+
 }

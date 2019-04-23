@@ -75,6 +75,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
@@ -123,11 +124,11 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     OnTagEditListener {
 
   private static final String TAG = "PlayerActivity";
-  public static final String EXTRA_SHOW_ANIMATION = "ShowAnimation";
+//  public static final String EXTRA_SHOW_ANIMATION = "ShowAnimation";
 //  public static final String EXTRA_FROM_NOTIFY = "FromNotify";
 //  public static final String EXTRA_FROM_ACTIVITY = "FromActivity";
-  public static final String EXTRA_ANIM_URL = "AnimUrl";
-  public static final String EXTRA_RECT = "Rect";
+//  public static final String EXTRA_ANIM_URL = "AnimUrl";
+//  public static final String EXTRA_RECT = "Rect";
 
   //上次选中的Fragment
   private int mPrevPosition = 1;
@@ -215,35 +216,35 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   private CoverFragment mCoverFragment;
   private RecordFragment mRecordFragment;
 
-  private static final String SCALE_WIDTH = "SCALE_WIDTH";
-  private static final String SCALE_HEIGHT = "SCALE_HEIGHT";
-  private static final String TRANSITION_X = "TRANSITION_X";
-  private static final String TRANSITION_Y = "TRANSITION_Y";
-  /**
-   * 存储图片缩放比例和位移距离
-   */
-  private Bundle mScaleBundle = new Bundle();
-  private Bundle mTransitionBundle = new Bundle();
-  /**
-   * 上一个界面图片的宽度和高度
-   */
-  private int mOriginWidth;
-  private int mOriginHeight;
-  /**
-   * 上一个界面图片的位置信息
-   */
-  private Rect mOriginRect;
-  /**
-   * 终点View的位置信息
-   */
-  private Rect mDestRect = new Rect();
-  /**
-   * 动画参数
-   */
-  private static final SpringConfig COVER_IN_SPRING_CONFIG = SpringConfig
-      .fromOrigamiTensionAndFriction(30, 7);
-  private static final SpringConfig COVER_OUT_SPRING_CONFIG = SpringConfig
-      .fromOrigamiTensionAndFriction(35, 7);
+//  private static final String SCALE_WIDTH = "SCALE_WIDTH";
+//  private static final String SCALE_HEIGHT = "SCALE_HEIGHT";
+//  private static final String TRANSITION_X = "TRANSITION_X";
+//  private static final String TRANSITION_Y = "TRANSITION_Y";
+//  /**
+//   * 存储图片缩放比例和位移距离
+//   */
+//  private Bundle mScaleBundle = new Bundle();
+//  private Bundle mTransitionBundle = new Bundle();
+//  /**
+//   * 上一个界面图片的宽度和高度
+//   */
+//  private int mOriginWidth;
+//  private int mOriginHeight;
+//  /**
+//   * 上一个界面图片的位置信息
+//   */
+//  private Rect mOriginRect;
+//  /**
+//   * 终点View的位置信息
+//   */
+//  private Rect mDestRect = new Rect();
+//  /**
+//   * 动画参数
+//   */
+//  private static final SpringConfig COVER_IN_SPRING_CONFIG = SpringConfig
+//      .fromOrigamiTensionAndFriction(30, 7);
+//  private static final SpringConfig COVER_OUT_SPRING_CONFIG = SpringConfig
+//      .fromOrigamiTensionAndFriction(35, 7);
 
   /**
    * 下拉关闭
@@ -285,14 +286,30 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
   private TagReceiver mTagReceiver;
 
-//    @Override
-//    protected void setUpTheme() {
-//        if (ThemeStore.isLightTheme())
-//            super.setUpTheme();
-//        else {
-//            setTheme(R.style.AudioHolderStyle_Night);
-//        }
+  @Override
+  protected void setUpTheme() {
+//    if (ThemeStore.isLightTheme()) {
+//      super.setUpTheme();
+//    } else {
+//      setTheme(R.style.AudioHolderStyle_Night);
 //    }
+    final int superThemeRes = ThemeStore.getThemeRes();
+    int themeRes;
+    switch (superThemeRes) {
+      case R.style.Theme_APlayer:
+        themeRes = R.style.PlayerActivityStyle;
+        break;
+      case R.style.Theme_APlayer_Black:
+        themeRes = R.style.PlayerActivityStyle_Black;
+        break;
+      case R.style.Theme_APlayer_Dark:
+        themeRes = R.style.PlayerActivityStyle_Dark;
+        break;
+      default:
+        themeRes = R.style.PlayerActivityStyle;
+    }
+    setTheme(themeRes);
+  }
 
   @Override
   protected void setNavigationBarColor() {
@@ -328,10 +345,10 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     mTagReceiver = new TagReceiver(this);
     registerLocalReceiver(mTagReceiver, new IntentFilter(TagReceiver.ACTION_EDIT_TAG));
 
-    mShowAnimation = getIntent().getBooleanExtra(EXTRA_SHOW_ANIMATION,false);
+//    mShowAnimation = getIntent().getBooleanExtra(EXTRA_SHOW_ANIMATION,false);
     mInfo = MusicServiceRemote.getCurrentSong();
     //动画图片信息
-    AnimationUrl animUrl = getIntent().getParcelableExtra(EXTRA_ANIM_URL);
+//    AnimationUrl animUrl = getIntent().getParcelableExtra(EXTRA_ANIM_URL);
     mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
     setUpBottom();
@@ -342,50 +359,41 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     setUpSeekBar();
     setUpViewColor();
 
-    //设置失败加载的图片和缩放类型
-    mAnimationCover = new SimpleDraweeView(this);
-    mAnimationCover.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
-    mAnimationCover.getHierarchy().setFailureImage(
-        isLightTheme() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night,
-        ScalingUtils.ScaleType.CENTER_CROP);
-    mContainer.addView(mAnimationCover);
-
-    //设置封面
-    if (mInfo != null) {
-      if (animUrl != null && !TextUtils.isEmpty(animUrl.getUrl())
-          && animUrl.getAlbumId() == mInfo.getAlbumId()) {
-        mAnimationCover.setImageURI(animUrl.getUrl());
-      } else {
-        new LibraryUriRequest(mAnimationCover,
-            getSearchRequestWithAlbumType(mInfo),
-            new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
-      }
-    }
+//    //设置失败加载的图片和缩放类型
+//    mAnimationCover = new SimpleDraweeView(this);
+//    mAnimationCover.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
+//    mAnimationCover.getHierarchy().setFailureImage(
+//        isLightTheme() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night,
+//        ScalingUtils.ScaleType.CENTER_CROP);
+//    mContainer.addView(mAnimationCover);
+//
+//    //设置封面
+//    if (mInfo != null) {
+//      if (animUrl != null && !TextUtils.isEmpty(animUrl.getUrl())
+//          && animUrl.getAlbumId() == mInfo.getAlbumId()) {
+//        mAnimationCover.setImageURI(animUrl.getUrl());
+//      } else {
+//        new LibraryUriRequest(mAnimationCover,
+//            getSearchRequestWithAlbumType(mInfo),
+//            new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
+//      }
+//    }
 
   }
 
+//  /**
+//   * 计算图片缩放比例，以及位移距离
+//   */
+//  private void getMoveInfo(Rect destRect) {
+//    // 计算图片缩放比例，并存储在 bundle 中
+//    mScaleBundle.putFloat(SCALE_WIDTH, (float) destRect.width() / mOriginWidth);
+//    mScaleBundle.putFloat(SCALE_HEIGHT, (float) destRect.height() / mOriginHeight);
+//
+//    // 计算位移距离，并将数据存储到 bundle 中
+//    mTransitionBundle.putFloat(TRANSITION_X, destRect.left - mOriginRect.left);
+//    mTransitionBundle.putFloat(TRANSITION_Y, destRect.top - mOriginRect.top);
+//  }
 
-  /**
-   * 计算图片缩放比例，以及位移距离
-   */
-  private void getMoveInfo(Rect destRect) {
-    // 计算图片缩放比例，并存储在 bundle 中
-    mScaleBundle.putFloat(SCALE_WIDTH, (float) destRect.width() / mOriginWidth);
-    mScaleBundle.putFloat(SCALE_HEIGHT, (float) destRect.height() / mOriginHeight);
-
-    // 计算位移距离，并将数据存储到 bundle 中
-    mTransitionBundle.putFloat(TRANSITION_X, destRect.left - mOriginRect.left);
-    mTransitionBundle.putFloat(TRANSITION_Y, destRect.top - mOriginRect.top);
-  }
-
-  @Override
-  protected void onStart() {
-    super.onStart();
-    //只有从Activity启动，才使用动画
-    if (mShowAnimation) {
-      overridePendingTransition(0, 0);
-    }
-  }
 
   @Override
   public void onResume() {
@@ -404,124 +412,143 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     onPlayStateChange();
   }
 
+//  @Override
+//  protected void onSaveInstanceState(Bundle outState) {
+//    super.onSaveInstanceState(outState);
+//    outState.putParcelable(EXTRA_RECT, mOriginRect);
+//    //activity重启后就不用动画了
+//    outState.putBoolean(EXTRA_SHOW_ANIMATION, false);
+//  }
+//
+//  @Override
+//  protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//    super.onRestoreInstanceState(savedInstanceState);
+//    if (savedInstanceState != null) {
+//      if (mOriginRect == null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
+//        mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
+//      }
+//      mShowAnimation = savedInstanceState.getBoolean(EXTRA_SHOW_ANIMATION,false);
+//    }
+//  }
 
   @Override
-  protected void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
-    outState.putParcelable(EXTRA_RECT, mOriginRect);
-    //activity重启后就不用动画了
-    outState.putBoolean(EXTRA_SHOW_ANIMATION, false);
+  protected void onStart() {
+    super.onStart();
+    //只有从Activity启动，才使用动画
+//    if (mShowAnimation) {
+//      overridePendingTransition(0, 0);
+//    }
+    overridePendingTransition(R.anim.audio_in, 0);
   }
 
+
   @Override
-  protected void onRestoreInstanceState(Bundle savedInstanceState) {
-    super.onRestoreInstanceState(savedInstanceState);
-    if (savedInstanceState != null) {
-      if (mOriginRect == null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
-        mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
-      }
-      mShowAnimation = savedInstanceState.getBoolean(EXTRA_SHOW_ANIMATION,false);
-    }
+  public void finish() {
+    super.finish();
+    overridePendingTransition(0, R.anim.audio_out);
   }
 
   @Override
   public void onBackPressed() {
-    //从通知栏打开或者横屏直接退出
-    if (!mShowAnimation) {
-      finish();
-      overridePendingTransition(0, R.anim.audio_out);
-      return;
-    }
-    if (mPager.getCurrentItem() == 1) {
-      if (mIsBacking || mAnimationCover == null) {
-        return;
-      }
-      mIsBacking = true;
-
-      //更新动画控件封面 保证退场动画的封面与fragment中封面一致
-      ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder
-          .newBuilderWithSource(mUri == null ? Uri.EMPTY : mUri);
-      DraweeController controller = Fresco.newDraweeControllerBuilder()
-          .setImageRequest(imageRequestBuilder.build())
-          .setOldController(mAnimationCover.getController())
-//                    .setControllerListener(new ControllerListener<ImageInfo>() {
-//                        @Override
-//                        public void onSubmit(String id, Object callerContext) {
+    super.onBackPressed();
+//    finish();
+//    overridePendingTransition(0, R.anim.audio_out);
+//    //从通知栏打开或者横屏直接退出
+//    if (!mShowAnimation) {
+//      finish();
+//      overridePendingTransition(0, R.anim.audio_out);
+//      return;
+//    }
+//    if (mPager.getCurrentItem() == 1) {
+//      if (mIsBacking || mAnimationCover == null) {
+//        return;
+//      }
+//      mIsBacking = true;
 //
-//                        }
-//
-//                        @Override
-//                        public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
-//                            playBackAnimation();
-//                        }
-//
-//                        @Override
-//                        public void onIntermediateImageSet(String id, ImageInfo imageInfo) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onIntermediateImageFailed(String id, Throwable throwable) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onFailure(String id, Throwable throwable) {
-//                            playBackAnimation();
-//                        }
-//
-//                        @Override
-//                        public void onRelease(String id) {
-//
-//                        }
-//                    })
-          .build();
-      mAnimationCover.setController(controller);
-      mAnimationCover.setVisibility(View.VISIBLE);
-      playBackAnimation();
-    } else {
-      finish();
-      overridePendingTransition(0, R.anim.audio_out);
-    }
+//      //更新动画控件封面 保证退场动画的封面与fragment中封面一致
+//      ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder
+//          .newBuilderWithSource(mUri == null ? Uri.EMPTY : mUri);
+//      DraweeController controller = Fresco.newDraweeControllerBuilder()
+//          .setImageRequest(imageRequestBuilder.build())
+//          .setOldController(mAnimationCover.getController())
+////                    .setControllerListener(new ControllerListener<ImageInfo>() {
+////                        @Override
+////                        public void onSubmit(String id, Object callerContext) {
+////
+////                        }
+////
+////                        @Override
+////                        public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+////                            playBackAnimation();
+////                        }
+////
+////                        @Override
+////                        public void onIntermediateImageSet(String id, ImageInfo imageInfo) {
+////
+////                        }
+////
+////                        @Override
+////                        public void onIntermediateImageFailed(String id, Throwable throwable) {
+////
+////                        }
+////
+////                        @Override
+////                        public void onFailure(String id, Throwable throwable) {
+////                            playBackAnimation();
+////                        }
+////
+////                        @Override
+////                        public void onRelease(String id) {
+////
+////                        }
+////                    })
+//          .build();
+//      mAnimationCover.setController(controller);
+//      mAnimationCover.setVisibility(View.VISIBLE);
+//      playBackAnimation();
+//    } else {
+//      finish();
+//      overridePendingTransition(0, R.anim.audio_out);
+//    }
 
   }
 
-  private void playBackAnimation() {
-    final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-    final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-    final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-    final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-    Spring coverSpring = SpringSystem.create().createSpring();
-    coverSpring.setSpringConfig(COVER_OUT_SPRING_CONFIG);
-    coverSpring.addListener(new SimpleSpringListener() {
-      @Override
-      public void onSpringUpdate(Spring spring) {
-        if (mAnimationCover == null) {
-          return;
-        }
-        final double currentVal = spring.getCurrentValue();
-        mAnimationCover.setTranslationX((float) (transitionX * currentVal));
-        mAnimationCover.setTranslationY((float) (transitionY * currentVal));
-        mAnimationCover.setScaleX((float) (1 + scaleX * currentVal));
-        mAnimationCover.setScaleY((float) (1 + scaleY * currentVal));
-      }
-
-      @Override
-      public void onSpringActivate(Spring spring) {
-        //隐藏fragment中的image
-        mCoverFragment.hideImage();
-      }
-
-      @Override
-      public void onSpringAtRest(Spring spring) {
-        finish();
-        overridePendingTransition(0, 0);
-      }
-    });
-    coverSpring.setOvershootClampingEnabled(true);
-    coverSpring.setCurrentValue(1);
-    coverSpring.setEndValue(0);
-  }
+//  private void playBackAnimation() {
+//    final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
+//    final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
+//    final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
+//    final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
+//    Spring coverSpring = SpringSystem.create().createSpring();
+//    coverSpring.setSpringConfig(COVER_OUT_SPRING_CONFIG);
+//    coverSpring.addListener(new SimpleSpringListener() {
+//      @Override
+//      public void onSpringUpdate(Spring spring) {
+//        if (mAnimationCover == null) {
+//          return;
+//        }
+//        final double currentVal = spring.getCurrentValue();
+//        mAnimationCover.setTranslationX((float) (transitionX * currentVal));
+//        mAnimationCover.setTranslationY((float) (transitionY * currentVal));
+//        mAnimationCover.setScaleX((float) (1 + scaleX * currentVal));
+//        mAnimationCover.setScaleY((float) (1 + scaleY * currentVal));
+//      }
+//
+//      @Override
+//      public void onSpringActivate(Spring spring) {
+//        //隐藏fragment中的image
+//        mCoverFragment.hideImage();
+//      }
+//
+//      @Override
+//      public void onSpringAtRest(Spring spring) {
+//        finish();
+//        overridePendingTransition(0, 0);
+//      }
+//    });
+//    coverSpring.setOvershootClampingEnabled(true);
+//    coverSpring.setCurrentValue(1);
+//    coverSpring.setEndValue(0);
+//  }
 
   /**
    * 上一首 下一首 播放、暂停
@@ -965,84 +992,84 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   }
 
   private void setUpCoverFragment() {
-    mCoverFragment.setOnFirstLoadFinishListener(() -> mAnimationCover.setVisibility(View.INVISIBLE));
-    mCoverFragment.setInflateFinishListener(view -> {
-      //不启动动画 直接显示
-      if (!mShowAnimation) {
-        mCoverFragment.showImage();
-        //隐藏动画用的封面并设置位置信息
-        mAnimationCover.setVisibility(View.GONE);
-        return;
-      }
-
-      if (mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
-        //获取传入的界面信息
-        mOriginRect = getIntent().getParcelableExtra(EXTRA_RECT);
-      }
-
-      if (mOriginRect == null) {
-        return;
-      }
-      // 获取上一个界面中，图片的宽度和高度
-      mOriginWidth = mOriginRect.width();
-      mOriginHeight = mOriginRect.height();
-
-      // 设置 view 的位置，使其和上一个界面中图片的位置重合
-      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
-      params.setMargins(mOriginRect.left,
-          mOriginRect.top - StatusBarUtil.getStatusBarHeight(mContext), mOriginRect.right,
-          mOriginRect.bottom);
-      mAnimationCover.setLayoutParams(params);
-
-      //获得终点控件的位置信息
-      view.getGlobalVisibleRect(mDestRect);
-      // 计算图片缩放比例和位移距离
-      getMoveInfo(mDestRect);
-
-      mAnimationCover.setPivotX(0);
-      mAnimationCover.setPivotY(0);
-
-      final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-      final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-      final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-      final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-
-      final Spring spring = SpringSystem.create().createSpring();
-      spring.setSpringConfig(COVER_IN_SPRING_CONFIG);
-      spring.addListener(new SimpleSpringListener() {
-        @Override
-        public void onSpringUpdate(Spring spring) {
-          if (mAnimationCover == null) {
-            return;
-          }
-          final double currentVal = spring.getCurrentValue();
-          mAnimationCover.setTranslationX((float) (transitionX * currentVal));
-          mAnimationCover.setTranslationY((float) (transitionY * currentVal));
-          mAnimationCover.setScaleX((float) (1 + scaleX * currentVal));
-          mAnimationCover.setScaleY((float) (1 + scaleY * currentVal));
-        }
-
-        @Override
-        public void onSpringAtRest(Spring spring) {
-          //入场动画结束时显示fragment中的封面
-          mCoverFragment.showImage();
-//                    mHandler.postDelayed(() -> {
-//                        //隐藏动画用的封面
-//                        mAnimationCover.setVisibility(View.INVISIBLE);
-//                    },24);
-
-        }
-
-        @Override
-        public void onSpringActivate(Spring spring) {
-          overridePendingTransition(0, 0);
-        }
-      });
-      spring.setOvershootClampingEnabled(true);
-      spring.setCurrentValue(0);
-      spring.setEndValue(1);
-
-    });
+//    mCoverFragment.setOnFirstLoadFinishListener(() -> mAnimationCover.setVisibility(View.INVISIBLE));
+//    mCoverFragment.setInflateFinishListener(view -> {
+//      //不启动动画 直接显示
+//      if (!mShowAnimation) {
+//        mCoverFragment.showImage();
+//        //隐藏动画用的封面并设置位置信息
+//        mAnimationCover.setVisibility(View.GONE);
+//        return;
+//      }
+//
+//      if (mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
+//        //获取传入的界面信息
+//        mOriginRect = getIntent().getParcelableExtra(EXTRA_RECT);
+//      }
+//
+//      if (mOriginRect == null) {
+//        return;
+//      }
+//      // 获取上一个界面中，图片的宽度和高度
+//      mOriginWidth = mOriginRect.width();
+//      mOriginHeight = mOriginRect.height();
+//
+//      // 设置 view 的位置，使其和上一个界面中图片的位置重合
+//      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
+//      params.setMargins(mOriginRect.left,
+//          mOriginRect.top - StatusBarUtil.getStatusBarHeight(mContext), mOriginRect.right,
+//          mOriginRect.bottom);
+//      mAnimationCover.setLayoutParams(params);
+//
+//      //获得终点控件的位置信息
+//      view.getGlobalVisibleRect(mDestRect);
+//      // 计算图片缩放比例和位移距离
+//      getMoveInfo(mDestRect);
+//
+//      mAnimationCover.setPivotX(0);
+//      mAnimationCover.setPivotY(0);
+//
+//      final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
+//      final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
+//      final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
+//      final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
+//
+//      final Spring spring = SpringSystem.create().createSpring();
+//      spring.setSpringConfig(COVER_IN_SPRING_CONFIG);
+//      spring.addListener(new SimpleSpringListener() {
+//        @Override
+//        public void onSpringUpdate(Spring spring) {
+//          if (mAnimationCover == null) {
+//            return;
+//          }
+//          final double currentVal = spring.getCurrentValue();
+//          mAnimationCover.setTranslationX((float) (transitionX * currentVal));
+//          mAnimationCover.setTranslationY((float) (transitionY * currentVal));
+//          mAnimationCover.setScaleX((float) (1 + scaleX * currentVal));
+//          mAnimationCover.setScaleY((float) (1 + scaleY * currentVal));
+//        }
+//
+//        @Override
+//        public void onSpringAtRest(Spring spring) {
+//          //入场动画结束时显示fragment中的封面
+//          mCoverFragment.showImage();
+////                    mHandler.postDelayed(() -> {
+////                        //隐藏动画用的封面
+////                        mAnimationCover.setVisibility(View.INVISIBLE);
+////                    },24);
+//
+//        }
+//
+//        @Override
+//        public void onSpringActivate(Spring spring) {
+//          overridePendingTransition(0, 0);
+//        }
+//      });
+//      spring.setOvershootClampingEnabled(true);
+//      spring.setCurrentValue(0);
+//      spring.setEndValue(1);
+//
+//    });
   }
 
 
@@ -1126,7 +1153,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   private void setUpBottom() {
     mBottomConfig = SPUtil
         .getValue(mContext, SPUtil.SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, BOTTOM_SHOW_BOTH);
-    if(!isPortraitOrientation(this)){//横屏不显示底部
+    if (!isPortraitOrientation(this)) {//横屏不显示底部
       mBottomConfig = BOTTOM_SHOW_NONE;
     }
     if (mBottomConfig == BOTTOM_SHOW_NEXT) {//仅显示下一首

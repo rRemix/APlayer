@@ -10,7 +10,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_centerHorizontal="true"
-    android:visibility="invisible"
+    android:visibility="visible"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     android:layout_marginBottom="16dp"
@@ -18,7 +18,7 @@
     app:cardElevation="8dp">
     <com.facebook.drawee.view.SimpleDraweeView
       android:id="@+id/cover_image"
-      android:visibility="invisible"
+      android:visibility="visible"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_gravity="center"

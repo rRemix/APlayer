@@ -46,8 +46,8 @@ public class CoverFragment extends BaseMusicFragment {
 
   private int mWidth;
   private Uri mUri = Uri.EMPTY;
-  private OnInflateFinishListener mInflateFinishListener;
-  private OnCoverFirstLoadFinishListener mFirstLoadFinishListener;
+//  private OnInflateFinishListener mInflateFinishListener;
+//  private OnCoverFirstLoadFinishListener mFirstLoadFinishListener;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,23 +65,23 @@ public class CoverFragment extends BaseMusicFragment {
 
     mImage.getHierarchy().setFailureImage(ThemeStore.isLightTheme() ? R.drawable.album_empty_bg_day
         : R.drawable.album_empty_bg_night);
-    mImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-      @Override
-      public boolean onPreDraw() {
-        mImage.getViewTreeObserver().removeOnPreDrawListener(this);
-        if (mInflateFinishListener != null) {
-          mInflateFinishListener.onViewInflateFinish(mImage);
-        }
-        return true;
-      }
-    });
+//    mImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+//      @Override
+//      public boolean onPreDraw() {
+//        mImage.getViewTreeObserver().removeOnPreDrawListener(this);
+//        if (mInflateFinishListener != null) {
+//          mInflateFinishListener.onViewInflateFinish(mImage);
+//        }
+//        return true;
+//      }
+//    });
 
     return rootView;
   }
 
-  public void setInflateFinishListener(OnInflateFinishListener l) {
-    mInflateFinishListener = l;
-  }
+//  public void setInflateFinishListener(OnInflateFinishListener l) {
+//    mInflateFinishListener = l;
+//  }
 
   /**
    * 操作为上一首歌曲时，显示往左侧消失的动画 下一首歌曲时，显示往右侧消失的动画
@@ -157,51 +157,50 @@ public class CoverFragment extends BaseMusicFragment {
 
   public void setImageUriInternal() {
 //        mShadow.setVisibility(View.INVISIBLE);
-    ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(mUri);
-    DraweeController controller = Fresco.newDraweeControllerBuilder()
-        .setImageRequest(imageRequestBuilder.build())
-        .setOldController(mImage.getController())
-        .setControllerListener(new ControllerListener<ImageInfo>() {
-          @Override
-          public void onSubmit(String id, Object callerContext) {
-
-          }
-
-          @Override
-          public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
-            if (mFirstLoadFinishListener != null) {
-              mFirstLoadFinishListener.onCoverFirstLoadFinish();
-              mFirstLoadFinishListener = null;
-            }
-//                        mShadow.setVisibility(View.VISIBLE);
-          }
-
-          @Override
-          public void onIntermediateImageSet(String id, ImageInfo imageInfo) {
-
-          }
-
-          @Override
-          public void onIntermediateImageFailed(String id, Throwable throwable) {
-
-          }
-
-          @Override
-          public void onFailure(String id, Throwable throwable) {
-            if (mFirstLoadFinishListener != null) {
-              mFirstLoadFinishListener.onCoverFirstLoadFinish();
-              mFirstLoadFinishListener = null;
-            }
-//                        mShadow.setVisibility(View.VISIBLE);
-          }
-
-          @Override
-          public void onRelease(String id) {
-
-          }
-        })
-        .build();
-    mImage.setController(controller);
+    mImage.setImageURI(mUri);
+//    ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(mUri);
+//    DraweeController controller = Fresco.newDraweeControllerBuilder()
+//        .setImageRequest(imageRequestBuilder.build())
+//        .setOldController(mImage.getController())
+//        .setControllerListener(new ControllerListener<ImageInfo>() {
+//          @Override
+//          public void onSubmit(String id, Object callerContext) {
+//
+//          }
+//
+//          @Override
+//          public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+////            if (mFirstLoadFinishListener != null) {
+////              mFirstLoadFinishListener.onCoverFirstLoadFinish();
+////              mFirstLoadFinishListener = null;
+////            }
+//          }
+//
+//          @Override
+//          public void onIntermediateImageSet(String id, ImageInfo imageInfo) {
+//
+//          }
+//
+//          @Override
+//          public void onIntermediateImageFailed(String id, Throwable throwable) {
+//
+//          }
+//
+//          @Override
+//          public void onFailure(String id, Throwable throwable) {
+////            if (mFirstLoadFinishListener != null) {
+////              mFirstLoadFinishListener.onCoverFirstLoadFinish();
+////              mFirstLoadFinishListener = null;
+////            }
+//          }
+//
+//          @Override
+//          public void onRelease(String id) {
+//
+//          }
+//        })
+//        .build();
+//    mImage.setController(controller);
   }
 
   /**
@@ -225,7 +224,7 @@ public class CoverFragment extends BaseMusicFragment {
     }
   }
 
-  public void setOnFirstLoadFinishListener(OnCoverFirstLoadFinishListener onFirstLoadFinishListener) {
-    mFirstLoadFinishListener = onFirstLoadFinishListener;
-  }
+//  public void setOnFirstLoadFinishListener(OnCoverFirstLoadFinishListener onFirstLoadFinishListener) {
+//    mFirstLoadFinishListener = onFirstLoadFinishListener;
+//  }
 }
