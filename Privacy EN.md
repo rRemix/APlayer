@@ -94,5 +94,5 @@ APlayer is developed in good faith and for general use. The developer will not b
 
 ## Contact
 
-Contributions to this project are welcomed. Contributions, suggestions or bug reports and fixes can be made by opening an issue or creating pull requests. Read our contributor's guidelines [here]() to get started. 
-If you have any questions about this Privacy Policy, or any other issue relating to the Facebook Event Sync project, please contact us [here](https://github.com/rRemix/APlayer) by opening an [issue](https://github.com/rRemix/APlayer/issues/new). 
+Contributions to this project are welcomed. Contributions, suggestions or bug reports and fixes can be made by opening an issue or creating pull requests. Read our contributor's guidelines [here](https://github.com/rRemix/APlayer/blob/master/Contributing%20EN.md) to get started. 
+If you have any questions about this Privacy Policy, or any other issue relating to APlayer, please contact us [here](https://github.com/rRemix/APlayer) by opening an [issue](https://github.com/rRemix/APlayer/issues/new). 
