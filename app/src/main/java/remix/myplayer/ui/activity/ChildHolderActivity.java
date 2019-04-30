@@ -48,6 +48,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.SPUtil.SETTING_KEY;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -171,20 +172,16 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
   public boolean onCreateOptionsMenu(@NonNull Menu menu) {
     super.onCreateOptionsMenu(menu);
     if (mType == Constants.PLAYLIST) {
-      mSortOrder = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME,
-          SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,
+      mSortOrder = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,
           SortOrder.PlayListSongSortOrder.SONG_A_Z);
     } else if (mType == Constants.ALBUM) {
-      mSortOrder = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME,
-          SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,
+      mSortOrder = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,
           SortOrder.ChildHolderSongSortOrder.SONG_TRACK_NUMBER);
     } else if (mType == Constants.ARTIST) {
-      mSortOrder = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME,
-          SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,
+      mSortOrder = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,
           SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
     } else {
-      mSortOrder = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME,
-          SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,
+      mSortOrder = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,
           SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
     }
     if (TextUtils.isEmpty(mSortOrder)) {
@@ -215,17 +212,13 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
       }
     }
     if (mType == Constants.PLAYLIST) {
-      SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME,
-          SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, sortOrder);
+      SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, sortOrder);
     } else if (mType == Constants.ALBUM) {
-      SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME,
-          SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, sortOrder);
+      SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, sortOrder);
     } else if (mType == Constants.ARTIST) {
-      SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME,
-          SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, sortOrder);
+      SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, sortOrder);
     } else {
-      SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME,
-          SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, sortOrder);
+      SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, sortOrder);
     }
     mSortOrder = sortOrder;
     if (update) {

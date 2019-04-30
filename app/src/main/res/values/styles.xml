@@ -7,6 +7,10 @@
   <style name="Theme.APlayer.Black" parent="@style/Theme.APlayer.Base.Black"/>
 
 
+  <style name="Theme.APlayer.Notification" parent="@android:style/TextAppearance.StatusBar.EventContent" />
+
+  <style name="Theme.APlayer.Notification.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title" />
+
   <!-- Base application theme. -->
 
   <style name="AppTheme" parent="Theme.APlayer">

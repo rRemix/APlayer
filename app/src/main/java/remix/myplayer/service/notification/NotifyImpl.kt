@@ -45,16 +45,20 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     remoteView.setTextViewText(R.id.notify_song, song.title)
     remoteView.setTextViewText(R.id.notify_artist_album, song.artist + " - " + song.album)
 
-    //设置了黑色背景
+    //非系统背景色 即黑色背景
     if (!isSystemColor) {
+      //字体颜色
       remoteBigView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))
       remoteView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))
+      remoteBigView.setTextColor(R.id.notify_artist_album, ColorUtil.getColor(R.color.dark_text_color_secondary))
+      remoteView.setTextColor(R.id.notify_artist_album, ColorUtil.getColor(R.color.dark_text_color_secondary))
       //背景
       remoteBigView.setImageViewResource(R.id.notify_bg, R.drawable.bg_notification_black)
       remoteBigView.setViewVisibility(R.id.notify_bg, View.VISIBLE)
       remoteView.setImageViewResource(R.id.notify_bg, R.drawable.bg_notification_black)
       remoteView.setViewVisibility(R.id.notify_bg, View.VISIBLE)
     }
+
     //桌面歌词
     remoteBigView.setImageViewResource(R.id.notify_lyric,
         if (service.isDesktopLyricLocked) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)

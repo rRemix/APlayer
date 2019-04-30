@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:lines="1"
         android:ellipsize="end"
-        android:textSize="@dimen/s16_size"
+        android:textAppearance="@style/Theme.APlayer.Notification.Title"
         android:layout_marginBottom="@dimen/d5_szie"/>
       <TextView
         style="@android:style/TextAppearance.StatusBar.EventContent"
@@ -46,7 +46,7 @@
         android:layout_height="wrap_content"
         android:lines="1"
         android:ellipsize="end"
-        android:textSize="@dimen/s14_size"/>
+        android:textAppearance="@style/Theme.APlayer.Notification"/>
     </LinearLayout>
 
 

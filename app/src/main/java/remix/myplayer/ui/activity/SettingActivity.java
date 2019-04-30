@@ -923,14 +923,13 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         .items(
             new String[]{getString(R.string.use_system_color), getString(R.string.use_black_color)})
         .itemsCallbackSingleChoice(SPUtil
-                .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR,
-                    true) ? 0 : 1,
+                .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.NOTIFY_SYSTEM_COLOR, true) ? 0 : 1,
             (dialog, view, which, text) -> {
-              SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME,
-                  SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, which == 0);
+              SPUtil.putValue(mContext, SETTING_KEY.NAME,
+                  SETTING_KEY.NOTIFY_SYSTEM_COLOR, which == 0);
               sendLocalBroadcast(new Intent(MusicService.ACTION_CMD)
                   .putExtra("Control", Command.TOGGLE_NOTIFY)
-                  .putExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,
+                  .putExtra(SETTING_KEY.NOTIFY_STYLE_CLASSIC,
                       mNotifyStyleSwitch.isChecked()));
               return true;
             })
@@ -950,7 +949,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN,
                     Constants.APLAYER_LOCKSCREEN),
             (dialog, view, which, text) -> {
-              SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN,
+              SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN,
                   which);
               mLockScreenTip.setText(which == 0 ? R.string.aplayer_lockscreen_tip :
                   which == 1 ? R.string.system_lockscreen_tip : R.string.lockscreen_off_tip);
@@ -966,7 +965,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
    */
   private void configLibraryCategory() {
     String categoryJson = SPUtil
-        .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, "");
+        .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LIBRARY_CATEGORY, "");
 
     List<Category> oldCategories = new Gson()
         .fromJson(categoryJson, new TypeToken<List<Category>>() {
@@ -998,8 +997,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
               if (!newCategories.equals(oldCategories)) {
                 mNeedRefreshLibrary = true;
                 getIntent().putExtra(EXTRA_CATEGORY, newCategories);
-                SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME,
-                    SPUtil.SETTING_KEY.LIBRARY_CATEGORY,
+                SPUtil.putValue(mContext, SETTING_KEY.NAME,
+                    SETTING_KEY.LIBRARY_CATEGORY,
                     new Gson().toJson(newCategories, new TypeToken<List<Category>>() {
                     }.getType()));
               }
@@ -1023,7 +1022,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         .title(R.string.set_filter_size)
         .items(new String[]{"0K", "500K", "1MB", "2MB"})
         .itemsCallbackSingleChoice(position, (dialog, itemView, which, text) -> {
-          SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE,
+          SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE,
               mScanSize[which]);
           MediaStoreUtil.SCAN_SIZE = mScanSize[which];
           getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null);
@@ -1033,7 +1032,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
   private void changeBottomOfPlayingScreen() {
     final int position = SPUtil
-        .getValue(mContext, SPUtil.SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, PlayerActivity.BOTTOM_SHOW_BOTH);
+        .getValue(mContext, SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, PlayerActivity.BOTTOM_SHOW_BOTH);
     getBaseDialog(mContext)
         .title(R.string.show_on_bottom)
         .items(new String[]{getString(R.string.show_next_song_only),
@@ -1042,7 +1041,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             , getString(R.string.close)})
         .itemsCallbackSingleChoice(position, (dialog, itemView, which, text) -> {
           if (position != which) {
-            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, which);
+            SPUtil.putValue(mContext, SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, which);
           }
           return true;
         }).show();

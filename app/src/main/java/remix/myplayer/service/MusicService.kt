@@ -121,7 +121,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   var playModel: Int = PLAY_LOOP
     set(newPlayModel) {
       desktopWidgetTask?.run()
-      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL, newPlayModel)
+      SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL, newPlayModel)
 //      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NEXT_SONG_ID, nextId)
 //      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, currentId)
       if (newPlayModel == PLAY_SHUFFLE) {
@@ -405,7 +405,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
    */
   val isDesktopLyricLocked: Boolean
     get() = if (desktopLyricView == null)
-      SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
+      SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
     else
       desktopLyricView?.isLocked == true
 
@@ -477,7 +477,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     wakeLock.setReferenceCounted(false)
     //通知栏
     notify = if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) and
-        !SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, false)) {
+        !SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.NOTIFY_STYLE_CLASSIC, false)) {
       NotifyImpl24(this)
     } else {
       NotifyImpl(this)
@@ -669,7 +669,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     //查找上次退出时保存的下一首歌曲是否还存在
     //如果不存在，重新设置下一首歌曲
     nextId = SPUtil
-        .getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NEXT_SONG_ID, -1)
+        .getValue(this, SETTING_KEY.NAME, SETTING_KEY.NEXT_SONG_ID, -1)
     if (nextId == -1) {
       nextIndex = currentIndex
       updateNextSong()
@@ -784,7 +784,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   @Synchronized
   fun setPlayQueue(newQueueList: List<Int>?, intent: Intent) {
     //当前模式是随机播放 或者即将设置为随机播放 都要更新mRandomList
-    val shuffle = intent.getBooleanExtra("shuffle", false) || SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL,
+    val shuffle = intent.getBooleanExtra("shuffle", false) || SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL,
         PLAY_LOOP) == PLAY_SHUFFLE
     if (newQueueList == null || newQueueList.isEmpty()) {
       return
@@ -866,8 +866,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     playbackHandler.post {
       //保存当前播放和下一首播放的歌曲的id
       SPUtil
-          .putValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, currentId)
-      SPUtil.putValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NEXT_SONG_ID, nextId)
+          .putValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_SONG_ID, currentId)
+      SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.NEXT_SONG_ID, nextId)
     }
   }
 
@@ -1006,8 +1006,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   inner class WidgetReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-      //            final int skin = SPUtil.getValue(context,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
-      //            SPUtil.putValue(context,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
+      //            final int skin = SPUtil.getValue(context,SETTING_KEY.NAME,SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
+      //            SPUtil.putValue(context,SETTING_KEY.NAME, SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
 
       val name = intent.getStringExtra(BaseAppwidget.EXTRA_WIDGET_NAME)
       val appIds = intent.getIntArrayExtra(BaseAppwidget.EXTRA_WIDGET_IDS)
@@ -1045,8 +1045,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         val appwidgetIntent = Intent(ACTION_CMD)
         val control = commandIntent?.getIntExtra(EXTRA_CONTROL, -1)
         if (control == UPDATE_APPWIDGET) {
-//          int skin = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
-//          SPUtil.putValue(this,SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
+//          int skin = SPUtil.getValue(this,SETTING_KEY.SETTING_,SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
+//          SPUtil.putValue(this,SETTING_KEY.NAME, SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
           updateAppwidget()
         } else {
           appwidgetIntent.putExtra(EXTRA_CONTROL, control)
@@ -1240,8 +1240,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
             intent.getBooleanExtra(EXTRA_DESKTOP_LYRIC, false)
           } else {
             !SPUtil.getValue(service,
-                SPUtil.SETTING_KEY.NAME,
-                SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
+                SETTING_KEY.NAME,
+                SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
           }
           if (open && !FloatWindowManager.getInstance().checkPermission(service)) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
@@ -1255,7 +1255,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
             ToastUtil.show(service, R.string.plz_give_float_permission)
             return
           }
-          SPUtil.putValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW,
+          SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW,
               open)
           if (showDesktopLyric != open) {
             showDesktopLyric = open
@@ -1268,7 +1268,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           }
         }
         Command.TOGGLE_MEDIASESSION ->
-          when (SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)) {
+          when (SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)) {
             APLAYER_LOCKSCREEN, CLOSE_LOCKSCREEN -> cleanMetaData()
             SYSTEM_LOCKSCREEN -> updateMediaSession(Command.NEXT)
           }
@@ -1282,13 +1282,15 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         }
         //切换通知栏样式
         Command.TOGGLE_NOTIFY -> {
-          val classic = intent.getBooleanExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, false)
+          val classic = intent.getBooleanExtra(SETTING_KEY.NOTIFY_STYLE_CLASSIC, false)
           notify = if (classic) {
             NotifyImpl(this@MusicService)
           } else {
             NotifyImpl24(this@MusicService)
           }
           if (Notify.isNotifyShowing) {
+            // 先取消再重新显示 让通知栏彻底刷新一次
+            notify.cancelPlayingNotify()
             updateNotification()
           }
         }
@@ -1297,7 +1299,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           if (desktopLyricView != null) {
             desktopLyricView?.saveLock(false, true)
           } else {
-            SPUtil.putValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
+            SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
           }
           //更新通知栏
           updateNotification()
@@ -1357,9 +1359,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         }
         //断点播放
         Command.PLAY_AT_BREAKPOINT -> {
-          playAtBreakPoint = intent.getBooleanExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, false)
+          playAtBreakPoint = intent.getBooleanExtra(SETTING_KEY.PLAY_AT_BREAKPOINT, false)
           if (!playAtBreakPoint) {
-            SPUtil.putValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS, 0)
+            SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_PLAY_PROGRESS, 0)
             stopSaveProgress()
           } else {
             startSaveProgress()
@@ -1367,11 +1369,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         }
         //切换定时器
         Command.TOGGLE_TIMER -> {
-          val hasDefault = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false)
+          val hasDefault = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.TIMER_DEFAULT, false)
           if (!hasDefault) {
             ToastUtil.show(service, getString(R.string.plz_set_default_time))
           }
-          val time = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1)
+          val time = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.TIMER_DURATION, -1)
           SleepTimer.toggleTimer((time * 1000).toLong())
         }
         //耳机拔出
@@ -1417,7 +1419,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
     val isSmartisan = Build.MANUFACTURER.equals("smartisan", ignoreCase = true)
-    if (!isSmartisan && SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == CLOSE_LOCKSCREEN) {
+    if (!isSmartisan && SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == CLOSE_LOCKSCREEN) {
       mediaSession.setMetadata(null)
       return
     }
@@ -1623,8 +1625,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     //迁移数据
     Migration.migrationDatabase(this)
 
-    val isFirst = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, true)
-    SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, false)
+    val isFirst = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, true)
+    SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, false)
     //读取歌曲id
     allSong.clear()
     allSong.addAll(MediaStoreUtil.getAllSongsId())
@@ -1642,17 +1644,17 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       })
 
       //通知栏样式
-      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,
+      SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.NOTIFY_STYLE_CLASSIC,
           Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
     } else {
       //播放模式
-      playModel = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL,
+      playModel = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL,
           PLAY_LOOP)
       //读取播放列表
       playQueue.clear()
       playQueue.addAll(repository.getPlayQueue().blockingGet())
 
-      showDesktopLyric = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
+      showDesktopLyric = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
     }
 
     if (playQueue.isEmpty()) {
@@ -1661,12 +1663,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
 
     //摇一摇
-    if (SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SHAKE, false)) {
+    if (SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SHAKE, false)) {
       ShakeDetector.getInstance().beginListen()
     }
     //播放倍速
     speed = java.lang.Float.parseFloat(
-        SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED, "1.0"))
+        SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
     restoreLastSong()
     loadFinished = true
     updateUIHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
@@ -1683,8 +1685,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
     //读取上次退出时正在播放的歌曲的id
-    val lastId = SPUtil
-        .getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1)
+    val lastId = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.LAST_SONG_ID, -1)
     //上次退出时正在播放的歌曲是否还存在
     var isLastSongExist = false
     //上次退出时正在播放的歌曲的pos
@@ -1701,9 +1702,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
 
     var item: Song
-    playAtBreakPoint = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, false)
+    playAtBreakPoint = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_AT_BREAKPOINT, false)
     lastProgress = if (playAtBreakPoint)
-      SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS, 0)
+      SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.LAST_PLAY_PROGRESS, 0)
     else
       0
     //上次退出时保存的正在播放的歌曲未失效
@@ -1712,7 +1713,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       setUpDataSource(item, pos)
     } else {
       lastProgress = 0
-      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS, 0)
+      SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.LAST_PLAY_PROGRESS, 0)
       //重新找到一个歌曲id
       var id = playQueue[0]
       for (i in playQueue.indices) {
@@ -1722,7 +1723,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         }
       }
       item = MediaStoreUtil.getSongById(id)
-      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, id)
+      SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.LAST_SONG_ID, id)
       setUpDataSource(item, 0)
     }
   }
@@ -1946,7 +1947,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     param.width = resources.displayMetrics.widthPixels
     param.height = ViewGroup.LayoutParams.WRAP_CONTENT
     param.x = 0
-    param.y = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_Y, 0)
+    param.y = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_Y, 0)
 
     if (desktopLyricView != null) {
       windowManager.removeView(desktopLyricView)
@@ -1975,7 +1976,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
    * 关闭桌面歌词
    */
   private fun closeDesktopLyric() {
-    SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
+    SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
     showDesktopLyric = false
     stopUpdateLyric()
     updateUIHandler.removeMessages(CREATE_DESKTOP_LRC)
@@ -2003,7 +2004,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     override fun run() {
       val progress = progress
       if (progress > 0) {
-        SPUtil.putValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS, progress)
+        SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_PLAY_PROGRESS, progress)
       }
     }
 
@@ -2105,7 +2106,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       if (Intent.ACTION_SCREEN_ON == action) {
         screenOn = true
         //显示锁屏
-        if (isPlay && SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == APLAYER_LOCKSCREEN) {
+        if (isPlay && SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == APLAYER_LOCKSCREEN) {
           context.startActivity(Intent(context, LockScreenActivity::class.java)
               .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         }

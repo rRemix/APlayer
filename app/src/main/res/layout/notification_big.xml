@@ -46,7 +46,6 @@
           android:padding="@dimen/d6_size"
           android:src="@drawable/icon_notify_btn_close_white"/>
         <TextView
-          style="@android:style/TextAppearance.StatusBar.EventContent.Title"
           android:id="@+id/notify_song"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -54,11 +53,10 @@
           android:layout_centerVertical="true"
           android:lines="1"
           android:ellipsize="end"
-          android:textSize="@dimen/s16_size"
+          android:textAppearance="@style/Theme.APlayer.Notification.Title"
           android:layout_toLeftOf="@id/notify_close"/>
       </RelativeLayout>
       <TextView
-        style="@android:style/TextAppearance.StatusBar.EventContent"
         android:id="@+id/notify_artist_album"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -66,7 +64,7 @@
         android:layout_marginBottom="@dimen/d12_size"
         android:lines="1"
         android:ellipsize="end"
-        android:textSize="@dimen/s14_size"/>
+        android:textAppearance="@style/Theme.APlayer.Notification"/>
 
       <!--三个控制按钮-->
       <LinearLayout

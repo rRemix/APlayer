@@ -11,6 +11,7 @@ import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.SPUtil.SETTING_KEY;
 
 /**
  * @ClassName
@@ -34,7 +35,7 @@ public class ThemeStore {
   public static int STATUS_BAR_ALPHA = 150;
 
   public static boolean IMMERSIVE_MODE = SPUtil
-      .getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.IMMERSIVE_MODE,
+      .getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.IMMERSIVE_MODE,
           false);
 
 
@@ -78,12 +79,12 @@ public class ThemeStore {
     }
   }
 
-  public static int getHighLightTextColor(){
+  public static int getHighLightTextColor() {
     int primaryColor = getMaterialPrimaryColor();
     if (ColorUtil.isColorCloseToWhite(primaryColor) && isLightTheme()) {
       primaryColor = ColorUtil.getColor(R.color.accent_gray_color);
     }
-    if(ColorUtil.isColorCloseToBlack(primaryColor) && isBlackTheme()){
+    if (ColorUtil.isColorCloseToBlack(primaryColor) && isBlackTheme()) {
       primaryColor = getTextColorPrimary();
     }
     return primaryColor;
