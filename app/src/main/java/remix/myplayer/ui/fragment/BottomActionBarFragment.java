@@ -6,17 +6,13 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -28,7 +24,6 @@ import java.lang.ref.WeakReference;
 import org.jetbrains.annotations.NotNull;
 import remix.myplayer.App;
 import remix.myplayer.R;
-import remix.myplayer.bean.misc.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.menu.CtrlButtonListener;
@@ -125,6 +120,12 @@ public class BottomActionBarFragment extends BaseMusicFragment {
   public void onMetaChanged() {
     super.onMetaChanged();
     updateSong();
+  }
+
+  @Override
+  public void onMediaStoreChanged() {
+    super.onMediaStoreChanged();
+    onMetaChanged();
   }
 
   @Override

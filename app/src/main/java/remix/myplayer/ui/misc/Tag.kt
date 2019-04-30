@@ -19,13 +19,15 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.misc.tageditor.TagEditor
-import remix.myplayer.misc.tageditor.TagReceiver
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.Command
+import remix.myplayer.service.MusicService
 import remix.myplayer.theme.TextInputLayoutUtil
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.theme.TintHelper
+import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_NEW_SONG
+import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_OLD_SONG
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import remix.myplayer.util.Util.sendCMDLocalBroadcast
@@ -110,13 +112,16 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
               return@onPositive
             }
 
+            val oldSong = song
             tagEditor.save(song, title, album, artist, year, genre, track, "")
                 .compose(RxUtil.applyScheduler())
                 .subscribe({ song ->
                   sendCMDLocalBroadcast(Command.CHANGE_LYRIC)
-                  sendLocalBroadcast(Intent(TagReceiver.ACTION_EDIT_TAG)
-                      .putExtra("newSong", song))
-//                                    setCurrentSong(song)
+//                  sendLocalBroadcast(Intent(TagReceiver.ACTION_EDIT_TAG)
+//                      .putExtra(EXTRA_NEW_SONG, song))
+                  sendLocalBroadcast(Intent(MusicService.TAG_CHANGE)
+                      .putExtra(EXTRA_NEW_SONG, song)
+                      .putExtra(EXTRA_OLD_SONG, oldSong))
                   ToastUtil.show(this, R.string.save_success)
                 }, { throwable -> ToastUtil.show(this, R.string.save_error_arg, throwable.toString()) })
           }

@@ -108,6 +108,7 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
 
   @Override
   public void onMetaChanged() {
+    super.onMetaChanged();
     if (mAdapter != null) {
       mAdapter.updatePlayingSong();
     }

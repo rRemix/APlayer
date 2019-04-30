@@ -3,17 +3,15 @@ package remix.myplayer.ui.activity;
 import static remix.myplayer.helper.MusicServiceRemote.setPlayQueue;
 import static remix.myplayer.service.MusicService.EXTRA_POSITION;
 import static remix.myplayer.util.MusicUtil.makeCmdIntent;
-import static remix.myplayer.util.Util.registerLocalReceiver;
-import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.Loader;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -23,7 +21,6 @@ import android.view.View;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.facebook.drawee.backends.pipeline.Fresco;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Function;
 import java.lang.ref.WeakReference;
@@ -34,15 +31,13 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.db.room.model.PlayList;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
-import remix.myplayer.misc.interfaces.OnTagEditListener;
-import remix.myplayer.misc.tageditor.TagReceiver;
-import remix.myplayer.request.UriRequest;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
@@ -51,7 +46,6 @@ import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -63,15 +57,13 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 专辑、艺术家、文件夹、播放列表详情
  */
-public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapter>
-    implements OnTagEditListener {
+public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapter> {
 
   public final static String TAG = ChildHolderActivity.class.getSimpleName();
   //获得歌曲信息列表的参数
   private int mId;
   private int mType;
   private String mArg;
-  private TagReceiver mTagEditReceiver;
 
   //歌曲数目与标题
   @BindView(R.id.childholder_item_num)
@@ -95,8 +87,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     ButterKnife.bind(this);
 
     mRefreshHandler = new MsgHandler(this);
-    mTagEditReceiver = new TagReceiver(this);
-    registerLocalReceiver(mTagEditReceiver, new IntentFilter(TagReceiver.ACTION_EDIT_TAG));
 
     //参数id，类型，标题
     mId = getIntent().getIntExtra(EXTRA_ID, -1);
@@ -271,20 +261,19 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     }
   }
 
-  public void onTagEdit(Song newSong) {
-    if (newSong == null) {
-      return;
-    }
-    Fresco.getImagePipeline().clearCaches();
-    final UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(newSong);
-    SPUtil.deleteValue(mContext, SPUtil.COVER_KEY.NAME, request.getLastFMKey());
-    SPUtil.deleteValue(mContext, SPUtil.COVER_KEY.NAME, request.getNeteaseCacheKey());
-    if (mType == Constants.ARTIST || mType == Constants.ALBUM) {
-      mId = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
-      Title = mType == Constants.ARTIST ? newSong.getArtist() : newSong.getAlbum();
-      mToolBar.setTitle(Title);
-      onMediaStoreChanged();
-    }
+  @Override
+  public void onMediaStoreChanged() {
+    super.onMediaStoreChanged();
+  }
+
+  @Override
+  public void onTagChanged(@NotNull Song oldSong, @NotNull Song newSong) {
+    super.onTagChanged(oldSong, newSong);
+//    if (mType == Constants.ARTIST || mType == Constants.ALBUM) {
+//      mId = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
+//      Title = mType == Constants.ARTIST ? newSong.getArtist() : newSong.getAlbum();
+//      mToolBar.setTitle(Title);
+//    }
   }
 
   /**
@@ -321,26 +310,15 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
   }
 
   @Override
-  protected void onPause() {
-    super.onPause();
-  }
-
-  @Override
-  protected void onResume() {
-    super.onResume();
-  }
-
-  @Override
   protected void onDestroy() {
     super.onDestroy();
     mRefreshHandler.remove();
-    unregisterLocalReceiver(mTagEditReceiver);
   }
 
   @OnHandleMessage
   public void handleInternal(Message msg) {
     switch (msg.what) {
-      case CLEAR_MULTI:
+      case MSG_RESET_MULTI:
         mAdapter.notifyDataSetChanged();
         break;
 //            case START:

@@ -1,7 +1,6 @@
 package remix.myplayer.ui.activity;
 
 import static remix.myplayer.misc.ExtKt.isPortraitOrientation;
-import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.service.MusicService.EXTRA_CONTROL;
 import static remix.myplayer.theme.ThemeStore.getAccentColor;
 import static remix.myplayer.theme.ThemeStore.getPlayerNextSongBgColor;
@@ -12,16 +11,13 @@ import static remix.myplayer.util.Constants.PLAY_REPEAT;
 import static remix.myplayer.util.Constants.PLAY_SHUFFLE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
-import static remix.myplayer.util.Util.registerLocalReceiver;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
 import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
@@ -37,7 +33,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.PopupMenu;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -48,7 +43,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -58,14 +52,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.drawable.ScalingUtils;
-import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.facebook.rebound.SimpleSpringListener;
-import com.facebook.rebound.Spring;
-import com.facebook.rebound.SpringConfig;
-import com.facebook.rebound.SpringSystem;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -75,21 +62,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
-import remix.myplayer.App;
 import remix.myplayer.R;
-import remix.myplayer.bean.misc.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
-import remix.myplayer.misc.interfaces.OnTagEditListener;
 import remix.myplayer.misc.menu.AudioPopupListener;
-import remix.myplayer.misc.tageditor.TagReceiver;
 import remix.myplayer.request.ImageUriRequest;
-import remix.myplayer.request.LibraryUriRequest;
-import remix.myplayer.request.RequestConfig;
-import remix.myplayer.request.UriRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
@@ -107,7 +87,6 @@ import remix.myplayer.ui.widget.AudioViewPager;
 import remix.myplayer.ui.widget.playpause.PlayPauseView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
@@ -120,8 +99,7 @@ import remix.myplayer.util.Util;
 /**
  * 播放界面
  */
-public class PlayerActivity extends BaseMusicActivity implements FileChooserDialog.FileCallback,
-    OnTagEditListener {
+public class PlayerActivity extends BaseMusicActivity implements FileChooserDialog.FileCallback {
 
   private static final String TAG = "PlayerActivity";
 //  public static final String EXTRA_SHOW_ANIMATION = "ShowAnimation";
@@ -284,7 +262,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer, false));
   };
 
-  private TagReceiver mTagReceiver;
 
   @Override
   protected void setUpTheme() {
@@ -342,8 +319,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     ButterKnife.bind(this);
 
     mHandler = new MsgHandler(this);
-    mTagReceiver = new TagReceiver(this);
-    registerLocalReceiver(mTagReceiver, new IntentFilter(TagReceiver.ACTION_EDIT_TAG));
 
 //    mShowAnimation = getIntent().getBooleanExtra(EXTRA_SHOW_ANIMATION,false);
     mInfo = MusicServiceRemote.getCurrentSong();
@@ -1072,6 +1047,16 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //    });
   }
 
+  @Override
+  public void onMediaStoreChanged() {
+    super.onMediaStoreChanged();
+
+    final Song newSong = MusicServiceRemote.getCurrentSong();
+    updateTopStatus(newSong);
+    mLyricFragment.updateLrc(newSong);
+    mInfo = newSong;
+    requestCover(false);
+  }
 
   @Override
   public void onMetaChanged() {
@@ -1331,7 +1316,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     super.onDestroy();
     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     mHandler.remove();
-    unregisterLocalReceiver(mTagReceiver);
   }
 
   /**
@@ -1396,20 +1380,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
   public LyricFragment getLyricFragment() {
     return mLyricFragment;
-  }
-
-  @Override
-  public void onTagEdit(Song newSong) {
-    if (newSong != null) {
-      updateTopStatus(newSong);
-      mLyricFragment.updateLrc(newSong, true);
-      Fresco.getImagePipeline().clearCaches();
-      final UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(mInfo);
-      SPUtil.deleteValue(mContext, SPUtil.COVER_KEY.NAME, request.getLastFMKey());
-      SPUtil.deleteValue(mContext, SPUtil.COVER_KEY.NAME, request.getNeteaseCacheKey());
-      mInfo = newSong;
-      requestCover(false);
-    }
   }
 
   public void showLyricOffsetView() {

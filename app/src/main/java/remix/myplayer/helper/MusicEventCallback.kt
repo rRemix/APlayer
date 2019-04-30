@@ -1,5 +1,6 @@
 package remix.myplayer.helper
 
+import remix.myplayer.bean.mp3.Song
 import remix.myplayer.service.MusicService
 
 interface MusicEventCallback {
@@ -16,4 +17,6 @@ interface MusicEventCallback {
   fun onPlayStateChange()
 
   fun onServiceDisConnected()
+
+  fun onTagChanged(oldSong: Song, newSong: Song)
 }

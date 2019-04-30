@@ -11,10 +11,14 @@ import android.os.Message
 import android.text.TextUtils
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.soundcloud.android.crop.Crop
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
+import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.misc.cache.DiskCache
@@ -79,7 +83,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
     super.onDestroy()
     Timber.tag(TAG).v("onDestroy")
     MusicServiceRemote.unbindFromService(serviceToken)
-    mMusicStateHandler?.removeCallbacksAndMessages(null)
+    musicStateHandler?.removeCallbacksAndMessages(null)
     if (receiverRegistered) {
       unregisterLocalReceiver(musicStateReceiver)
       receiverRegistered = true
@@ -153,6 +157,13 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
     }
   }
 
+  override fun onTagChanged(oldSong: Song, newSong: Song) {
+    Timber.tag(TAG).v("onTagChanged")
+    for (listener in serviceEventListeners) {
+      listener.onTagChanged(oldSong, newSong)
+    }
+  }
+
   override fun onServiceConnected(service: MusicService) {
     Timber.tag(TAG).v("onServiceConnected(), $service")
     if (!receiverRegistered) {
@@ -163,13 +174,14 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
       filter.addAction(MusicService.MEDIA_STORE_CHANGE)
       filter.addAction(MusicService.META_CHANGE)
       filter.addAction(MusicService.PLAY_STATE_CHANGE)
+      filter.addAction(MusicService.TAG_CHANGE)
       registerLocalReceiver(musicStateReceiver, filter)
       receiverRegistered = true
     }
     for (listener in serviceEventListeners) {
       listener.onServiceConnected(service)
     }
-    mMusicStateHandler = MusicStateHandler(this)
+    musicStateHandler = MusicStateHandler(this)
   }
 
   override fun onServiceDisConnected() {
@@ -180,17 +192,17 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
     for (listener in serviceEventListeners) {
       listener.onServiceDisConnected()
     }
-    mMusicStateHandler?.removeCallbacksAndMessages(null)
+    musicStateHandler?.removeCallbacksAndMessages(null)
   }
 
-  private var mMusicStateHandler: MusicStateHandler? = null
+  private var musicStateHandler: MusicStateHandler? = null
 
   private class MusicStateHandler(activity: BaseMusicActivity) : Handler() {
-    private val mRef: WeakReference<BaseMusicActivity> = WeakReference(activity)
+    private val ref: WeakReference<BaseMusicActivity> = WeakReference(activity)
 
     override fun handleMessage(msg: Message?) {
       val action = msg?.obj?.toString()
-      val activity = mRef.get()
+      val activity = ref.get()
       if (action != null && activity != null) {
         when (action) {
           MusicService.MEDIA_STORE_CHANGE -> {
@@ -208,6 +220,14 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
           MusicService.PLAY_STATE_CHANGE -> {
             activity.onPlayStateChange()
           }
+          MusicService.TAG_CHANGE -> {
+            val newSong = msg.data.getParcelable<Song?>(EXTRA_NEW_SONG)
+            val oldSong = msg.data.getParcelable<Song?>(EXTRA_OLD_SONG)
+
+            if (newSong != null && oldSong != null) {
+              activity.onTagChanged(oldSong, newSong)
+            }
+          }
         }
       }
 
@@ -215,17 +235,16 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   private class MusicStateReceiver(activity: BaseMusicActivity) : BroadcastReceiver() {
-    private val mRef: WeakReference<BaseMusicActivity> = WeakReference(activity)
+    private val ref: WeakReference<BaseMusicActivity> = WeakReference(activity)
 
     override fun onReceive(context: Context, intent: Intent) {
-      mRef.get()?.mMusicStateHandler?.let {
+      ref.get()?.musicStateHandler?.let {
         val action = intent.action
         val msg = it.obtainMessage(action.hashCode())
         msg.obj = action
-        msg.data.putString(EXTRA_PLAYLIST, intent.getStringExtra(EXTRA_PLAYLIST))
-        msg.data.putBoolean(EXTRA_PERMISSION, intent.getBooleanExtra(EXTRA_PERMISSION, false))
+        msg.data = intent.extras
         it.removeMessages(msg.what)
-        it.sendMessageDelayed(msg, 200)
+        it.sendMessageDelayed(msg, 50)
       }
 //            if (activity != null && action != null) {
 //                when (action) {
@@ -248,6 +267,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
 //            }
     }
   }
+
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
@@ -298,23 +318,27 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
           }
           Observable
               .create(ObservableOnSubscribe<Uri> { emitter ->
-                //获取以前的图片
-                if (customCover.type == Constants.ALBUM) {
-                  object : SimpleUriRequest(getSearchRequestWithAlbumType(
-                      MediaStoreUtil.getSongByAlbumId(customCover.id))) {
-                    override fun onError(throwable: Throwable) {
-                      emitter.onError(throwable)
-                    }
-
-                    override fun onSuccess(result: Uri?) {
-                      emitter.onNext(result!!)
-                      emitter.onComplete()
-                    }
-                  }.load()
-                } else {
-                  emitter.onNext(Uri.parse("file://$path"))
-                  emitter.onComplete()
-                }
+                //                //获取以前的图片
+//                if (customCover.type == Constants.ALBUM) {
+//                  object : SimpleUriRequest(getSearchRequestWithAlbumType(
+//                      MediaStoreUtil.getSongByAlbumId(customCover.id))) {
+//                    override fun onError(throwable: Throwable) {
+//                      emitter.onError(throwable)
+//                    }
+//
+//                    override fun onSuccess(result: String?) {
+//                      if (!result.isNullOrBlank()) {
+//                        emitter.onNext(Uri.parse(result))
+//                      }
+//                      emitter.onComplete()
+//                    }
+//                  }.load()
+//                } else {
+//                  emitter.onNext(Uri.parse("file://$path"))
+//                  emitter.onComplete()
+//                }
+                emitter.onNext(Uri.EMPTY)
+                emitter.onComplete()
               })
               .doOnSubscribe {
                 //如果设置的是专辑封面 修改内嵌封面
@@ -328,8 +352,10 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
               }
               .subscribe({ uri ->
                 val imagePipeline = Fresco.getImagePipeline()
-                imagePipeline.evictFromCache(uri)
-                imagePipeline.evictFromDiskCache(uri)
+                imagePipeline.clearCaches()
+//                imagePipeline.evictFromCache(uri)
+//                imagePipeline.evictFromDiskCache(uri)
+
               }, { throwable -> ToastUtil.show(mContext, R.string.save_error, throwable.toString()) })
         }
       }
@@ -339,13 +365,14 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   companion object {
     const val EXTRA_PLAYLIST = "extra_playlist"
     const val EXTRA_PERMISSION = "extra_permission"
-
+    const val EXTRA_NEW_SONG = "extra_new_song"
+    const val EXTRA_OLD_SONG = "extra_old_song"
 
     //更新适配器
-    const val UPDATE_ADAPTER = 100
+    const val MSG_UPDATE_ADAPTER = 100
     //多选更新
-    const val CLEAR_MULTI = 101
+    const val MSG_RESET_MULTI = 101
     //重建activity
-    const val RECREATE_ACTIVITY = 102
+    const val MSG_RECREATE_ACTIVITY = 102
   }
 }

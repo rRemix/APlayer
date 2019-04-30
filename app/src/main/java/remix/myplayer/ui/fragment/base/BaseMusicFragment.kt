@@ -3,6 +3,7 @@ package remix.myplayer.ui.fragment.base
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicEventCallback
 
 import remix.myplayer.service.MusicService
@@ -54,6 +55,10 @@ open class BaseMusicFragment : BaseFragment(), MusicEventCallback {
   }
 
   override fun onPlayStateChange() {
+  }
+
+  override fun onTagChanged(oldSong: Song, newSong: Song) {
+
   }
 
   override fun onServiceConnected(service: MusicService) {}

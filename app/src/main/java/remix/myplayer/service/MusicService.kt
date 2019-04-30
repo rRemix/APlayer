@@ -61,6 +61,7 @@ import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24
 import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS
+import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
 import remix.myplayer.ui.widget.desktop.DesktopLyricView
@@ -495,6 +496,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     eventFilter.addAction(MEDIA_STORE_CHANGE)
     eventFilter.addAction(PERMISSION_CHANGE)
     eventFilter.addAction(PLAYLIST_CHANGE)
+    eventFilter.addAction(TAG_CHANGE)
     registerLocalReceiver(musicEventReceiver, eventFilter)
 
     registerLocalReceiver(controlReceiver, IntentFilter(ACTION_CMD))
@@ -940,7 +942,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   }
 
   override fun onMediaStoreChanged() {
-
+    val song = MediaStoreUtil.getSongById(currentId)
+    currentSong = song
+    currentId = song.id
   }
 
   override fun onPermissionChanged(has: Boolean) {
@@ -948,6 +952,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       hasPermission = true
       loadSync()
     }
+  }
+
+  override fun onTagChanged(oldSong: Song, newSong: Song) {
+//    // 改变的歌曲是当前播放的
+//    if (oldSong.id == currentSong.id) {
+//      currentSong = newSong
+//      currentId = newSong.id
+//    }
   }
 
   override fun onPlayListChanged(name: String) {
@@ -1095,6 +1107,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       MEDIA_STORE_CHANGE == action -> onMediaStoreChanged()
       PERMISSION_CHANGE == action -> onPermissionChanged(intent.getBooleanExtra(EXTRA_PERMISSION, false))
       PLAYLIST_CHANGE == action -> onPlayListChanged(intent.getStringExtra(EXTRA_PLAYLIST))
+      TAG_CHANGE == action -> {
+        val newSong = intent.getParcelableExtra<Song?>(BaseMusicActivity.EXTRA_NEW_SONG)
+        val oldSong = intent.getParcelableExtra<Song?>(BaseMusicActivity.EXTRA_OLD_SONG)
+        if (newSong != null && oldSong != null) {
+          onTagChanged(oldSong, newSong)
+        }
+      }
     }
   }
 
@@ -2135,6 +2154,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     const val META_CHANGE = "$APLAYER_PACKAGE_NAME.meta.change"
     //播放状态变化
     const val PLAY_STATE_CHANGE = "$APLAYER_PACKAGE_NAME.play_state.change"
+    //歌曲标签变化
+    const val TAG_CHANGE = "$APLAYER_PACKAGE_NAME.tag_change"
 
     const val EXTRA_CONTROL = "Control"
     const val ACTION_APPWIDGET_OPERATE = "$APLAYER_PACKAGE_NAME.appwidget.operate"

@@ -58,6 +58,7 @@ import org.jetbrains.annotations.NotNull;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.Category;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
@@ -521,8 +522,10 @@ public class MainActivity extends MenuActivity {
 
   @Override
   public void onMediaStoreChanged() {
+    clearUriCache();
     super.onMediaStoreChanged();
-    mRefreshHandler.sendEmptyMessage(UPDATE_ADAPTER);
+    onMetaChanged();
+//    mRefreshHandler.sendEmptyMessage(MSG_UPDATE_ADAPTER);
   }
 
   @SuppressLint("CheckResult")
@@ -535,10 +538,10 @@ public class MainActivity extends MenuActivity {
           return;
         }
         if (data.getBooleanExtra(EXTRA_RECREATE, false)) { //设置后需要重启activity
-          mRefreshHandler.sendEmptyMessage(RECREATE_ACTIVITY);
+          mRefreshHandler.sendEmptyMessage(MSG_RECREATE_ACTIVITY);
         } else if (data.getBooleanExtra(EXTRA_REFRESH_ADAPTER, false)) { //刷新adapter
           clearUriCache();
-          mRefreshHandler.sendEmptyMessage(UPDATE_ADAPTER);
+          mRefreshHandler.sendEmptyMessage(MSG_UPDATE_ADAPTER);
         } else if (data.getBooleanExtra(EXTRA_REFRESH_LIBRARY, false)) { //刷新Library
           List<Category> categories = (List<Category>) data.getSerializableExtra(EXTRA_CATEGORY);
           if (categories != null && categories.size() > 0) {
@@ -612,7 +615,6 @@ public class MainActivity extends MenuActivity {
   }
 
   private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 108);
-
   @Override
   public void onMetaChanged() {
     super.onMetaChanged();
@@ -636,15 +638,15 @@ public class MainActivity extends MenuActivity {
 
   @OnHandleMessage
   public void handleInternal(Message msg) {
-    if (msg.what == RECREATE_ACTIVITY) {
+    if (msg.what == MSG_RECREATE_ACTIVITY) {
       recreate();
-    } else if (msg.what == CLEAR_MULTI) {
+    } else if (msg.what == MSG_RESET_MULTI) {
       for (Fragment temp : getSupportFragmentManager().getFragments()) {
         if (temp instanceof LibraryFragment) {
           ((LibraryFragment) temp).getAdapter().notifyDataSetChanged();
         }
       }
-    } else if (msg.what == UPDATE_ADAPTER) {
+    } else if (msg.what == MSG_UPDATE_ADAPTER) {
       //刷新适配器
       for (Fragment temp : getSupportFragmentManager().getFragments()) {
         if (temp instanceof LibraryFragment) {

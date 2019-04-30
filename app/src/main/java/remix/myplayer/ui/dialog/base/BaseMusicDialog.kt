@@ -3,6 +3,7 @@ package remix.myplayer.ui.dialog.base
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS
@@ -58,6 +59,10 @@ open class BaseMusicDialog : BaseDialog(), MusicEventCallback {
   }
 
   override fun onMetaChanged() {
+  }
+
+  override fun onTagChanged(oldSong: Song, newSong: Song) {
+
   }
 
   override fun onPlayStateChange() {
