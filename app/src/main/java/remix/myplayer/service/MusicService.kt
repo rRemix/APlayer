@@ -680,9 +680,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         randomQueue.indexOf(nextId)
       nextSong = MediaStoreUtil.getSongById(nextId)
       if (nextSong == EMPTY_SONG) {
-        return
+        updateNextSong()
       }
-      updateNextSong()
     }
   }
 
@@ -719,9 +718,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
 
     unregisterLocalReceiver(controlReceiver)
     unregisterLocalReceiver(musicEventReceiver)
-    Util.unregisterReceiver(this, headSetReceiver)
-    Util.unregisterReceiver(this, screenReceiver)
-    Util.unregisterReceiver(this, widgetReceiver)
+    unregisterReceiver(this, headSetReceiver)
+    unregisterReceiver(this, screenReceiver)
+    unregisterReceiver(this, widgetReceiver)
 
     releaseWakeLock()
     contentResolver.unregisterContentObserver(mediaStoreObserver)
@@ -732,16 +731,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   }
 
   private fun closeAudioEffectSession() {
-    val audioEffectsIntent = Intent(
-        AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
+    val audioEffectsIntent = Intent(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
     audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mediaPlayer.audioSessionId)
     audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
     sendBroadcast(audioEffectsIntent)
   }
 
   private fun openAudioEffectSession() {
-    val audioEffectsIntent = Intent(
-        AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION)
+    val audioEffectsIntent = Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION)
     audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mediaPlayer.audioSessionId)
     audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
     sendBroadcast(audioEffectsIntent)
