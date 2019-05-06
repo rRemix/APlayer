@@ -32,8 +32,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 1522
-        versionName "1.5.2.2-debug"
+        versionCode 1530
+        versionName "1.5.3.0-debug"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
@@ -209,6 +209,8 @@ dependencies {
 
     //bugly
     implementation 'com.tencent.bugly:crashreport:2.8.6.0'
+
+    //gp
     implementation 'com.anjlab.android.iab.v3:library:1.0.44'
 
     //room

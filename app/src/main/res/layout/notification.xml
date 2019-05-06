@@ -31,7 +31,6 @@
       android:orientation="vertical"
       android:gravity="center_vertical">
       <TextView
-        style="@android:style/TextAppearance.StatusBar.EventContent.Title"
         android:id="@+id/notify_song"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,7 +39,6 @@
         android:textAppearance="@style/Theme.APlayer.Notification.Title"
         android:layout_marginBottom="@dimen/d5_szie"/>
       <TextView
-        style="@android:style/TextAppearance.StatusBar.EventContent"
         android:id="@+id/notify_artist_album"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -63,14 +61,16 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
-        android:src="@drawable/icon_notify_play"/>
+        android:src="@drawable/icon_notify_play"
+        android:tint="@color/ate_secondary_text_light"/>
       <ImageButton
         android:id="@+id/notify_next"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
-        android:src="@drawable/icon_notify_next"/>
+        android:src="@drawable/icon_notify_next"
+        android:tint="@color/ate_secondary_text_light"/>
 
       <ImageButton
         android:layout_weight="1"

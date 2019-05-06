@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <style name="Theme.APlayer.Notification" parent="@android:style/TextAppearance.Material.Notification" />
+  <style name="Theme.APlayer.Notification.Title" parent="TextAppearance.Compat.Notification.Title" />
+  <style name="Theme.APlayer.Notification" parent="TextAppearance.Compat.Notification" />
 
-  <style name="Theme.APlayer.Notification.Title" parent="@android:style/TextAppearance.Material.Notification.Title" />
+
 </resources>

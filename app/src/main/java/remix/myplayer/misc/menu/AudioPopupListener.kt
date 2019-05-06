@@ -19,12 +19,11 @@ import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme.getBaseDialog
-import remix.myplayer.ui.misc.Tag
-import remix.myplayer.ui.activity.EQActivity
 import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.ui.dialog.FileChooserDialog
 import remix.myplayer.ui.dialog.TimerDialog
+import remix.myplayer.ui.misc.Tag
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
@@ -111,14 +110,13 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
         TimerDialog.newInstance().show(fm, TimerDialog::class.java.simpleName)
       }
       R.id.menu_eq -> {
-        val audioEffectIntent = Intent(
-            AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
-        audioEffectIntent
-            .putExtra(AudioEffect.EXTRA_AUDIO_SESSION, getMediaPlayer()!!.getAudioSessionId())
+        val audioEffectIntent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
+        val audioSessionId = getMediaPlayer()?.audioSessionId
+        audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
         if (Util.isIntentAvailable(activity, audioEffectIntent)) {
           activity.startActivityForResult(audioEffectIntent, 0)
         } else {
-          activity.startActivity(Intent(activity, EQActivity::class.java))
+          ToastUtil.show(activity, R.string.no_equalizer)
         }
       }
       R.id.menu_collect -> {

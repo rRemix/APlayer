@@ -3,9 +3,13 @@ package remix.myplayer.service.notification
 import android.app.Notification
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.support.v4.app.NotificationCompat
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.RemoteViews
+import android.widget.TextView
 import remix.myplayer.R
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
@@ -17,6 +21,7 @@ import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import remix.myplayer.util.SPUtil
 import timber.log.Timber
 
+
 /**
  * Created by Remix on 2017/11/22.
  */
@@ -24,6 +29,24 @@ import timber.log.Timber
 class NotifyImpl(context: MusicService) : Notify(context) {
   private lateinit var remoteView: RemoteViews
   private lateinit var remoteBigView: RemoteViews
+
+  private var titleColor: Int? = null
+  private var textColor: Int? = null
+
+  init {
+    try {
+      val linearLayout = LayoutInflater.from(context).inflate(R.layout.notification_big, null)
+
+      val titleView = linearLayout.findViewById<TextView>(R.id.notify_song)
+      val textView = linearLayout.findViewById<TextView>(R.id.notify_artist_album)
+
+      titleColor = titleView.textColors.defaultColor
+      textColor = textView.textColors.defaultColor
+    } catch (e: Exception) {
+      Timber.w(e)
+    }
+  }
+
 
   override fun updateForPlaying() {
     isStop = false
@@ -102,7 +125,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
   }
 
   private fun buildNotification(context: Context): Notification {
-    val builder = NotificationCompat.Builder(context, Notify.PLAYING_NOTIFICATION_CHANNEL_ID)
+    val builder = NotificationCompat.Builder(context, PLAYING_NOTIFICATION_CHANNEL_ID)
     builder.setContent(remoteView)
         .setCustomBigContentView(remoteBigView)
         .setContentText("")
@@ -141,6 +164,27 @@ class NotifyImpl(context: MusicService) : Notify(context) {
         if (service.isDesktopLyricLocked) Command.UNLOCK_DESKTOP_LYRIC else Command.TOGGLE_DESKTOP_LYRIC)
     remoteBigView.setOnClickPendingIntent(R.id.notify_lyric, lyricIntent)
     remoteView.setOnClickPendingIntent(R.id.notify_lyric, lyricIntent)
+  }
+
+  private fun tintBitmap(resId: Int, color: Int?): Bitmap {
+    val bitmap = BitmapFactory.decodeResource(service.resources, resId)
+    return replaceBitmapColor(bitmap, color ?: return bitmap)
+  }
+
+  private fun replaceBitmapColor(oldBitmap: Bitmap, newColor: Int): Bitmap {
+    val copy = oldBitmap.copy(Bitmap.Config.ARGB_8888, true)
+    //循环获得bitmap所有像素点
+    val width = copy.width
+    val height = copy.height
+    for (i in 0 until height) {
+      for (j in 0 until width) {
+        val color = copy.getPixel(j, i)
+        if (color != Color.TRANSPARENT) {
+          copy.setPixel(j, i, newColor)  //替换
+        }
+      }
+    }
+    return copy
   }
 
 }

@@ -82,7 +82,7 @@ public class ThemeStore {
   public static int getHighLightTextColor() {
     int primaryColor = getMaterialPrimaryColor();
     if (ColorUtil.isColorCloseToWhite(primaryColor) && isLightTheme()) {
-      primaryColor = ColorUtil.getColor(R.color.accent_gray_color);
+      primaryColor = getTextColorPrimary();
     }
     if (ColorUtil.isColorCloseToBlack(primaryColor) && isBlackTheme()) {
       primaryColor = getTextColorPrimary();

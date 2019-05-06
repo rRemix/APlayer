@@ -96,6 +96,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     if (mId == -1 || mType == -1 || TextUtils.isEmpty(mArg)) {
       ToastUtil.show(this, R.string.illegal_arg);
       finish();
+      return;
     }
 
     mChoice = new MultipleChoice<>(this,
