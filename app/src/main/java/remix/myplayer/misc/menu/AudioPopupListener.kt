@@ -2,7 +2,6 @@ package remix.myplayer.misc.menu
 
 import android.content.ContextWrapper
 import android.content.Intent
-import android.media.audiofx.AudioEffect
 import android.support.v7.widget.PopupMenu
 import android.view.MenuItem
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
@@ -12,9 +11,9 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
+import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
-import remix.myplayer.helper.MusicServiceRemote.getMediaPlayer
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -110,14 +109,7 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
         TimerDialog.newInstance().show(fm, TimerDialog::class.java.simpleName)
       }
       R.id.menu_eq -> {
-        val audioEffectIntent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
-        val audioSessionId = getMediaPlayer()?.audioSessionId
-        audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
-        if (Util.isIntentAvailable(activity, audioEffectIntent)) {
-          activity.startActivityForResult(audioEffectIntent, 0)
-        } else {
-          ToastUtil.show(activity, R.string.no_equalizer)
-        }
+        EQHelper.startEqualizer(activity)
       }
       R.id.menu_collect -> {
         DatabaseRepository.getInstance()

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
   android:layout_width="match_parent"
-  android:layout_height="match_parent">
+  android:layout_height="match_parent"
+  android:orientation="vertical">
 
   <android.support.design.widget.AppBarLayout
     android:layout_width="match_parent"
@@ -24,45 +24,77 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content">
       <LinearLayout
+        android:id="@+id/eq_anchor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_centerVertical="true"
         android:layout_marginTop="@dimen/d10_size"
         android:layout_marginBottom="@dimen/d10_size"
         android:layout_marginLeft="@dimen/d16_size"
-        android:id="@+id/eq_anchor">
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
         <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:layout_marginBottom="@dimen/d6_size"
           android:text="@string/use_eq"
           android:textColor="?attr/text_color_secondary"
-          android:textSize="@dimen/s14_size"
-          android:layout_marginBottom="@dimen/d6_size"/>
-        <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:textColor="?attr/text_color_secondary"
-          android:textSize="@dimen/s12_size"
-          android:text="@string/need_earphone"/>
+          android:textSize="@dimen/s14_size"/>
       </LinearLayout>
       <android.support.v7.widget.SwitchCompat
-        android:background="@color/transparent"
+        android:id="@+id/eq_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textOn=""
-        android:textOff=""
-        android:id="@+id/eq_switch"
-        android:layout_gravity="right|center_vertical"
         android:layout_marginRight="@dimen/d16_size"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        android:layout_gravity="right|center_vertical"
+        android:background="@color/transparent"
+        android:textOff=""
+        android:textOn=""/>
       <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/d1_size"
-        android:background="?attr/divider_color"
-        android:layout_below="@id/eq_anchor"/>
+        android:layout_below="@id/eq_anchor"
+        android:background="?attr/divider_color"/>
     </RelativeLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:gravity="center_vertical"
+      android:orientation="horizontal">
+      <TextView
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/bass_boost"
+        android:textColor="?attr/text_color_primary"/>
+      <android.support.v7.widget.AppCompatSeekBar
+        android:id="@+id/bass_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="1000"/>
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:gravity="center_vertical"
+      android:orientation="horizontal">
+      <TextView
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/virtualizer"
+        android:textColor="?attr/text_color_primary"/>
+      <android.support.v7.widget.AppCompatSeekBar
+        android:id="@+id/virtualizer_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="1000"/>
+    </LinearLayout>
 
     <LinearLayout
       android:id="@+id/eq_container"
@@ -72,19 +104,19 @@
       android:layout_marginTop="@dimen/d20_size"
       android:layout_marginBottom="@dimen/d20_size"
       android:gravity="center_horizontal"
-      android:orientation="horizontal">
-    </LinearLayout>
+      android:orientation="vertical"/>
+
     <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="0dp"
       android:layout_weight="1"
       android:gravity="center">
       <Button
+        android:id="@+id/eq_reset"
         android:layout_width="@dimen/d200_size"
         android:layout_height="wrap_content"
-        android:onClick="onReset"
-        android:id="@+id/eq_reset"
         android:layout_gravity="center"
+        android:onClick="onReset"
         android:text="@string/reset"
         android:textColor="@color/white"
         android:textSize="@dimen/s16_size"/>

@@ -96,7 +96,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
     }
 
     final ChildHolderViewHolder holder = (ChildHolderViewHolder) baseHolder;
-    if (song == null || song.getId() < 0 || song.Title.equals(mContext.getString(R.string.song_lose_effect))) {
+    if (song == null || song.getId() < 0 || song.getTitle().equals(mContext.getString(R.string.song_lose_effect))) {
       holder.mTitle.setText(R.string.song_lose_effect);
       holder.mButton.setVisibility(View.INVISIBLE);
     } else {

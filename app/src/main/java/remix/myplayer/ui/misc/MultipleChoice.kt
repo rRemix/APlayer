@@ -60,7 +60,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
       when (type) {
         Constants.SONG, Constants.PLAYLISTSONG -> {
           checkParam.forEach {
-            ids.add((it as Song).Id)
+            ids.add((it as Song).id)
           }
         }
         Constants.ALBUM -> {
@@ -96,7 +96,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
     when (type) {
       Constants.SONG, Constants.PLAYLISTSONG -> {
         checkParam.forEach {
-          ids.add((it as Song).Id)
+          ids.add((it as Song).id)
         }
       }
       Constants.ALBUM -> {

@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 import static remix.myplayer.App.IS_GOOGLEPLAY;
+import static remix.myplayer.helper.EQHelper.REQUEST_EQ;
 import static remix.myplayer.helper.LanguageHelper.AUTO;
 import static remix.myplayer.helper.M3UHelper.exportPlayListToFile;
 import static remix.myplayer.helper.M3UHelper.importLocalPlayList;
@@ -63,6 +64,7 @@ import remix.myplayer.bean.misc.Feedback;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.db.room.model.PlayList;
+import remix.myplayer.helper.EQHelper;
 import remix.myplayer.helper.LanguageHelper;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.ShakeDetector;
@@ -144,7 +146,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
   ImageView[] mArrows;
 
   private static final int REQUEST_THEME_COLOR = 0x10;
-  private static final int REQUEST_EQ = 0x100;
 
   //是否需要重建activity
   private boolean mNeedRecreate = false;
@@ -424,7 +425,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                           position == 0 && text.toString().endsWith(
                               "(" + getString(R.string.new_create) + ")");
                       mDisposables.add(
-                          importM3UFile(SettingActivity.this,file, chooseNew ? newPlaylistName : text.toString(), chooseNew));
+                          importM3UFile(SettingActivity.this, file, chooseNew ? newPlaylistName : text.toString(),
+                              chooseNew));
                     })
                     .show();
               }
@@ -518,7 +520,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
       //锁屏显示
       case R.id.setting_lockscreen_container:
         configLockScreen();
-
         break;
       //导航栏变色
       case R.id.setting_navigation_container:
@@ -556,7 +557,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         break;
       //音效设置
       case R.id.setting_eq_container:
-        startEqualizer();
+        EQHelper.startEqualizer(this);
         break;
       //意见与反馈
       case R.id.setting_feedback_container:
@@ -640,7 +641,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         .items(new String[]{auto, zh, english})
         .itemsCallbackSingleChoice(SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO),
             (dialog, itemView, which, text) -> {
-              LanguageHelper.saveSelectLanguage(mContext,which);
+              LanguageHelper.saveSelectLanguage(mContext, which);
 
               Intent intent = new Intent(mContext, MainActivity.class);
               intent.setAction(Intent.ACTION_MAIN);
@@ -885,28 +886,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             mNeedRefreshAdapter = true;
           }
         }.start()).show();
-  }
-
-  /**
-   * 启动均衡器
-   */
-  private void startEqualizer() {
-    final int sessionId = MusicServiceRemote.getMediaPlayer().getAudioSessionId();
-    if (sessionId == AudioEffect.ERROR_BAD_VALUE) {
-      Toast.makeText(mContext, getResources().getString(R.string.no_audio_ID), Toast.LENGTH_LONG)
-          .show();
-      return;
-    }
-    Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-    audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION,
-        MusicServiceRemote.getMediaPlayer().getAudioSessionId());
-    audioEffectIntent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
-    if (Util.isIntentAvailable(this, audioEffectIntent)) {
-      startActivityForResult(audioEffectIntent, REQUEST_EQ);
-    } else {
-      ToastUtil.show(mContext, R.string.no_equalizer);
-//            startActivity(new Intent(this, EQActivity.class));
-    }
   }
 
   /**

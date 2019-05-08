@@ -27,20 +27,20 @@ public class Song implements Cloneable, Parcelable {
       .getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SHOW_DISPLAYNAME,
           false);
 
-  public int Id;
-  public String Title;
-  public String Displayname;
-  public String Album;
-  public int AlbumId;
-  public String Artist;
-  public int ArtistId;
-  public long Duration;
-  public String RealTime;
-  public String Url;
-  public long Size;
-  public String Year = "";
-  public String TitleKey;
-  public long AddTime;
+  private int Id;
+  private String Title;
+  private String Displayname;
+  private String Album;
+  private int AlbumId;
+  private String Artist;
+  private int ArtistId;
+  private long Duration;
+  private String RealTime;
+  private String Url;
+  private long Size;
+  private String Year = "";
+  private String TitleKey;
+  private long AddTime;
   private boolean isLove;
 
   public Song() {

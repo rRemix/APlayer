@@ -213,6 +213,16 @@ public class SPUtil {
     String MODE_FOR_PLAYLIST = "mode_for_playlist";
     //语言
     String LANGUAGE = "language";
+    //eq
+    String ENABLE_EQ = "enable_eq";
+    //bass boost
+//    String ENABLE_BASS_BOOST = "enable_bass_boost";
+    //bass boost strength
+    String BASS_BOOST_STRENGTH = "bass_boost_strength";
+    //virtualizer
+//    String ENABLE_VIRTUALIZER = "enable_virtualizer";
+    //virtualizer strength
+    String VIRTUALIZER_STRENGTH = "virtualizer_strength";
   }
 
   public interface LYRIC_OFFSET_KEY {

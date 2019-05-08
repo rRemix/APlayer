@@ -157,6 +157,7 @@ public class AddtoPlayListDialog extends BaseMusicDialog implements
                           return DatabaseRepository.getInstance().insertToPlayList(mList, newId);
                         }
                       })
+                      .compose(applySingleScheduler())
                       .subscribe(num -> {
                         ToastUtil.show(getContext(), R.string.add_playlist_success);
                         ToastUtil

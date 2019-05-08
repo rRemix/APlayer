@@ -23,7 +23,7 @@ class CustomSortAdapter(context: Context, layoutId: Int) : BaseAdapter<Song, Cus
   override fun convert(holder: CustomSortHolder?, song: Song?, position: Int) {
     if (song == null || holder == null)
       return
-    holder.mTitle.text = song.Title
+    holder.mTitle.text = song.title
     holder.mAlbum.text = song.album
     //封面
 

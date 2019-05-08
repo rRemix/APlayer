@@ -2,13 +2,11 @@ package remix.myplayer.service
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
-import android.app.Service
 import android.content.*
 import android.database.ContentObserver
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.media.AudioManager
-import android.media.audiofx.AudioEffect
 import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.*
@@ -23,6 +21,7 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
 import com.tencent.bugly.crashreport.CrashReport
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
@@ -39,10 +38,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.bean.mp3.Song.EMPTY_SONG
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayQueue
-import remix.myplayer.helper.LanguageHelper
-import remix.myplayer.helper.MusicEventCallback
-import remix.myplayer.helper.ShakeDetector
-import remix.myplayer.helper.SleepTimer
+import remix.myplayer.helper.*
 import remix.myplayer.lyric.LyricHolder
 import remix.myplayer.lyric.LyricHolder.Companion.LYRIC_FIND_INTERVAL
 import remix.myplayer.lyric.bean.LyricRowWrapper
@@ -59,6 +55,7 @@ import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24
+import remix.myplayer.theme.Theme
 import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS
 import remix.myplayer.ui.activity.base.BaseMusicActivity
@@ -71,7 +68,6 @@ import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
-import remix.myplayer.util.Util
 import remix.myplayer.util.Util.*
 import timber.log.Timber
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
@@ -452,7 +448,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
 
     Single
         .create<String> { emitter ->
-          hasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS)
+          hasPermission = hasPermissions(EXTERNAL_STORAGE_PERMISSIONS)
           if (!loadFinished && hasPermission) {
             load()
           }
@@ -463,15 +459,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe { action -> handleStartCommandIntent(commandIntent, action) }
 
-    return Service.START_NOT_STICKY
+    return START_NOT_STICKY
   }
 
   private fun setUp() {
-
-    HeadsetPlugReceiver.setHeadsetOn(audioManager.isWiredHeadsetOn)
-
     playbackThread.start()
-
 
     //电源锁
     wakeLock.setReferenceCounted(false)
@@ -524,15 +516,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
 
     setUpPlayer()
     setUpSession()
-
-    //初始化音效设置
-    val i = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
-    i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mediaPlayer.audioSessionId)
-    if (Util.isIntentAvailable(this, i)) {
-      openAudioEffectSession()
-    } else {
-//      EQActivity.Init()
-    }
 
   }
 
@@ -631,7 +614,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       } catch (ignored: Exception) {
 
       }
-
       false
     }
   }
@@ -659,10 +641,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     currentId = currentSong.id
     currentIndex = pos
     prepare(currentSong.url, false)
-    //桌面歌词
-    //        updateDesktopLyric();
-    //初始化下一首歌曲
-    //        updateNextSong();
     if (playModel == PLAY_SHUFFLE) {
       makeShuffleList(currentId)
     }
@@ -689,7 +667,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     if (alreadyUnInit) {
       return
     }
-    closeAudioEffectSession()
+    EQHelper.close(this, mediaPlayer)
     if (isPlaying) {
       pause(false)
     }
@@ -730,21 +708,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     alreadyUnInit = true
   }
 
-  private fun closeAudioEffectSession() {
-    val audioEffectsIntent = Intent(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
-    audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mediaPlayer.audioSessionId)
-    audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
-    sendBroadcast(audioEffectsIntent)
-  }
-
-  private fun openAudioEffectSession() {
-    val audioEffectsIntent = Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION)
-    audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mediaPlayer.audioSessionId)
-    audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
-    sendBroadcast(audioEffectsIntent)
-  }
-
-
   fun setAllSong(allSong: List<Int>?) {
     allSong?.let {
       this.allSong.clear()
@@ -767,11 +730,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     playQueue.clear()
     playQueue.addAll(newQueueList)
 
-    repository.runInTransaction(Runnable {
+    repository.runInTransaction {
       repository.clearPlayQueue()
           .concatWith(repository.insertToPlayQueue(playQueue))
           .subscribe()
-    })
+    }
   }
 
   /**
@@ -803,11 +766,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
 
-    repository.runInTransaction(Runnable {
+    repository.runInTransaction {
       repository.clearPlayQueue()
           .concatWith(repository.insertToPlayQueue(playQueue))
           .subscribe()
-    })
+    }
 
   }
 
@@ -843,27 +806,29 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
     setPlay(true)
-    //eq可用
-    val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
-    intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mediaPlayer.audioSessionId)
-    if (Util.isIntentAvailable(this, intent)) {
-      openAudioEffectSession()
-    }
+
+    //ijkmediaplayer每次设置数据源后audioSessionId会变化
+    EQHelper.open(this, mediaPlayer)
+
     //倍速播放
     setSpeed(speed)
+
     //更新所有界面
     updateUIHandler.sendEmptyMessage(UPDATE_META_DATA)
+
+    //播放
     mediaPlayer.start()
+
+    //渐变
     if (fadeIn) {
       volumeController.fadeIn()
     } else {
       volumeController.directTo(1f)
     }
 
+    //保存当前播放和下一首播放的歌曲的id
     playbackHandler.post {
-      //保存当前播放和下一首播放的歌曲的id
-      SPUtil
-          .putValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_SONG_ID, currentId)
+      SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_SONG_ID, currentId)
       SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.NEXT_SONG_ID, nextId)
     }
   }
@@ -902,9 +867,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
    * @param position 播放位置
    */
   override fun playSelectSong(position: Int) {
-    //        final List<Integer> playQueue = new ArrayList<>(playQueue);
-    //        final List<Integer> randomQueue = new ArrayList<>(randomQueue);
-
     currentIndex = position
     if (currentIndex == -1 || currentIndex >= playQueue.size) {
       ToastUtil.show(service, R.string.illegal_arg)
@@ -916,24 +878,19 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     nextIndex = currentIndex
     nextId = currentId
 
-    try {
-      //如果是随机播放 需要调整下RandomQueue
-      //保证正常播放队列和随机播放队列中当前歌曲的索引一致
-      val index = randomQueue.indexOf(currentId)
-      if (playModel == PLAY_SHUFFLE &&
-          index != currentIndex &&
-          index > 0) {
-        Collections.swap(randomQueue, currentIndex, index)
-      }
-    } catch (e: Exception) {
-      CrashReport.postCatchedException(MusicServiceException("playSelectSong", e))
+    //如果是随机播放 需要调整下RandomQueue
+    //保证正常播放队列和随机播放队列中当前歌曲的索引一致
+    val index = randomQueue.indexOf(currentId)
+    if (playModel == PLAY_SHUFFLE &&
+        index != currentIndex &&
+        index > 0) {
+      Collections.swap(randomQueue, currentIndex, index)
     }
 
     if (currentSong.url.isNullOrEmpty()) {
       ToastUtil.show(service, R.string.song_lose_effect)
       return
     }
-    //        isPlay = true;
     prepare(currentSong.url)
     updateNextSong()
   }
@@ -1245,7 +1202,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
               val permissionIntent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
               permissionIntent.data = Uri.parse("package:$packageName")
               permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-              if (Util.isIntentAvailable(service, permissionIntent)) {
+              if (isIntentAvailable(service, permissionIntent)) {
                 startActivity(permissionIntent)
               }
             }
@@ -1339,10 +1296,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           if (playModel != PLAY_SHUFFLE) {
             Single
                 .fromCallable {
-                  repository.runInTransaction(Runnable {
+                  repository.runInTransaction {
                     repository.clearPlayQueue()
                     repository.insertToPlayQueue(playQueue)
-                  })
+                  }
                   true
                 }
                 .compose(applySingleScheduler())
@@ -1372,10 +1329,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           }
           val time = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.TIMER_DURATION, -1)
           SleepTimer.toggleTimer((time * 1000).toLong())
-        }
-        //耳机拔出
-        Command.HEADSET_CHANGE -> if (isPlaying) {
-          pause(false)
         }
         else -> {
         }
@@ -1605,7 +1558,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   fun setSpeed(speed: Float) {
     if (prepared) {
       this.speed = speed
-      mediaPlayer.setSpeed(this.speed)
+      mediaPlayer.setSpeed(speed)
     }
   }
 

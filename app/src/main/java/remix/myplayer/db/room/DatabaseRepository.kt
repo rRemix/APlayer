@@ -39,11 +39,10 @@ class DatabaseRepository private constructor() {
       return field
     }
 
-  fun runInTransaction(body: Runnable) {
-    executors.execute {
-      db.runInTransaction(body)
-    }
+  fun runInTransaction(block: () -> Unit) {
+    executors.execute(block)
   }
+
 
   /**
    * 插入多首歌曲到播放队列
@@ -153,7 +152,7 @@ class DatabaseRepository private constructor() {
     return getAllPlaylist()
         .flatMapCompletable { playLists ->
           CompletableSource {
-            val audioIds = songs.map { song -> song.Id }
+            val audioIds = songs.map { song -> song.id }
             playLists.forEach { playList ->
               deleteFromPlayList(audioIds, playList.name).subscribe()
             }

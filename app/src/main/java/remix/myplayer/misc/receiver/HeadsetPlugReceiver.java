@@ -1,5 +1,6 @@
 package remix.myplayer.misc.receiver;
 
+import static remix.myplayer.util.Util.sendCMDLocalBroadcast;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 import android.content.BroadcastReceiver;
@@ -19,18 +20,18 @@ import remix.myplayer.util.Constants;
  */
 public class HeadsetPlugReceiver extends BroadcastReceiver {
 
-  /**
-   * 耳机是否插入
-   */
-  public static boolean IsHeadsetOn = false;
-
-  public static void setHeadsetOn(boolean headsetOn) {
-    IsHeadsetOn = headsetOn;
-  }
-
-  public static boolean getHeadsetOn() {
-    return IsHeadsetOn;
-  }
+//  /**
+//   * 耳机是否插入
+//   */
+//  public static boolean IsHeadsetOn = false;
+//
+//  public static void setHeadsetOn(boolean headsetOn) {
+//    IsHeadsetOn = headsetOn;
+//  }
+//
+//  public static boolean getHeadsetOn() {
+//    return IsHeadsetOn;
+//  }
 
 
   @Override
@@ -47,15 +48,16 @@ public class HeadsetPlugReceiver extends BroadcastReceiver {
       headsetOn = intent.getIntExtra("state", -1) == 1;
     }
 
-    setHeadsetOn(headsetOn);
-    Intent eqIntent = new Intent(Constants.SOUNDEFFECT_ACTION);
-    eqIntent.putExtra("IsHeadsetOn", getHeadsetOn());
-    sendLocalBroadcast(eqIntent);
+//    setHeadsetOn(headsetOn);
+//    Intent eqIntent = new Intent(Constants.SOUNDEFFECT_ACTION);
+//    eqIntent.putExtra("IsHeadsetOn", getHeadsetOn());
+//    sendLocalBroadcast(eqIntent);
 
     if (!headsetOn /**&& MusicServiceRemote.isPlaying()*/) {
-      Intent cmdIntent = new Intent(MusicService.ACTION_CMD);
-      cmdIntent.putExtra("Control", Command.HEADSET_CHANGE);
-      sendLocalBroadcast(cmdIntent);
+      sendCMDLocalBroadcast(Command.PAUSE);
+//      Intent cmdIntent = new Intent(MusicService.ACTION_CMD);
+//      cmdIntent.putExtra("Control", Command.HEADSET_CHANGE);
+//      sendLocalBroadcast(cmdIntent);
     }
     try {
       abortBroadcast();
