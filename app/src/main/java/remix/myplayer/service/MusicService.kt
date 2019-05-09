@@ -20,8 +20,6 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
-import com.tencent.bugly.crashreport.CrashReport
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
@@ -44,7 +42,6 @@ import remix.myplayer.lyric.LyricHolder.Companion.LYRIC_FIND_INTERVAL
 import remix.myplayer.lyric.bean.LyricRowWrapper
 import remix.myplayer.misc.LogObserver
 import remix.myplayer.misc.Migration
-import remix.myplayer.misc.exception.MusicServiceException
 import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.misc.observer.MediaStoreObserver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
@@ -55,7 +52,6 @@ import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24
-import remix.myplayer.theme.Theme
 import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS
 import remix.myplayer.ui.activity.base.BaseMusicActivity
@@ -715,6 +711,22 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
   }
 
+  private fun updateQueueItem() {
+    mediaSession.setQueueTitle(currentSong.title)
+
+    val queue = if (playModel == PLAY_SHUFFLE) randomQueue else playQueue
+    mediaSession.setQueue(queue.map {
+      val song = MediaStoreUtil.getSongById(it)
+      val mediaMetadata = MediaMetadataCompat.Builder()
+          .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, it.toString())
+          .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.title)
+          .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.artist)
+          .build()
+
+      return@map MediaSessionCompat.QueueItem(mediaMetadata.description, it.toLong())
+    })
+  }
+
   /**
    * 设置播放队列
    */
@@ -735,6 +747,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           .concatWith(repository.insertToPlayQueue(playQueue))
           .subscribe()
     }
+
+    updateQueueItem()
   }
 
   /**
@@ -772,6 +786,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           .subscribe()
     }
 
+    updateQueueItem()
   }
 
   private fun setPlay(isPlay: Boolean) {
@@ -1375,6 +1390,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
 
     val builder = MediaMetadataCompat.Builder()
+        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, currentSong.id.toString())
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentSong.album)
         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentSong.artist)
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentSong.artist)
@@ -1408,6 +1424,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
 
     mediaSession.setPlaybackState(PlaybackStateCompat.Builder()
+        .setActiveQueueItemId(currentSong.id.toLong())
         .setState(if (isPlay) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED, progress.toLong(), speed)
         .setActions(MEDIA_SESSION_ACTIONS).build())
   }

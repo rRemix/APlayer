@@ -33,13 +33,13 @@ android {
         minSdkVersion 17
         targetSdkVersion 26
         versionCode 1530
-        versionName "1.5.3.0-debug"
+        versionName "1.5.3.0"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
-//            abiFilters 'armeabi-v7a'
-            abiFilters 'armeabi-v7a', 'x86'
+            abiFilters 'armeabi-v7a'
+//            abiFilters 'armeabi-v7a', 'x86'
         }
         externalNativeBuild {
             cmake {
