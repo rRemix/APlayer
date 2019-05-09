@@ -20,6 +20,8 @@ APlayer is designed with all the basic features of a music player. Aside from th
 - File browser.
 - Lyrics
 - Gesture 
+- Desktop lyric 
+- Sleep timer
 - UI customizations.
 
 ---
@@ -67,13 +69,16 @@ Yes, you can easily import and export playlists on APlayer. This option is found
 
 7. **Can I sort tracks on APlayer?**
 
-No, you can't sort tracks on the app at the moment. But, this feature will be implemented soon. 
+Yes, you can sort tracks on APlayer. To sort tracks;
+
+- Click on the first icon located at the top right of the app.
+- Choose the sorting option you desire, by clicking it. 
 
 ---
 
 8. **Where can I find the APlayer's equalizer?**
 
-APlayer doesn't have its own equalizer. It uses your device's equalizer app. But you can access it from/on APlayer. The equalizer is located on the settings page. 
+APlayer doesn't have its own equalizer. It uses your device's equalizer app. But you can access it from/on APlayer. The equalizer is located on the settings page. However, built-in equalizer will be available in the next update release. 
 
 ---
 
@@ -85,7 +90,10 @@ Yes, you can customize/tune the equalizer to suit it to your preferred sound.
 
 10. **Can I include/exclude folders from the music library?** 
 
-No, you cannot exclude folders that contain music files from showing in the music library. But, you can decide to play music from a particular folder. 
+You cannot do this directly. But if you don't wish to play or see songs from a particular folder, you can choose to remove it. To restore it;
+
+- Go to the app settings.
+- Click on 'Restore songs' and the folder you removed will be restored. 
 
 ---
 
@@ -133,7 +141,7 @@ No, all the features and tools on APlayer are available for free.
 
 17. **What device operating system can use APlayer?**
 
-APlayer is an Android software meaning it is only available to users using any device running on Android OS. Android 5.0+
+APlayer is an Android software meaning it is only available to users using any device running on Android OS. Android 4.2+
 
 ---
 
