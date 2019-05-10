@@ -34,8 +34,9 @@ object EQHelper {
 
   var enable = false
 
-  var systemSessionOpen = false
-  var builtIdSessionOpen = false
+//  var systemSessionOpen = false
+//  var builtIdSessionOpen = false
+  var builtEqualizerInit = false
 
   val isBassBoostEnabled: Boolean
     get() = enable && bassBoost?.strengthSupported == true
@@ -60,6 +61,39 @@ object EQHelper {
 //        virtualizer?.setStrength(strength.toShort())
 //      }
 //    }
+
+
+  fun init(context: Context,mediaPlayer: IjkMediaPlayer) {
+    val audioSessionId = mediaPlayer.audioSessionId
+    Timber.v("init, audioSessionId: $audioSessionId")
+
+    if (audioSessionId == AudioEffect.ERROR_BAD_VALUE) {
+      return
+    }
+
+    equalizer = Equalizer(0, audioSessionId)
+    equalizer?.also { equalizer ->
+      equalizer.enabled = enable
+
+      //得到当前Equalizer引擎所支持的控制频率的标签数目。
+      bandNumber = equalizer.numberOfBands
+
+      //得到之前存储的每个频率的db值
+      for (i in 0 until bandNumber) {
+        val bangLevel = SPUtil.getValue(App.getContext(), NAME, "band$i", 0)
+        bandLevels.add(bangLevel.toShort())
+      }
+
+      //最小范围
+      minLevel = equalizer.bandLevelRange[0]
+      //最大范围
+      maxLevel = equalizer.bandLevelRange[1]
+
+      //初始化完成
+      builtEqualizerInit = true
+    }
+
+  }
 
   fun open(context: Context, mediaPlayer: IjkMediaPlayer) {
     val audioSessionId = mediaPlayer.audioSessionId
@@ -89,18 +123,11 @@ object EQHelper {
         //得到之前存储的每个频率的db值
         for (i in 0 until bandNumber) {
           val bangLevel = SPUtil.getValue(App.getContext(), NAME, "band$i", 0)
-          bandLevels.add(bangLevel.toShort())
           if (enable) {
             equalizer.setBandLevel(i.toShort(), bangLevel.toShort())
           }
         }
-
-        //最小范围
-        minLevel = equalizer.bandLevelRange[0]
-        //最大范围
-        maxLevel = equalizer.bandLevelRange[1]
       }
-
 
       //低音增强
       bassBoost?.enabled = false
@@ -130,9 +157,6 @@ object EQHelper {
 //        }
 //      }
 
-      //初始化完成
-      builtIdSessionOpen = true
-
       Timber.v("min: $minLevel max: $maxLevel bandNumber: $bandNumber")
     }
   }
@@ -144,8 +168,6 @@ object EQHelper {
     equalizer?.release()
     closeSystemAudioEffectSession(context, mediaPlayer.audioSessionId)
 
-    builtIdSessionOpen = false
-    systemSessionOpen = false
   }
 
 
@@ -203,7 +225,6 @@ object EQHelper {
     audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
     audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, context.packageName)
     context.sendBroadcast(audioEffectsIntent)
-    systemSessionOpen = true
   }
 
   private fun closeSystemAudioEffectSession(context: Context, audioSessionId: Int) {
@@ -211,7 +232,6 @@ object EQHelper {
     audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
     audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, context.packageName)
     context.sendBroadcast(audioEffectsIntent)
-    systemSessionOpen = false
   }
 
   /**
@@ -235,9 +255,9 @@ object EQHelper {
   }
 
   private fun isSystemAudioEffectAvailable(context: Context): Boolean {
-//    return isIntentAvailable(context, Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL))
-    return false
+    return isIntentAvailable(context, Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL))
   }
+
 
   const val REQUEST_EQ = 0
 

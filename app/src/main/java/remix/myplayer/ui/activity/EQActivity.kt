@@ -25,14 +25,8 @@ class EQActivity : ToolbarActivity() {
     super.onCreate(savedInstanceState)
 
     val sessionId = MusicServiceRemote.getMediaPlayer()?.audioSessionId
-    if (sessionId == AudioEffect.ERROR_BAD_VALUE) {
+    if (sessionId == AudioEffect.ERROR_BAD_VALUE || !EQHelper.builtEqualizerInit) {
       Toast.makeText(this, resources.getString(R.string.no_audio_ID), Toast.LENGTH_LONG).show()
-      finish()
-      return
-    }
-
-    if (!EQHelper.builtIdSessionOpen) {
-      ToastUtil.show(this, R.string.eq_initial_failed)
       finish()
       return
     }
@@ -48,7 +42,7 @@ class EQActivity : ToolbarActivity() {
 
   private fun setUpUI() {
     //初始化开关
-    eq_switch.isEnabled = EQHelper.builtIdSessionOpen
+    eq_switch.isEnabled = EQHelper.builtEqualizerInit
     eq_switch.isChecked = EQHelper.enable
     eq_switch.setOnCheckedChangeListener { buttonView, isChecked ->
       updateEnable(isChecked)

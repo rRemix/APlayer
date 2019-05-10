@@ -589,10 +589,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     mediaPlayer.setOnPreparedListener { mp ->
       Timber.v("准备完成:%s", firstPrepared)
 
-      //ijkmediaplayer每次设置数据源后audioSessionId会变化
-      EQHelper.open(this, mediaPlayer)
-
       if (firstPrepared) {
+        EQHelper.init(this,mediaPlayer)
         firstPrepared = false
         if (lastProgress > 0) {
           mediaPlayer.seekTo(lastProgress.toLong())
@@ -827,8 +825,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
     setPlay(true)
 
-//    //ijkmediaplayer每次设置数据源后audioSessionId会变化
-//    EQHelper.open(this, mediaPlayer)
+    //ijkmediaplayer每次设置数据源后audioSessionId会变化
+    EQHelper.open(this, mediaPlayer)
 
     //倍速播放
     setSpeed(speed)
