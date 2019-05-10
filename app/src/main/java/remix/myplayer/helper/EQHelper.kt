@@ -7,8 +7,6 @@ import android.media.audiofx.AudioEffect
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.Virtualizer
-import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import remix.myplayer.App
 import remix.myplayer.R
@@ -24,9 +22,9 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer
  */
 object EQHelper {
 
-  private lateinit var equalizer: Equalizer
-  private lateinit var bassBoost: BassBoost
-  private lateinit var virtualizer: Virtualizer
+  private var equalizer: Equalizer? = null
+  private var bassBoost: BassBoost? = null
+  private var virtualizer: Virtualizer? = null
 
   private val bandLevels = ArrayList<Short>()
 
@@ -40,29 +38,28 @@ object EQHelper {
   var builtIdSessionOpen = false
 
   val isBassBoostEnabled: Boolean
-    get() = enable && bassBoost.strengthSupported
+    get() = enable && bassBoost?.strengthSupported == true
 
   var bassBoostStrength: Int
     get() = SPUtil.getValue(App.getContext(), NAME, BASS_BOOST_STRENGTH, 0)
     set(strength) {
       SPUtil.putValue(App.getContext(), NAME, BASS_BOOST_STRENGTH, strength)
       if (isBassBoostEnabled) {
-        bassBoost.setStrength(strength.toShort())
+        bassBoost?.setStrength(strength.toShort())
       }
     }
 
-  val isVirtualizerEnabled: Boolean
-    get() = enable && virtualizer.strengthSupported
-
-  var virtualizerStrength: Int
-    get() = SPUtil.getValue(App.getContext(), NAME, VIRTUALIZER_STRENGTH, 0)
-    set(strength) {
-      SPUtil.putValue(App.getContext(), NAME, VIRTUALIZER_STRENGTH, strength)
-      if (isVirtualizerEnabled) {
-        virtualizer.setStrength(strength.toShort())
-      }
-    }
-
+//  val isVirtualizerEnabled: Boolean
+//    get() = enable && virtualizer?.strengthSupported == true
+//
+//  var virtualizerStrength: Int
+//    get() = SPUtil.getValue(App.getContext(), NAME, VIRTUALIZER_STRENGTH, 0)
+//    set(strength) {
+//      SPUtil.putValue(App.getContext(), NAME, VIRTUALIZER_STRENGTH, strength)
+//      if (isVirtualizerEnabled) {
+//        virtualizer?.setStrength(strength.toShort())
+//      }
+//    }
 
   fun open(context: Context, mediaPlayer: IjkMediaPlayer) {
     val audioSessionId = mediaPlayer.audioSessionId
@@ -79,39 +76,59 @@ object EQHelper {
       enable = SPUtil.getValue(App.getContext(), NAME, ENABLE_EQ, false)
 
       //EQ
+      equalizer?.enabled = false
+      equalizer?.release()
+
       equalizer = Equalizer(0, audioSessionId)
-      equalizer.enabled = enable
+      equalizer?.also { equalizer ->
+        equalizer.enabled = enable
 
-      //得到当前Equalizer引擎所支持的控制频率的标签数目。
-      bandNumber = equalizer.numberOfBands
+        //得到当前Equalizer引擎所支持的控制频率的标签数目。
+        bandNumber = equalizer.numberOfBands
 
-      //得到之前存储的每个频率的db值
-      for (i in 0 until bandNumber) {
-        val bangLevel = SPUtil.getValue(App.getContext(), NAME, "band$i", 0)
-        bandLevels.add(bangLevel.toShort())
-        if (enable) {
-          equalizer.setBandLevel(i.toShort(), bangLevel.toShort())
+        //得到之前存储的每个频率的db值
+        for (i in 0 until bandNumber) {
+          val bangLevel = SPUtil.getValue(App.getContext(), NAME, "band$i", 0)
+          bandLevels.add(bangLevel.toShort())
+          if (enable) {
+            equalizer.setBandLevel(i.toShort(), bangLevel.toShort())
+          }
+        }
+
+        //最小范围
+        minLevel = equalizer.bandLevelRange[0]
+        //最大范围
+        maxLevel = equalizer.bandLevelRange[1]
+      }
+
+
+      //低音增强
+      bassBoost?.enabled = false
+      bassBoost?.release()
+
+      bassBoost = BassBoost(0, audioSessionId)
+      bassBoost?.also { bassBoost ->
+        bassBoost.enabled = enable && bassBoost.strengthSupported
+        if (bassBoost.enabled) {
+          bassBoost.setStrength(bassBoostStrength.toShort())
         }
       }
 
-      //最小范围
-      minLevel = equalizer.bandLevelRange[0]
-      //最大范围
-      maxLevel = equalizer.bandLevelRange[1]
-
-      //低音增强
-      bassBoost = BassBoost(0, audioSessionId)
-      bassBoost.enabled = enable && bassBoost.strengthSupported
-      if (bassBoost.enabled) {
-        bassBoost.setStrength(bassBoostStrength.toShort())
-      }
-
       //环绕声
-      virtualizer = Virtualizer(0, audioSessionId)
-      virtualizer.enabled = enable && virtualizer.strengthSupported
-      if (virtualizer.enabled) {
-        virtualizer.setStrength(virtualizerStrength.toShort())
-      }
+//      virtualizer?.enabled = false
+//      virtualizer?.canVirtualize()
+//
+//      virtualizer = Virtualizer(0, audioSessionId)
+//      virtualizer?.also { virtualizer ->
+//        try {
+//          virtualizer.enabled = enable && virtualizer.strengthSupported
+//          if (virtualizer.enabled) {
+//            virtualizer.setStrength(virtualizerStrength.toShort())
+//          }
+//        } catch (e: Exception) {
+//          Timber.w(e)
+//        }
+//      }
 
       //初始化完成
       builtIdSessionOpen = true
@@ -122,21 +139,18 @@ object EQHelper {
 
   fun close(context: Context, mediaPlayer: IjkMediaPlayer) {
     Timber.v("close")
-    val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
-    intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mediaPlayer.audioSessionId)
-    if (isIntentAvailable(context, intent)) {
-      closeSystemAudioEffectSession(context, mediaPlayer.audioSessionId)
-    } else {
-      equalizer.enabled = false
-      equalizer.release()
-    }
+
+    equalizer?.enabled = false
+    equalizer?.release()
+    closeSystemAudioEffectSession(context, mediaPlayer.audioSessionId)
+
     builtIdSessionOpen = false
     systemSessionOpen = false
   }
 
 
   fun getCenterFreq(band: Int): Int {
-    return equalizer.getCenterFreq(band.toShort())
+    return equalizer?.getCenterFreq(band.toShort()) ?: 0
   }
 
   fun getBandLevel(band: Int): Short {
@@ -144,7 +158,7 @@ object EQHelper {
   }
 
   fun setBandLevel(band: Int, level: Int) {
-    equalizer.setBandLevel(band.toShort(), level.toShort())
+    equalizer?.setBandLevel(band.toShort(), level.toShort())
     bandLevels[band] = level.toShort()
     SPUtil.putValue(App.getContext(), NAME, "band$band", level)
   }
@@ -153,17 +167,25 @@ object EQHelper {
     this.enable = enable
     SPUtil.putValue(App.getContext(), NAME, ENABLE_EQ, enable)
 
-    equalizer.enabled = enable
+    equalizer?.enabled = enable
     for (band in 0 until bandNumber) {
       val bandLevel = if (enable) getBandLevel(band) else 0
-      equalizer.setBandLevel(band.toShort(), bandLevel)
+      equalizer?.setBandLevel(band.toShort(), bandLevel)
     }
 
-    bassBoost.enabled = isBassBoostEnabled
-    bassBoost.setStrength(if (isBassBoostEnabled) bassBoostStrength.toShort() else 0)
+    try {
+      bassBoost?.enabled = isBassBoostEnabled
+      bassBoost?.setStrength(if (isBassBoostEnabled) bassBoostStrength.toShort() else 0)
+    } catch (e: Exception) {
+      Timber.w(e)
+    }
 
-    virtualizer.enabled = isVirtualizerEnabled
-    virtualizer.setStrength(if (isVirtualizerEnabled) virtualizerStrength.toShort() else 0)
+//    try {
+//      virtualizer?.enabled = isVirtualizerEnabled
+//      virtualizer?.setStrength(if (isVirtualizerEnabled) virtualizerStrength.toShort() else 0)
+//    } catch (e: Exception) {
+//      Timber.w(e)
+//    }
 
   }
 
@@ -173,7 +195,7 @@ object EQHelper {
     }
 
     bassBoostStrength = 0
-    virtualizerStrength = 0
+//    virtualizerStrength = 0
   }
 
   private fun openSystemAudioEffectSession(context: Context, audioSessionId: Int) {
@@ -197,10 +219,9 @@ object EQHelper {
    */
   @JvmStatic
   fun startEqualizer(activity: Activity) {
-    val sessionId = MusicServiceRemote.getMediaPlayer()?.getAudioSessionId()
+    val sessionId = MusicServiceRemote.getMediaPlayer()?.audioSessionId
     if (sessionId == AudioEffect.ERROR_BAD_VALUE) {
-      Toast.makeText(activity, activity.resources.getString(R.string.no_audio_ID), Toast.LENGTH_LONG)
-          .show()
+      Toast.makeText(activity, activity.resources.getString(R.string.no_audio_ID), Toast.LENGTH_LONG).show()
       return
     }
     val audioEffectIntent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
@@ -214,8 +235,8 @@ object EQHelper {
   }
 
   private fun isSystemAudioEffectAvailable(context: Context): Boolean {
-    return false
 //    return isIntentAvailable(context, Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL))
+    return false
   }
 
   const val REQUEST_EQ = 0

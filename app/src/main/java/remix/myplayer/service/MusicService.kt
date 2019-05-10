@@ -69,6 +69,7 @@ import timber.log.Timber
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
 import java.lang.ref.WeakReference
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by Remix on 2015/12/1.
@@ -587,6 +588,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
     mediaPlayer.setOnPreparedListener { mp ->
       Timber.v("准备完成:%s", firstPrepared)
+
+      //ijkmediaplayer每次设置数据源后audioSessionId会变化
+      EQHelper.open(this, mediaPlayer)
+
       if (firstPrepared) {
         firstPrepared = false
         if (lastProgress > 0) {
@@ -714,7 +719,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   private fun updateQueueItem() {
     mediaSession.setQueueTitle(currentSong.title)
 
-    val queue = if (playModel == PLAY_SHUFFLE) randomQueue else playQueue
+    val queue = ArrayList(if (playModel == PLAY_SHUFFLE) randomQueue else playQueue)
     mediaSession.setQueue(queue.map {
       val song = MediaStoreUtil.getSongById(it)
       val mediaMetadata = MediaMetadataCompat.Builder()
@@ -822,8 +827,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     }
     setPlay(true)
 
-    //ijkmediaplayer每次设置数据源后audioSessionId会变化
-    EQHelper.open(this, mediaPlayer)
+//    //ijkmediaplayer每次设置数据源后audioSessionId会变化
+//    EQHelper.open(this, mediaPlayer)
 
     //倍速播放
     setSpeed(speed)

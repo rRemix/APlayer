@@ -82,7 +82,8 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="20dp"
       android:gravity="center_vertical"
-      android:orientation="horizontal">
+      android:orientation="horizontal"
+      android:visibility="gone">
       <TextView
         android:layout_width="80dp"
         android:layout_height="wrap_content"

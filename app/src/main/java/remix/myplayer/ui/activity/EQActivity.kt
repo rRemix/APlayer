@@ -1,15 +1,18 @@
 package remix.myplayer.ui.activity
 
+import android.media.audiofx.AudioEffect
 import android.os.Bundle
 import android.support.v7.widget.AppCompatSeekBar
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import butterknife.ButterKnife
 import kotlinx.android.synthetic.main.activity_eq.*
 import remix.myplayer.R
 import remix.myplayer.helper.EQHelper
+import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.theme.TintHelper
 import remix.myplayer.util.ToastUtil
@@ -19,13 +22,21 @@ import remix.myplayer.util.ToastUtil
  */
 class EQActivity : ToolbarActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    val sessionId = MusicServiceRemote.getMediaPlayer()?.audioSessionId
+    if (sessionId == AudioEffect.ERROR_BAD_VALUE) {
+      Toast.makeText(this, resources.getString(R.string.no_audio_ID), Toast.LENGTH_LONG).show()
+      finish()
+      return
+    }
+
     if (!EQHelper.builtIdSessionOpen) {
       ToastUtil.show(this, R.string.eq_initial_failed)
       finish()
       return
     }
 
-    super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_eq)
     ButterKnife.bind(this)
 
@@ -47,10 +58,6 @@ class EQActivity : ToolbarActivity() {
 
     //初始化重置按钮背景
     TintHelper.setTintAuto(eq_reset, ThemeStore.getAccentColor(), false)
-//    eq_reset.background = GradientDrawableMaker()
-//        .corner(5f)
-//        .color(ThemeStore.getAccentColor())
-//        .make()
     eq_reset.isEnabled = EQHelper.enable
 
     val bandNumber = EQHelper.bandNumber
@@ -105,20 +112,20 @@ class EQActivity : ToolbarActivity() {
     TintHelper.setTint(bass_seekbar, accentColor, false)
 
     //环绕声
-    virtualizer_seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-      override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-        EQHelper.virtualizerStrength = progress
-      }
-
-      override fun onStartTrackingTouch(seekBar: SeekBar?) {
-      }
-
-      override fun onStopTrackingTouch(seekBar: SeekBar?) {
-      }
-
-    })
-    virtualizer_seekbar.isEnabled = EQHelper.isVirtualizerEnabled
-    virtualizer_seekbar.progress = EQHelper.virtualizerStrength
+//    virtualizer_seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+//      override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+//        EQHelper.virtualizerStrength = progress
+//      }
+//
+//      override fun onStartTrackingTouch(seekBar: SeekBar?) {
+//      }
+//
+//      override fun onStopTrackingTouch(seekBar: SeekBar?) {
+//      }
+//
+//    })
+//    virtualizer_seekbar.isEnabled = EQHelper.isVirtualizerEnabled
+//    virtualizer_seekbar.progress = EQHelper.virtualizerStrength
     TintHelper.setTint(virtualizer_seekbar, accentColor, false)
   }
 
@@ -133,7 +140,7 @@ class EQActivity : ToolbarActivity() {
     }
 
     bass_seekbar.isEnabled = EQHelper.isBassBoostEnabled
-    virtualizer_seekbar.isEnabled = EQHelper.isVirtualizerEnabled
+//    virtualizer_seekbar.isEnabled = EQHelper.isVirtualizerEnabled
   }
 
   //重置音效设置
