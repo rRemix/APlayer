@@ -25,8 +25,15 @@ class EQActivity : ToolbarActivity() {
     super.onCreate(savedInstanceState)
 
     val sessionId = MusicServiceRemote.getMediaPlayer()?.audioSessionId
-    if (sessionId == AudioEffect.ERROR_BAD_VALUE || !EQHelper.builtEqualizerInit) {
+    if (sessionId == AudioEffect.ERROR_BAD_VALUE || sessionId == null) {
       Toast.makeText(this, resources.getString(R.string.no_audio_ID), Toast.LENGTH_LONG).show()
+      finish()
+      return
+    }
+
+    // 初始化两次
+    if (!EQHelper.init(this,sessionId,true)) {
+      ToastUtil.show(this, R.string.eq_initial_failed)
       finish()
       return
     }

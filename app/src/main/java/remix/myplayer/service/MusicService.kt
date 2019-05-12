@@ -590,7 +590,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       Timber.v("准备完成:%s", firstPrepared)
 
       if (firstPrepared) {
-        EQHelper.init(this,mediaPlayer)
+        EQHelper.init(this, mp.audioSessionId)
         firstPrepared = false
         if (lastProgress > 0) {
           mediaPlayer.seekTo(lastProgress.toLong())
@@ -600,6 +600,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       Timber.v("开始播放")
       //记录播放历史
       updatePlayHistory()
+
       play(false)
     }
 
@@ -823,6 +824,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     if (!audioFocus) {
       return
     }
+
     setPlay(true)
 
     //ijkmediaplayer每次设置数据源后audioSessionId会变化
@@ -1455,7 +1457,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       pause(true)
     }
     prepared = false
-    //    openAudioEffectSession();
 
     playbackHandler.post {
       try {
