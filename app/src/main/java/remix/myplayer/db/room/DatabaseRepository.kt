@@ -48,10 +48,10 @@ class DatabaseRepository private constructor() {
    * 插入多首歌曲到播放队列
    */
   fun insertToPlayQueue(audioIds: List<Int>): Single<Int> {
+    val actual = audioIds.toMutableList()
     return getPlayQueue()
         .map {
           //不重复添加
-          val actual = audioIds.toMutableList()
           actual.removeAll(it)
 
           db.playQueueDao().insertPlayQueue(convertAudioIdsToPlayQueues(actual))

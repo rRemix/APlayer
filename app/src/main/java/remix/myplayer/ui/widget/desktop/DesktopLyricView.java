@@ -21,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -104,18 +103,27 @@ public class DesktopLyricView extends RelativeLayout {
 //  private UnLockNotify mNotify;
 
   //当前字体大小
+  private static final int TINY = 0;
   private static final int SMALL = 1;
   private static final int MEDIUM = 2;
   private static final int BIG = 3;
+  private static final int HUGE = 4;
 
   //第一行歌词字体大小
+  private static final int FIRST_LINE_HUGE = 20;
   private static final int FIRST_LINE_BIG = 19;
   private static final int FIRST_LINE_MEDIUM = 18;
   private static final int FIRST_LINE_SMALL = 17;
+  private static final int FIRST_LINE_TINY = 16;
   //第二行歌词字体大小
+  private static final int SECOND_LINE_HUGE = 18;
   private static final int SECOND_LINE_BIG = 17;
   private static final int SECOND_LINE_MEDIUM = 16;
   private static final int SECOND_LINE_SMALL = 15;
+  private static final int SECOND_LINE_TINY = 14;
+
+  private static final int TYPE_TEXT_SIZE_FIRST_LINE = 0;
+  private static final int TYPE_TEXT_SIZE_SECOND_LINE = 1;
 
   private int mTextSizeType = MEDIUM;
   private Runnable mHideRunnable = new Runnable() {
@@ -225,10 +233,8 @@ public class DesktopLyricView extends RelativeLayout {
     MDTintHelper.setTint(mSeekBarB, color);
 
     mText1.setTextColor(color);
-    mText1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL
-        : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
-    mText2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL
-        : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
+    mText1.setTextSize(getTextSize(TYPE_TEXT_SIZE_FIRST_LINE));
+    mText2.setTextSize(getTextSize(TYPE_TEXT_SIZE_SECOND_LINE));
     mIsLock = SPUtil.getValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_LOCK, false);
 
     mTextSizeType = SPUtil
@@ -245,6 +251,20 @@ public class DesktopLyricView extends RelativeLayout {
     });
   }
 
+  /**
+   * @param type 0: 第一行 1:第二行
+   */
+  private float getTextSize(int type) {
+    if (type == TYPE_TEXT_SIZE_FIRST_LINE) {
+      return mTextSizeType == TINY ? FIRST_LINE_TINY : mTextSizeType == SMALL ? FIRST_LINE_SMALL
+          : mTextSizeType == MEDIUM ? FIRST_LINE_MEDIUM : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_HUGE;
+    } else if (type == TYPE_TEXT_SIZE_SECOND_LINE) {
+      return mTextSizeType == TINY ? SECOND_LINE_TINY : mTextSizeType == SMALL ? SECOND_LINE_SMALL
+          : mTextSizeType == MEDIUM ? SECOND_LINE_MEDIUM : mTextSizeType == BIG ? SECOND_LINE_MEDIUM : SECOND_LINE_HUGE;
+    } else {
+      throw new IllegalArgumentException("unknown textSize type");
+    }
+  }
 
   public void setText(LrcRow lrc1, LrcRow lrc2) {
     if (lrc1 != null) {
@@ -375,7 +395,7 @@ public class DesktopLyricView extends RelativeLayout {
         boolean needRefresh = false;
         if (view.getId() == R.id.widget_lrc_bigger) {
           //当前已经是最大字体
-          if (mTextSizeType == BIG) {
+          if (mTextSizeType == HUGE) {
             break;
           }
           mTextSizeType++;
@@ -383,19 +403,16 @@ public class DesktopLyricView extends RelativeLayout {
         }
         if (view.getId() == R.id.widget_lrc_smaller) {
           //当前已经是最小字体
-          if (mTextSizeType == SMALL) {
+          if (mTextSizeType == TINY) {
             break;
           }
           mTextSizeType--;
           needRefresh = true;
         }
         if (needRefresh) {
-          mText1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL
-              : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
-          mText2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL
-              : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
-          SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_TEXT_SIZE,
-              mTextSizeType);
+          mText1.setTextSize(getTextSize(TYPE_TEXT_SIZE_FIRST_LINE));
+          mText2.setTextSize(getTextSize(TYPE_TEXT_SIZE_SECOND_LINE));
+          SPUtil.putValue(mService, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DESKTOP_LYRIC_TEXT_SIZE, mTextSizeType);
           //操作后重置消息的时间
           resetHide();
         }

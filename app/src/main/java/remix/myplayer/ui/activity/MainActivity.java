@@ -178,6 +178,9 @@ public class MainActivity extends MenuActivity {
     mRefreshHandler = new MsgHandler(this);
     mRefreshHandler.postDelayed(this::checkUpdate, 500);
     mRefreshHandler.postDelayed(this::parseIntent, 500);
+
+    //清除多选显示状态
+    MultipleChoice.setActiveSomeWhere(false);
   }
 
   @Override

@@ -20,6 +20,7 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
@@ -48,6 +49,7 @@ import remix.myplayer.misc.receiver.HeadsetPlugReceiver
 import remix.myplayer.misc.receiver.MediaButtonReceiver
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
+import remix.myplayer.request.network.RxUtil
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
@@ -590,6 +592,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       Timber.v("准备完成:%s", firstPrepared)
 
       if (firstPrepared) {
+        mp.pause()
         EQHelper.init(this, mp.audioSessionId)
         firstPrepared = false
         if (lastProgress > 0) {
@@ -942,6 +945,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           .getPlayQueue()
           .compose(applySingleScheduler())
           .subscribe { ids ->
+            Timber.v("新的播放队列: ${ids.size}")
+
             playQueue.clear()
             playQueue.addAll(ids)
 
@@ -1122,7 +1127,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     //更新桌面歌词播放按钮
     desktopLyricView?.setPlayIcon(isPlaying)
     shortcutManager.updateContinueShortcut(this)
-    sendLocalBroadcast(Intent(MusicService.PLAY_STATE_CHANGE))
+    sendLocalBroadcast(Intent(PLAY_STATE_CHANGE))
   }
 
   /**
@@ -1218,7 +1223,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
                 SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
           }
           if (open && !FloatWindowManager.getInstance().checkPermission(service)) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
               val permissionIntent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
               permissionIntent.data = Uri.parse("package:$packageName")
               permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -1290,42 +1295,38 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
             ToastUtil.show(service, R.string.already_add_to_next_song)
             return
           }
-          //根据当前播放模式，添加到队列
-          if (playModel == PLAY_SHUFFLE) {
-            if (randomQueue.contains(nextSong.id)) {
-              randomQueue.remove(Integer.valueOf(nextSong.id))
-              randomQueue.add(if (currentIndex + 1 < randomQueue.size) currentIndex + 1 else 0,
-                  nextSong.id)
-            } else {
-              randomQueue.add(randomQueue.indexOf(currentId) + 1, nextSong.id)
-            }
+          //更新随机和普通播放队列
+          if (randomQueue.contains(nextSong.id)) {
+            randomQueue.remove(Integer.valueOf(nextSong.id))
+            randomQueue.add(if (currentIndex + 1 < randomQueue.size) currentIndex + 1 else 0,
+                nextSong.id)
           } else {
-            if (playQueue.contains(nextSong.id)) {
-              playQueue.remove(Integer.valueOf(nextSong.id))
-              playQueue.add(if (currentIndex + 1 < playQueue.size) currentIndex + 1 else 0,
-                  nextSong.id)
-            } else {
-              playQueue.add(playQueue.indexOf(currentId) + 1, nextSong.id)
-            }
+            randomQueue.add(randomQueue.indexOf(currentId) + 1, nextSong.id)
+          }
+          if (playQueue.contains(nextSong.id)) {
+            playQueue.remove(Integer.valueOf(nextSong.id))
+            playQueue.add(if (currentIndex + 1 < playQueue.size) currentIndex + 1 else 0,
+                nextSong.id)
+          } else {
+            playQueue.add(playQueue.indexOf(currentId) + 1, nextSong.id)
           }
 
           //更新下一首
           nextIndex = currentIndex
           updateNextSong()
           //保存到数据库
-          if (playModel != PLAY_SHUFFLE) {
-            Single
-                .fromCallable {
-                  repository.runInTransaction {
-                    repository.clearPlayQueue()
-                    repository.insertToPlayQueue(playQueue)
-                  }
-                  true
-                }
-                .compose(applySingleScheduler())
-                .subscribe({ success -> ToastUtil.show(service, R.string.already_add_to_next_song) },
-                    { throwable -> ToastUtil.show(service, R.string.play_failed) })
-          }
+          Single
+              .fromCallable {
+                repository.clearPlayQueue()
+                    .concatWith(repository.insertToPlayQueue(playQueue))
+                    .subscribe()
+              }
+              .compose(applySingleScheduler())
+              .subscribe({
+                ToastUtil.show(service, R.string.already_add_to_next_song)
+              }, {
+                ToastUtil.show(service, R.string.play_failed)
+              })
         }
         //改变歌词源
         Command.CHANGE_LYRIC -> if (showDesktopLyric) {
@@ -1456,25 +1457,31 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     if (isPlaying) {
       pause(true)
     }
-    prepared = false
 
-    playbackHandler.post {
-      try {
-        isLove = repository.isMyLove(currentId)
-            .onErrorReturn {
-              false
-            }
-            .blockingGet()
-        mediaPlayer.reset()
-        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0)
-        mediaPlayer.dataSource = path
-        mediaPlayer.prepareAsync()
-        prepared = true
-      } catch (e: Exception) {
-        ToastUtil.show(service, getString(R.string.play_failed) + e.toString())
-        prepared = false
-      }
-    }
+    Single
+        .fromCallable {
+          prepared = false
+          isLove = repository.isMyLove(currentId)
+              .onErrorReturn {
+                false
+              }
+              .blockingGet()
+
+          mediaPlayer.reset()
+          mediaPlayer.dataSource = path
+          mediaPlayer.prepareAsync()
+          // ijkplayer如果设置了start-on-prepared为0，可能导致切歌的时候出现爆音
+          // 暂时的解决办法就是先将音量设为0
+          mediaPlayer.setVolume(0f, 0f)
+          prepared = true
+        }
+        .compose(applySingleScheduler())
+        .subscribe({
+          Timber.v("prepare finish")
+        }) {
+          ToastUtil.show(service, getString(R.string.play_failed) + it.toString())
+          prepared = false
+        }
   }
 
   /**
@@ -1822,7 +1829,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           }
         }
       } else {
-        Timber.v("app在前台不用更新")
+//        Timber.v("app在前台不用更新")
       }
     }
 
