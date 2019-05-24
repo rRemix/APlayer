@@ -86,8 +86,9 @@ public class SPUtil {
   }
 
   public interface UPDATE_KEY {
-
     String NAME = "Update";
+
+    String IGNORE_FOREVER = "ignore_forever";
   }
 
   public interface LYRIC_KEY {

@@ -27,8 +27,6 @@ import timber.log.Timber
  */
 
 class NotifyImpl(context: MusicService) : Notify(context) {
-  private lateinit var remoteView: RemoteViews
-  private lateinit var remoteBigView: RemoteViews
 
   private var titleColor: Int? = null
   private var textColor: Int? = null
@@ -51,12 +49,12 @@ class NotifyImpl(context: MusicService) : Notify(context) {
   override fun updateForPlaying() {
     isStop = false
 
-    remoteBigView = RemoteViews(service.packageName, R.layout.notification_big)
-    remoteView = RemoteViews(service.packageName, R.layout.notification)
+    val remoteView = RemoteViews(service.packageName, R.layout.notification)
+    val remoteBigView = RemoteViews(service.packageName, R.layout.notification_big)
     val isPlay = service.isPlaying
 
-    buildAction(service)
-    val notification = buildNotification(service)
+    buildAction(service, remoteView, remoteBigView)
+    val notification = buildNotification(service, remoteView, remoteBigView)
 
     val song = service.currentSong
     val isSystemColor = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true)
@@ -124,7 +122,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     }.load()
   }
 
-  private fun buildNotification(context: Context): Notification {
+  private fun buildNotification(context: Context, remoteView: RemoteViews, remoteBigView: RemoteViews): Notification {
     val builder = NotificationCompat.Builder(context, PLAYING_NOTIFICATION_CHANNEL_ID)
     builder.setContent(remoteView)
         .setCustomBigContentView(remoteBigView)
@@ -140,7 +138,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     return builder.build()
   }
 
-  private fun buildAction(context: Context) {
+  private fun buildAction(context: Context, remoteView: RemoteViews, remoteBigView: RemoteViews) {
     //添加Action
     //切换
     val playIntent = buildPendingIntent(context, Command.TOGGLE)

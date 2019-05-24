@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Environment
 import android.text.TextUtils
+import io.reactivex.Single
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.github.Release
@@ -28,8 +29,17 @@ object UpdateAgent {
   fun check(context: Context) {
     if (listener == null)
       return
-    HttpClient.getGithubApiservice().getLatestRelease("rRemix", "APlayer")
-        .compose(RxUtil.applyScheduler())
+
+    Single
+        .fromCallable {
+          if (!forceCheck && SPUtil.getValue(context, SPUtil.UPDATE_KEY.NAME, SPUtil.UPDATE_KEY.IGNORE_FOREVER, false)) {
+            throw Exception("ignore update forever")
+          }
+        }
+        .flatMap {
+          HttpClient.getGithubApiservice().getLatestRelease("rRemix", "APlayer")
+        }
+        .compose(RxUtil.applySingleScheduler())
         .doFinally {
           listener = null
         }

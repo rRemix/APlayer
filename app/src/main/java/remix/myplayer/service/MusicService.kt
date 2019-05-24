@@ -21,6 +21,7 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
 import io.reactivex.Completable
+import io.reactivex.CompletableSource
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
@@ -737,8 +738,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   /**
    * 设置播放队列
    */
-  @WorkerThread
-  @Synchronized
   fun setPlayQueue(newQueueList: List<Int>?) {
     if (newQueueList == null || newQueueList.isEmpty()) {
       return
@@ -752,17 +751,17 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     repository.runInTransaction {
       repository.clearPlayQueue()
           .concatWith(repository.insertToPlayQueue(playQueue))
+          .concatWith(CompletableSource {
+            updateQueueItem()
+          })
           .subscribe()
     }
 
-    updateQueueItem()
   }
 
   /**
    * 设置播放队列
    */
-  @WorkerThread
-  @Synchronized
   fun setPlayQueue(newQueueList: List<Int>?, intent: Intent) {
     //当前模式是随机播放 或者即将设置为随机播放 都要更新mRandomList
     val shuffle = intent.getBooleanExtra("shuffle", false) || SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL,
@@ -790,10 +789,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     repository.runInTransaction {
       repository.clearPlayQueue()
           .concatWith(repository.insertToPlayQueue(playQueue))
+          .concatWith(CompletableSource {
+            updateQueueItem()
+          })
           .subscribe()
     }
 
-    updateQueueItem()
   }
 
   private fun setPlay(isPlay: Boolean) {

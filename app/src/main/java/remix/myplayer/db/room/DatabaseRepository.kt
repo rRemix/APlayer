@@ -40,7 +40,9 @@ class DatabaseRepository private constructor() {
     }
 
   fun runInTransaction(block: () -> Unit) {
-    executors.execute(block)
+    executors.execute {
+      db.runInTransaction(block)
+    }
   }
 
 

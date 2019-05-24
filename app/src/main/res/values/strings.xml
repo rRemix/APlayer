@@ -341,6 +341,7 @@
   <string name="update">Update</string>
   <string name="new_version_found">New version found</string>
   <string name="ignore_this_version">Ignore this version</string>
+  <string name="ignore_check_update_forever">Ignore update forever</string>
   <string name="empty_path_report_to_developer">Path of apk is empty,please report issue to developer</string>
   <string name="rename">Rename</string>
   <string name="no_equalizer">No equalizer found</string>

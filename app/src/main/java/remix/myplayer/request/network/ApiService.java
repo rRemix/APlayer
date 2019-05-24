@@ -2,6 +2,7 @@ package remix.myplayer.request.network;
 
 import android.support.annotation.Nullable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import okhttp3.ResponseBody;
 import remix.myplayer.BuildConfig;
 import remix.myplayer.bean.github.Release;
@@ -50,5 +51,5 @@ public interface ApiService {
 
   @GET("repos/{owner}/{repo}/releases/latest")
   @Headers("Authorization: token " + BuildConfig.GITHUB_SECRET_KEY)
-  Observable<Release> getLatestRelease(@Path("owner") String owner, @Path("repo") String repo);
+  Single<Release> getLatestRelease(@Path("owner") String owner, @Path("repo") String repo);
 }

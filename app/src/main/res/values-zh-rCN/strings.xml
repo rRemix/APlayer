@@ -341,6 +341,7 @@
   <string name="update">更新</string>
   <string name="new_version_found">发现新版本</string>
   <string name="ignore_this_version">忽略该版本</string>
+  <string name="ignore_check_update_forever">不再检查更新</string>
   <string name="empty_path_report_to_developer">安装路径为空,请反馈给开发者</string>
   <string name="rename">重命名</string>
   <string name="no_equalizer">没有找到均衡器</string>
