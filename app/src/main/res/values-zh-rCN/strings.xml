@@ -213,6 +213,7 @@
   <string name="cancel_ignore_lrc">取消忽略歌词</string>
   <string name="select_lrc">手动选择</string>
   <string name="path_empty">播放路径为空</string>
+  <string name="file_not_exist">音乐文件不存在</string>
   <string name="desktop_lyric_lock">桌面歌词已锁定</string>
   <string name="desktop_lyric__lock_ticker">桌面歌词已锁定,可在通知栏解锁</string>
   <string name="desktop_lyric__unlock">桌面歌词已解除锁定</string>

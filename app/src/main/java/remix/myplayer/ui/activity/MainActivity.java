@@ -58,7 +58,6 @@ import org.jetbrains.annotations.NotNull;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.misc.Category;
-import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
@@ -294,11 +293,20 @@ public class MainActivity extends MenuActivity {
   private int mMenuLayoutId = R.menu.menu_main;
 
   public int parseMenuId(int tag) {
-    return tag == Category.TAG_SONG ? R.menu.menu_main :
-        tag == Category.TAG_ALBUM ? R.menu.menu_album :
-            tag == Category.TAG_ARTIST ? R.menu.menu_artist :
-                tag == Category.TAG_PLAYLIST ? R.menu.menu_playlist :
-                    tag == Category.TAG_FOLDER ? R.menu.menu_folder : R.menu.menu_main_simple;
+    switch (tag) {
+      case Category.TAG_SONG:
+        return R.menu.menu_main;
+      case Category.TAG_ALBUM:
+        return R.menu.menu_album;
+      case Category.TAG_ARTIST:
+        return R.menu.menu_artist;
+      case Category.TAG_PLAYLIST:
+        return R.menu.menu_playlist;
+      case Category.TAG_FOLDER:
+        return R.menu.menu_folder;
+      default:
+        return R.menu.menu_main_simple;
+    }
   }
 
   @Override
@@ -354,6 +362,7 @@ public class MainActivity extends MenuActivity {
       SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,
           sortOrder);
     }
+    clearUriCache();
     mCurrentFragment.onMediaStoreChanged();
   }
 
@@ -618,6 +627,7 @@ public class MainActivity extends MenuActivity {
   }
 
   private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 108);
+
   @Override
   public void onMetaChanged() {
     super.onMetaChanged();

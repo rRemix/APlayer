@@ -61,7 +61,10 @@ abstract class MenuActivity : ToolbarActivity() {
           sortOrder = SortOrder.SongSortOrder.SONG_DATE
           item.isChecked = true
         }
-        R.id.action_sort_order_date_desc -> sortOrder = SortOrder.SongSortOrder.SONG_DATE_DESC
+        R.id.action_sort_order_date_desc -> {
+          sortOrder = SortOrder.SongSortOrder.SONG_DATE_DESC
+          item.isChecked = true
+        }
         //                case R.id.action_sort_order_duration:
         //                    sortOrder = SortOrder.SongSortOrder.SONG_DURATION;
         //                    item.setChecked(true);
@@ -130,7 +133,7 @@ abstract class MenuActivity : ToolbarActivity() {
     }
   }
 
-  protected fun tintMenuIcon(menu: Menu) {
+  private fun tintMenuIcon(menu: Menu) {
     ToolbarContentTintHelper.handleOnCreateOptionsMenu(this, toolbar, menu, getToolbarBackgroundColor(toolbar))
   }
 

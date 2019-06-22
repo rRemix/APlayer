@@ -20,8 +20,6 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
-import io.reactivex.Completable
-import io.reactivex.CompletableSource
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
@@ -50,7 +48,6 @@ import remix.myplayer.misc.receiver.HeadsetPlugReceiver
 import remix.myplayer.misc.receiver.MediaButtonReceiver
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.network.RxUtil
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
@@ -70,6 +67,7 @@ import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util.*
 import timber.log.Timber
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
+import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
@@ -124,6 +122,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         makeShuffleList(currentId)
       }
       field = newPlayModel
+      updateQueueItem()
     }
 
   /**
@@ -143,7 +142,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   /**
    * 返回当前播放歌曲
    */
-  var currentSong: Song = Song.EMPTY_SONG
+  var currentSong: Song = EMPTY_SONG
 
   /**
    * 当前播放的歌曲是否收藏
@@ -645,9 +644,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     currentId = currentSong.id
     currentIndex = pos
     prepare(currentSong.url, false)
-    if (playModel == PLAY_SHUFFLE) {
-      makeShuffleList(currentId)
-    }
+//    if (playModel == PLAY_SHUFFLE) {
+//      makeShuffleList(currentId)
+//    }
     //查找上次退出时保存的下一首歌曲是否还存在
     //如果不存在，重新设置下一首歌曲
     nextId = SPUtil
@@ -720,19 +719,28 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   }
 
   private fun updateQueueItem() {
-    mediaSession.setQueueTitle(currentSong.title)
+    Single
+        .fromCallable {
+          val queue = ArrayList(if (playModel == PLAY_SHUFFLE) randomQueue else playQueue)
+          return@fromCallable queue.map {
+            val song = MediaStoreUtil.getSongById(it)
+            val mediaMetadata = MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, it.toString())
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.title)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.artist)
+                .build()
 
-    val queue = ArrayList(if (playModel == PLAY_SHUFFLE) randomQueue else playQueue)
-    mediaSession.setQueue(queue.map {
-      val song = MediaStoreUtil.getSongById(it)
-      val mediaMetadata = MediaMetadataCompat.Builder()
-          .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, it.toString())
-          .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.title)
-          .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.artist)
-          .build()
-
-      return@map MediaSessionCompat.QueueItem(mediaMetadata.description, it.toLong())
-    })
+            return@map MediaSessionCompat.QueueItem(mediaMetadata.description, it.toLong())
+          }
+        }
+        .compose(applySingleScheduler())
+        .subscribe({
+          mediaSession.setQueueTitle(currentSong.title)
+          mediaSession.setQueue(it)
+        }, {
+          ToastUtil.show(this, it.toString())
+          Timber.v(it)
+        })
   }
 
   /**
@@ -748,12 +756,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     playQueue.clear()
     playQueue.addAll(newQueueList)
 
+    updateQueueItem()
+
     repository.runInTransaction {
       repository.clearPlayQueue()
           .concatWith(repository.insertToPlayQueue(playQueue))
-          .concatWith(CompletableSource {
-            updateQueueItem()
-          })
           .subscribe()
     }
 
@@ -786,12 +793,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
 
+    updateQueueItem()
     repository.runInTransaction {
       repository.clearPlayQueue()
           .concatWith(repository.insertToPlayQueue(playQueue))
-          .concatWith(CompletableSource {
-            updateQueueItem()
-          })
           .subscribe()
     }
 
@@ -1135,7 +1140,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
    * 接受控制命令 包括暂停、播放、上下首、改版播放模式等
    */
   inner class ControlReceiver : BroadcastReceiver() {
-
+    private var last = System.currentTimeMillis()
     override fun onReceive(context: Context, intent: Intent?) {
       Timber.v("ControlReceiver: %s", intent)
       if (intent == null || intent.extras == null) {
@@ -1146,6 +1151,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
 
       if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT
           || control == Command.TOGGLE || control == Command.PAUSE || control == Command.START) {
+        //判断下间隔时间
+        if (System.currentTimeMillis() - last < 500) {
+          Timber.v("间隔小于500ms")
+          return
+        }
         //保存控制命令,用于播放界面判断动画
         operation = control
         if (playQueue.size == 0) {
@@ -1158,6 +1168,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
               })
         }
       }
+
+      last = System.currentTimeMillis()
 
       when (control) {
         //关闭通知栏
@@ -1249,7 +1261,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         }
         Command.TOGGLE_MEDIASESSION ->
           when (SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)) {
-            APLAYER_LOCKSCREEN, CLOSE_LOCKSCREEN -> cleanMetaData()
+            APLAYER_LOCKSCREEN, CLOSE_LOCKSCREEN -> clearMediaSession()
             SYSTEM_LOCKSCREEN -> updateMediaSession(Command.NEXT)
           }
         //临时播放一首歌曲
@@ -1373,11 +1385,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   /**
    * 清除锁屏显示的内容
    */
-  private fun cleanMetaData() {
+  private fun clearMediaSession() {
+    mediaSession.setMetadata(MediaMetadataCompat.Builder().build())
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      mediaSession.setMetadata(MediaMetadataCompat.Builder().build())
       mediaSession.setPlaybackState(
           PlaybackStateCompat.Builder().setState(PlaybackState.STATE_NONE, 0, 1f).build())
+    } else {
+      mediaSession.setPlaybackState(PlaybackStateCompat.Builder().build())
     }
   }
 
@@ -1386,13 +1400,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
    * 更新锁屏
    */
   private fun updateMediaSession(control: Int) {
-    if (currentSong == EMPTY_SONG) {
-      mediaSession.setMetadata(null)
-      return
-    }
-    val isSmartisan = Build.MANUFACTURER.equals("smartisan", ignoreCase = true)
-    if (!isSmartisan && SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == CLOSE_LOCKSCREEN) {
-      mediaSession.setMetadata(null)
+    if (currentSong == EMPTY_SONG ||
+        SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == CLOSE_LOCKSCREEN) {
       return
     }
 
@@ -1445,6 +1454,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     Timber.v("准备播放: %s", path)
     if (TextUtils.isEmpty(path)) {
       ToastUtil.show(service, getString(R.string.path_empty))
+      return
+    }
+    if (!File(path).exists()) {
+      ToastUtil.show(service, getString(R.string.file_not_exist))
       return
     }
     if (requestFocus) {
@@ -1573,6 +1586,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     //            Collections.shuffle(randomQueue);
     //        }
     randomQueue.shuffle()
+
+    updateQueueItem()
   }
 
   /**
@@ -1626,12 +1641,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.NOTIFY_STYLE_CLASSIC,
           Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
     } else {
-      //播放模式
-      playModel = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL,
-          PLAY_LOOP)
       //读取播放列表
       playQueue.clear()
       playQueue.addAll(repository.getPlayQueue().blockingGet())
+      //播放模式
+      playModel = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL,
+          PLAY_LOOP)
 
       showDesktopLyric = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
     }
@@ -1649,6 +1664,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     speed = java.lang.Float.parseFloat(
         SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
     restoreLastSong()
+    updateQueueItem()
     loadFinished = true
     updateUIHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
     //        sendLocalBroadcast(new Intent(ACTION_LOAD_FINISH).putExtra("Song", currentSong));
@@ -1750,7 +1766,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         startUpdateLyric()
       }
     }
-
   }
 
   /**
@@ -1801,7 +1816,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
     desktopWidgetTask = WidgetTask()
-    timer.schedule(desktopWidgetTask, 1000, 1000)
+    timer.schedule(desktopWidgetTask, INTERVAL_APPWIDGET, INTERVAL_APPWIDGET)
   }
 
 
@@ -1810,7 +1825,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       return
     }
     desktopLyricTask = LyricTask()
-    timer.schedule(desktopLyricTask, 1000, LYRIC_FIND_INTERVAL)
+    timer.schedule(desktopLyricTask, LYRIC_FIND_INTERVAL, LYRIC_FIND_INTERVAL)
   }
 
   private fun stopUpdateLyric() {
@@ -1845,7 +1860,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   }
 
   private inner class LyricTask : TimerTask() {
-    private var songInLyricTask = Song.EMPTY_SONG
+    private var songInLyricTask = EMPTY_SONG
     private val tag = LyricTask::class.java.simpleName
     val lyricHolder = LyricHolder(this@MusicService)
     var force = false
@@ -2162,6 +2177,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     private const val APPWIDGET_MEDIUM_TRANSPARENT = "AppWidgetMediumTransparent"
     private const val APPWIDGET_SMALL_TRANSPARENT = "AppWidgetSmallTransparent"
 
+    private const val INTERVAL_APPWIDGET = 1000L
 
     /**
      * 复制bitmap

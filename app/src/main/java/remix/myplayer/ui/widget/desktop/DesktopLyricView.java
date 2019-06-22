@@ -260,7 +260,7 @@ public class DesktopLyricView extends RelativeLayout {
           : mTextSizeType == MEDIUM ? FIRST_LINE_MEDIUM : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_HUGE;
     } else if (type == TYPE_TEXT_SIZE_SECOND_LINE) {
       return mTextSizeType == TINY ? SECOND_LINE_TINY : mTextSizeType == SMALL ? SECOND_LINE_SMALL
-          : mTextSizeType == MEDIUM ? SECOND_LINE_MEDIUM : mTextSizeType == BIG ? SECOND_LINE_MEDIUM : SECOND_LINE_HUGE;
+          : mTextSizeType == MEDIUM ? SECOND_LINE_MEDIUM : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_HUGE;
     } else {
       throw new IllegalArgumentException("unknown textSize type");
     }

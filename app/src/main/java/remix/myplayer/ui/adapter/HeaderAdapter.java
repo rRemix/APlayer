@@ -1,8 +1,6 @@
 package remix.myplayer.ui.adapter;
 
 import static remix.myplayer.misc.ExtKt.isPortraitOrientation;
-import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
-import static remix.myplayer.theme.ThemeStore.isLightTheme;
 
 import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
@@ -197,7 +195,7 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
       final int position) {
     final String cacheUri = mUriCache.get(position);
     if (cacheUri != null) {
-      simpleDraweeView.setImageURI(mUriCache.get(position));
+      simpleDraweeView.setImageURI(cacheUri);
       return Observable.just("").subscribe();
     } else {
       return new LibraryUriRequest(simpleDraweeView,
@@ -216,9 +214,9 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
             // 没有错误类型 忽略
           } else if (throwable instanceof UnknownHostException) {
             // 没有网络 忽略
-          } else if(throwable instanceof NoSuchElementException){
+          } else if (throwable instanceof NoSuchElementException) {
             // 没有结果不再查找
-            mUriCache.put(position,"");
+            mUriCache.put(position, "");
           } else if (ERROR_NO_RESULT.equals(throwable.getMessage()) ||
               ERROR_BLACKLIST.equals(throwable.getMessage())) {
             // 黑名单或者没有结果 不再查找
@@ -243,8 +241,8 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
         final View childView = parent.getChildAt(i);
         if (childView instanceof SimpleDraweeView) {
           final Object tag = childView.getTag();
-          if (tag != null && tag instanceof Disposable) {
-            Disposable disposable = (Disposable) tag;
+          if (tag instanceof Disposable) {
+            final Disposable disposable = (Disposable) tag;
             if (!disposable.isDisposed()) {
               disposable.dispose();
             }

@@ -213,6 +213,7 @@
   <string name="cancel_ignore_lrc">Cancel ignore lyric</string>
   <string name="select_lrc">Manual choose</string>
   <string name="path_empty">The path is empty</string>
+  <string name="file_not_exist">File does not exist</string>
   <string name="desktop_lyric_lock">The desktop lyric has been locked</string>
   <string name="desktop_lyric__lock_ticker">The desktop lyric is locked and can be unlocked in the notification bar</string>
   <string name="desktop_lyric__unlock">The desktop lyric has been unlocked</string>
