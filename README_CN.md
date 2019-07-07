@@ -1,5 +1,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/rRemix/APlayer/blob/master/LICENSE)
 
+# [English](/README.md)
+
 # APlayer
 # 安卓本地音乐播放器
 

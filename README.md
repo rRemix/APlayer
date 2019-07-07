@@ -1,5 +1,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/rRemix/APlayer/blob/master/LICENSE)
 
+# [中文](/README_CN.md)
+
 # APlayer
 # Android Music Player
 
