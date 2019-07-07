@@ -2,14 +2,15 @@
 
 # [中文](/README_CN.md)
 
-# APlayer
-# Android Music Player
+# APlayer - Android Music Player
 
 ## Intro
-- A beautiful and powerful music player<br>
+- A beautiful and powerful music player
 
 ## Download
-- https://play.google.com/store/apps/details?id=remix.myplayer
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+     alt="Get it on Google Play"
+     height="80">](https://play.google.com/store/apps/details?id=remix.myplayer)
 
 ## Screenshot
 <img src="/pictures/Screenshot_20180112-112950.png" alt="screenshot" title="screenshot" width="270" height="486" /><img src="/pictures/Screenshot_20180112-113007.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113128.png" alt="screenshot" title="screenshot" width="270" height="486" /><br><br>

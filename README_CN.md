@@ -2,15 +2,15 @@
 
 # [English](/README.md)
 
-# APlayer
-# 安卓本地音乐播放器
+# APlayer - 安卓本地音乐播放器
 
 ## 简介
-遵循 Material Design 设计,UI清新简洁,操作简单,功能齐全<br>
-下载地址:<br>
-https://www.coolapk.com/apk/remix.myplayer<br>
-https://play.google.com/store/apps/details?id=remix.myplayer
+- 一款简洁、功能强大的的音乐播放器
 
+## 下载
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+     alt="Get it on Google Play"
+     height="80">](https://play.google.com/store/apps/details?id=remix.myplayer)
 
 ## 截图
 <img src="/pictures/Screenshot_20180112-112950.png" alt="screenshot" title="screenshot" width="270" height="486" /><img src="/pictures/Screenshot_20180112-113007.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113128.png" alt="screenshot" title="screenshot" width="270" height="486" /><br><br>
