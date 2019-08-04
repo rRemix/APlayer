@@ -22,7 +22,7 @@ import java.lang.ref.WeakReference
 open class LibraryUriRequest(image: SimpleDraweeView, protected val mRequest: UriRequest,
                              config: RequestConfig) : ImageUriRequest<String>(config) {
 
-  val mImageRef = WeakReference<SimpleDraweeView>(image)
+  val mImageRef = WeakReference(image)
 
   override fun onError(throwable: Throwable?) {
 //    mImageRef.get()?.setImageURI(Uri.EMPTY)

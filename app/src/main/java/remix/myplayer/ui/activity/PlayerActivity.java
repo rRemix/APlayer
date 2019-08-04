@@ -12,7 +12,6 @@ import static remix.myplayer.util.Constants.PLAY_SHUFFLE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
-import static remix.myplayer.util.Util.unregisterLocalReceiver;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -51,7 +50,6 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -87,6 +85,7 @@ import remix.myplayer.ui.widget.AudioViewPager;
 import remix.myplayer.ui.widget.playpause.PlayPauseView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
@@ -192,7 +191,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   //Fragment
   private LyricFragment mLyricFragment;
   private CoverFragment mCoverFragment;
-  private RecordFragment mRecordFragment;
+//  private RecordFragment mRecordFragment;
 
 //  private static final String SCALE_WIDTH = "SCALE_WIDTH";
 //  private static final String SCALE_HEIGHT = "SCALE_HEIGHT";
@@ -374,7 +373,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   public void onResume() {
     super.onResume();
     if (isPortraitOrientation(this)) {
-      mPager.setCurrentItem(1);
+      mPager.setCurrentItem(0);
     }
     //更新进度条
     new ProgressThread().start();
@@ -867,16 +866,17 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     setUpLyricFragment();
 
     if (isPortraitOrientation(this)) {
-      mRecordFragment = new RecordFragment();
+//      mRecordFragment = new RecordFragment();
 
       //Viewpager
       PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager());
-      adapter.addFragment(mRecordFragment);
+//      adapter.addFragment(mRecordFragment);
       adapter.addFragment(mCoverFragment);
       adapter.addFragment(mLyricFragment);
 
       mPager.setAdapter(adapter);
       mPager.setOffscreenPageLimit(adapter.getCount() - 1);
+      mPager.setCurrentItem(0);
 
       final int THRESHOLD_Y = DensityUtil.dip2px(mContext, 40);
       final int THRESHOLD_X = DensityUtil.dip2px(mContext, 60);
@@ -906,13 +906,14 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
           mDotList.get(mPrevPosition).setImageDrawable(mNormalIndicator);
           mDotList.get(position).setImageDrawable(mHighLightIndicator);
           mPrevPosition = position;
-          if (position == 0) {
-            mPager.setIntercept(true);
-          } else {
-            mPager.setIntercept(false);
-          }
+//          if (position == 0) {
+//            mPager.setIntercept(true);
+//          } else {
+//            mPager.setIntercept(false);
+//          }
+          mPager.setIntercept(false);
           //歌词界面常亮
-          if (position == 2 && SPUtil
+          if (position == 1 && SPUtil
               .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON, false)) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
           }
@@ -1336,8 +1337,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     SPUtil.putValue(mContext, SPUtil.LYRIC_KEY.NAME, mInfo.getId() + "",
         SPUtil.LYRIC_KEY.LYRIC_MANUAL);
     mLyricFragment.updateLrc(file.getAbsolutePath());
-    sendLocalBroadcast(
-        new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
+
+    sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC));
   }
 
   @Override
@@ -1383,6 +1384,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   }
 
   public void showLyricOffsetView() {
+    //todo∂
     if (mPager.getCurrentItem() != 2) {
       mPager.setCurrentItem(2, true);
     }

@@ -23,6 +23,7 @@ import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.ui.dialog.FileChooserDialog
 import remix.myplayer.ui.dialog.TimerDialog
 import remix.myplayer.ui.misc.Tag
+import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
@@ -62,8 +63,7 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
                 0, 1, 2, 3 -> { //0网易 1酷狗 2本地 3内嵌
                   SPUtil.putValue(ref.get(), SPUtil.LYRIC_KEY.NAME, song.id.toString(), position + 2)
                   lyricFragment.updateLrc(song, true)
-                  sendLocalBroadcast(Intent(MusicService.ACTION_CMD)
-                      .putExtra("Control", Command.CHANGE_LYRIC))
+                  sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
                 }
                 4 -> { //手动选择歌词
                   FileChooserDialog.Builder(activity)
@@ -85,8 +85,7 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
                               SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
                           lyricFragment.updateLrc(song)
                         }
-                        sendLocalBroadcast(Intent(MusicService.ACTION_CMD)
-                            .putExtra("Control", Command.CHANGE_LYRIC))
+                        sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
                       }
                       .show()
                 }

@@ -23,7 +23,6 @@ import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
  */
 @TargetApi(Build.VERSION_CODES.O)
 class NotifyImpl24(context: MusicService) : Notify(context) {
-
   override fun updateForPlaying() {
     isStop = false
 
@@ -31,7 +30,12 @@ class NotifyImpl24(context: MusicService) : Notify(context) {
 
     //设置封面
     val size = DensityUtil.dip2px(service, 128f)
-    object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
+    disposable?.dispose()
+    disposable = object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
+      override fun onStart() {
+        val result = BitmapFactory.decodeResource(service.resources, R.drawable.album_empty_bg_night)
+        updateWithBitmap(result, song)
+      }
       override fun onError(throwable: Throwable) {
         val result = BitmapFactory.decodeResource(service.resources, R.drawable.album_empty_bg_night)
         updateWithBitmap(result, song)

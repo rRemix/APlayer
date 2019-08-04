@@ -18,7 +18,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Parcelable;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
@@ -27,19 +26,17 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.widget.Toast;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -88,24 +85,27 @@ public class Util {
    * 判断app是否运行在前台
    */
   public static boolean isAppOnForeground() {
-    ActivityManager activityManager = (ActivityManager) App.getContext()
-        .getSystemService(Context.ACTIVITY_SERVICE);
-    String packageName = App.getContext().getPackageName();
+    try {
+      ActivityManager activityManager = (ActivityManager) App.getContext()
+          .getSystemService(Context.ACTIVITY_SERVICE);
+      String packageName = App.getContext().getPackageName();
 
-    List<ActivityManager.RunningAppProcessInfo> appProcesses = null;
-    if (activityManager != null) {
-      appProcesses = activityManager
-          .getRunningAppProcesses();
-    }
-    if (appProcesses == null) {
-      return false;
-    }
-
-    for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
-      if (appProcess.processName.equals(packageName)
-          && appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-        return true;
+      List<ActivityManager.RunningAppProcessInfo> appProcesses = null;
+      if (activityManager != null) {
+        appProcesses = activityManager.getRunningAppProcesses();
       }
+      if (appProcesses == null) {
+        return false;
+      }
+
+      for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+        if (appProcess.processName.equals(packageName)
+            && appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+          return true;
+        }
+      }
+    } catch (Exception e) {
+      Timber.w("isAppOnForeground(), ex: %s", e.getMessage());
     }
     return false;
   }

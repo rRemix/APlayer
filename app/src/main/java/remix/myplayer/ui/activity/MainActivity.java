@@ -102,7 +102,6 @@ public class MainActivity extends MenuActivity {
   public static final String EXTRA_REFRESH_LIBRARY = "needRefreshLibrary";
   public static final String EXTRA_CATEGORY = "Category";
 
-  public static final long DELAY_HIDE_LOCATION = TimeUnit.SECONDS.toMillis(4);
 
   @BindView(R.id.tabs)
   TabLayout mTablayout;

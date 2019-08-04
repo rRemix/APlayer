@@ -2,10 +2,10 @@
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:orientation="vertical"
+  android:id="@+id/root"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:id="@+id/root">
+  android:orientation="vertical">
   <android.support.design.widget.AppBarLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -32,27 +32,27 @@
           android:id="@+id/setting_common_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="@string/common"
           android:layout_margin="@dimen/d14_size"
-          android:textSize="@dimen/s16_size"
-          android:textColor="?attr/colorAccent"/>
+          android:text="@string/common"
+          android:textColor="?attr/colorAccent"
+          android:textSize="@dimen/s16_size"/>
         <LinearLayout
           android:id="@+id/setting_filter_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:gravity="center_vertical"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
-          android:background="?attr/background_rect_ripple">
+          android:background="?attr/background_rect_ripple"
+          android:gravity="center_vertical"
+          android:orientation="vertical">
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/music_filter"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -65,19 +65,19 @@
           android:id="@+id/setting_lockscreen_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:gravity="center_vertical"
-          android:paddingLeft="@dimen/d16_size"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
-          android:background="?attr/background_rect_ripple">
+          android:paddingLeft="@dimen/d16_size"
+          android:background="?attr/background_rect_ripple"
+          android:gravity="center_vertical"
+          android:orientation="vertical">
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/lockscreen_show"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:id="@+id/setting_lockscreen_text"
             android:layout_width="wrap_content"
@@ -95,15 +95,15 @@
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
           android:background="?attr/background_rect_ripple"
-          android:orientation="vertical"
-          android:gravity="center_vertical">
+          android:gravity="center_vertical"
+          android:orientation="vertical">
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/manual_scan"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:id="@+id/setting_scan_text"
             android:layout_width="wrap_content"
@@ -121,15 +121,15 @@
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
           android:background="?attr/background_rect_ripple"
-          android:orientation="vertical"
-          android:gravity="center_vertical">
+          android:gravity="center_vertical"
+          android:orientation="vertical">
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/playlist_import"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -146,15 +146,15 @@
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
           android:background="?attr/background_rect_ripple"
-          android:orientation="vertical"
-          android:gravity="center_vertical">
+          android:gravity="center_vertical"
+          android:orientation="vertical">
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/export_playlist"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -171,16 +171,16 @@
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
           android:background="?attr/background_rect_ripple"
-          android:orientation="vertical"
-          android:gravity="center_vertical">
+          android:gravity="center_vertical"
+          android:orientation="vertical">
 
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/restore_songs"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
 
           <TextView
             android:layout_width="wrap_content"
@@ -198,17 +198,17 @@
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
           android:background="?attr/background_rect_ripple"
-          android:orientation="vertical"
           android:gravity="center_vertical"
+          android:orientation="vertical"
           android:visibility="visible">
 
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/select_language"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
 
           <TextView
             android:layout_width="wrap_content"
@@ -228,19 +228,19 @@
           <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
+            android:layout_marginLeft="@dimen/d16_size"
+            android:layout_marginRight="@dimen/d16_size"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/setting_breakpoint_switch"
-            android:layout_marginLeft="@dimen/d16_size"
-            android:layout_marginRight="@dimen/d16_size">
+            android:gravity="center_vertical"
+            android:orientation="vertical">
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
               android:text="@string/play_breakpoint"
               android:textColor="?attr/text_color_primary"
-              android:textSize="@dimen/s16_size"
-              android:layout_marginBottom="@dimen/d2_size"/>
+              android:textSize="@dimen/s16_size"/>
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -249,14 +249,14 @@
               android:textSize="@dimen/s14_size"/>
           </LinearLayout>
           <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setting_breakpoint_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn=""
-            android:textOff=""
-            android:id="@+id/setting_breakpoint_switch"
-            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_alignParentRight="true"
+            android:textOff=""
+            android:textOn=""/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -269,19 +269,19 @@
           <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/d16_size"
-            android:layout_marginRight="@dimen/d16_size">
+            android:layout_marginRight="@dimen/d16_size"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
               android:text="@string/shake"
               android:textColor="?attr/text_color_primary"
-              android:textSize="@dimen/s16_size"
-              android:layout_marginBottom="@dimen/d2_size"/>
+              android:textSize="@dimen/s16_size"/>
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -290,14 +290,14 @@
               android:textSize="@dimen/s14_size"/>
           </LinearLayout>
           <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setting_shake_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn=""
-            android:textOff=""
-            android:id="@+id/setting_shake_switch"
-            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_alignParentRight="true"
+            android:textOff=""
+            android:textOn=""/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -311,20 +311,20 @@
           <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/d16_size"
-            android:layout_marginRight="@dimen/d16_size">
+            android:layout_marginRight="@dimen/d16_size"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
               android:text="@string/show_displayname"
               android:textColor="?attr/text_color_primary"
-              android:textSize="@dimen/s16_size"
-              android:layout_marginBottom="@dimen/d2_size"/>
+              android:textSize="@dimen/s16_size"/>
 
             <TextView
               android:layout_width="wrap_content"
@@ -335,14 +335,14 @@
           </LinearLayout>
 
           <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setting_displayname_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn=""
-            android:textOff=""
-            android:id="@+id/setting_displayname_switch"
-            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_alignParentRight="true"
+            android:textOff=""
+            android:textOn=""/>
         </RelativeLayout>
 
         <View
@@ -356,30 +356,117 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
         <TextView
+          android:id="@+id/setting_play_title"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_margin="@dimen/d14_size"
+          android:text="@string/play"
+          android:textColor="?attr/colorAccent"
+          android:textSize="@dimen/s16_size"/>
+
+        <RelativeLayout
+          android:id="@+id/setting_audio_focus_container"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingTop="@dimen/d10_size"
+          android:paddingBottom="@dimen/d10_size"
+          android:background="?attr/background_rect_ripple">
+
+          <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/d16_size"
+            android:layout_marginRight="@dimen/d16_size"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
+              android:text="@string/audio_focus"
+              android:textColor="?attr/text_color_primary"
+              android:textSize="@dimen/s16_size"/>
+
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/audio_focus_tip"
+              android:textColor="?attr/text_color_secondary"
+              android:textSize="@dimen/s14_size"/>
+          </LinearLayout>
+
+          <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setting_audio_focus_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/d14_size"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:textOff=""
+            android:textOn=""/>
+        </RelativeLayout>
+
+        <LinearLayout
+          android:id="@+id/setting_auto_play_headset_container"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingTop="@dimen/d10_size"
+          android:paddingBottom="@dimen/d10_size"
+          android:paddingLeft="@dimen/d16_size"
+          android:background="?attr/background_rect_ripple"
+          android:gravity="center_vertical"
+          android:orientation="vertical">
+          <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
+            android:text="@string/auto_play"
+            android:textColor="?attr/text_color_primary"
+            android:textSize="@dimen/s16_size"/>
+          <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/auto_play_tip"
+            android:textColor="?attr/text_color_secondary"
+            android:textSize="@dimen/s14_size"/>
+        </LinearLayout>
+
+
+      </LinearLayout>
+
+
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
           android:id="@+id/setting_color_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="@string/color"
           android:layout_margin="@dimen/d14_size"
-          android:textSize="@dimen/s16_size"
-          android:textColor="?attr/colorAccent"/>
+          android:text="@string/color"
+          android:textColor="?attr/colorAccent"
+          android:textSize="@dimen/s16_size"/>
         <LinearLayout
           android:id="@+id/setting_general_theme_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
+          android:paddingLeft="@dimen/d16_size"
           android:background="?attr/background_rect_ripple"
-          android:orientation="vertical"
           android:gravity="center_vertical"
-          android:paddingLeft="@dimen/d16_size">
+          android:orientation="vertical">
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/general_theme"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:id="@+id/setting_general_theme_text"
             android:layout_width="wrap_content"
@@ -397,18 +484,18 @@
           <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/d16_size"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/d16_size">
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
               android:text="@string/primary_color"
               android:textColor="?attr/text_color_primary"
-              android:textSize="@dimen/s16_size"
-              android:layout_marginBottom="@dimen/d2_size"/>
+              android:textSize="@dimen/s16_size"/>
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -420,10 +507,10 @@
             android:id="@+id/setting_color_primary_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/bg_circle_small"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:src="@drawable/bg_circle_small"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -436,18 +523,18 @@
           <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/d16_size"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/d16_size">
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
               android:text="@string/accent_color"
               android:textColor="?attr/text_color_primary"
-              android:textSize="@dimen/s16_size"
-              android:layout_marginBottom="@dimen/d2_size"/>
+              android:textSize="@dimen/s16_size"/>
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -459,10 +546,10 @@
             android:id="@+id/setting_color_accent_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/bg_circle_small"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:src="@drawable/bg_circle_small"/>
         </RelativeLayout>
 
 
@@ -476,19 +563,19 @@
           <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/d16_size"
-            android:layout_marginRight="@dimen/d16_size">
+            android:layout_marginRight="@dimen/d16_size"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
               android:text="@string/immersive"
               android:textColor="?attr/text_color_primary"
-              android:textSize="@dimen/s16_size"
-              android:layout_marginBottom="@dimen/d2_size"/>
+              android:textSize="@dimen/s16_size"/>
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -497,14 +584,14 @@
               android:textSize="@dimen/s14_size"/>
           </LinearLayout>
           <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setting_immersive_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn=""
-            android:textOff=""
-            android:id="@+id/setting_immersive_switch"
-            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_alignParentRight="true"
+            android:textOff=""
+            android:textOn=""/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -518,19 +605,19 @@
           <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/d16_size"
-            android:layout_marginRight="@dimen/d16_size">
+            android:layout_marginRight="@dimen/d16_size"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
               android:text="@string/navigation_color"
               android:textColor="?attr/text_color_primary"
-              android:textSize="@dimen/s16_size"
-              android:layout_marginBottom="@dimen/d2_size"/>
+              android:textSize="@dimen/s16_size"/>
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -539,20 +626,20 @@
               android:textSize="@dimen/s14_size"/>
           </LinearLayout>
           <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setting_navaigation_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn=""
-            android:textOff=""
-            android:id="@+id/setting_navaigation_switch"
-            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_alignParentRight="true"
+            android:textOff=""
+            android:textOn=""/>
         </RelativeLayout>
 
         <View
-          android:layout_below="@id/setting_navigation_container"
           android:layout_width="match_parent"
           android:layout_height="1px"
+          android:layout_below="@id/setting_navigation_container"
           android:background="?attr/divider_color"/>
       </LinearLayout>
 
@@ -563,32 +650,32 @@
           android:id="@+id/setting_library_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="@string/library"
+          android:layout_margin="@dimen/d14_size"
           android:layout_alignParentLeft="true"
           android:layout_alignParentTop="true"
-          android:layout_margin="@dimen/d14_size"
-          android:textSize="@dimen/s16_size"
-          android:textColor="?attr/colorAccent"/>
+          android:text="@string/library"
+          android:textColor="?attr/colorAccent"
+          android:textSize="@dimen/s16_size"/>
         <LinearLayout
           android:id="@+id/setting_library_category_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:gravity="center_vertical"
-          android:layout_centerVertical="true"
           android:layout_alignParentLeft="true"
           android:layout_below="@id/setting_library_title"
+          android:layout_centerVertical="true"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
-          android:background="?attr/background_rect_ripple">
+          android:background="?attr/background_rect_ripple"
+          android:gravity="center_vertical"
+          android:orientation="vertical">
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/library_category"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:id="@+id/setting_library_category_text"
             android:layout_width="wrap_content"
@@ -599,9 +686,9 @@
         </LinearLayout>
 
         <View
-          android:layout_below="@id/setting_library_category_container"
           android:layout_width="match_parent"
           android:layout_height="1px"
+          android:layout_below="@id/setting_library_category_container"
           android:background="?attr/divider_color"/>
       </RelativeLayout>
 
@@ -612,32 +699,32 @@
           android:id="@+id/setting_player_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="@string/player"
+          android:layout_margin="@dimen/d14_size"
           android:layout_alignParentLeft="true"
           android:layout_alignParentTop="true"
-          android:layout_margin="@dimen/d14_size"
-          android:textSize="@dimen/s16_size"
-          android:textColor="?attr/colorAccent"/>
+          android:text="@string/player"
+          android:textColor="?attr/colorAccent"
+          android:textSize="@dimen/s16_size"/>
         <LinearLayout
           android:id="@+id/setting_player_bottom_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:gravity="center_vertical"
-          android:layout_centerVertical="true"
           android:layout_alignParentLeft="true"
           android:layout_below="@id/setting_player_title"
+          android:layout_centerVertical="true"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
-          android:background="?attr/background_rect_ripple">
+          android:background="?attr/background_rect_ripple"
+          android:gravity="center_vertical"
+          android:orientation="vertical">
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/show_on_bottom"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -657,19 +744,19 @@
           <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/d16_size"
-            android:layout_marginRight="@dimen/d16_size">
+            android:layout_marginRight="@dimen/d16_size"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
               android:text="@string/screen_always_on_title"
               android:textColor="?attr/text_color_primary"
-              android:textSize="@dimen/s16_size"
-              android:layout_marginBottom="@dimen/d2_size"/>
+              android:textSize="@dimen/s16_size"/>
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -678,20 +765,20 @@
               android:textSize="@dimen/s14_size"/>
           </LinearLayout>
           <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setting_screen_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn=""
-            android:textOff=""
-            android:id="@+id/setting_screen_switch"
-            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_alignParentRight="true"
+            android:textOff=""
+            android:textOn=""/>
         </RelativeLayout>
 
         <View
-          android:layout_below="@id/setting_screen_container"
           android:layout_width="match_parent"
           android:layout_height="1px"
+          android:layout_below="@id/setting_screen_container"
           android:background="?attr/divider_color"/>
       </RelativeLayout>
 
@@ -703,11 +790,11 @@
           android:id="@+id/setting_cover_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="@string/cover"
-          android:layout_gravity="start"
           android:layout_margin="@dimen/d14_size"
-          android:textSize="@dimen/s16_size"
-          android:textColor="?attr/colorAccent"/>
+          android:layout_gravity="start"
+          android:text="@string/cover"
+          android:textColor="?attr/colorAccent"
+          android:textSize="@dimen/s16_size"/>
 
         <RelativeLayout
           android:id="@+id/setting_ignore_mediastore_container"
@@ -719,19 +806,19 @@
           <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
+            android:layout_marginLeft="@dimen/d16_size"
+            android:layout_marginRight="@dimen/d16_size"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/setting_ignore_mediastore_switch"
-            android:layout_marginLeft="@dimen/d16_size"
-            android:layout_marginRight="@dimen/d16_size">
+            android:gravity="center_vertical"
+            android:orientation="vertical">
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
               android:text="@string/ignore_mediastore_artwork"
               android:textColor="?attr/text_color_primary"
-              android:textSize="@dimen/s16_size"
-              android:layout_marginBottom="@dimen/d2_size"/>
+              android:textSize="@dimen/s16_size"/>
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -740,33 +827,33 @@
               android:textSize="@dimen/s14_size"/>
           </LinearLayout>
           <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setting_ignore_mediastore_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn=""
-            android:textOff=""
-            android:id="@+id/setting_ignore_mediastore_switch"
-            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_alignParentRight="true"
+            android:textOff=""
+            android:textOn=""/>
         </RelativeLayout>
 
         <LinearLayout
           android:id="@+id/setting_album_cover_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:gravity="center_vertical"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
-          android:background="?attr/background_rect_ripple">
+          android:background="?attr/background_rect_ripple"
+          android:gravity="center_vertical"
+          android:orientation="vertical">
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/auto_download_album_artist_cover"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:id="@+id/setting_album_cover_text"
             android:layout_width="wrap_content"
@@ -779,19 +866,19 @@
           android:id="@+id/setting_cover_source_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:gravity="center_vertical"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
-          android:background="?attr/background_rect_ripple">
+          android:background="?attr/background_rect_ripple"
+          android:gravity="center_vertical"
+          android:orientation="vertical">
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/cover_download_source"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -813,10 +900,10 @@
           android:id="@+id/setting_lrc_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="@string/lrc"
           android:layout_margin="@dimen/d14_size"
-          android:textSize="@dimen/s16_size"
-          android:textColor="?attr/colorAccent"/>
+          android:text="@string/lrc"
+          android:textColor="?attr/colorAccent"
+          android:textSize="@dimen/s16_size"/>
         <RelativeLayout
           android:id="@+id/setting_lrc_float_container"
           android:layout_width="match_parent"
@@ -827,56 +914,56 @@
           <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/d16_size"
-            android:layout_marginRight="@dimen/d16_size">
+            android:layout_marginRight="@dimen/d16_size"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
               android:text="@string/float_lrc"
               android:textColor="?attr/text_color_primary"
-              android:textSize="@dimen/s16_size"
-              android:layout_marginBottom="@dimen/d2_size"/>
+              android:textSize="@dimen/s16_size"/>
             <TextView
               android:id="@+id/setting_lrc_float_tip"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:text="@string/opened_desktop_lrc"
               android:textColor="?attr/text_color_secondary"
-              android:textSize="@dimen/s14_size"
-              android:text="@string/opened_desktop_lrc"/>
+              android:textSize="@dimen/s14_size"/>
           </LinearLayout>
           <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setting_lrc_float_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn=""
-            android:textOff=""
-            android:id="@+id/setting_lrc_float_switch"
-            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_alignParentRight="true"
+            android:textOff=""
+            android:textOn=""/>
         </RelativeLayout>
 
         <LinearLayout
           android:id="@+id/setting_lrc_priority_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:gravity="center_vertical"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
-          android:paddingRight="@dimen/d16_size">
+          android:paddingRight="@dimen/d16_size"
+          android:gravity="center_vertical"
+          android:orientation="vertical">
 
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/lrc_priority"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
 
           <TextView
             android:layout_width="wrap_content"
@@ -926,36 +1013,36 @@
           android:id="@+id/setting_notify_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="@string/notify"
+          android:layout_margin="@dimen/d14_size"
           android:layout_alignParentLeft="true"
           android:layout_alignParentTop="true"
-          android:layout_margin="@dimen/d14_size"
-          android:textSize="@dimen/s16_size"
-          android:textColor="?attr/colorAccent"/>
+          android:text="@string/notify"
+          android:textColor="?attr/colorAccent"
+          android:textSize="@dimen/s16_size"/>
         <RelativeLayout
           android:id="@+id/setting_classic_notify_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:layout_below="@id/setting_notify_title"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
-          android:background="?attr/background_rect_ripple"
-          android:layout_below="@id/setting_notify_title">
+          android:background="?attr/background_rect_ripple">
           <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/d16_size"
-            android:layout_marginRight="@dimen/d16_size">
+            android:layout_marginRight="@dimen/d16_size"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
               android:text="@string/notify_style"
               android:textColor="?attr/text_color_primary"
-              android:textSize="@dimen/s16_size"
-              android:layout_marginBottom="@dimen/d2_size"/>
+              android:textSize="@dimen/s16_size"/>
             <TextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -964,36 +1051,36 @@
               android:textSize="@dimen/s14_size"/>
           </LinearLayout>
           <android.support.v7.widget.SwitchCompat
+            android:id="@+id/setting_notify_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn=""
-            android:textOff=""
-            android:id="@+id/setting_notify_switch"
-            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_alignParentRight="true"
+            android:textOff=""
+            android:textOn=""/>
         </RelativeLayout>
 
         <LinearLayout
           android:id="@+id/setting_notify_color_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:layout_alignParentLeft="true"
           android:layout_below="@id/setting_classic_notify_container"
+          android:layout_centerVertical="true"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
+          android:paddingLeft="@dimen/d16_size"
           android:background="?attr/background_rect_ripple"
-          android:orientation="vertical"
           android:gravity="center_vertical"
-          android:layout_centerVertical="true"
-          android:layout_alignParentLeft="true"
-          android:paddingLeft="@dimen/d16_size">
+          android:orientation="vertical">
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
             android:text="@string/notify_bg_color"
             android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s16_size"
-            android:layout_marginBottom="@dimen/d2_size"/>
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -1003,9 +1090,9 @@
         </LinearLayout>
 
         <View
-          android:layout_below="@id/setting_notify_color_container"
           android:layout_width="match_parent"
           android:layout_height="1px"
+          android:layout_below="@id/setting_notify_color_container"
           android:background="?attr/divider_color"/>
       </RelativeLayout>
 
@@ -1016,12 +1103,12 @@
           android:id="@+id/setting_other_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="@string/other"
+          android:layout_margin="@dimen/d14_size"
           android:layout_alignParentLeft="true"
           android:layout_alignParentTop="true"
-          android:layout_margin="@dimen/d14_size"
-          android:textSize="@dimen/s16_size"
-          android:textColor="?attr/colorAccent"/>
+          android:text="@string/other"
+          android:textColor="?attr/colorAccent"
+          android:textSize="@dimen/s16_size"/>
         <RelativeLayout
           android:id="@+id/setting_eq_container"
           android:layout_width="match_parent"
@@ -1033,20 +1120,20 @@
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/eq_setting"
-            android:textSize="@dimen/s16_size"
-            android:textColor="?attr/text_color_primary"
-            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/d16_size"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/d16_size"/>
+            android:layout_centerVertical="true"
+            android:text="@string/eq_setting"
+            android:textColor="?attr/text_color_primary"
+            android:textSize="@dimen/s16_size"/>
           <ImageView
             android:id="@+id/setting_eq_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/arrow_right"
-            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_centerVertical="true"
+            android:background="@drawable/arrow_right"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -1060,20 +1147,20 @@
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/feedback_info"
-            android:textSize="@dimen/s16_size"
-            android:textColor="?attr/text_color_primary"
-            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/d16_size"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/d16_size"/>
+            android:layout_centerVertical="true"
+            android:text="@string/feedback_info"
+            android:textColor="?attr/text_color_primary"
+            android:textSize="@dimen/s16_size"/>
           <ImageView
             android:id="@+id/setting_feedback_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/arrow_right"
-            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_centerVertical="true"
+            android:background="@drawable/arrow_right"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -1087,20 +1174,20 @@
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/about_info"
-            android:textSize="@dimen/s16_size"
-            android:textColor="?attr/text_color_primary"
-            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/d16_size"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/d16_size"/>
+            android:layout_centerVertical="true"
+            android:text="@string/about_info"
+            android:textColor="?attr/text_color_primary"
+            android:textSize="@dimen/s16_size"/>
           <ImageView
             android:id="@+id/setting_about_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/arrow_right"
-            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_centerVertical="true"
+            android:background="@drawable/arrow_right"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -1114,21 +1201,21 @@
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/check_update"
-            android:textSize="@dimen/s16_size"
-            android:textColor="?attr/text_color_primary"
-            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/d16_size"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/d16_size"/>
+            android:layout_centerVertical="true"
+            android:text="@string/check_update"
+            android:textColor="?attr/text_color_primary"
+            android:textSize="@dimen/s16_size"/>
           <ImageView
-            android:visibility="gone"
             android:id="@+id/setting_update_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/arrow_right"
-            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_centerVertical="true"
+            android:background="@drawable/arrow_right"
+            android:visibility="gone"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -1142,27 +1229,27 @@
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/clear_cache"
-            android:textSize="@dimen/s16_size"
-            android:textColor="?attr/text_color_primary"
-            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/d16_size"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/d16_size"/>
+            android:layout_centerVertical="true"
+            android:text="@string/clear_cache"
+            android:textColor="?attr/text_color_primary"
+            android:textSize="@dimen/s16_size"/>
           <TextView
             android:id="@+id/setting_clear_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/s14_size"
-            android:textColor="?attr/text_color_primary"
-            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/d14_size"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/d14_size"/>
+            android:layout_centerVertical="true"
+            android:textColor="?attr/text_color_primary"
+            android:textSize="@dimen/s14_size"/>
         </RelativeLayout>
 
         <View
-          android:layout_below="@id/setting_clear_container"
           android:layout_width="match_parent"
           android:layout_height="1px"
+          android:layout_below="@id/setting_clear_container"
           android:background="?attr/divider_color"/>
       </RelativeLayout>
     </LinearLayout>

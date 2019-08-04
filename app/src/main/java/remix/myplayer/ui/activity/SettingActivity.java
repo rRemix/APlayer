@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.GradientDrawable;
-import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,13 +39,10 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.MaterialDialog.ListCallbackSingleChoice;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.gson.Gson;
@@ -66,17 +62,16 @@ import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.helper.EQHelper;
 import remix.myplayer.helper.LanguageHelper;
-import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
 import remix.myplayer.misc.update.UpdateAgent;
 import remix.myplayer.misc.update.UpdateListener;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.service.Command;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.theme.TintHelper;
@@ -98,6 +93,7 @@ import remix.myplayer.util.Util;
  * @Author Xiaoborui
  * @Date 2016/8/23 13:51
  */
+//todo 重构整个界面
 public class SettingActivity extends ToolbarActivity implements FolderChooserDialog.FolderCallback,
     FileChooserDialog.FileCallback, ColorChooserDialog.ColorCallback {
 
@@ -135,10 +131,12 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
   SwitchCompat mShowDisplaynameSwitch;
   @BindView(R.id.setting_general_theme_text)
   TextView mThemeText;
+  @BindView(R.id.setting_audio_focus_switch)
+  SwitchCompat mAudioFocusSwitch;
 
   @BindViews({R.id.setting_common_title, R.id.setting_color_title, R.id.setting_cover_title,
       R.id.setting_library_title, R.id.setting_lrc_title, R.id.setting_notify_title,
-      R.id.setting_other_title, R.id.setting_player_title})
+      R.id.setting_other_title, R.id.setting_player_title, R.id.setting_play_title})
   TextView[] mTitles;
 
   @BindViews({R.id.setting_eq_arrow, R.id.setting_feedback_arrow, R.id.setting_about_arrow,
@@ -188,10 +186,12 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,
         SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, SPUtil.SETTING_KEY.IMMERSIVE_MODE,
         SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE,
-        SPUtil.SETTING_KEY.SHOW_DISPLAYNAME};
-    ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch, mFloatLrcSwitch,
-        mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch, mBreakpointSwitch,
-        mIgnoreMediastoreSwitch, mShowDisplaynameSwitch}, new ButterKnife.Action<SwitchCompat>() {
+        SPUtil.SETTING_KEY.SHOW_DISPLAYNAME, SPUtil.SETTING_KEY.AUDIO_FOCUS};
+    ButterKnife.apply(new SwitchCompat[]{
+        mNaviSwitch, mShakeSwitch, mFloatLrcSwitch,
+        mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch,
+        mBreakpointSwitch, mIgnoreMediastoreSwitch, mShowDisplaynameSwitch,
+        mAudioFocusSwitch}, new ButterKnife.Action<SwitchCompat>() {
       @Override
       public void apply(@NonNull SwitchCompat view, final int index) {
         TintHelper.setTintAuto(view, ThemeStore.getAccentColor(), false);
@@ -240,24 +240,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 intent.putExtra(EXTRA_DESKTOP_LYRIC, mFloatLrcSwitch.isChecked());
                 sendLocalBroadcast(intent);
                 break;
-              //屏幕常亮
-              case R.id.setting_screen_switch:
-                break;
-              //通知栏样式
-              case R.id.setting_notify_switch:
-                sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.TOGGLE_NOTIFY)
-                    .putExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, isChecked));
-                break;
               //沉浸式状态栏
               case R.id.setting_immersive_switch:
                 ThemeStore.IMMERSIVE_MODE = isChecked;
                 mNeedRecreate = true;
                 mHandler.sendEmptyMessage(RECREATE);
-                break;
-              //断点播放
-              case R.id.setting_breakpoint_switch:
-                sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.PLAY_AT_BREAKPOINT)
-                    .putExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, isChecked));
                 break;
               //忽略内嵌
               case R.id.setting_ignore_mediastore_switch:
@@ -276,10 +263,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
       }
     });
 
-//        //歌词搜索路径
-//        if (!SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "").equals("")) {
-//            mLrcPath.setText(getString(R.string.lrc_tip, SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")));
-//        }
     //桌面歌词
     mFloatLrcTip.setText(
         mFloatLrcSwitch.isChecked() ? R.string.opened_desktop_lrc : R.string.closed_desktop_lrc);
@@ -393,44 +376,36 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         DatabaseRepository.getInstance()
             .getAllPlaylist()
-            .map(new Function<List<PlayList>, List<String>>() {
-              @Override
-              public List<String> apply(List<PlayList> playLists) throws Exception {
-                List<String> allPlayListsName = new ArrayList<>();
-                //判断是否存在
-                boolean alreadyExist = false;
-                for (PlayList playList : playLists) {
-                  allPlayListsName.add(playList.getName());
-                  if (playList.getName().equalsIgnoreCase(newPlaylistName)) {
-                    alreadyExist = true;
-                  }
+            .map(playLists -> {
+              List<String> allPlayListsName = new ArrayList<>();
+              //判断是否存在
+              boolean alreadyExist = false;
+              for (PlayList playList : playLists) {
+                allPlayListsName.add(playList.getName());
+                if (playList.getName().equalsIgnoreCase(newPlaylistName)) {
+                  alreadyExist = true;
                 }
-                //不存在则提示新建
-                if (!alreadyExist) {
-                  allPlayListsName.add(0, newPlaylistName + "(" + getString(R.string.new_create) + ")");
-                }
-
-                return allPlayListsName;
               }
+              //不存在则提示新建
+              if (!alreadyExist) {
+                allPlayListsName.add(0, newPlaylistName + "(" + getString(R.string.new_create) + ")");
+              }
+
+              return allPlayListsName;
             })
             .compose(applySingleScheduler())
-            .subscribe(new Consumer<List<String>>() {
-              @Override
-              public void accept(List<String> allPlayListsName) throws Exception {
-                Theme.getBaseDialog(mContext)
-                    .title(R.string.import_playlist_to)
-                    .items(allPlayListsName)
-                    .itemsCallback((dialog1, itemView, position, text) -> {
-                      final boolean chooseNew =
-                          position == 0 && text.toString().endsWith(
-                              "(" + getString(R.string.new_create) + ")");
-                      mDisposables.add(
-                          importM3UFile(SettingActivity.this, file, chooseNew ? newPlaylistName : text.toString(),
-                              chooseNew));
-                    })
-                    .show();
-              }
-            });
+            .subscribe(allPlayListsName -> Theme.getBaseDialog(mContext)
+                .title(R.string.import_playlist_to)
+                .items(allPlayListsName)
+                .itemsCallback((dialog1, itemView, position, text) -> {
+                  final boolean chooseNew =
+                      position == 0 && text.toString().endsWith(
+                          "(" + getString(R.string.new_create) + ")");
+                  mDisposables.add(
+                      importM3UFile(SettingActivity.this, file, chooseNew ? newPlaylistName : text.toString(),
+                          chooseNew));
+                })
+                .show());
 
         break;
     }
@@ -459,23 +434,21 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
   @SuppressLint("CheckResult")
   @OnClick({R.id.setting_filter_container, R.id.setting_primary_color_container,
-      R.id.setting_notify_color_container,
-      R.id.setting_feedback_container, R.id.setting_about_container, R.id.setting_update_container,
+      R.id.setting_notify_color_container, R.id.setting_feedback_container,
+      R.id.setting_about_container, R.id.setting_update_container,
       R.id.setting_lockscreen_container, R.id.setting_lrc_priority_container,
-      R.id.setting_lrc_float_container,
-      R.id.setting_navigation_container, R.id.setting_shake_container, R.id.setting_eq_container,
+      R.id.setting_lrc_float_container, R.id.setting_navigation_container,
+      R.id.setting_shake_container, R.id.setting_eq_container,
       R.id.setting_clear_container, R.id.setting_breakpoint_container,
-      R.id.setting_screen_container,
-      R.id.setting_scan_container, R.id.setting_classic_notify_container,
-      R.id.setting_album_cover_container,
+      R.id.setting_screen_container, R.id.setting_scan_container,
+      R.id.setting_classic_notify_container, R.id.setting_album_cover_container,
       R.id.setting_library_category_container, R.id.setting_immersive_container,
-      R.id.setting_import_playlist_container,
-      R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container,
-      R.id.setting_cover_source_container,
+      R.id.setting_import_playlist_container, R.id.setting_export_playlist_container,
+      R.id.setting_ignore_mediastore_container, R.id.setting_cover_source_container,
       R.id.setting_player_bottom_container, R.id.setting_restore_delete_container,
-      R.id.setting_displayname_container,
-      R.id.setting_general_theme_container, R.id.setting_accent_color_container,
-      R.id.setting_language_container})
+      R.id.setting_displayname_container, R.id.setting_general_theme_container,
+      R.id.setting_accent_color_container, R.id.setting_language_container,
+      R.id.setting_auto_play_headset_container, R.id.setting_audio_focus_container})
   public void onClick(View v) {
     switch (v.getId()) {
       //文件过滤
@@ -488,19 +461,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         break;
       //桌面歌词
       case R.id.setting_lrc_float_container:
-//                if((!mFloatLrcSwitch.isChecked() && FloatWindowManager.getInstance().checkPermission(this)) || mFloatLrcSwitch.isChecked()){
-//                    mFloatLrcSwitch.setChecked(!mFloatLrcSwitch.isChecked());
-//                }
         mFloatLrcSwitch.setChecked(!mFloatLrcSwitch.isChecked());
         break;
-//            //歌词扫描路径
-//            case R.id.setting_lrc_path_container:
-//                new FolderChooserDialog.Builder(this)
-//                        .chooseButton(R.string.choose_folder)
-//                        .allowNewFolder(false, R.string.new_folder)
-//                        .tag("Lrc")
-//                        .show();
-//                break;
       //歌词搜索优先级
       case R.id.setting_lrc_priority_container:
         configLyricPriority();
@@ -629,7 +591,31 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
       case R.id.setting_language_container:
         changeLanguage();
         break;
+      //音频焦点
+      case R.id.setting_audio_focus_container:
+        mAudioFocusSwitch.setChecked(!mAudioFocusSwitch.isChecked());
+        break;
+      //自动播放
+      case R.id.setting_auto_play_headset_container:
+        configAutoPlay();
+        break;
     }
+  }
+
+  private void configAutoPlay() {
+    final String headset = getString(R.string.auto_play_headset_plug);
+    final String open = getString(R.string.auto_play_open_software);
+    final String never = getString(R.string.auto_play_none);
+
+    int choice = SPUtil
+        .getValue(this, SETTING_KEY.NAME, SETTING_KEY.AUTO_PLAY, HeadsetPlugReceiver.NEVER);
+    getBaseDialog(this)
+        .items(new String[]{headset, open, never})
+        .itemsCallbackSingleChoice(choice, (dialog, itemView, which, text) -> {
+          SPUtil.putValue(SettingActivity.this, SETTING_KEY.NAME, SETTING_KEY.AUTO_PLAY, which);
+          return true;
+        })
+        .show();
   }
 
   private void changeLanguage() {
@@ -906,10 +892,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             (dialog, view, which, text) -> {
               SPUtil.putValue(mContext, SETTING_KEY.NAME,
                   SETTING_KEY.NOTIFY_SYSTEM_COLOR, which == 0);
-              sendLocalBroadcast(new Intent(MusicService.ACTION_CMD)
-                  .putExtra("Control", Command.TOGGLE_NOTIFY)
-                  .putExtra(SETTING_KEY.NOTIFY_STYLE_CLASSIC,
-                      mNotifyStyleSwitch.isChecked()));
               return true;
             })
         .show();
@@ -930,11 +912,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             (dialog, view, which, text) -> {
               SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN,
                   which);
-              mLockScreenTip.setText(which == 0 ? R.string.aplayer_lockscreen_tip :
-                  which == 1 ? R.string.system_lockscreen_tip : R.string.lockscreen_off_tip);
-              Intent intent = new Intent(MusicService.ACTION_CMD);
-              intent.putExtra("Control", Command.TOGGLE_MEDIASESSION);
-              sendLocalBroadcast(intent);
+              mLockScreenTip.setText(
+                  which == Constants.APLAYER_LOCKSCREEN ? R.string.aplayer_lockscreen_tip :
+                      which == Constants.SYSTEM_LOCKSCREEN ? R.string.system_lockscreen_tip :
+                          R.string.lockscreen_off_tip);
               return true;
             }).show();
   }

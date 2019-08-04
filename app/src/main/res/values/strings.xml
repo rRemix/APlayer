@@ -392,4 +392,13 @@
   <string name="english">English</string>
   <string name="bass_boost">Bass boost</string>
   <string name="virtualizer">Virtualizer</string>
+
+  <string name="audio_focus">Ignore audio focus</string>
+  <string name="audio_focus_tip">Don\'t pauses music when loss audio focus</string>
+
+  <string name="auto_play">Auto play</string>
+  <string name="auto_play_tip">Configure whether to play automatically</string>
+  <string name="auto_play_headset_plug">When headphone jack plugged it\`s starts playing</string>
+  <string name="auto_play_open_software">When open software it\`s starts playing</string>
+  <string name="auto_play_none">Never</string>
 </resources>

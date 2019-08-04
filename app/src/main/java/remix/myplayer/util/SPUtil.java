@@ -19,7 +19,7 @@ import remix.myplayer.bean.misc.LyricPriority;
  */
 public class SPUtil {
 
-  public static SPUtil mInstance;
+  private static SPUtil mInstance;
 
   public SPUtil() {
     if (mInstance == null) {
@@ -224,6 +224,10 @@ public class SPUtil {
 //    String ENABLE_VIRTUALIZER = "enable_virtualizer";
     //virtualizer strength
     String VIRTUALIZER_STRENGTH = "virtualizer_strength";
+    //音频焦点
+    String AUDIO_FOCUS = "audio_focus";
+    //自动播放
+    String AUTO_PLAY = "auto_play_headset_plug_in";
   }
 
   public interface LYRIC_OFFSET_KEY {

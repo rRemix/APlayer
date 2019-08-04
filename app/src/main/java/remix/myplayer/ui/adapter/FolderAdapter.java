@@ -17,8 +17,8 @@ import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.theme.GradientDrawableMaker;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
+import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 
@@ -85,9 +85,9 @@ public class FolderAdapter extends BaseAdapter<Folder, FolderAdapter.FolderHolde
 
     if (mOnItemClickListener != null && holder.mContainer != null) {
       holder.mContainer.setOnClickListener(
-          v -> mOnItemClickListener.onItemClick(v, holder.getAdapterPosition()));
+          v -> mOnItemClickListener.onItemClick(v, position));
       holder.mContainer.setOnLongClickListener(v -> {
-        mOnItemClickListener.onItemLongClick(v, holder.getAdapterPosition());
+        mOnItemClickListener.onItemLongClick(v, position);
         return true;
       });
     }

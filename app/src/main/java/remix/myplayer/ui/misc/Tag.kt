@@ -117,8 +117,6 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
                 .compose(RxUtil.applyScheduler())
                 .subscribe({ song ->
                   sendCMDLocalBroadcast(Command.CHANGE_LYRIC)
-//                  sendLocalBroadcast(Intent(TagReceiver.ACTION_EDIT_TAG)
-//                      .putExtra(EXTRA_NEW_SONG, song))
                   sendLocalBroadcast(Intent(MusicService.TAG_CHANGE)
                       .putExtra(EXTRA_NEW_SONG, song)
                       .putExtra(EXTRA_OLD_SONG, oldSong))

@@ -2,9 +2,7 @@ package remix.myplayer.ui.adapter;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.theme.ThemeStore.getHighLightTextColor;
-import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
 import static remix.myplayer.theme.ThemeStore.getTextColorPrimary;
-import static remix.myplayer.theme.ThemeStore.isLightTheme;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 import android.annotation.SuppressLint;
@@ -36,7 +34,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.MusicUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -135,7 +132,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
     final SongViewHolder holder = (SongViewHolder) baseHolder;
 
     //封面
-    holder.mImage.setTag(setImage(holder.mImage,getSearchRequestWithAlbumType(song),SMALL_IMAGE_SIZE, position));
+    holder.mImage.setTag(setImage(holder.mImage, getSearchRequestWithAlbumType(song), SMALL_IMAGE_SIZE, position));
 
 //        //是否为无损
 //        if(!TextUtils.isEmpty(song.getDisplayname())){
@@ -176,18 +173,18 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
     });
 
     holder.mContainer.setOnClickListener(v -> {
-      if (holder.getAdapterPosition() - 1 < 0) {
+      if (position - 1 < 0) {
         ToastUtil.show(mContext, R.string.illegal_arg);
         return;
       }
-      mOnItemClickListener.onItemClick(v, holder.getAdapterPosition() - 1);
+      mOnItemClickListener.onItemClick(v, position - 1);
     });
     holder.mContainer.setOnLongClickListener(v -> {
-      if (holder.getAdapterPosition() - 1 < 0) {
+      if (position - 1 < 0) {
         ToastUtil.show(mContext, R.string.illegal_arg);
         return true;
       }
-      mOnItemClickListener.onItemLongClick(v, holder.getAdapterPosition() - 1);
+      mOnItemClickListener.onItemLongClick(v, position - 1);
       return true;
     });
 

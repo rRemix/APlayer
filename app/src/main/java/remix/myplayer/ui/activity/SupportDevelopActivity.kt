@@ -39,6 +39,7 @@ import remix.myplayer.theme.Theme
 import remix.myplayer.ui.adapter.PurchaseAdapter
 import remix.myplayer.util.AlipayUtil
 import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 import java.io.File
 import java.io.OutputStream
 import java.util.*
@@ -161,7 +162,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
             2 -> {
               val intent = Intent("android.intent.action.VIEW")
               intent.data = Uri.parse("https://www.paypal.me/rRemix")
-              startActivity(intent)
+              Util.startActivitySafely(this@SupportDevelopActivity, intent)
             }
             else -> {
               mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position - 3])
@@ -212,7 +213,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
           }
 
           override fun onStart() {
-            if (hasWindowFocus()){
+            if (hasWindowFocus()) {
               mLoading.show()
             }
           }

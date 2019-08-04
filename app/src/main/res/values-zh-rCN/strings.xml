@@ -393,4 +393,13 @@
 
   <string name="bass_boost">低音增强</string>
   <string name="virtualizer">环绕声</string>
+
+  <string name="audio_focus">忽略音频焦点</string>
+  <string name="audio_focus_tip">失去音频焦点时不暂停播放</string>
+
+  <string name="auto_play">自动播放</string>
+  <string name="auto_play_tip">配置是否自动播放</string>
+  <string name="auto_play_headset_plug">耳机插入时自动播放</string>
+  <string name="auto_play_open_software">打开软件时自动播放</string>
+  <string name="auto_play_none">从不</string>
 </resources>

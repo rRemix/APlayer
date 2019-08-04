@@ -12,14 +12,14 @@ import remix.myplayer.service.MusicService
 import remix.myplayer.util.SPUtil
 import timber.log.Timber
 import java.lang.ref.WeakReference
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Created by remix on 2019/2/6
  */
 class LyricHolder(service: MusicService) {
 
-  @Volatile
-  private var lrcRows: List<LrcRow>? = null
+  private val lrcRows = CopyOnWriteArrayList<LrcRow>()
   private val reference: WeakReference<MusicService> = WeakReference(service)
   private var disposable: Disposable? = null
   private var song: Song = Song.EMPTY_SONG
@@ -48,30 +48,28 @@ class LyricHolder(service: MusicService) {
         }
         val progress = service.progress + offset
 
-        lrcRows?.let { lrcRows ->
-          for (i in lrcRows.indices.reversed()) {
-            val lrcRow = lrcRows[i]
-            val interval = progress - lrcRow.time
-            if (i == 0 && interval < 0) {
-              //未开始歌唱前显示歌曲信息
-              wrapper.lineOne = LrcRow("", 0, song.title)
-              wrapper.lineTwo = LrcRow("", 0, song.artist + " - " + song.album)
-              return wrapper
-            } else if (progress >= lrcRow.time) {
-              if (lrcRow.hasTranslate()) {
-                wrapper.lineOne = LrcRow(lrcRow)
-                wrapper.lineOne.content = lrcRow.content
-                wrapper.lineTwo = LrcRow(lrcRow)
-                wrapper.lineTwo.content = lrcRow.translate
-              } else {
-                wrapper.lineOne = lrcRow
-                wrapper.lineTwo = LrcRow(if (i + 1 < lrcRows.size) lrcRows[i + 1] else LYRIC_EMPTY_ROW)
-              }
-              return wrapper
+        for (i in lrcRows.indices.reversed()) {
+          val lrcRow = lrcRows[i]
+          val interval = progress - lrcRow.time
+          if (i == 0 && interval < 0) {
+            //未开始歌唱前显示歌曲信息
+            wrapper.lineOne = LrcRow("", 0, song.title)
+            wrapper.lineTwo = LrcRow("", 0, song.artist + " - " + song.album)
+            return wrapper
+          } else if (progress >= lrcRow.time) {
+            if (lrcRow.hasTranslate()) {
+              wrapper.lineOne = LrcRow(lrcRow)
+              wrapper.lineOne.content = lrcRow.content
+              wrapper.lineTwo = LrcRow(lrcRow)
+              wrapper.lineTwo.content = lrcRow.translate
+            } else {
+              wrapper.lineOne = lrcRow
+              wrapper.lineTwo = LrcRow(if (i + 1 < lrcRows.size) lrcRows[i + 1] else LYRIC_EMPTY_ROW)
             }
+            return wrapper
           }
-
         }
+
         return wrapper
 
       }
@@ -89,7 +87,7 @@ class LyricHolder(service: MusicService) {
 
     if (song == Song.EMPTY_SONG) {
       status = Status.NO
-      lrcRows = null
+      lrcRows.clear()
       return
     }
 
@@ -98,18 +96,21 @@ class LyricHolder(service: MusicService) {
     disposable?.dispose()
     disposable = lyricSearcher.setSong(song)
         .getLyricObservable()
-        .doOnSubscribe { status = Status.SEARCHING }
-        .subscribe({ it ->
+        .doOnSubscribe {
+          status = Status.SEARCHING
+        }
+        .subscribe({
           if (id == song.id) {
             status = Status.NORMAL
             offset = SPUtil.getValue(App.getContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, id.toString(), 0)
-            lrcRows = it
+            lrcRows.clear()
+            lrcRows.addAll(it)
           }
         }, { throwable ->
           Timber.v(throwable)
           if (id == song.id) {
             status = Status.NO
-            lrcRows = null
+            lrcRows.clear()
           }
         })
   }

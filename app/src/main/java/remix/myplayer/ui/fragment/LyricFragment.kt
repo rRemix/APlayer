@@ -83,6 +83,7 @@ class LyricFragment : BaseMusicFragment() {
   override fun onDestroyView() {
     msgHandler.remove()
     disposable?.dispose()
+    onFindListener = null
     super.onDestroyView()
   }
 

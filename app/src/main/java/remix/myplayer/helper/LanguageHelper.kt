@@ -13,7 +13,7 @@ object LanguageHelper {
   const val CHINESE = 1
   const val ENGLISH = 2
 
-  var sLocal: Locale = Locale.getDefault()
+  private var sLocal: Locale = Locale.getDefault()
 
   private val TAG = "LanguageHelper"
 
@@ -29,7 +29,7 @@ object LanguageHelper {
   /**
    * 获取选择的语言设置
    */
-  private fun getSetLanguageLocale(context: Context): Locale? {
+  private fun selectLanguageLocale(context: Context): Locale? {
     return when (SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO)) {
       AUTO -> sLocal
       CHINESE -> Locale.CHINA
@@ -46,7 +46,7 @@ object LanguageHelper {
 
   @JvmStatic
   fun setLocal(context: Context): Context {
-    return updateResources(context, getSetLanguageLocale(context))
+    return updateResources(context, selectLanguageLocale(context))
   }
 
   private fun updateResources(context: Context, locale: Locale?): Context {
@@ -72,7 +72,7 @@ object LanguageHelper {
     val resources = context.applicationContext.resources
     val dm = resources.displayMetrics
     val config = resources.configuration
-    val locale = getSetLanguageLocale(context)
+    val locale = selectLanguageLocale(context)
     config.locale = locale
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       val localeList = LocaleList(locale!!)

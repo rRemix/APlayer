@@ -10,6 +10,7 @@ import android.content.Intent
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.support.v4.app.TaskStackBuilder
+import io.reactivex.disposables.Disposable
 import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -21,6 +22,8 @@ import remix.myplayer.ui.activity.PlayerActivity
  */
 
 abstract class Notify internal constructor(internal var service: MusicService) {
+  protected var disposable: Disposable? = null
+
   private val notificationManager: NotificationManager by lazy {
     service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
   }

@@ -10,7 +10,6 @@ import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.squareup.leakcanary.LeakCanary;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -49,14 +48,6 @@ public class App extends MultiDexApplication {
     }
 
     setUp();
-
-//    //异常捕获
-//    CrashHandler.getInstance().init(this);
-
-    // 检测内存泄漏
-    if (!LeakCanary.isInAnalyzerProcess(this)) {
-      LeakCanary.install(this);
-    }
 
     // AppShortcut
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {

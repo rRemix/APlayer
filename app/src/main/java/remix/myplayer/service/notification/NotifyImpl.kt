@@ -6,10 +6,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.support.v4.app.NotificationCompat
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.RemoteViews
-import android.widget.TextView
 import remix.myplayer.R
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
@@ -28,22 +26,22 @@ import timber.log.Timber
 
 class NotifyImpl(context: MusicService) : Notify(context) {
 
-  private var titleColor: Int? = null
-  private var textColor: Int? = null
+//  private var titleColor: Int? = null
+//  private var textColor: Int? = null
 
-  init {
-    try {
-      val linearLayout = LayoutInflater.from(context).inflate(R.layout.notification_big, null)
-
-      val titleView = linearLayout.findViewById<TextView>(R.id.notify_song)
-      val textView = linearLayout.findViewById<TextView>(R.id.notify_artist_album)
-
-      titleColor = titleView.textColors.defaultColor
-      textColor = textView.textColors.defaultColor
-    } catch (e: Exception) {
-      Timber.w(e)
-    }
-  }
+//  init {
+//    try {
+//      val linearLayout = LayoutInflater.from(context).inflate(R.layout.notification_big, null)
+//
+//      val titleView = linearLayout.findViewById<TextView>(R.id.notify_song)
+//      val textView = linearLayout.findViewById<TextView>(R.id.notify_artist_album)
+//
+//      titleColor = titleView.textColors.defaultColor
+//      textColor = textView.textColors.defaultColor
+//    } catch (e: Exception) {
+//      Timber.w(e)
+//    }
+//  }
 
 
   override fun updateForPlaying() {
@@ -52,12 +50,11 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     val remoteView = RemoteViews(service.packageName, R.layout.notification)
     val remoteBigView = RemoteViews(service.packageName, R.layout.notification_big)
     val isPlay = service.isPlaying
+    val song = service.currentSong
+    val isSystemColor = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true)
 
     buildAction(service, remoteView, remoteBigView)
     val notification = buildNotification(service, remoteView, remoteBigView)
-
-    val song = service.currentSong
-    val isSystemColor = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true)
 
     //设置歌手，歌曲名
     remoteBigView.setTextViewText(R.id.notify_song, song.title)
@@ -92,20 +89,30 @@ class NotifyImpl(context: MusicService) : Notify(context) {
       remoteBigView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_pause)
       remoteView.setImageViewResource(R.id.notify_play, R.drawable.icon_notify_pause)
     }
+
     //设置封面
     val size = DensityUtil.dip2px(service, 128f)
 
-    object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
+    disposable?.dispose()
+    disposable = object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
+      override fun onStart() {
+        Timber.v("onStart")
+        remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+        remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+        pushNotify(notification)
+      }
+
       override fun onError(throwable: Throwable) {
+        Timber.v("onError")
         remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
         remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
         pushNotify(notification)
       }
 
       override fun onSuccess(result: Bitmap?) {
+        Timber.v("onSuccess")
         try {
-          //                        Bitmap result = copy(bitmap);
-          if (result != null) {
+          if (result != null && !result.isRecycled) {
             remoteBigView.setImageViewBitmap(R.id.notify_image, result)
             remoteView.setImageViewBitmap(R.id.notify_image, result)
           } else {
@@ -164,25 +171,25 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     remoteView.setOnClickPendingIntent(R.id.notify_lyric, lyricIntent)
   }
 
-  private fun tintBitmap(resId: Int, color: Int?): Bitmap {
-    val bitmap = BitmapFactory.decodeResource(service.resources, resId)
-    return replaceBitmapColor(bitmap, color ?: return bitmap)
-  }
-
-  private fun replaceBitmapColor(oldBitmap: Bitmap, newColor: Int): Bitmap {
-    val copy = oldBitmap.copy(Bitmap.Config.ARGB_8888, true)
-    //循环获得bitmap所有像素点
-    val width = copy.width
-    val height = copy.height
-    for (i in 0 until height) {
-      for (j in 0 until width) {
-        val color = copy.getPixel(j, i)
-        if (color != Color.TRANSPARENT) {
-          copy.setPixel(j, i, newColor)  //替换
-        }
-      }
-    }
-    return copy
-  }
+//  private fun tintBitmap(resId: Int, color: Int?): Bitmap {
+//    val bitmap = BitmapFactory.decodeResource(service.resources, resId)
+//    return replaceBitmapColor(bitmap, color ?: return bitmap)
+//  }
+//
+//  private fun replaceBitmapColor(oldBitmap: Bitmap, newColor: Int): Bitmap {
+//    val copy = oldBitmap.copy(Bitmap.Config.ARGB_8888, true)
+//    //循环获得bitmap所有像素点
+//    val width = copy.width
+//    val height = copy.height
+//    for (i in 0 until height) {
+//      for (j in 0 until width) {
+//        val color = copy.getPixel(j, i)
+//        if (color != Color.TRANSPARENT) {
+//          copy.setPixel(j, i, newColor)  //替换
+//        }
+//      }
+//    }
+//    return copy
+//  }
 
 }

@@ -115,20 +115,20 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
     }.load();
 
     holder.mContainer.setOnClickListener(v -> {
-      if (holder.getAdapterPosition() - 1 < 0) {
+      if (position - 1 < 0) {
         ToastUtil.show(mContext, R.string.illegal_arg);
         return;
       }
-      mOnItemClickListener.onItemClick(holder.mContainer, holder.getAdapterPosition() - 1);
+      mOnItemClickListener.onItemClick(holder.mContainer, position - 1);
     });
 
     //多选菜单
     holder.mContainer.setOnLongClickListener(v -> {
-      if (holder.getAdapterPosition() - 1 < 0) {
+      if (position - 1 < 0) {
         ToastUtil.show(mContext, R.string.illegal_arg);
         return true;
       }
-      mOnItemClickListener.onItemLongClick(holder.mContainer, holder.getAdapterPosition() - 1);
+      mOnItemClickListener.onItemLongClick(holder.mContainer, position - 1);
       return true;
     });
 

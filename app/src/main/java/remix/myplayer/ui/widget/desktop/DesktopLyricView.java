@@ -368,7 +368,7 @@ public class DesktopLyricView extends RelativeLayout {
       case R.id.widget_lock:
         saveLock(true, true);
         mUIHandler.postDelayed(mHideRunnable, 0);
-        Util.sendCMDLocalBroadcast(Command.LOCK_LYRIC);
+        Util.sendCMDLocalBroadcast(Command.LOCK_DESKTOP_LYRIC);
 //                mUnLock.setVisibility(VISIBLE);
         break;
       //歌词字体、大小设置

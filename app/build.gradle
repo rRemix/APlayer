@@ -32,14 +32,14 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 1535
-        versionName "1.5.3.5-debug"
+        versionCode 1540
+        versionName "1.5.4.0"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
-//            abiFilters 'armeabi-v7a'
-            abiFilters 'armeabi-v7a', 'x86'
+            abiFilters 'armeabi-v7a'
+//            abiFilters 'armeabi-v7a', 'x86'
         }
         externalNativeBuild {
             cmake {
@@ -107,9 +107,9 @@ android {
 //        tencent{}
 //        alibaba{}
 //        meizu{}
-//        assistant91{}
-//        baidu{}
-//        anzhuomarket{}
+        assistant91{}
+        baidu{}
+        anzhuomarket{}
 //        chuizi {}
 //        qihu360 {}
 
@@ -184,7 +184,7 @@ dependencies {
 
     //rx
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
 
     //retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.6.0'
@@ -199,16 +199,14 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     //leakCanary
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.3'
-    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.3'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.0-beta-2'
 
     //butterKnife
     implementation 'com.jakewharton:butterknife:9.0.0'
     kapt 'com.jakewharton:butterknife-compiler:9.0.0'
 
     //bugly
-    implementation 'com.tencent.bugly:crashreport:2.8.6.0'
+    implementation 'com.tencent.bugly:crashreport:3.0.0'
 
     //gp
     implementation 'com.anjlab.android.iab.v3:library:1.0.44'

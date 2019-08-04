@@ -3,7 +3,6 @@ package remix.myplayer.service
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.*
-import android.database.ContentObserver
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.media.AudioManager
@@ -45,6 +44,8 @@ import remix.myplayer.misc.Migration
 import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.misc.observer.MediaStoreObserver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
+import remix.myplayer.misc.receiver.HeadsetPlugReceiver.Companion.NEVER
+import remix.myplayer.misc.receiver.HeadsetPlugReceiver.Companion.OPEN_SOFTWARE
 import remix.myplayer.misc.receiver.MediaButtonReceiver
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
@@ -80,7 +81,8 @@ import kotlin.collections.ArrayList
  * 播放Service 歌曲的播放 控制 回调相关activity的界面更新 通知栏的控制
  */
 @SuppressLint("CheckResult")
-class MusicService : BaseService(), Playback, MusicEventCallback {
+class MusicService : BaseService(), Playback, MusicEventCallback,
+    SharedPreferences.OnSharedPreferenceChangeListener {
   /**
    * 所有歌曲id
    */
@@ -461,8 +463,48 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     return START_NOT_STICKY
   }
 
+  override fun onSharedPreferenceChanged(sp: SharedPreferences, key: String) {
+    when (key) {
+      //通知栏背景色
+      SETTING_KEY.NOTIFY_SYSTEM_COLOR,
+        //通知栏样式
+      SETTING_KEY.NOTIFY_STYLE_CLASSIC -> {
+        val classic = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.NOTIFY_STYLE_CLASSIC, false)
+        notify = if (classic) {
+          NotifyImpl(this@MusicService)
+        } else {
+          NotifyImpl24(this@MusicService)
+        }
+        if (Notify.isNotifyShowing) {
+          // 先取消再重新显示 让通知栏彻底刷新一次
+          notify.cancelPlayingNotify()
+          updateNotification()
+        }
+      }
+      //锁屏
+      SETTING_KEY.LOCKSCREEN -> {
+        when (SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)) {
+          APLAYER_LOCKSCREEN, CLOSE_LOCKSCREEN -> clearMediaSession()
+          SYSTEM_LOCKSCREEN -> updateMediaSession(Command.NEXT)
+        }
+      }
+      //断点播放
+      SETTING_KEY.PLAY_AT_BREAKPOINT -> {
+        playAtBreakPoint = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_AT_BREAKPOINT, false)
+        if (!playAtBreakPoint) {
+          stopSaveProgress()
+        } else {
+          startSaveProgress()
+        }
+      }
+    }
+  }
+
   private fun setUp() {
     playbackThread.start()
+
+    //配置变化
+    getSharedPreferences(SETTING_KEY.NAME, Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this)
 
     //电源锁
     wakeLock.setReferenceCounted(false)
@@ -506,16 +548,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
 
     //监听数据库变化
     contentResolver.registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mediaStoreObserver)
-    contentResolver.registerContentObserver(Uri.parse("content://media/external/images/media"), true,
-        object : ContentObserver(null) {
-          override fun onChange(selfChange: Boolean, uri: Uri?) {
-            Timber.v("onChange, selfChange: $selfChange uri:$uri")
-          }
-        })
 
     setUpPlayer()
     setUpSession()
-
   }
 
   /**
@@ -592,18 +627,21 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
       Timber.v("准备完成:%s", firstPrepared)
 
       if (firstPrepared) {
-        mp.pause()
-        EQHelper.init(this, mp.audioSessionId)
-        firstPrepared = false
         if (lastProgress > 0) {
           mediaPlayer.seekTo(lastProgress.toLong())
         }
-        return@setOnPreparedListener
+        firstPrepared = false
+        EQHelper.init(this, mp.audioSessionId)
+        //自动播放
+        if (SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.AUTO_PLAY, NEVER) != OPEN_SOFTWARE) {
+          mp.pause()
+          return@setOnPreparedListener
+        }
       }
       Timber.v("开始播放")
       //记录播放历史
       updatePlayHistory()
-
+      //开始播放
       play(false)
     }
 
@@ -702,6 +740,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     unregisterReceiver(this, headSetReceiver)
     unregisterReceiver(this, screenReceiver)
     unregisterReceiver(this, widgetReceiver)
+    getSharedPreferences(SETTING_KEY.NAME, Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this)
+
 
     releaseWakeLock()
     contentResolver.unregisterContentObserver(mediaStoreObserver)
@@ -1259,31 +1299,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
             }
           }
         }
-        Command.TOGGLE_MEDIASESSION ->
-          when (SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)) {
-            APLAYER_LOCKSCREEN, CLOSE_LOCKSCREEN -> clearMediaSession()
-            SYSTEM_LOCKSCREEN -> updateMediaSession(Command.NEXT)
-          }
         //临时播放一首歌曲
         Command.PLAY_TEMP -> {
           intent.getParcelableExtra<Song>(EXTRA_SONG)?.let {
             currentSong = it
             operation = Command.PLAY_TEMP
             prepare(currentSong.url)
-          }
-        }
-        //切换通知栏样式
-        Command.TOGGLE_NOTIFY -> {
-          val classic = intent.getBooleanExtra(SETTING_KEY.NOTIFY_STYLE_CLASSIC, false)
-          notify = if (classic) {
-            NotifyImpl(this@MusicService)
-          } else {
-            NotifyImpl24(this@MusicService)
-          }
-          if (Notify.isNotifyShowing) {
-            // 先取消再重新显示 让通知栏彻底刷新一次
-            notify.cancelPlayingNotify()
-            updateNotification()
           }
         }
         //解锁桌面歌词
@@ -1296,10 +1317,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           //更新通知栏
           updateNotification()
         }
-        //锁定通知栏
-        Command.LOCK_LYRIC ->
+        //锁定桌面歌词，更新通知栏
+        Command.LOCK_DESKTOP_LYRIC -> {
           //更新通知栏
           updateNotification()
+        }
         //某一首歌曲添加至下一首播放
         Command.ADD_TO_NEXT_SONG -> {
           val nextSong = intent.getParcelableExtra<Song>(EXTRA_SONG) ?: return
@@ -1344,16 +1366,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         //改变歌词源
         Command.CHANGE_LYRIC -> if (showDesktopLyric) {
           updateDesktopLyric(true)
-        }
-        //断点播放
-        Command.PLAY_AT_BREAKPOINT -> {
-          playAtBreakPoint = intent.getBooleanExtra(SETTING_KEY.PLAY_AT_BREAKPOINT, false)
-          if (!playAtBreakPoint) {
-            SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_PLAY_PROGRESS, 0)
-            stopSaveProgress()
-          } else {
-            startSaveProgress()
-          }
         }
         //切换定时器
         Command.TOGGLE_TIMER -> {
@@ -1762,6 +1774,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     } else {
       //屏幕点亮才更新
       if (screenOn) {
+        //更新歌词源
         desktopLyricTask?.force = force
         startUpdateLyric()
       }
@@ -1892,7 +1905,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         if (isDesktopLyricShowing) {
           updateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
         }
-
       } else {
         if (!isDesktopLyricShowing) {
           updateUIHandler.removeMessages(CREATE_DESKTOP_LRC)
@@ -2008,7 +2020,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
   private inner class AudioFocusChangeListener : AudioManager.OnAudioFocusChangeListener {
 
     //记录焦点变化之前是否在播放;
-    private var mNeedContinue = false
+    private var needContinue = false
 
     override fun onAudioFocusChange(focusChange: Int) {
       when (focusChange) {
@@ -2017,16 +2029,16 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           audioFocus = true
           if (!prepared) {
             setUpPlayer()
-          } else if (mNeedContinue) {
+          } else if (needContinue) {
             play(true)
-            mNeedContinue = false
+            needContinue = false
             operation = Command.TOGGLE
           }
           volumeController.directTo(1f)
         }
         //短暂暂停
         AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-          mNeedContinue = isPlay
+          needContinue = isPlay
           if (isPlay && prepared) {
             operation = Command.TOGGLE
             pause(false)
@@ -2038,6 +2050,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
         }
         //暂停
         AudioManager.AUDIOFOCUS_LOSS -> {
+          val ignoreFocus = SPUtil.getValue(this@MusicService, SETTING_KEY.NAME, SETTING_KEY.AUDIO_FOCUS, false)
+          if (ignoreFocus) {
+            Timber.v("忽略音频焦点 不暂停")
+            return
+          }
           audioFocus = false
           if (isPlay && prepared) {
             operation = Command.TOGGLE
@@ -2045,9 +2062,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
           }
         }
       }
-      //通知更新ui
-//      updateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
-//      updateUIHandler.sendEmptyMessage(Constants.UPDATE_META_DATA);
     }
   }
 
@@ -2178,6 +2192,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback {
     private const val APPWIDGET_SMALL_TRANSPARENT = "AppWidgetSmallTransparent"
 
     private const val INTERVAL_APPWIDGET = 1000L
+
 
     /**
      * 复制bitmap

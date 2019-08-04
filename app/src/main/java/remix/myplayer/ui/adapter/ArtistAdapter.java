@@ -101,7 +101,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     }
     //设置封面
     final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
-    holder.mImage.setTag(setImage(holder.mImage,ImageUriUtil.getSearchRequest(artist),imageSize,position));
+    holder.mImage.setTag(setImage(holder.mImage, ImageUriUtil.getSearchRequest(artist), imageSize, position));
 
     holder.mContainer.setOnClickListener(v -> {
       if (holder.getAdapterPosition() - 1 < 0) {
@@ -112,7 +112,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     });
     //多选菜单
     holder.mContainer.setOnLongClickListener(v -> {
-      if (holder.getAdapterPosition() - 1 < 0) {
+      if (position - 1 < 0) {
         ToastUtil.show(mContext, R.string.illegal_arg);
         return true;
       }

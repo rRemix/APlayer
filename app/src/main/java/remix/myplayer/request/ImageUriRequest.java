@@ -103,11 +103,16 @@ public abstract class ImageUriRequest<T> {
 
   public abstract void onSuccess(@Nullable T result);
 
+  protected void onStart(){
+
+  }
+
   public abstract Disposable load();
 
   protected Observable<String> getCoverObservable(UriRequest request) {
     return Observable.concat(getCustomThumbObservable(request), getContentThumbObservable(request),
         getNetworkThumbObservable(request))
+        .doOnSubscribe(disposable -> onStart())
         .firstOrError()
         .toObservable();
   }

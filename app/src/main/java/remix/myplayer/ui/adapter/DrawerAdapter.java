@@ -52,7 +52,7 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
     holder.mText.setText(titleRes);
     holder.mText.setTextColor(Theme.resolveColor(mContext, R.attr.text_color_primary));
     holder.mRoot
-        .setOnClickListener(v -> mOnItemClickListener.onItemClick(v, holder.getAdapterPosition()));
+        .setOnClickListener(v -> mOnItemClickListener.onItemClick(v, position));
     holder.mRoot.setSelected(mSelectIndex == position);
     holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(
         mContext,
