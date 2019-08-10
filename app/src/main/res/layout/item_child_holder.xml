@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="@dimen/d64_size"
-  android:gravity="center_vertical"
-  android:background="?attr/background_list">
+  android:background="?attr/background_list"
+  android:gravity="center_vertical">
 
   <View
     android:id="@+id/indicator"
@@ -13,47 +14,57 @@
     android:layout_marginTop="8dp"
     android:layout_marginBottom="8dp"/>
 
+  <com.facebook.drawee.view.SimpleDraweeView
+    android:id="@+id/item_simpleiview"
+    android:layout_width="@dimen/d40_size"
+    android:layout_height="@dimen/d40_size"
+    android:layout_marginStart="16dp"
+    android:layout_centerVertical="true"
+    android:visibility="visible"
+    app:actualImageScaleType="centerCrop"
+    app:fadeDuration="@integer/FadeDuration"
+    app:failureImage="?attr/default_album"
+    app:failureImageScaleType="centerCrop"
+    app:placeholderImage="?attr/default_album"
+    app:placeholderImageScaleType="centerCrop"
+    app:roundAsCircle="true"/>
 
-  <!--结尾处按钮-->
+  <TextView
+    android:id="@+id/album_holder_item_title"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="@dimen/d16_size"
+    android:layout_marginEnd="@dimen/d8_size"
+    android:layout_toEndOf="@id/item_simpleiview"
+    android:layout_toStartOf="@id/song_item_button"
+    android:ellipsize="end"
+    android:gravity="center_vertical|start"
+    android:lines="1"
+    android:textColor="?attr/text_color_primary"
+    android:textSize="@dimen/s16_size"/>
+
+  <ImageView
+    android:id="@+id/sq"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/d2_size"
+    android:background="@color/transparent"
+    android:src="@drawable/icon_sq"
+    android:visibility="gone"/>
+
   <ImageButton
-    android:layout_alignParentRight="true"
     android:id="@+id/song_item_button"
     android:layout_width="@dimen/item_list_btn_size"
     android:layout_height="@dimen/item_list_btn_size"
+    android:layout_alignParentEnd="true"
     android:layout_centerVertical="true"
-    android:scaleType="center"
-    android:background="?attr/background_oval_ripple"/>
-
-  <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/d64_size"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:layout_marginLeft="@dimen/d16_size"
-    android:layout_marginRight="@dimen/d8_size">
-    <ImageView
-      android:id="@+id/sq"
-      android:visibility="gone"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:src="@drawable/icon_sq"
-      android:background="@color/transparent"
-      android:layout_marginRight="@dimen/d2_size"/>
-    <TextView
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:gravity="center_vertical"
-      android:id="@+id/album_holder_item_title"
-      android:lines="1"
-      android:ellipsize="end"
-      android:textSize="@dimen/s16_size"
-      android:textColor="?attr/text_color_primary"/>
-  </LinearLayout>
+    android:background="?attr/background_oval_ripple"
+    android:scaleType="center"/>
 
   <View
     android:layout_width="match_parent"
     android:layout_height="@dimen/d1_size"
-    android:background="?attr/divider_color"
+    android:layout_marginStart="@dimen/d16_size"
     android:layout_alignParentBottom="true"
-    android:layout_marginLeft="@dimen/d16_size"/>
+    android:background="?attr/divider_color"/>
 </RelativeLayout>

@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -31,7 +30,6 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.db.room.model.PlayList;
-import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.handler.MsgHandler;
@@ -102,8 +100,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     mChoice = new MultipleChoice<>(this,
         mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
 
-    mAdapter = new ChildHolderAdapter(this, R.layout.item_child_holder, mType, mArg, mChoice,
-        mRecyclerView);
+    mAdapter = new ChildHolderAdapter(R.layout.item_song_recycle, mType, mArg, mChoice, mRecyclerView);
     mChoice.setAdapter(mAdapter);
     mChoice.setExtra(mId);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {

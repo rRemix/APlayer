@@ -1,81 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:fresco="http://schemas.android.com/apk/res-auto"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/item_container"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
-  android:id="@+id/item_container"
-  android:background="?attr/background_grid">
+  android:background="?attr/background_grid"
+  android:orientation="vertical">
+
   <remix.myplayer.ui.widget.WidthFitSquareLayout
     android:id="@+id/item_simpleiview_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_alignParentTop="true"
-    android:layout_centerHorizontal="true">
+    android:layout_height="match_parent">
     <com.facebook.drawee.view.SimpleDraweeView
+      android:id="@+id/item_simpleiview"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:id="@+id/item_simpleiview"
       android:layout_gravity="center"
-      fresco:fadeDuration="@integer/FadeDuration"
-      fresco:placeholderImage="?attr/default_album"
-      fresco:placeholderImageScaleType="centerCrop"
-      fresco:actualImageScaleType="centerCrop"
-      fresco:failureImage="?attr/default_album"
-      fresco:failureImageScaleType="centerCrop"
-      fresco:roundedCornerRadius="@dimen/d2_size"/>
+      app:actualImageScaleType="centerCrop"
+      app:fadeDuration="@integer/FadeDuration"
+      app:failureImage="?attr/default_album"
+      app:failureImageScaleType="centerCrop"
+      app:placeholderImage="?attr/default_album"
+      app:placeholderImageScaleType="centerCrop"
+      app:roundedCornerRadius="@dimen/d2_size"/>
     <ImageView
-      android:visibility="gone"
       android:id="@+id/item_half_circle"
-      android:layout_gravity="right|center_vertical"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:src="@drawable/icon_half_circular_left"/>
+      android:layout_gravity="end|center_vertical"
+      android:src="@drawable/icon_half_circular_left"
+      android:visibility="gone"
+      tools:visibility="visible"/>
   </remix.myplayer.ui.widget.WidthFitSquareLayout>
 
-  <RelativeLayout
+  <android.support.constraint.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="@dimen/item_grid_text_container_height"
-    android:layout_below="@+id/item_simpleiview_container">
-    <LinearLayout
-      android:layout_centerVertical="true"
-      android:layout_width="match_parent"
+    android:layout_height="@dimen/item_grid_text_container_height">
+
+    <TextView
+      android:id="@+id/item_text1"
+      android:layout_width="0dp"
       android:layout_height="wrap_content"
-      android:orientation="vertical"
-      android:layout_marginLeft="@dimen/d10_size"
-      android:layout_marginRight="@dimen/d10_size"
-      android:gravity="center_vertical"
-      android:layout_toLeftOf="@id/item_button"
-      android:layout_alignParentLeft="true">
-      <TextView
-        android:layout_gravity="center_vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/item_text1"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textColor="?attr/text_color_primary"
-        android:textSize="@dimen/s14_size"/>
-      <TextView
-        android:layout_marginTop="@dimen/d2_size"
-        android:layout_gravity="center_vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/item_text2"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textColor="?attr/text_color_secondary"
-        android:textSize="@dimen/s12_size"/>
-    </LinearLayout>
+      android:layout_marginStart="@dimen/d10_size"
+      android:layout_marginEnd="@dimen/d10_size"
+      android:layout_gravity="start|center_vertical"
+      android:ellipsize="end"
+      android:maxLines="1"
+      android:textColor="?attr/text_color_primary"
+      android:textSize="@dimen/s14_size"
+      app:layout_constraintBottom_toTopOf="@id/item_text2"
+      app:layout_constraintEnd_toStartOf="@id/item_button"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_chainStyle="packed"
+      tools:text="1111111111"/>
+    <TextView
+      android:id="@+id/item_text2"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/d2_size"
+      android:layout_gravity="start|center_vertical"
+      android:ellipsize="end"
+      android:maxLines="1"
+      android:textColor="?attr/text_color_secondary"
+      android:textSize="@dimen/s12_size"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="@id/item_text1"
+      app:layout_constraintStart_toStartOf="@id/item_text1"
+      app:layout_constraintTop_toBottomOf="@id/item_text1"
+      tools:text="222222222"/>
 
     <ImageButton
+      android:id="@+id/item_button"
       android:layout_width="@dimen/item_list_btn_size"
       android:layout_height="@dimen/item_list_btn_size"
-      android:layout_centerVertical="true"
-      android:layout_alignParentRight="true"
-      android:id="@+id/item_button"
-      android:background="?attr/background_oval_ripple"/>
-  </RelativeLayout>
+      android:background="?attr/background_oval_ripple"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toEndOf="@id/item_text1"
+      app:layout_constraintTop_toTopOf="parent"/>
+  </android.support.constraint.ConstraintLayout>
 
 
-</RelativeLayout>
+</LinearLayout>

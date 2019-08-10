@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.View
+import android.widget.TextView
 import butterknife.BindView
 import butterknife.ButterKnife
 import remix.myplayer.R
@@ -37,12 +38,15 @@ import timber.log.Timber
 /**
  * 正在播放列表Dialog
  */
+
 class PlayQueueDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<Song>> {
   @BindView(R.id.playqueue_recyclerview)
   lateinit var recyclerView: LocationRecyclerView
+  @BindView(R.id.tv_title)
+  lateinit var tvTitle: TextView
 
   val adapter: PlayQueueAdapter by lazy {
-    PlayQueueAdapter(requireContext(), R.layout.item_playqueue)
+    PlayQueueAdapter(R.layout.item_playqueue)
   }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -94,6 +98,7 @@ class PlayQueueDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<So
     if (data == null) {
       return
     }
+    tvTitle.text = getString(R.string.play_queue, data.size)
     adapter.setData(data)
     val currentId = MusicServiceRemote.getCurrentSong().id
     if (currentId < 0) {

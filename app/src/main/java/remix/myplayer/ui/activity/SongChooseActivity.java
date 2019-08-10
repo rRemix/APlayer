@@ -78,7 +78,7 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdapter>
     TextView cancel = findViewById(R.id.cancel);
     cancel.setTextColor(getTextColorPrimary());
     mConfirm.setTextColor(getTextColorSecondary());
-    mAdapter = new SongChooseAdapter(this, R.layout.item_song_choose, isValid -> {
+    mAdapter = new SongChooseAdapter(R.layout.item_song_choose, isValid -> {
       mConfirm.setAlpha(isValid ? 1.0f : 0.6f);
       mConfirm.setClickable(isValid);
     });

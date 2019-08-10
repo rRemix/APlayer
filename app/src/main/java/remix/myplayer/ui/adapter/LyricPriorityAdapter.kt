@@ -10,9 +10,9 @@ import remix.myplayer.ui.adapter.holder.BaseViewHolder
 import remix.myplayer.util.SPUtil
 
 
-class LyricPriorityAdapter(context: Context?, layoutId: Int) : BaseAdapter<LyricPriority, LyricPriorityAdapter.LyricPriorityHolder>(context, layoutId) {
+class LyricPriorityAdapter(context: Context?, layoutId: Int) : BaseAdapter<LyricPriority, LyricPriorityAdapter.LyricPriorityHolder>(layoutId) {
   init {
-    mDatas = Gson().fromJson(SPUtil.getValue(mContext, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
+    mDatas = Gson().fromJson(SPUtil.getValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
         object : TypeToken<List<LyricPriority>>() {}.type)
   }
 

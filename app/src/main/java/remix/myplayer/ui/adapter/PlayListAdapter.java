@@ -5,6 +5,7 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -45,16 +46,17 @@ import remix.myplayer.util.ToastUtil;
 public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> implements
     FastScroller.SectionIndexer {
 
-  public PlayListAdapter(Context context, int layoutId, MultipleChoice multiChoice,
+  public PlayListAdapter(int layoutId, MultipleChoice multiChoice,
       RecyclerView recyclerView) {
-    super(context, layoutId, multiChoice, recyclerView);
+    super(layoutId, multiChoice, recyclerView);
   }
 
+  @NonNull
   @Override
-  public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+  public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     if (viewType == TYPE_HEADER) {
       return new HeaderHolder(
-          LayoutInflater.from(mContext).inflate(R.layout.layout_header_2, parent, false));
+          LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_header_2, parent, false));
     }
     return viewType == HeaderAdapter.LIST_MODE ?
         new PlayListListHolder(LayoutInflater.from(parent.getContext())
@@ -64,18 +66,9 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
   }
 
   @Override
-  public void onViewRecycled(BaseViewHolder holder) {
+  public void onViewRecycled(@NonNull BaseViewHolder holder) {
     super.onViewRecycled(holder);
     disposeLoad(holder);
-//    if (holder instanceof PlayListHolder) {
-//      if (((PlayListHolder) holder).mImage.getTag() != null) {
-//        Disposable disposable = (Disposable) ((PlayListHolder) holder).mImage.getTag();
-//        if (!disposable.isDisposed()) {
-//          disposable.dispose();
-//        }
-//      }
-//      ((PlayListHolder) holder).mImage.setImageURI(Uri.EMPTY);
-//    }
   }
 
   @SuppressLint("RestrictedApi")
@@ -94,8 +87,10 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
     if (info == null) {
       return;
     }
+
+    final Context context = baseHolder.itemView.getContext();
     holder.mName.setText(info.getName());
-    holder.mOther.setText(mContext.getString(R.string.song_count, info.getAudioIds().size()));
+    holder.mOther.setText(context.getString(R.string.song_count, info.getAudioIds().size()));
 
     //设置专辑封面
     final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
@@ -116,7 +111,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
     holder.mContainer.setOnClickListener(v -> {
       if (position - 1 < 0) {
-        ToastUtil.show(mContext, R.string.illegal_arg);
+        ToastUtil.show(context, R.string.illegal_arg);
         return;
       }
       mOnItemClickListener.onItemClick(holder.mContainer, position - 1);
@@ -125,7 +120,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
     //多选菜单
     holder.mContainer.setOnLongClickListener(v -> {
       if (position - 1 < 0) {
-        ToastUtil.show(mContext, R.string.illegal_arg);
+        ToastUtil.show(context, R.string.illegal_arg);
         return true;
       }
       mOnItemClickListener.onItemLongClick(holder.mContainer, position - 1);
@@ -140,10 +135,10 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
       if (mChoice.isActive()) {
         return;
       }
-      final PopupMenu popupMenu = new PopupMenu(mContext, holder.mButton);
+      final PopupMenu popupMenu = new PopupMenu(context, holder.mButton);
       popupMenu.getMenuInflater().inflate(R.menu.menu_playlist_item, popupMenu.getMenu());
       popupMenu.setOnMenuItemClickListener(
-          new LibraryListener(mContext, info.getId(), Constants.PLAYLIST, info.getName()));
+          new LibraryListener(context, info.getId(), Constants.PLAYLIST, info.getName()));
       popupMenu.show();
     });
 
@@ -178,7 +173,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
     @BindView(R.id.item_button)
     ImageView mButton;
     @BindView(R.id.item_container)
-    RelativeLayout mContainer;
+    ViewGroup mContainer;
 
     PlayListHolder(View itemView) {
       super(itemView);
@@ -198,46 +193,5 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
       super(itemView);
     }
   }
-
-  /**
-   * 先查找是否设置过封面，没有再查找播放列表下所有歌曲，直到有一首歌曲存在封面
-   */
-//    class AsynLoadImage extends AsyncTask<Integer,Integer,String> {
-//        private final SimpleDraweeView mImage;
-//        public AsynLoadImage(SimpleDraweeView imageView) {
-//            mImage = imageView;
-//        }
-//        @Override
-//        protected String doInBackground(Integer... params) {
-//            int playListId = params[0];
-//            ArrayList<Integer> list = PlayListUtil.getSongIds(playListId);
-//            String url = null;
-//            File imgFile =  new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + Util.hashKeyForDisk(Integer.valueOf(playListId) * 255 + ""));
-//            if(imgFile != null && imgFile.exists())
-//                return imgFile.getAbsolutePath();
-//
-//            if(list != null && list.size() > 0) {
-//                for(Integer id : list){
-//                    Song item = MediaStoreUtil.getSongById(id);
-//                    if(item == null)
-//                        return "";
-//                    url = MediaStoreUtil.getImageUrl(item.getAlbumId() + "",Constants.URL_ALBUM);
-//                    if(url != null && !url.equals("")) {
-//                        File file = new File(url);
-//                        if(file.exists()) {
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//            return url;
-//        }
-//        @Override
-//        protected void onPostExecute(String url) {
-//            Uri uri = Uri.importM3UFile("file:///" + url);
-//            if(mImage != null)
-//                mImage.setImageURI(uri);
-//        }
-//    }
 
 }

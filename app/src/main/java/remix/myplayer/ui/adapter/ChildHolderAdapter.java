@@ -1,14 +1,15 @@
 package remix.myplayer.ui.adapter;
 
 import static remix.myplayer.helper.MusicServiceRemote.setPlayQueue;
+import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.theme.ThemeStore.getHighLightTextColor;
-import static remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor;
 import static remix.myplayer.theme.ThemeStore.getTextColorPrimary;
-import static remix.myplayer.theme.ThemeStore.isLightTheme;
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.MusicUtil.makeCmdIntent;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import butterknife.BindView;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 import java.util.ArrayList;
 import remix.myplayer.R;
@@ -32,7 +34,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.ToastUtil;
 
@@ -48,24 +49,33 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
 
   private Song mLastPlaySong = MusicServiceRemote.getCurrentSong();
 
-  public ChildHolderAdapter(Context context, int layoutId, int type, String arg,
+  public ChildHolderAdapter(int layoutId, int type, String arg,
       MultipleChoice multiChoice, RecyclerView recyclerView) {
-    super(context, layoutId, multiChoice, recyclerView);
+    super(layoutId, multiChoice, recyclerView);
     this.mType = type;
     this.mArg = arg;
   }
 
+  @NonNull
   @Override
-  public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+  public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     return viewType == TYPE_HEADER ?
         new SongAdapter.HeaderHolder(
-            LayoutInflater.from(mContext).inflate(R.layout.layout_header_1, parent, false)) :
+            LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_header_1, parent, false)) :
         new ChildHolderViewHolder(
-            LayoutInflater.from(mContext).inflate(R.layout.item_child_holder, parent, false));
+            LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song_recycle, parent, false));
+  }
+
+
+  @Override
+  public void onViewRecycled(@NonNull BaseViewHolder holder) {
+    super.onViewRecycled(holder);
+    disposeLoad(holder);
   }
 
   @Override
   protected void convert(final BaseViewHolder baseHolder, final Song song, int position) {
+    final Context context = baseHolder.itemView.getContext();
     if (position == 0) {
       final SongAdapter.HeaderHolder headerHolder = (SongAdapter.HeaderHolder) baseHolder;
       //没有歌曲时隐藏
@@ -74,10 +84,11 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
         return;
       }
 
-      headerHolder.mShuffleIv.setImageDrawable(
-          Theme.tintVectorDrawable(mContext, R.drawable.ic_shuffle_white_24dp,
+      headerHolder.mIvShuffle.setImageDrawable(
+          Theme.tintVectorDrawable(context, R.drawable.ic_shuffle_white_24dp,
               ThemeStore.getAccentColor())
       );
+      headerHolder.mTvShuffle.setText(context.getString(R.string.play_random, getItemCount() - 1));
 
       //显示当前排序方式
       headerHolder.mRoot.setOnClickListener(v -> {
@@ -87,7 +98,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
           ids.add(info.getId());
         }
         if (ids.size() == 0) {
-          ToastUtil.show(mContext, R.string.no_song);
+          ToastUtil.show(context, R.string.no_song);
           return;
         }
         setPlayQueue(ids, makeCmdIntent(Command.NEXT, true));
@@ -96,25 +107,31 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
     }
 
     final ChildHolderViewHolder holder = (ChildHolderViewHolder) baseHolder;
-    if (song == null || song.getId() < 0 || song.getTitle().equals(mContext.getString(R.string.song_lose_effect))) {
-      holder.mTitle.setText(R.string.song_lose_effect);
+    if (song == null || song.getId() < 0 || song.getTitle().equals(context.getString(R.string.song_lose_effect))) {
+      holder.mName.setText(R.string.song_lose_effect);
       holder.mButton.setVisibility(View.INVISIBLE);
     } else {
       holder.mButton.setVisibility(View.VISIBLE);
 
+      //封面
+      holder.mImage.setTag(setImage(holder.mImage, getSearchRequestWithAlbumType(song), SMALL_IMAGE_SIZE, position));
+
       //高亮
       if (MusicServiceRemote.getCurrentSong().getId() == song.getId()) {
         mLastPlaySong = song;
-        holder.mTitle.setTextColor(getHighLightTextColor());
+        holder.mName.setTextColor(getHighLightTextColor());
         holder.mIndicator.setVisibility(View.VISIBLE);
       } else {
-        holder.mTitle.setTextColor(getTextColorPrimary());
+        holder.mName.setTextColor(getTextColorPrimary());
         holder.mIndicator.setVisibility(View.GONE);
       }
       holder.mIndicator.setBackgroundColor(getHighLightTextColor());
 
       //设置标题
-      holder.mTitle.setText(song.getShowName());
+      holder.mName.setText(song.getShowName());
+
+      //艺术家与专辑
+      holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
 
       if (holder.mButton != null) {
         //设置按钮着色
@@ -125,10 +142,10 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
           if (mChoice.isActive()) {
             return;
           }
-          final PopupMenu popupMenu = new PopupMenu(mContext, holder.mButton, Gravity.END);
+          final PopupMenu popupMenu = new PopupMenu(context, holder.mButton, Gravity.END);
           popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
           popupMenu.setOnMenuItemClickListener(
-              new SongPopupListener((AppCompatActivity) mContext, song, mType == Constants.PLAYLIST,
+              new SongPopupListener((AppCompatActivity) context, song, mType == Constants.PLAYLIST,
                   mArg));
           popupMenu.show();
         });
@@ -138,7 +155,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
     if (holder.mContainer != null && mOnItemClickListener != null) {
       holder.mContainer.setOnClickListener(v -> {
         if (holder.getAdapterPosition() - 1 < 0) {
-          ToastUtil.show(mContext, R.string.illegal_arg);
+          ToastUtil.show(context, R.string.illegal_arg);
           return;
         }
         if (song != null && song.getId() > 0) {
@@ -147,7 +164,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
       });
       holder.mContainer.setOnLongClickListener(v -> {
         if (holder.getAdapterPosition() - 1 < 0) {
-          ToastUtil.show(mContext, R.string.illegal_arg);
+          ToastUtil.show(context, R.string.illegal_arg);
           return true;
         }
         mOnItemClickListener.onItemLongClick(v, holder.getAdapterPosition() - 1);
@@ -193,12 +210,12 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
       }
 
       if (newHolder != null) {
-        newHolder.mTitle.setTextColor(getHighLightTextColor());
+        newHolder.mName.setTextColor(getHighLightTextColor());
         newHolder.mIndicator.setVisibility(View.VISIBLE);
       }
 
       if (oldHolder != null) {
-        oldHolder.mTitle.setTextColor(getTextColorPrimary());
+        oldHolder.mName.setTextColor(getTextColorPrimary());
         oldHolder.mIndicator.setVisibility(View.GONE);
       }
       mLastPlaySong = currentSong;
@@ -206,10 +223,13 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
   }
 
   static class ChildHolderViewHolder extends BaseViewHolder {
-
-    @BindView(R.id.album_holder_item_title)
-    TextView mTitle;
-    @BindView(R.id.song_item_button)
+    @BindView(R.id.song_head_image)
+    SimpleDraweeView mImage;
+    @BindView(R.id.song_title)
+    TextView mName;
+    @BindView(R.id.song_other)
+    TextView mOther;
+    @BindView(R.id.song_button)
     public ImageButton mButton;
     public View mContainer;
     @BindView(R.id.indicator)

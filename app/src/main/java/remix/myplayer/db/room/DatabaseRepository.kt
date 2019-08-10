@@ -314,8 +314,10 @@ class DatabaseRepository private constructor() {
           if (songs.size < idsInQueue.size) {
             Timber.v("删除播放队列中不存在的歌曲")
             val deleteIds = ArrayList<Int>()
+            val existIds = songs.map { it.id }
+
             for (audioId in idsInQueue) {
-              if (!songs.contains(Song(audioId))) {
+              if (!existIds.contains(audioId)) {
                 deleteIds.add(audioId)
               }
             }
@@ -380,8 +382,10 @@ class DatabaseRepository private constructor() {
           if (songs.size < playList.audioIds.size) {
             Timber.v("删除播放列表中不存在的歌曲")
             val deleteIds = ArrayList<Int>()
+            val existIds = songs.map { it.id }
+
             for (audioId in playList.audioIds) {
-              if (!songs.contains(Song(audioId))) {
+              if (!existIds.contains(audioId)) {
                 deleteIds.add(audioId)
               }
             }

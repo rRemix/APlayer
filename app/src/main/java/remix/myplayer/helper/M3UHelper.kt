@@ -146,7 +146,7 @@ object M3UHelper {
             bw.write(HEADER)
             for (song in songs) {
               bw.newLine()
-              bw.write(ENTRY + song.duration + DURATION_SEPARATOR + song.artist + " - " + song.title)
+              bw.write(ENTRY + song.getDuration() + DURATION_SEPARATOR + song.artist + " - " + song.title)
               bw.newLine()
               bw.write(song.url)
             }

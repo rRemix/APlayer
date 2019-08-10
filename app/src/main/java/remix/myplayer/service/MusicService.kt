@@ -32,7 +32,7 @@ import remix.myplayer.appwidgets.medium.AppWidgetMediumTransparent
 import remix.myplayer.appwidgets.small.AppWidgetSmall
 import remix.myplayer.appwidgets.small.AppWidgetSmallTransparent
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.bean.mp3.Song.EMPTY_SONG
+import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayQueue
 import remix.myplayer.helper.*
@@ -40,7 +40,6 @@ import remix.myplayer.lyric.LyricHolder
 import remix.myplayer.lyric.LyricHolder.Companion.LYRIC_FIND_INTERVAL
 import remix.myplayer.lyric.bean.LyricRowWrapper
 import remix.myplayer.misc.LogObserver
-import remix.myplayer.misc.Migration
 import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.misc.observer.MediaStoreObserver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
@@ -144,7 +143,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 返回当前播放歌曲
    */
-  var currentSong: Song = EMPTY_SONG
+  var currentSong: Song = Song.EMPTY_SONG
 
   /**
    * 当前播放的歌曲是否收藏
@@ -1422,8 +1421,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentSong.album)
         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentSong.artist)
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentSong.artist)
-        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currentSong.displayname)
-        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.duration)
+        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currentSong.displayName)
+        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.getDuration())
         .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (currentIndex + 1).toLong())
         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.title)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1525,7 +1524,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       //如果是点击下一首 播放预先设置好的下一首歌曲
       currentId = nextId
       currentIndex = nextIndex
-      currentSong = Song(nextSong)
+      currentSong = nextSong.copy()
     } else {
       val queue = ArrayList(if (playModel == PLAY_SHUFFLE)
         randomQueue
@@ -1628,8 +1627,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   @WorkerThread
   @Synchronized
   private fun load() {
-    //迁移数据
-    Migration.migrationDatabase(this)
 
     val isFirst = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, true)
     SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, false)
@@ -1759,7 +1756,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 获得电源锁
    */
   private fun acquireWakeLock() {
-    wakeLock.acquire(if (currentSong != EMPTY_SONG) currentSong.duration else 30000L)
+    wakeLock.acquire(if (currentSong != EMPTY_SONG) currentSong.getDuration() else 30000L)
   }
 
   private fun updateDesktopLyric(force: Boolean) {

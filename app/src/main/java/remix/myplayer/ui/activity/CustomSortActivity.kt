@@ -32,7 +32,7 @@ import kotlin.collections.ArrayList
 class CustomSortActivity : ToolbarActivity() {
 
   private val adapter: CustomSortAdapter by lazy {
-    CustomSortAdapter(mContext, R.layout.item_custom_sort)
+    CustomSortAdapter(R.layout.item_custom_sort)
   }
   private val mdDialog: MaterialDialog by lazy {
     Theme.getBaseDialog(mContext)

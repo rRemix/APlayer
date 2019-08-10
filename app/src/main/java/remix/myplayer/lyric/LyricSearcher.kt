@@ -49,8 +49,8 @@ class LyricSearcher {
 
   private fun parse() {
     try {
-      if (!TextUtils.isEmpty(song.displayname)) {
-        val temp = song.displayname
+      if (!TextUtils.isEmpty(song.displayName)) {
+        val temp = song.displayName
         displayName = if (temp.indexOf('.') > 0) temp.substring(0, temp.lastIndexOf('.')) else temp
       }
       searchKey = getLyricSearchKey(song)
@@ -114,14 +114,14 @@ class LyricSearcher {
         Observable.concat(observables).firstOrError().toObservable()
       }
       else -> {
-        Observable.error<List<LrcRow>>(Throwable("unknown type"))
+        Observable.error(Throwable("unknown type"))
       }
     }
 
     return if (isTypeAvailable(type)) Observable.concat(getCacheObservable(), observable)
         .firstOrError()
         .toObservable()
-        .doOnSubscribe { disposable ->
+        .doOnSubscribe {
           cacheKey = Util.hashKeyForDisk(song.id.toString() + "-" +
               (if (!TextUtils.isEmpty(song.artist)) song.artist else "") + "-" +
               if (!TextUtils.isEmpty(song.title)) song.title else "")
@@ -313,7 +313,7 @@ class LyricSearcher {
    */
   private fun getKuGouObservable(): Observable<List<LrcRow>> {
     //酷狗歌词
-    return HttpClient.getKuGouApiservice().getKuGouSearch(1, "yes", "pc", searchKey, song.duration, "")
+    return HttpClient.getKuGouApiservice().getKuGouSearch(1, "yes", "pc", searchKey, song.getDuration(), "")
         .flatMap { body ->
           val searchResponse = Gson().fromJson(body.string(), KSearchResponse::class.java)
           HttpClient.getKuGouApiservice().getKuGouLyric(1, "pc", "lrc", "utf8",

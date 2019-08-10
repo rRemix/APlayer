@@ -52,7 +52,7 @@ public class AlbumFragment extends LibraryFragment<Album, AlbumAdapter> {
 
   @Override
   protected void initAdapter() {
-    mAdapter = new AlbumAdapter(mContext, R.layout.item_album_recycle_grid, mChoice, mRecyclerView);
+    mAdapter = new AlbumAdapter(R.layout.item_album_recycle_grid, mChoice, mRecyclerView);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(View view, int position) {

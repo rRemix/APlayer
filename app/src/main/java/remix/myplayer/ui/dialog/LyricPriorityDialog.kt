@@ -11,7 +11,6 @@ import remix.myplayer.R
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.adapter.LyricPriorityAdapter
-import remix.myplayer.ui.dialog.base.BaseDialog
 import remix.myplayer.ui.dialog.base.BaseMusicDialog
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
@@ -28,7 +27,7 @@ class LyricPriorityDialog : BaseMusicDialog() {
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val view = requireActivity().layoutInflater.inflate(R.layout.dialog_lyric_priority, null)
 
-    val adapter = LyricPriorityAdapter(activity, R.layout.item_lyric_priority)
+    val adapter = LyricPriorityAdapter(context, R.layout.item_lyric_priority)
     val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
     recyclerView.layoutManager = LinearLayoutManager(activity)
     ItemTouchHelper(object : ItemTouchHelper.Callback() {

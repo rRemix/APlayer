@@ -39,13 +39,13 @@ public class DesktopLyricColorAdapter extends BaseAdapter<Integer, DesktopLyricC
       R.color.md_white_primary, R.color.md_pink_primary
   );
 
-  public DesktopLyricColorAdapter(Context Context, int layoutId, int width) {
-    super(Context, layoutId);
+  public DesktopLyricColorAdapter(Context context, int layoutId, int width) {
+    super(layoutId);
     setData(COLORS);
     mItemWidth = width / COLORS.size();
     //宽度太小
-    if (mItemWidth < DensityUtil.dip2px(mContext, 20)) {
-      mItemWidth = DensityUtil.dip2px(mContext, 20);
+    if (mItemWidth < DensityUtil.dip2px(context, 20)) {
+      mItemWidth = DensityUtil.dip2px(context, 20);
     }
     mCurrentColor = ThemeStore.getFloatLyricTextColor();
 
@@ -54,8 +54,8 @@ public class DesktopLyricColorAdapter extends BaseAdapter<Integer, DesktopLyricC
   /**
    * 判断是否是选中的颜色
    */
-  private boolean isColorChoose(int colorRes) {
-    return mContext.getResources().getColor(colorRes) == mCurrentColor;
+  private boolean isColorChoose(Context context, int colorRes) {
+    return context.getResources().getColor(colorRes) == mCurrentColor;
   }
 
   public void setCurrentColor(int color) {
@@ -66,12 +66,13 @@ public class DesktopLyricColorAdapter extends BaseAdapter<Integer, DesktopLyricC
 
   @NonNull
   @Override
-  public FloatColorHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+  public FloatColorHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    final Context context = parent.getContext();
     FloatColorHolder holder = new FloatColorHolder(
-        LayoutInflater.from(mContext).inflate(R.layout.item_float_lrc_color, parent, false));
+        LayoutInflater.from(context).inflate(R.layout.item_float_lrc_color, parent, false));
 
     RelativeLayout.LayoutParams imgLayoutParam = new RelativeLayout.LayoutParams(
-        DensityUtil.dip2px(mContext, 18), DensityUtil.dip2px(mContext, 18));
+        DensityUtil.dip2px(context, 18), DensityUtil.dip2px(context, 18));
     imgLayoutParam.addRule(RelativeLayout.CENTER_IN_PARENT);
     holder.mColor.setLayoutParams(imgLayoutParam);
 
@@ -88,7 +89,7 @@ public class DesktopLyricColorAdapter extends BaseAdapter<Integer, DesktopLyricC
     final int color = colorRes != R.color.md_white_primary ?
         ColorUtil.getColor(colorRes) : Color.parseColor("#F9F9F9");
 
-    if (isColorChoose(colorRes)) {
+    if (isColorChoose(holder.itemView.getContext(), colorRes)) {
       holder.mColor.setBackground(new GradientDrawableMaker()
           .shape(GradientDrawable.OVAL)
           .color(color)

@@ -259,15 +259,14 @@ public class ImageUriUtil {
         null,
         null, null, null)) {
       if (cursor != null && cursor.getCount() > 0) {
-        List<Album> albums = new ArrayList<>();
-        String[] names = cursor.getColumnNames();
+
+        List<Integer> albumIds = new ArrayList<>();
         while (cursor.moveToNext()) {
-          albums.add(new Album(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Albums._ID))));
+          albumIds.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Albums._ID)));
         }
-        for (Album album : albums) {
+        for (Integer albumId : albumIds) {
           Uri uri = ContentUris
-              .withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
-                  album.getAlbumID());
+              .withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId);
           if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
             return uri.toString();
           }

@@ -44,7 +44,7 @@ class AppWidgetMediumTransparent : BaseAppwidget() {
     updateRemoteViews(service, remoteViews, song)
     //设置时间
     val currentTime = service.progress.toLong()
-    val remainTime = song.duration - service.progress
+    val remainTime = song.getDuration() - service.progress
     if (currentTime > 0 && remainTime > 0) {
       remoteViews.setTextViewText(R.id.appwidget_progress, Util.getTime(currentTime) + "/" + Util.getTime(remainTime))
     }
@@ -66,7 +66,7 @@ class AppWidgetMediumTransparent : BaseAppwidget() {
     updateRemoteViews(service, remoteViews, song)
     //设置时间
     val currentTime = service.progress.toLong()
-    val remainTime = song.duration - service.progress
+    val remainTime = song.getDuration() - service.progress
     if (currentTime > 0 && remainTime > 0) {
       remoteViews.setTextViewText(R.id.appwidget_progress, Util.getTime(currentTime) + "/" + Util.getTime(remainTime))
     }

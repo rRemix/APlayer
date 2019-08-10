@@ -31,8 +31,8 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
   private int[] TITLES = new int[]{R.string.drawer_song, R.string.drawer_recently,
       R.string.support_develop, R.string.drawer_setting, R.string.exit};
 
-  public DrawerAdapter(Context Context, int layoutId) {
-    super(Context, layoutId);
+  public DrawerAdapter(int layoutId) {
+    super(layoutId);
   }
 
   public void setSelectIndex(int index) {
@@ -50,12 +50,12 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
     Theme.tintDrawable(holder.mImg, IMAGES[position], ThemeStore.getAccentColor());
 
     holder.mText.setText(titleRes);
-    holder.mText.setTextColor(Theme.resolveColor(mContext, R.attr.text_color_primary));
+    holder.mText.setTextColor(Theme.resolveColor(holder.itemView.getContext(), R.attr.text_color_primary));
     holder.mRoot
         .setOnClickListener(v -> mOnItemClickListener.onItemClick(v, position));
     holder.mRoot.setSelected(mSelectIndex == position);
     holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(
-        mContext,
+        holder.itemView.getContext(),
         new GradientDrawableMaker()
             .color(getDrawerEffectColor()).make(),
         new GradientDrawableMaker()

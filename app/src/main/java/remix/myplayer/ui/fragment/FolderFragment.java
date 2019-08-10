@@ -42,7 +42,7 @@ public class FolderFragment extends LibraryFragment<Folder, FolderAdapter> {
 
   @Override
   protected void initAdapter() {
-    mAdapter = new FolderAdapter(mContext, R.layout.item_folder_recycle, mChoice);
+    mAdapter = new FolderAdapter(R.layout.item_folder_recycle, mChoice);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(View view, int position) {

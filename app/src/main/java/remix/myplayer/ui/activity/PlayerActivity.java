@@ -16,6 +16,7 @@ import static remix.myplayer.util.Util.sendLocalBroadcast;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -50,7 +51,6 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.facebook.drawee.view.SimpleDraweeView;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -108,14 +108,12 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 //  public static final String EXTRA_RECT = "Rect";
 
   //上次选中的Fragment
-  private int mPrevPosition = 1;
+  private int mPrevPosition = 0;
   //第一次启动的标志变量
   private boolean mFirstStart = true;
   //是否正在拖动进度条
   public boolean mIsDragSeekBarFromUser = false;
 
-  //入场动画封面
-  SimpleDraweeView mAnimationCover;
   //顶部信息
   @BindView(R.id.top_title)
   TextView mTopTitle;
@@ -167,7 +165,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   //高亮与非高亮指示器
   private Drawable mHighLightIndicator;
   private Drawable mNormalIndicator;
-  private ArrayList<ImageView> mDotList;
+  private ArrayList<ImageView> mIndicators;
 
   //当前播放的歌曲
   private Song mInfo;
@@ -181,52 +179,14 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   //需要高斯模糊的高度与宽度
   public int mWidth;
   public int mHeight;
-  //是否从通知栏启动
-//  private boolean mFromNotify = false;
-  //是否从Activity启动
-//  private boolean mFromActivity = false;
-  //是否显示过场动画
-  private boolean mShowAnimation = false;
 
   //Fragment
   private LyricFragment mLyricFragment;
   private CoverFragment mCoverFragment;
-//  private RecordFragment mRecordFragment;
-
-//  private static final String SCALE_WIDTH = "SCALE_WIDTH";
-//  private static final String SCALE_HEIGHT = "SCALE_HEIGHT";
-//  private static final String TRANSITION_X = "TRANSITION_X";
-//  private static final String TRANSITION_Y = "TRANSITION_Y";
-//  /**
-//   * 存储图片缩放比例和位移距离
-//   */
-//  private Bundle mScaleBundle = new Bundle();
-//  private Bundle mTransitionBundle = new Bundle();
-//  /**
-//   * 上一个界面图片的宽度和高度
-//   */
-//  private int mOriginWidth;
-//  private int mOriginHeight;
-//  /**
-//   * 上一个界面图片的位置信息
-//   */
-//  private Rect mOriginRect;
-//  /**
-//   * 终点View的位置信息
-//   */
-//  private Rect mDestRect = new Rect();
-//  /**
-//   * 动画参数
-//   */
-//  private static final SpringConfig COVER_IN_SPRING_CONFIG = SpringConfig
-//      .fromOrigamiTensionAndFriction(30, 7);
-//  private static final SpringConfig COVER_OUT_SPRING_CONFIG = SpringConfig
-//      .fromOrigamiTensionAndFriction(35, 7);
 
   /**
    * 下拉关闭
    */
-  private boolean mIsBacking = false;
   private float mEventY1;
   private float mEventY2;
   private float mEventX1;
@@ -254,6 +214,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   public static final int BOTTOM_SHOW_VOLUME = 1;
   public static final int BOTTOM_SHOW_BOTH = 2;
   public static final int BOTTOM_SHOW_NONE = 3;
+
+  private static final int FRAGMENT_COUNT = 2;
 
   private static final int DELAY_SHOW_NEXT_SONG = 3000;
   private Runnable mVolumeRunnable = () -> {
@@ -328,8 +290,8 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     setUpBottom();
     setUpSize();
     setUpTop();
-    setUpGuide();
     setUpFragments();
+    setUpIndicator();
     setUpSeekBar();
     setUpViewColor();
 
@@ -676,11 +638,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   /**
    * 初始化三个dot
    */
-  private void setUpGuide() {
-    mDotList = new ArrayList<>();
-    mDotList.add(findViewById(R.id.guide_01));
-    mDotList.add(findViewById(R.id.guide_02));
-    mDotList.add(findViewById(R.id.guide_03));
+  private void setUpIndicator() {
     int width = DensityUtil.dip2px(this, 8);
     int height = DensityUtil.dip2px(this, 2);
 
@@ -696,9 +654,12 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         .color(getAccentColor())
         .alpha(0.3f)
         .make();
-    for (int i = 0; i < mDotList.size(); i++) {
-      mDotList.get(i).setImageDrawable(mNormalIndicator);
-    }
+
+    mIndicators = new ArrayList<>();
+    mIndicators.add(findViewById(R.id.guide_01));
+    mIndicators.add(findViewById(R.id.guide_02));
+    mIndicators.get(0).setImageDrawable(mHighLightIndicator);
+    mIndicators.get(1).setImageDrawable(mNormalIndicator);
   }
 
   /**
@@ -903,15 +864,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
         @Override
         public void onPageSelected(int position) {
-          mDotList.get(mPrevPosition).setImageDrawable(mNormalIndicator);
-          mDotList.get(position).setImageDrawable(mHighLightIndicator);
+          mIndicators.get(mPrevPosition).setImageDrawable(mNormalIndicator);
+          mIndicators.get(position).setImageDrawable(mHighLightIndicator);
           mPrevPosition = position;
-//          if (position == 0) {
-//            mPager.setIntercept(true);
-//          } else {
-//            mPager.setIntercept(false);
-//          }
-          mPager.setIntercept(false);
           //歌词界面常亮
           if (position == 1 && SPUtil
               .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON, false)) {

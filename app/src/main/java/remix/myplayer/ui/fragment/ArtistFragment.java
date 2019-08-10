@@ -52,8 +52,7 @@ public class ArtistFragment extends LibraryFragment<Artist, ArtistAdapter> {
 
   @Override
   protected void initAdapter() {
-    mAdapter = new ArtistAdapter(mContext, R.layout.item_artist_recycle_grid, mChoice,
-        mRecyclerView);
+    mAdapter = new ArtistAdapter(R.layout.item_artist_recycle_grid, mChoice, mRecyclerView);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(View view, int position) {

@@ -103,15 +103,18 @@ public abstract class ImageUriRequest<T> {
 
   public abstract void onSuccess(@Nullable T result);
 
-  protected void onStart(){
+  protected void onStart() {
 
   }
 
   public abstract Disposable load();
 
   protected Observable<String> getCoverObservable(UriRequest request) {
-    return Observable.concat(getCustomThumbObservable(request), getContentThumbObservable(request),
-        getNetworkThumbObservable(request))
+    return Observable
+        .concat(
+            getCustomThumbObservable(request),
+            getContentThumbObservable(request),
+            getNetworkThumbObservable(request))
         .doOnSubscribe(disposable -> onStart())
         .firstOrError()
         .toObservable();
@@ -248,8 +251,7 @@ public abstract class ImageUriRequest<T> {
         .flatMap(new Function<Boolean, ObservableSource<String>>() {
           private Observable<ResponseBody> getObservable(UriRequest request) {
             return request.getSearchType() == ImageUriRequest.URL_ALBUM ?
-                HttpClient.getLastFMApiservice()
-                    .getAlbumInfo(request.getAlbumName(), request.getArtistName(), null) :
+                HttpClient.getLastFMApiservice().getAlbumInfo(request.getAlbumName(), request.getArtistName(), null) :
                 HttpClient.getLastFMApiservice().getArtistInfo(request.getArtistName(), null);
           }
 

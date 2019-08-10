@@ -37,8 +37,7 @@ import remix.myplayer.util.SPUtil;
  * @Date 2017/1/17 16:36
  */
 
-public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extends
-    BaseAdapter<M, BaseViewHolder> {
+public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extends BaseAdapter<M, BaseViewHolder> {
 
   // 封面uri缓存
   SparseArray<String> mUriCache = new SparseArray<>();
@@ -60,9 +59,9 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
   //当前列表模式 1:列表 2:网格
   int mMode = GRID_MODE;
 
-  HeaderAdapter(Context context, int layoutId, MultipleChoice multiChoice,
+  HeaderAdapter(int layoutId, MultipleChoice multiChoice,
       RecyclerView recyclerView) {
-    super(context, layoutId);
+    super(layoutId);
     this.mChoice = multiChoice;
     this.mRecyclerView = recyclerView;
     String key = this instanceof AlbumAdapter ? SPUtil.SETTING_KEY.MODE_FOR_ALBUM :
@@ -71,7 +70,7 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
                 null;
     //其他的列表都是List模式
     this.mMode =
-        key != null ? SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, key, GRID_MODE) : LIST_MODE;
+        key != null ? SPUtil.getValue(recyclerView.getContext(), SPUtil.SETTING_KEY.NAME, key, GRID_MODE) : LIST_MODE;
   }
 
   @Override
@@ -138,33 +137,33 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
     mMode = newModel;
     setUpModeButton(headerHolder);
     //重新设置LayoutManager和adapter并刷新列表
-    mRecyclerView.setLayoutManager(mMode == LIST_MODE ? new LinearLayoutManager(mContext)
-        : new GridLayoutManager(mContext, 2));
+    mRecyclerView.setLayoutManager(mMode == LIST_MODE ? new LinearLayoutManager(headerHolder.itemView.getContext())
+        : new GridLayoutManager(headerHolder.itemView.getContext(), 2));
     mRecyclerView.setAdapter(this);
     //保存当前模式
-    saveMode();
+    saveMode(headerHolder.itemView.getContext());
   }
 
   private void tintModeButton(HeaderHolder headerHolder) {
     headerHolder.mListModeBtn.setImageDrawable(
-        Theme.tintVectorDrawable(mContext, R.drawable.ic_format_list_bulleted_white_24dp,
+        Theme.tintVectorDrawable(headerHolder.itemView.getContext(), R.drawable.ic_format_list_bulleted_white_24dp,
             mMode == LIST_MODE ? ThemeStore.getAccentColor()
                 : ColorUtil.getColor(R.color.default_model_button_color))
     );
 
     headerHolder.mGridModeBtn.setImageDrawable(
-        Theme.tintVectorDrawable(mContext, R.drawable.ic_apps_white_24dp,
+        Theme.tintVectorDrawable(headerHolder.itemView.getContext(), R.drawable.ic_apps_white_24dp,
             mMode == GRID_MODE ? ThemeStore.getAccentColor()
                 : ColorUtil.getColor(R.color.default_model_button_color))
     );
 
   }
 
-  private void saveMode() {
+  private void saveMode(Context context) {
     String key = this instanceof AlbumAdapter ? SPUtil.SETTING_KEY.MODE_FOR_ALBUM :
         this instanceof ArtistAdapter ? SPUtil.SETTING_KEY.MODE_FOR_ARTIST :
             SPUtil.SETTING_KEY.MODE_FOR_PLAYLIST;
-    SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, key, mMode);
+    SPUtil.putValue(context, SPUtil.SETTING_KEY.NAME, key, mMode);
   }
 
   void setMarginForGridLayout(BaseViewHolder holder, int position) {
@@ -172,7 +171,7 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
     if (mMode == GRID_MODE && holder.mRoot != null) {
       ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) holder.mRoot
           .getLayoutParams();
-      if (isPortraitOrientation(mContext)) { //竖屏
+      if (isPortraitOrientation(holder.itemView.getContext())) { //竖屏
         if (position % 2 == 1) {
           lp.setMargins(GRID_MARGIN_HORIZONTAL, GRID_MARGIN_VERTICAL,
               GRID_MARGIN_HORIZONTAL / 2, GRID_MARGIN_VERTICAL);

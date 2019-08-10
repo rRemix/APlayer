@@ -1,6 +1,5 @@
 package remix.myplayer.ui.adapter
 
-import android.content.Context
 import android.net.Uri
 import android.view.View
 import android.widget.TextView
@@ -18,7 +17,7 @@ import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 /**
  * Created by Remix on 2018/3/15.
  */
-class CustomSortAdapter(context: Context, layoutId: Int) : BaseAdapter<Song, CustomSortAdapter.CustomSortHolder>(context, layoutId) {
+class CustomSortAdapter(layoutId: Int) : BaseAdapter<Song, CustomSortAdapter.CustomSortHolder>(layoutId) {
 
   override fun convert(holder: CustomSortHolder?, song: Song?, position: Int) {
     if (song == null || holder == null)

@@ -69,29 +69,7 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
     ButterKnife.bind(this);
     setUpToolbar("");
 
-//        mSearchView.setIconified(false);
-
-//        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String key) {
-//                if (!key.equals(mkey)){
-//                    search(key);
-//                    return true;
-//                }
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String key) {
-//                if (!key.equals(mkey)){
-//                    search(key);
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
-
-    mAdapter = new SearchAdapter(this, R.layout.item_search_reulst);
+    mAdapter = new SearchAdapter(R.layout.item_search_reulst);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(View view, int position) {

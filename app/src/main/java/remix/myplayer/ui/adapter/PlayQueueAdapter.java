@@ -29,8 +29,8 @@ public class PlayQueueAdapter extends BaseAdapter<Song, PlayQueueAdapter.PlayQue
   private int mAccentColor;
   private int mTextColor;
 
-  public PlayQueueAdapter(Context context, int layoutId) {
-    super(context, layoutId);
+  public PlayQueueAdapter(int layoutId) {
+    super(layoutId);
     mAccentColor = ThemeStore.getAccentColor();
     mTextColor = ThemeStore.getTextColorPrimary();
   }
@@ -39,7 +39,7 @@ public class PlayQueueAdapter extends BaseAdapter<Song, PlayQueueAdapter.PlayQue
   protected void convert(final PlayQueueHolder holder, Song song, int position) {
     if (song == null) {
       //歌曲已经失效
-      holder.mSong.setText(mContext.getString(R.string.song_lose_effect));
+      holder.mSong.setText(R.string.song_lose_effect);
       holder.mArtist.setVisibility(View.GONE);
       return;
     }

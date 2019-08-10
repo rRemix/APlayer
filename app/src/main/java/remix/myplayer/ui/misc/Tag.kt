@@ -58,11 +58,11 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
       //歌曲路径
       root.song_detail_path.text = song.url
       //歌曲名称
-      root.song_detail_name.text = song.displayname
+      root.song_detail_name.text = song.displayName
       //歌曲大小
       root.song_detail_size.text = getString(R.string.cache_size, 1.0f * song.size / ByteConstants.MB)
       //歌曲时长
-      root.song_detail_duration.text = Util.getTime(song.duration)
+      root.song_detail_duration.text = Util.getTime(song.getDuration())
       //歌曲格式
       tagEditor.formatSingle()
           .observeOn(AndroidSchedulers.mainThread())

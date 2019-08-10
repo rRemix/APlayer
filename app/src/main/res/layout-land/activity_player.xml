@@ -10,41 +10,36 @@
   android:fitsSystemWindows="true">
 
   <!--三个导航图标-->
-  <RelativeLayout
+  <LinearLayout
     android:id="@+id/holder_indicator"
     android:layout_width="0dp"
     android:layout_height="0dp"
-    android:visibility="gone"
-    tools:ignore="MissingConstraints">
-    <ImageView
-      android:id="@+id/guide_02"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginLeft="@dimen/d4_size"
-      android:layout_marginRight="@dimen/d4_size"
-      android:layout_centerInParent="true"/>
+    android:paddingTop="@dimen/d2_size"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:visibility="gone">
     <ImageView
       android:id="@+id/guide_01"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_alignTop="@id/guide_02"
-      android:layout_centerVertical="true"
-      android:layout_toLeftOf="@id/guide_02"/>
+      android:layout_marginEnd="@dimen/d4_size"/>
+    <ImageView
+      android:id="@+id/guide_02"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/d4_size"/>
     <ImageView
       android:id="@+id/guide_03"
       android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_alignTop="@id/guide_02"
-      android:layout_centerVertical="true"
-      android:layout_toRightOf="@id/guide_02"/>
-  </RelativeLayout>
+      android:layout_height="wrap_content"/>
+  </LinearLayout>
   <!-- viewpager保留 大小为零 -->
   <remix.myplayer.ui.widget.AudioViewPager
     android:id="@+id/holder_pager"
     android:layout_width="0dp"
     android:layout_height="0dp"
-    android:visibility="gone"
     android:overScrollMode="never"
+    android:visibility="gone"
     tools:ignore="MissingConstraints"/>
 
   <LinearLayout
@@ -70,19 +65,19 @@
           android:id="@+id/container_cover"
           android:layout_width="0dp"
           android:layout_height="match_parent"
+          app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintLeft_toLeftOf="parent"
           app:layout_constraintRight_toLeftOf="@id/container_lyric"
-          app:layout_constraintTop_toTopOf="parent"
-          app:layout_constraintBottom_toBottomOf="parent"/>
+          app:layout_constraintTop_toTopOf="parent"/>
 
         <FrameLayout
           android:id="@+id/container_lyric"
           android:layout_width="0dp"
           android:layout_height="match_parent"
-          app:layout_constraintRight_toRightOf="parent"
+          app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintLeft_toRightOf="@id/container_cover"
-          app:layout_constraintTop_toTopOf="parent"
-          app:layout_constraintBottom_toBottomOf="parent"/>
+          app:layout_constraintRight_toRightOf="parent"
+          app:layout_constraintTop_toTopOf="parent"/>
 
 
       </android.support.constraint.ConstraintLayout>

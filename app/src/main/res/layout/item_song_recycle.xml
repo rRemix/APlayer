@@ -14,23 +14,22 @@
     android:layout_height="match_parent"
     android:layout_marginTop="8dp"
     android:layout_marginBottom="8dp"
+    app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintLeft_toLeftOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toBottomOf="parent"/>
+    app:layout_constraintTop_toTopOf="parent"/>
 
   <com.facebook.drawee.view.SimpleDraweeView
     android:id="@+id/song_head_image"
     android:layout_width="@dimen/d40_size"
     android:layout_height="@dimen/d40_size"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
+    android:layout_marginStart="16dp"
     android:visibility="visible"
     app:actualImageScaleType="centerCrop"
     app:fadeDuration="@integer/FadeDuration"
     app:failureImage="?attr/default_album"
     app:failureImageScaleType="centerCrop"
     app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toStartOf="@+id/song_text_container"
+    app:layout_constraintRight_toLeftOf="@id/song_title"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     app:placeholderImage="?attr/default_album"
@@ -51,74 +50,56 @@
     android:layout_width="0dp"
     android:layout_height="@dimen/d1_size"
     android:layout_marginStart="16dp"
-    android:layout_marginLeft="16dp"
     android:background="?attr/divider_color"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintStart_toStartOf="parent"/>
 
-  <android.support.constraint.ConstraintLayout
-    android:id="@+id/song_text_container"
+  <TextView
+    android:id="@+id/song_title"
     android:layout_width="0dp"
-    android:layout_height="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp"
+    android:layout_marginStart="16dp"
     android:layout_marginEnd="8dp"
-    android:layout_marginRight="8dp"
+    android:ellipsize="end"
+    android:gravity="start|center_vertical"
+    android:lines="1"
+    android:textColor="?attr/text_color_primary"
+    android:textSize="@dimen/s14_size"
     app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/song_other"
     app:layout_constraintEnd_toStartOf="@+id/song_button"
     app:layout_constraintStart_toEndOf="@+id/song_head_image"
     app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintVertical_bias="1.0">
+    app:layout_constraintVertical_chainStyle="packed"
+    tools:text="七里香七里香七里香七里香七里香七里香"/>
 
-    <android.support.constraint.Guideline
-      android:id="@+id/guideline"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:orientation="horizontal"
-      app:layout_constraintGuide_percent="0.5"/>
+  <TextView
+    android:id="@+id/song_other"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="2dp"
+    android:ellipsize="end"
+    android:gravity="start|center_vertical"
+    android:lines="1"
+    android:textColor="?attr/text_color_secondary"
+    android:textSize="@dimen/s12_size"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="@id/song_title"
+    app:layout_constraintStart_toStartOf="@id/song_title"
+    app:layout_constraintTop_toBottomOf="@+id/song_title"
+    tools:text="周杰伦"/>
 
-    <TextView
-      android:id="@+id/song_title"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="2dp"
-      android:ellipsize="end"
-      android:lines="1"
-      android:textColor="?attr/text_color_primary"
-      android:textSize="@dimen/s14_size"
-      app:layout_constraintBottom_toTopOf="@id/guideline"
-      tools:text="七里香七里香七里香七里香七里香七里香"/>
+  <ImageView
+    android:id="@+id/sq"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp"
+    android:background="@color/transparent"
+    android:visibility="gone"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:srcCompat="@drawable/icon_sq"
+    tools:visibility="visible"/>
 
-    <ImageView
-      android:id="@+id/sq"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="2dp"
-      android:background="@color/transparent"
-      android:visibility="gone"
-      app:layout_constraintBottom_toTopOf="@+id/guideline"
-      app:layout_constraintStart_toEndOf="@+id/song_title"
-      app:srcCompat="@drawable/icon_sq"
-      tools:visibility="visible"/>
-
-    <TextView
-      android:id="@+id/song_other"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="2dp"
-      android:ellipsize="end"
-      android:lines="1"
-      android:textColor="?attr/text_color_secondary"
-      android:textSize="@dimen/s12_size"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@+id/guideline"
-      tools:text="周杰伦"/>
-  </android.support.constraint.ConstraintLayout>
-
-  <!--<remix.myplayer.ui.widget.ColumnView-->
-    <!--android:id="@+id/song_columnview"-->
-    <!--android:layout_width="@dimen/d18_size"-->
-    <!--android:layout_height="@dimen/d16_size"-->
-    <!--android:visibility="gone"-->
-    <!--app:columnnum="4"-->
-    <!--app:columnwidth="@dimen/d2_size"/>-->
 </android.support.constraint.ConstraintLayout>

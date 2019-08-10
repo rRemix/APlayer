@@ -5,6 +5,7 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -15,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -44,16 +44,17 @@ import remix.myplayer.util.ToastUtil;
 public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implements
     FastScroller.SectionIndexer {
 
-  public AlbumAdapter(Context context, int layoutId, MultipleChoice multipleChoice,
+  public AlbumAdapter(int layoutId, MultipleChoice multipleChoice,
       RecyclerView recyclerView) {
-    super(context, layoutId, multipleChoice, recyclerView);
+    super(layoutId, multipleChoice, recyclerView);
   }
 
+  @NonNull
   @Override
-  public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+  public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     if (viewType == TYPE_HEADER) {
       return new HeaderHolder(
-          LayoutInflater.from(mContext).inflate(R.layout.layout_header_2, parent, false));
+          LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_header_2, parent, false));
     }
     return viewType == HeaderAdapter.LIST_MODE ?
         new AlbumListHolder(LayoutInflater.from(parent.getContext())
@@ -63,19 +64,9 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
   }
 
   @Override
-  public void onViewRecycled(BaseViewHolder holder) {
+  public void onViewRecycled(@NonNull BaseViewHolder holder) {
     super.onViewRecycled(holder);
     disposeLoad(holder);
-//    if (holder instanceof AlbumHolder) {
-//      final AlbumHolder albumHolder = (AlbumHolder) holder;
-//      if (albumHolder.mImage.getTag() != null) {
-//        Disposable disposable = (Disposable) albumHolder.mImage.getTag();
-//        if (!disposable.isDisposed()) {
-//          disposable.dispose();
-//        }
-//      }
-//      albumHolder.mImage.setImageURI(Uri.EMPTY);
-//    }
   }
 
   @SuppressLint("RestrictedApi")
@@ -90,6 +81,8 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     if (!(baseHolder instanceof AlbumHolder)) {
       return;
     }
+
+    final Context context = baseHolder.itemView.getContext();
     final AlbumHolder holder = (AlbumHolder) baseHolder;
     holder.mText1.setText(album.getAlbum());
 
@@ -107,7 +100,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
 
     holder.mContainer.setOnClickListener(v -> {
       if (position - 1 < 0) {
-        ToastUtil.show(mContext, R.string.illegal_arg);
+        ToastUtil.show(context, R.string.illegal_arg);
         return;
       }
       mOnItemClickListener.onItemClick(holder.mContainer, position - 1);
@@ -115,10 +108,10 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     //多选菜单
     holder.mContainer.setOnLongClickListener(v -> {
       if (position - 1 < 0) {
-        ToastUtil.show(mContext, R.string.illegal_arg);
+        ToastUtil.show(context, R.string.illegal_arg);
         return true;
       }
-      mOnItemClickListener.onItemClick(holder.mContainer, position - 1);
+      mOnItemClickListener.onItemLongClick(holder.mContainer, position - 1);
       return true;
     });
 
@@ -130,9 +123,10 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
       if (mChoice.isActive()) {
         return;
       }
-      final PopupMenu popupMenu = new PopupMenu(mContext, holder.mButton, Gravity.END);
+      final PopupMenu popupMenu = new PopupMenu(context, holder.mButton, Gravity.END);
       popupMenu.getMenuInflater().inflate(R.menu.menu_album_item, popupMenu.getMenu());
-      popupMenu.setOnMenuItemClickListener(new LibraryListener(mContext,
+      popupMenu.setOnMenuItemClickListener(new LibraryListener(
+          context,
           albumId,
           Constants.ALBUM,
           album.getAlbum()));
@@ -145,7 +139,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     //半圆着色
     if (mMode == HeaderAdapter.GRID_MODE) {
       Theme.tintDrawable(holder.mHalfCircle, R.drawable.icon_half_circular_left,
-          ThemeStore.getBackgroundColorMain(mContext));
+          ThemeStore.getBackgroundColorMain(context));
     }
 
     setMarginForGridLayout(holder, position);
@@ -179,10 +173,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     @BindView(R.id.item_simpleiview)
     SimpleDraweeView mImage;
     @BindView(R.id.item_container)
-    RelativeLayout mContainer;
-//        @BindView(R.id.item_root)
-//        @Nullable
-//        View mRoot;
+    ViewGroup mContainer;
 
     AlbumHolder(View v) {
       super(v);

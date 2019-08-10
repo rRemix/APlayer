@@ -253,7 +253,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
               //文件名
               case R.id.setting_displayname_switch:
-                Song.SHOW_DISPLAYNAME = isChecked;
+                Song.Companion.setSHOW_DISPLAYNAME(isChecked);
                 mNeedRefreshAdapter = true;
                 break;
             }

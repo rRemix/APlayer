@@ -1,6 +1,5 @@
 package remix.myplayer.ui.adapter;
 
-import android.content.Context;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -18,8 +17,8 @@ import remix.myplayer.ui.adapter.holder.BaseViewHolder;
  */
 public class AddtoPlayListAdapter extends BaseAdapter<PlayList, AddtoPlayListAdapter.PlayListAddToHolder> {
 
-  public AddtoPlayListAdapter(Context context, int layoutId) {
-    super(context, layoutId);
+  public AddtoPlayListAdapter(int layoutId) {
+    super(layoutId);
   }
 
 

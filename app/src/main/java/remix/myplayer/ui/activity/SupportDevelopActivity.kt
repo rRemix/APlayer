@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
@@ -24,7 +25,6 @@ import io.reactivex.ObservableSource
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
 import io.reactivex.functions.Function
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
@@ -40,6 +40,7 @@ import remix.myplayer.ui.adapter.PurchaseAdapter
 import remix.myplayer.util.AlipayUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
+import timber.log.Timber
 import java.io.File
 import java.io.OutputStream
 import java.util.*
@@ -65,7 +66,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
     ButterKnife.bind(this)
     setUpToolbar(getString(R.string.support_develop))
 
-    mAdapter = PurchaseAdapter(mContext, R.layout.item_support)
+    mAdapter = PurchaseAdapter(R.layout.item_support)
 
     val beans = ArrayList<PurchaseBean>()
     if (!App.IS_GOOGLEPLAY) {
@@ -228,13 +229,22 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
     Toast.makeText(this, R.string.restored_previous_purchases, Toast.LENGTH_SHORT).show()
   }
 
+  @SuppressLint("CheckResult")
   override fun onProductPurchased(productId: String, details: TransactionDetails?) {
-    Single.fromCallable {
-      mBillingProcessor?.consumePurchase(productId)
-    }.subscribeOn(Schedulers.io())
+    Single
+        .fromCallable {
+          mBillingProcessor?.consumePurchase(productId)
+        }.subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(Consumer {
-          Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show()
+        .subscribe({
+          if (it == true) {
+            Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show()
+          } else {
+            Toast.makeText(this, R.string.payment_failure, Toast.LENGTH_SHORT).show()
+          }
+        }, {
+          Timber.w(it)
+          Toast.makeText(this, R.string.payment_failure, Toast.LENGTH_SHORT).show()
         })
 
   }
@@ -257,6 +267,5 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
     if (mLoading.isShowing)
       mLoading.dismiss()
   }
-
 
 }

@@ -5,6 +5,7 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
@@ -43,16 +44,17 @@ import remix.myplayer.util.ToastUtil;
 public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> implements
     FastScroller.SectionIndexer {
 
-  public ArtistAdapter(Context context, int layoutId, MultipleChoice multiChoice,
+  public ArtistAdapter(int layoutId, MultipleChoice multiChoice,
       FastScrollRecyclerView recyclerView) {
-    super(context, layoutId, multiChoice, recyclerView);
+    super(layoutId, multiChoice, recyclerView);
   }
 
+  @NonNull
   @Override
-  public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+  public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     if (viewType == TYPE_HEADER) {
       return new HeaderHolder(
-          LayoutInflater.from(mContext).inflate(R.layout.layout_header_2, parent, false));
+          LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_header_2, parent, false));
     }
     return viewType == HeaderAdapter.LIST_MODE ?
         new ArtistAdapter.ArtistListHolder(LayoutInflater.from(parent.getContext())
@@ -62,18 +64,9 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
   }
 
   @Override
-  public void onViewRecycled(BaseViewHolder holder) {
+  public void onViewRecycled(@NonNull BaseViewHolder holder) {
     super.onViewRecycled(holder);
     disposeLoad(holder);
-//    if (holder instanceof ArtistHolder) {
-//      if (((ArtistHolder) holder).mImage.getTag() != null) {
-//        Disposable disposable = (Disposable) ((ArtistHolder) holder).mImage.getTag();
-//        if (!disposable.isDisposed()) {
-//          disposable.dispose();
-//        }
-//      }
-//      ((ArtistHolder) holder).mImage.setImageURI(Uri.EMPTY);
-//    }
   }
 
   @SuppressLint({"RestrictedApi", "CheckResult"})
@@ -88,13 +81,15 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     if (!(baseHolder instanceof ArtistHolder)) {
       return;
     }
+
+    final Context context = baseHolder.itemView.getContext();
     final ArtistHolder holder = (ArtistHolder) baseHolder;
     //设置歌手名
     holder.mText1.setText(artist.getArtist());
     final int artistId = artist.getArtistID();
     if (holder instanceof ArtistListHolder && holder.mText2 != null) {
       if (artist.getCount() > 0) {
-        holder.mText2.setText(mContext.getString(R.string.song_count_1, artist.getCount()));
+        holder.mText2.setText(context.getString(R.string.song_count_1, artist.getCount()));
       } else {
         holder.mText2.setText(App.getContext().getString(R.string.song_count_1, artist.getCount()));
       }
@@ -105,7 +100,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
     holder.mContainer.setOnClickListener(v -> {
       if (holder.getAdapterPosition() - 1 < 0) {
-        ToastUtil.show(mContext, R.string.illegal_arg);
+        ToastUtil.show(context, R.string.illegal_arg);
         return;
       }
       mOnItemClickListener.onItemClick(holder.mContainer, position - 1);
@@ -113,7 +108,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     //多选菜单
     holder.mContainer.setOnLongClickListener(v -> {
       if (position - 1 < 0) {
-        ToastUtil.show(mContext, R.string.illegal_arg);
+        ToastUtil.show(context, R.string.illegal_arg);
         return true;
       }
       mOnItemClickListener.onItemLongClick(holder.mContainer, position - 1);
@@ -129,9 +124,9 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
       if (mChoice.isActive()) {
         return;
       }
-      final PopupMenu popupMenu = new PopupMenu(mContext, holder.mButton);
+      final PopupMenu popupMenu = new PopupMenu(context, holder.mButton);
       popupMenu.getMenuInflater().inflate(R.menu.menu_artist_item, popupMenu.getMenu());
-      popupMenu.setOnMenuItemClickListener(new LibraryListener(mContext,
+      popupMenu.setOnMenuItemClickListener(new LibraryListener(context,
           artistId,
           Constants.ARTIST,
           artist.getArtist()));
@@ -145,18 +140,6 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     //设置padding
     setMarginForGridLayout(holder, position);
   }
-
-//    @NonNull
-//    @Override
-//    public String getSectionName(int position) {
-//        if(position == 0)
-//            return "";
-//        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position - 1)){
-//            String artist = mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-//            return !TextUtils.isEmpty(artist) ? (Pinyin.toPinyin(artist.charAt(0))).toUpperCase().substring(0,1)  : "";
-//        }
-//        return "";
-//    }
 
   @Override
   public String getSectionText(int position) {
@@ -183,7 +166,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     @BindView(R.id.item_button)
     ImageButton mButton;
     @BindView(R.id.item_container)
-    RelativeLayout mContainer;
+    ViewGroup mContainer;
 
     ArtistHolder(View v) {
       super(v);

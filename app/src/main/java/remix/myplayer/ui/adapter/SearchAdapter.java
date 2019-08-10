@@ -4,8 +4,8 @@ import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
@@ -34,12 +34,12 @@ import remix.myplayer.ui.adapter.holder.BaseViewHolder;
  */
 public class SearchAdapter extends BaseAdapter<Song, SearchAdapter.SearchResHolder> {
 
-  public SearchAdapter(Context context, int layoutId) {
-    super(context, layoutId);
+  public SearchAdapter(int layoutId) {
+    super(layoutId);
   }
 
   @Override
-  public void onViewRecycled(SearchAdapter.SearchResHolder holder) {
+  public void onViewRecycled(@NonNull SearchAdapter.SearchResHolder holder) {
     super.onViewRecycled(holder);
     if ((holder).mImage.getTag() != null) {
       Disposable disposable = (Disposable) (holder).mImage.getTag();
@@ -66,10 +66,10 @@ public class SearchAdapter extends BaseAdapter<Song, SearchAdapter.SearchResHold
     Theme.tintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
 
     holder.mButton.setOnClickListener(v -> {
-      final PopupMenu popupMenu = new PopupMenu(mContext, holder.mButton, Gravity.END);
+      final PopupMenu popupMenu = new PopupMenu(holder.itemView.getContext(), holder.mButton, Gravity.END);
       popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
       popupMenu.setOnMenuItemClickListener(
-          new SongPopupListener((AppCompatActivity) mContext, song, false, ""));
+          new SongPopupListener((AppCompatActivity) holder.itemView.getContext(), song, false, ""));
       popupMenu.show();
     });
 

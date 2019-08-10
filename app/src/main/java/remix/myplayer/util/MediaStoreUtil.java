@@ -250,7 +250,7 @@ public class MediaStoreUtil {
   @WorkerThread
   public static Song getSongInfo(Cursor cursor) {
     if (cursor == null || cursor.getColumnCount() <= 0) {
-      return Song.EMPTY_SONG;
+      return Song.Companion.getEMPTY_SONG();
     }
 
     long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
@@ -613,7 +613,7 @@ public class MediaStoreUtil {
 
   public static Song getSong(@Nullable String selection, String[] selectionValues) {
     List<Song> songs = getSongs(selection, selectionValues, null);
-    return songs != null && songs.size() > 0 ? songs.get(0) : Song.EMPTY_SONG;
+    return songs != null && songs.size() > 0 ? songs.get(0) : Song.Companion.getEMPTY_SONG();
   }
 
   public static List<Song> getSongs(@Nullable String selection, String[] selectionValues,

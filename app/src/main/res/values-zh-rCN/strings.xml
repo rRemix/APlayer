@@ -64,7 +64,7 @@
   <string name="set_success">设置成功</string>
   <string name="plz_set_correct_time">请设置正确的时间</string>
   <string name="cancel_success">取消成功</string>
-  <string name="play_random">随机播放全部</string>
+  <string name="play_random">随机播放全部(%d)</string>
   <string name="scan_tip">大于此设置数值的音频文件就会出现在歌曲库里</string>
   <string name="search_hint">搜索歌曲 艺人 专辑</string>
   <string name="no_search_result">无搜索结果</string>
@@ -72,7 +72,7 @@
   <string name="use_system_color">使用系统底色</string>
   <string name="use_black_color">使用黑色底色</string>
 
-  <string name="play_queue">播放队列</string>
+  <string name="play_queue">播放队列(%d)</string>
   <string name="choose_song">选择歌曲</string>
   <string name="choose_no_song">未选择任何歌曲</string>
   <string name="set_album_cover_error">设置专辑封面失败</string>
@@ -316,6 +316,7 @@
   <string name="error_setup_inapp_billing">初始化内购失败: %s</string>
   <string name="error_occur">发生错误: %s</string>
   <string name="thank_you">感谢您的支持!</string>
+  <string name="payment_failure">支付失败</string>
   <string name="restored_previous_purchases">恢复过往的内购</string>
   <string name="paypal">Paypal</string>
   <string name="exit">退出</string>

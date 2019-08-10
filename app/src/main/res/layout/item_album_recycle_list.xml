@@ -1,65 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-  android:id="@+id/item_container"
+<android.support.constraint.ConstraintLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:fresco="http://schemas.android.com/apk/res-auto"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/item_container"
   android:layout_width="match_parent"
   android:layout_height="@dimen/d64_size"
   android:background="?attr/background_list">
   <com.facebook.drawee.view.SimpleDraweeView
+    android:id="@+id/item_simpleiview"
     android:layout_width="@dimen/d42_size"
     android:layout_height="@dimen/d42_size"
-    android:id="@+id/item_simpleiview"
-    fresco:fadeDuration="@integer/FadeDuration"
-    fresco:placeholderImage="?attr/default_album"
-    fresco:placeholderImageScaleType="centerCrop"
-    fresco:actualImageScaleType="centerCrop"
-    fresco:failureImage="?attr/default_album"
-    fresco:failureImageScaleType="centerCrop"
-    android:layout_centerVertical="true"
-    android:layout_marginLeft="@dimen/d8_size"/>
+    android:layout_marginStart="@dimen/d8_size"
+    app:actualImageScaleType="centerCrop"
+    app:fadeDuration="@integer/FadeDuration"
+    app:failureImage="?attr/default_album"
+    app:failureImageScaleType="centerCrop"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:placeholderImage="?attr/default_album"
+    app:placeholderImageScaleType="centerCrop"/>
 
-  <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_toRightOf="@id/item_simpleiview"
-    android:layout_toLeftOf="@+id/item_button"
-    android:layout_margin="@dimen/d8_size"
-    android:gravity="center_vertical"
-    android:orientation="vertical"
-    android:id="@+id/song_text_container">
-    <TextView
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:lines="1"
-      android:ellipsize="end"
-      android:textSize="@dimen/s14_size"
-      android:textColor="?attr/text_color_primary"
-      android:id="@+id/item_text1"/>
-    <TextView
-      android:id="@+id/item_text2"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:lines="1"
-      android:ellipsize="end"
-      android:textSize="@dimen/s12_size"
-      android:textColor="?attr/text_color_secondary"
-      android:layout_marginTop="@dimen/d4_size"/>
-  </LinearLayout>
-  <!--结尾处按钮-->
+
+  <TextView
+    android:id="@+id/item_text1"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp"
+    android:layout_marginStart="@dimen/d8_size"
+    android:layout_marginEnd="@dimen/d8_size"
+    android:ellipsize="end"
+    android:gravity="start|center_vertical"
+    android:lines="1"
+    android:textColor="?attr/text_color_primary"
+    android:textSize="@dimen/s14_size"
+    app:layout_constraintBottom_toTopOf="@id/item_text2"
+    app:layout_constraintEnd_toStartOf="@id/item_button"
+    app:layout_constraintStart_toEndOf="@id/item_simpleiview"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_chainStyle="packed"/>
+
+  <TextView
+    android:id="@+id/item_text2"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/d4_size"
+    android:ellipsize="end"
+    android:gravity="start|center_vertical"
+    android:lines="1"
+    android:textColor="?attr/text_color_secondary"
+    android:textSize="@dimen/s12_size"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="@id/item_text1"
+    app:layout_constraintRight_toRightOf="@id/item_text1"
+    app:layout_constraintTop_toBottomOf="@id/item_text1"/>
+
   <ImageButton
-    android:layout_alignParentRight="true"
-    android:layout_marginRight="@dimen/d8_size"
     android:id="@+id/item_button"
     android:layout_width="@dimen/item_list_btn_size"
     android:layout_height="@dimen/item_list_btn_size"
-    android:layout_centerVertical="true"
-    android:background="?attr/background_oval_ripple"/>
+    android:layout_marginEnd="@dimen/d8_size"
+    android:background="?attr/background_oval_ripple"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toTopOf="parent"/>
 
   <View
     android:layout_width="match_parent"
     android:layout_height="@dimen/d1_size"
+    android:layout_marginStart="@dimen/d8_size"
     android:background="?attr/divider_color"
-    android:layout_alignParentBottom="true"
-    android:layout_marginLeft="@dimen/d8_size"/>
-</RelativeLayout>
+    app:layout_constraintBottom_toBottomOf="parent"/>
+</android.support.constraint.ConstraintLayout>

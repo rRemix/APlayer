@@ -8,6 +8,8 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -52,41 +54,33 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
 
   private Song mLastPlaySong = MusicServiceRemote.getCurrentSong();
 
-  public SongAdapter(Context context, int layoutId, MultipleChoice multiChoice, int type,
+  public SongAdapter(int layoutId, MultipleChoice multiChoice, int type,
       RecyclerView recyclerView) {
-    super(context, layoutId, multiChoice, recyclerView);
+    super(layoutId, multiChoice, recyclerView);
     mType = type;
     mRecyclerView = recyclerView;
   }
 
+  @NonNull
   @Override
-  public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+  public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     return viewType == TYPE_HEADER ?
         new HeaderHolder(
-            LayoutInflater.from(mContext).inflate(R.layout.layout_header_1, parent, false)) :
+            LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_header_1, parent, false)) :
         new SongViewHolder(
-            LayoutInflater.from(mContext).inflate(R.layout.item_song_recycle, parent, false));
+            LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song_recycle, parent, false));
   }
 
   @Override
-  public void onViewRecycled(BaseViewHolder holder) {
+  public void onViewRecycled(@NonNull BaseViewHolder holder) {
     super.onViewRecycled(holder);
     disposeLoad(holder);
-//    if (holder instanceof SongViewHolder) {
-//      final SongViewHolder songViewHolder = (SongViewHolder) holder;
-//      if (songViewHolder.mImage.getTag() != null) {
-//        Disposable disposable = (Disposable) songViewHolder.mImage.getTag();
-//        if (!disposable.isDisposed()) {
-//          disposable.dispose();
-//        }
-//        songViewHolder.mImage.setTag(null);
-//      }
-//    }
   }
 
   @SuppressLint("RestrictedApi")
   @Override
   protected void convert(BaseViewHolder baseHolder, final Song song, int position) {
+    final Context context = baseHolder.itemView.getContext();
     if (position == 0) {
       final HeaderHolder headerHolder = (HeaderHolder) baseHolder;
       //没有歌曲时隐藏
@@ -97,17 +91,18 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
         headerHolder.mRoot.setVisibility(View.VISIBLE);
       }
 
-      headerHolder.mShuffleIv.setImageDrawable(
-          Theme.tintVectorDrawable(mContext, R.drawable.ic_shuffle_white_24dp,
+      headerHolder.mIvShuffle.setImageDrawable(
+          Theme.tintVectorDrawable(context, R.drawable.ic_shuffle_white_24dp,
               ThemeStore.getAccentColor())
       );
+      headerHolder.mTvShuffle.setText(context.getString(R.string.play_random, getItemCount() - 1));
 
       headerHolder.mRoot.setOnClickListener(v -> {
         Intent intent = MusicUtil.makeCmdIntent(Command.NEXT, true);
         if (mType == ALLSONG) {
           List<Integer> allSong = MusicServiceRemote.getAllSong();
           if (allSong == null || allSong.isEmpty()) {
-            ToastUtil.show(mContext, R.string.no_song);
+            ToastUtil.show(context, R.string.no_song);
             return;
           }
           MusicServiceRemote.setPlayQueue(allSong, intent);
@@ -117,7 +112,7 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
             IdList.add(mDatas.get(i).getId());
           }
           if (IdList.size() == 0) {
-            ToastUtil.show(mContext, R.string.no_song);
+            ToastUtil.show(context, R.string.no_song);
             return;
           }
           MusicServiceRemote.setPlayQueue(IdList, intent);
@@ -135,8 +130,8 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
     holder.mImage.setTag(setImage(holder.mImage, getSearchRequestWithAlbumType(song), SMALL_IMAGE_SIZE, position));
 
 //        //是否为无损
-//        if(!TextUtils.isEmpty(song.getDisplayname())){
-//            String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
+//        if(!TextUtils.isEmpty(song.getDisplayName())){
+//            String prefix = song.getDisplayName().substring(song.getDisplayName().lastIndexOf(".") + 1);
 //            holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
 //        }
 
@@ -165,23 +160,23 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
       if (mChoice.isActive()) {
         return;
       }
-      final PopupMenu popupMenu = new PopupMenu(mContext, holder.mButton, Gravity.END);
+      final PopupMenu popupMenu = new PopupMenu(context, holder.mButton, Gravity.END);
       popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
       popupMenu.setOnMenuItemClickListener(
-          new SongPopupListener((AppCompatActivity) mContext, song, false, ""));
+          new SongPopupListener((AppCompatActivity) context, song, false, ""));
       popupMenu.show();
     });
 
     holder.mContainer.setOnClickListener(v -> {
       if (position - 1 < 0) {
-        ToastUtil.show(mContext, R.string.illegal_arg);
+        ToastUtil.show(context, R.string.illegal_arg);
         return;
       }
       mOnItemClickListener.onItemClick(v, position - 1);
     });
     holder.mContainer.setOnLongClickListener(v -> {
       if (position - 1 < 0) {
-        ToastUtil.show(mContext, R.string.illegal_arg);
+        ToastUtil.show(context, R.string.illegal_arg);
         return true;
       }
       mOnItemClickListener.onItemLongClick(v, position - 1);
@@ -267,7 +262,9 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
     @BindView(R.id.divider)
     View mDivider;
     @BindView(R.id.play_shuffle_button)
-    ImageView mShuffleIv;
+    ImageView mIvShuffle;
+    @BindView(R.id.tv_shuffle_count)
+    TextView mTvShuffle;
 
     HeaderHolder(View itemView) {
       super(itemView);

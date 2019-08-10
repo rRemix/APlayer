@@ -159,7 +159,7 @@ abstract class BaseAppwidget
     //设置时间
     remoteViews.setTextColor(R.id.appwidget_progress, skin.progressColor)
     //进度
-    remoteViews.setProgressBar(R.id.appwidget_seekbar, song.duration.toInt(), service.progress, false)
+    remoteViews.setProgressBar(R.id.appwidget_seekbar, song.getDuration().toInt(), service.progress, false)
   }
 
   private fun updateLove(service: MusicService,remoteViews: RemoteViews, song: Song) {

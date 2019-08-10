@@ -55,8 +55,7 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
 
     mHandler = new MsgHandler(this);
 
-    mAdapter = new SongAdapter(this, R.layout.item_song_recycle, mChoice, SongAdapter.RECENTLY,
-        mRecyclerView);
+    mAdapter = new SongAdapter(R.layout.item_song_recycle, mChoice, SongAdapter.RECENTLY, mRecyclerView);
     mChoice.setAdapter(mAdapter);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
@@ -131,7 +130,7 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
   @Override
   public void onMediaStoreChanged() {
     super.onMediaStoreChanged();
-    if(mAdapter != null){
+    if (mAdapter != null) {
       mAdapter.clearUriCache();
     }
   }

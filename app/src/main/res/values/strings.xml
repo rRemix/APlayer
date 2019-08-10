@@ -64,7 +64,7 @@
   <string name="set_success">Apply success</string>
   <string name="plz_set_correct_time">Please set the correct time</string>
   <string name="cancel_success">Cancel success</string>
-  <string name="play_random">Shuffle all</string>
+  <string name="play_random">shuffle all(%d)</string>
   <string name="scan_tip">The audio file that is larger than this setting will appear in the song library</string>
   <string name="search_hint">Search song artist album</string>
   <string name="no_search_result">No result</string>
@@ -72,7 +72,7 @@
   <string name="use_system_color">Use the system background color</string>
   <string name="use_black_color">Use the black background color</string>
 
-  <string name="play_queue">Playing queue</string>
+  <string name="play_queue">Playing queue(%d)</string>
   <string name="choose_song">Choose song</string>
   <string name="choose_no_song">No songs were selected</string>
   <string name="set_album_cover_error">Set album cover failed</string>
@@ -317,6 +317,7 @@
   <string name="error_occur">Error occurred: %s</string>
   <string name="thank_you">Thank you!</string>
   <string name="restored_previous_purchases">Restored previous purchases.</string>
+  <string name="payment_failure">payment failure</string>
   <string name="paypal">Paypal</string>
   <string name="exit">Exit</string>
   <string name="plz_set_default_time">Please set the default time first</string>

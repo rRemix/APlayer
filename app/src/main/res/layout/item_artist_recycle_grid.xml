@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.constraint.ConstraintLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:fresco="http://schemas.android.com/apk/res-auto"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
   android:id="@+id/item_container"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
-  android:background="?attr/background_grid">
+  android:background="?attr/background_grid"
+  android:orientation="vertical">
 
   <remix.myplayer.ui.widget.WidthFitSquareLayout
     android:id="@+id/item_simpleiview_container"
@@ -17,40 +19,40 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_centerHorizontal="true"
-      fresco:actualImageScaleType="centerCrop"
-      fresco:fadeDuration="@integer/FadeDuration"
-      fresco:failureImage="?attr/default_artist"
-      fresco:failureImageScaleType="centerCrop"
-      fresco:placeholderImage="?attr/default_artist"
-      fresco:placeholderImageScaleType="centerCrop"
-      fresco:roundedCornerRadius="@dimen/d2_size"/>
+      app:actualImageScaleType="centerCrop"
+      app:fadeDuration="@integer/FadeDuration"
+      app:failureImage="?attr/default_artist"
+      app:failureImageScaleType="centerCrop"
+      app:placeholderImage="?attr/default_artist"
+      app:placeholderImageScaleType="centerCrop"
+      app:roundedCornerRadius="@dimen/d2_size"/>
   </remix.myplayer.ui.widget.WidthFitSquareLayout>
 
-  <RelativeLayout
-    android:layout_width="match_parent"
+  <TextView
+    android:id="@+id/item_text1"
+    android:layout_width="0dp"
     android:layout_height="@dimen/item_grid_text_container_height"
-    android:layout_below="@+id/item_simpleiview_container">
-    <ImageButton
-      android:id="@+id/item_button"
-      android:layout_width="@dimen/item_list_btn_size"
-      android:layout_height="@dimen/item_list_btn_size"
-      android:layout_alignParentRight="true"
-      android:layout_centerVertical="true"
-      android:background="?attr/background_oval_ripple"/>
+    android:layout_marginLeft="@dimen/d10_size"
+    android:layout_marginRight="@dimen/d10_size"
+    android:ellipsize="end"
+    android:gravity="center_vertical|start"
+    android:maxLines="1"
+    android:textColor="?attr/text_color_primary"
+    android:textSize="@dimen/s16_size"
+    app:layout_constraintEnd_toStartOf="@id/item_button"
+    app:layout_constraintHorizontal_chainStyle="packed"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/item_simpleiview_container"
+    tools:text="111111"/>
 
-    <TextView
-      android:id="@+id/item_text1"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:layout_marginLeft="@dimen/d10_size"
-      android:layout_marginRight="@dimen/d10_size"
-      android:layout_toLeftOf="@id/item_button"
-      android:ellipsize="end"
-      android:gravity="center_vertical|left"
-      android:maxLines="1"
-      android:textColor="?attr/text_color_primary"
-      android:textSize="@dimen/s16_size"/>
+  <ImageButton
+    android:id="@+id/item_button"
+    android:layout_width="@dimen/item_list_btn_size"
+    android:layout_height="@dimen/item_list_btn_size"
+    android:background="?attr/background_oval_ripple"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@id/item_text1"
+    app:layout_constraintTop_toBottomOf="@id/item_simpleiview_container"/>
 
-  </RelativeLayout>
-
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

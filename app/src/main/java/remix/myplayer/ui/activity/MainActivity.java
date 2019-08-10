@@ -53,7 +53,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import org.jetbrains.annotations.NotNull;
 import remix.myplayer.App;
 import remix.myplayer.R;
@@ -450,7 +449,7 @@ public class MainActivity extends MenuActivity {
 
 
   private void setUpDrawerLayout() {
-    mDrawerAdapter = new DrawerAdapter(this, R.layout.item_drawer);
+    mDrawerAdapter = new DrawerAdapter(R.layout.item_drawer);
     mDrawerAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(View view, int position) {

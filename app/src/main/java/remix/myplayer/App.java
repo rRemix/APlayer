@@ -15,7 +15,6 @@ import com.tencent.bugly.crashreport.CrashReport.UserStrategy;
 import io.reactivex.plugins.RxJavaPlugins;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.helper.LanguageHelper;
-import remix.myplayer.misc.Migration;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.util.Util;
 import timber.log.Timber;
@@ -58,20 +57,16 @@ public class App extends MultiDexApplication {
     loadLibrary();
 
     // 处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
-    if (!BuildConfig.DEBUG) {
-      RxJavaPlugins.setErrorHandler(throwable -> {
-        Timber.v(throwable);
-        CrashReport.postCatchedException(throwable);
-      });
-    }
+    RxJavaPlugins.setErrorHandler(throwable -> {
+      Timber.v(throwable);
+      CrashReport.postCatchedException(throwable);
+    });
 
   }
 
   private void setUp() {
     DiskCache.init(this);
     LanguageHelper.setApplicationLanguage(this);
-    Migration.migrationLibrary(this);
-    Migration.migrationPlayModel(this);
   }
 
   @Override

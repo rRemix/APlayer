@@ -1,7 +1,6 @@
 package remix.myplayer.ui.adapter
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.View
 import android.widget.TextView
 import butterknife.BindView
@@ -11,10 +10,11 @@ import remix.myplayer.R
 import remix.myplayer.bean.misc.PurchaseBean
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
 
-class PurchaseAdapter(context: Context, layoutId: Int) : BaseAdapter<PurchaseBean, PurchaseAdapter.PurchaseHolder>(context, layoutId) {
+class PurchaseAdapter(layoutId: Int) : BaseAdapter<PurchaseBean, PurchaseAdapter.PurchaseHolder>(layoutId) {
   private val LOGOS_OTHERS = listOf(R.drawable.icon_cookie, R.drawable.icon_cake, R.drawable.icon_drink,
       R.drawable.icon_movie, R.drawable.icon_gift)
   private val LOGOS_DONATE = listOf(R.drawable.icon_wechat_donate, R.drawable.icon_alipay_donate, R.drawable.icon_paypal_donate)
+
   @SuppressLint("SetTextI18n")
   override fun convert(holder: PurchaseHolder?, bean: PurchaseBean?, position: Int) {
     if (holder == null || bean == null)

@@ -1,6 +1,6 @@
 package remix.myplayer.ui.adapter;
 
-import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,15 +20,13 @@ import remix.myplayer.ui.adapter.holder.BaseViewHolder;
  */
 public abstract class BaseAdapter<D, T extends BaseViewHolder> extends RecyclerView.Adapter<T> {
 
-  protected Context mContext;
   protected OnItemClickListener mOnItemClickListener;
-  List<D> mDatas;
-  protected int mLayoutId;
+  protected List<D> mDatas;
+  private int mLayoutId;
   private Constructor mConstructor;
 
 
-  public BaseAdapter(Context context, int layoutId) {
-    this.mContext = context;
+  public BaseAdapter(int layoutId) {
     this.mLayoutId = layoutId;
     try {
       this.mConstructor = getGenericClass().getDeclaredConstructor(View.class);
@@ -60,9 +58,9 @@ public abstract class BaseAdapter<D, T extends BaseViewHolder> extends RecyclerV
 
   @SuppressWarnings("unchecked")
   @Override
-  public T onCreateViewHolder(ViewGroup parent, int viewType) {
+  public T onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     try {
-      View itemView = LayoutInflater.from(mContext).inflate(mLayoutId, parent, false);
+      View itemView = LayoutInflater.from(parent.getContext()).inflate(mLayoutId, parent, false);
       return (T) mConstructor.newInstance(itemView);
     } catch (Exception e) {
       throw new IllegalArgumentException(e.toString());

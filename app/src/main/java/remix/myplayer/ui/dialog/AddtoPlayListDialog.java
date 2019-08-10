@@ -87,7 +87,7 @@ public class AddtoPlayListDialog extends BaseMusicDialog implements
       dismiss();
     }
 
-    mAdapter = new AddtoPlayListAdapter(getContext(), R.layout.item_playlist_addto);
+    mAdapter = new AddtoPlayListAdapter(R.layout.item_playlist_addto);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @SuppressLint("CheckResult")
       @Override

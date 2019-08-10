@@ -3,7 +3,6 @@ package remix.myplayer.ui.adapter;
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
-import android.content.Context;
 import android.net.Uri;
 import android.view.View;
 import android.widget.CheckBox;
@@ -33,8 +32,8 @@ public class SongChooseAdapter extends BaseAdapter<Song, SongChooseAdapter.SongC
   private OnSongChooseListener mCheckListener;
   private ArrayList<Integer> mCheckSongIdList = new ArrayList<>();
 
-  public SongChooseAdapter(Context context, int layoutID, OnSongChooseListener l) {
-    super(context, layoutID);
+  public SongChooseAdapter(int layoutID, OnSongChooseListener l) {
+    super(layoutID);
     mCheckListener = l;
   }
 
