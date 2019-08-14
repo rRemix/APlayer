@@ -1,9 +1,11 @@
 package remix.myplayer.request.network;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
-import remix.myplayer.lyric.HttpHelper;
+import org.jetbrains.annotations.NotNull;
+import remix.myplayer.bean.github.Release;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -12,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by Remix on 2017/11/20.
  */
 
-public class HttpClient implements HttpHelper {
+public class HttpClient {
 
   private static final String NETEASE_BASE_URL = "http://music.163.com/api/";
   private static final String KUGOU_BASE_URL = "http://lyrics.kugou.com/";
@@ -29,21 +31,21 @@ public class HttpClient implements HttpHelper {
     return SingletonHolder.mInstance;
   }
 
-  public static ApiService getNeteaseApiservice() {
-    return getInstance().mNeteaseApi;
-  }
-
-  public static ApiService getKuGouApiservice() {
-    return getInstance().mKuGouApi;
-  }
-
-  public static ApiService getLastFMApiservice() {
-    return getInstance().mLastfmApi;
-  }
-
-  public static ApiService getGithubApiservice() {
-    return getInstance().mGithubApi;
-  }
+//  public static ApiService getNeteaseApiservice() {
+//    return getInstance().mNeteaseApi;
+//  }
+//
+//  public static ApiService getKuGouApiservice() {
+//    return getInstance().mKuGouApi;
+//  }
+//
+//  public static ApiService getLastFMApiservice() {
+//    return getInstance().mLastfmApi;
+//  }
+//
+//  public static ApiService getGithubApiservice() {
+//    return getInstance().mGithubApi;
+//  }
 
   private HttpClient() {
     Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
@@ -141,25 +143,34 @@ public class HttpClient implements HttpHelper {
 //    }
 
 
-  @Override
   public Observable<ResponseBody> getNeteaseSearch(String key, int offset, int limit, int type) {
     return mNeteaseApi.getNeteaseSearch(key, offset, limit, type);
   }
 
-  @Override
   public Observable<ResponseBody> getNeteaseLyric(int song_id) {
     return mNeteaseApi.getNeteaseLyric("pc", song_id, -1, -1, -1);
   }
 
-  @Override
   public Observable<ResponseBody> getKuGouSearch(String keyword, long duration, String hash) {
     return mKuGouApi.getKuGouSearch(1, "yes", "pc", keyword, duration, "");
   }
 
-  @Override
   public Observable<ResponseBody> getKuGouLyric(int id, String accessKey) {
     return mKuGouApi.getKuGouLyric(1, "pc", "lrc", "utf8", id, accessKey);
   }
+
+  public Observable<ResponseBody> getAlbumInfo(String albumName, String artistName, String lang) {
+    return mLastfmApi.getAlbumInfo(albumName, artistName, lang);
+  }
+
+  public Observable<ResponseBody> getArtistInfo(String artistName, String lang) {
+    return mLastfmApi.getArtistInfo(artistName, lang);
+  }
+
+  public Single<Release> getLatestRelease(@NotNull String owner, @NotNull String repo) {
+    return mGithubApi.getLatestRelease(owner, repo);
+  }
+
 
   private static class SingletonHolder {
 

@@ -19,12 +19,12 @@ import retrofit2.http.Query;
 public interface ApiService {
 
   @POST("search/pc")
-//    @Headers("Cookie: appver=1.5.0.75771")
+  @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
   Observable<ResponseBody> getNeteaseSearch(@Query("s") String key, @Query("offset") int offset,
       @Query("limit") int limit, @Query("type") int type);
 
   @GET("song/lyric")
-//    @Headers("Cookie: appver=1.5.0.75771")
+  @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
   Observable<ResponseBody> getNeteaseLyric(@Query("os") String os, @Query("id") int id,
       @Query("lv") int lv, @Query("kv") int kv, @Query("tv") int tv);
 

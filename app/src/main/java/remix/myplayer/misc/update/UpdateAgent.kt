@@ -37,7 +37,7 @@ object UpdateAgent {
           }
         }
         .flatMap {
-          HttpClient.getGithubApiservice().getLatestRelease("rRemix", "APlayer")
+          HttpClient.getInstance().getLatestRelease("rRemix", "APlayer")
         }
         .compose(RxUtil.applySingleScheduler())
         .doFinally {
@@ -66,12 +66,12 @@ object UpdateAgent {
             listener?.onUpdateReturned(UpdateStatus.IGNORED, context.getString(R.string.update_ignore), release)
             return@subscribe
           }
-          //路径不合法
+          //文件大小不合法
           if (release.assets!![0].size < 0) {
             listener?.onUpdateReturned(UpdateStatus.ErrorSizeFormat, "Size为空", release)
             return@subscribe
           }
-          //文件大小不合法
+          //路径不合法
           if (TextUtils.isEmpty(release.assets!![0].browser_download_url)) {
             listener?.onUpdateReturned(UpdateStatus.ErrorSizeFormat, "下载地址为空", release)
             return@subscribe
