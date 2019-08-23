@@ -16,6 +16,7 @@ import static remix.myplayer.util.Util.sendLocalBroadcast;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -26,12 +27,15 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
+import android.support.v7.graphics.Palette.Swatch;
 import android.support.v7.widget.PopupMenu;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -68,6 +72,8 @@ import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.menu.AudioPopupListener;
 import remix.myplayer.request.ImageUriRequest;
+import remix.myplayer.request.RemoteUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
@@ -90,6 +96,7 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -204,8 +211,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   private static final int UPDATE_BG = 1;
   private static final int UPDATE_TIME_ONLY = 2;
   private static final int UPDATE_TIME_ALL = 3;
-  private Bitmap mRawBitMap;
-  private Palette.Swatch mSwatch;
   private AudioManager mAudioManager;
 
   //底部显示控制
@@ -234,9 +239,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     final int superThemeRes = ThemeStore.getThemeRes();
     int themeRes;
     switch (superThemeRes) {
-      case R.style.Theme_APlayer:
-        themeRes = R.style.PlayerActivityStyle;
-        break;
       case R.style.Theme_APlayer_Black:
         themeRes = R.style.PlayerActivityStyle_Black;
         break;
@@ -281,10 +283,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
     mHandler = new MsgHandler(this);
 
-//    mShowAnimation = getIntent().getBooleanExtra(EXTRA_SHOW_ANIMATION,false);
     mInfo = MusicServiceRemote.getCurrentSong();
-    //动画图片信息
-//    AnimationUrl animUrl = getIntent().getParcelableExtra(EXTRA_ANIM_URL);
     mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
     setUpBottom();
@@ -295,41 +294,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     setUpSeekBar();
     setUpViewColor();
 
-//    //设置失败加载的图片和缩放类型
-//    mAnimationCover = new SimpleDraweeView(this);
-//    mAnimationCover.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
-//    mAnimationCover.getHierarchy().setFailureImage(
-//        isLightTheme() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night,
-//        ScalingUtils.ScaleType.CENTER_CROP);
-//    mContainer.addView(mAnimationCover);
-//
-//    //设置封面
-//    if (mInfo != null) {
-//      if (animUrl != null && !TextUtils.isEmpty(animUrl.getUrl())
-//          && animUrl.getAlbumId() == mInfo.getAlbumId()) {
-//        mAnimationCover.setImageURI(animUrl.getUrl());
-//      } else {
-//        new LibraryUriRequest(mAnimationCover,
-//            getSearchRequestWithAlbumType(mInfo),
-//            new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
-//      }
-//    }
-
   }
-
-//  /**
-//   * 计算图片缩放比例，以及位移距离
-//   */
-//  private void getMoveInfo(Rect destRect) {
-//    // 计算图片缩放比例，并存储在 bundle 中
-//    mScaleBundle.putFloat(SCALE_WIDTH, (float) destRect.width() / mOriginWidth);
-//    mScaleBundle.putFloat(SCALE_HEIGHT, (float) destRect.height() / mOriginHeight);
-//
-//    // 计算位移距离，并将数据存储到 bundle 中
-//    mTransitionBundle.putFloat(TRANSITION_X, destRect.left - mOriginRect.left);
-//    mTransitionBundle.putFloat(TRANSITION_Y, destRect.top - mOriginRect.top);
-//  }
-
 
   @Override
   public void onResume() {
@@ -348,32 +313,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     onPlayStateChange();
   }
 
-//  @Override
-//  protected void onSaveInstanceState(Bundle outState) {
-//    super.onSaveInstanceState(outState);
-//    outState.putParcelable(EXTRA_RECT, mOriginRect);
-//    //activity重启后就不用动画了
-//    outState.putBoolean(EXTRA_SHOW_ANIMATION, false);
-//  }
-//
-//  @Override
-//  protected void onRestoreInstanceState(Bundle savedInstanceState) {
-//    super.onRestoreInstanceState(savedInstanceState);
-//    if (savedInstanceState != null) {
-//      if (mOriginRect == null && savedInstanceState.getParcelable(EXTRA_RECT) != null) {
-//        mOriginRect = savedInstanceState.getParcelable(EXTRA_RECT);
-//      }
-//      mShowAnimation = savedInstanceState.getBoolean(EXTRA_SHOW_ANIMATION,false);
-//    }
-//  }
-
   @Override
   protected void onStart() {
     super.onStart();
-    //只有从Activity启动，才使用动画
-//    if (mShowAnimation) {
-//      overridePendingTransition(0, 0);
-//    }
     overridePendingTransition(R.anim.audio_in, 0);
   }
 
@@ -383,108 +325,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     super.finish();
     overridePendingTransition(0, R.anim.audio_out);
   }
-
-  @Override
-  public void onBackPressed() {
-    super.onBackPressed();
-//    finish();
-//    overridePendingTransition(0, R.anim.audio_out);
-//    //从通知栏打开或者横屏直接退出
-//    if (!mShowAnimation) {
-//      finish();
-//      overridePendingTransition(0, R.anim.audio_out);
-//      return;
-//    }
-//    if (mPager.getCurrentItem() == 1) {
-//      if (mIsBacking || mAnimationCover == null) {
-//        return;
-//      }
-//      mIsBacking = true;
-//
-//      //更新动画控件封面 保证退场动画的封面与fragment中封面一致
-//      ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder
-//          .newBuilderWithSource(mUri == null ? Uri.EMPTY : mUri);
-//      DraweeController controller = Fresco.newDraweeControllerBuilder()
-//          .setImageRequest(imageRequestBuilder.build())
-//          .setOldController(mAnimationCover.getController())
-////                    .setControllerListener(new ControllerListener<ImageInfo>() {
-////                        @Override
-////                        public void onSubmit(String id, Object callerContext) {
-////
-////                        }
-////
-////                        @Override
-////                        public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
-////                            playBackAnimation();
-////                        }
-////
-////                        @Override
-////                        public void onIntermediateImageSet(String id, ImageInfo imageInfo) {
-////
-////                        }
-////
-////                        @Override
-////                        public void onIntermediateImageFailed(String id, Throwable throwable) {
-////
-////                        }
-////
-////                        @Override
-////                        public void onFailure(String id, Throwable throwable) {
-////                            playBackAnimation();
-////                        }
-////
-////                        @Override
-////                        public void onRelease(String id) {
-////
-////                        }
-////                    })
-//          .build();
-//      mAnimationCover.setController(controller);
-//      mAnimationCover.setVisibility(View.VISIBLE);
-//      playBackAnimation();
-//    } else {
-//      finish();
-//      overridePendingTransition(0, R.anim.audio_out);
-//    }
-
-  }
-
-//  private void playBackAnimation() {
-//    final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-//    final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-//    final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-//    final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-//    Spring coverSpring = SpringSystem.create().createSpring();
-//    coverSpring.setSpringConfig(COVER_OUT_SPRING_CONFIG);
-//    coverSpring.addListener(new SimpleSpringListener() {
-//      @Override
-//      public void onSpringUpdate(Spring spring) {
-//        if (mAnimationCover == null) {
-//          return;
-//        }
-//        final double currentVal = spring.getCurrentValue();
-//        mAnimationCover.setTranslationX((float) (transitionX * currentVal));
-//        mAnimationCover.setTranslationY((float) (transitionY * currentVal));
-//        mAnimationCover.setScaleX((float) (1 + scaleX * currentVal));
-//        mAnimationCover.setScaleY((float) (1 + scaleY * currentVal));
-//      }
-//
-//      @Override
-//      public void onSpringActivate(Spring spring) {
-//        //隐藏fragment中的image
-//        mCoverFragment.hideImage();
-//      }
-//
-//      @Override
-//      public void onSpringAtRest(Spring spring) {
-//        finish();
-//        overridePendingTransition(0, 0);
-//      }
-//    });
-//    coverSpring.setOvershootClampingEnabled(true);
-//    coverSpring.setCurrentValue(1);
-//    coverSpring.setEndValue(0);
-//  }
 
   /**
    * 上一首 下一首 播放、暂停
@@ -545,6 +385,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
         @SuppressLint("RestrictedApi") final PopupMenu popupMenu = new PopupMenu(mContext, v, Gravity.TOP);
         popupMenu.getMenuInflater().inflate(R.menu.menu_audio_item, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(new AudioPopupListener(this, mInfo));
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+          popupMenu.getMenu().removeItem(R.id.menu_speed);
+        }
         popupMenu.show();
         break;
     }
@@ -581,8 +424,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
 
         break;
       case R.id.next_song:
-//                mLyric.setVisibility(View.GONE);
-//                mVolumeContainer.setVisibility(View.VISIBLE);
         if (mBottomConfig == BOTTOM_SHOW_BOTH) {
           mNextSong.startAnimation(makeAnimation(mNextSong, false));
           mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer, true));
@@ -1018,12 +859,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   public void onMetaChanged() {
     super.onMetaChanged();
     mInfo = MusicServiceRemote.getCurrentSong();
-    //两种情况下更新ui
-    //一是activity在前台  二是activity暂停后有更新的动作，当activity重新回到前台后更新ui
-//        if (!mIsForeground) {
-//            mNeedUpdateUI = true;
-//            return;
-//        }
     //当操作不为播放或者暂停且正在运行时，更新所有控件
     final int operation = MusicServiceRemote.getOperation();
     if ((operation != Command.TOGGLE || mFirstStart)) {
@@ -1038,7 +873,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       mProgressSeekBar.setMax(mDuration);
       //更新下一首歌曲
       mNextSong.setText(getString(R.string.next_song, MusicServiceRemote.getNextSong().getTitle()));
-      updateBg();
+      updateBackground();
       requestCover(operation != Command.TOGGLE && !mFirstStart);
     }
   }
@@ -1204,28 +1039,45 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   }
 
   //更新背景
-  private void updateBg() {
-//        if(!mDiscolour)
-//            return;
-//        Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
-//            mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
-//            if(mRawBitMap == null)
-//                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
-//            Palette.from(mRawBitMap).generate(palette -> {
-//                if(palette == null || palette.getMutedSwatch() == null){
-//                    mSwatch = new Palette.Swatch(Color.GRAY,100);
-//                } else {
-//                    mSwatch = palette.getMutedSwatch();//柔和 暗色
-//                }
-//                e.onNext(mSwatch);
-//            });
-//        })
-//        .compose(RxUtil.applyScheduler())
-//        .subscribe(swatch -> {
-//            int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
-//            int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
-//            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
-//        });
+  private void updateBackground() {
+//    new RemoteUriRequest(getSearchRequestWithAlbumType(mInfo),
+//        new RequestConfig.Builder(200, 200).build()) {
+//
+//      @Override
+//      public void onError(Throwable throwable) {
+//        Timber.v(throwable);
+//        updateSwatch(null);
+//      }
+//
+//      @Override
+//      public void onSuccess(@Nullable Bitmap result) {
+//        updateSwatch(result);
+//      }
+//    }.load();
+  }
+
+  @SuppressLint("CheckResult")
+  private void updateSwatch(final Bitmap bitmap) {
+    Single
+        .fromCallable(() -> bitmap == null ?
+            BitmapFactory.decodeResource(getResources(),
+                isLightTheme() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night)
+            : bitmap)
+        .map(result -> {
+          final Palette palette = Palette.from(result).generate();
+          return palette.getMutedSwatch();
+        })
+        .onErrorReturnItem(new Swatch(Color.GRAY, 100))
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(swatch -> {
+//          int colorFrom = ColorUtil.adjustAlpha(swatch.getRgb(), 0.3f);
+//          int colorTo = ColorUtil.adjustAlpha(swatch.getRgb(), 0.05f);
+          final int colorFrom = swatch.getRgb();
+          final int colorTo = swatch.getRgb();
+          mContainer.setBackground(
+              new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{colorFrom, colorTo}));
+        }, Timber::v);
 
   }
 

@@ -16,7 +16,6 @@ import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY.*
 import remix.myplayer.util.Util.isIntentAvailable
 import timber.log.Timber
-import tv.danmaku.ijk.media.player.IjkMediaPlayer
 
 /**
  * created by Remix on 2019-05-06
@@ -124,8 +123,7 @@ object EQHelper {
     return builtEqualizerInit
   }
 
-  fun open(context: Context, mediaPlayer: IjkMediaPlayer) {
-    val audioSessionId = mediaPlayer.audioSessionId
+  fun open(context: Context, audioSessionId: Int) {
     Timber.v("open, audioSessionId: $audioSessionId")
 
     if (audioSessionId == AudioEffect.ERROR_BAD_VALUE) {
@@ -195,7 +193,7 @@ object EQHelper {
     }
   }
 
-  fun close(context: Context, mediaPlayer: IjkMediaPlayer) {
+  fun close(context: Context, audioSessionId: Int) {
     Timber.v("close")
 
     tryRun({
@@ -210,7 +208,7 @@ object EQHelper {
 
     })
 
-    closeSystemAudioEffectSession(context, mediaPlayer.audioSessionId)
+    closeSystemAudioEffectSession(context, audioSessionId)
   }
 
 

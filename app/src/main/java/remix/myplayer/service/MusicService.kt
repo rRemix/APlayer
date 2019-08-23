@@ -6,6 +6,7 @@ import android.content.*
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.media.AudioManager
+import android.media.MediaPlayer
 import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.*
@@ -66,7 +67,6 @@ import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util.*
 import timber.log.Timber
-import tv.danmaku.ijk.media.player.IjkMediaPlayer
 import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
@@ -95,6 +95,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 已经生成过的随机数 用于随机播放模式
    */
   private val randomQueue: MutableList<Int> = ArrayList()
+
   /**
    * 是否第一次准备完成
    */
@@ -154,15 +155,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 下一首歌曲的索引
    */
   private var nextIndex = 0
+
   /**
    * 下一首播放歌曲的id
    */
   private var nextId = -1
+
   /**
    * 下一首播放的mp3
-   */
-  /**
-   * 返回下一首播放歌曲
    */
   var nextSong: Song = EMPTY_SONG
     private set
@@ -170,8 +170,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * MediaPlayer 负责歌曲的播放等
    */
-  var mediaPlayer: IjkMediaPlayer = IjkMediaPlayer()
-
+  var mediaPlayer: MediaPlayer = MediaPlayer()
 
   /**
    * 桌面部件
@@ -370,7 +369,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       return 0
     }
 
-  val duration: Long
+  val duration: Int
     get() = if (prepared) {
       mediaPlayer.duration
     } else 0
@@ -405,6 +404,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     else
       desktopLyricView?.isLocked == true
 
+  /**
+   * 锁屏
+   */
+  private var lockScreen: Int = CLOSE_LOCKSCREEN
 
   override fun onTaskRemoved(rootIntent: Intent) {
     super.onTaskRemoved(rootIntent)
@@ -482,9 +485,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       //锁屏
       SETTING_KEY.LOCKSCREEN -> {
-        when (SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)) {
-          APLAYER_LOCKSCREEN, CLOSE_LOCKSCREEN -> clearMediaSession()
-          SYSTEM_LOCKSCREEN -> updateMediaSession(Command.NEXT)
+        lockScreen = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)
+        when (lockScreen) {
+          CLOSE_LOCKSCREEN -> clearMediaSession()
+          SYSTEM_LOCKSCREEN, APLAYER_LOCKSCREEN -> updateMediaSession(Command.NEXT)
         }
       }
       //断点播放
@@ -595,7 +599,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
 
       override fun onSeekTo(pos: Long) {
-        setProgress(pos)
+        setProgress(pos.toInt())
       }
     })
 
@@ -608,7 +612,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 初始化Mediaplayer
    */
   private fun setUpPlayer() {
-    mediaPlayer = IjkMediaPlayer()
+    mediaPlayer = MediaPlayer()
 
     mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
     mediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK)
@@ -627,16 +631,15 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
       if (firstPrepared) {
         if (lastProgress > 0) {
-          mediaPlayer.seekTo(lastProgress.toLong())
+          mediaPlayer.seekTo(lastProgress)
         }
         firstPrepared = false
-        EQHelper.init(this, mp.audioSessionId)
         //自动播放
         if (SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.AUTO_PLAY, NEVER) != OPEN_SOFTWARE) {
-          mp.pause()
           return@setOnPreparedListener
         }
       }
+
       Timber.v("开始播放")
       //记录播放历史
       updatePlayHistory()
@@ -656,6 +659,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       false
     }
+
+    EQHelper.init(this, mediaPlayer.audioSessionId)
+    EQHelper.open(this, mediaPlayer.audioSessionId)
   }
 
 
@@ -707,7 +713,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     if (alreadyUnInit) {
       return
     }
-    EQHelper.close(this, mediaPlayer)
+    EQHelper.close(this, mediaPlayer.audioSessionId)
     if (isPlaying) {
       pause(false)
     }
@@ -874,9 +880,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
 
     setPlay(true)
-
-    //ijkmediaplayer每次设置数据源后audioSessionId会变化
-    EQHelper.open(this, mediaPlayer)
 
     //倍速播放
     setSpeed(speed)
@@ -1411,8 +1414,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 更新锁屏
    */
   private fun updateMediaSession(control: Int) {
-    if (currentSong == EMPTY_SONG ||
-        SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == CLOSE_LOCKSCREEN) {
+    if (currentSong == EMPTY_SONG || lockScreen == CLOSE_LOCKSCREEN) {
       return
     }
 
@@ -1493,11 +1495,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
               .blockingGet()
 
           mediaPlayer.reset()
-          mediaPlayer.dataSource = path
+          mediaPlayer.setDataSource(path)
           mediaPlayer.prepareAsync()
-          // ijkplayer如果设置了start-on-prepared为0，可能导致切歌的时候出现爆音
-          // 暂时的解决办法就是先将音量设为0
-          mediaPlayer.setVolume(0f, 0f)
           prepared = true
         }
         .compose(applySingleScheduler())
@@ -1604,7 +1603,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 设置MediaPlayer播放进度
    */
-  fun setProgress(current: Long) {
+  fun setProgress(current: Int) {
     if (prepared) {
       mediaPlayer.seekTo(current)
     }
@@ -1613,7 +1612,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   fun setSpeed(speed: Float) {
     if (prepared) {
       this.speed = speed
-      mediaPlayer.setSpeed(speed)
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (mediaPlayer.isPlaying) {
+          mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
+        } else {
+          mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
+          mediaPlayer.pause()
+        }
+      }
     }
   }
 
