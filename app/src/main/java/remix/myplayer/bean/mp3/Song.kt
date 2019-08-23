@@ -1,14 +1,9 @@
 package remix.myplayer.bean.mp3
 
-import android.content.ContentValues
 import android.os.Parcelable
-import android.provider.MediaStore
 import kotlinx.android.parcel.Parcelize
 import remix.myplayer.App
 import remix.myplayer.util.SPUtil
-import timber.log.Timber
-import tv.danmaku.ijk.media.player.IjkMediaPlayer
-import java.io.File
 
 /**
  * Created by Remix on 2015/11/30.
@@ -56,32 +51,32 @@ data class Song(
 
 
   fun getDuration(): Long {
-    if (duration <= 0) {
-      val ijkMediaPlayer = IjkMediaPlayer()
-      try {
-        val file = File(url)
-        if (!file.exists()) {
-          return duration
-        }
-        ijkMediaPlayer.dataSource = url
-        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0)
-        ijkMediaPlayer.prepareAsync()
-        Thread.sleep(20)
-        duration = ijkMediaPlayer.duration
-        Timber.v("duration: %s", duration)
-        if (duration > 0) {
-          val contentValues = ContentValues()
-          contentValues.put(MediaStore.Audio.Media.DURATION, duration)
-          val updateCount = App.getContext().contentResolver
-              .update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                  contentValues, MediaStore.Audio.Media._ID + "=?", arrayOf(id.toString() + ""))
-          Timber.v("UpdateCount: %s", updateCount)
-        }
-      } catch (e: Exception) {
-        Timber.v(e)
-      }
-
-    }
+//    if (duration <= 0) {
+//      val ijkMediaPlayer = IjkMediaPlayer()
+//      try {
+//        val file = File(url)
+//        if (!file.exists()) {
+//          return duration
+//        }
+//        ijkMediaPlayer.dataSource = url
+//        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0)
+//        ijkMediaPlayer.prepareAsync()
+//        Thread.sleep(20)
+//        duration = ijkMediaPlayer.duration
+//        Timber.v("duration: %s", duration)
+//        if (duration > 0) {
+//          val contentValues = ContentValues()
+//          contentValues.put(MediaStore.Audio.Media.DURATION, duration)
+//          val updateCount = App.getContext().contentResolver
+//              .update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//                  contentValues, MediaStore.Audio.Media._ID + "=?", arrayOf(id.toString() + ""))
+//          Timber.v("UpdateCount: %s", updateCount)
+//        }
+//      } catch (e: Exception) {
+//        Timber.v(e)
+//      }
+//
+//    }
     return duration
   }
 

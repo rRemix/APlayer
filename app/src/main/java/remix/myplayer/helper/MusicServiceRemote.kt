@@ -2,12 +2,12 @@ package remix.myplayer.helper
 
 import android.app.Activity
 import android.content.*
+import android.media.MediaPlayer
 import android.os.IBinder
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Constants
-import tv.danmaku.ijk.media.player.IjkMediaPlayer
 import java.util.*
 
 object MusicServiceRemote {
@@ -105,7 +105,7 @@ object MusicServiceRemote {
   }
 
   @JvmStatic
-  fun getMediaPlayer(): IjkMediaPlayer? {
+  fun getMediaPlayer(): MediaPlayer? {
     return service?.mediaPlayer
   }
 
@@ -125,7 +125,7 @@ object MusicServiceRemote {
   }
 
   @JvmStatic
-  fun getDuration(): Long {
+  fun getDuration(): Int {
     return service?.duration ?: 0
   }
 
@@ -135,7 +135,7 @@ object MusicServiceRemote {
   }
 
   @JvmStatic
-  fun setProgress(progress: Long) {
+  fun setProgress(progress: Int) {
     service?.setProgress(progress)
   }
 
