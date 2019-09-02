@@ -26,7 +26,7 @@ data class Song(
     val url: String,
     val size: Long,
     val year: String?,
-    val titleKey: String,
+    val titleKey: String?,
     val addTime: Long) : Parcelable {
 
 

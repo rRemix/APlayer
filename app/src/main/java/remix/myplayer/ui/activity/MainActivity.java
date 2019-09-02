@@ -214,7 +214,7 @@ public class MainActivity extends MenuActivity {
                 .title(R.string.new_playlist)
                 .positiveText(R.string.create)
                 .negativeText(R.string.cancel)
-                .inputRange(1, 15)
+                .inputRange(1, 25)
                 .input("", getString(R.string.local_list) + playLists.size(), (dialog, input) -> {
                   if (!TextUtils.isEmpty(input)) {
                     DatabaseRepository.getInstance()

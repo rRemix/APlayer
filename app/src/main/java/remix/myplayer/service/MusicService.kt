@@ -500,6 +500,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           startSaveProgress()
         }
       }
+      //倍速播放
+      SETTING_KEY.SPEED -> {
+        speed = java.lang.Float.parseFloat(SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
+        setSpeed(speed)
+      }
     }
   }
 
@@ -881,14 +886,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     setPlay(true)
 
+    //播放
+    mediaPlayer.start()
+
     //倍速播放
     setSpeed(speed)
 
     //更新所有界面
     updateUIHandler.sendEmptyMessage(UPDATE_META_DATA)
-
-    //播放
-    mediaPlayer.start()
 
     //渐变
     if (fadeIn) {
@@ -1609,15 +1614,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
   }
 
-  fun setSpeed(speed: Float) {
-    if (prepared) {
-      this.speed = speed
+  private fun setSpeed(speed: Float) {
+    if (prepared ) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         if (mediaPlayer.isPlaying) {
           mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
-        } else {
-          mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
-          mediaPlayer.pause()
         }
       }
     }

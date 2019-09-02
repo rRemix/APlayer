@@ -150,11 +150,6 @@ object MusicServiceRemote {
   }
 
   @JvmStatic
-  fun setSpeed(speed: Float) {
-    service?.setSpeed(speed)
-  }
-
-  @JvmStatic
   fun deleteFromService(songs: List<Song>) {
     service?.deleteSongFromService(songs)
   }

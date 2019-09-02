@@ -169,7 +169,6 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
                     ToastUtil.show(App.getContext(), R.string.speed_range_tip)
                     return@InputCallback
                   }
-                  MusicServiceRemote.setSpeed(speed)
                   SPUtil.putValue(activity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED,
                       input.toString())
                 })

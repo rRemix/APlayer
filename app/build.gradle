@@ -32,13 +32,13 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 1550
-        versionName "1.5.5.0-debug"
+        versionCode 1543
+        versionName "1.5.4.3"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
-//            abiFilters 'armeabi-v7a'
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
             abiFilters 'armeabi-v7a', 'x86'
         }
         externalNativeBuild {
@@ -85,7 +85,7 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            android.applicationVariants.all { variant ->
+            android.applicationVariants.all {variant ->
                 variant.outputs.all {
                     outputFileName = "APlayer_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${releaseTime()}.apk"
                 }
@@ -107,16 +107,16 @@ android {
 //        tencent{}
 //        alibaba{}
 //        meizu{}
-        assistant91{}
-        baidu{}
-        anzhuomarket{}
+        assistant91 {}
+        baidu {}
+        anzhuomarket {}
 //        chuizi {}
 //        qihu360 {}
 
         xiaomi {}
         kuan {}
         google {}
-        productFlavors.all { flavor ->
+        productFlavors.all {flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }
     }
@@ -142,7 +142,7 @@ android {
 //    }
 
     configurations.all {
-        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        resolutionStrategy.eachDependency {DependencyResolveDetails details ->
             def requested = details.requested
             if (requested.group == 'com.android.support') {
                 if (!requested.name.startsWith("multidex")) {
@@ -241,7 +241,7 @@ def getProperties(String fileName) {
     final def Properties properties = new Properties()
     def file = file(fileName)
     if (file.exists()) {
-        file.withInputStream { stream -> properties.load(stream) }
+        file.withInputStream {stream -> properties.load(stream)}
     }
     return properties
 }
