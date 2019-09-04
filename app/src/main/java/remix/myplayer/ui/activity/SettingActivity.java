@@ -870,6 +870,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             Fresco.getImagePipeline().clearCaches();
             mHandler.sendEmptyMessage(CLEAR_FINISH);
             mNeedRefreshAdapter = true;
+            ImageUriRequest.clearUriCache();
           }
         }.start()).show();
   }

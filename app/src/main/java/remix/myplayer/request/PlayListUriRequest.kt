@@ -4,14 +4,12 @@ import android.net.Uri
 import com.facebook.drawee.view.SimpleDraweeView
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
-import io.reactivex.SingleSource
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
 import io.reactivex.observers.DisposableObserver
 import remix.myplayer.App
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 
@@ -28,11 +26,11 @@ open class PlayListUriRequest(image: SimpleDraweeView, request: UriRequest, conf
 
   override fun load(): Disposable {
     val coverObservables = DatabaseRepository.getInstance()
-        .getPlayList(mRequest.id)
-        .flatMap(Function<PlayList, SingleSource<List<Song>>> { playList ->
+        .getPlayList(request.id)
+        .flatMap { playList ->
           DatabaseRepository.getInstance()
               .getPlayListSongs(App.getContext(), playList, true)
-        })
+        }
         .flatMapObservable(Function<List<Song>, ObservableSource<Song>> { songs ->
           Observable.create { emitter ->
             for (song in songs) {
@@ -41,16 +39,17 @@ open class PlayListUriRequest(image: SimpleDraweeView, request: UriRequest, conf
             emitter.onComplete()
           }
         })
-        .concatMapDelayError(Function<Song, ObservableSource<String>> { song ->
-          getCoverObservable(getSearchRequestWithAlbumType(song)) })
+        .concatMapDelayError { song ->
+          getCoverObservable(getSearchRequestWithAlbumType(song))
+        }
 
-    return Observable.concat(getCustomThumbObservable(mRequest), coverObservables)
+    return Observable.concat(getCustomThumbObservable(request), coverObservables)
         .firstOrError()
         .toObservable()
         .compose(RxUtil.applyScheduler())
         .subscribeWith(object : DisposableObserver<String>() {
           override fun onStart() {
-            mImageRef.get()?.setImageURI(Uri.EMPTY)
+            ref.get()?.setImageURI(Uri.EMPTY)
           }
 
           override fun onNext(s: String) {

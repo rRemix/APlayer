@@ -220,7 +220,6 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     }
     mSortOrder = sortOrder;
     if (update) {
-      mAdapter.clearUriCache();
       onMediaStoreChanged();
     }
 

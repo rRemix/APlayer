@@ -1,5 +1,7 @@
 package remix.myplayer.request;
 
+import static remix.myplayer.request.LibraryUriRequest.ERROR_BLACKLIST;
+import static remix.myplayer.request.LibraryUriRequest.ERROR_NO_RESULT;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_ALBUM;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_ARTIST;
 import static remix.myplayer.request.UriRequest.TYPE_NETEASE_SONG;
@@ -14,6 +16,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.common.util.UriUtil;
@@ -34,8 +37,10 @@ import io.reactivex.functions.Function;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import okhttp3.ResponseBody;
 import remix.myplayer.App;
 import remix.myplayer.R;
@@ -51,6 +56,7 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -58,7 +64,9 @@ import remix.myplayer.util.SPUtil;
 
 public abstract class ImageUriRequest<T> {
 
-  public static final List<String> BLACKLIST = Arrays
+  private static final SparseArray<String> MEMORY_CACHE = new SparseArray<>();
+
+  private static final List<String> BLACKLIST = Arrays
       .asList("https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png",
           "https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png");
 
@@ -99,6 +107,10 @@ public abstract class ImageUriRequest<T> {
   public ImageUriRequest() {
   }
 
+  public static void clearUriCache(){
+    MEMORY_CACHE.clear();
+  }
+
   public abstract void onError(Throwable throwable);
 
   public abstract void onSuccess(@Nullable T result);
@@ -112,30 +124,65 @@ public abstract class ImageUriRequest<T> {
   protected Observable<String> getCoverObservable(UriRequest request) {
     return Observable
         .concat(
+            getMemoryCacheObservable(request),
             getCustomThumbObservable(request),
-            getContentThumbObservable(request),
+//            getContentThumbObservable(request),
             getNetworkThumbObservable(request))
+        .doOnNext(result -> {
+          if (TextUtils.isEmpty(result)) {
+            throw new Exception(ERROR_NO_RESULT);
+          }
+          if (ImageUriRequest.BLACKLIST.contains(result)) {
+            throw new Exception(ERROR_BLACKLIST);
+          }
+        })
+        .doOnError(throwable -> {
+          if (throwable == null) {
+            // 没有错误类型 忽略
+          } else if (throwable instanceof UnknownHostException) {
+            // 没有网络 忽略
+          } else if (throwable instanceof NoSuchElementException) {
+            // 没有结果不再查找
+            MEMORY_CACHE.put(request.hashCode(), "");
+          } else if (ERROR_NO_RESULT.equals(throwable.getMessage()) ||
+              ERROR_BLACKLIST.equals(throwable.getMessage())) {
+            // 黑名单或者没有结果 不再查找
+            MEMORY_CACHE.put(request.hashCode(), "");
+          } else {
+            // 默认不处理
+          }
+        })
+        .doOnNext(result -> {
+          MEMORY_CACHE.put(request.hashCode(), result);
+        })
         .doOnSubscribe(disposable -> onStart())
         .firstOrError()
         .toObservable();
   }
 
+  private Observable<String> getMemoryCacheObservable(UriRequest request) {
+    return Observable.create(emitter -> {
+      final String cache = MEMORY_CACHE.get(request.hashCode());
+      if (cache != null) {
+        Timber.v("cache: %s", cache);
+        emitter.onNext(cache);
+      }
+      emitter.onComplete();
+    });
+  }
+
 
   Observable<String> getCustomThumbObservable(UriRequest request) {
-    return Observable.create(new ObservableOnSubscribe<String>() {
-      @Override
-      public void subscribe(ObservableEmitter<String> emitter) throws Exception {
-
-        //是否设置过自定义封面
-        if (request.getSearchType() != URL_ALBUM) {
-          File customImage = ImageUriUtil
-              .getCustomThumbIfExist(request.getID(), request.getSearchType());
-          if (customImage != null && customImage.exists()) {
-            emitter.onNext(PREFIX_FILE + customImage.getAbsolutePath());
-          }
+    return Observable.create(emitter -> {
+      //是否设置过自定义封面
+      if (request.getSearchType() != URL_ALBUM) {
+        File customImage = ImageUriUtil
+            .getCustomThumbIfExist(request.getID(), request.getSearchType());
+        if (customImage != null && customImage.exists()) {
+          emitter.onNext(PREFIX_FILE + customImage.getAbsolutePath());
         }
-        emitter.onComplete();
       }
+      emitter.onComplete();
     });
   }
 
@@ -251,7 +298,8 @@ public abstract class ImageUriRequest<T> {
         .flatMap(new Function<Boolean, ObservableSource<String>>() {
           private Observable<ResponseBody> getObservable(UriRequest request) {
             return request.getSearchType() == ImageUriRequest.URL_ALBUM ?
-                HttpClient.getInstance().getAlbumInfo(request.getAlbumName(), request.getArtistName(), null) :
+                HttpClient.getInstance()
+                    .getAlbumInfo(request.getAlbumName(), request.getArtistName(), null) :
                 HttpClient.getInstance().getArtistInfo(request.getArtistName(), null);
           }
 

@@ -33,7 +33,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.Adapter;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
@@ -67,13 +66,13 @@ import remix.myplayer.misc.receiver.ExitReceiver;
 import remix.myplayer.misc.update.DownloadService;
 import remix.myplayer.misc.update.UpdateAgent;
 import remix.myplayer.misc.update.UpdateListener;
+import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.DrawerAdapter;
-import remix.myplayer.ui.adapter.HeaderAdapter;
 import remix.myplayer.ui.adapter.MainPagerAdapter;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
@@ -360,7 +359,6 @@ public class MainActivity extends MenuActivity {
       SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,
           sortOrder);
     }
-    clearUriCache();
     mCurrentFragment.onMediaStoreChanged();
   }
 
@@ -532,7 +530,6 @@ public class MainActivity extends MenuActivity {
 
   @Override
   public void onMediaStoreChanged() {
-    clearUriCache();
     super.onMediaStoreChanged();
     onMetaChanged();
 //    mRefreshHandler.sendEmptyMessage(MSG_UPDATE_ADAPTER);
@@ -550,7 +547,7 @@ public class MainActivity extends MenuActivity {
         if (data.getBooleanExtra(EXTRA_RECREATE, false)) { //设置后需要重启activity
           mRefreshHandler.sendEmptyMessage(MSG_RECREATE_ACTIVITY);
         } else if (data.getBooleanExtra(EXTRA_REFRESH_ADAPTER, false)) { //刷新adapter
-          clearUriCache();
+          ImageUriRequest.clearUriCache();
           mRefreshHandler.sendEmptyMessage(MSG_UPDATE_ADAPTER);
         } else if (data.getBooleanExtra(EXTRA_REFRESH_LIBRARY, false)) { //刷新Library
           List<Category> categories = (List<Category>) data.getSerializableExtra(EXTRA_CATEGORY);
@@ -583,20 +580,6 @@ public class MainActivity extends MenuActivity {
         break;
     }
   }
-
-  private void clearUriCache() {
-    // 清除uriCache
-    for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-      if (fragment instanceof LibraryFragment) {
-        final LibraryFragment libraryFragment = (LibraryFragment) fragment;
-        final Adapter adapter = libraryFragment.getAdapter();
-        if (adapter instanceof HeaderAdapter) {
-          ((HeaderAdapter) adapter).clearUriCache();
-        }
-      }
-    }
-  }
-
 
   @Override
   public void onBackPressed() {

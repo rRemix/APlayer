@@ -11,12 +11,7 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import com.facebook.drawee.view.SimpleDraweeView;
-import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
-import java.net.UnknownHostException;
-import java.util.NoSuchElementException;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import remix.myplayer.R;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -37,10 +32,8 @@ import remix.myplayer.util.SPUtil;
  * @Date 2017/1/17 16:36
  */
 
-public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extends BaseAdapter<M, BaseViewHolder> {
-
-  // 封面uri缓存
-  SparseArray<String> mUriCache = new SparseArray<>();
+public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extends
+    BaseAdapter<M, BaseViewHolder> {
 
   //显示模式 1:列表 2:网格
   public final static int LIST_MODE = 1;
@@ -70,7 +63,9 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
                 null;
     //其他的列表都是List模式
     this.mMode =
-        key != null ? SPUtil.getValue(recyclerView.getContext(), SPUtil.SETTING_KEY.NAME, key, GRID_MODE) : LIST_MODE;
+        key != null ? SPUtil
+            .getValue(recyclerView.getContext(), SPUtil.SETTING_KEY.NAME, key, GRID_MODE)
+            : LIST_MODE;
   }
 
   @Override
@@ -137,8 +132,9 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
     mMode = newModel;
     setUpModeButton(headerHolder);
     //重新设置LayoutManager和adapter并刷新列表
-    mRecyclerView.setLayoutManager(mMode == LIST_MODE ? new LinearLayoutManager(headerHolder.itemView.getContext())
-        : new GridLayoutManager(headerHolder.itemView.getContext(), 2));
+    mRecyclerView.setLayoutManager(
+        mMode == LIST_MODE ? new LinearLayoutManager(headerHolder.itemView.getContext())
+            : new GridLayoutManager(headerHolder.itemView.getContext(), 2));
     mRecyclerView.setAdapter(this);
     //保存当前模式
     saveMode(headerHolder.itemView.getContext());
@@ -146,7 +142,8 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
 
   private void tintModeButton(HeaderHolder headerHolder) {
     headerHolder.mListModeBtn.setImageDrawable(
-        Theme.tintVectorDrawable(headerHolder.itemView.getContext(), R.drawable.ic_format_list_bulleted_white_24dp,
+        Theme.tintVectorDrawable(headerHolder.itemView.getContext(),
+            R.drawable.ic_format_list_bulleted_white_24dp,
             mMode == LIST_MODE ? ThemeStore.getAccentColor()
                 : ColorUtil.getColor(R.color.default_model_button_color))
     );
@@ -192,49 +189,16 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
       final UriRequest uriRequest,
       final int imageSize,
       final int position) {
-    final String cacheUri = mUriCache.get(position);
-    if (cacheUri != null) {
-      simpleDraweeView.setImageURI(cacheUri);
-      return Observable.just("").subscribe();
-    } else {
-      return new LibraryUriRequest(simpleDraweeView,
-          uriRequest,
-          new RequestConfig.Builder(imageSize, imageSize).build()) {
-        @Override
-        public void onSave(@NotNull String result) {
-          super.onSave(result);
-          mUriCache.put(position, result);
-        }
-
-        @Override
-        public void onError(@Nullable Throwable throwable) {
-          super.onError(throwable);
-          if (throwable == null) {
-            // 没有错误类型 忽略
-          } else if (throwable instanceof UnknownHostException) {
-            // 没有网络 忽略
-          } else if (throwable instanceof NoSuchElementException) {
-            // 没有结果不再查找
-            mUriCache.put(position, "");
-          } else if (ERROR_NO_RESULT.equals(throwable.getMessage()) ||
-              ERROR_BLACKLIST.equals(throwable.getMessage())) {
-            // 黑名单或者没有结果 不再查找
-            mUriCache.put(position, "");
-          } else {
-            // 默认不处理
-          }
-        }
-      }.load();
-    }
-  }
-
-  public void clearUriCache() {
-    mUriCache.clear();
+    return new LibraryUriRequest(simpleDraweeView,
+        uriRequest,
+        new RequestConfig.Builder(imageSize, imageSize).build()) {
+    }.load();
   }
 
   void disposeLoad(final ViewHolder holder) {
     //
-    final ViewGroup parent = holder.itemView instanceof ViewGroup ? (ViewGroup) holder.itemView : null;
+    final ViewGroup parent =
+        holder.itemView instanceof ViewGroup ? (ViewGroup) holder.itemView : null;
     if (parent != null) {
       for (int i = 0; i < parent.getChildCount(); i++) {
         final View childView = parent.getChildAt(i);

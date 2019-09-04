@@ -2,9 +2,9 @@ package remix.myplayer.appshortcuts
 
 import android.content.Intent
 import android.os.Bundle
-
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseMusicActivity
+import remix.myplayer.util.Util
 
 /**
  * Created by Remix on 2017/11/1.
@@ -16,7 +16,9 @@ class AppShortcutActivity : BaseMusicActivity() {
     super.onCreate(savedInstanceState)
 
     val type = if (intent != null) intent.getIntExtra(KEY_SHORTCUT_TYPE, -1) else -1
-    startService(type)
+    if (Util.isAppOnForeground()) {
+      startService(type)
+    }
     finish()
   }
 

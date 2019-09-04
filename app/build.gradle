@@ -85,7 +85,7 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            android.applicationVariants.all { variant ->
+            android.applicationVariants.all {variant ->
                 variant.outputs.all {
                     outputFileName = "APlayer_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${releaseTime()}.apk"
                 }
@@ -107,16 +107,16 @@ android {
 //        tencent{}
 //        alibaba{}
 //        meizu{}
-        assistant91{}
-        baidu{}
-        anzhuomarket{}
+        assistant91 {}
+        baidu {}
+        anzhuomarket {}
 //        chuizi {}
 //        qihu360 {}
 
         xiaomi {}
         kuan {}
         google {}
-        productFlavors.all { flavor ->
+        productFlavors.all {flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }
     }
@@ -142,7 +142,7 @@ android {
 //    }
 
     configurations.all {
-        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        resolutionStrategy.eachDependency {DependencyResolveDetails details ->
             def requested = details.requested
             if (requested.group == 'com.android.support') {
                 if (!requested.name.startsWith("multidex")) {
@@ -184,12 +184,12 @@ dependencies {
 
     //rx
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.11'
 
     //retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.6.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.6.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.1'
 
     //rxpermission
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
@@ -238,10 +238,10 @@ def releaseTime() {
 }
 
 def getProperties(String fileName) {
-    final def Properties properties = new Properties()
+    final Properties properties = new Properties()
     def file = file(fileName)
     if (file.exists()) {
-        file.withInputStream { stream -> properties.load(stream) }
+        file.withInputStream {stream -> properties.load(stream)}
     }
     return properties
 }
