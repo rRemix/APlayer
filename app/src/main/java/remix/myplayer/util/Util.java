@@ -543,7 +543,7 @@ public class Util {
 
   public static void installApk(Context context, String path) {
     if (path == null) {
-      ToastUtil.show(App.getContext(), context.getString(R.string.empty_path_report_to_developer));
+      ToastUtil.show(context, context.getString(R.string.empty_path_report_to_developer));
       return;
     }
     File installFile = new File(path);

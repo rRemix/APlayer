@@ -41,7 +41,7 @@ class MediaStoreObserver(service: MusicService) : ContentObserver(null), Runnabl
       match = sUriMatcher.match(uri)
       if (match > 0) {
         handler.removeCallbacks(this)
-        handler.postDelayed(this, 500)
+        handler.postDelayed(this, 800)
       }
     }
   }

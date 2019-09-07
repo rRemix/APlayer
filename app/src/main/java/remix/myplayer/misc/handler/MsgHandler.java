@@ -5,8 +5,7 @@ import android.os.Looper;
 import android.os.Message;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-import remix.myplayer.App;
-import remix.myplayer.util.ToastUtil;
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2017/11/16.
@@ -42,7 +41,7 @@ public class MsgHandler extends Handler {
     try {
       mMethod.invoke(mRef.get(), msg);
     } catch (Exception e) {
-      ToastUtil.show(App.getContext(), "调用Method失败:" + e.toString());
+      Timber.w(e);
     }
   }
 

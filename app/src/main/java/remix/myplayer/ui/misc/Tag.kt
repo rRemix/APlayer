@@ -44,7 +44,7 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
 
   fun detail() {
     if (!tagEditor.initSuccess) {
-      ToastUtil.show(App.getContext(), R.string.init_failed)
+      ToastUtil.show(this, R.string.init_failed)
       return
     }
     R.string.export_fail
@@ -91,7 +91,7 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
 
   fun edit() {
     if (!tagEditor.initSuccess) {
-      ToastUtil.show(App.getContext(), R.string.init_failed)
+      ToastUtil.show(this, R.string.init_failed)
       return
     }
     val editDialog = Theme.getBaseDialog(this)

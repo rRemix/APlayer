@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -56,7 +55,8 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
   public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     if (viewType == TYPE_HEADER) {
       return new HeaderHolder(
-          LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_header_2, parent, false));
+          LayoutInflater.from(parent.getContext())
+              .inflate(R.layout.layout_header_2, parent, false));
     }
     return viewType == HeaderAdapter.LIST_MODE ?
         new PlayListListHolder(LayoutInflater.from(parent.getContext())
@@ -96,17 +96,8 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
     final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
 
     new PlayListUriRequest(holder.mImage,
-        new UriRequest(info.getId(), UriRequest.TYPE_NETEASE_SONG, ImageUriRequest.URL_PLAYLIST),
+        new UriRequest(info.getId(), ImageUriRequest.URL_PLAYLIST, UriRequest.TYPE_NETEASE_SONG),
         new RequestConfig.Builder(imageSize, imageSize).build()) {
-      @Override
-      public void onSave(@NotNull String result) {
-        mUriCache.put(position, result);
-      }
-
-      @Override
-      public void onError(@Nullable Throwable throwable) {
-        mUriCache.put(position, "");
-      }
     }.load();
 
     holder.mContainer.setOnClickListener(v -> {

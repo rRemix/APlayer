@@ -9,7 +9,6 @@ public class UriRequest implements Serializable {
   public static final int TYPE_NETEASE_SONG = 1;
   public static final int TYPE_NETEASE_ALBUM = 10;
   public static final int TYPE_NETEASE_ARTIST = 100;
-  public static final int TYPE_NONE = 0;
 
   public static final UriRequest DEFAULT_REQUEST = new UriRequest();
 
@@ -169,6 +168,10 @@ public class UriRequest implements Serializable {
   public int hashCode() {
     int result = mId;
     result = 31 * result + mSearchType;
+    result = 31 * result + mNeteaseType;
+    result = 31 * result + (mTitle != null ? mTitle.hashCode() : 0);
+    result = 31 * result + (mAlbumName != null ? mAlbumName.hashCode() : 0);
+    result = 31 * result + (mArtistName != null ? mArtistName.hashCode() : 0);
     return result;
   }
 }

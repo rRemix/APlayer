@@ -19,30 +19,17 @@ import java.lang.ref.WeakReference
  * Created by Remix on 2017/12/4.
  */
 
-open class LibraryUriRequest(image: SimpleDraweeView, protected val mRequest: UriRequest,
+open class LibraryUriRequest(image: SimpleDraweeView, protected val request: UriRequest,
                              config: RequestConfig) : ImageUriRequest<String>(config) {
 
-  val mImageRef = WeakReference(image)
+  protected val ref = WeakReference(image)
 
   override fun onError(throwable: Throwable?) {
 //    mImageRef.get()?.setImageURI(Uri.EMPTY)
     Timber.v("onError() %s", throwable?.message)
   }
 
-  open fun onSave(result: String) {
-
-  }
-
   override fun onSuccess(result: String?) {
-    if (TextUtils.isEmpty(result) || result == null) {
-      onError(Throwable(ERROR_NO_RESULT))
-      return
-    }
-    if (ImageUriRequest.BLACKLIST.contains(result)) {
-      onError(Throwable(ERROR_BLACKLIST))
-      return
-    }
-    onSave(result)
     Timber.v("onSuccess() %s", result)
     val imageRequestBuilder = ImageRequestBuilder
         .newBuilderWithSource(Uri.parse(result))
@@ -50,7 +37,7 @@ open class LibraryUriRequest(image: SimpleDraweeView, protected val mRequest: Ur
       imageRequestBuilder.resizeOptions = ResizeOptions.forDimensions(mConfig.width, mConfig.height)
     }
 
-    val image = mImageRef.get() ?: return
+    val image = ref.get() ?: return
     val controller = Fresco.newDraweeControllerBuilder()
         .setImageRequest(imageRequestBuilder.build())
         .setOldController(image.controller)
@@ -83,11 +70,11 @@ open class LibraryUriRequest(image: SimpleDraweeView, protected val mRequest: Ur
   }
 
   override fun load(): Disposable {
-    return getCoverObservable(mRequest)
+    return getCoverObservable(request)
         .compose(RxUtil.applyScheduler())
         .subscribeWith(object : DisposableObserver<String>() {
           override fun onStart() {
-            mImageRef.get()?.setImageURI(Uri.EMPTY)
+            ref.get()?.setImageURI(Uri.EMPTY)
           }
 
           override fun onNext(s: String) {

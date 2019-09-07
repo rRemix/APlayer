@@ -6,22 +6,17 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.LocaleList;
-import android.support.annotation.RequiresApi;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import java.util.Locale;
+import remix.myplayer.BuildConfig;
 import remix.myplayer.helper.LanguageHelper;
 import remix.myplayer.misc.manager.ActivityManager;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -55,20 +50,20 @@ public class BaseActivity extends AppCompatActivity {
     mContext = this;
     mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS);
     //严格模式
-//        if (BuildConfig.DEBUG) {
-//            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-//                    .detectDiskReads()
-//                    .detectDiskWrites()
-//                    .detectNetwork()
-//                    .detectCustomSlowCalls()
-//                    .penaltyLog()
-//                    .build());
-//            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-//                    .detectAll()
-//                    .penaltyLog()
-//                    .penaltyDropBox()
-//                    .build());
-//        }
+    if (BuildConfig.DEBUG) {
+      StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+          .detectDiskReads()
+          .detectDiskWrites()
+          .detectNetwork()
+          .detectCustomSlowCalls()
+          .penaltyLog()
+          .build());
+      StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+          .detectAll()
+          .penaltyLog()
+          .penaltyDropBox()
+          .build());
+    }
 
     setUpTheme();
     super.onCreate(savedInstanceState);

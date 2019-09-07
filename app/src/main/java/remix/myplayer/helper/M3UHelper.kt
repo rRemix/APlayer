@@ -1,6 +1,5 @@
 package remix.myplayer.helper
 
-import android.app.Activity
 import android.content.Context
 import android.provider.MediaStore
 import io.reactivex.CompletableSource
@@ -19,7 +18,6 @@ import remix.myplayer.util.ToastUtil
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
-import java.lang.ref.WeakReference
 
 object M3UHelper {
   private val databaseRepository = DatabaseRepository.getInstance()
@@ -33,9 +31,8 @@ object M3UHelper {
    * 导入歌单
    */
   @JvmStatic
-  fun importM3UFile(activity: Activity, file: File, playlistName: String, newCreate: Boolean): Disposable? {
-    val activityRef = WeakReference<Activity>(activity)
-    val dialog = Theme.getBaseDialog(activity)
+  fun importM3UFile(context: Context, file: File, playlistName: String, newCreate: Boolean): Disposable? {
+    val dialog = Theme.getBaseDialog(context)
         .title(R.string.saveing)
         .content(R.string.please_wait)
         .cancelable(false)
@@ -86,21 +83,17 @@ object M3UHelper {
         .compose(applySingleScheduler())
         .subscribe(
             {
-              activityRef.get()?.runOnUiThread {
-                dialog.dismiss()
-              }
-              ToastUtil.show(App.getContext(), App.getContext().getString(R.string.import_playlist_to_count, playlistName, it))
+              dialog.dismiss()
+              ToastUtil.show(context, App.getContext().getString(R.string.import_playlist_to_count, playlistName, it))
             },
             {
-              activityRef.get()?.runOnUiThread {
-                dialog.dismiss()
-              }
-              ToastUtil.show(App.getContext(), R.string.import_fail, it.toString())
+              dialog.dismiss()
+              ToastUtil.show(context, R.string.import_fail, it.toString())
             })
   }
 
   @JvmStatic
-  fun importLocalPlayList(playlistLocal: Map<String, List<Int>>, select: Array<CharSequence>): Disposable? {
+  fun importLocalPlayList(context: Context, playlistLocal: Map<String, List<Int>>, select: Array<CharSequence>): Disposable? {
     val singles = playlistLocal.entries
         .filter {
           select.contains(it.key)
@@ -125,9 +118,9 @@ object M3UHelper {
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe({
-          ToastUtil.show(App.getContext(), R.string.import_count, it.toString())
+          ToastUtil.show(context, R.string.import_count, it.toString())
         }, {
-          ToastUtil.show(App.getContext(), R.string.import_fail, it.toString())
+          ToastUtil.show(context, R.string.import_fail, it.toString())
         })
 
 
@@ -157,9 +150,9 @@ object M3UHelper {
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe({
-          ToastUtil.show(App.getContext(), R.string.export_success)
+          ToastUtil.show(context, R.string.export_success)
         }, {
-          ToastUtil.show(App.getContext(), R.string.export_fail, it.toString())
+          ToastUtil.show(context, R.string.export_fail, it.toString())
         })
   }
 }

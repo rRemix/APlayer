@@ -107,4 +107,18 @@ public class App extends MultiDexApplication {
     // timer
     Timber.plant(new Timber.DebugTree());
   }
+
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    Timber.v("onLowMemory");
+    Fresco.getImagePipeline().clearMemoryCaches();
+  }
+
+  @Override
+  public void onTrimMemory(int level) {
+    super.onTrimMemory(level);
+    Timber.v("onTrimMemory");
+    Fresco.getImagePipeline().clearMemoryCaches();
+  }
 }

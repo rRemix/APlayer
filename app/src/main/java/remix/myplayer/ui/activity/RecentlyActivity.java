@@ -130,9 +130,6 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
   @Override
   public void onMediaStoreChanged() {
     super.onMediaStoreChanged();
-    if (mAdapter != null) {
-      mAdapter.clearUriCache();
-    }
   }
 
   @Override

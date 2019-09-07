@@ -49,8 +49,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -363,7 +361,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
           return;
         }
         mDisposables
-            .add(exportPlayListToFile(this, playListName, new File(folder, playListName.concat(".m3u"))));
+            .add(exportPlayListToFile(this, playListName,
+                new File(folder, playListName.concat(".m3u"))));
         break;
     }
   }
@@ -388,7 +387,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
               }
               //不存在则提示新建
               if (!alreadyExist) {
-                allPlayListsName.add(0, newPlaylistName + "(" + getString(R.string.new_create) + ")");
+                allPlayListsName
+                    .add(0, newPlaylistName + "(" + getString(R.string.new_create) + ")");
               }
 
               return allPlayListsName;
@@ -402,7 +402,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                       position == 0 && text.toString().endsWith(
                           "(" + getString(R.string.new_create) + ")");
                   mDisposables.add(
-                      importM3UFile(SettingActivity.this, file, chooseNew ? newPlaylistName : text.toString(),
+                      importM3UFile(SettingActivity.this, file,
+                          chooseNew ? newPlaylistName : text.toString(),
                           chooseNew));
                 })
                 .show());
@@ -625,7 +626,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     getBaseDialog(this)
         .items(new String[]{auto, zh, english})
-        .itemsCallbackSingleChoice(SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO),
+        .itemsCallbackSingleChoice(
+            SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO),
             (dialog, itemView, which, text) -> {
               LanguageHelper.saveSelectLanguage(mContext, which);
 
@@ -762,11 +764,13 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                       .itemsCallbackMultiChoice(
                           selectedIndices.toArray(new Integer[0]),
                           (dialog1, which, allSelects) -> {
-                            mDisposables.add(importLocalPlayList(localPlayLists, allSelects));
+                            mDisposables
+                                .add(importLocalPlayList(mContext, localPlayLists, allSelects));
                             return true;
                           }).show();
 
-                }, throwable -> ToastUtil.show(mContext, R.string.import_fail, throwable.toString()));
+                }, throwable -> ToastUtil
+                    .show(mContext, R.string.import_fail, throwable.toString()));
           }
         })
         .theme(ThemeStore.getMDDialogTheme())
@@ -870,6 +874,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             Fresco.getImagePipeline().clearCaches();
             mHandler.sendEmptyMessage(CLEAR_FINISH);
             mNeedRefreshAdapter = true;
+            ImageUriRequest.clearUriCache();
           }
         }.start()).show();
   }
@@ -992,7 +997,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
   private void changeBottomOfPlayingScreen() {
     final int position = SPUtil
-        .getValue(mContext, SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, PlayerActivity.BOTTOM_SHOW_BOTH);
+        .getValue(mContext, SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN,
+            PlayerActivity.BOTTOM_SHOW_BOTH);
     getBaseDialog(mContext)
         .title(R.string.show_on_bottom)
         .items(new String[]{getString(R.string.show_next_song_only),

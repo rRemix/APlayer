@@ -1,7 +1,6 @@
 package remix.myplayer.misc.menu
 
 import android.content.ContextWrapper
-import android.content.Intent
 import android.support.v7.widget.PopupMenu
 import android.view.MenuItem
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
@@ -16,7 +15,6 @@ import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
-import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
@@ -166,7 +164,7 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
                   }
 
                   if (speed > 1.5f || speed < 0.5f) {
-                    ToastUtil.show(App.getContext(), R.string.speed_range_tip)
+                    ToastUtil.show(activity, R.string.speed_range_tip)
                     return@InputCallback
                   }
                   SPUtil.putValue(activity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SPEED,
