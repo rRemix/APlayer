@@ -68,7 +68,8 @@ public abstract class ImageUriRequest<T> {
 
   private static final List<String> BLACKLIST = Arrays
       .asList("https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png",
-          "https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png");
+          "https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png",
+          "http://p1.music.126.net/l8KRlRa-YLNW0GOBeN6fIA==/17914342951434926.jpg");
 
   private static final String PREFIX_FILE = "file://";
   private static final String PREFIX_EMBEDDED = "embedded://";
@@ -107,7 +108,7 @@ public abstract class ImageUriRequest<T> {
   public ImageUriRequest() {
   }
 
-  public static void clearUriCache(){
+  public static void clearUriCache() {
     MEMORY_CACHE.clear();
   }
 
