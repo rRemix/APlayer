@@ -45,8 +45,6 @@ class NotifyImpl(context: MusicService) : Notify(context) {
 
 
   override fun updateForPlaying() {
-    isStop = false
-
     val remoteView = RemoteViews(service.packageName, R.layout.notification)
     val remoteBigView = RemoteViews(service.packageName, R.layout.notification_big)
     val isPlay = service.isPlaying

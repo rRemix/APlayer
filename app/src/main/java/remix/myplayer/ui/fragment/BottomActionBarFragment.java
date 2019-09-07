@@ -160,7 +160,7 @@ public class BottomActionBarFragment extends BaseMusicFragment {
   //更新界面
   public void updateSong() {
     final Song song = MusicServiceRemote.getCurrentSong();
-    Timber.v("updateSong() %s", song.toString());
+    Timber.v("updateSong()");
     //歌曲名 艺术家
     if (mTitle != null) {
       mTitle.setText(song.getTitle());

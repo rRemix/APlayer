@@ -24,8 +24,6 @@ import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 @TargetApi(Build.VERSION_CODES.O)
 class NotifyImpl24(context: MusicService) : Notify(context) {
   override fun updateForPlaying() {
-    isStop = false
-
     val song = service.currentSong
 
     //设置封面
@@ -87,8 +85,6 @@ class NotifyImpl24(context: MusicService) : Notify(context) {
             .setShowActionsInCompactView(0, 1, 2)
             .setMediaSession(service.mediaSession.sessionToken))
         .build()
-    if (isStop)
-      return
     pushNotify(notification)
   }
 

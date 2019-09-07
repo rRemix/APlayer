@@ -30,8 +30,6 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
   private var notifyMode = NOTIFY_MODE_BACKGROUND
 
-  internal var isStop: Boolean = false
-
   internal val contentIntent: PendingIntent
     get() {
       val result = Intent(service, PlayerActivity::class.java)
@@ -67,6 +65,8 @@ abstract class Notify internal constructor(internal var service: MusicService) {
   abstract fun updateForPlaying()
 
   internal fun pushNotify(notification: Notification) {
+    if (service.stop)
+      return
     val newNotifyMode: Int = if (service.isPlaying) {
       NOTIFY_MODE_FOREGROUND
     } else {
@@ -93,7 +93,6 @@ abstract class Notify internal constructor(internal var service: MusicService) {
   fun cancelPlayingNotify() {
     service.stopForeground(true)
     notificationManager.cancel(PLAYING_NOTIFICATION_ID)
-    isStop = true
     isNotifyShowing = false
     //        notifyMode = NOTIFY_MODE_NONE;
   }

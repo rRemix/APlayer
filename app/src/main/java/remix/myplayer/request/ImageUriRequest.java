@@ -126,7 +126,7 @@ public abstract class ImageUriRequest<T> {
         .concat(
             getMemoryCacheObservable(request),
             getCustomThumbObservable(request),
-//            getContentThumbObservable(request),
+            getContentThumbObservable(request),
             getNetworkThumbObservable(request))
         .doOnNext(result -> {
           if (TextUtils.isEmpty(result)) {
