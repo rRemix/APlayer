@@ -27,14 +27,14 @@ public class SPUtil {
     }
   }
 
-  public static boolean putStringSet(Context context, String name, String key, Set<String> set) {
+  public static void putStringSet(Context context, String name, String key, Set<String> set) {
     if (set == null) {
-      return false;
+      return;
     }
     SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE)
         .edit();
     editor.remove(key);
-    return editor.putStringSet(key, set).commit();
+    editor.putStringSet(key, set).apply();
   }
 
   public static Set<String> getStringSet(Context context, String name, String key) {
@@ -42,23 +42,23 @@ public class SPUtil {
         .getStringSet(key, new HashSet<>());
   }
 
-  public static boolean putValue(Context context, String name, String key, int value) {
+  public static void putValue(Context context, String name, String key, int value) {
     SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE)
         .edit();
-    return editor.putInt(key, value).commit();
+    editor.putInt(key, value).apply();
   }
 
-  public static boolean putValue(Context context, String name, String key, String value) {
+  public static void putValue(Context context, String name, String key, String value) {
     SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE)
         .edit();
-    return editor.putString(key, value).commit();
+    editor.putString(key, value).apply();
   }
 
-  public static boolean putValue(Context context, String name, String key, boolean value) {
+  public static void putValue(Context context, String name, String key, boolean value) {
     SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE)
         .edit();
 
-    return editor.putBoolean(key, value).commit();
+    editor.putBoolean(key, value).apply();
   }
 
   public static boolean getValue(Context context, String name, Object key, boolean dft) {
@@ -86,6 +86,7 @@ public class SPUtil {
   }
 
   public interface UPDATE_KEY {
+
     String NAME = "Update";
 
     String IGNORE_FOREVER = "ignore_forever";

@@ -16,7 +16,6 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.SparseArray;
 import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.common.util.UriUtil;
@@ -41,6 +40,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
 import okhttp3.ResponseBody;
 import remix.myplayer.App;
 import remix.myplayer.R;
@@ -64,7 +64,7 @@ import timber.log.Timber;
 
 public abstract class ImageUriRequest<T> {
 
-  private static final SparseArray<String> MEMORY_CACHE = new SparseArray<>();
+  private static final ConcurrentHashMap<Integer,String> MEMORY_CACHE = new ConcurrentHashMap<>();
 
   private static final List<String> BLACKLIST = Arrays
       .asList("https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png",

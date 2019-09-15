@@ -1,7 +1,9 @@
 package remix.myplayer.util;
 
 import static remix.myplayer.helper.MusicServiceRemote.setPlayQueue;
+import static remix.myplayer.service.MusicService.EXTRA_CONTROL;
 import static remix.myplayer.service.MusicService.EXTRA_POSITION;
+import static remix.myplayer.service.MusicService.EXTRA_SHUFFLE;
 
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
@@ -126,8 +128,8 @@ public class MusicUtil {
   }
 
   public static Intent makeCmdIntent(int cmd, boolean shuffle) {
-    return new Intent(MusicService.ACTION_CMD).putExtra("Control", cmd)
-        .putExtra("shuffle", shuffle);
+    return new Intent(MusicService.ACTION_CMD).putExtra(EXTRA_CONTROL, cmd)
+        .putExtra(EXTRA_SHUFFLE, shuffle);
   }
 
   public static Intent makeCmdIntent(int cmd) {

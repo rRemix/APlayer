@@ -100,7 +100,8 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     mChoice = new MultipleChoice<>(this,
         mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
 
-    mAdapter = new ChildHolderAdapter(R.layout.item_song_recycle, mType, mArg, mChoice, mRecyclerView);
+    mAdapter = new ChildHolderAdapter(R.layout.item_song_recycle, mType, mArg, mChoice,
+        mRecyclerView);
     mChoice.setAdapter(mAdapter);
     mChoice.setExtra(mId);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
@@ -170,17 +171,21 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
   public boolean onCreateOptionsMenu(@NonNull Menu menu) {
     super.onCreateOptionsMenu(menu);
     if (mType == Constants.PLAYLIST) {
-      mSortOrder = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,
-          SortOrder.PlayListSongSortOrder.SONG_A_Z);
+      mSortOrder = SPUtil
+          .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,
+              SortOrder.PlayListSongSortOrder.SONG_A_Z);
     } else if (mType == Constants.ALBUM) {
-      mSortOrder = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,
-          SortOrder.ChildHolderSongSortOrder.SONG_TRACK_NUMBER);
+      mSortOrder = SPUtil
+          .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,
+              SortOrder.ChildHolderSongSortOrder.SONG_TRACK_NUMBER);
     } else if (mType == Constants.ARTIST) {
-      mSortOrder = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,
-          SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
+      mSortOrder = SPUtil
+          .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,
+              SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
     } else {
-      mSortOrder = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,
-          SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
+      mSortOrder = SPUtil
+          .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,
+              SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
     }
     if (TextUtils.isEmpty(mSortOrder)) {
       return true;
@@ -210,13 +215,17 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
       }
     }
     if (mType == Constants.PLAYLIST) {
-      SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, sortOrder);
+      SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,
+          sortOrder);
     } else if (mType == Constants.ALBUM) {
-      SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, sortOrder);
+      SPUtil
+          .putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, sortOrder);
     } else if (mType == Constants.ARTIST) {
-      SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, sortOrder);
+      SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,
+          sortOrder);
     } else {
-      SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, sortOrder);
+      SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,
+          sortOrder);
     }
     mSortOrder = sortOrder;
     if (update) {
@@ -371,8 +380,11 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
 
     @NonNull
     private List<Song> getChildSongs() {
-      ChildHolderActivity activity = mRef.get();
-      List<Song> songs = activity.getMP3List();
+      final ChildHolderActivity activity = mRef.get();
+      List<Song> songs = new ArrayList<>();
+      if (activity != null) {
+        songs = activity.getMP3List();
+      }
       return songs != null ? songs : new ArrayList<>();
     }
   }

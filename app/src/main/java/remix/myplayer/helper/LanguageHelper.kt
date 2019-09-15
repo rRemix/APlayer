@@ -4,33 +4,28 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.LocaleList
-import java.util.Locale
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
+import java.util.*
 
 object LanguageHelper {
   const val AUTO = 0
   const val CHINESE = 1
   const val ENGLISH = 2
+  var current = -1
 
   private var sLocal: Locale = Locale.getDefault()
 
   private val TAG = "LanguageHelper"
 
-//  fun getSelectLanguage(context: Context): String {
-//    return when (SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO)) {
-//      AUTO -> context.getString(R.string.auto)
-//      CHINESE -> context.getString(R.string.zh)
-//      ENGLISH -> context.getString(R.string.english)
-//      else -> context.getString(R.string.zh)
-//    }
-//  }
-
   /**
    * 获取选择的语言设置
    */
   private fun selectLanguageLocale(context: Context): Locale? {
-    return when (SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO)) {
+    if (current == -1) {
+      current = SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO)
+    }
+    return when (current) {
       AUTO -> sLocal
       CHINESE -> Locale.CHINA
       ENGLISH -> Locale.ENGLISH
@@ -41,6 +36,7 @@ object LanguageHelper {
   @JvmStatic
   fun saveSelectLanguage(context: Context, select: Int) {
     SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, select)
+    current = select
     setApplicationLanguage(context)
   }
 
@@ -75,7 +71,7 @@ object LanguageHelper {
     val locale = selectLanguageLocale(context)
     config.locale = locale
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      val localeList = LocaleList(locale!!)
+      val localeList = LocaleList(locale ?: return)
       LocaleList.setDefault(localeList)
       config.locales = localeList
       context.applicationContext.createConfigurationContext(config)

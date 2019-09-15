@@ -52,6 +52,12 @@ class CustomSortActivity : ToolbarActivity() {
 
     playlistId = intent.getIntExtra(EXTRA_ID, -1)
     val playlistName = intent.getStringExtra(EXTRA_NAME) ?: ""
+
+    if (!intent.hasExtra(EXTRA_LIST)) {
+      ToastUtil.show(this, R.string.illegal_arg)
+      finish()
+      return
+    }
     songs = intent.getSerializableExtra(EXTRA_LIST) as ArrayList<Song>
 
     setUpToolbar(playlistName)

@@ -3,7 +3,6 @@ package remix.myplayer.misc
 import android.content.Context
 import android.content.res.Configuration
 import android.provider.MediaStore
-import com.tencent.bugly.Bugly
 import com.tencent.bugly.crashreport.CrashReport
 import kotlinx.coroutines.launch
 import remix.myplayer.bean.mp3.Album
@@ -31,10 +30,10 @@ fun Context.isPortraitOrientation(): Boolean {
   return orientation == Configuration.ORIENTATION_PORTRAIT
 }
 
-fun MusicService.launchEasy(func: suspend () -> Unit, catch: (e: Exception) -> Unit = { Timber.w(it) }) {
+fun MusicService.tryLaunch(block: suspend () -> Unit, catch: (e: Exception) -> Unit = { Timber.w(it) }) {
   launch {
     try {
-      func.invoke()
+      block.invoke()
     } catch (e: Exception) {
       catch.invoke(e)
       CrashReport.postCatchedException(e)

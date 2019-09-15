@@ -1,11 +1,7 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
-
 apply plugin: 'kotlin-kapt'
-
 apply plugin: 'bugly'
 
 bugly {
@@ -31,15 +27,12 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 1550
-        versionName "1.5.5.0"
+        versionCode 1551
+        versionName "1.5.5.1"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
-        ndk {
-//            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'
-            abiFilters 'armeabi-v7a', 'arm64-v8a'
-        }
+
         externalNativeBuild {
             cmake {
                 cppFlags ""
@@ -74,6 +67,14 @@ android {
             signingConfig signingConfigs.release
             debuggable true
             minifyEnabled false
+
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-DEBUG'
+
+            ndk {
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'
+//            abiFilters 'armeabi-v7a', 'arm64-v8a'
+            }
         }
         release {
             //混淆代码
@@ -83,10 +84,14 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            android.applicationVariants.all {variant ->
-                variant.outputs.all {
-                    outputFileName = "APlayer_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${new Date().format("yyyy-MM-dd HH-mm")}.apk"
-                }
+            ndk {
+                abiFilters 'armeabi-v7a', 'arm64-v8a'
+            }
+        }
+
+        android.applicationVariants.all {variant ->
+            variant.outputs.all {
+                outputFileName = "APlayer_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${new Date().format("yyyy-MM-dd HH-mm")}.apk"
             }
         }
     }

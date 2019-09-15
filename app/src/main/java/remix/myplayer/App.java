@@ -1,5 +1,6 @@
 package remix.myplayer;
 
+import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -12,6 +13,8 @@ import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy;
+import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.plugins.RxJavaPlugins;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.helper.LanguageHelper;
@@ -112,13 +115,41 @@ public class App extends MultiDexApplication {
   public void onLowMemory() {
     super.onLowMemory();
     Timber.v("onLowMemory");
-    Fresco.getImagePipeline().clearMemoryCaches();
+    Completable
+        .fromAction(() -> Fresco.getImagePipeline().clearMemoryCaches())
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .subscribe();
   }
 
   @Override
   public void onTrimMemory(int level) {
     super.onTrimMemory(level);
-    Timber.v("onTrimMemory");
-    Fresco.getImagePipeline().clearMemoryCaches();
+    Timber.v("onTrimMemory, %s", level);
+
+    Completable
+        .fromAction(() -> {
+          switch (level) {
+            case ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN:
+              // 释放UI
+              break;
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW:
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL:
+              // 释放不需要资源
+              Fresco.getImagePipeline().clearMemoryCaches();
+              break;
+            case ComponentCallbacks2.TRIM_MEMORY_BACKGROUND:
+            case ComponentCallbacks2.TRIM_MEMORY_MODERATE:
+            case ComponentCallbacks2.TRIM_MEMORY_COMPLETE:
+              // 尽可能释放资源
+              Timber.v("");
+              Fresco.getImagePipeline().clearMemoryCaches();
+              break;
+            default:
+              break;
+          }
+        })
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .subscribe();
   }
 }
