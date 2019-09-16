@@ -103,18 +103,12 @@ public class MediaStoreUtil {
             SortOrder.ArtistSortOrder.ARTIST_A_Z))) {
       if (cursor != null) {
         while (cursor.moveToNext()) {
-          int id = cursor.getInt(0);
-          String artist = cursor.getString(1);
-          String artistName = cursor.getString(2);
-
           try {
             artists.add(new Artist(cursor.getInt(0),
                 cursor.getString(1),
                 cursor.getInt(2)));
-          } catch (Exception e) {
-            CrashReport
-                .postCatchedException(
-                    new Exception("getAllArtist, id: " + id + " artist: " + artist + " artistName: " + artistName));
+          } catch (Exception ignored) {
+
           }
         }
       }
@@ -140,16 +134,14 @@ public class MediaStoreUtil {
             SortOrder.AlbumSortOrder.ALBUM_A_Z))) {
       if (cursor != null) {
         while (cursor.moveToNext()) {
-          int albumId = cursor.getInt(0);
-          String album = cursor.getString(1);
-          int artistId = cursor.getInt(2);
-          String artist = cursor.getString(3);
-          int count = cursor.getInt(4);
           try {
-            albums.add(new Album(albumId, album, artistId, artist, count));
-          } catch (Exception e) {
-            CrashReport.postCatchedException(new Exception("getAllAlbum, albumId: " + albumId +
-                "album: " + album + " artistId: " + artistId + " artist: " + artist + " count: " + count));
+            albums.add(new Album(cursor.getInt(0),
+                cursor.getString(1),
+                cursor.getInt(2),
+                cursor.getString(3),
+                cursor.getInt(4)));
+          } catch (Exception ignored) {
+
           }
 
         }

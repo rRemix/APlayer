@@ -71,7 +71,7 @@ abstract class BaseAppwidget
   }
 
   protected fun updateCover(service: MusicService, remoteViews: RemoteViews, appWidgetIds: IntArray?, reloadCover: Boolean) {
-    val song = service.currentSong ?: return
+    val song = service.currentSong
     val size = if (this.javaClass.simpleName == AppWidgetBig::class.java.simpleName) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
     object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
       override fun onError(throwable: Throwable) {

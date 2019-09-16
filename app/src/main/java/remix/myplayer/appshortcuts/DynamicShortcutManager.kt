@@ -6,6 +6,7 @@ import android.content.ContextWrapper
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.os.Build
+import remix.myplayer.BuildConfig
 import remix.myplayer.appshortcuts.shortcuttype.ContinuePlayShortcutType
 import remix.myplayer.appshortcuts.shortcuttype.LastAddedShortcutType
 import remix.myplayer.appshortcuts.shortcuttype.MyLoveShortcutType
@@ -17,28 +18,33 @@ import java.util.*
  * Created by Remix on 2017/11/1.
  */
 @TargetApi(Build.VERSION_CODES.N_MR1)
-class DynamicShortcutManager(private val mContext: Context) : ContextWrapper(mContext.applicationContext) {
-  private var mShortcutManger: ShortcutManager? = null
+class DynamicShortcutManager(private val context: Context) : ContextWrapper(context.applicationContext) {
+  private var shortcutManger: ShortcutManager? = null
 
   private val defaultShortcut: List<ShortcutInfo>
-    get() = Arrays.asList(ContinuePlayShortcutType(mContext).shortcutInfo,
-        LastAddedShortcutType(mContext).shortcutInfo,
-        MyLoveShortcutType(mContext).shortcutInfo,
-        ShuffleShortcutType(mContext).shortcutInfo)
+    get() = listOf(ContinuePlayShortcutType(context).shortcutInfo, LastAddedShortcutType(context).shortcutInfo, MyLoveShortcutType(context).shortcutInfo, ShuffleShortcutType(context).shortcutInfo)
 
   init {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
-      mShortcutManger = getSystemService(ShortcutManager::class.java)
+      shortcutManger = getSystemService(ShortcutManager::class.java)
   }
 
   fun setUpShortcut() {
-    if (mShortcutManger?.dynamicShortcuts?.size == 0) {
-      mShortcutManger?.dynamicShortcuts = defaultShortcut
+    val shortcuts = shortcutManger?.dynamicShortcuts
+    if(BuildConfig.DEBUG){
+      //debug模式下有leakCanary
+      if (shortcuts?.size == 0 || shortcuts?.get(0)?.id == "com.squareup.leakcanary.dynamic_shortcut") {
+        shortcutManger?.addDynamicShortcuts(defaultShortcut)
+      }
+    } else{
+     if(shortcuts?.size == 0){
+       shortcutManger?.addDynamicShortcuts(defaultShortcut)
+     }
     }
   }
 
   fun updateContinueShortcut(service: MusicService) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
-      mShortcutManger?.updateShortcuts(Arrays.asList(ContinuePlayShortcutType(service).shortcutInfo))
+      shortcutManger?.updateShortcuts(listOf(ContinuePlayShortcutType(service).shortcutInfo))
   }
 }

@@ -9,24 +9,26 @@ import remix.myplayer.theme.Theme
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import timber.log.Timber
+import java.lang.ref.WeakReference
 
 
-class UpdateListener(val context: Context) : Listener {
+class UpdateListener(activity: Context) : Listener {
+  private val ref = WeakReference(activity)
 
   override fun onUpdateReturned(code: Int, message: String, release: Release?) {
     val showToast = UpdateAgent.forceCheck
     if (release == null) {
       if (showToast)
-        ToastUtil.show(context, message)
+        ToastUtil.show(ref.get() ?: return, message)
       return
     }
     when (code) {
       UpdateStatus.Yes -> {
-        val builder = Theme.getBaseDialog(context)
+        val builder = Theme.getBaseDialog(ref.get() ?: return)
             .title(R.string.new_version_found)
             .positiveText(R.string.update)
             .onPositive { _, _ ->
-              context.startService(Intent(context, DownloadService::class.java)
+              ref.get()?.startService(Intent(ref.get() ?: return@onPositive, DownloadService::class.java)
                   .putExtra(EXTRA_RESPONSE, release))
             }
             .content(release.body ?: "")
@@ -34,12 +36,12 @@ class UpdateListener(val context: Context) : Listener {
         if (!isForce(release)) {
           builder
               .negativeText(R.string.ignore_check_update_forever)
-              .onNegative { dialog, which ->
-                SPUtil.putValue(context, SPUtil.UPDATE_KEY.NAME, SPUtil.UPDATE_KEY.IGNORE_FOREVER, true)
+              .onNegative { _, _ ->
+                SPUtil.putValue(ref.get() ?: return@onNegative, SPUtil.UPDATE_KEY.NAME, SPUtil.UPDATE_KEY.IGNORE_FOREVER, true)
               }
               .neutralText(R.string.ignore_this_version)
               .neutralColorAttr(R.attr.text_color_primary)
-              .onNeutral { _, _ -> SPUtil.putValue(context, SPUtil.UPDATE_KEY.NAME, UpdateAgent.getOnlineVersionCode(release).toString(), true) }
+              .onNeutral { _, _ -> SPUtil.putValue(ref.get() ?: return@onNeutral, SPUtil.UPDATE_KEY.NAME, UpdateAgent.getOnlineVersionCode(release).toString(), true) }
         } else {
 
           builder.canceledOnTouchOutside(false)
@@ -50,22 +52,20 @@ class UpdateListener(val context: Context) : Listener {
 
       UpdateStatus.No, UpdateStatus.ErrorSizeFormat -> {
         if (showToast)
-          ToastUtil.show(context, message)
+          ToastUtil.show(ref.get() ?: return, message)
       }
       UpdateStatus.IGNORED -> {
-//                if(showToast)
-//                    ToastUtil.show(context, message)
+        // ignore
       }
       else -> {
         if (showToast)
-          ToastUtil.show(context, message)
+          ToastUtil.show(ref.get() ?: return, message)
       }
     }
   }
 
   override fun onUpdateError(throwable: Throwable) {
     Timber.v("onUpdateError: $throwable")
-//        ToastUtil.show(context, R.string.update_error, throwable)
   }
 
   private fun isForce(release: Release?): Boolean {

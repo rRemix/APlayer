@@ -56,7 +56,7 @@ object UpdateAgent {
             listener?.onUpdateReturned(UpdateStatus.No, context.getString(R.string.no_update), null)
             //删除以前的安装包
             val downloadDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-            if (downloadDir.exists() && downloadDir.listFiles() != null && downloadDir.listFiles().isNotEmpty()) {
+            if (downloadDir?.exists() == true && downloadDir.listFiles() != null && downloadDir.listFiles().isNotEmpty()) {
               Util.deleteFilesByDirectory(downloadDir)
             }
             return@subscribe

@@ -49,7 +49,6 @@ import remix.myplayer.misc.receiver.MediaButtonReceiver
 import remix.myplayer.misc.tryLaunch
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
-import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
@@ -61,6 +60,7 @@ import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISS
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
 import remix.myplayer.ui.widget.desktop.DesktopLyricView
 import remix.myplayer.util.Constants.*
+import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
@@ -116,6 +116,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   var playModel: Int = PLAY_LOOP
     set(newPlayModel) {
+      Timber.v("修改播放模式: $newPlayModel")
       desktopWidgetTask?.run()
       SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL, newPlayModel)
 //      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NEXT_SONG_ID, nextId)
@@ -436,7 +437,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
   @SuppressLint("CheckResult")
   override fun onStartCommand(commandIntent: Intent?, flags: Int, startId: Int): Int {
-    Timber.tag(TAG_LIFECYCLE).v("onStartCommand")
+    val control = commandIntent?.getIntExtra(EXTRA_CONTROL, -1)
+    Timber.tag(TAG_LIFECYCLE).v("onStartCommand, control: $control flags: $flags startId: $startId")
     stop = false
 
     tryLaunch(block = {
@@ -867,11 +869,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     setPlay(true)
 
-    //倍速播放
-    setSpeed(speed)
-
     //播放
     mediaPlayer.start()
+
+    //倍速播放
+    setSpeed(speed)
 
     //更新所有界面
     updateUIHandler.sendEmptyMessage(UPDATE_META_DATA)
@@ -1091,30 +1093,41 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         controlReceiver.onReceive(this, shuffleIntent)
       }
       ACTION_SHORTCUT_MYLOVE -> {
-        val myLoveIds = repository.getMyLoveList().blockingGet()
-        if (myLoveIds == null || myLoveIds.isEmpty()) {
-          ToastUtil.show(service, R.string.list_is_empty)
-          return
-        }
-        val myloveIntent = Intent(ACTION_CMD)
-        myloveIntent.putExtra(EXTRA_CONTROL, Command.PLAYSELECTEDSONG)
-        myloveIntent.putExtra(EXTRA_POSITION, 0)
-        setPlayQueue(myLoveIds, myloveIntent)
+        tryLaunch({
+          val myLoveIds = withContext(Dispatchers.IO){
+            repository.getMyLoveList().blockingGet()
+          }
+          if (myLoveIds == null || myLoveIds.isEmpty()) {
+            ToastUtil.show(service, R.string.list_is_empty)
+            return@tryLaunch
+          }
+
+          val myloveIntent = Intent(ACTION_CMD)
+          myloveIntent.putExtra(EXTRA_CONTROL, Command.PLAYSELECTEDSONG)
+          myloveIntent.putExtra(EXTRA_POSITION, 0)
+          setPlayQueue(myLoveIds, myloveIntent)
+        })
+
       }
       ACTION_SHORTCUT_LASTADDED -> {
-        val songs = MediaStoreUtil.getLastAddedSong()
-        val lastAddIds = ArrayList<Int>()
-        if (songs == null || songs.size == 0) {
-          ToastUtil.show(service, R.string.list_is_empty)
-          return
-        }
-        for (song in songs) {
-          lastAddIds.add(song.id)
-        }
-        val lastedIntent = Intent(ACTION_CMD)
-        lastedIntent.putExtra(EXTRA_CONTROL, Command.PLAYSELECTEDSONG)
-        lastedIntent.putExtra(EXTRA_POSITION, 0)
-        setPlayQueue(lastAddIds, lastedIntent)
+        tryLaunch({
+          val songs = withContext(Dispatchers.IO){
+            MediaStoreUtil.getLastAddedSong()
+          }
+          val lastAddIds = ArrayList<Int>()
+          if (songs == null || songs.size == 0) {
+            ToastUtil.show(service, R.string.list_is_empty)
+            return@tryLaunch
+          }
+          for (song in songs) {
+            lastAddIds.add(song.id)
+          }
+          val lastedIntent = Intent(ACTION_CMD)
+          lastedIntent.putExtra(EXTRA_CONTROL, Command.PLAYSELECTEDSONG)
+          lastedIntent.putExtra(EXTRA_POSITION, 0)
+          setPlayQueue(lastAddIds, lastedIntent)
+        })
+
       }
       else -> if (action.equals(ACTION_CMD, ignoreCase = true)) {
         controlReceiver.onReceive(this, commandIntent)
@@ -1187,6 +1200,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       val control = intent.getIntExtra(EXTRA_CONTROL, -1)
       this@MusicService.control = control
+      Timber.v("control: $control")
 
       if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT
           || control == Command.TOGGLE || control == Command.PAUSE || control == Command.START) {
@@ -1616,11 +1630,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
   private fun setSpeed(speed: Float) {
-    if (prepared) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        if (mediaPlayer.isPlaying) {
-          mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
-        }
+    if (prepared && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && mediaPlayer.isPlaying) {
+      try {
+        mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
+      } catch (e: Exception) {
+        Timber.w(e)
       }
     }
   }
@@ -1714,7 +1728,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             break
           }
         }
-      } catch (e: Exception){
+      } catch (e: Exception) {
         Timber.v("restoreLastSong error: ${e.message}")
       }
     }
