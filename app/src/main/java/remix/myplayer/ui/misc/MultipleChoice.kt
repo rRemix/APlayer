@@ -8,6 +8,7 @@ import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import remix.myplayer.App
@@ -27,8 +28,12 @@ import remix.myplayer.ui.adapter.*
 import remix.myplayer.ui.widget.MultiPopupWindow
 import remix.myplayer.ui.widget.TipPopupwindow
 import remix.myplayer.util.*
+import java.lang.ref.WeakReference
 
-class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.OnClickListener {
+class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListener {
+  private val activityRef = WeakReference(activity)
+  private val disposableContainer = CompositeDisposable()
+
   private val databaseRepository = DatabaseRepository.getInstance()
   //所有选中的position
   private val checkPos = ArrayList<Int>()
@@ -126,18 +131,19 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
 
   @SuppressLint("CheckResult")
   private fun delete() {
+    val context = activityRef.get() ?: return
     val title = when (type) {
-      Constants.PLAYLIST -> activity.getString(R.string.confirm_delete_playlist)
-      Constants.PLAYLISTSONG -> activity.getString(R.string.confirm_delete_from_playlist)
-      else -> activity.getString(R.string.confirm_delete_from_library)
+      Constants.PLAYLIST -> context.getString(R.string.confirm_delete_playlist)
+      Constants.PLAYLISTSONG -> context.getString(R.string.confirm_delete_from_playlist)
+      else -> context.getString(R.string.confirm_delete_from_library)
     }
 
-    getSongIdSingle()
+    val disposable = getSongIdSingle()
         .flatMap { getSongsSingle(it) }
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe { songs ->
-          Theme.getBaseDialog(activity)
+          Theme.getBaseDialog(context)
               .content(title)
               .positiveText(R.string.confirm)
               .negativeText(R.string.cancel)
@@ -150,13 +156,13 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
                       close()
                     }
                     .subscribe(Consumer {
-                      ToastUtil.show(activity, activity.getString(R.string.delete_multi_song, it))
+                      ToastUtil.show(context, context.getString(R.string.delete_multi_song, it))
 
                     })
 
               }.show()
         }
-
+    disposableContainer.add(disposable)
   }
 
   private fun deleteSingle(dialog: MaterialDialog, songs: List<Song>): Single<Int> {
@@ -170,7 +176,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
 
               checkParam.forEach {
                 val playlist = it as PlayList
-                if (playlist.name != activity.getString(R.string.my_favorite)) {
+                if (playlist.name != activityRef.get()?.getString(R.string.my_favorite)) {
                   databaseRepository.deletePlayList((it as PlayList).id).subscribe()
                 }
               }
@@ -193,7 +199,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
 
   @SuppressLint("CheckResult")
   private fun addToPlayQueue() {
-    getSongIdSingle()
+    val disposable = getSongIdSingle()
         .flatMap {
           databaseRepository.insertToPlayQueue(it)
         }
@@ -203,18 +209,17 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
           close()
         }
         .subscribe(Consumer {
+          val activity = activityRef.get() ?: return@Consumer
           ToastUtil.show(activity, activity.getString(R.string.add_song_playqueue_success, it))
         })
+    disposableContainer.add(disposable)
   }
 
   @SuppressLint("CheckResult")
   private fun addToPlayList() {
-
+    val activity = activityRef.get() ?: return
     //获得所有播放列表的信息
-    databaseRepository.getAllPlaylist()
-//        .filter {
-//          it.isNotEmpty()
-//        }
+    val disposable = databaseRepository.getAllPlaylist()
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe({ playLists ->
@@ -278,6 +283,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
         }, {
           ToastUtil.show(activity, activity.getString(R.string.add_error))
         })
+    disposableContainer.add(disposable)
   }
 
   fun click(pos: Int, data: T): Boolean {
@@ -336,6 +342,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
 
 
   fun open() {
+    val activity = activityRef.get() ?: return
     popup = MultiPopupWindow(activity)
     popup?.show(View(activity))
     if (SPUtil.getValue(activity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FIRST_SHOW_MULTI, true)) {
@@ -352,6 +359,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
   }
 
   fun close() {
+    disposableContainer.clear()
     isActive = false
     isActiveSomeWhere = false
     popup?.dismiss()
@@ -381,7 +389,7 @@ class MultipleChoice<T>(private val activity: Activity, val type: Int) : View.On
   }
 
   override fun toString(): String {
-    return "MultipleChoice(activity=$activity, type=$type, checkPos=$checkPos, checkParam=$checkParam, isActive=$isActive, adapter=$adapter, popup=$popup, extra=$extra)"
+    return "MultipleChoice(activity=${activityRef.get()}, type=$type, checkPos=$checkPos, checkParam=$checkParam, isActive=$isActive, adapter=$adapter, popup=$popup, extra=$extra)"
   }
 
 

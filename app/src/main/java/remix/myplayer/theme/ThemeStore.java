@@ -21,38 +21,35 @@ import remix.myplayer.util.SPUtil.SETTING_KEY;
  */
 public class ThemeStore {
 
-  private static final String NAME = "aplayer-theme";
+  public static final String NAME = "aplayer-theme";
 
   public static final String LIGHT = "light";
   public static final String DARK = "dark";
   public static final String BLACK = "black";
-  private static final String KEY_THEME = "theme";
-  private static final String KEY_PRIMARY_COLOR = "primary_color";
-  private static final String KEY_PRIMARY_DARK_COLOR = "primary_dark_color";
-  private static final String KEY_ACCENT_COLOR = "accent_color";
-  private static final String KEY_FLOAT_LYRIC_TEXT_COLOR = "float_lyric_text_color";
+  public static final String KEY_THEME = "theme";
+  public static final String KEY_PRIMARY_COLOR = "primary_color";
+  public static final String KEY_PRIMARY_DARK_COLOR = "primary_dark_color";
+  public static final String KEY_ACCENT_COLOR = "accent_color";
+  public static final String KEY_FLOAT_LYRIC_TEXT_COLOR = "float_lyric_text_color";
 
   public static int STATUS_BAR_ALPHA = 150;
 
-  public static boolean IMMERSIVE_MODE = SPUtil
-      .getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.IMMERSIVE_MODE,
-          false);
+  public static boolean sColoredNavigation = false;
+  public static boolean sImmersiveMode = false;
+  public static String sTheme = LIGHT;
 
 
   public static void setGeneralTheme(int pos) {
-    SPUtil.putValue(App.getContext(), NAME, KEY_THEME,
-        pos == 0 ? LIGHT : pos == 1 ? DARK : BLACK);
+    setGeneralTheme(pos == 0 ? LIGHT : pos == 1 ? DARK : BLACK);
   }
 
-  public static void setGeneralTheme(String theme) {
+  private static void setGeneralTheme(String theme) {
+    sTheme = theme;
     SPUtil.putValue(App.getContext(), NAME, KEY_THEME, theme);
   }
 
-//    public static void setGeneralTheme
-
   public static String getThemeText() {
-    String theme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
-    switch (theme) {
+    switch (sTheme) {
       case LIGHT:
         return App.getContext().getString(R.string.light_theme);
       case BLACK:
@@ -66,8 +63,7 @@ public class ThemeStore {
 
   @StyleRes
   public static int getThemeRes() {
-    String theme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
-    switch (theme) {
+    switch (sTheme) {
       case LIGHT:
         return R.style.Theme_APlayer;
       case BLACK:
@@ -139,7 +135,7 @@ public class ThemeStore {
 
   @ColorInt
   public static int getStatusBarColor() {
-    return IMMERSIVE_MODE ? getMaterialPrimaryColor() : getMaterialPrimaryDarkColor();
+    return sImmersiveMode ? getMaterialPrimaryColor() : getMaterialPrimaryDarkColor();
   }
 
   @ColorInt

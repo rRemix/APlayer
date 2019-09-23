@@ -82,6 +82,7 @@ import kotlin.collections.ArrayList
 @SuppressLint("CheckResult")
 class MusicService : BaseService(), Playback, MusicEventCallback,
     SharedPreferences.OnSharedPreferenceChangeListener, CoroutineScope by MainScope() {
+  private val lock = Object()
   /**
    * 所有歌曲id
    */
@@ -438,7 +439,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   @SuppressLint("CheckResult")
   override fun onStartCommand(commandIntent: Intent?, flags: Int, startId: Int): Int {
     val control = commandIntent?.getIntExtra(EXTRA_CONTROL, -1)
-    Timber.tag(TAG_LIFECYCLE).v("onStartCommand, control: $control flags: $flags startId: $startId")
+    val action = commandIntent?.action
+
+    Timber.tag(TAG_LIFECYCLE).v("onStartCommand, control: $control action: $action flags: $flags startId: $startId")
     stop = false
 
     tryLaunch(block = {
@@ -448,7 +451,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           load()
         }
       }
-      val action = commandIntent?.action ?: return@tryLaunch
       handleStartCommandIntent(commandIntent, action)
     })
     return START_NOT_STICKY
@@ -780,14 +782,17 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 设置播放队列
    */
   fun setPlayQueue(newQueueList: List<Int>?) {
-    if (newQueueList == null || newQueueList.isEmpty()) {
-      return
+    synchronized(this) {
+      if (newQueueList == null || newQueueList.isEmpty()) {
+        return
+      }
+      if (newQueueList == playQueue) {
+        return
+      }
+
+      playQueue.clear()
+      playQueue.addAll(newQueueList)
     }
-    if (newQueueList == playQueue) {
-      return
-    }
-    playQueue.clear()
-    playQueue.addAll(newQueueList)
 
     updateQueueItem()
 
@@ -808,22 +813,25 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     if (newQueueList == null || newQueueList.isEmpty()) {
       return
     }
-    //设置的播放队列相等
-    val equals = newQueueList == playQueue
-    if (!equals) {
-      playQueue.clear()
-      playQueue.addAll(newQueueList)
-    }
 
-    controlReceiver.onReceive(this, intent)
+    synchronized(this) {
+      //设置的播放队列相等
+      val equals = newQueueList == playQueue
+      if (!equals) {
+        playQueue.clear()
+        playQueue.addAll(newQueueList)
+      }
 
-    if (equals) {
-      return
-    }
+      handleCommand(intent)
 
-    if (shuffle && playModel != PLAY_SHUFFLE) {
-      playModel = PLAY_SHUFFLE
-      updateNextSong()
+      if (equals) {
+        return
+      }
+
+      if (shuffle && playModel != PLAY_SHUFFLE) {
+        playModel = PLAY_SHUFFLE
+        updateNextSong()
+      }
     }
 
     updateQueueItem()
@@ -945,11 +953,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
       //如果是随机播放 需要调整下RandomQueue
       //保证正常播放队列和随机播放队列中当前歌曲的索引一致
-      val index = randomQueue.indexOf(currentId)
-      if (playModel == PLAY_SHUFFLE &&
-          index != currentIndex &&
-          index > 0) {
-        Collections.swap(randomQueue, currentIndex, index)
+      synchronized(this) {
+        val index = randomQueue.indexOf(currentId)
+        if (playModel == PLAY_SHUFFLE &&
+            index != currentIndex &&
+            index > 0) {
+          Collections.swap(randomQueue, currentIndex, index)
+        }
       }
 
       if (currentSong.url.isEmpty()) {
@@ -994,8 +1004,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           .subscribe { ids ->
             Timber.v("新的播放队列: ${ids.size}")
 
-            playQueue.clear()
-            playQueue.addAll(ids)
+            synchronized(this) {
+              playQueue.clear()
+              playQueue.addAll(ids)
+            }
 
             // 如果下一首歌曲不在队列里面 重新设置下一首歌曲
             if (!playQueue.contains(nextId)) {
@@ -1064,7 +1076,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
   }
 
-  private fun handleStartCommandIntent(commandIntent: Intent?, action: String) {
+  private fun handleStartCommandIntent(commandIntent: Intent?, action: String?) {
+    Timber.v("handleStartCommandIntent")
+    if(action == null){
+      return
+    }
     firstPrepared = false
     when (action) {
       ACTION_APPWIDGET_OPERATE -> {
@@ -1076,13 +1092,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           updateAppwidget()
         } else {
           appwidgetIntent.putExtra(EXTRA_CONTROL, control)
-          controlReceiver.onReceive(this, appwidgetIntent)
+          handleCommand(appwidgetIntent)
         }
       }
       ACTION_SHORTCUT_CONTINUE_PLAY -> {
         val continueIntent = Intent(ACTION_CMD)
         continueIntent.putExtra(EXTRA_CONTROL, Command.TOGGLE)
-        controlReceiver.onReceive(this, continueIntent)
+        handleCommand(continueIntent)
       }
       ACTION_SHORTCUT_SHUFFLE -> {
         if (playModel != PLAY_SHUFFLE) {
@@ -1090,11 +1106,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         }
         val shuffleIntent = Intent(ACTION_CMD)
         shuffleIntent.putExtra(EXTRA_CONTROL, Command.NEXT)
-        controlReceiver.onReceive(this, shuffleIntent)
+        handleCommand(shuffleIntent)
       }
       ACTION_SHORTCUT_MYLOVE -> {
         tryLaunch({
-          val myLoveIds = withContext(Dispatchers.IO){
+          val myLoveIds = withContext(Dispatchers.IO) {
             repository.getMyLoveList().blockingGet()
           }
           if (myLoveIds == null || myLoveIds.isEmpty()) {
@@ -1111,7 +1127,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       ACTION_SHORTCUT_LASTADDED -> {
         tryLaunch({
-          val songs = withContext(Dispatchers.IO){
+          val songs = withContext(Dispatchers.IO) {
             MediaStoreUtil.getLastAddedSong()
           }
           val lastAddIds = ArrayList<Int>()
@@ -1130,7 +1146,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
       }
       else -> if (action.equals(ACTION_CMD, ignoreCase = true)) {
-        controlReceiver.onReceive(this, commandIntent)
+        handleCommand(commandIntent)
       }
     }
   }
@@ -1191,206 +1207,209 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 接受控制命令 包括暂停、播放、上下首、改版播放模式等
    */
+  private var last = System.currentTimeMillis()
   inner class ControlReceiver : BroadcastReceiver() {
-    private var last = System.currentTimeMillis()
     override fun onReceive(context: Context, intent: Intent?) {
-      Timber.v("ControlReceiver: %s", intent)
-      if (intent == null || intent.extras == null) {
+      handleCommand(intent)
+    }
+  }
+
+  private fun handleCommand(intent: Intent?) {
+    Timber.v("ControlReceiver: %s", intent)
+    if (intent == null || intent.extras == null) {
+      return
+    }
+    val control = intent.getIntExtra(EXTRA_CONTROL, -1)
+    this@MusicService.control = control
+    Timber.v("control: $control")
+
+    if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT
+        || control == Command.TOGGLE || control == Command.PAUSE || control == Command.START) {
+      //判断下间隔时间
+      if (System.currentTimeMillis() - last < 500) {
+        Timber.v("间隔小于500ms")
         return
       }
-      val control = intent.getIntExtra(EXTRA_CONTROL, -1)
-      this@MusicService.control = control
-      Timber.v("control: $control")
+      //保存控制命令,用于播放界面判断动画
+      operation = control
+      if (playQueue.size == 0) {
+        //列表为空，尝试读取
+        repository.getPlayQueue()
+            .compose(applySingleScheduler())
+            .subscribe(Consumer {
+              playQueue.clear()
+              playQueue.addAll(it)
+            })
+      }
+    }
 
-      if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT
-          || control == Command.TOGGLE || control == Command.PAUSE || control == Command.START) {
-        //判断下间隔时间
-        if (System.currentTimeMillis() - last < 500) {
-          Timber.v("间隔小于500ms")
+
+    when (control) {
+      //关闭通知栏
+      Command.CLOSE_NOTIFY -> {
+        Notify.isNotifyShowing = false
+        //          if (notify instanceof NotifyImpl24) { //仅仅只是设置标志位
+        //            return;
+        //          }
+        pause(false)
+        needShowDesktopLyric = true
+        showDesktopLyric = false
+        updateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
+        stopUpdateLyric()
+        updateUIHandler.postDelayed({ notify.cancelPlayingNotify() }, 300)
+      }
+      //播放选中的歌曲
+      Command.PLAYSELECTEDSONG -> {
+        playSelectSong(intent.getIntExtra(EXTRA_POSITION, -1))
+      }
+      //播放上一首
+      Command.PREV -> {
+        playPrevious()
+      }
+      //播放下一首
+      Command.NEXT -> {
+        playNext()
+      }
+      //暂停或者继续播放
+      Command.TOGGLE -> {
+        toggle()
+      }
+      //暂停
+      Command.PAUSE -> {
+        pause(false)
+      }
+      //继续播放
+      Command.START -> {
+        play(false)
+      }
+      //改变播放模式
+      Command.CHANGE_MODEL -> {
+        playModel = if (playModel == PLAY_REPEAT) PLAY_LOOP else playModel + 1
+      }
+      //取消或者添加收藏
+      Command.LOVE -> {
+        repository.toggleMyLove(currentId)
+            .compose(applySingleScheduler())
+            .subscribe({
+              if (it) {
+                isLove = !isLove
+                updateAppwidget()
+              }
+            }, {
+              Timber.v(it)
+            })
+      }
+      //桌面歌词
+      Command.TOGGLE_DESKTOP_LYRIC -> {
+        val open: Boolean = if (intent.hasExtra(EXTRA_DESKTOP_LYRIC)) {
+          intent.getBooleanExtra(EXTRA_DESKTOP_LYRIC, false)
+        } else {
+          !SPUtil.getValue(service,
+              SETTING_KEY.NAME,
+              SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
+        }
+        if (open && !FloatWindowManager.getInstance().checkPermission(service)) {
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val permissionIntent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+            permissionIntent.data = Uri.parse("package:$packageName")
+            permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            if (isIntentAvailable(service, permissionIntent)) {
+              startActivity(permissionIntent)
+            }
+          }
+          ToastUtil.show(service, R.string.plz_give_float_permission)
           return
         }
-        //保存控制命令,用于播放界面判断动画
-        operation = control
-        if (playQueue.size == 0) {
-          //列表为空，尝试读取
-          repository.getPlayQueue()
-              .compose(applySingleScheduler())
-              .subscribe(Consumer {
-                playQueue.clear()
-                playQueue.addAll(it)
-              })
+        SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW,
+            open)
+        if (showDesktopLyric != open) {
+          showDesktopLyric = open
+          ToastUtil.show(service, if (showDesktopLyric) R.string.opened_desktop_lrc else R.string.closed_desktop_lrc)
+          if (showDesktopLyric) {
+            updateDesktopLyric(false)
+          } else {
+            closeDesktopLyric()
+          }
         }
       }
+      //临时播放一首歌曲
+      Command.PLAY_TEMP -> {
+        intent.getParcelableExtra<Song>(EXTRA_SONG)?.let {
+          currentSong = it
+          operation = Command.PLAY_TEMP
+          prepare(currentSong.url)
+        }
+      }
+      //解锁桌面歌词
+      Command.UNLOCK_DESKTOP_LYRIC -> {
+        if (desktopLyricView != null) {
+          desktopLyricView?.saveLock(false, true)
+        } else {
+          SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
+        }
+        //更新通知栏
+        updateNotification()
+      }
+      //锁定桌面歌词，更新通知栏
+      Command.LOCK_DESKTOP_LYRIC -> {
+        //更新通知栏
+        updateNotification()
+      }
+      //某一首歌曲添加至下一首播放
+      Command.ADD_TO_NEXT_SONG -> {
+        val nextSong = intent.getParcelableExtra<Song>(EXTRA_SONG) ?: return
+        //添加到播放队列
+        if (nextId == nextSong.id) {
+          ToastUtil.show(service, R.string.already_add_to_next_song)
+          return
+        }
+        //更新随机和普通播放队列
+        if (randomQueue.contains(nextSong.id)) {
+          randomQueue.remove(Integer.valueOf(nextSong.id))
+          randomQueue.add(if (currentIndex + 1 < randomQueue.size) currentIndex + 1 else 0,
+              nextSong.id)
+        } else {
+          randomQueue.add(randomQueue.indexOf(currentId) + 1, nextSong.id)
+        }
+        if (playQueue.contains(nextSong.id)) {
+          playQueue.remove(Integer.valueOf(nextSong.id))
+          playQueue.add(if (currentIndex + 1 < playQueue.size) currentIndex + 1 else 0,
+              nextSong.id)
+        } else {
+          playQueue.add(playQueue.indexOf(currentId) + 1, nextSong.id)
+        }
 
-      last = System.currentTimeMillis()
-
-      when (control) {
-        //关闭通知栏
-        Command.CLOSE_NOTIFY -> {
-          Notify.isNotifyShowing = false
-          //          if (notify instanceof NotifyImpl24) { //仅仅只是设置标志位
-          //            return;
-          //          }
-          pause(false)
-          needShowDesktopLyric = true
-          showDesktopLyric = false
-          updateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
-          stopUpdateLyric()
-          updateUIHandler.postDelayed({ notify.cancelPlayingNotify() }, 300)
-        }
-        //播放选中的歌曲
-        Command.PLAYSELECTEDSONG -> {
-          playSelectSong(intent.getIntExtra(EXTRA_POSITION, -1))
-        }
-        //播放上一首
-        Command.PREV -> {
-          playPrevious()
-        }
-        //播放下一首
-        Command.NEXT -> {
-          playNext()
-        }
-        //暂停或者继续播放
-        Command.TOGGLE -> {
-          toggle()
-        }
-        //暂停
-        Command.PAUSE -> {
-          pause(false)
-        }
-        //继续播放
-        Command.START -> {
-          play(false)
-        }
-        //改变播放模式
-        Command.CHANGE_MODEL -> {
-          playModel = if (playModel == PLAY_REPEAT) PLAY_LOOP else playModel + 1
-        }
-        //取消或者添加收藏
-        Command.LOVE -> {
-          repository.toggleMyLove(currentId)
-              .compose(applySingleScheduler())
-              .subscribe({
-                if (it) {
-                  isLove = !isLove
-                  updateAppwidget()
-                }
-              }, {
-                Timber.v(it)
-              })
-        }
-        //桌面歌词
-        Command.TOGGLE_DESKTOP_LYRIC -> {
-          val open: Boolean = if (intent.hasExtra(EXTRA_DESKTOP_LYRIC)) {
-            intent.getBooleanExtra(EXTRA_DESKTOP_LYRIC, false)
-          } else {
-            !SPUtil.getValue(service,
-                SETTING_KEY.NAME,
-                SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
-          }
-          if (open && !FloatWindowManager.getInstance().checkPermission(service)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-              val permissionIntent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-              permissionIntent.data = Uri.parse("package:$packageName")
-              permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-              if (isIntentAvailable(service, permissionIntent)) {
-                startActivity(permissionIntent)
-              }
+        //更新下一首
+        nextIndex = currentIndex
+        updateNextSong()
+        //保存到数据库
+        Single
+            .fromCallable {
+              repository.clearPlayQueue()
+                  .concatWith(repository.insertToPlayQueue(playQueue))
+                  .subscribe()
             }
-            ToastUtil.show(service, R.string.plz_give_float_permission)
-            return
-          }
-          SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW,
-              open)
-          if (showDesktopLyric != open) {
-            showDesktopLyric = open
-            ToastUtil.show(service, if (showDesktopLyric) R.string.opened_desktop_lrc else R.string.closed_desktop_lrc)
-            if (showDesktopLyric) {
-              updateDesktopLyric(false)
-            } else {
-              closeDesktopLyric()
-            }
-          }
+            .compose(applySingleScheduler())
+            .subscribe({
+              ToastUtil.show(service, R.string.already_add_to_next_song)
+            }, {
+              ToastUtil.show(service, R.string.play_failed)
+            })
+      }
+      //改变歌词源
+      Command.CHANGE_LYRIC -> if (showDesktopLyric) {
+        updateDesktopLyric(true)
+      }
+      //切换定时器
+      Command.TOGGLE_TIMER -> {
+        val hasDefault = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.TIMER_DEFAULT, false)
+        if (!hasDefault) {
+          ToastUtil.show(service, getString(R.string.plz_set_default_time))
         }
-        //临时播放一首歌曲
-        Command.PLAY_TEMP -> {
-          intent.getParcelableExtra<Song>(EXTRA_SONG)?.let {
-            currentSong = it
-            operation = Command.PLAY_TEMP
-            prepare(currentSong.url)
-          }
-        }
-        //解锁桌面歌词
-        Command.UNLOCK_DESKTOP_LYRIC -> {
-          if (desktopLyricView != null) {
-            desktopLyricView?.saveLock(false, true)
-          } else {
-            SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
-          }
-          //更新通知栏
-          updateNotification()
-        }
-        //锁定桌面歌词，更新通知栏
-        Command.LOCK_DESKTOP_LYRIC -> {
-          //更新通知栏
-          updateNotification()
-        }
-        //某一首歌曲添加至下一首播放
-        Command.ADD_TO_NEXT_SONG -> {
-          val nextSong = intent.getParcelableExtra<Song>(EXTRA_SONG) ?: return
-          //添加到播放队列
-          if (nextId == nextSong.id) {
-            ToastUtil.show(service, R.string.already_add_to_next_song)
-            return
-          }
-          //更新随机和普通播放队列
-          if (randomQueue.contains(nextSong.id)) {
-            randomQueue.remove(Integer.valueOf(nextSong.id))
-            randomQueue.add(if (currentIndex + 1 < randomQueue.size) currentIndex + 1 else 0,
-                nextSong.id)
-          } else {
-            randomQueue.add(randomQueue.indexOf(currentId) + 1, nextSong.id)
-          }
-          if (playQueue.contains(nextSong.id)) {
-            playQueue.remove(Integer.valueOf(nextSong.id))
-            playQueue.add(if (currentIndex + 1 < playQueue.size) currentIndex + 1 else 0,
-                nextSong.id)
-          } else {
-            playQueue.add(playQueue.indexOf(currentId) + 1, nextSong.id)
-          }
-
-          //更新下一首
-          nextIndex = currentIndex
-          updateNextSong()
-          //保存到数据库
-          Single
-              .fromCallable {
-                repository.clearPlayQueue()
-                    .concatWith(repository.insertToPlayQueue(playQueue))
-                    .subscribe()
-              }
-              .compose(applySingleScheduler())
-              .subscribe({
-                ToastUtil.show(service, R.string.already_add_to_next_song)
-              }, {
-                ToastUtil.show(service, R.string.play_failed)
-              })
-        }
-        //改变歌词源
-        Command.CHANGE_LYRIC -> if (showDesktopLyric) {
-          updateDesktopLyric(true)
-        }
-        //切换定时器
-        Command.TOGGLE_TIMER -> {
-          val hasDefault = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.TIMER_DEFAULT, false)
-          if (!hasDefault) {
-            ToastUtil.show(service, getString(R.string.plz_set_default_time))
-          }
-          val time = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.TIMER_DURATION, -1)
-          SleepTimer.toggleTimer((time * 1000).toLong())
-        }
-        else -> {
-        }
+        val time = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.TIMER_DURATION, -1)
+        SleepTimer.toggleTimer((time * 1000).toLong())
+      }
+      else -> {
       }
     }
   }
@@ -1602,21 +1621,15 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 生成随机播放列表
    */
   private fun makeShuffleList(current: Int) {
-    randomQueue.clear()
-    randomQueue.addAll(playQueue)
-    if (randomQueue.isEmpty()) {
-      return
+    synchronized(this) {
+      randomQueue.clear()
+      randomQueue.addAll(playQueue)
+      if (randomQueue.isEmpty()) {
+        return
+      }
+      randomQueue.shuffle()
+      Timber.v("makeShuffleList, randomQueue: ${randomQueue.size}")
     }
-    //        if (current >= 0) {
-    //            boolean removed = randomQueue.remove(Integer.valueOf(current));
-    //            Collections.shuffle(randomQueue);
-    //            if(removed)
-    //                randomQueue.add(0,current);
-    //        } else {
-    //            Collections.shuffle(randomQueue);
-    //        }
-    randomQueue.shuffle()
-    Timber.v("makeShuffleList, randomQueue: ${randomQueue.size}")
     updateQueueItem()
   }
 
@@ -1653,6 +1666,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   @WorkerThread
   @Synchronized
   private fun load() {
+    Timber.v("load")
     val isFirst = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, true)
     SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, false)
     //读取歌曲id

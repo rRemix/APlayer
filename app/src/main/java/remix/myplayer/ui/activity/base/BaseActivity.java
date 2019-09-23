@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity.base;
 
+import static remix.myplayer.theme.ThemeStore.sColoredNavigation;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 import android.Manifest;
@@ -18,7 +19,6 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.Util;
 
@@ -101,8 +101,7 @@ public class BaseActivity extends AppCompatActivity {
    */
   protected void setNavigationBarColor() {
     //导航栏变色
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil
-        .getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION, false)) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && sColoredNavigation) {
       final int navigationColor = ThemeStore.getNavigationBarColor();
       getWindow().setNavigationBarColor(navigationColor);
       Theme.setLightNavigationbarAuto(this, ColorUtil.isColorLight(navigationColor));

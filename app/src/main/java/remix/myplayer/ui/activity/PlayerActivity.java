@@ -6,6 +6,7 @@ import static remix.myplayer.theme.ThemeStore.getAccentColor;
 import static remix.myplayer.theme.ThemeStore.getPlayerNextSongBgColor;
 import static remix.myplayer.theme.ThemeStore.getPlayerProgressColor;
 import static remix.myplayer.theme.ThemeStore.isLightTheme;
+import static remix.myplayer.theme.ThemeStore.sColoredNavigation;
 import static remix.myplayer.util.Constants.PLAY_LOOP;
 import static remix.myplayer.util.Constants.PLAY_REPEAT;
 import static remix.myplayer.util.Constants.PLAY_SHUFFLE;
@@ -255,8 +256,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   protected void setNavigationBarColor() {
     super.setNavigationBarColor();
     //导航栏变色
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil
-        .getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION, false)) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && sColoredNavigation) {
       final int navigationColor = ThemeStore.getBackgroundColorMain(this);
       getWindow().setNavigationBarColor(navigationColor);
       Theme.setLightNavigationbarAuto(this, ColorUtil.isColorLight(navigationColor));

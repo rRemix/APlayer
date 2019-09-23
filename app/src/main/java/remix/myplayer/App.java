@@ -1,5 +1,9 @@
 package remix.myplayer;
 
+import static remix.myplayer.theme.ThemeStore.KEY_THEME;
+import static remix.myplayer.theme.ThemeStore.LIGHT;
+import static remix.myplayer.theme.ThemeStore.NAME;
+
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -19,6 +23,9 @@ import io.reactivex.plugins.RxJavaPlugins;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.helper.LanguageHelper;
 import remix.myplayer.misc.cache.DiskCache;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.SPUtil.SETTING_KEY;
 import remix.myplayer.util.Util;
 import timber.log.Timber;
 
@@ -70,6 +77,16 @@ public class App extends MultiDexApplication {
   private void setUp() {
     DiskCache.init(this);
     LanguageHelper.setApplicationLanguage(this);
+
+    new Thread() {
+      @Override
+      public void run() {
+        ThemeStore.sImmersiveMode = SPUtil
+            .getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.IMMERSIVE_MODE, false);
+        ThemeStore.sTheme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
+        ThemeStore.sColoredNavigation = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION, false);
+      }
+    }.start();
   }
 
   @Override

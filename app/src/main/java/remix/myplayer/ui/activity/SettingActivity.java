@@ -207,6 +207,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
               //变色导航栏
               case R.id.setting_navaigation_switch:
                 mNeedRecreate = true;
+                ThemeStore.sColoredNavigation = isChecked;
                 mHandler.sendEmptyMessage(RECREATE);
                 break;
               //摇一摇
@@ -240,7 +241,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
               //沉浸式状态栏
               case R.id.setting_immersive_switch:
-                ThemeStore.IMMERSIVE_MODE = isChecked;
+                ThemeStore.sImmersiveMode = isChecked;
                 mNeedRecreate = true;
                 mHandler.sendEmptyMessage(RECREATE);
                 break;
