@@ -217,6 +217,8 @@ dependencies {
     implementation 'com.facebook.rebound:rebound:0.3.8'
     implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
     implementation 'com.github.promeg:tinypinyin:2.0.1'
+    implementation 'org.slf4j:slf4j-api:1.7.28'
+    implementation 'com.github.tony19:logback-android:2.0.0'
 
 }
 

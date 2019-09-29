@@ -51,18 +51,18 @@ public class BaseActivity extends AppCompatActivity {
     mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS);
     //严格模式
     if (BuildConfig.DEBUG) {
-      StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-          .detectDiskReads()
-          .detectDiskWrites()
-          .detectNetwork()
-          .detectCustomSlowCalls()
-          .penaltyLog()
-          .build());
-      StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-          .detectAll()
-          .penaltyLog()
-          .penaltyDropBox()
-          .build());
+//      StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+//          .detectDiskReads()
+//          .detectDiskWrites()
+//          .detectNetwork()
+//          .detectCustomSlowCalls()
+//          .penaltyLog()
+//          .build());
+//      StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//          .detectAll()
+//          .penaltyLog()
+//          .penaltyDropBox()
+//          .build());
     }
 
     setUpTheme();

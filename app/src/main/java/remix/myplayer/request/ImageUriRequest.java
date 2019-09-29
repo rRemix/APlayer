@@ -165,7 +165,6 @@ public abstract class ImageUriRequest<T> {
     return Observable.create(emitter -> {
       final String cache = MEMORY_CACHE.get(request.hashCode());
       if (cache != null) {
-        Timber.v("cache: %s", cache);
         emitter.onNext(cache);
       }
       emitter.onComplete();

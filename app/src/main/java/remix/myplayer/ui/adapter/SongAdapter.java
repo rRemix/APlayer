@@ -107,15 +107,15 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
           }
           MusicServiceRemote.setPlayQueue(allSong, intent);
         } else {
-          ArrayList<Integer> IdList = new ArrayList<>();
+          ArrayList<Integer> ids = new ArrayList<>();
           for (int i = 0; i < mDatas.size(); i++) {
-            IdList.add(mDatas.get(i).getId());
+            ids.add(mDatas.get(i).getId());
           }
-          if (IdList.size() == 0) {
+          if (ids.size() == 0) {
             ToastUtil.show(context, R.string.no_song);
             return;
           }
-          MusicServiceRemote.setPlayQueue(IdList, intent);
+          MusicServiceRemote.setPlayQueue(ids, intent);
         }
       });
       return;

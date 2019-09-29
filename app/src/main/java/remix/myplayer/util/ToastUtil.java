@@ -1,5 +1,6 @@
 package remix.myplayer.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -42,17 +43,23 @@ public class ToastUtil {
   public static void show(Context context, CharSequence message, int duration) {
     if (isShow) {
       if (Looper.myLooper() == Looper.getMainLooper()) {
-        Toast toast = Toast.makeText(context, message, duration);
-//        toast.getView().setAlpha(0.8f);
-        toast.show();
+        showInternal(context,message,duration);
       } else {
         mainHandler.post(() -> {
-          Toast toast = Toast.makeText(context, message, duration);
-//          toast.getView().setAlpha(0.8f);
-          toast.show();
+          showInternal(context,message,duration);
         });
       }
     }
+  }
+
+  private static void showInternal(Context context, CharSequence message, int duration){
+    if(context instanceof Activity){
+      if(((Activity) context).isFinishing() || ((Activity) context).isDestroyed()){
+        return;
+      }
+    }
+    Toast toast = Toast.makeText(context, message, duration);
+    toast.show();
   }
 
   /**

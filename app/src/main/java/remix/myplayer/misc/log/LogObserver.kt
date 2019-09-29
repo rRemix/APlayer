@@ -1,4 +1,4 @@
-package remix.myplayer.misc
+package remix.myplayer.misc.log
 
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable

@@ -20,6 +20,7 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
+import com.tencent.bugly.crashreport.CrashReport
 import io.reactivex.Single
 import io.reactivex.functions.Consumer
 import kotlinx.coroutines.*
@@ -39,8 +40,8 @@ import remix.myplayer.helper.*
 import remix.myplayer.lyric.LyricHolder
 import remix.myplayer.lyric.LyricHolder.Companion.LYRIC_FIND_INTERVAL
 import remix.myplayer.lyric.bean.LyricRowWrapper
-import remix.myplayer.misc.LogObserver
 import remix.myplayer.misc.floatpermission.FloatWindowManager
+import remix.myplayer.misc.log.LogObserver
 import remix.myplayer.misc.observer.MediaStoreObserver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver.Companion.NEVER
@@ -782,65 +783,62 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 设置播放队列
    */
   fun setPlayQueue(newQueueList: List<Int>?) {
-    synchronized(this) {
-      if (newQueueList == null || newQueueList.isEmpty()) {
-        return
-      }
-      if (newQueueList == playQueue) {
-        return
-      }
-
-      playQueue.clear()
-      playQueue.addAll(newQueueList)
+    Timber.v("setPlayQueue")
+    if (newQueueList == null || newQueueList.isEmpty()) {
+      return
+    }
+    if (newQueueList == playQueue) {
+      return
     }
 
+    playQueue.clear()
+    playQueue.addAll(newQueueList)
+
+    launch {
+      withContext(Dispatchers.IO) {
+        repository.clearPlayQueue()
+            .concatWith(repository.insertToPlayQueue(playQueue))
+            .subscribe()
+      }
+    }
     updateQueueItem()
-
-    repository.runInTransaction {
-      repository.clearPlayQueue()
-          .concatWith(repository.insertToPlayQueue(playQueue))
-          .subscribe()
-    }
-
   }
 
   /**
    * 设置播放队列
    */
   fun setPlayQueue(newQueueList: List<Int>?, intent: Intent) {
+    Timber.v("setPlayQueue")
     //如果是随机播放，需要更新randomList
     val shuffle = intent.getBooleanExtra(EXTRA_SHUFFLE, false)
     if (newQueueList == null || newQueueList.isEmpty()) {
       return
     }
 
-    synchronized(this) {
-      //设置的播放队列相等
-      val equals = newQueueList == playQueue
-      if (!equals) {
-        playQueue.clear()
-        playQueue.addAll(newQueueList)
-      }
+    //设置的播放队列相等
+    val equals = newQueueList == playQueue
+    if (!equals) {
+      playQueue.clear()
+      playQueue.addAll(newQueueList)
+    }
+    if (shuffle) {
+      playModel = PLAY_SHUFFLE
+      updateNextSong()
+    }
+    handleCommand(intent)
 
-      handleCommand(intent)
-
-      if (equals) {
-        return
-      }
-
-      if (shuffle && playModel != PLAY_SHUFFLE) {
-        playModel = PLAY_SHUFFLE
-        updateNextSong()
-      }
+    if (equals) {
+      return
     }
 
+    launch {
+      withContext(Dispatchers.IO) {
+        repository.clearPlayQueue()
+            .concatWith(repository.insertToPlayQueue(playQueue))
+            .subscribe()
+      }
+    }
     updateQueueItem()
-    repository.runInTransaction {
-      repository.clearPlayQueue()
-          .concatWith(repository.insertToPlayQueue(playQueue))
-          .subscribe()
-    }
-
   }
 
   private fun setPlay(isPlay: Boolean) {
@@ -953,12 +951,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
       //如果是随机播放 需要调整下RandomQueue
       //保证正常播放队列和随机播放队列中当前歌曲的索引一致
-      synchronized(this) {
-        val index = randomQueue.indexOf(currentId)
-        if (playModel == PLAY_SHUFFLE &&
-            index != currentIndex &&
-            index > 0) {
+      val index = randomQueue.indexOf(currentId)
+      if (playModel == PLAY_SHUFFLE &&
+          index != currentIndex && index > 0) {
+        try {
           Collections.swap(randomQueue, currentIndex, index)
+        } catch (e: Exception){
+          CrashReport.postCatchedException(Throwable("设置randomQueue失败, $e"))
         }
       }
 
@@ -1002,11 +1001,19 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           .getPlayQueue()
           .compose(applySingleScheduler())
           .subscribe { ids ->
+            if (ids.isEmpty() || ids == playQueue) {
+              Timber.v("忽略onPlayListChanged")
+              return@subscribe
+            }
             Timber.v("新的播放队列: ${ids.size}")
 
-            synchronized(this) {
-              playQueue.clear()
-              playQueue.addAll(ids)
+            playQueue.clear()
+            playQueue.addAll(ids)
+
+            // 随机播放模式下重新设置下RandomQueue
+            if (playModel == PLAY_SHUFFLE) {
+              Timber.v("播放队列改变后重新设置随机队列")
+              makeShuffleList(currentId)
             }
 
             // 如果下一首歌曲不在队列里面 重新设置下一首歌曲
@@ -1014,12 +1021,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
               Timber.v("播放队列改变后重新设置下一首歌曲")
               updateNextSong()
               //todo 更新播放界面下一首
-            }
-
-            // 随机播放模式下重新设置下RandomQueue
-            if (playModel == PLAY_SHUFFLE) {
-              Timber.v("播放队列改变后重新设置随机队列")
-              makeShuffleList(currentId)
             }
           }
     }
@@ -1078,7 +1079,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
   private fun handleStartCommandIntent(commandIntent: Intent?, action: String?) {
     Timber.v("handleStartCommandIntent")
-    if(action == null){
+    if (action == null) {
       return
     }
     firstPrepared = false
@@ -1208,6 +1209,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 接受控制命令 包括暂停、播放、上下首、改版播放模式等
    */
   private var last = System.currentTimeMillis()
+
   inner class ControlReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
       handleCommand(intent)
@@ -1215,7 +1217,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
   private fun handleCommand(intent: Intent?) {
-    Timber.v("ControlReceiver: %s", intent)
+    Timber.v("handleCommand: %s", intent)
     if (intent == null || intent.extras == null) {
       return
     }
@@ -1234,6 +1236,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       operation = control
       if (playQueue.size == 0) {
         //列表为空，尝试读取
+        Timber.v("列表为空，尝试读取")
         repository.getPlayQueue()
             .compose(applySingleScheduler())
             .subscribe(Consumer {
@@ -1590,16 +1593,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 更新下一首歌曲
    */
-  fun updateNextSong() {
-    if (playQueue.size == 0) {
+  private fun updateNextSong() {
+    if (playQueue.isEmpty() && randomQueue.isEmpty()) {
       ToastUtil.show(service, R.string.list_is_empty)
       return
     }
 
     if (playModel == PLAY_SHUFFLE) {
-      if (randomQueue.size == 0) {
-        makeShuffleList(currentId)
-      }
       if (++nextIndex >= randomQueue.size) {
         nextIndex = 0
       }
@@ -1610,26 +1610,21 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       nextId = playQueue[nextIndex]
     }
-
-    launch(context = Dispatchers.IO,
-        block = {
-          nextSong = MediaStoreUtil.getSongById(nextId)
-        })
+    nextSong = MediaStoreUtil.getSongById(nextId)
+    Timber.v("updateNextSong, song=$nextSong")
   }
 
   /**
    * 生成随机播放列表
    */
   private fun makeShuffleList(current: Int) {
-    synchronized(this) {
-      randomQueue.clear()
-      randomQueue.addAll(playQueue)
-      if (randomQueue.isEmpty()) {
-        return
-      }
-      randomQueue.shuffle()
-      Timber.v("makeShuffleList, randomQueue: ${randomQueue.size}")
+    randomQueue.clear()
+    randomQueue.addAll(playQueue)
+    if (randomQueue.isEmpty()) {
+      return
     }
+    randomQueue.shuffle()
+    Timber.v("makeShuffleList, randomQueue: ${randomQueue.size}")
     updateQueueItem()
   }
 
@@ -2146,8 +2141,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         screenOn = true
         //显示锁屏
         if (isPlay && SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == APLAYER_LOCKSCREEN) {
-          context.startActivity(Intent(context, LockScreenActivity::class.java)
-              .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+          try {
+            context.startActivity(Intent(context, LockScreenActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+          } catch (e: Exception) {
+            Timber.v("启动锁屏页失败: $e")
+          }
         }
         //重新显示桌面歌词
         updateDesktopLyric(false)

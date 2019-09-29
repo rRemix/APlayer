@@ -124,8 +124,6 @@ public class App extends MultiDexApplication {
         .build();
     Fresco.initialize(this, config);
 
-    // timer
-    Timber.plant(new Timber.DebugTree());
   }
 
   @Override

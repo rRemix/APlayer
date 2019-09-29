@@ -26,11 +26,9 @@ open class LibraryUriRequest(image: SimpleDraweeView, protected val request: Uri
 
   override fun onError(throwable: Throwable?) {
 //    mImageRef.get()?.setImageURI(Uri.EMPTY)
-    Timber.v("onError() %s", throwable?.message)
   }
 
   override fun onSuccess(result: String?) {
-    Timber.v("onSuccess() %s", result)
     val imageRequestBuilder = ImageRequestBuilder
         .newBuilderWithSource(Uri.parse(result))
     if (mConfig.isResize) {

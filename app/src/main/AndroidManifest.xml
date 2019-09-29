@@ -242,6 +242,14 @@
         android:resource="@xml/provider_paths"/>
     </provider>
 
+    <provider
+      android:authorities="${applicationId}.log-trojan"
+      android:exported="false"
+      android:initOrder="1000"
+      android:multiprocess="true"
+      android:name="remix.myplayer.misc.log.LogTrojanProvider">
+    </provider>
+
   </application>
 
 </manifest>
