@@ -113,14 +113,8 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
           if (songs.size() == 0) {
             return;
           }
-          ArrayList<Integer> idList = new ArrayList<>();
-          for (Song info : songs) {
-            if (info != null && info.getId() > 0) {
-              idList.add(info.getId());
-            }
-          }
           //设置正在播放列表
-          setPlayQueue(idList, makeCmdIntent(Command.PLAYSELECTEDSONG)
+          setPlayQueue(songs, makeCmdIntent(Command.PLAYSELECTEDSONG)
               .putExtra(EXTRA_POSITION, position));
         }
       }

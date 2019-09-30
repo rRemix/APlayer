@@ -2,8 +2,10 @@ package remix.myplayer.misc
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Looper
 import android.provider.MediaStore
 import com.tencent.bugly.crashreport.CrashReport
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
@@ -30,7 +32,7 @@ fun Context.isPortraitOrientation(): Boolean {
   return orientation == Configuration.ORIENTATION_PORTRAIT
 }
 
-fun MusicService.tryLaunch(block: suspend () -> Unit, catch: (e: Exception) -> Unit = { Timber.w(it) }) {
+fun CoroutineScope.tryLaunch(block: suspend () -> Unit, catch: (e: Exception) -> Unit = { Timber.w(it) }) {
   launch {
     try {
       block.invoke()
@@ -38,6 +40,18 @@ fun MusicService.tryLaunch(block: suspend () -> Unit, catch: (e: Exception) -> U
       catch.invoke(e)
       CrashReport.postCatchedException(e)
     }
+  }
+}
+
+fun Any?.checkMainThread() {
+  if (Looper.myLooper() != Looper.getMainLooper()) {
+    throw RuntimeException("$this should be used only from the application's main thread")
+  }
+}
+
+fun Any?.checkWorkerThread() {
+  if (Looper.myLooper() != Looper.getMainLooper()) {
+    throw RuntimeException("$this should be used only from the worker thread")
   }
 }
 

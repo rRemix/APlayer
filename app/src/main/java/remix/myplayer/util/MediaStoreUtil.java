@@ -537,6 +537,10 @@ public class MediaStoreUtil {
     return getSongId(MediaStore.Audio.Media.DATA + " = ?", new String[]{url});
   }
 
+  public static Song getSongByUrl(String url){
+    return getSong(MediaStore.Audio.Media.DATA + " = ?", new String[]{url});
+  }
+
   /**
    * 设置铃声
    */

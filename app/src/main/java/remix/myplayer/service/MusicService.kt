@@ -20,7 +20,6 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
-import com.tencent.bugly.crashreport.CrashReport
 import io.reactivex.Single
 import io.reactivex.functions.Consumer
 import kotlinx.coroutines.*
@@ -55,6 +54,7 @@ import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24
 import remix.myplayer.ui.activity.LockScreenActivity
+import remix.myplayer.ui.activity.PlayerActivity.ACTION_UPDATE_NEXT
 import remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
@@ -83,20 +83,15 @@ import kotlin.collections.ArrayList
 @SuppressLint("CheckResult")
 class MusicService : BaseService(), Playback, MusicEventCallback,
     SharedPreferences.OnSharedPreferenceChangeListener, CoroutineScope by MainScope() {
-  private val lock = Object()
   /**
-   * 所有歌曲id
+   * 播放队列
    */
-  val allSong: MutableList<Int> = ArrayList()
-  /**
-   * 播放队列id
-   */
-  val playQueue: MutableList<Int> = ArrayList()
+  private val playQueue: MutableList<Song> = ArrayList()
 
   /**
-   * 已经生成过的随机数 用于随机播放模式
+   * 随机播放队列
    */
-  private val randomQueue: MutableList<Int> = ArrayList()
+  private val randomQueue: MutableList<Song> = ArrayList()
 
   /**
    * 是否第一次准备完成
@@ -119,14 +114,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   var playModel: Int = PLAY_LOOP
     set(newPlayModel) {
       Timber.v("修改播放模式: $newPlayModel")
+      field = newPlayModel
       desktopWidgetTask?.run()
       SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL, newPlayModel)
-//      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NEXT_SONG_ID, nextId)
-//      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, currentId)
       if (newPlayModel == PLAY_SHUFFLE) {
-        makeShuffleList(currentId)
+        makeShuffleList()
       }
-      field = newPlayModel
+      updateNextSong()
       updateQueueItem()
     }
 
@@ -138,11 +132,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 当前播放的索引
    */
-  private var currentIndex = 0
-  /**
-   * 当前正在播放的歌曲id
-   */
-  private var currentId = -1
+  private var currentPosition = 0
 
   /**
    * 返回当前播放歌曲
@@ -157,12 +147,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 下一首歌曲的索引
    */
-  private var nextIndex = 0
-
-  /**
-   * 下一首播放歌曲的id
-   */
-  private var nextId = -1
+  private var nextPosition = 0
 
   /**
    * 下一首播放的mp3
@@ -236,7 +221,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 更新相关Activity的Handler
    */
-  private val updateUIHandler = UpdateUIHandler(this)
+  private val uiHandler = UIHandler(this)
 
   /**
    * 电源锁
@@ -679,29 +664,28 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     //初始化当前播放歌曲
     Timber.v("当前歌曲:%s", item.title)
     currentSong = item
-    currentId = currentSong.id
-    currentIndex = pos
+    currentPosition = pos
     prepare(currentSong.url, false)
-//    if (playModel == PLAY_SHUFFLE) {
-//      makeShuffleList(currentId)
+    //根据当前播放模式 确定下一首歌曲
+    nextPosition = currentPosition
+    updateNextSong()
+
+//    //查找上次退出时保存的下一首歌曲是否还存在
+//    //如果不存在，重新设置下一首歌曲
+//    val nextId = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.NEXT_SONG_ID, -1)
+//    if (nextId == -1) {
+//      nextPosition = currentPosition
+//      updateNextSong()
+//    } else {
+//      nextPosition = if (playModel != PLAY_SHUFFLE)
+//        playQueue.indexOfFirst { it.id == nextId }
+//      else
+//        randomQueue.indexOfFirst { it.id == nextId }
+//      nextSong = MediaStoreUtil.getSongById(nextId)
+//      if (nextSong == EMPTY_SONG) {
+//        updateNextSong()
+//      }
 //    }
-    //查找上次退出时保存的下一首歌曲是否还存在
-    //如果不存在，重新设置下一首歌曲
-    nextId = SPUtil
-        .getValue(this, SETTING_KEY.NAME, SETTING_KEY.NEXT_SONG_ID, -1)
-    if (nextId == -1) {
-      nextIndex = currentIndex
-      updateNextSong()
-    } else {
-      nextIndex = if (playModel != PLAY_SHUFFLE)
-        playQueue.indexOf(nextId)
-      else
-        randomQueue.indexOf(nextId)
-      nextSong = MediaStoreUtil.getSongById(nextId)
-      if (nextSong == EMPTY_SONG) {
-        updateNextSong()
-      }
-    }
   }
 
   private fun unInit() {
@@ -725,7 +709,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     removeDesktopLyric()
 
-    updateUIHandler.removeCallbacksAndMessages(null)
+    uiHandler.removeCallbacksAndMessages(null)
     showDesktopLyric = false
 
     audioManager.abandonAudioFocus(audioFocusListener)
@@ -749,11 +733,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     alreadyUnInit = true
   }
 
-  fun setAllSong(allSong: List<Int>?) {
-    allSong?.let {
-      this.allSong.clear()
-      this.allSong.addAll(it)
-    }
+  fun setAllSong(allSong: List<Song>?) {
+//    allSong?.let {
+//      this.allSong.clear()
+//      this.allSong.addAll(it)
+//    }
   }
 
   private fun updateQueueItem() {
@@ -761,13 +745,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     tryLaunch(block = {
       withContext(Dispatchers.IO) {
         val queue = ArrayList(if (playModel == PLAY_SHUFFLE) randomQueue else playQueue)
-            .map {
-              val song = MediaStoreUtil.getSongById(it)
+            .map { song ->
               return@map MediaSessionCompat.QueueItem(MediaMetadataCompat.Builder()
-                  .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, it.toString())
+                  .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, song.id.toString())
                   .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.title)
                   .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.artist)
-                  .build().description, it.toLong())
+                  .build().description, song.id.toLong())
             }
         Timber.v("updateQueueItem, queue: ${queue.size}")
         mediaSession.setQueueTitle(currentSong.title)
@@ -782,7 +765,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 设置播放队列
    */
-  fun setPlayQueue(newQueueList: List<Int>?) {
+  fun setPlayQueue(newQueueList: List<Song>?) {
     Timber.v("setPlayQueue")
     if (newQueueList == null || newQueueList.isEmpty()) {
       return
@@ -797,7 +780,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     launch {
       withContext(Dispatchers.IO) {
         repository.clearPlayQueue()
-            .concatWith(repository.insertToPlayQueue(playQueue))
+            .concatWith(repository.insertToPlayQueue(playQueue.map { it.id }))
             .subscribe()
       }
     }
@@ -807,7 +790,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 设置播放队列
    */
-  fun setPlayQueue(newQueueList: List<Int>?, intent: Intent) {
+  fun setPlayQueue(newQueueList: List<Song>?, intent: Intent) {
     Timber.v("setPlayQueue")
     //如果是随机播放，需要更新randomList
     val shuffle = intent.getBooleanExtra(EXTRA_SHUFFLE, false)
@@ -834,7 +817,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     launch {
       withContext(Dispatchers.IO) {
         repository.clearPlayQueue()
-            .concatWith(repository.insertToPlayQueue(playQueue))
+            .concatWith(repository.insertToPlayQueue(playQueue.map { it.id }))
             .subscribe()
       }
     }
@@ -843,7 +826,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
   private fun setPlay(isPlay: Boolean) {
     this.isPlay = isPlay
-    updateUIHandler.sendEmptyMessage(UPDATE_PLAY_STATE)
+    uiHandler.sendEmptyMessage(UPDATE_PLAY_STATE)
     //        sendLocalBroadcast(new Intent(PLAY_STATE_CHANGE));
   }
 
@@ -882,7 +865,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     setSpeed(speed)
 
     //更新所有界面
-    updateUIHandler.sendEmptyMessage(UPDATE_META_DATA)
+    uiHandler.sendEmptyMessage(UPDATE_META_DATA)
 
     //渐变
     if (fadeIn) {
@@ -894,8 +877,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     //保存当前播放和下一首播放的歌曲的id
     launch {
       withContext(Dispatchers.IO) {
-        SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_SONG_ID, currentId)
-        SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.NEXT_SONG_ID, nextId)
+        SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_SONG_ID, currentSong.id)
+        SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.NEXT_SONG_ID, nextSong.id)
       }
     }
   }
@@ -923,7 +906,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         return
       }
       setPlay(false)
-      updateUIHandler.sendEmptyMessage(UPDATE_META_DATA)
+      uiHandler.sendEmptyMessage(UPDATE_META_DATA)
       volumeController.fadeOut()
     }
   }
@@ -934,49 +917,37 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * @param position 播放位置
    */
   override fun playSelectSong(position: Int) {
-    launch {
-      Timber.v("playSelectSong, $position")
-      currentIndex = position
-      if (currentIndex == -1 || currentIndex >= playQueue.size) {
-        ToastUtil.show(service, R.string.illegal_arg)
-        return@launch
-      }
-      currentId = playQueue[currentIndex]
-      currentSong = withContext(Dispatchers.IO) {
-        MediaStoreUtil.getSongById(currentId)
-      }
-
-      nextIndex = currentIndex
-      nextId = currentId
-
-      //如果是随机播放 需要调整下RandomQueue
-      //保证正常播放队列和随机播放队列中当前歌曲的索引一致
-      val index = randomQueue.indexOf(currentId)
-      if (playModel == PLAY_SHUFFLE &&
-          index != currentIndex && index > 0) {
-        try {
-          Collections.swap(randomQueue, currentIndex, index)
-        } catch (e: Exception){
-          CrashReport.postCatchedException(Throwable("设置randomQueue失败, $e"))
-        }
-      }
-
-      if (currentSong.url.isEmpty()) {
-        ToastUtil.show(service, R.string.song_lose_effect)
-        return@launch
-      }
-      prepare(currentSong.url)
-      updateNextSong()
+    Timber.v("playSelectSong, $position")
+    currentPosition = position
+    if (currentPosition == -1 || currentPosition >= playQueue.size) {
+      ToastUtil.show(service, R.string.illegal_arg)
+      return
     }
+
+    currentSong = playQueue[currentPosition]
+
+    //如果是随机播放 需要调整下RandomQueue
+    //保证正常播放队列和随机播放队列中当前歌曲的索引一致
+//    val index = randomQueue.indexOfFirst { it.id == currentSong.id }
+//    if (playModel == PLAY_SHUFFLE &&
+//        index != currentPosition && index > 0) {
+//      Collections.swap(randomQueue, currentPosition, index)
+//    }
+
+    if (currentSong.url.isEmpty()) {
+      ToastUtil.show(service, R.string.song_lose_effect)
+      return
+    }
+    prepare(currentSong.url)
+    updateNextSong()
   }
 
   override fun onMediaStoreChanged() {
     launch {
       val song = withContext(Dispatchers.IO) {
-        MediaStoreUtil.getSongById(currentId)
+        MediaStoreUtil.getSongById(currentSong.id)
       }
       currentSong = song
-      currentId = song.id
     }
   }
 
@@ -998,7 +969,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   override fun onPlayListChanged(name: String) {
     if (name == PlayQueue.TABLE_NAME) {
       repository
-          .getPlayQueue()
+          .getPlayQueueSongs()
           .compose(applySingleScheduler())
           .subscribe { ids ->
             if (ids.isEmpty() || ids == playQueue) {
@@ -1013,11 +984,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             // 随机播放模式下重新设置下RandomQueue
             if (playModel == PLAY_SHUFFLE) {
               Timber.v("播放队列改变后重新设置随机队列")
-              makeShuffleList(currentId)
+              makeShuffleList()
             }
 
             // 如果下一首歌曲不在队列里面 重新设置下一首歌曲
-            if (!playQueue.contains(nextId)) {
+            if (!playQueue.contains(nextSong)) {
               Timber.v("播放队列改变后重新设置下一首歌曲")
               updateNextSong()
               //todo 更新播放界面下一首
@@ -1111,10 +1082,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       ACTION_SHORTCUT_MYLOVE -> {
         tryLaunch({
-          val myLoveIds = withContext(Dispatchers.IO) {
-            repository.getMyLoveList().blockingGet()
+          val songs = withContext(Dispatchers.IO) {
+            val myLoveIds = repository.getMyLoveList().blockingGet()
+            MediaStoreUtil.getSongsByIds(myLoveIds)
           }
-          if (myLoveIds == null || myLoveIds.isEmpty()) {
+
+          if (songs == null || songs.isEmpty()) {
             ToastUtil.show(service, R.string.list_is_empty)
             return@tryLaunch
           }
@@ -1122,7 +1095,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           val myloveIntent = Intent(ACTION_CMD)
           myloveIntent.putExtra(EXTRA_CONTROL, Command.PLAYSELECTEDSONG)
           myloveIntent.putExtra(EXTRA_POSITION, 0)
-          setPlayQueue(myLoveIds, myloveIntent)
+          setPlayQueue(songs, myloveIntent)
         })
 
       }
@@ -1131,18 +1104,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           val songs = withContext(Dispatchers.IO) {
             MediaStoreUtil.getLastAddedSong()
           }
-          val lastAddIds = ArrayList<Int>()
           if (songs == null || songs.size == 0) {
             ToastUtil.show(service, R.string.list_is_empty)
             return@tryLaunch
           }
-          for (song in songs) {
-            lastAddIds.add(song.id)
-          }
           val lastedIntent = Intent(ACTION_CMD)
           lastedIntent.putExtra(EXTRA_CONTROL, Command.PLAYSELECTEDSONG)
           lastedIntent.putExtra(EXTRA_POSITION, 0)
-          setPlayQueue(lastAddIds, lastedIntent)
+          setPlayQueue(songs, lastedIntent)
         })
 
       }
@@ -1237,7 +1206,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       if (playQueue.size == 0) {
         //列表为空，尝试读取
         Timber.v("列表为空，尝试读取")
-        repository.getPlayQueue()
+        repository.getPlayQueueSongs()
             .compose(applySingleScheduler())
             .subscribe(Consumer {
               playQueue.clear()
@@ -1257,9 +1226,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         pause(false)
         needShowDesktopLyric = true
         showDesktopLyric = false
-        updateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
+        uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
         stopUpdateLyric()
-        updateUIHandler.postDelayed({ notify.cancelPlayingNotify() }, 300)
+        uiHandler.postDelayed({ notify.cancelPlayingNotify() }, 300)
       }
       //播放选中的歌曲
       Command.PLAYSELECTEDSONG -> {
@@ -1291,7 +1260,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       //取消或者添加收藏
       Command.LOVE -> {
-        repository.toggleMyLove(currentId)
+        repository.toggleMyLove(currentSong.id)
             .compose(applySingleScheduler())
             .subscribe({
               if (it) {
@@ -1362,34 +1331,32 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       Command.ADD_TO_NEXT_SONG -> {
         val nextSong = intent.getParcelableExtra<Song>(EXTRA_SONG) ?: return
         //添加到播放队列
-        if (nextId == nextSong.id) {
+        if (this.nextSong.id == nextSong.id) {
           ToastUtil.show(service, R.string.already_add_to_next_song)
           return
         }
         //更新随机和普通播放队列
-        if (randomQueue.contains(nextSong.id)) {
-          randomQueue.remove(Integer.valueOf(nextSong.id))
-          randomQueue.add(if (currentIndex + 1 < randomQueue.size) currentIndex + 1 else 0,
-              nextSong.id)
+        if (randomQueue.contains(nextSong)) {
+          randomQueue.remove(nextSong)
+          randomQueue.add(if (currentPosition + 1 < randomQueue.size) currentPosition + 1 else 0, nextSong)
         } else {
-          randomQueue.add(randomQueue.indexOf(currentId) + 1, nextSong.id)
+          randomQueue.add(randomQueue.indexOf(currentSong) + 1, nextSong)
         }
-        if (playQueue.contains(nextSong.id)) {
-          playQueue.remove(Integer.valueOf(nextSong.id))
-          playQueue.add(if (currentIndex + 1 < playQueue.size) currentIndex + 1 else 0,
-              nextSong.id)
+        if (playQueue.contains(nextSong)) {
+          playQueue.remove(nextSong)
+          playQueue.add(if (currentPosition + 1 < playQueue.size) currentPosition + 1 else 0, nextSong)
         } else {
-          playQueue.add(playQueue.indexOf(currentId) + 1, nextSong.id)
+          playQueue.add(playQueue.indexOf(currentSong) + 1, nextSong)
         }
 
         //更新下一首
-        nextIndex = currentIndex
+        nextPosition = currentPosition
         updateNextSong()
         //保存到数据库
         Single
             .fromCallable {
               repository.clearPlayQueue()
-                  .concatWith(repository.insertToPlayQueue(playQueue))
+                  .concatWith(repository.insertToPlayQueue(playQueue.map { it.id }))
                   .subscribe()
             }
             .compose(applySingleScheduler())
@@ -1424,11 +1391,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     return cmd == Command.PAUSE || cmd == Command.START || cmd == Command.TOGGLE
   }
 
-  private fun updateAllView(cmd: Int): Boolean {
-    return (cmd == Command.PLAYSELECTEDSONG || cmd == Command.PREV || cmd == Command.NEXT
-        || cmd == Command.PLAY_TEMP)
-  }
-
   /**
    * 清除锁屏显示的内容
    */
@@ -1458,7 +1420,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentSong.artist)
         .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currentSong.displayName)
         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.getDuration())
-        .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (currentIndex + 1).toLong())
+        .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (currentPosition + 1).toLong())
         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.title)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       builder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playQueue.size.toLong())
@@ -1526,7 +1488,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
           prepared = false
           isLove = withContext(Dispatchers.IO) {
-            repository.isMyLove(currentId)
+            repository.isMyLove(currentSong.id)
                 .onErrorReturn {
                   false
                 }
@@ -1559,8 +1521,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     Timber.v("播放下一首")
     if (isNext) {
       //如果是点击下一首 播放预先设置好的下一首歌曲
-      currentId = nextId
-      currentIndex = nextIndex
+      currentPosition = nextPosition
       currentSong = nextSong.copy()
     } else {
       val queue = ArrayList(if (playModel == PLAY_SHUFFLE)
@@ -1568,17 +1529,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       else
         playQueue)
       //如果点击上一首
-      if (--currentIndex < 0) {
-        currentIndex = queue.size - 1
+      if (--currentPosition < 0) {
+        currentPosition = queue.size - 1
       }
-      if (currentIndex == -1 || currentIndex > queue.size - 1) {
+      if (currentPosition == -1 || currentPosition > queue.size - 1) {
         return
       }
-      currentId = queue[currentIndex]
-
-      currentSong = MediaStoreUtil.getSongById(currentId)
-      nextIndex = currentIndex
-      nextId = currentId
+      currentSong = queue[currentPosition]
     }
     if (currentSong == EMPTY_SONG) {
       ToastUtil.show(service, R.string.song_lose_effect)
@@ -1595,29 +1552,31 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   private fun updateNextSong() {
     if (playQueue.isEmpty() && randomQueue.isEmpty()) {
-      ToastUtil.show(service, R.string.list_is_empty)
       return
     }
 
-    if (playModel == PLAY_SHUFFLE) {
-      if (++nextIndex >= randomQueue.size) {
-        nextIndex = 0
+    synchronized(this) {
+      nextPosition = currentPosition + 1
+      if (playModel == PLAY_SHUFFLE) {
+        if (nextPosition >= randomQueue.size) {
+          nextPosition = 0
+        }
+        nextSong = randomQueue[nextPosition]
+      } else {
+        if (nextPosition >= playQueue.size) {
+          nextPosition = 0
+        }
+        nextSong = playQueue[nextPosition]
       }
-      nextId = randomQueue[nextIndex]
-    } else {
-      if (++nextIndex >= playQueue.size) {
-        nextIndex = 0
-      }
-      nextId = playQueue[nextIndex]
     }
-    nextSong = MediaStoreUtil.getSongById(nextId)
-    Timber.v("updateNextSong, song=$nextSong")
+    sendLocalBroadcast(Intent(ACTION_UPDATE_NEXT))
+    Timber.v("updateNextSong,model: $playModel curPos: $currentPosition nextPos: $nextPosition song=$nextSong")
   }
 
   /**
    * 生成随机播放列表
    */
-  private fun makeShuffleList(current: Int) {
+  private fun makeShuffleList() {
     randomQueue.clear()
     randomQueue.addAll(playQueue)
     if (randomQueue.isEmpty()) {
@@ -1664,53 +1623,42 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     Timber.v("load")
     val isFirst = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, true)
     SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, false)
-    //读取歌曲id
-    allSong.clear()
-    allSong.addAll(MediaStoreUtil.getAllSongsId())
     //第一次启动软件
     if (isFirst) {
       //新建我的收藏
-      repository.insertPlayList(getString(R.string.my_favorite)).subscribe(object : LogObserver() {
-        override fun onSuccess(value: Any) {
-          super.onSuccess(value)
-        }
-
-        override fun onError(e: Throwable) {
-          super.onError(e)
-        }
-      })
+      repository.insertPlayList(getString(R.string.my_favorite)).subscribe(LogObserver())
 
       //通知栏样式
       SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.NOTIFY_STYLE_CLASSIC,
           Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
-    } else {
-      //读取播放列表
-      playQueue.clear()
-      playQueue.addAll(repository.getPlayQueue().blockingGet())
-      //播放模式
-      playModel = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL,
-          PLAY_LOOP)
-
-      showDesktopLyric = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
     }
+
+    //读取播放列表
+    playQueue.clear()
+    playQueue.addAll(repository.getPlayQueueSongs().blockingGet())
 
     if (playQueue.isEmpty()) {
       //默认全部歌曲为播放列表
-      setPlayQueue(allSong)
+      setPlayQueue(MediaStoreUtil.getAllSong())
     }
 
     //摇一摇
     if (SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SHAKE, false)) {
       ShakeDetector.getInstance().beginListen()
     }
-    //播放倍速
-    speed = java.lang.Float.parseFloat(
-        SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
-    //锁屏
-    lockScreen = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)
+
     restoreLastSong()
+
+    //用户设置
+    lockScreen = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)
+    playModel = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL,
+        PLAY_LOOP)
+    showDesktopLyric = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
+    speed = java.lang.Float.parseFloat(SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
+
     loadFinished = true
-    updateUIHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
+
+    uiHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
   }
 
 
@@ -1729,54 +1677,46 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     var pos = 0
     //查找上次退出时的歌曲是否还存在
     if (lastId != -1) {
-      try {
-        for (i in playQueue.indices) {
-          if (lastId == playQueue[i]) {
-            isLastSongExist = true
-            pos = i
-            break
-          }
+      for (i in playQueue.indices) {
+        if (lastId == playQueue[i].id) {
+          isLastSongExist = true
+          pos = i
+          break
         }
-      } catch (e: Exception) {
-        Timber.v("restoreLastSong error: ${e.message}")
       }
     }
 
-    var item: Song
+    var song: Song
     playAtBreakPoint = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_AT_BREAKPOINT, false)
     lastProgress = if (playAtBreakPoint)
       SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.LAST_PLAY_PROGRESS, 0)
     else
       0
     //上次退出时保存的正在播放的歌曲未失效
-    item = MediaStoreUtil.getSongById(lastId)
-    if (isLastSongExist && item != null) {
-      setUpDataSource(item, pos)
+    song = MediaStoreUtil.getSongById(lastId)
+    if (isLastSongExist && song != null) {
+      setUpDataSource(song, pos)
     } else {
       lastProgress = 0
       SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.LAST_PLAY_PROGRESS, 0)
       //重新找到一个歌曲id
-      var id = playQueue[0]
+      var id = playQueue[0].id
       for (i in playQueue.indices) {
-        id = playQueue[i]
+        id = playQueue[i].id
         if (id != lastId) {
           break
         }
       }
-      item = MediaStoreUtil.getSongById(id)
+      song = MediaStoreUtil.getSongById(id)
       SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.LAST_SONG_ID, id)
-      setUpDataSource(item, 0)
+      setUpDataSource(song, 0)
     }
   }
 
   fun deleteSongFromService(deleteSongs: List<Song>?) {
     if (deleteSongs != null && deleteSongs.isNotEmpty()) {
-      val ids = ArrayList<Int>()
-      for (song in deleteSongs) {
-        ids.add(song.id)
-      }
-      allSong.removeAll(ids)
-      playQueue.removeAll(ids)
+      playQueue.removeAll(deleteSongs)
+      randomQueue.removeAll(deleteSongs)
     }
   }
 
@@ -1887,7 +1827,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       val isAppOnForeground = isAppOnForeground()
       if (!isAppOnForeground) { //app在前台也不用更新
         appWidgets.forEach {
-          updateUIHandler.post {
+          uiHandler.post {
             it.value.partiallyUpdateWidget(service)
           }
         }
@@ -1931,28 +1871,28 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         return
       }
       if (stop) {
-        updateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
+        uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
         return
       }
       //当前应用在前台
       if (isAppOnForeground()) {
         if (isDesktopLyricShowing) {
-          updateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
+          uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
         }
       } else {
         if (!isDesktopLyricShowing) {
-          updateUIHandler.removeMessages(CREATE_DESKTOP_LRC)
+          uiHandler.removeMessages(CREATE_DESKTOP_LRC)
           Timber.tag(tag).v("请求创建桌面歌词")
-          updateUIHandler.sendEmptyMessageDelayed(CREATE_DESKTOP_LRC, 50)
+          uiHandler.sendEmptyMessageDelayed(CREATE_DESKTOP_LRC, 50)
         } else {
-          updateUIHandler.obtainMessage(UPDATE_DESKTOP_LRC_CONTENT, lyricHolder.findCurrentLyric()).sendToTarget()
+          uiHandler.obtainMessage(UPDATE_DESKTOP_LRC_CONTENT, lyricHolder.findCurrentLyric()).sendToTarget()
         }
       }
     }
 
     override fun cancel(): Boolean {
       lyricHolder.dispose()
-//      updateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
+//      uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
       Timber.tag(tag).v("停止更新桌面歌词")
       return super.cancel()
     }
@@ -1960,7 +1900,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     fun cancelByNotification() {
       needShowDesktopLyric = true
       showDesktopLyric = false
-      updateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
+      uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
       cancel()
     }
   }
@@ -2019,8 +1959,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
     showDesktopLyric = false
     stopUpdateLyric()
-    updateUIHandler.removeMessages(CREATE_DESKTOP_LRC)
-    updateUIHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
+    uiHandler.removeMessages(CREATE_DESKTOP_LRC)
+    uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
   }
 
   private fun startSaveProgress() {
@@ -2100,7 +2040,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
 
-  private class UpdateUIHandler internal constructor(
+  private class UIHandler internal constructor(
       service: MusicService,
       private val ref: WeakReference<MusicService> = WeakReference(service))
     : Handler() {

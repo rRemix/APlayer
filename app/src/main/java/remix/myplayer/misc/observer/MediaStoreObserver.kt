@@ -27,7 +27,7 @@ class MediaStoreObserver(service: MusicService) : ContentObserver(null), Runnabl
   override fun run() {
     Completable
         .fromAction {
-          service.get()?.setAllSong(MediaStoreUtil.getAllSongsId())
+//          service.get()?.setAllSong(MediaStoreUtil.getAllSongsId())
         }
         .subscribeOn(Schedulers.io())
         .subscribe()

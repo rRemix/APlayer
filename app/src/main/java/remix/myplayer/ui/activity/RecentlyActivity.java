@@ -14,7 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import java.util.ArrayList;
 import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
@@ -43,7 +42,6 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
   View mPlaceHolder;
   @BindView(R.id.recyclerview)
   FastScrollRecyclerView mRecyclerView;
-  private ArrayList<Integer> mIdList = new ArrayList<>();
 
   private MsgHandler mHandler;
 
@@ -55,14 +53,19 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
 
     mHandler = new MsgHandler(this);
 
-    mAdapter = new SongAdapter(R.layout.item_song_recycle, mChoice, SongAdapter.RECENTLY, mRecyclerView);
+    mAdapter = new SongAdapter(R.layout.item_song_recycle, mChoice, SongAdapter.RECENTLY,
+        mRecyclerView);
     mChoice.setAdapter(mAdapter);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(View view, int position) {
         final Song song = mAdapter.getDatas().get(position);
         if (song != null && !mChoice.click(position, song)) {
-          setPlayQueue(mIdList, makeCmdIntent(Command.PLAYSELECTEDSONG)
+          final List<Song> songs = mAdapter.getDatas();
+          if (songs == null || songs.isEmpty()) {
+            return;
+          }
+          setPlayQueue(songs, makeCmdIntent(Command.PLAYSELECTEDSONG)
               .putExtra(EXTRA_POSITION, position));
         }
       }
@@ -84,10 +87,6 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
   public void onLoadFinished(android.content.Loader<List<Song>> loader, List<Song> data) {
     super.onLoadFinished(loader, data);
     if (data != null) {
-      mIdList = new ArrayList<>();
-      for (Song song : data) {
-        mIdList.add(song.getId());
-      }
       mRecyclerView.setVisibility(data.size() > 0 ? View.VISIBLE : View.GONE);
       mPlaceHolder.setVisibility(data.size() > 0 ? View.GONE : View.VISIBLE);
     } else {

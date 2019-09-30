@@ -25,6 +25,7 @@ import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.util.Constants
+import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.MediaStoreUtil.getSongIds
 import remix.myplayer.util.MediaStoreUtil.getSongIdsByParentId
 import remix.myplayer.util.MusicUtil.makeCmdIntent
@@ -70,27 +71,31 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
 //        }
 
     getSongIdSingle()
+        .map {
+          MediaStoreUtil.getSongsByIds(it)
+        }
         .observeOn(AndroidSchedulers.mainThread())
         .subscribeOn(Schedulers.io())
-        .subscribe(Consumer { songIds ->
+        .subscribe(Consumer { songs ->
+          val ids = songs.map { it.id }
           when (item.itemId) {
             //播放
             R.id.menu_play -> {
-              if (songIds == null || songIds.isEmpty()) {
+              if (songs == null || songs.isEmpty()) {
                 ToastUtil.show(context, R.string.list_is_empty)
                 return@Consumer
               }
-              setPlayQueue(songIds, makeCmdIntent(Command.PLAYSELECTEDSONG)
+              setPlayQueue(songs, makeCmdIntent(Command.PLAYSELECTEDSONG)
                   .putExtra(EXTRA_POSITION, 0))
             }
             //添加到播放队列
             R.id.menu_add_to_play_queue -> {
-              if (songIds == null || songIds.isEmpty()) {
+              if (songs == null || songs.isEmpty()) {
                 ToastUtil.show(context, R.string.list_is_empty)
                 return@Consumer
               }
               DatabaseRepository.getInstance()
-                  .insertToPlayQueue(songIds)
+                  .insertToPlayQueue(ids)
                   .compose(applySingleScheduler())
                   .subscribe(Consumer {
                     ToastUtil.show(context, context.getString(R.string.add_song_playqueue_success, it))
@@ -98,7 +103,7 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
             }
             //添加到播放列表
             R.id.menu_add_to_playlist -> {
-              AddtoPlayListDialog.newInstance(songIds)
+              AddtoPlayListDialog.newInstance(ids)
                   .show((context as BaseActivity).supportFragmentManager, AddtoPlayListDialog::class.java.simpleName)
             }
             //删除
@@ -116,7 +121,7 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
                   .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
                   .onAny { dialog, which ->
                     if (which == POSITIVE) {
-                      DeleteHelper.deleteSongs(songIds, dialog.isPromptCheckBoxChecked, id, type == Constants.PLAYLIST)
+                      DeleteHelper.deleteSongs(ids, dialog.isPromptCheckBoxChecked, id, type == Constants.PLAYLIST)
                           .compose(applySingleScheduler())
                           .subscribe({
                             ToastUtil.show(context, if (it) R.string.delete_success else R.string.delete_error)

@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import remix.myplayer.App;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import timber.log.Timber;
@@ -33,7 +34,7 @@ public class MusicUtil {
   }
 
   public static void playFromUri(Uri uri) {
-    List<Integer> songs = null;
+    List<Song> songs = null;
     if (uri.getScheme() != null && uri.getAuthority() != null) {
       if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
         String songId = null;
@@ -48,7 +49,7 @@ public class MusicUtil {
               if (fileProviderPath.startsWith("///")) {
                 fileProviderPath = fileProviderPath.substring(2, fileProviderPath.length());
               }
-              songs.add(MediaStoreUtil.getSongIdByUrl(fileProviderPath));
+              songs.add(MediaStoreUtil.getSongByUrl(fileProviderPath));
             }
             break;
           case "media":
@@ -58,14 +59,14 @@ public class MusicUtil {
             String displayName = uri.getLastPathSegment();
             if (!TextUtils.isEmpty(displayName)) {
               songs = MediaStoreUtil
-                  .getSongIds(MediaStore.Audio.Media.DISPLAY_NAME + "=?", new String[]{displayName},
+                  .getSongs(MediaStore.Audio.Media.DISPLAY_NAME + "=?", new String[]{displayName},
                       null);
             }
             break;
         }
         if (songId != null && TextUtils.isDigitsOnly(songId)) {
           songs = new ArrayList<>();
-          songs.add(Integer.valueOf(songId));
+          songs.add(MediaStoreUtil.getSongById(Integer.valueOf(songId)));
         }
       }
     }
@@ -87,10 +88,10 @@ public class MusicUtil {
         songFile = new File(uri.getPath());
       }
       if (songFile != null) {
-        int id = MediaStoreUtil.getSongIdByUrl(songFile.getAbsolutePath());
-        if (id > 0) {
+        final Song song = MediaStoreUtil.getSongByUrl(songFile.getAbsolutePath());
+        if (song != Song.getEMPTY_SONG()) {
           songs = new ArrayList<>();
-          songs.add(id);
+          songs.add(song);
         }
       }
     }

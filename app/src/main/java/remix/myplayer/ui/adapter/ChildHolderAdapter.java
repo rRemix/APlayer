@@ -23,7 +23,6 @@ import android.widget.TextView;
 import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
-import java.util.ArrayList;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
@@ -61,9 +60,11 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
   public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     return viewType == TYPE_HEADER ?
         new SongAdapter.HeaderHolder(
-            LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_header_1, parent, false)) :
+            LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.layout_header_1, parent, false)) :
         new ChildHolderViewHolder(
-            LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song_recycle, parent, false));
+            LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_song_recycle, parent, false));
   }
 
 
@@ -93,28 +94,26 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
       //显示当前排序方式
       headerHolder.mRoot.setOnClickListener(v -> {
         //设置正在播放列表
-        ArrayList<Integer> ids = new ArrayList<>();
-        for (Song info : mDatas) {
-          ids.add(info.getId());
-        }
-        if (ids.size() == 0) {
+        if (mDatas == null || mDatas.isEmpty()) {
           ToastUtil.show(context, R.string.no_song);
           return;
         }
-        setPlayQueue(ids, makeCmdIntent(Command.NEXT, true));
+        setPlayQueue(mDatas, makeCmdIntent(Command.NEXT, true));
       });
       return;
     }
 
     final ChildHolderViewHolder holder = (ChildHolderViewHolder) baseHolder;
-    if (song == null || song.getId() < 0 || song.getTitle().equals(context.getString(R.string.song_lose_effect))) {
+    if (song == null || song.getId() < 0 || song.getTitle()
+        .equals(context.getString(R.string.song_lose_effect))) {
       holder.mName.setText(R.string.song_lose_effect);
       holder.mButton.setVisibility(View.INVISIBLE);
     } else {
       holder.mButton.setVisibility(View.VISIBLE);
 
       //封面
-      holder.mImage.setTag(setImage(holder.mImage, getSearchRequestWithAlbumType(song), SMALL_IMAGE_SIZE, position));
+      holder.mImage.setTag(
+          setImage(holder.mImage, getSearchRequestWithAlbumType(song), SMALL_IMAGE_SIZE, position));
 
       //高亮
       if (MusicServiceRemote.getCurrentSong().getId() == song.getId()) {
@@ -205,8 +204,10 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
         newHolder = (ChildHolderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(index);
       }
       ChildHolderViewHolder oldHolder = null;
-      if (mRecyclerView.findViewHolderForAdapterPosition(lastIndex) instanceof ChildHolderViewHolder) {
-        oldHolder = (ChildHolderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(lastIndex);
+      if (mRecyclerView
+          .findViewHolderForAdapterPosition(lastIndex) instanceof ChildHolderViewHolder) {
+        oldHolder = (ChildHolderViewHolder) mRecyclerView
+            .findViewHolderForAdapterPosition(lastIndex);
       }
 
       if (newHolder != null) {
@@ -223,6 +224,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
   }
 
   static class ChildHolderViewHolder extends BaseViewHolder {
+
     @BindView(R.id.song_head_image)
     SimpleDraweeView mImage;
     @BindView(R.id.song_title)

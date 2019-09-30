@@ -8,7 +8,6 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -24,8 +23,6 @@ import android.widget.TextView;
 import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
-import java.util.ArrayList;
-import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.MusicServiceRemote;
@@ -46,7 +43,8 @@ import remix.myplayer.util.ToastUtil;
 /**
  * Created by Remix on 2016/4/11.
  */
-public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements FastScroller.SectionIndexer {
+public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements
+    FastScroller.SectionIndexer {
 
   private int mType;
   public static final int ALLSONG = 0;
@@ -66,9 +64,11 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
   public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     return viewType == TYPE_HEADER ?
         new HeaderHolder(
-            LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_header_1, parent, false)) :
+            LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.layout_header_1, parent, false)) :
         new SongViewHolder(
-            LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song_recycle, parent, false));
+            LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_song_recycle, parent, false));
   }
 
   @Override
@@ -99,24 +99,11 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
 
       headerHolder.mRoot.setOnClickListener(v -> {
         Intent intent = MusicUtil.makeCmdIntent(Command.NEXT, true);
-        if (mType == ALLSONG) {
-          List<Integer> allSong = MusicServiceRemote.getAllSong();
-          if (allSong == null || allSong.isEmpty()) {
-            ToastUtil.show(context, R.string.no_song);
-            return;
-          }
-          MusicServiceRemote.setPlayQueue(allSong, intent);
-        } else {
-          ArrayList<Integer> ids = new ArrayList<>();
-          for (int i = 0; i < mDatas.size(); i++) {
-            ids.add(mDatas.get(i).getId());
-          }
-          if (ids.size() == 0) {
-            ToastUtil.show(context, R.string.no_song);
-            return;
-          }
-          MusicServiceRemote.setPlayQueue(ids, intent);
+        if (mDatas == null || mDatas.isEmpty()) {
+          ToastUtil.show(context, R.string.no_song);
+          return;
         }
+        MusicServiceRemote.setPlayQueue(mDatas, intent);
       });
       return;
     }
@@ -127,7 +114,8 @@ public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements 
     final SongViewHolder holder = (SongViewHolder) baseHolder;
 
     //封面
-    holder.mImage.setTag(setImage(holder.mImage, getSearchRequestWithAlbumType(song), SMALL_IMAGE_SIZE, position));
+    holder.mImage.setTag(
+        setImage(holder.mImage, getSearchRequestWithAlbumType(song), SMALL_IMAGE_SIZE, position));
 
 //        //是否为无损
 //        if(!TextUtils.isEmpty(song.getDisplayName())){

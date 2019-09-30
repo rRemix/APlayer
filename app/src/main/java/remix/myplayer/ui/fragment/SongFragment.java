@@ -13,7 +13,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import butterknife.BindView;
-import java.util.ArrayList;
 import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
@@ -52,20 +51,18 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
 
   @Override
   protected void initAdapter() {
-    mAdapter = new SongAdapter(R.layout.item_song_recycle, mChoice, SongAdapter.ALLSONG, mRecyclerView);
+    mAdapter = new SongAdapter(R.layout.item_song_recycle, mChoice, SongAdapter.ALLSONG,
+        mRecyclerView);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(View view, int position) {
         if (getUserVisibleHint() && !mChoice.click(position, mAdapter.getDatas().get(position))) {
           //设置正在播放列表
           final List<Song> songs = mAdapter.getDatas();
-          ArrayList<Integer> ids = new ArrayList<>();
-          for (Song song : songs) {
-            if (song != null && song.getId() > 0) {
-              ids.add(song.getId());
-            }
+          if (songs == null || songs.isEmpty()) {
+            return;
           }
-          setPlayQueue(ids, makeCmdIntent(Command.PLAYSELECTEDSONG)
+          setPlayQueue(songs, makeCmdIntent(Command.PLAYSELECTEDSONG)
               .putExtra(EXTRA_POSITION, position));
 
         }

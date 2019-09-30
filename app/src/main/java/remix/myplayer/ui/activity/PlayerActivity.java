@@ -12,10 +12,14 @@ import static remix.myplayer.util.Constants.PLAY_REPEAT;
 import static remix.myplayer.util.Constants.PLAY_SHUFFLE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
+import static remix.myplayer.util.Util.registerLocalReceiver;
 import static remix.myplayer.util.Util.sendLocalBroadcast;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -229,6 +233,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer, false));
   };
 
+  private Receiver mReceiver = new Receiver();
 
   @Override
   protected void setUpTheme() {
@@ -294,6 +299,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     setUpSeekBar();
     setUpViewColor();
 
+    registerLocalReceiver(mReceiver,new IntentFilter(ACTION_UPDATE_NEXT));
   }
 
   @Override
@@ -1124,6 +1130,7 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     super.onDestroy();
     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     mHandler.remove();
+    Util.unregisterLocalReceiver(mReceiver);
   }
 
   /**
@@ -1191,12 +1198,21 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
   }
 
   public void showLyricOffsetView() {
-    //todo∂
+    //todo
     if (mPager.getCurrentItem() != 2) {
       mPager.setCurrentItem(2, true);
     }
     if (getLyricFragment() != null) {
       getLyricFragment().showLyricOffsetView();
+    }
+  }
+
+  public static final String ACTION_UPDATE_NEXT = "remix.myplayer.update.next_song";
+  private class Receiver extends BroadcastReceiver{
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      //更新下一首歌曲
+      mNextSong.setText(getString(R.string.next_song, MusicServiceRemote.getNextSong().getTitle()));
     }
   }
 }
