@@ -176,9 +176,13 @@ public static final int *;
 # kotlinx
 -dontwarn kotlinx.**
 -keepnames class kotlinx.** { *; }
-
-# Most of volatile fields are updated with AFU and should not be mangled
 -keepclassmembernames class kotlinx.** {
     volatile <fields>;
 }
+
+# logback-android
+-keep class ch.qos.** { *; }
+-keep class org.slf4j.** { *; }
+-keepattributes *Annotation*
+-dontwarn ch.qos.logback.core.net.*
 
