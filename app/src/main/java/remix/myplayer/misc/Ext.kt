@@ -38,7 +38,6 @@ fun CoroutineScope.tryLaunch(block: suspend () -> Unit, catch: (e: Exception) ->
       block.invoke()
     } catch (e: Exception) {
       catch.invoke(e)
-      CrashReport.postCatchedException(e)
     }
   }
 }
@@ -50,7 +49,7 @@ fun Any?.checkMainThread() {
 }
 
 fun Any?.checkWorkerThread() {
-  if (Looper.myLooper() != Looper.getMainLooper()) {
+  if (Looper.myLooper() == Looper.getMainLooper()) {
     throw RuntimeException("$this should be used only from the worker thread")
   }
 }

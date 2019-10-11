@@ -2,91 +2,106 @@ package remix.myplayer.service
 
 import android.content.Intent
 import android.support.annotation.WorkerThread
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.misc.checkMainThread
-import remix.myplayer.misc.checkWorkerThread
 import remix.myplayer.misc.log.LogObserver
+import remix.myplayer.request.network.RxUtil
 import remix.myplayer.ui.activity.PlayerActivity
-import remix.myplayer.util.Constants
-import remix.myplayer.util.SPUtil
-import remix.myplayer.util.ToastUtil
-import remix.myplayer.util.Util
+import remix.myplayer.util.*
+import remix.myplayer.util.Constants.MODE_SHUFFLE
 import timber.log.Timber
+import java.lang.ref.WeakReference
 
 /**
  * created by Remix on 2019-09-26
  */
-class PlayQueue(private val service: MusicService) : CoroutineScope by MainScope() {
+class PlayQueue(service: MusicService) {
+  private val service = WeakReference(service)
   private val repository = DatabaseRepository.getInstance()
 
   private var loaded = false
 
   // 当前播放队列
-  private val playQueue = ArrayList<Song>()
+  private val _playingQueue = ArrayList<Song>()
+  val playingQueue: List<Song>
+    get() = _playingQueue
+
+
   // 原始的队列
-  private val originalQueue = ArrayList<Song>()
+  private val _originalQueue = ArrayList<Song>()
+  val originalQueue: List<Song>
+    get() = _originalQueue
+
 
   // 下一首歌曲的位置
-  private var nextPosition = 0
+  var nextPosition = 0
+    private set
 
   // 当前播放的位置
-  private var position = 0
+  var position = 0
+    private set
 
   // 当前正在播放的歌曲
   var song = Song.EMPTY_SONG
-    private set
 
   // 下一首歌曲
   var nextSong = Song.EMPTY_SONG
-    private set
-
-//  // 播放模式
-//  var playModel: Int = Constants.PLAY_LOOP
-//    set(newPlayModel) {
-//      Timber.v("修改播放模式: $newPlayModel")
-////      service.updateAppwidget()
-//      SPUtil.putValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL, newPlayModel)
-//      makeList()
-//      field = newPlayModel
-////      service.updateQueueItem()
-//    }
 
   fun makeList() {
-    checkMainThread()
-    if (service.playModel == Constants.PLAY_SHUFFLE) {
-      makeShuffleList()
-    } else {
-      makeNormalList()
+    val service = service.get() ?: return
+    synchronized(this) {
+      if (service.playModel == MODE_SHUFFLE) {
+        makeShuffleList()
+      } else {
+        makeNormalList()
+      }
     }
+    Timber.v("makeList, list:{${_playingQueue.map { it.title }}}")
   }
 
 
   private fun makeNormalList() {
-    playQueue.clear()
-    playQueue.addAll(originalQueue)
-    Timber.v("makeNormalList, queue: ${playQueue.size}")
+    if (_playingQueue.isEmpty()) {
+      return
+    }
+    _playingQueue.clear()
+    _playingQueue.addAll(_originalQueue)
+    Timber.v("makeNormalList, queue: ${_playingQueue.size}")
   }
 
   private fun makeShuffleList() {
-    playQueue.clear()
-    playQueue.addAll(originalQueue)
-    playQueue.shuffle()
-    Timber.v("makeShuffleList, queue: ${playQueue.size}")
-  }
+    if (_playingQueue.isEmpty()) {
+      return
+    }
 
+    _playingQueue.clear()
+    _playingQueue.addAll(_originalQueue)
+
+    if (position >= 0) {
+      val removeSong = _playingQueue.removeAt(position)
+      _playingQueue.shuffle()
+      _playingQueue.add(0, removeSong)
+    } else {
+      _playingQueue.shuffle()
+    }
+
+    Timber.v("makeShuffleList, queue: ${_playingQueue.size}")
+  }
 
   @WorkerThread
   @Synchronized
   fun restoreIfNecessary() {
-    checkWorkerThread()
-    if (!loaded && playQueue.isEmpty()) {
-      originalQueue.addAll(repository.getPlayQueueSongs().blockingGet())
-      playQueue.addAll(originalQueue)
+    if (!loaded && _playingQueue.isEmpty()) {
+      val queue = repository.getPlayQueueSongs().blockingGet()
+      if (queue.isNotEmpty()) {
+        _originalQueue.addAll(queue)
+        _playingQueue.addAll(_originalQueue)
+        makeList()
+      } else {
+        //默认全部歌曲为播放列表
+        setPlayQueue(MediaStoreUtil.getAllSong())
+      }
 
       restoreLastSong()
       loaded = true
@@ -97,10 +112,11 @@ class PlayQueue(private val service: MusicService) : CoroutineScope by MainScope
    * 初始化上一次退出时时正在播放的歌曲
    */
   private fun restoreLastSong() {
-    if (originalQueue.isEmpty()) {
+    if (_originalQueue.isEmpty()) {
       return
     }
     //读取上次退出时正在播放的歌曲的id
+    val service = service.get() ?: return
     val lastId = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1)
     //上次退出时正在播放的歌曲是否还存在
     var isLastSongExist = false
@@ -108,25 +124,21 @@ class PlayQueue(private val service: MusicService) : CoroutineScope by MainScope
     var pos = 0
     //查找上次退出时的歌曲是否还存在
     if (lastId != -1) {
-      try {
-        for (i in originalQueue.indices) {
-          if (lastId == originalQueue[i].id) {
-            isLastSongExist = true
-            pos = i
-            break
-          }
+      for (i in _originalQueue.indices) {
+        if (lastId == _originalQueue[i].id) {
+          isLastSongExist = true
+          pos = i
+          break
         }
-      } catch (e: Exception) {
-        Timber.v("restoreLastSong error: ${e.message}")
       }
     }
 
     //上次退出时保存的正在播放的歌曲未失效
     if (isLastSongExist) {
-      setUpDataSource(originalQueue[pos], pos)
+      setUpDataSource(_originalQueue[pos], pos)
     } else {
       //重新找到一个歌曲id
-      setUpDataSource(originalQueue[0], 0)
+      setUpDataSource(_originalQueue[0], 0)
     }
   }
 
@@ -145,77 +157,156 @@ class PlayQueue(private val service: MusicService) : CoroutineScope by MainScope
   }
 
   private fun getSongAt(position: Int): Song {
-//    return playQueue.getOrElse(position) {
-//      Timber.v("getSongAt, 返回默认值")
-//      Song.EMPTY_SONG
-//    }
-    return originalQueue.getOrElse(position) {
+    return _originalQueue.getOrElse(position) {
       Song.EMPTY_SONG
     }
   }
 
-  fun getPlayingQueue(): List<Song> {
-    return playQueue
-  }
-
   fun setPlayQueue(songs: List<Song>) {
-    originalQueue.clear()
-    originalQueue.addAll(songs)
+    synchronized(this) {
+      _originalQueue.clear()
+      _originalQueue.addAll(songs)
+    }
 
     makeList()
     saveQueue()
   }
 
+  /**
+   * 添加到下一首播放
+   */
+  fun addNextSong(nextSong: Song) {
+    //添加到播放队列
+    if (nextSong == this.nextSong) {
+      ToastUtil.show(service.get() ?: return, R.string.already_add_to_next_song)
+      return
+    }
+
+    synchronized(this) {
+      if (_playingQueue.contains(nextSong)) {
+        _playingQueue.remove(nextSong)
+        _playingQueue.add(if (position + 1 < playingQueue.size) position + 1 else 0, nextSong)
+      } else {
+        _playingQueue.add(_playingQueue.indexOf(song) + 1, nextSong)
+      }
+      if (_originalQueue.contains(nextSong)) {
+        _originalQueue.remove(nextSong)
+        _originalQueue.add(if (position + 1 < _originalQueue.size) position + 1 else 0, nextSong)
+      } else {
+        _originalQueue.add(_originalQueue.indexOf(song) + 1, nextSong)
+      }
+    }
+    updateNextSong()
+    saveQueue()
+  }
+
   fun addSong(song: Song) {
-    playQueue.add(song)
-    originalQueue.add(song)
+    synchronized(this) {
+      _playingQueue.add(song)
+      _originalQueue.add(song)
+    }
     saveQueue()
   }
 
   fun addSong(position: Int, song: Song) {
-    playQueue.add(position, song)
-    originalQueue.add(position, song)
+    synchronized(this) {
+      _playingQueue.add(position, song)
+      _originalQueue.add(position, song)
+    }
     saveQueue()
   }
 
+  fun remove(song: Song) {
+    synchronized(this) {
+      _playingQueue.remove(song)
+      _originalQueue.remove(song)
+    }
+    saveQueue()
+  }
+
+  fun removeAll(deleteSongs: List<Song>) {
+    synchronized(this) {
+      _playingQueue.removeAll(deleteSongs)
+      _originalQueue.removeAll(deleteSongs)
+    }
+    saveQueue()
+  }
+
+  /**
+   * 直接设置position
+   */
   fun setPosition(pos: Int) {
     position = pos
     song = getSongAt(position)
+//    //如果是随机播放 需要调整当前歌曲在播放队列中的位置
+//    //保证正常播放队列和随机播放队列中当前歌曲的索引一致
+//    val index = _playingQueue.indexOf(song)
+//    if (service.get()?.playModel == Constants.MODE_SHUFFLE &&
+//        index > 0 &&
+//        index < _playingQueue.size &&
+//        index != position) {
+//      Collections.swap(_playingQueue, position, index)
+//    }
+  }
+
+  /**
+   * 根据当前播放歌曲重新定位position
+   */
+  fun rePosition() {
+    val newPosition = _originalQueue.indexOf(song)
+    if (newPosition >= 0) {
+      position = newPosition
+    }
+  }
+
+  fun next() {
+    position = nextPosition
+    song = nextSong.copy()
+    updateNextSong()
+  }
+
+  fun previous() {
+    if (--position < 0) {
+      position = _playingQueue.size - 1
+    }
+    if (position == -1 || position > _playingQueue.size - 1) {
+      return
+    }
+    song = getSongAt(position)
+    updateNextSong()
   }
 
   private fun saveQueue() {
-    launch {
-      repository.clearPlayQueue()
-          .flatMap {
-            repository.insertToPlayQueue(originalQueue.map { song.id })
-          }
-          .subscribe(LogObserver())
-    }
+    repository.clearPlayQueue()
+        .flatMap {
+          repository.insertToPlayQueue(_originalQueue.map { it.id })
+        }
+        .compose(RxUtil.applySingleScheduler())
+        .subscribe(LogObserver())
   }
 
-  private fun updateNextSong() {
-    checkMainThread()
-
-    if (playQueue.isEmpty() && playQueue.isEmpty()) {
-      ToastUtil.show(service, R.string.list_is_empty)
+  fun updateNextSong() {
+    if (_playingQueue.isEmpty()) {
       return
     }
 
-    nextPosition = position + 1
-    if (nextPosition >= playQueue.size) {
-      nextPosition = 0
+    synchronized(this) {
+      nextPosition = position + 1
+      if (nextPosition >= _playingQueue.size) {
+        nextPosition = 0
+      }
+      nextSong = _playingQueue[nextPosition]
     }
-    nextSong = playQueue[nextPosition]
-    Timber.v("updateNextSong, song=$nextSong")
-
 
     Util.sendLocalBroadcast(Intent(PlayerActivity.ACTION_UPDATE_NEXT))
-    Timber.v("updateNextSong, curPos: $position nextPos: $nextPosition song=$nextSong")
+    Timber.v("updateNextSong, curPos: $position nextPos: $nextPosition nextSong=${nextSong.title}\n list:{${_playingQueue.map { it.title }}}")
+  }
+
+  fun size(): Int {
+    return _playingQueue.size
   }
 
   fun isEmpty(): Boolean {
-    return playQueue.isEmpty()
+    return _playingQueue.isEmpty()
   }
-
-
 }

@@ -101,7 +101,7 @@ object MusicServiceRemote {
 
   @JvmStatic
   fun getPlayModel(): Int {
-    return service?.playModel ?: Constants.PLAY_LOOP
+    return service?.playModel ?: Constants.MODE_LOOP
   }
 
   @JvmStatic
@@ -117,11 +117,6 @@ object MusicServiceRemote {
   @JvmStatic
   fun getCurrentSong(): Song {
     return service?.currentSong ?: Song.EMPTY_SONG
-  }
-
-  @JvmStatic
-  fun setCurrentSong(song: Song) {
-    service?.currentSong = song
   }
 
   @JvmStatic

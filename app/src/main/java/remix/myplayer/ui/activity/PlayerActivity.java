@@ -7,9 +7,9 @@ import static remix.myplayer.theme.ThemeStore.getPlayerNextSongBgColor;
 import static remix.myplayer.theme.ThemeStore.getPlayerProgressColor;
 import static remix.myplayer.theme.ThemeStore.isLightTheme;
 import static remix.myplayer.theme.ThemeStore.sColoredNavigation;
-import static remix.myplayer.util.Constants.PLAY_LOOP;
-import static remix.myplayer.util.Constants.PLAY_REPEAT;
-import static remix.myplayer.util.Constants.PLAY_SHUFFLE;
+import static remix.myplayer.util.Constants.MODE_LOOP;
+import static remix.myplayer.util.Constants.MODE_REPEAT;
+import static remix.myplayer.util.Constants.MODE_SHUFFLE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 import static remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN;
 import static remix.myplayer.util.Util.registerLocalReceiver;
@@ -32,10 +32,8 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -77,8 +75,6 @@ import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.menu.AudioPopupListener;
 import remix.myplayer.request.ImageUriRequest;
-import remix.myplayer.request.RemoteUriRequest;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
@@ -361,17 +357,17 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
       //设置播放模式
       case R.id.playbar_model:
         int currentModel = MusicServiceRemote.getPlayModel();
-        currentModel = (currentModel == PLAY_REPEAT ? PLAY_LOOP : ++currentModel);
+        currentModel = (currentModel == MODE_REPEAT ? MODE_LOOP : ++currentModel);
         MusicServiceRemote.setPlayModel(currentModel);
-        mPlayModel.setImageDrawable(Theme.tintDrawable(currentModel == PLAY_LOOP ? R.drawable.play_btn_loop :
-                currentModel == PLAY_SHUFFLE ? R.drawable.play_btn_shuffle : R.drawable.play_btn_loop_one,
+        mPlayModel.setImageDrawable(Theme.tintDrawable(currentModel == MODE_LOOP ? R.drawable.play_btn_loop :
+                currentModel == MODE_SHUFFLE ? R.drawable.play_btn_shuffle : R.drawable.play_btn_loop_one,
             ThemeStore.getPlayerBtnColor()));
 
-        String msg = currentModel == PLAY_LOOP ? getString(R.string.model_normal)
-            : currentModel == PLAY_SHUFFLE ? getString(R.string.model_random)
+        String msg = currentModel == MODE_LOOP ? getString(R.string.model_normal)
+            : currentModel == MODE_SHUFFLE ? getString(R.string.model_random)
                 : getString(R.string.model_repeat);
         //刷新下一首
-        if (currentModel != PLAY_SHUFFLE) {
+        if (currentModel != MODE_SHUFFLE) {
           mNextSong
               .setText(getString(R.string.next_song, MusicServiceRemote.getNextSong().getTitle()));
         }
@@ -1012,9 +1008,9 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     Theme.tintDrawable(mTopMore, R.drawable.icon_player_more, tintColor);
     //播放模式与播放队列
     int playMode = SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAY_MODEL,
-        PLAY_LOOP);
-    Theme.tintDrawable(mPlayModel, playMode == PLAY_LOOP ? R.drawable.play_btn_loop :
-        playMode == PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+        MODE_LOOP);
+    Theme.tintDrawable(mPlayModel, playMode == MODE_LOOP ? R.drawable.play_btn_loop :
+        playMode == MODE_SHUFFLE ? R.drawable.play_btn_shuffle :
             R.drawable.play_btn_loop_one, tintColor);
     Theme.tintDrawable(mPlayQueue, R.drawable.play_btn_normal_list, tintColor);
 

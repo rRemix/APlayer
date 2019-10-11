@@ -39,8 +39,8 @@ enum class AppWidgetSkin(@param:ColorInt var titleColor: Int, @param:ColorInt va
   fun getModeRes(service: MusicService): Int {
     val playModel = service.playModel
     return when (playModel) {
-      Constants.PLAY_SHUFFLE -> modeShuffleRes
-      Constants.PLAY_REPEAT -> modeRepeatRes
+      Constants.MODE_SHUFFLE -> modeShuffleRes
+      Constants.MODE_REPEAT -> modeRepeatRes
       else -> modeNormalRes
     }
   }

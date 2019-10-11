@@ -21,9 +21,9 @@ public class Constants {
   public final static String SOUNDEFFECT_ACTION = "remix.music.SOUNDEFFECT_ACTION";
 
   //播放模式
-  public final static int PLAY_LOOP = 1;
-  public final static int PLAY_SHUFFLE = 2;
-  public final static int PLAY_REPEAT = 3;
+  public final static int MODE_LOOP = 1;
+  public final static int MODE_SHUFFLE = 2;
+  public final static int MODE_REPEAT = 3;
 
 
   //0:软件锁屏 1:系统锁屏 2:关闭
