@@ -977,8 +977,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         val appwidgetIntent = Intent(ACTION_CMD)
         val control = commandIntent?.getIntExtra(EXTRA_CONTROL, -1)
         if (control == UPDATE_APPWIDGET) {
-//          int skin = SPUtil.getValue(this,SETTING_KEY.SETTING_,SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
-//          SPUtil.putValue(this,SETTING_KEY.NAME, SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
           updateAppwidget()
         } else {
           appwidgetIntent.putExtra(EXTRA_CONTROL, control)

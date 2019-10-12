@@ -8,8 +8,11 @@ import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.misc.log.LogObserver
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.ui.activity.PlayerActivity
-import remix.myplayer.util.*
 import remix.myplayer.util.Constants.MODE_SHUFFLE
+import remix.myplayer.util.MediaStoreUtil
+import remix.myplayer.util.SPUtil
+import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -79,9 +82,11 @@ class PlayQueue(service: MusicService) {
     _playingQueue.addAll(_originalQueue)
 
     if (position >= 0) {
-      val removeSong = _playingQueue.removeAt(position)
       _playingQueue.shuffle()
-      _playingQueue.add(0, removeSong)
+      if (position < _playingQueue.size) {
+        val removeSong = _playingQueue.removeAt(position)
+        _playingQueue.add(0, removeSong)
+      }
     } else {
       _playingQueue.shuffle()
     }
@@ -237,16 +242,11 @@ class PlayQueue(service: MusicService) {
    */
   fun setPosition(pos: Int) {
     position = pos
+    // 随机播放模式重置下随机队列
+    if (service.get()?.playModel == MODE_SHUFFLE) {
+      makeShuffleList()
+    }
     song = getSongAt(position)
-//    //如果是随机播放 需要调整当前歌曲在播放队列中的位置
-//    //保证正常播放队列和随机播放队列中当前歌曲的索引一致
-//    val index = _playingQueue.indexOf(song)
-//    if (service.get()?.playModel == Constants.MODE_SHUFFLE &&
-//        index > 0 &&
-//        index < _playingQueue.size &&
-//        index != position) {
-//      Collections.swap(_playingQueue, position, index)
-//    }
   }
 
   /**
