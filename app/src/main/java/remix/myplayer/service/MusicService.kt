@@ -591,10 +591,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       Timber.v("准备完成:%s", firstPrepared)
 
       if (firstPrepared) {
+        firstPrepared = false
         if (lastProgress > 0) {
           mediaPlayer.seekTo(lastProgress)
         }
-        firstPrepared = false
         //自动播放
         if (SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.AUTO_PLAY, NEVER) != OPEN_SOFTWARE) {
           return@setOnPreparedListener
@@ -1471,6 +1471,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         MODE_LOOP)
     showDesktopLyric = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
     speed = java.lang.Float.parseFloat(SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
+    playAtBreakPoint = SPUtil.getValue(service,SETTING_KEY.NAME,SETTING_KEY.PLAY_AT_BREAKPOINT,false)
+    lastProgress = SPUtil.getValue(service,SETTING_KEY.NAME,SETTING_KEY.LAST_PLAY_PROGRESS,0)
 
     //读取播放列表
     playQueue.restoreIfNecessary()
