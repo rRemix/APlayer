@@ -65,7 +65,7 @@ class PlayQueue(service: MusicService) {
 
 
   private fun makeNormalList() {
-    if (_playingQueue.isEmpty()) {
+    if (_originalQueue.isEmpty()) {
       return
     }
     _playingQueue.clear()
@@ -74,7 +74,7 @@ class PlayQueue(service: MusicService) {
   }
 
   private fun makeShuffleList() {
-    if (_playingQueue.isEmpty()) {
+    if (_originalQueue.isEmpty()) {
       return
     }
 
