@@ -229,7 +229,7 @@
   <string name="load_overtime">Loading timeout</string>
   <string name="scan_failed">Scan failed:%s</string>
   <string name="scanning">Scanning</string>
-  <string name="scanned_count">%d songs were scanned</string>
+  <string name="scanned_finish">Scan finish</string>
   <string name="scaning">Scanning</string>
   <string name="no_audio_file">No audio file</string>
   <string name="manual_scan_tip">Please make sure that the scan directory without .nomedia file(Hidden file)</string>
@@ -278,6 +278,8 @@
   <string name="album_desc">Album desc</string>
   <string name="title">Title</string>
   <string name="title_desc">Title desc</string>
+  <string name="display_title">File name</string>
+  <string name="display_title_desc">File name desc</string>
   <string name="artist">Artist</string>
   <string name="artist_desc">Artist desc</string>
   <string name="date">Date</string>
@@ -402,4 +404,6 @@
   <string name="auto_play_headset_plug">When headphone jack plugged it\`s starts playing</string>
   <string name="auto_play_open_software">When open software it\`s starts playing</string>
   <string name="auto_play_none">Never</string>
+  <string name="deleting">Deleting</string>
+  <string name="adding">Adding</string>
 </resources>

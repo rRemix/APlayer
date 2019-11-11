@@ -16,6 +16,12 @@
           android:title="@string/title_desc"
           android:id="@+id/action_sort_order_title_desc"/>
         <item
+          android:title="@string/display_title"
+          android:id="@+id/action_sort_order_display_title"/>
+        <item
+          android:title="@string/display_title_desc"
+          android:id="@+id/action_sort_order_display_title_desc"/>
+        <item
           android:title="@string/album"
           android:id="@+id/action_sort_order_album"/>
         <item

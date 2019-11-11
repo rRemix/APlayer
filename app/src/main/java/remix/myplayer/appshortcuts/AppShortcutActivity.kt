@@ -2,6 +2,7 @@ package remix.myplayer.appshortcuts
 
 import android.content.Intent
 import android.os.Bundle
+import remix.myplayer.App
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.util.Util
@@ -16,7 +17,7 @@ class AppShortcutActivity : BaseMusicActivity() {
     super.onCreate(savedInstanceState)
 
     val type = if (intent != null) intent.getIntExtra(KEY_SHORTCUT_TYPE, -1) else -1
-    if (Util.isAppOnForeground()) {
+    if (App.getContext().isAppForeground) {
       startService(type)
     }
     finish()

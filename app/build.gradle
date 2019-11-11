@@ -27,8 +27,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 15530
-        versionName "1.5.5.3"
+        versionCode 15540
+        versionName "1.5.5.4"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
@@ -47,12 +47,6 @@ android {
     }
 
     signingConfigs {
-        debug {
-            storeFile file("/Users/remix/Android/Development/Debug.jks")
-            storePassword "123456"
-            keyAlias "Debug"
-            keyPassword "123456"
-        }
         release {
             def properties = getProperties('../local.properties')
             keyAlias properties['keystore.keyAlias']
@@ -78,6 +72,7 @@ android {
         }
         release {
             //混淆代码
+            signingConfig signingConfigs.release
             minifyEnabled true
             debuggable false
             zipAlignEnabled true

@@ -4,11 +4,14 @@ import static remix.myplayer.theme.ThemeStore.KEY_THEME;
 import static remix.myplayer.theme.ThemeStore.LIGHT;
 import static remix.myplayer.theme.ThemeStore.NAME;
 
+import android.app.Activity;
+import android.app.Application.ActivityLifecycleCallbacks;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 import com.facebook.common.util.ByteConstants;
@@ -33,10 +36,11 @@ import timber.log.Timber;
  * Created by Remix on 16-3-16.
  */
 
-public class App extends MultiDexApplication {
+public class App extends MultiDexApplication implements ActivityLifecycleCallbacks {
 
-  private static Context mContext;
+  private static App mContext;
 
+  private int mForegroundActivityCount = 0;
   //是否是googlePlay版本
   public static boolean IS_GOOGLEPLAY;
 
@@ -50,7 +54,7 @@ public class App extends MultiDexApplication {
   @Override
   public void onCreate() {
     super.onCreate();
-    mContext = getApplicationContext();
+    mContext = this;
 
     if (!BuildConfig.DEBUG) {
       IS_GOOGLEPLAY = "google".equalsIgnoreCase(Util.getAppMetaData("BUGLY_APP_CHANNEL"));
@@ -72,6 +76,7 @@ public class App extends MultiDexApplication {
       CrashReport.postCatchedException(throwable);
     });
 
+    registerActivityLifecycleCallbacks(this);
   }
 
   private void setUp() {
@@ -84,7 +89,8 @@ public class App extends MultiDexApplication {
         ThemeStore.sImmersiveMode = SPUtil
             .getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.IMMERSIVE_MODE, false);
         ThemeStore.sTheme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
-        ThemeStore.sColoredNavigation = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.COLOR_NAVIGATION, false);
+        ThemeStore.sColoredNavigation = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME,
+            SPUtil.SETTING_KEY.COLOR_NAVIGATION, false);
       }
     }.start();
   }
@@ -96,7 +102,7 @@ public class App extends MultiDexApplication {
   }
 
 
-  public static Context getContext() {
+  public static App getContext() {
     return mContext;
   }
 
@@ -166,5 +172,44 @@ public class App extends MultiDexApplication {
         })
         .subscribeOn(AndroidSchedulers.mainThread())
         .subscribe();
+  }
+
+  public boolean isAppForeground() {
+    return mForegroundActivityCount > 0;
+  }
+
+  @Override
+  public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+  }
+
+  @Override
+  public void onActivityStarted(Activity activity) {
+    mForegroundActivityCount++;
+  }
+
+  @Override
+  public void onActivityResumed(Activity activity) {
+
+  }
+
+  @Override
+  public void onActivityPaused(Activity activity) {
+
+  }
+
+  @Override
+  public void onActivityStopped(Activity activity) {
+    mForegroundActivityCount--;
+  }
+
+  @Override
+  public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+  }
+
+  @Override
+  public void onActivityDestroyed(Activity activity) {
+
   }
 }

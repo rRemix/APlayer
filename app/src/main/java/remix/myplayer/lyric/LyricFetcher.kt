@@ -17,7 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 /**
  * Created by remix on 2019/2/6
  */
-class LyricHolder(service: MusicService) {
+class LyricFetcher(service: MusicService) {
 
   private val lrcRows = CopyOnWriteArrayList<LrcRow>()
   private val reference: WeakReference<MusicService> = WeakReference(service)

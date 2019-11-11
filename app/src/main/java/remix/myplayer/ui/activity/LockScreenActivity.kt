@@ -18,8 +18,8 @@ import kotlinx.android.synthetic.main.activity_lockscreen.*
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicServiceRemote
-import remix.myplayer.lyric.LyricHolder
-import remix.myplayer.lyric.LyricHolder.Companion.LYRIC_FIND_INTERVAL
+import remix.myplayer.lyric.LyricFetcher
+import remix.myplayer.lyric.LyricFetcher.Companion.LYRIC_FIND_INTERVAL
 import remix.myplayer.lyric.bean.LyricRowWrapper
 import remix.myplayer.lyric.bean.LyricRowWrapper.LYRIC_WRAPPER_NO
 import remix.myplayer.lyric.bean.LyricRowWrapper.LYRIC_WRAPPER_SEARCHING
@@ -275,12 +275,12 @@ class LockScreenActivity : BaseMusicActivity() {
   private class UpdateLockScreenLyricThread constructor(activity: LockScreenActivity, service: MusicService) : Thread() {
 
     private val ref: WeakReference<LockScreenActivity> = WeakReference(activity)
-    private val lyricHolder: LyricHolder = LyricHolder(service)
+    private val lyricFetcher: LyricFetcher = LyricFetcher(service)
     private var songInThread = Song.EMPTY_SONG
 
     override fun interrupt() {
       super.interrupt()
-      lyricHolder.dispose()
+      lyricFetcher.dispose()
     }
 
     override fun run() {
@@ -294,12 +294,12 @@ class LockScreenActivity : BaseMusicActivity() {
         val song = MusicServiceRemote.getCurrentSong()
         if (songInThread !== song) {
           songInThread = song
-          lyricHolder.updateLyricRows(songInThread)
+          lyricFetcher.updateLyricRows(songInThread)
           continue
         }
 
         val activity = ref.get()
-        activity?.setCurrentLyric(lyricHolder.findCurrentLyric())
+        activity?.setCurrentLyric(lyricFetcher.findCurrentLyric())
       }
     }
   }

@@ -5,6 +5,7 @@ import static remix.myplayer.helper.SortOrder.SongSortOrder.SONG_ARTIST_A_Z;
 import static remix.myplayer.helper.SortOrder.SongSortOrder.SONG_ARTIST_Z_A;
 
 import android.provider.MediaStore;
+import android.provider.MediaStore.Audio.Media;
 
 /**
  * Created by Remix on 2018/3/22.
@@ -25,6 +26,8 @@ public final class SortOrder {
     String SONG_ALBUM_Z_A = SONG_ALBUM_A_Z + " desc ";
     String SONG_DATE = MediaStore.Audio.Media.DATE_ADDED;
     String SONG_DATE_DESC = MediaStore.Audio.Media.DATE_ADDED + " desc ";
+    String SONG_DISPLAY_TITLE_A_Z = Media.DISPLAY_NAME;
+    String SONG_DISPLAY_TITLE_Z_A = Media.DISPLAY_NAME + " desc ";
     String SONG_DURATION = MediaStore.Audio.Media.DURATION;
     String SONG_YEAR = MediaStore.Audio.Media.YEAR;
   }

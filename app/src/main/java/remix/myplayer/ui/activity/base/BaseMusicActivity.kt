@@ -11,22 +11,18 @@ import android.os.Message
 import android.text.TextUtils
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.soundcloud.android.crop.Crop
-import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.misc.cache.DiskCache
-import remix.myplayer.request.SimpleUriRequest
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Constants
-import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
@@ -91,7 +87,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   private fun bindToService() {
-    if (!Util.isAppOnForeground()) {
+    if (!App.getContext().isAppForeground) {
       Timber.tag(TAG).v("bindToService(),app isn't on foreground")
       pendingBindService = true
       return

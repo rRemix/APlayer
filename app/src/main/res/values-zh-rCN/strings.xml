@@ -229,7 +229,7 @@
   <string name="load_overtime">加载数据超时</string>
   <string name="scan_failed">扫描失败:%s</string>
   <string name="scanning">正在扫描</string>
-  <string name="scanned_count">共扫描%d首歌曲</string>
+  <string name="scanned_finish">扫描完成</string>
   <string name="scaning">正在扫描</string>
   <string name="no_audio_file">无音频文件</string>
   <string name="manual_scan_tip">请确保扫描目录下没有.nomedia的隐藏文件</string>
@@ -278,6 +278,8 @@
   <string name="album_desc">专辑降序</string>
   <string name="title">标题</string>
   <string name="title_desc">标题降序</string>
+  <string name="display_title">文件名</string>
+  <string name="display_title_desc">文件名降序</string>
   <string name="artist">艺术家</string>
   <string name="artist_desc">艺术家降序</string>
   <string name="date">添加时间</string>
@@ -403,4 +405,6 @@
   <string name="auto_play_headset_plug">耳机插入时自动播放</string>
   <string name="auto_play_open_software">打开软件时自动播放</string>
   <string name="auto_play_none">从不</string>
+  <string name="deleting">删除中</string>
+  <string name="adding">添加中</string>
 </resources>

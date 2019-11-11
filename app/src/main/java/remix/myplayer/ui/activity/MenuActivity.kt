@@ -41,6 +41,14 @@ abstract class MenuActivity : ToolbarActivity() {
           sortOrder = SortOrder.SongSortOrder.SONG_Z_A
           item.isChecked = true
         }
+        R.id.action_sort_order_display_title -> {
+          sortOrder = SortOrder.SongSortOrder.SONG_DISPLAY_TITLE_A_Z
+          item.isChecked = true
+        }
+        R.id.action_sort_order_display_title_desc -> {
+          sortOrder = SortOrder.SongSortOrder.SONG_DISPLAY_TITLE_Z_A
+          item.isChecked = true
+        }
         R.id.action_sort_order_album -> {
           sortOrder = SortOrder.SongSortOrder.SONG_ALBUM_A_Z
           item.isChecked = true
@@ -113,6 +121,8 @@ abstract class MenuActivity : ToolbarActivity() {
     when (sortOrder) {
       SortOrder.SongSortOrder.SONG_A_Z -> subMenu.findItem(R.id.action_sort_order_title).isChecked = true
       SortOrder.SongSortOrder.SONG_Z_A -> subMenu.findItem(R.id.action_sort_order_title_desc).isChecked = true
+      SortOrder.SongSortOrder.SONG_DISPLAY_TITLE_A_Z -> subMenu.findItem(R.id.action_sort_order_display_title).isChecked = true
+      SortOrder.SongSortOrder.SONG_DISPLAY_TITLE_Z_A -> subMenu.findItem(R.id.action_sort_order_display_title_desc).isChecked = true
       SortOrder.SongSortOrder.SONG_ALBUM_A_Z -> subMenu.findItem(R.id.action_sort_order_album).isChecked = true
       SortOrder.SongSortOrder.SONG_ALBUM_Z_A -> subMenu.findItem(R.id.action_sort_order_album_desc).isChecked = true
       SortOrder.SongSortOrder.SONG_ARTIST_A_Z -> subMenu.findItem(R.id.action_sort_order_artist).isChecked = true

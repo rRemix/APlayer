@@ -4,7 +4,7 @@ import static remix.myplayer.lyric.bean.LrcRow.LYRIC_EMPTY_ROW;
 import static remix.myplayer.lyric.bean.LrcRow.LYRIC_NO_ROW;
 import static remix.myplayer.lyric.bean.LrcRow.LYRIC_SEARCHING_ROW;
 
-import remix.myplayer.lyric.LyricHolder;
+import remix.myplayer.lyric.LyricFetcher;
 
 /**
  * @ClassName
@@ -30,7 +30,7 @@ public class LyricRowWrapper {
   private LrcRow mLineOne = LYRIC_EMPTY_ROW;
   private LrcRow mLineTwo = LYRIC_EMPTY_ROW;
 
-  private LyricHolder.Status mStatus;
+  private LyricFetcher.Status mStatus;
 
   public LrcRow getLineOne() {
     return mLineOne;
@@ -48,11 +48,11 @@ public class LyricRowWrapper {
     mLineTwo = lineTwo;
   }
 
-  public LyricHolder.Status getStatus() {
+  public LyricFetcher.Status getStatus() {
     return mStatus;
   }
 
-  public void setStatus(LyricHolder.Status status) {
+  public void setStatus(LyricFetcher.Status status) {
     mStatus = status;
   }
 

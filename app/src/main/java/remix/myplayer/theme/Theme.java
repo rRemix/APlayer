@@ -19,6 +19,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
@@ -126,9 +127,7 @@ public class Theme {
   }
 
   /**
-   * @param context
-   * @param resId
-   * @return
+   *
    */
   public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context,
       @DrawableRes int resId) {
@@ -137,10 +136,7 @@ public class Theme {
   }
 
   /**
-   * @param context
-   * @param resId
-   * @param color
-   * @return
+   *
    */
   public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context,
       @DrawableRes int resId, @ColorInt int color) {
@@ -204,10 +200,7 @@ public class Theme {
 //    }
 
   /**
-   * @param color
-   * @param contentDrawable
-   * @param maskDrawable
-   * @return
+   *
    */
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   public static RippleDrawable getRippleDrawable(@ColorInt int color, Drawable contentDrawable,
@@ -230,6 +223,15 @@ public class Theme {
       stateListDrawable.addState(new int[]{}, defaultDrawable);
       return stateListDrawable;
     }
+  }
+
+  public static MaterialDialog.Builder getLoadingDialog(Context context,String content) {
+    return Theme.getBaseDialog(context)
+        .title(content)
+        .content(R.string.please_wait)
+        .canceledOnTouchOutside(false)
+        .progress(true, 0)
+        .progressIndeterminateStyle(false);
   }
 
   public static MaterialDialog.Builder getBaseDialog(Context context) {

@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
 import com.google.gson.Gson
+import com.tencent.bugly.crashreport.CrashReport
 import io.reactivex.Completable
 import io.reactivex.CompletableSource
 import io.reactivex.Single
@@ -18,6 +19,7 @@ import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.SPUtil
 import timber.log.Timber
 import java.util.*
+import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashSet
@@ -68,9 +70,30 @@ class DatabaseRepository private constructor() {
   fun deleteFromPlayQueue(audioIds: List<Int>): Single<Int> {
     return Single
         .fromCallable {
-          db.playQueueDao().deleteSongs(audioIds)
+          deleteFromPlayQueueInternal(audioIds)
         }
+  }
 
+
+  private fun deleteFromPlayQueueInternal(audioIds: List<Int>): Int {
+    if (audioIds.isEmpty()) {
+      return 0
+    }
+    return db.runInTransaction(Callable {
+      var count = 0
+      val length = audioIds.size / MAX_ARGUMENT_COUNT + 1
+      for (i in 0 until length) {
+        val lastIndex = if ((i + 1) * MAX_ARGUMENT_COUNT < audioIds.size) (i + 1) * MAX_ARGUMENT_COUNT else 1
+        try {
+          count += db.playQueueDao().deleteSongs(audioIds.subList(i * MAX_ARGUMENT_COUNT, lastIndex))
+        } catch (e: Exception) {
+          Timber.e(e)
+          CrashReport.postCatchedException(e)
+        }
+      }
+      Timber.v("deleteFromPlayQueueInternal, count: $count")
+      return@Callable count
+    })
   }
 
   /**
@@ -79,7 +102,8 @@ class DatabaseRepository private constructor() {
   fun insertToPlayList(audioIds: List<Int>, playlistId: Int = -1): Single<Int> {
     return Single
         .fromCallable {
-          db.playListDao().selectById(playlistId) ?: throw IllegalArgumentException("No Playlist Found")
+          db.playListDao().selectById(playlistId)
+              ?: throw IllegalArgumentException("No Playlist Found")
         }
         .map {
           //不重复添加
@@ -323,7 +347,7 @@ class DatabaseRepository private constructor() {
             }
 
             if (deleteIds.isNotEmpty()) {
-              db.playQueueDao().deleteSongs(deleteIds)
+              deleteFromPlayQueueInternal(deleteIds)
             }
           }
         }
@@ -499,5 +523,6 @@ class DatabaseRepository private constructor() {
         }
 
     private const val CUSTOMSORT = "CUSTOMSORT"
+    private const val MAX_ARGUMENT_COUNT = 300
   }
 }

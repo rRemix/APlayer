@@ -5,7 +5,6 @@ import android.app.Activity
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.View
-import com.afollestad.materialdialogs.MaterialDialog
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -138,39 +137,45 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
       else -> context.getString(R.string.confirm_delete_from_library)
     }
 
-    val disposable = getSongIdSingle()
-        .flatMap { getSongsSingle(it) }
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe { songs ->
-          Theme.getBaseDialog(context)
-              .content(title)
-              .positiveText(R.string.confirm)
-              .negativeText(R.string.cancel)
-              .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
-              .onPositive { dialog, which ->
-                deleteSingle(dialog, songs)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doFinally {
-                      close()
-                    }
-                    .subscribe(Consumer {
-                      ToastUtil.show(context, context.getString(R.string.delete_multi_song, it))
+    val dialog = Theme.getLoadingDialog(context, context.getString(R.string.deleting)).build()
 
-                    })
-
-              }.show()
-        }
-    disposableContainer.add(disposable)
+    getBaseDialog(context)
+        .content(title)
+        .positiveText(R.string.confirm)
+        .negativeText(R.string.cancel)
+        .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
+        .onPositive { _, which ->
+          val disposable = getSongIdSingle()
+              .flatMap { ids ->
+                getSongsSingle(ids)
+              }
+              .flatMap { songs ->
+                deleteSingle(dialog.isPromptCheckBoxChecked, songs)
+              }
+              .subscribeOn(Schedulers.io())
+              .observeOn(AndroidSchedulers.mainThread())
+              .doOnSubscribe {
+                dialog.show()
+              }
+              .doFinally {
+                if (dialog.isShowing) {
+                  dialog.dismiss()
+                }
+                close()
+              }
+              .subscribe { count ->
+                ToastUtil.show(context, context.getString(R.string.delete_multi_song, count))
+              }
+          disposableContainer.add(disposable)
+        }.show()
   }
 
-  private fun deleteSingle(dialog: MaterialDialog, songs: List<Song>): Single<Int> {
+  private fun deleteSingle(deleteSource: Boolean, songs: List<Song>): Single<Int> {
     return Single
         .fromCallable {
           when (type) {
             Constants.PLAYLIST -> { //删除播放列表
-              if (dialog.isPromptCheckBoxChecked) {
+              if (deleteSource) {
                 MediaStoreUtil.delete(songs, true)
               }
 
@@ -184,14 +189,14 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
               songs.size
             }
             Constants.PLAYLISTSONG -> { //删除播放列表内歌曲
-              if (dialog.isPromptCheckBoxChecked) {
+              if (deleteSource) {
                 MediaStoreUtil.delete(songs, true)
               } else {
                 databaseRepository.deleteFromPlayList(songs.map { it.id }, extra).blockingGet()
               }
             }
             else -> {
-              MediaStoreUtil.delete(songs, dialog.isPromptCheckBoxChecked)
+              MediaStoreUtil.delete(songs, deleteSource)
             }
           }
         }
@@ -199,13 +204,22 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
 
   @SuppressLint("CheckResult")
   private fun addToPlayQueue() {
+    val context = activityRef.get() ?: return
+    val dialog = Theme.getLoadingDialog(context, context.getString(R.string.adding)).build()
+
     val disposable = getSongIdSingle()
         .flatMap {
           databaseRepository.insertToPlayQueue(it)
         }
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
+        .doOnSubscribe {
+          dialog.show()
+        }
         .doFinally {
+          if (dialog.isShowing) {
+            dialog.dismiss()
+          }
           close()
         }
         .subscribe(Consumer {
