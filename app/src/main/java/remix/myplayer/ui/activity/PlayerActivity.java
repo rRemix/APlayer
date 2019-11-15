@@ -971,12 +971,6 @@ public class PlayerActivity extends BaseMusicActivity implements FileChooserDial
     final int width = DensityUtil.dip2px(this, 2);
     final int height = DensityUtil.dip2px(this, 6);
 
-    new GradientDrawableMaker()
-        .width(width)
-        .height(height)
-        .color(accentColor)
-        .make();
-
     mProgressSeekBar.setThumb(new InsetDrawable(
         new GradientDrawableMaker()
             .width(width)

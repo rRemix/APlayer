@@ -203,7 +203,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 更新相关Activity的Handler
    */
-  private val uiHandler = UIHandler(this)
+  private val uiHandler = PlaybackHandler(this)
 
   /**
    * 电源锁
@@ -1333,6 +1333,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }.load()
     }
 
+    updatePlaybackState()
+  }
+
+  private fun updatePlaybackState() {
     mediaSession.setPlaybackState(PlaybackStateCompat.Builder()
         .setActiveQueueItemId(currentSong.id.toLong())
         .setState(if (isPlay) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED, progress.toLong(), speed)
@@ -1425,6 +1429,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   fun setProgress(current: Int) {
     if (prepared) {
       mediaPlayer.seekTo(current)
+      updatePlaybackState()
     }
   }
 
@@ -1657,7 +1662,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         return
       }
       //当前应用在前台
-      if (isAppOnForeground1()) {
+      if (isAppOnForeground()) {
         if (isDesktopLyricShowing) {
           uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
         }
@@ -1822,7 +1827,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
 
-  private class UIHandler internal constructor(
+  private class PlaybackHandler internal constructor(
       service: MusicService,
       private val ref: WeakReference<MusicService> = WeakReference(service))
     : Handler() {

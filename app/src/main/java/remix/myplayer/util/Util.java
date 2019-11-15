@@ -114,6 +114,7 @@ public class Util {
       }
     } catch (Exception e) {
       Timber.w("isAppOnForeground(), ex: %s", e.getMessage());
+      return isAppOnForeground1();
     }
     return false;
   }

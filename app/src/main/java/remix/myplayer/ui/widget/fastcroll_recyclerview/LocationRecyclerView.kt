@@ -16,16 +16,16 @@ class LocationRecyclerView @JvmOverloads constructor(
 
   init {
     addOnScrollListener(object : RecyclerView.OnScrollListener() {
-      override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+      override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         super.onScrolled(recyclerView, dx, dy)
         //在这里进行第二次滚动（最后的100米！）
         if (move) {
           move = false
           //获取要置顶的项在当前屏幕的位置，mIndex是记录的要置顶项在RecyclerView中的位置
           val n = pos - (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-          if (n in 0..(childCount - 1)) {
+          if (n in 0 until childCount) {
             //获取要置顶的项顶部离RecyclerView顶部的距离
-            val top = getChildAt(n).getTop()
+            val top = getChildAt(n).top
             //最后的移动
             scrollBy(0, top)
           }
@@ -78,7 +78,7 @@ class LocationRecyclerView @JvmOverloads constructor(
       }
     }
     if (pos >= 0) {
-      getLayoutManager().scrollToPosition(pos)
+      getLayoutManager()?.scrollToPosition(pos)
     }
   }
 }
