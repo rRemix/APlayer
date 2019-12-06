@@ -54,7 +54,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
   @RequiresApi(api = Build.VERSION_CODES.O)
   private fun createNotificationChannel() {
-    val playingNotificationChannel = NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID, service.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW)
+    val playingNotificationChannel = NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID, service.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_DEFAULT)
     playingNotificationChannel.setShowBadge(false)
     playingNotificationChannel.enableLights(false)
     playingNotificationChannel.enableVibration(false)

@@ -262,7 +262,7 @@ public class ImageUriUtil {
 
         List<Integer> albumIds = new ArrayList<>();
         while (cursor.moveToNext()) {
-          albumIds.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Albums._ID)));
+          albumIds.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID)));
         }
         for (Integer albumId : albumIds) {
           Uri uri = ContentUris

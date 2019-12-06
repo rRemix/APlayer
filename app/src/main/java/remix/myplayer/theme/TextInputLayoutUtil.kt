@@ -1,8 +1,11 @@
 package remix.myplayer.theme
 
 import android.content.res.ColorStateList
+import android.graphics.Color
+import android.os.Build
 import android.support.annotation.ColorInt
 import android.support.design.widget.TextInputLayout
+import timber.log.Timber
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -11,22 +14,30 @@ object TextInputLayoutUtil {
 
   fun setHint(view: TextInputLayout, @ColorInt hintColor: Int) {
     try {
-      val mDefaultTextColorField = TextInputLayout::class.java.getDeclaredField("mDefaultTextColor")
-      mDefaultTextColorField.isAccessible = true
-      mDefaultTextColorField.set(view, ColorStateList.valueOf(hintColor))
+      val defaultTextColorField = if (Build.VERSION.SDK_INT >= 29) {
+        TextInputLayout::class.java.getDeclaredField("defaultHintTextColor")
+      } else {
+        TextInputLayout::class.java.getDeclaredField("mDefaultTextColor")
+      }
+      defaultTextColorField.isAccessible = true
+      defaultTextColorField.set(view, ColorStateList.valueOf(hintColor))
     } catch (t: Throwable) {
-      throw RuntimeException("Failed to set TextInputLayout hint (collapsed) color: " + t.localizedMessage, t)
+      Timber.v(t)
     }
 
   }
 
   fun setAccent(view: TextInputLayout, @ColorInt accentColor: Int) {
     try {
-      val mFocusedTextColorField = TextInputLayout::class.java.getDeclaredField("mFocusedTextColor")
-      mFocusedTextColorField.isAccessible = true
-      mFocusedTextColorField.set(view, ColorStateList.valueOf(accentColor))
+      val focusedTextColorField = if (Build.VERSION.SDK_INT >= 29) {
+        TextInputLayout::class.java.getDeclaredField("focusedTextColor")
+      } else {
+        TextInputLayout::class.java.getDeclaredField("mFocusedTextColor")
+      }
+      focusedTextColorField.isAccessible = true
+      focusedTextColorField.set(view, ColorStateList.valueOf(accentColor))
     } catch (t: Throwable) {
-      throw RuntimeException("Failed to set TextInputLayout accent (expanded) color: " + t.localizedMessage, t)
+      Timber.v(t)
     }
 
   }
