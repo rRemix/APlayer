@@ -158,7 +158,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
   private final int CLEAR_FINISH = 102;
   private MsgHandler mHandler;
   private final int[] mScanSize = new int[]{0, 500 * ByteConstants.KB, ByteConstants.MB,
-      2 * ByteConstants.MB};
+      2 * ByteConstants.MB, 5 * ByteConstants.MB};
   private String mOriginalAlbumChoice;
 
   private List<Disposable> mDisposables = new ArrayList<>();
@@ -986,7 +986,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     }
     getBaseDialog(mContext)
         .title(R.string.set_filter_size)
-        .items(new String[]{"0K", "500K", "1MB", "2MB"})
+        .items(new String[]{"0K", "500K", "1MB", "2MB", "5MB"})
         .itemsCallbackSingleChoice(position, (dialog, itemView, which, text) -> {
           SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE,
               mScanSize[which]);

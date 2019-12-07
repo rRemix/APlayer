@@ -136,7 +136,7 @@
   <string name="lockscreen_show">锁屏设置</string>
   <string name="manual_scan">手动扫描</string>
   <string name="lrc_priority">搜索顺序</string>
-  <string name="lrc_priorty_tip">配置搜索时各个数据源顺序</string>
+  <string name="lrc_priority_tip">配置搜索时各个数据源顺序(长按并拖动排序)</string>
   <string name="navigation_color">导航栏变色</string>
   <string name="navigation_is_show">导航栏是否跟随主题色变化</string>
   <string name="shake">摇一摇</string>

@@ -968,7 +968,7 @@
           <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/lrc_priorty_tip"
+            android:text="@string/lrc_priority_tip"
             android:textColor="?attr/text_color_secondary"
             android:textSize="@dimen/s14_size"/>
         </LinearLayout>

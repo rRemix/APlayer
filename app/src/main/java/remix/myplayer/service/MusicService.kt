@@ -1117,7 +1117,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT
         || control == Command.TOGGLE || control == Command.PAUSE || control == Command.START) {
       //判断下间隔时间
-      if (System.currentTimeMillis() - last < 500) {
+      if ((control == Command.PREV || control == Command.NEXT) && System.currentTimeMillis() - last < 500) {
         Timber.v("间隔小于500ms")
         return
       }
@@ -1390,7 +1390,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           }
           mediaPlayer.prepareAsync()
           prepared = true
-          Timber.v("prepare finish")
+          Timber.v("prepare finish: $path")
         },
         catch = {
           ToastUtil.show(service, getString(R.string.play_failed) + it.toString())
@@ -1475,8 +1475,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     //用户设置
     lockScreen = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)
-    playModel = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL,
-        MODE_LOOP)
+    playModel = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL, MODE_LOOP)
     showDesktopLyric = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
     speed = java.lang.Float.parseFloat(SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
     playAtBreakPoint = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.PLAY_AT_BREAKPOINT, false)

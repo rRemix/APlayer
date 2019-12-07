@@ -136,7 +136,7 @@
   <string name="lockscreen_show">LockScreen</string>
   <string name="manual_scan">Manual scan</string>
   <string name="lrc_priority">Priority of lyric search</string>
-  <string name="lrc_priorty_tip">Config priority of lyric search</string>
+  <string name="lrc_priority_tip">Config priority of lyric search(long press and drag to sort)</string>
   <string name="navigation_color">Colored navigation bar</string>
   <string name="navigation_is_show">Whether colored navigation bar</string>
   <string name="shake">Shake</string>

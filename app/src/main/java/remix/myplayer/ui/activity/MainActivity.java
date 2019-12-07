@@ -173,7 +173,6 @@ public class MainActivity extends MenuActivity {
     //handler
     mRefreshHandler = new MsgHandler(this);
     mRefreshHandler.postDelayed(this::checkUpdate, 500);
-    mRefreshHandler.postDelayed(this::parseIntent, 500);
 
     //清除多选显示状态
     MultipleChoice.setActiveSomeWhere(false);
@@ -628,6 +627,7 @@ public class MainActivity extends MenuActivity {
   @Override
   public void onServiceConnected(@NotNull MusicService service) {
     super.onServiceConnected(service);
+    mRefreshHandler.postDelayed(this::parseIntent, 500);
   }
 
   @OnHandleMessage
