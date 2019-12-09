@@ -18,6 +18,7 @@ public class UriRequest implements Serializable {
   private String mTitle = "";
   private String mAlbumName = "";
   private String mArtistName = "";
+  private int mSongId;
 
   public UriRequest() {
   }
@@ -43,9 +44,10 @@ public class UriRequest implements Serializable {
     this.mArtistName = artistName;
   }
 
-  public UriRequest(int id, int searchType, int neteaseType, String title, String albumName,
+  public UriRequest(int id, int songId,int searchType, int neteaseType, String title, String albumName,
       String artistName) {
     this.mId = id;
+    this.mSongId = songId;
     this.mSearchType = searchType;
     this.mNeteaseType = neteaseType;
     this.mTitle = title;
@@ -134,6 +136,11 @@ public class UriRequest implements Serializable {
   public int getNeteaseType() {
     return mNeteaseType;
   }
+
+  public int getSongId() {
+    return mSongId;
+  }
+
 
   @Override
   public boolean equals(Object o) {

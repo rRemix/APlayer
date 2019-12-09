@@ -56,7 +56,6 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
-import timber.log.Timber;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -64,7 +63,7 @@ import timber.log.Timber;
 
 public abstract class ImageUriRequest<T> {
 
-  private static final ConcurrentHashMap<Integer,String> MEMORY_CACHE = new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<Integer, String> MEMORY_CACHE = new ConcurrentHashMap<>();
 
   private static final List<String> BLACKLIST = Arrays
       .asList("https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png",
@@ -209,9 +208,14 @@ public abstract class ImageUriRequest<T> {
             imageUrl = PREFIX_EMBEDDED + songs.get(0).getUrl();
           }
         } else {
-          Uri uri = ContentUris
-              .withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
-                  request.getID());
+          Uri uri;
+          if (request.getSongId() > 0) {
+            uri = Uri
+                .parse("content://media/external/audio/media/" + request.getSongId() + "/albumart");
+          } else {
+            uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
+                request.getID());
+          }
           if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
             imageUrl = uri.toString();
           }

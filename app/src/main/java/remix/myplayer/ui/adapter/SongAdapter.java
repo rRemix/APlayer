@@ -46,16 +46,10 @@ import remix.myplayer.util.ToastUtil;
 public class SongAdapter extends HeaderAdapter<Song, BaseViewHolder> implements
     FastScroller.SectionIndexer {
 
-  private int mType;
-  public static final int ALLSONG = 0;
-  public static final int RECENTLY = 1;
-
   private Song mLastPlaySong = MusicServiceRemote.getCurrentSong();
 
-  public SongAdapter(int layoutId, MultipleChoice multiChoice, int type,
-      RecyclerView recyclerView) {
+  public SongAdapter(int layoutId, MultipleChoice multiChoice, RecyclerView recyclerView) {
     super(layoutId, multiChoice, recyclerView);
-    mType = type;
     mRecyclerView = recyclerView;
   }
 

@@ -154,7 +154,9 @@ public class ImageUriUtil {
   }
 
   public static UriRequest getSearchRequestWithAlbumType(Song song) {
-    return new UriRequest(song.getAlbumId(), ImageUriRequest.URL_ALBUM,
+    return new UriRequest(song.getAlbumId(),
+        song.getId(),
+        ImageUriRequest.URL_ALBUM,
         UriRequest.TYPE_NETEASE_SONG,
         song.getTitle(), song.getAlbum(), song.getArtist());
   }

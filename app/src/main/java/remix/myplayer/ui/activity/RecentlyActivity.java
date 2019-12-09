@@ -53,8 +53,7 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
 
     mHandler = new MsgHandler(this);
 
-    mAdapter = new SongAdapter(R.layout.item_song_recycle, mChoice, SongAdapter.RECENTLY,
-        mRecyclerView);
+    mAdapter = new SongAdapter(R.layout.item_song_recycle, mChoice, mRecyclerView);
     mChoice.setAdapter(mAdapter);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
