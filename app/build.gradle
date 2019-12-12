@@ -27,7 +27,7 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 15600
+        versionCode 15601
         versionName "1.5.6.0"
 
         flavorDimensions "default"

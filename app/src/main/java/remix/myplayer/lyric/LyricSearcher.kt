@@ -88,25 +88,25 @@ class LyricSearcher {
       SPUtil.LYRIC_KEY.LYRIC_LOCAL -> {
         getLocalObservable()
       }
-      SPUtil.LYRIC_KEY.LYRIC_NETEASE -> {
-        getNeteaseObservable()
-      }
       SPUtil.LYRIC_KEY.LYRIC_KUGOU -> {
         getKuGouObservable()
+      }
+      SPUtil.LYRIC_KEY.LYRIC_NETEASE -> {
+        getNeteaseObservable()
       }
       SPUtil.LYRIC_KEY.LYRIC_MANUAL -> {
         getManualObservable(manualPath)
       }
       SPUtil.LYRIC_KEY.LYRIC_DEFAULT -> {
-        //默认优先级排序 网易-酷狗-本地-内嵌
+        //默认优先级排序 酷狗-网易-本地-内嵌
         val priority = Gson().fromJson<List<LyricPriority>>(SPUtil.getValue(App.getContext(), SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
             object : TypeToken<List<LyricPriority>>() {}.type)
 
         val observables = mutableListOf<Observable<List<LrcRow>>>()
         priority.forEach {
           when (it.priority) {
-            LyricPriority.NETEASE.priority -> observables.add(getNeteaseObservable())
             LyricPriority.KUGOU.priority -> observables.add(getKuGouObservable())
+            LyricPriority.NETEASE.priority -> observables.add(getNeteaseObservable())
             LyricPriority.LOCAL.priority -> observables.add(getLocalObservable())
             LyricPriority.EMBEDED.priority -> observables.add(getEmbeddedObservable())
           }
@@ -316,14 +316,18 @@ class LyricSearcher {
     return HttpClient.getInstance().getKuGouSearch(searchKey, song.getDuration(), "")
         .flatMap { body ->
           val searchResponse = Gson().fromJson(body.string(), KSearchResponse::class.java)
-          HttpClient.getInstance().getKuGouLyric(
-              searchResponse.candidates[0].id,
-              searchResponse.candidates[0].accesskey)
-              .map { lrcBody ->
-                val lrcResponse = Gson().fromJson(lrcBody.string(), KLrcResponse::class.java)
-                Timber.v("KugouLyric")
-                lrcParser.getLrcRows(getBufferReader(Base64.decode(lrcResponse.content, Base64.DEFAULT)), true, cacheKey, searchKey)
-              }
+          if (searchResponse.candidates.isNotEmpty() && song.title.equals(searchResponse.candidates[0].song,true)) {
+            HttpClient.getInstance().getKuGouLyric(
+                searchResponse.candidates[0].id,
+                searchResponse.candidates[0].accesskey)
+                .map { lrcBody ->
+                  val lrcResponse = Gson().fromJson(lrcBody.string(), KLrcResponse::class.java)
+                  Timber.v("KugouLyric")
+                  lrcParser.getLrcRows(getBufferReader(Base64.decode(lrcResponse.content, Base64.DEFAULT)), true, cacheKey, searchKey)
+                }
+          } else {
+            Observable.empty()
+          }
         }
         .onErrorResumeNext(Function {
           Observable.empty()

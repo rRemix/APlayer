@@ -171,7 +171,6 @@ public class LrcRow implements Comparable<LrcRow> {
         LrcRow lrcRow = new LrcRow(tem, formatTime(tem) - offset, content);
         lrcRows.add(lrcRow);
       } catch (Exception e) {
-        Timber.v(e);
       }
     }
     return lrcRows;

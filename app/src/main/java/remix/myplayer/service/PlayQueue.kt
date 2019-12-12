@@ -60,7 +60,7 @@ class PlayQueue(service: MusicService) {
         makeNormalList()
       }
     }
-    Timber.v("makeList, list:{${_playingQueue.map { it.title }}}")
+    Timber.v("makeList, size: ${_playingQueue.size}")
   }
 
 
@@ -299,7 +299,7 @@ class PlayQueue(service: MusicService) {
     }
 
     Util.sendLocalBroadcast(Intent(PlayerActivity.ACTION_UPDATE_NEXT))
-    Timber.v("updateNextSong, curPos: $position nextPos: $nextPosition nextSong=${nextSong.title}\n list:{${_playingQueue.map { it.title }}}")
+    Timber.v("updateNextSong, curPos: $position nextPos: $nextPosition nextSong=${nextSong.title}\n }")
   }
 
   fun size(): Int {

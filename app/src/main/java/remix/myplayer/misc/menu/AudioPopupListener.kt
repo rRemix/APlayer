@@ -11,7 +11,6 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.EQHelper
-import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
@@ -49,8 +48,8 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
 
         val lyricFragment = ref.get()?.lyricFragment ?: return true
         getBaseDialog(ref.get())
-            .items(getString(R.string.netease),
-                getString(R.string.kugou),
+            .items(getString(R.string.kugou),
+                getString(R.string.netease),
                 getString(R.string.local),
                 getString(R.string.embedded_lyric),
                 getString(R.string.select_lrc),
@@ -58,7 +57,7 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
                 getString(R.string.change_offset))
             .itemsCallback { dialog, itemView, position, text ->
               when (position) {
-                0, 1, 2, 3 -> { //0网易 1酷狗 2本地 3内嵌
+                0, 1, 2, 3 -> { //0酷狗 1网易 2本地 3内嵌
                   SPUtil.putValue(ref.get(), SPUtil.LYRIC_KEY.NAME, song.id.toString(), position + 2)
                   lyricFragment.updateLrc(song, true)
                   sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
