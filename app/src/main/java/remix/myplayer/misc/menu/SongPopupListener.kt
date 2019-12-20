@@ -65,6 +65,14 @@ class SongPopupListener(activity: AppCompatActivity,
         activity.intent = coverIntent
         Crop.pickImage(activity, Crop.REQUEST_PICK)
       }
+      R.id.menu_collect -> {
+        DatabaseRepository.getInstance()
+            .insertToPlayList(listOf(song.id), activity.getString(R.string.my_favorite))
+            .compose<Int>(applySingleScheduler<Int>())
+            .subscribe(
+                { count -> ToastUtil.show(activity, activity.getString(R.string.add_song_playlist_success, 1, activity.getString(R.string.my_favorite))) },
+                { throwable -> ToastUtil.show(activity, R.string.add_song_playlist_error) })
+      }
       R.id.menu_ring -> {
         MediaStoreUtil.setRing(activity, song.id)
       }

@@ -1001,7 +1001,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         handleCommand(shuffleIntent)
       }
       ACTION_SHORTCUT_MYLOVE -> {
-        tryLaunch({
+        tryLaunch{
           val songs = withContext(Dispatchers.IO) {
             val myLoveIds = repository.getMyLoveList().blockingGet()
             MediaStoreUtil.getSongsByIds(myLoveIds)
@@ -1016,11 +1016,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           myloveIntent.putExtra(EXTRA_CONTROL, Command.PLAYSELECTEDSONG)
           myloveIntent.putExtra(EXTRA_POSITION, 0)
           setPlayQueue(songs, myloveIntent)
-        })
+        }
 
       }
       ACTION_SHORTCUT_LASTADDED -> {
-        tryLaunch({
+        tryLaunch{
           val songs = withContext(Dispatchers.IO) {
             MediaStoreUtil.getLastAddedSong()
           }
@@ -1032,7 +1032,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           lastedIntent.putExtra(EXTRA_CONTROL, Command.PLAYSELECTEDSONG)
           lastedIntent.putExtra(EXTRA_POSITION, 0)
           setPlayQueue(songs, lastedIntent)
-        })
+        }
 
       }
       else -> if (action.equals(ACTION_CMD, ignoreCase = true)) {
@@ -1607,7 +1607,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     private val tag: String = WidgetTask::class.java.simpleName
 
     override fun run() {
-      val isAppOnForeground = isAppOnForeground1()
+      val isAppOnForeground = isAppOnForeground()
       // app在前台不用更新
       if (!isAppOnForeground) {
         appWidgets.forEach {

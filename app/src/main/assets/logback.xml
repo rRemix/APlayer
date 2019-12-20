@@ -1,5 +1,7 @@
 <configuration>
-  <appender class="ch.qos.logback.classic.android.LogcatAppender" name="LOGCAT">
+  <property name="LOG_DIR" value="/sdcard/Android/data/${PACKAGE_NAME}/logs" />
+
+  <appender name="LOGCAT" class="ch.qos.logback.classic.android.LogcatAppender">
     <tagEncoder>
       <pattern>[%-23.23logger]</pattern>
     </tagEncoder>
@@ -8,7 +10,20 @@
     </encoder>
   </appender>
 
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/current.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/%d{yyyy.MM.dd.HH}.log.gz</fileNamePattern>
+      <maxHistory>4320</maxHistory>
+      <totalSizeCap>3GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%date %-10relative %-6level [%-23.23logger]: [%thread] %msg%n</pattern>
+    </encoder>
+  </appender>
+
   <root level="TRACE">
-    <appender-ref ref="LOGCAT"/>
+    <appender-ref ref="LOGCAT" />
+    <appender-ref ref="FILE" />
   </root>
 </configuration>

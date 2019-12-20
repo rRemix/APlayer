@@ -407,4 +407,5 @@
   <string name="auto_play_none">从不</string>
   <string name="deleting">删除中</string>
   <string name="adding">添加中</string>
+  <string name="send_log">是否同时发送日志?</string>
 </resources>

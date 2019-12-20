@@ -81,7 +81,7 @@ class DefaultLrcParser : ILrcParser {
         //读取offset标签
         if (eachLine.startsWith("[offset:") && eachLine.endsWith("]")) {
           val offsetInString = eachLine.substring(eachLine.lastIndexOf(":") + 1, eachLine.length - 1)
-          if (!offsetInString.isEmpty() && TextUtils.isDigitsOnly(offsetInString)) {
+          if (offsetInString.isNotEmpty() && TextUtils.isDigitsOnly(offsetInString)) {
             offset = Integer.valueOf(offsetInString)
           }
         }

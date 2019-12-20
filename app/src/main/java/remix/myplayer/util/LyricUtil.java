@@ -3,11 +3,9 @@ package remix.myplayer.util;
 import android.os.Environment;
 import android.text.TextUtils;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.mozilla.universalchardet.UniversalDetector;
+import timber.log.Timber;
 
 public class LyricUtil {
 
@@ -115,32 +113,11 @@ public class LyricUtil {
   }
 
   public static String getCharset(final String filePath) {
-    FileInputStream fileInputStream = null;
     try {
-      fileInputStream = new FileInputStream(filePath);
-      byte[] buf = new byte[1024];
-      UniversalDetector detector = new UniversalDetector(null);
-      int hasRead;
-      while ((hasRead = fileInputStream.read(buf)) > 0 && !detector.isDone()) {
-        detector.handleData(buf, 0, hasRead);
-      }
-      detector.dataEnd();
-      String encoding = detector.getDetectedCharset();
-      detector.reset();
-      fileInputStream.close();
-      return !TextUtils.isEmpty(encoding) ? encoding : "UTF-8";
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      if (fileInputStream != null) {
-        try {
-          fileInputStream.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
+      return EncodingDetect.getJavaEncode(filePath);
+    } catch (Exception e) {
+      Timber.w(e);
+      return "UTF-8";
     }
-
-    return "UTF-8";
   }
 }

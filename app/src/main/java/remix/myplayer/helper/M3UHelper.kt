@@ -31,7 +31,7 @@ object M3UHelper {
    * 导入歌单
    */
   @JvmStatic
-  fun importM3UFile(context: Context, file: File, playlistName: String, newCreate: Boolean): Disposable? {
+  fun importM3UFile(context: Context, file: File, playlistName: String, newCreate: Boolean): Disposable {
     val dialog = Theme.getBaseDialog(context)
         .title(R.string.saveing)
         .content(R.string.please_wait)
@@ -93,7 +93,7 @@ object M3UHelper {
   }
 
   @JvmStatic
-  fun importLocalPlayList(context: Context, playlistLocal: Map<String, List<Int>>, select: Array<CharSequence>): Disposable? {
+  fun importLocalPlayList(context: Context, playlistLocal: Map<String, List<Int>>, select: Array<CharSequence>): Disposable {
     val singles = playlistLocal.entries
         .filter {
           select.contains(it.key)
@@ -127,7 +127,7 @@ object M3UHelper {
   }
 
   @JvmStatic
-  fun exportPlayListToFile(context: Context, playlistName: String, file: File): Disposable? {
+  fun exportPlayListToFile(context: Context, playlistName: String, file: File): Disposable {
     return databaseRepository
         .getPlayList(playlistName)
         .flatMap {

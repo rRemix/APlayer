@@ -25,6 +25,7 @@ open class LibraryUriRequest(image: SimpleDraweeView, protected val request: Uri
   protected val ref = WeakReference(image)
 
   override fun onError(throwable: Throwable?) {
+    Timber.v("onError, request: $request msg: ${throwable?.message}")
 //    mImageRef.get()?.setImageURI(Uri.EMPTY)
   }
 
@@ -51,11 +52,9 @@ open class LibraryUriRequest(image: SimpleDraweeView, protected val request: Uri
           override fun onIntermediateImageSet(s: String?, imageInfo: ImageInfo?) {}
 
           override fun onIntermediateImageFailed(s: String?, throwable: Throwable?) {
-            Timber.v("onIntermediateImageFailed() %s", throwable.toString())
           }
 
           override fun onFailure(s: String?, throwable: Throwable?) {
-            Timber.v("onFailure %s", throwable.toString())
           }
 
           override fun onRelease(s: String?) {

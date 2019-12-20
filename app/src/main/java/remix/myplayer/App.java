@@ -83,16 +83,15 @@ public class App extends MultiDexApplication implements ActivityLifecycleCallbac
     DiskCache.init(this);
     LanguageHelper.setApplicationLanguage(this);
 
-    new Thread() {
-      @Override
-      public void run() {
-        ThemeStore.sImmersiveMode = SPUtil
-            .getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.IMMERSIVE_MODE, false);
-        ThemeStore.sTheme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
-        ThemeStore.sColoredNavigation = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME,
-            SPUtil.SETTING_KEY.COLOR_NAVIGATION, false);
-      }
-    }.start();
+    Completable
+        .fromAction(() -> {
+          ThemeStore.sImmersiveMode = SPUtil
+              .getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.IMMERSIVE_MODE, false);
+          ThemeStore.sTheme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
+          ThemeStore.sColoredNavigation = SPUtil.getValue(App.getContext(), SETTING_KEY.NAME,
+              SETTING_KEY.COLOR_NAVIGATION, false);
+        })
+        .subscribe();
   }
 
   @Override

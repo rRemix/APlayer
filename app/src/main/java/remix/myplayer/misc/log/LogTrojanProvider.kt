@@ -4,7 +4,6 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import remix.myplayer.misc.log.LogTree
 import timber.log.Timber
 
 class LogTrojanProvider : ContentProvider() {

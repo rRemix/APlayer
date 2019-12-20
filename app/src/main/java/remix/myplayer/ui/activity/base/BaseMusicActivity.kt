@@ -13,6 +13,9 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.soundcloud.android.crop.Crop
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
@@ -34,7 +37,7 @@ import java.lang.ref.WeakReference
 import java.util.*
 
 @SuppressLint("Registered")
-open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
+open class BaseMusicActivity : BaseActivity(), MusicEventCallback,CoroutineScope by MainScope(){
   private var serviceToken: MusicServiceRemote.ServiceToken? = null
   private val serviceEventListeners = ArrayList<MusicEventCallback>()
   private var musicStateReceiver: MusicStateReceiver? = null
@@ -78,6 +81,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   override fun onDestroy() {
     super.onDestroy()
     Timber.tag(TAG).v("onDestroy")
+    cancel()
     MusicServiceRemote.unbindFromService(serviceToken)
     musicStateHandler?.removeCallbacksAndMessages(null)
     if (receiverRegistered) {
@@ -87,7 +91,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   }
 
   private fun bindToService() {
-    if (!App.getContext().isAppForeground) {
+    if (!Util.isAppOnForeground()) {
       Timber.tag(TAG).v("bindToService(),app isn't on foreground")
       pendingBindService = true
       return
@@ -352,7 +356,9 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
 //                imagePipeline.evictFromCache(uri)
 //                imagePipeline.evictFromDiskCache(uri)
 
-              }, { throwable -> ToastUtil.show(mContext, R.string.save_error, throwable.toString()) })
+              }, { throwable ->
+                ToastUtil.show(mContext, R.string.save_error_arg, throwable.toString())
+              })
         }
       }
     }
