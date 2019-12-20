@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity
 
+import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -35,6 +36,7 @@ import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import remix.myplayer.util.StatusBarUtil
+import timber.log.Timber
 import java.lang.ref.WeakReference
 
 /**
@@ -86,6 +88,11 @@ class LockScreenActivity : BaseMusicActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_lockscreen)
+    try {
+      requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+    } catch (e: Exception){
+      Timber.v(e)
+    }
 
     val metric = DisplayMetrics()
     windowManager.defaultDisplay.getMetrics(metric)
