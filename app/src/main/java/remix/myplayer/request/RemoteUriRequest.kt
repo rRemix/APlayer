@@ -8,7 +8,7 @@ import remix.myplayer.request.network.RxUtil
  * Created by Remix on 2017/12/10.
  */
 
-abstract class RemoteUriRequest(private val request: UriRequest, config: RequestConfig) : ImageUriRequest<Bitmap>(config) {
+public abstract class RemoteUriRequest(private val request: UriRequest, config: RequestConfig) : ImageUriRequest<Bitmap>(config) {
 
   override fun load(): Disposable {
     return getThumbBitmapObservable(request)

@@ -16,13 +16,13 @@ import io.reactivex.ObservableOnSubscribe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.misc.cache.DiskCache
+import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Constants
@@ -37,7 +37,7 @@ import java.lang.ref.WeakReference
 import java.util.*
 
 @SuppressLint("Registered")
-open class BaseMusicActivity : BaseActivity(), MusicEventCallback,CoroutineScope by MainScope(){
+open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScope by MainScope() {
   private var serviceToken: MusicServiceRemote.ServiceToken? = null
   private val serviceEventListeners = ArrayList<MusicEventCallback>()
   private var musicStateReceiver: MusicStateReceiver? = null
@@ -123,6 +123,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback,CoroutineScope
 
   override fun onMediaStoreChanged() {
     Timber.tag(TAG).v("onMediaStoreChanged")
+    ImageUriRequest.clearUriCache()
     for (listener in serviceEventListeners) {
       listener.onMediaStoreChanged()
     }

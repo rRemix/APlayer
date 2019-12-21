@@ -24,7 +24,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import com.facebook.common.util.ByteConstants;
-import com.tencent.bugly.crashreport.CrashReport;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -93,14 +92,16 @@ public class MediaStoreUtil {
       return new ArrayList<>();
     }
     ArrayList<Artist> artists = new ArrayList<>();
-    try (Cursor cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-        new String[]{MediaStore.Audio.Media.ARTIST_ID,
-            MediaStore.Audio.Media.ARTIST,
-            "count(" + Media.ARTIST_ID + ")"},
-        MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
-        null,
-        SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
-            SortOrder.ArtistSortOrder.ARTIST_A_Z))) {
+    try (Cursor cursor = mContext.getContentResolver()
+        .query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            new String[]{MediaStore.Audio.Media.ARTIST_ID,
+                MediaStore.Audio.Media.ARTIST,
+                "count(" + Media.ARTIST_ID + ")"},
+            MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY ("
+                + MediaStore.Audio.Media.ARTIST_ID,
+            null,
+            SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
+                SortOrder.ArtistSortOrder.ARTIST_A_Z))) {
       if (cursor != null) {
         while (cursor.moveToNext()) {
           try {
@@ -122,16 +123,18 @@ public class MediaStoreUtil {
       return new ArrayList<>();
     }
     ArrayList<Album> albums = new ArrayList<>();
-    try (Cursor cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-        new String[]{MediaStore.Audio.Media.ALBUM_ID,
-            MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.ARTIST_ID,
-            MediaStore.Audio.Media.ARTIST,
-            "count(" + Media.ALBUM_ID + ")"},
-        MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
-        null,
-        SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
-            SortOrder.AlbumSortOrder.ALBUM_A_Z))) {
+    try (Cursor cursor = mContext.getContentResolver()
+        .query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            new String[]{MediaStore.Audio.Media.ALBUM_ID,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.ARTIST_ID,
+                MediaStore.Audio.Media.ARTIST,
+                "count(" + Media.ALBUM_ID + ")"},
+            MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY ("
+                + MediaStore.Audio.Media.ALBUM_ID,
+            null,
+            SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
+                SortOrder.AlbumSortOrder.ALBUM_A_Z))) {
       if (cursor != null) {
         while (cursor.moveToNext()) {
           try {
@@ -537,7 +540,7 @@ public class MediaStoreUtil {
     return getSongId(MediaStore.Audio.Media.DATA + " = ?", new String[]{url});
   }
 
-  public static Song getSongByUrl(String url){
+  public static Song getSongByUrl(String url) {
     return getSong(MediaStore.Audio.Media.DATA + " = ?", new String[]{url});
   }
 
@@ -627,7 +630,7 @@ public class MediaStoreUtil {
 
   public static Song getSong(@Nullable String selection, String[] selectionValues) {
     List<Song> songs = getSongs(selection, selectionValues, null);
-    return songs != null && songs.size() > 0 ? songs.get(0) : Song.Companion.getEMPTY_SONG();
+    return songs != null && songs.size() > 0 ? songs.get(0) : Song.getEMPTY_SONG();
   }
 
   public static List<Song> getSongs(@Nullable String selection, String[] selectionValues,
@@ -653,5 +656,22 @@ public class MediaStoreUtil {
   public static List<Song> getSongs(@Nullable String selection, String[] selectionValues) {
     return getSongs(selection, selectionValues, SPUtil
         .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER, null));
+  }
+
+  /**
+   * 歌曲数量
+   * @return
+   */
+  public static int getCount() {
+    try (Cursor cursor = mContext.getContentResolver()
+        .query(Media.EXTERNAL_CONTENT_URI, new String[]{Media._ID}, getBaseSelection(), null, null)) {
+      if (cursor != null) {
+        return cursor.getCount();
+      }
+    } catch (Exception e) {
+      Timber.v(e);
+    }
+
+    return 0;
   }
 }

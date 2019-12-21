@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.media.MediaScannerConnection
 import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.*
@@ -38,6 +37,7 @@ import remix.myplayer.helper.*
 import remix.myplayer.lyric.LyricFetcher
 import remix.myplayer.lyric.LyricFetcher.Companion.LYRIC_FIND_INTERVAL
 import remix.myplayer.lyric.bean.LyricRowWrapper
+import remix.myplayer.misc.MediaScanner
 import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.misc.log.LogObserver
 import remix.myplayer.misc.observer.MediaStoreObserver
@@ -297,7 +297,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 监听Mediastore变化
    */
   private val mediaStoreObserver: MediaStoreObserver by lazy {
-    MediaStoreObserver(this)
+    MediaStoreObserver()
   }
   private lateinit var service: MusicService
 
@@ -1001,7 +1001,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         handleCommand(shuffleIntent)
       }
       ACTION_SHORTCUT_MYLOVE -> {
-        tryLaunch{
+        tryLaunch {
           val songs = withContext(Dispatchers.IO) {
             val myLoveIds = repository.getMyLoveList().blockingGet()
             MediaStoreUtil.getSongsByIds(myLoveIds)
@@ -1020,7 +1020,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
       }
       ACTION_SHORTCUT_LASTADDED -> {
-        tryLaunch{
+        tryLaunch {
           val songs = withContext(Dispatchers.IO) {
             MediaStoreUtil.getLastAddedSong()
           }
@@ -1488,13 +1488,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     uiHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
 
-    //开机扫描
-    MediaScannerConnection.scanFile(this,
-        arrayOf(Environment.getExternalStorageDirectory().absolutePath),
-        arrayOf("audio/*")
-    ) { path, uri ->
-      Timber.v("path: $path uri: $uri")
-    }
+    //打开软件扫描
+    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
+        .apply {
+          if (exists() && isDirectory) {
+            MediaScanner(this@MusicService).scanFilesSimply(this)
+          }
+        }
   }
 
   fun deleteSongFromService(deleteSongs: List<Song>?) {

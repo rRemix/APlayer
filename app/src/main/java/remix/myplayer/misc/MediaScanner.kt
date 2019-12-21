@@ -19,6 +19,8 @@ import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.ToastUtil
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
+
 
 /**
  * Created by Remix on 2017/11/20.
@@ -26,7 +28,24 @@ import java.io.File
 
 class MediaScanner(private val context: Context) {
 
-  fun scanFiles(dir: File) {
+  fun scanFilesSimply(folder: File) {
+    val toScanFiles = ArrayList<File>()
+    val completed = AtomicInteger()
+
+    getScanFiles(folder, toScanFiles)
+
+    if (toScanFiles.isNotEmpty()) {
+      MediaScannerConnection.scanFile(
+          context,
+          toScanFiles.map { it.absolutePath }.toTypedArray(),
+          toScanFiles.map { "audio/*" }.toTypedArray()
+      ) { path, uri ->
+        Timber.v("onScanCompleted, path: $path uri: $uri completed: $completed")
+      }
+    }
+  }
+
+  fun scanFiles(folder: File) {
     var subscription: Subscription? = null
     var connection: MediaScannerConnection? = null
     val toScanFiles = ArrayList<File>()
@@ -43,7 +62,7 @@ class MediaScanner(private val context: Context) {
     connection = MediaScannerConnection(context, object : MediaScannerConnection.MediaScannerConnectionClient {
       override fun onMediaScannerConnected() {
         Flowable.create(FlowableOnSubscribe<File> { emitter ->
-          getFileCount(dir, toScanFiles)
+          getScanFiles(folder, toScanFiles)
           for (file in toScanFiles) {
             emitter.onNext(file)
           }
@@ -79,21 +98,22 @@ class MediaScanner(private val context: Context) {
 
       override fun onScanCompleted(path: String, uri: Uri) {
         subscription?.request(1)
-        Timber.v("onScanCompleted --- path: $path uri: $uri")
+        Timber.v("onScanCompleted, path: $path uri: $uri")
       }
     })
     connection.connect()
 
   }
 
-  private fun getFileCount(file: File, toScanFiles: ArrayList<File>) {
+
+  private fun getScanFiles(file: File, toScanFiles: ArrayList<File>) {
     if (file.isFile && file.length() >= MediaStoreUtil.SCAN_SIZE) {
       if (isAudioFile(file))
         toScanFiles.add(file)
     } else {
       val files = file.listFiles() ?: return
       for (temp in files) {
-        getFileCount(temp, toScanFiles)
+        getScanFiles(temp, toScanFiles)
       }
     }
   }

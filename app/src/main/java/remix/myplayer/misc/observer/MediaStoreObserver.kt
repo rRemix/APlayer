@@ -9,19 +9,16 @@ import android.os.Handler
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import remix.myplayer.service.MusicService
-import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
-import java.lang.ref.WeakReference
 
 /**
  * Created by taeja on 16-3-30.
  * @param service
  * @param handler The handler to run [.onChange] on, or null if none.
  */
-class MediaStoreObserver(service: MusicService) : ContentObserver(null), Runnable {
+class MediaStoreObserver : ContentObserver(null), Runnable {
   private val handler = Handler()
-  private val service: WeakReference<MusicService> = WeakReference(service)
   private var match = -1
 
   override fun run() {
@@ -50,9 +47,9 @@ class MediaStoreObserver(service: MusicService) : ContentObserver(null), Runnabl
   companion object {
     private val sUriMatcher = UriMatcher(UriMatcher.NO_MATCH)
 
-    const val TYPE_INSERT = 1
-    const val TYPE_UPDATE = 2
-    const val TYPE_DELETE = 3
+    private const val TYPE_INSERT = 1
+    private const val TYPE_UPDATE = 2
+    private const val TYPE_DELETE = 3
 
     init {
       sUriMatcher.addURI("media", "external/audio/media/#", TYPE_INSERT)//insert
