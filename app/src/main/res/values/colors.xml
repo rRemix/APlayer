@@ -28,7 +28,7 @@
   <color name="light_background_color_dialog">#ffffff</color>
   <color name="light_text_color_primary">#1c1b19</color>
   <color name="light_text_color_secondary">#6d6c69</color>
-  <color name="light_divider_color">#ededed</color>
+  <color name="light_divider_color">#00000000</color>
   <color name="light_ripple_color">#1f000000</color>
   <color name="light_select_color">#1f000000</color>
   <color name="light_library_color">#f1f1f1</color>
@@ -37,7 +37,7 @@
   <color name="dark_background_color_dialog">#1d1a1d</color>
   <color name="dark_text_color_primary">#ffffff</color>
   <color name="dark_text_color_secondary">#6c6a6c</color>
-  <color name="dark_divider_color">#322f33</color>
+  <color name="dark_divider_color">#00000000</color>
   <color name="dark_ripple_color">#33ffffff</color>
   <!--<color name="night_ripple_color">#353538</color>-->
   <color name="dark_select_color">#33ffffff</color>

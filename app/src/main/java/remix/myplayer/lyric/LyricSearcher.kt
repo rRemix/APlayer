@@ -196,6 +196,8 @@ class LyricSearcher {
         MediaStore.Files.FileColumns.DATA + " like ? or " +
             MediaStore.Files.FileColumns.DATA + " like ? or " +
             MediaStore.Files.FileColumns.DATA + " like ? or " +
+            MediaStore.Files.FileColumns.DATA + " like ? or " +
+            MediaStore.Files.FileColumns.DATA + " like ? or " +
             MediaStore.Files.FileColumns.DATA + " like ?",
         getLocalSearchKey(),
         null)
@@ -217,14 +219,18 @@ class LyricSearcher {
    * 本地歌词搜索的关键字
    * displayName.lrc
    * title.lrc
+   * title-artist.lrc
+   * displayname-artist.lrc
    * artist-title.lrc
    * aritst-displayName.lrc
    */
   private fun getLocalSearchKey(searchPath: String? = null): Array<String> {
     return arrayOf("%$displayName$SUFFIX_LYRIC",
         "%${song.title}$SUFFIX_LYRIC",
+        "%${song.title}%${song.artist}$SUFFIX_LYRIC",
+        "%${song.displayName}%${song.artist}$SUFFIX_LYRIC",
         "%${song.artist}%${song.title}$SUFFIX_LYRIC",
-        "%${song.artist}$displayName$SUFFIX_LYRIC")
+        "%${song.artist}%$displayName$SUFFIX_LYRIC")
   }
 
   /**
