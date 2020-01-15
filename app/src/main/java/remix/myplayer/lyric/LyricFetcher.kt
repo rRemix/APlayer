@@ -69,11 +69,8 @@ class LyricFetcher(service: MusicService) {
             return wrapper
           }
         }
-
         return wrapper
-
       }
-
       else -> {
         return LYRIC_WRAPPER_NO
       }
@@ -100,11 +97,15 @@ class LyricFetcher(service: MusicService) {
           status = Status.SEARCHING
         }
         .subscribe({
+          Timber.v("updateLyricRows, lrc: $it")
           if (id == song.id) {
             status = Status.NORMAL
             offset = SPUtil.getValue(App.getContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, id.toString(), 0)
             lrcRows.clear()
             lrcRows.addAll(it)
+          } else {
+            lrcRows.clear()
+            status = Status.NO
           }
         }, { throwable ->
           Timber.v(throwable)

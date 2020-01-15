@@ -384,7 +384,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
                     mDisposables.add(
                         importM3UFile(this@SettingActivity, file,
                             if (chooseNew) newPlaylistName else text.toString(),
-                            chooseNew) ?: return@itemsCallback)
+                            chooseNew))
                   }
                   .show()
             }
@@ -572,7 +572,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
           tryLaunch(catch = {
             Timber.w(it)
             ToastUtil.show(this, R.string.send_error, it.toString())
-          }) {
+          }, block = {
             if (which == DialogAction.POSITIVE) {
               withContext(Dispatchers.IO) {
                 try {
@@ -580,7 +580,8 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
                   zipFile.delete()
                   zipFile.createNewFile()
                   zipFile.zipOutputStream()
-                      .zipFrom("${Environment.getExternalStorageDirectory().absolutePath}/Android/data/$packageName/logs")
+                      .zipFrom("${Environment.getExternalStorageDirectory().absolutePath}/Android/data/$packageName/logs",
+                          "${applicationInfo.dataDir}/shared_prefs")
                   if (zipFile.length() > 0) {
                     val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                       emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -608,7 +609,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
               ToastUtil.show(this, R.string.not_found_email)
             }
 //            Intent.createChooser(data,"Email")
-          }
+          })
         }
         .show()
   }

@@ -234,6 +234,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 是否显示桌面歌词
    */
   private var showDesktopLyric = false
+    set(value) {
+      Timber.v(Throwable("设置桌面歌词开关, old: $field new: $value"))
+      field = value
+    }
 
   /**
    * 桌面歌词控件
@@ -425,6 +429,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
   override fun onSharedPreferenceChanged(sp: SharedPreferences, key: String) {
+    Timber.v("onSharedPreferenceChanged, key: $key")
     when (key) {
       //通知栏背景色
       SETTING_KEY.NOTIFY_SYSTEM_COLOR,
@@ -1252,8 +1257,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         ToastUtil.show(service, R.string.already_add_to_next_song)
       }
       //改变歌词源
-      Command.CHANGE_LYRIC -> if (showDesktopLyric) {
-        updateDesktopLyric(true)
+      Command.CHANGE_LYRIC -> {
+        if (showDesktopLyric) {
+          updateDesktopLyric(true)
+        }
       }
       //切换定时器
       Command.TOGGLE_TIMER -> {
@@ -1520,6 +1527,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
   private fun updateDesktopLyric(force: Boolean) {
+    Timber.v("updateDesktopLyric, showDesktopLyric: $showDesktopLyric")
     if (!showDesktopLyric) {
       return
     }
@@ -1642,18 +1650,18 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       if (songInLyricTask != playQueue.song) {
         songInLyricTask = playQueue.song
         lyricFetcher.updateLyricRows(songInLyricTask)
-        Timber.tag(TAG_DESKTOP_LYRIC).v("重新获取歌词内容")
+        Timber.tag(TAG_DESKTOP_LYRIC).v("重新获取歌词内容, id: ${songInLyricTask.id}")
         return
       }
       if (force) {
         force = false
         lyricFetcher.updateLyricRows(songInLyricTask)
-        Timber.tag(TAG_DESKTOP_LYRIC).v("强制重新获取歌词")
+        Timber.tag(TAG_DESKTOP_LYRIC).v("强制重新获取歌词, id: ${songInLyricTask.id}")
         return
       }
-//      Timber.TAG_DESKTOP_LYRIC(TAG_DESKTOP_LYRIC).v("更新桌面歌词")
       //判断权限
       if (checkNoPermission()) {
+        Timber.v("无悬浮窗权限")
         return
       }
       if (stop) {

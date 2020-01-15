@@ -42,8 +42,8 @@ fun Context.isPortraitOrientation(): Boolean {
 fun CoroutineScope.tryLaunch(
     context: CoroutineContext = EmptyCoroutineContext,
     start: CoroutineStart = CoroutineStart.DEFAULT,
-    catch: ((e: Exception) -> Unit)? = { Timber.w(it) },
-    block: suspend () -> Unit) {
+    block: suspend () -> Unit,
+    catch: ((e: Exception) -> Unit)? = { Timber.w(it) }) {
   launch(context, start) {
     try {
       block()
@@ -51,6 +51,18 @@ fun CoroutineScope.tryLaunch(
       catch?.invoke(e)
     }
   }
+}
+
+fun CoroutineScope.tryLaunch(
+    context: CoroutineContext = EmptyCoroutineContext,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    block: suspend () -> Unit) {
+  tryLaunch(context = context,
+      start = start,
+      block = block,
+      catch = {
+        Timber.w(it)
+      })
 }
 
 fun Any?.checkMainThread() {

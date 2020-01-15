@@ -566,7 +566,6 @@ public class LrcView extends View implements ILrcView {
         if (mCurRow != i) {
           mLastRow = mCurRow;
           mCurRow = i;
-          log("mCurRow=i=" + mCurRow);
           if (fromSeekBarByUser) {
             if (!mScroller.isFinished()) {
               mScroller.forceFinished(true);
