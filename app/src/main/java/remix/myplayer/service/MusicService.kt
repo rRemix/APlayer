@@ -41,6 +41,7 @@ import remix.myplayer.misc.MediaScanner
 import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.misc.log.LogObserver
 import remix.myplayer.misc.observer.MediaStoreObserver
+import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver.Companion.NEVER
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver.Companion.OPEN_SOFTWARE
@@ -136,6 +137,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 当前播放的歌曲是否收藏
    */
   var isLove: Boolean = false
+
+  /**
+   * 播放完当前歌曲后是否停止app
+   */
+  private var exitAfterCompletion: Boolean = false
 
   /**
    * MediaPlayer 负责歌曲的播放等
@@ -519,6 +525,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     //监听数据库变化
     contentResolver.registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mediaStoreObserver)
 
+    //定时关闭
+    SleepTimer.addCallback(object : SleepTimer.Callback {
+      override fun onFinish() {
+        exitAfterCompletion = true
+      }
+    })
+
     setUpPlayer()
     setUpSession()
   }
@@ -585,6 +598,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     mediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK)
 
     mediaPlayer.setOnCompletionListener { mp ->
+      if(exitAfterCompletion){
+        sendBroadcast(Intent(EXIT)
+            .setComponent(ComponentName(this@MusicService, ExitReceiver::class.java)))
+        return@setOnCompletionListener
+      }
       if (playModel == MODE_REPEAT) {
         prepare(playQueue.song.url)
       } else {
@@ -1272,6 +1290,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         SleepTimer.toggleTimer((time * 1000).toLong())
       }
       else -> {
+        Timber.v("unknown command")
       }
     }
   }
