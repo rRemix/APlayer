@@ -15,6 +15,7 @@ import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
 import java.lang.ref.WeakReference
+import kotlin.math.max
 
 /**
  * created by Remix on 2019-09-26
@@ -38,8 +39,7 @@ class PlayQueue(service: MusicService) {
 
 
   // 下一首歌曲的位置
-  var nextPosition = 0
-    private set
+  private var nextPosition = 0
 
   // 当前播放的位置
   var position = 0
@@ -161,12 +161,6 @@ class PlayQueue(service: MusicService) {
     updateNextSong()
   }
 
-  private fun getSongAt(position: Int): Song {
-    return _originalQueue.getOrElse(position) {
-      Song.EMPTY_SONG
-    }
-  }
-
   fun setPlayQueue(songs: List<Song>) {
     synchronized(this) {
       _originalQueue.clear()
@@ -246,7 +240,7 @@ class PlayQueue(service: MusicService) {
     if (service.get()?.playModel == MODE_SHUFFLE) {
       makeShuffleList()
     }
-    song = getSongAt(position)
+    song = _originalQueue[position]
   }
 
   /**
@@ -272,7 +266,7 @@ class PlayQueue(service: MusicService) {
     if (position == -1 || position > _playingQueue.size - 1) {
       return
     }
-    song = getSongAt(position)
+    song = _playingQueue[position]
     updateNextSong()
   }
 
