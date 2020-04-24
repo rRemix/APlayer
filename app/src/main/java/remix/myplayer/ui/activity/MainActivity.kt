@@ -421,8 +421,11 @@ open class MainActivity : MenuActivity() {
           //设置
           3 -> startActivityForResult(Intent(mContext, SettingActivity::class.java), REQUEST_SETTING)
           //退出
-          4 -> sendBroadcast(Intent(Constants.EXIT)
-              .setComponent(ComponentName(mContext, ExitReceiver::class.java)))
+          4 -> {
+            Timber.v("发送Exit广播")
+            sendBroadcast(Intent(Constants.ACTION_EXIT)
+                .setComponent(ComponentName(mContext, ExitReceiver::class.java)))
+          }
         }
         mDrawerAdapter.setSelectIndex(position)
       }

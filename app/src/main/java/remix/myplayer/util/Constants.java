@@ -17,8 +17,7 @@ public class Constants {
   public final static int PLAYLIST = 4;
   public final static int PLAYLISTSONG = 5;
 
-  public final static String EXIT = "remix.music.EXIT";
-  public final static String SOUNDEFFECT_ACTION = "remix.music.SOUNDEFFECT_ACTION";
+  public final static String ACTION_EXIT = "remix.music.EXIT";
 
   //播放模式
   public final static int MODE_LOOP = 1;

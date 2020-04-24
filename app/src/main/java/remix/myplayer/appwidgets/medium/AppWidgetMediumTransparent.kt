@@ -19,8 +19,7 @@ class AppWidgetMediumTransparent : BaseAppwidget() {
     val intent = Intent(MusicService.ACTION_WIDGET_UPDATE)
     intent.putExtra(EXTRA_WIDGET_NAME, this.javaClass.simpleName)
     intent.putExtra(EXTRA_WIDGET_IDS, appWidgetIds)
-    intent.flags = Intent.FLAG_RECEIVER_REGISTERED_ONLY
-    context.sendBroadcast(intent)
+    Util.sendLocalBroadcast(intent)
   }
 
   private fun defaultAppWidget(context: Context, appWidgetIds: IntArray) {

@@ -73,7 +73,7 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(View view, int position) {
-        if (mAdapter != null && mAdapter.getDatas() != null) {
+        if (mAdapter != null && mAdapter.getDatas() != null && position >= 0 && position < mAdapter.getDatas().size()) {
           sendLocalBroadcast(makeCmdIntent(Command.PLAY_TEMP)
               .putExtra(EXTRA_SONG, mAdapter.getDatas().get(position)));
         } else {

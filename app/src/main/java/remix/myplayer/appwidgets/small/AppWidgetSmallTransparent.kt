@@ -10,6 +10,7 @@ import remix.myplayer.appwidgets.AppWidgetSkin
 import remix.myplayer.appwidgets.BaseAppwidget
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.service.MusicService
+import remix.myplayer.util.Util
 
 class AppWidgetSmallTransparent : BaseAppwidget() {
 
@@ -19,8 +20,7 @@ class AppWidgetSmallTransparent : BaseAppwidget() {
     val intent = Intent(MusicService.ACTION_WIDGET_UPDATE)
     intent.putExtra(EXTRA_WIDGET_NAME, this.javaClass.simpleName)
     intent.putExtra(EXTRA_WIDGET_IDS, appWidgetIds)
-    intent.flags = Intent.FLAG_RECEIVER_REGISTERED_ONLY
-    context.sendBroadcast(intent)
+    Util.sendLocalBroadcast(intent)
   }
 
   private fun defaultAppWidget(context: Context, appWidgetIds: IntArray) {

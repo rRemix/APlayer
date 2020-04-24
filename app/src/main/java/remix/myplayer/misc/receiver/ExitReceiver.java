@@ -21,6 +21,7 @@ public class ExitReceiver extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
+    Timber.v("开始关闭app");
     //停止所有service
     ServiceManager.StopAll();
 //      //关闭通知

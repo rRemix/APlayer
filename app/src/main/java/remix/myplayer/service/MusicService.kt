@@ -65,6 +65,7 @@ import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 import remix.myplayer.util.Util.*
 import timber.log.Timber
 import java.io.File
@@ -515,7 +516,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     noisyFilter.addAction(Intent.ACTION_HEADSET_PLUG)
     registerReceiver(headSetReceiver, noisyFilter)
 
-    registerReceiver(widgetReceiver, IntentFilter(ACTION_WIDGET_UPDATE))
+    registerLocalReceiver(widgetReceiver, IntentFilter(ACTION_WIDGET_UPDATE))
 
     val screenFilter = IntentFilter()
     screenFilter.addAction(Intent.ACTION_SCREEN_ON)
@@ -599,7 +600,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     mediaPlayer.setOnCompletionListener { mp ->
       if(exitAfterCompletion){
-        sendBroadcast(Intent(EXIT)
+        Timber.v("发送Exit广播")
+        sendBroadcast(Intent(ACTION_EXIT)
             .setComponent(ComponentName(this@MusicService, ExitReceiver::class.java)))
         return@setOnCompletionListener
       }
@@ -689,9 +691,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     unregisterLocalReceiver(controlReceiver)
     unregisterLocalReceiver(musicEventReceiver)
+    unregisterLocalReceiver(widgetReceiver)
     unregisterReceiver(this, headSetReceiver)
     unregisterReceiver(this, screenReceiver)
-    unregisterReceiver(this, widgetReceiver)
 
     getSharedPreferences(SETTING_KEY.NAME, Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this)
 
@@ -966,6 +968,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
       val name = intent.getStringExtra(BaseAppwidget.EXTRA_WIDGET_NAME)
       val appIds = intent.getIntArrayExtra(BaseAppwidget.EXTRA_WIDGET_IDS)
+      Timber.v("name: $name appIds: $appIds")
       when (name) {
         APPWIDGET_BIG -> if (appWidgets[APPWIDGET_BIG] != null) {
           appWidgets[APPWIDGET_BIG]?.updateWidget(service, appIds, true)
