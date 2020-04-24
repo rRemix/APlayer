@@ -250,6 +250,9 @@ class DatabaseRepository private constructor() {
         .fromCallable {
           db.playListDao().runtimeQuery(SimpleSQLiteQuery(sortQuery))
         }
+        .onErrorReturn {
+          ArrayList()
+        }
   }
 
 

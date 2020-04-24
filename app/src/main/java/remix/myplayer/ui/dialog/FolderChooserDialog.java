@@ -167,7 +167,8 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
   @Override
   public void onSelection(MaterialDialog materialDialog, View view, int i, CharSequence s) {
     if (canGoUp && i == 0) {
-      parentFolder = parentFolder.getParentFile();
+      parentFolder =
+          parentFolder.getParentFile() != null ? parentFolder.getParentFile() : parentFolder;
       if (parentFolder.getAbsolutePath().equals("/storage/emulated")) {
         parentFolder = parentFolder.getParentFile();
       }

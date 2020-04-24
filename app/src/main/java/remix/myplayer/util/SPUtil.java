@@ -233,7 +233,7 @@ public class SPUtil {
     String MANUAL_SCAN_FOLDER = "manual_scan_folder";
     //导入m3u目录
     String IMPORT_PLAYLIST_FOLDER = "import_playlist_folder";
-    //到处m3u目录
+    //导出m3u目录
     String EXPORT_PLAYLIST_FOLDER = "export_playlist_folder";
   }
 
