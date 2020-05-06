@@ -15,9 +15,9 @@ public class DiskCache {
 
   private static DiskLruCache mLrcCache;
 
-  public static void init(Context context) {
+  public static void init(Context context, String name) {
     try {
-      File lrcCacheDir = getDiskCacheDir(context, "lyric");
+      File lrcCacheDir = getDiskCacheDir(context, name);
       if (!lrcCacheDir.exists()) {
         lrcCacheDir.mkdir();
       }

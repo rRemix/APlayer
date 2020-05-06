@@ -168,7 +168,7 @@
   <string name="system_lockscreen">System LockScreen</string>
   <string name="aplayer_lockscreen_tip">Uses the current songs album cover as lockscreen wallpaper,the style depends on APlayer</string>
   <string name="system_lockscreen_tip">Uses the current songs album cover as lockscreen wallpaper,the style depends on your system</string>
-  <string name="lockscreen_off_tip">Lockscreen will\'t show album cover</string>
+  <string name="lockscreen_off_tip">Lockscreen will\'t show album cover(some features will be unavailable)</string>
 
   <string name="choose_or_close_lockscreen">Whether lockscreen will show the album cover</string>
   <string name="cant_play_this_sont">Unable to play this song</string>

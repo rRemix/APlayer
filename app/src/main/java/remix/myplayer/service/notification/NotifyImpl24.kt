@@ -82,7 +82,7 @@ class NotifyImpl24(context: MusicService) : Notify(context) {
         .setPriority(PRIORITY_MAX)
         .setContentText(song.artist + " - " + song.album)
         .setStyle(android.support.v4.media.app.NotificationCompat.MediaStyle()
-            .setShowActionsInCompactView(0, 1, 2)
+            .setShowActionsInCompactView(0, 1, 2, 3)
             .setMediaSession(service.mediaSession.sessionToken))
         .build()
     pushNotify(notification)

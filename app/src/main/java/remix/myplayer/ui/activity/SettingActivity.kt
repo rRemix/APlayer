@@ -49,6 +49,7 @@ import remix.myplayer.helper.M3UHelper.importLocalPlayList
 import remix.myplayer.helper.M3UHelper.importM3UFile
 import remix.myplayer.helper.ShakeDetector
 import remix.myplayer.misc.MediaScanner
+import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
@@ -849,8 +850,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
               //清除配置文件、数据库等缓存
               Util.deleteFilesByDirectory(cacheDir)
               Util.deleteFilesByDirectory(externalCacheDir)
-              //                        SPUtil.deleteFile(mContext,SPUtil.SETTING_KEY.NAME);
-              //                        deleteDatabase(DBOpenHelper.DBNAME);
+              DiskCache.init(mContext, "lyric")
               //清除fresco缓存
               Fresco.getImagePipeline().clearCaches()
               mHandler.sendEmptyMessage(CLEAR_FINISH)

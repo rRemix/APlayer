@@ -80,7 +80,7 @@ public class App extends MultiDexApplication implements ActivityLifecycleCallbac
   }
 
   private void setUp() {
-    DiskCache.init(this);
+    DiskCache.init(this, "lyric");
     LanguageHelper.setApplicationLanguage(this);
 
     Completable

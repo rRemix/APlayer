@@ -65,7 +65,6 @@ import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
-import remix.myplayer.util.Util
 import remix.myplayer.util.Util.*
 import timber.log.Timber
 import java.io.File
@@ -599,7 +598,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     mediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK)
 
     mediaPlayer.setOnCompletionListener { mp ->
-      if(exitAfterCompletion){
+      if (exitAfterCompletion) {
         Timber.v("发送Exit广播")
         sendBroadcast(Intent(ACTION_EXIT)
             .setComponent(ComponentName(this@MusicService, ExitReceiver::class.java)))

@@ -43,6 +43,7 @@ import remix.myplayer.util.Util
 import timber.log.Timber
 import java.io.File
 import java.io.OutputStream
+import java.lang.ref.WeakReference
 import java.util.*
 
 class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
@@ -184,7 +185,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
         .progress(true, 0)
         .progressIndeterminateStyle(false).build()
 
-    mBillingProcessor = BillingProcessor(this, BuildConfig.GOOGLE_PLAY_LICENSE_KEY, this)
+    mBillingProcessor = BillingProcessor(this, BuildConfig.GOOGLE_PLAY_LICENSE_KEY, BillingHandler(this))
   }
 
   private fun loadSkuDetails() {
@@ -222,15 +223,18 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
   }
 
   override fun onBillingInitialized() {
+    Timber.v("loadSkuDetails")
     loadSkuDetails()
   }
 
   override fun onPurchaseHistoryRestored() {
+    Timber.v("onPurchaseHistoryRestored")
     Toast.makeText(this, R.string.restored_previous_purchases, Toast.LENGTH_SHORT).show()
   }
 
   @SuppressLint("CheckResult")
   override fun onProductPurchased(productId: String, details: TransactionDetails?) {
+    Timber.v("onProductPurchased")
     Single
         .fromCallable {
           mBillingProcessor?.consumePurchase(productId)
@@ -250,6 +254,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
   }
 
   override fun onBillingError(errorCode: Int, error: Throwable?) {
+    Timber.v("onBillingError")
     ToastUtil.show(mContext, R.string.error_occur, "code = $errorCode err =  $error")
   }
 
@@ -268,4 +273,23 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
       mLoading.dismiss()
   }
 
+  private class BillingHandler(handler: BillingProcessor.IBillingHandler) : BillingProcessor.IBillingHandler {
+    private val ref = WeakReference<BillingProcessor.IBillingHandler>(handler)
+    override fun onBillingInitialized() {
+      ref.get()?.onBillingInitialized()
+    }
+
+    override fun onPurchaseHistoryRestored() {
+      ref.get()?.onPurchaseHistoryRestored()
+    }
+
+    override fun onProductPurchased(productId: String, details: TransactionDetails?) {
+      ref.get()?.onProductPurchased(productId, details)
+    }
+
+    override fun onBillingError(errorCode: Int, error: Throwable?) {
+      ref.get()?.onBillingError(errorCode, error)
+    }
+
+  }
 }
