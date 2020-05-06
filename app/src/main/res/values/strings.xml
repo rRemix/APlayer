@@ -391,8 +391,10 @@
   <string name="select_language_tips">Will change APlayer language by force</string>
 
   <string name="auto">Auto</string>
-  <string name="zh">Chinese</string>
+  <string name="zh_simple">Simplified Chinese</string>
+  <string name="zh_traditional">Traditional Chinese</string>
   <string name="english">English</string>
+
   <string name="bass_boost">Bass boost</string>
   <string name="virtualizer">Virtualizer</string>
 

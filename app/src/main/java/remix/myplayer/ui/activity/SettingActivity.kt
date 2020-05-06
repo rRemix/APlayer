@@ -96,38 +96,55 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
   @BindView(R.id.setting_color_primary_indicator)
   lateinit var mPrimaryColorSrc: ImageView
+
   @BindView(R.id.setting_color_accent_indicator)
   lateinit var mAccentColorSrc: ImageView
+
   @BindView(R.id.setting_clear_text)
   lateinit var mCache: TextView
+
   @BindView(R.id.setting_navaigation_switch)
   lateinit var mNaviSwitch: SwitchCompat
+
   @BindView(R.id.setting_shake_switch)
   lateinit var mShakeSwitch: SwitchCompat
+
   @BindView(R.id.setting_lrc_float_switch)
   lateinit var mFloatLrcSwitch: SwitchCompat
+
   @BindView(R.id.setting_lrc_float_tip)
   lateinit var mFloatLrcTip: TextView
+
   @BindView(R.id.setting_screen_switch)
   lateinit var mScreenSwitch: SwitchCompat
+
   @BindView(R.id.setting_notify_switch)
   lateinit var mNotifyStyleSwitch: SwitchCompat
+
   @BindView(R.id.setting_notify_color_container)
   lateinit var mNotifyColorContainer: View
+
   @BindView(R.id.setting_album_cover_text)
   lateinit var mAlbumCoverText: TextView
+
   @BindView(R.id.setting_lockscreen_text)
   lateinit var mLockScreenTip: TextView
+
   @BindView(R.id.setting_immersive_switch)
   lateinit var mImmersiveSwitch: SwitchCompat
+
   @BindView(R.id.setting_breakpoint_switch)
   lateinit var mBreakpointSwitch: SwitchCompat
+
   @BindView(R.id.setting_ignore_mediastore_switch)
   lateinit var mIgnoreMediastoreSwitch: SwitchCompat
+
   @BindView(R.id.setting_displayname_switch)
   lateinit var mShowDisplaynameSwitch: SwitchCompat
+
   @BindView(R.id.setting_general_theme_text)
   lateinit var mThemeText: TextView
+
   @BindView(R.id.setting_audio_focus_switch)
   lateinit var mAudioFocusSwitch: SwitchCompat
 
@@ -139,10 +156,13 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
   //是否需要重建activity
   private var mNeedRecreate = false
+
   //是否需要刷新adapter
   private var mNeedRefreshAdapter = false
+
   //是否需要刷新library
   private var mNeedRefreshLibrary: Boolean = false
+
   //    //是否从主题颜色选择对话框返回
   //    private boolean mFromColorChoose = false;
   //缓存大小
@@ -528,12 +548,13 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   }
 
   private fun changeLanguage() {
-    val zh = getString(R.string.zh)
+    val zhSimple = getString(R.string.zh_simple)
+    val zhTraditional = getString(R.string.zh_traditional)
     val english = getString(R.string.english)
     val auto = getString(R.string.auto)
 
     getBaseDialog(this)
-        .items(auto, zh, english)
+        .items(auto, zhSimple, zhTraditional, english)
         .itemsCallbackSingleChoice(
             SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO)
         ) { dialog, itemView, which, text ->

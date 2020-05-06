@@ -10,8 +10,9 @@ import java.util.*
 
 object LanguageHelper {
   const val AUTO = 0
-  const val CHINESE = 1
-  const val ENGLISH = 2
+  private const val CHINESE_SIMPLE = 1
+  private const val CHINESE_TRADITIONAL = 2
+  private const val ENGLISH = 3
   var current = -1
 
   private var sLocal: Locale = Locale.getDefault()
@@ -27,8 +28,9 @@ object LanguageHelper {
     }
     return when (current) {
       AUTO -> sLocal
-      CHINESE -> Locale.CHINA
+      CHINESE_SIMPLE -> Locale.SIMPLIFIED_CHINESE
       ENGLISH -> Locale.ENGLISH
+      CHINESE_TRADITIONAL -> Locale.TRADITIONAL_CHINESE
       else -> sLocal
     }
   }
