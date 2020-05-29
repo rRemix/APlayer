@@ -89,7 +89,7 @@
   <string name="save_error">儲存失敗</string>
   <string name="save_error_arg">儲存失敗: %s</string>
   <string name="arg_illegal">參數不合法: %d</string>
-  <string name="send_success">發送成功 感謝您的回報!</string>
+  <string name="send_success">發送成功 感謝您的反饋!</string>
   <string name="send_error">發送失敗: %s</string>
   <string name="screenshot_save_at">截圖檔案已儲存至%s</string>
   <string name="not_install_weibo">您還未安裝微博客戶端</string>
