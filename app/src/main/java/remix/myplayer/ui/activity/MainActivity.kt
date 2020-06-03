@@ -36,6 +36,7 @@ import remix.myplayer.App
 import remix.myplayer.App.IS_GOOGLEPLAY
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Category
+import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.helper.MusicServiceRemote
@@ -544,10 +545,13 @@ open class MainActivity : MenuActivity() {
 
   override fun onMetaChanged() {
     super.onMetaChanged()
-    mHeadText.text = getString(R.string.play_now, MusicServiceRemote.getCurrentSong().title)
-    LibraryUriRequest(mHeadImg,
-        getSearchRequestWithAlbumType(MusicServiceRemote.getCurrentSong()),
-        RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load()
+    val currentSong = MusicServiceRemote.getCurrentSong()
+    if (currentSong != Song.EMPTY_SONG) {
+      mHeadText.text = getString(R.string.play_now, currentSong.title)
+      LibraryUriRequest(mHeadImg,
+          getSearchRequestWithAlbumType(currentSong),
+          RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load()
+    }
   }
 
   override fun onPlayStateChange() {
@@ -561,6 +565,9 @@ open class MainActivity : MenuActivity() {
   override fun onServiceConnected(service: MusicService) {
     super.onServiceConnected(service)
     mRefreshHandler.postDelayed({ this.parseIntent() }, 500)
+    mRefreshHandler.post {
+      onMetaChanged()
+    }
   }
 
   @OnHandleMessage

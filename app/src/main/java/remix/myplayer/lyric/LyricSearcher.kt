@@ -217,20 +217,20 @@ class LyricSearcher {
   /**
    * @param searchPath 设置的本地歌词搜索路径
    * 本地歌词搜索的关键字
+   * artist-displayName.lrc
    * displayName.lrc
    * title.lrc
    * title-artist.lrc
    * displayname-artist.lrc
    * artist-title.lrc
-   * aritst-displayName.lrc
    */
   private fun getLocalSearchKey(searchPath: String? = null): Array<String> {
-    return arrayOf("%$displayName$SUFFIX_LYRIC",
+    return arrayOf("%${song.artist}%$displayName$SUFFIX_LYRIC",
+        "%$displayName$SUFFIX_LYRIC",
         "%${song.title}$SUFFIX_LYRIC",
         "%${song.title}%${song.artist}$SUFFIX_LYRIC",
         "%${song.displayName}%${song.artist}$SUFFIX_LYRIC",
-        "%${song.artist}%${song.title}$SUFFIX_LYRIC",
-        "%${song.artist}%$displayName$SUFFIX_LYRIC")
+        "%${song.artist}%${song.title}$SUFFIX_LYRIC")
   }
 
   /**
@@ -322,7 +322,7 @@ class LyricSearcher {
     return HttpClient.getInstance().getKuGouSearch(searchKey, song.getDuration(), "")
         .flatMap { body ->
           val searchResponse = Gson().fromJson(body.string(), KSearchResponse::class.java)
-          if (searchResponse.candidates.isNotEmpty() && song.title.equals(searchResponse.candidates[0].song,true)) {
+          if (searchResponse.candidates.isNotEmpty() && song.title.equals(searchResponse.candidates[0].song, true)) {
             HttpClient.getInstance().getKuGouLyric(
                 searchResponse.candidates[0].id,
                 searchResponse.candidates[0].accesskey)
