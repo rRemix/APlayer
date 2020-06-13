@@ -21,7 +21,7 @@ public class LrcRow implements Comparable<LrcRow> {
    ***/
   private String mTimeStr;
   /**
-   * 开始时间 毫米数  00:10:00  为10000
+   * 开始时间 毫秒数  00:10:00  为10000
    **/
   private int mTime;
   /**
@@ -148,7 +148,7 @@ public class LrcRow implements Comparable<LrcRow> {
    * 将歌词文件中的某一行 解析成一个List<LrcRow> 因为一行中可能包含了多个LrcRow对象 比如  [03:33.02][00:36.37]当鸽子不再象征和平  ，就包含了2个对象
    */
   public static List<LrcRow> createRows(String lrcLine, int offset) {
-    if (!lrcLine.startsWith("[") || (lrcLine.indexOf("]") != 9 && lrcLine.indexOf(']') != 10)) {
+    if (!lrcLine.startsWith("[") || !lrcLine.contains("]")) {
       return null;
     }
     //最后一个"]"
@@ -184,10 +184,14 @@ public class LrcRow implements Comparable<LrcRow> {
   private static int formatTime(String timeStr) {
     timeStr = timeStr.replace('.', ':');
     String[] times = timeStr.split(":");
-
+    
+    if (times.length > 2) {
+      return Integer.parseInt(times[0]) * 60 * 1000
+          + Integer.parseInt(times[1]) * 1000
+          + Integer.parseInt(times[2]);
+    }
     return Integer.parseInt(times[0]) * 60 * 1000
-        + Integer.parseInt(times[1]) * 1000
-        + Integer.parseInt(times[2]);
+        + Integer.parseInt(times[1]) * 1000;
   }
 
   @Override
