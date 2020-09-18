@@ -60,7 +60,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
 
   public final static String TAG = ChildHolderActivity.class.getSimpleName();
   //获得歌曲信息列表的参数
-  private int mId;
+  private long mId;
   private int mType;
   private String mArg;
 
@@ -88,7 +88,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
     mRefreshHandler = new MsgHandler(this);
 
     //参数id，类型，标题
-    mId = getIntent().getIntExtra(EXTRA_ID, -1);
+    mId = getIntent().getLongExtra(EXTRA_ID, -1);
     mType = getIntent().getIntExtra(EXTRA_TYPE, -1);
     mArg = getIntent().getStringExtra(EXTRA_TITLE);
     if (mId == -1 || mType == -1 || TextUtils.isEmpty(mArg)) {
@@ -351,7 +351,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
   private static final String EXTRA_TYPE = "type";
   private static final String EXTRA_TITLE = "title";
 
-  public static void start(Context context, int type, int id, String title) {
+  public static void start(Context context, int type, long id, String title) {
     context.startActivity(new Intent(context, ChildHolderActivity.class)
         .putExtra(EXTRA_ID, id)
         .putExtra(EXTRA_TYPE, type)

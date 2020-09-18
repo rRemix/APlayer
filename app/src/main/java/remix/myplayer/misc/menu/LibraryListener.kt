@@ -36,7 +36,7 @@ import remix.myplayer.util.ToastUtil
  * Created by taeja on 16-1-25.
  */
 class LibraryListener(private val context: Context, //专辑id 艺术家id 歌曲id 文件夹position
-                      private val id: Int, //0:专辑 1:歌手 2:文件夹 3:播放列表
+                      private val id: Long, //0:专辑 1:歌手 2:文件夹 3:播放列表
                       private val type: Int, //专辑名 艺术家名 文件夹position或者播放列表名字
                       private val key: String) : PopupMenu.OnMenuItemClickListener {
 

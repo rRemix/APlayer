@@ -18,9 +18,9 @@ data class Song(
     val displayName: String,
     val title: String,
     val album: String,
-    val albumId: Int,
+    val albumId: Long,
     val artist: String,
-    val artistId: Int,
+    val artistId: Long,
     private var duration: Long,
     val realTime: String,
     val url: String,
@@ -89,9 +89,9 @@ data class Song(
     result = 31 * result + displayName.hashCode()
     result = 31 * result + title.hashCode()
     result = 31 * result + album.hashCode()
-    result = 31 * result + albumId
+    result = 31 * result + albumId.hashCode()
     result = 31 * result + artist.hashCode()
-    result = 31 * result + artistId
+    result = 31 * result + artistId.hashCode()
     result = 31 * result + duration.hashCode()
     result = 31 * result + realTime.hashCode()
     result = 31 * result + url.hashCode()

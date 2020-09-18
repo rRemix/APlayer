@@ -34,14 +34,14 @@ interface PlayListDao {
     SELECT * FROM PlayList
     WHERE id = :id
   """)
-  fun selectById(id: Int): PlayList?
+  fun selectById(id: Long): PlayList?
 
   @Query("""
     UPDATE PlayList
     SET audioIds = :audioIds
     WHERE id = :playlistId
   """)
-  fun updateAudioIDs(playlistId: Int, audioIds: String): Int
+  fun updateAudioIDs(playlistId: Long, audioIds: String): Int
 
   @Query("""
     UPDATE PlayList
@@ -58,7 +58,7 @@ interface PlayListDao {
     DELETE FROM PlayList
     WHERE id = :id
   """)
-  fun deletePlayList(id: Int): Int
+  fun deletePlayList(id: Long): Int
 
   @Query("""
     DELETE FROM PlayList

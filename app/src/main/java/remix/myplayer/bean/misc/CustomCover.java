@@ -9,21 +9,21 @@ import android.os.Parcelable;
 
 public class CustomCover implements Parcelable {
 
-  private int mId;
+  private long mId;
   private int mType;
   private String mkey;
 
-  public CustomCover(int id, int type, String key) {
+  public CustomCover(long id, int type, String key) {
     this.mId = id;
     this.mType = type;
     this.mkey = key;
   }
 
-  public int getId() {
+  public long getId() {
     return mId;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.mId = id;
   }
 
@@ -59,7 +59,7 @@ public class CustomCover implements Parcelable {
 
   @Override
   public void writeToParcel(Parcel dest, int flags) {
-    dest.writeInt(this.mId);
+    dest.writeLong(this.mId);
     dest.writeInt(this.mType);
     dest.writeString(this.mkey);
   }

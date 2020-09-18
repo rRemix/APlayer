@@ -213,7 +213,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
             activity.onPermissionChanged(msg.data.getBoolean(EXTRA_PERMISSION))
           }
           MusicService.PLAYLIST_CHANGE -> {
-            activity.onPlayListChanged(msg.data.getString(EXTRA_PLAYLIST))
+            activity.onPlayListChanged(msg.data.getString(EXTRA_PLAYLIST) ?: "")
           }
           MusicService.META_CHANGE -> {
             activity.onMetaChanged()
@@ -313,7 +313,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
           }
 
           val path = Crop.getOutput(data).encodedPath
-          if (TextUtils.isEmpty(path) || id == -1) {
+          if (TextUtils.isEmpty(path) || id == -1L) {
             ToastUtil.show(mContext, errorTxt)
             return
           }

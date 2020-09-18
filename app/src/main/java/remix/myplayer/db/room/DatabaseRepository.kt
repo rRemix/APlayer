@@ -33,7 +33,7 @@ class DatabaseRepository private constructor() {
 
   private val executors = Executors.newSingleThreadExecutor()
 
-  private var myLoveId: Int = 0
+  private var myLoveId: Long = 0
     get() {
       if (field <= 0) {
         field = db.playListDao().selectAll().getOrNull(0)?.id ?: 0
@@ -99,7 +99,7 @@ class DatabaseRepository private constructor() {
   /**
    * 插入多首歌曲到播放列表
    */
-  fun insertToPlayList(audioIds: List<Int>, playlistId: Int = -1): Single<Int> {
+  fun insertToPlayList(audioIds: List<Int>, playlistId: Long = -1): Single<Int> {
     return Single
         .fromCallable {
           db.playListDao().selectById(playlistId)
@@ -156,7 +156,7 @@ class DatabaseRepository private constructor() {
   /**
    * 从播放列表移除
    */
-  fun deleteFromPlayList(audioIds: List<Int>, playlistId: Int): Single<Int> {
+  fun deleteFromPlayList(audioIds: List<Int>, playlistId: Long): Single<Int> {
     return Single
         .fromCallable {
           db.playListDao().selectById(playlistId) ?: throw IllegalArgumentException()
@@ -225,7 +225,7 @@ class DatabaseRepository private constructor() {
   /**
    * 获取播放列表
    */
-  fun getPlayList(id: Int): Single<PlayList> {
+  fun getPlayList(id: Long): Single<PlayList> {
     return Single
         .fromCallable {
           db.playListDao().selectById(id)
@@ -269,7 +269,7 @@ class DatabaseRepository private constructor() {
   /**
    * 更新列表内的歌曲id
    */
-  fun updatePlayListAudios(playlistId: Int, audioIds: List<Int>): Single<Int> {
+  fun updatePlayListAudios(playlistId: Long, audioIds: List<Int>): Single<Int> {
     return Single
         .fromCallable {
           db.playListDao().updateAudioIDs(playlistId, Gson().toJson(audioIds))
@@ -378,7 +378,7 @@ class DatabaseRepository private constructor() {
   /**
    * 删除播放列表
    */
-  fun deletePlayList(playListId: Int): Single<Int> {
+  fun deletePlayList(playListId: Long): Single<Int> {
     return Single
         .fromCallable {
           db.playListDao().deletePlayList(playListId)

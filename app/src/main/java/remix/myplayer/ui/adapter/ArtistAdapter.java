@@ -86,7 +86,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     final ArtistHolder holder = (ArtistHolder) baseHolder;
     //设置歌手名
     holder.mText1.setText(artist.getArtist());
-    final int artistId = artist.getArtistID();
+    final long artistId = artist.getArtistID();
     if (holder instanceof ArtistListHolder && holder.mText2 != null) {
       if (artist.getCount() > 0) {
         holder.mText2.setText(context.getString(R.string.song_count_1, artist.getCount()));

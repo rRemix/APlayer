@@ -12,7 +12,7 @@ public class UriRequest implements Serializable {
 
   public static final UriRequest DEFAULT_REQUEST = new UriRequest();
 
-  private int mId;
+  private long mId;
   private int mSearchType;
   private int mNeteaseType;
   private String mTitle = "";
@@ -23,13 +23,13 @@ public class UriRequest implements Serializable {
   public UriRequest() {
   }
 
-  public UriRequest(int id, int searchType, int neteaseType) {
+  public UriRequest(long id, int searchType, int neteaseType) {
     this.mSearchType = searchType;
     this.mId = id;
     this.mNeteaseType = neteaseType;
   }
 
-  public UriRequest(int id, int searchType, int neteaseType, String albumName, String artistName) {
+  public UriRequest(long id, int searchType, int neteaseType, String albumName, String artistName) {
     this.mId = id;
     this.mSearchType = searchType;
     this.mNeteaseType = neteaseType;
@@ -37,14 +37,14 @@ public class UriRequest implements Serializable {
     this.mArtistName = artistName;
   }
 
-  public UriRequest(int id, int searchType, int neteaseType, String artistName) {
+  public UriRequest(long id, int searchType, int neteaseType, String artistName) {
     this.mId = id;
     this.mSearchType = searchType;
     this.mNeteaseType = neteaseType;
     this.mArtistName = artistName;
   }
 
-  public UriRequest(int id, int songId,int searchType, int neteaseType, String title, String albumName,
+  public UriRequest(long id, int songId,int searchType, int neteaseType, String title, String albumName,
       String artistName) {
     this.mId = id;
     this.mSongId = songId;
@@ -93,7 +93,7 @@ public class UriRequest implements Serializable {
     return "lastfm " + hashCode();
   }
 
-  public int getID() {
+  public long getID() {
     return mId;
   }
 
@@ -173,7 +173,7 @@ public class UriRequest implements Serializable {
 
   @Override
   public int hashCode() {
-    int result = mId;
+    int result = (int) (mId ^ (mId >>> 32));
     result = 31 * result + mSearchType;
     result = 31 * result + mNeteaseType;
     result = 31 * result + (mTitle != null ? mTitle.hashCode() : 0);

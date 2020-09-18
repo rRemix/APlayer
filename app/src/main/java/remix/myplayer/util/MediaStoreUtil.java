@@ -17,7 +17,9 @@ import android.database.Cursor;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.BaseColumns;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Audio.AudioColumns;
 import android.provider.MediaStore.Audio.Media;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -79,7 +81,22 @@ public class MediaStoreUtil {
   }
 
   private static String BASE_SELECTION = " ";
-
+  private static final String[] BASE_PROJECTION = new String[]{
+      BaseColumns._ID,
+      AudioColumns.TITLE,
+      AudioColumns.TITLE_KEY,
+      AudioColumns.DISPLAY_NAME,
+      AudioColumns.TRACK,
+      AudioColumns.SIZE,
+      AudioColumns.YEAR,
+      AudioColumns.DURATION,
+      AudioColumns.DATE_ADDED,
+      AudioColumns.DATA,
+      AudioColumns.ALBUM_ID,
+      AudioColumns.ALBUM,
+      AudioColumns.ARTIST_ID,
+      AudioColumns.ARTIST,
+  };
 
   static {
     SCAN_SIZE = SPUtil
@@ -105,7 +122,7 @@ public class MediaStoreUtil {
       if (cursor != null) {
         while (cursor.moveToNext()) {
           try {
-            artists.add(new Artist(cursor.getInt(0),
+            artists.add(new Artist(cursor.getLong(0),
                 cursor.getString(1),
                 cursor.getInt(2)));
           } catch (Exception ignored) {
@@ -138,9 +155,9 @@ public class MediaStoreUtil {
       if (cursor != null) {
         while (cursor.moveToNext()) {
           try {
-            albums.add(new Album(cursor.getInt(0),
+            albums.add(new Album(cursor.getLong(0),
                 cursor.getString(1),
-                cursor.getInt(2),
+                cursor.getLong(2),
                 cursor.getString(3),
                 cursor.getInt(4)));
           } catch (Exception ignored) {
@@ -233,7 +250,7 @@ public class MediaStoreUtil {
    * @param type 1:专辑  2:歌手
    * @return 对应所有歌曲的id
    */
-  public static List<Song> getSongsByArtistIdOrAlbumId(int id, int type) {
+  public static List<Song> getSongsByArtistIdOrAlbumId(long id, int type) {
     String selection = null;
     String sortOrder = null;
     String[] selectionValues = null;
@@ -278,10 +295,10 @@ public class MediaStoreUtil {
             TYPE_SONG),
         processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),
             TYPE_ALBUM),
-        cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
+        cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
         processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),
             TYPE_ARTIST),
-        cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID)),
+        cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID)),
         duration,
         Util.getTime(duration),
         data,
@@ -292,7 +309,7 @@ public class MediaStoreUtil {
     return song;
   }
 
-  public static List<Integer> getSongIdsByParentId(int parentId) {
+  public static List<Integer> getSongIdsByParentId(long parentId) {
     List<Integer> ids = new ArrayList<>();
     try (Cursor cursor = mContext.getContentResolver()
         .query(MediaStore.Files.getContentUri("external"),
@@ -309,7 +326,7 @@ public class MediaStoreUtil {
   /**
    * 根据文件夹名字
    */
-  public static List<Song> getSongsByParentId(int parentId) {
+  public static List<Song> getSongsByParentId(long parentId) {
     List<Integer> ids = getSongIdsByParentId(parentId);
 
     if (ids.size() == 0) {
@@ -332,7 +349,7 @@ public class MediaStoreUtil {
    * @param albumId 歌曲id
    * @return 对应歌曲信息
    */
-  public static Song getSongByAlbumId(int albumId) {
+  public static Song getSongByAlbumId(long albumId) {
     return getSong(MediaStore.Audio.Media.ALBUM_ID + "=?", new String[]{albumId + ""});
   }
 
@@ -362,7 +379,7 @@ public class MediaStoreUtil {
   }
 
 
-  private static void insertAlbumArt(@NonNull Context context, int albumId, String path) {
+  private static void insertAlbumArt(@NonNull Context context, long albumId, String path) {
     ContentResolver contentResolver = context.getContentResolver();
 
     Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
@@ -382,7 +399,7 @@ public class MediaStoreUtil {
   }
 
   @WorkerThread
-  public static void saveArtwork(Context context, int albumId, File artFile)
+  public static void saveArtwork(Context context, long albumId, File artFile)
       throws TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException, IOException, CannotWriteException {
     Song song = MediaStoreUtil.getSongByAlbumId(albumId);
     if (song == null) {
@@ -593,7 +610,7 @@ public class MediaStoreUtil {
     }
     try {
       return mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-          null, selection, selectionValues, sortOrder);
+          BASE_PROJECTION, selection, selectionValues, sortOrder);
     } catch (SecurityException e) {
       return null;
     }

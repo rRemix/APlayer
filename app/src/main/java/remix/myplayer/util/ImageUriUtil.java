@@ -70,7 +70,7 @@ public class ImageUriUtil {
   /**
    * 返回自定义的封面
    */
-  public static File getCustomThumbIfExist(int id, int type) {
+  public static File getCustomThumbIfExist(long id, int type) {
     File img = type == ImageUriRequest.URL_ALBUM ? new File(
         DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/album") + "/" + Util
             .hashKeyForDisk(id + ""))
@@ -255,7 +255,7 @@ public class ImageUriUtil {
   }
 
 
-  public static String getArtistArt(int artistId) {
+  public static String getArtistArt(long artistId) {
     try (Cursor cursor = App.getContext().getContentResolver().query(
         MediaStore.Audio.Artists.Albums.getContentUri("external", artistId),
         null,

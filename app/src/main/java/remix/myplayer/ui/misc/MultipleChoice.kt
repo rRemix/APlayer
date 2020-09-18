@@ -42,7 +42,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
   var isActive: Boolean = false
   var adapter: RecyclerView.Adapter<*>? = null
   private var popup: MultiPopupWindow? = null
-  var extra: Int = 0
+  var extra: Long = 0
 
   private fun getSongsSingle(ids: List<Int>): Single<List<Song>> {
     return Single.fromCallable {

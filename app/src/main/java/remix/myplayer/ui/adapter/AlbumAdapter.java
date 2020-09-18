@@ -87,7 +87,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     holder.mText1.setText(album.getAlbum());
 
     //设置封面
-    final int albumId = album.getAlbumID();
+    final long albumId = album.getAlbumID();
     final int imageSize = mMode == LIST_MODE ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
     holder.mImage.setTag(setImage(holder.mImage, ImageUriUtil.getSearchRequest(album), imageSize, position));
 

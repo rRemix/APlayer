@@ -11,7 +11,7 @@ import com.google.gson.reflect.TypeToken
 @TypeConverters(PlayList.Converter::class)
 data class PlayList(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Long,
     val name: String,
 //    val count: Int,
     val audioIds: LinkedHashSet<Int>,

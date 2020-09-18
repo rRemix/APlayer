@@ -43,14 +43,14 @@ class CustomSortActivity : ToolbarActivity() {
   }
 
   private lateinit var songs: ArrayList<Song>
-  private var playlistId = -1
+  private var playlistId = -1L
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_custom_sort)
     ButterKnife.bind(this@CustomSortActivity)
 
-    playlistId = intent.getIntExtra(EXTRA_ID, -1)
+    playlistId = intent.getLongExtra(EXTRA_ID, -1)
     val playlistName = intent.getStringExtra(EXTRA_NAME) ?: ""
 
     if (!intent.hasExtra(EXTRA_LIST)) {
@@ -134,7 +134,7 @@ class CustomSortActivity : ToolbarActivity() {
 
   companion object {
     @JvmStatic
-    fun start(context: Context, id: Int, name: String, list: List<Song>) {
+    fun start(context: Context, id: Long, name: String, list: List<Song>) {
       context.startActivity(Intent(context, CustomSortActivity::class.java)
           .putExtra(EXTRA_ID, id)
           .putExtra(EXTRA_NAME, name)
