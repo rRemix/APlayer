@@ -1,9 +1,11 @@
 package remix.myplayer.db.room
 
+import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.InvalidationTracker
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
+import android.arch.persistence.room.migration.Migration
 import android.content.Context
 import android.content.Intent
 import remix.myplayer.db.room.AppDatabase.Companion.VERSION
@@ -35,7 +37,7 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun historyDao(): HistoryDao
 
   companion object {
-    const val VERSION = 2
+    const val VERSION = 3
 
     @Volatile
     private var INSTANCE: AppDatabase? = null
@@ -47,17 +49,23 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
     private fun buildDatabase(context: Context): AppDatabase {
+      val migration1to2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+        }
+
+      }
       val database = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "aplayer.db")
+          .addMigrations(migration1to2)
           .build()
-      database.invalidationTracker.addObserver(object : InvalidationTracker.Observer(PlayList.TABLE_NAME,PlayQueue.TABLE_NAME) {
+      database.invalidationTracker.addObserver(object : InvalidationTracker.Observer(PlayList.TABLE_NAME, PlayQueue.TABLE_NAME) {
         override fun onInvalidated(tables: MutableSet<String>) {
           Timber.v("onInvalidated: $tables")
-          if(tables.contains(PlayList.TABLE_NAME)){
+          if (tables.contains(PlayList.TABLE_NAME)) {
             sendLocalBroadcast(Intent(MusicService.PLAYLIST_CHANGE)
-                .putExtra(EXTRA_PLAYLIST,PlayList.TABLE_NAME))
-          } else if(tables.contains(PlayQueue.TABLE_NAME)){
+                .putExtra(EXTRA_PLAYLIST, PlayList.TABLE_NAME))
+          } else if (tables.contains(PlayQueue.TABLE_NAME)) {
             sendLocalBroadcast(Intent(MusicService.PLAYLIST_CHANGE)
-                .putExtra(EXTRA_PLAYLIST,PlayQueue.TABLE_NAME))
+                .putExtra(EXTRA_PLAYLIST, PlayQueue.TABLE_NAME))
           }
         }
       })
