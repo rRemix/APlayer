@@ -7,10 +7,8 @@ import com.google.gson.reflect.TypeToken
 import remix.myplayer.App
 import remix.myplayer.lyric.bean.LrcRow
 import remix.myplayer.misc.cache.DiskCache
-import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
-import kotlin.collections.ArrayList
 
 /**
  * @ClassName

@@ -35,7 +35,7 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun historyDao(): HistoryDao
 
   companion object {
-    const val VERSION = 1
+    const val VERSION = 2
 
     @Volatile
     private var INSTANCE: AppDatabase? = null

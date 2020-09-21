@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.text.TextUtils;
 import com.facebook.common.util.ByteConstants;
 import java.io.File;
 import java.io.IOException;
@@ -35,11 +36,22 @@ public class DiskCache {
     String cachePath = "";
     if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
         || !Environment.isExternalStorageRemovable()) {
-      File file = context.getExternalCacheDir();
-      if (file != null) {
-        cachePath = file.getPath();
+      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+        File[] files = context.getExternalCacheDirs();
+        for (File file : files) {
+          if (file != null && file.exists() && file.isDirectory()) {
+            cachePath = file.getAbsolutePath();
+            break;
+          }
+        }
+      } else {
+        File file = context.getExternalCacheDir();
+        if (file != null && file.exists() && file.isDirectory()) {
+          cachePath = file.getAbsolutePath();
+        }
       }
-    } else {
+    }
+    if (TextUtils.isEmpty(cachePath)) {
       cachePath = context.getCacheDir().getPath();
     }
     return new File(cachePath + File.separator + uniqueName);
