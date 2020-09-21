@@ -49,13 +49,13 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
     private fun buildDatabase(context: Context): AppDatabase {
-      val migration1to2 = object : Migration(1, 2) {
+      val migration1to3 = object : Migration(1, 3) {
         override fun migrate(database: SupportSQLiteDatabase) {
         }
 
       }
       val database = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "aplayer.db")
-          .addMigrations(migration1to2)
+          .addMigrations(migration1to3)
           .build()
       database.invalidationTracker.addObserver(object : InvalidationTracker.Observer(PlayList.TABLE_NAME, PlayQueue.TABLE_NAME) {
         override fun onInvalidated(tables: MutableSet<String>) {
