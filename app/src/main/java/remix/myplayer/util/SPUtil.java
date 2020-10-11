@@ -149,6 +149,8 @@ public class SPUtil {
     String ONLINE_LYRIC_FIRST = "online_lyric_first";
     //是否开启桌面歌词
     String DESKTOP_LYRIC_SHOW = "desktop_lyric_show";
+    //是否开启状态栏歌词
+    String STATUSBAR_LYRIC_SHOW = "statusbar_lyric_show";
     //沉浸式状态栏
     String IMMERSIVE_MODE = "immersive_mode";
     //过滤大小

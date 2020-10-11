@@ -237,6 +237,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
   /**
+   * 是否显示状态栏歌词
+   */
+  private var showStatusBarLyric = false
+    set(value) {
+      field = value
+    }
+
+  /**
    * 是否显示桌面歌词
    */
   private var showDesktopLyric = false
@@ -351,6 +359,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   private var desktopLyricTask: LyricTask? = null
   private var desktopWidgetTask: WidgetTask? = null
 
+  /**
+   * 状态栏歌词
+   */
+  private var statusBarLyricTask : StatusBarLyricTask? = null
 
   private var needShowDesktopLyric: Boolean = false
 
@@ -1095,6 +1107,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       needShowDesktopLyric = false
     }
     updateDesktopLyric(false)
+    updateStatusBarLyric()
     updateNotification()
     updateMediaSession(operation)
     // 是否需要保存进度
@@ -1107,6 +1120,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
   private fun updateNotification() {
     notify.updateForPlaying()
+  }
+
+  private fun updateNotificationWithLrc(lrc: String) {
+    notify.updateWithLyric(lrc)
   }
 
   private fun handlePlayStateChange() {
@@ -1246,6 +1263,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           }
         }
       }
+      // 状态栏歌词
+      Command.TOGGLE_STATUS_BAR_LRC -> {
+        showStatusBarLyric = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.STATUSBAR_LYRIC_SHOW, false)
+        updateStatusBarLyric()
+      }
       //临时播放一首歌曲
       Command.PLAY_TEMP -> {
         intent.getParcelableExtra<Song>(EXTRA_SONG)?.let {
@@ -1281,6 +1303,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         if (showDesktopLyric) {
           updateDesktopLyric(true)
         }
+        updateStatusBarLyric()
       }
       //切换定时器
       Command.TOGGLE_TIMER -> {
@@ -1505,6 +1528,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     lockScreen = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN)
     playModel = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL, MODE_LOOP)
     showDesktopLyric = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
+    showStatusBarLyric = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.STATUSBAR_LYRIC_SHOW, false);
     speed = java.lang.Float.parseFloat(SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
     playAtBreakPoint = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.PLAY_AT_BREAKPOINT, false)
     lastProgress = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_PLAY_PROGRESS, 0)
@@ -1564,6 +1588,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         desktopLyricTask?.force = force
         startUpdateLyric()
       }
+    }
+  }
+
+  private fun updateStatusBarLyric() {
+    if (!showStatusBarLyric || !isPlaying || !screenOn) {
+      stopUpdateStatusBarLyric()
+    } else if (showStatusBarLyric && screenOn) {
+      startUpdateStatusBarLyric()
     }
   }
 
@@ -1632,6 +1664,19 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     desktopLyricTask = null
   }
 
+  private fun startUpdateStatusBarLyric() {
+    if (statusBarLyricTask != null) {
+      return
+    }
+    statusBarLyricTask = StatusBarLyricTask()
+    timer.schedule(statusBarLyricTask, LYRIC_FIND_INTERVAL, LYRIC_FIND_INTERVAL)
+  }
+
+  private fun stopUpdateStatusBarLyric() {
+    statusBarLyricTask?.cancel()
+    statusBarLyricTask = null
+  }
+
   private inner class WidgetTask : TimerTask() {
     private val tag: String = WidgetTask::class.java.simpleName
 
@@ -1655,6 +1700,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
   fun setLyricOffset(offset: Int) {
     desktopLyricTask?.lyricFetcher?.offset = offset
+    statusBarLyricTask?.lyricFetcher?.offset = offset
   }
 
   private inner class LyricTask : TimerTask() {
@@ -1720,6 +1766,31 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
   }
 
+  private inner class StatusBarLyricTask : TimerTask() {
+    private var songInLyricTask = EMPTY_SONG
+    val lyricFetcher = LyricFetcher(this@MusicService)
+    var prev = ""
+
+    override fun run() {
+      if (showStatusBarLyric) {
+        if (songInLyricTask != playQueue.song) {
+          songInLyricTask = playQueue.song
+          lyricFetcher.updateLyricRows(songInLyricTask)
+          return
+        }
+        var wrapper = lyricFetcher.findCurrentLyric()
+        if (TextUtils.equals(prev, wrapper.lineOne.content)) return
+        prev = wrapper.lineOne.content
+        uiHandler.obtainMessage(UPDATE_STATUS_BAR_LRC, wrapper).sendToTarget()
+      }
+    }
+
+    override fun cancel(): Boolean {
+      lyricFetcher.dispose()
+      uiHandler.sendEmptyMessage(UPDATE_NOTIFICATION)
+      return super.cancel()
+    }
+  }
 
   private fun createDesktopLyric() {
     if (checkNoPermission()) {
@@ -1883,6 +1954,15 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         CREATE_DESKTOP_LRC -> {
           musicService.createDesktopLyric()
         }
+        UPDATE_STATUS_BAR_LRC -> {
+          if (msg.obj is LyricRowWrapper) {
+            val wrapper = msg.obj as LyricRowWrapper
+            musicService.updateNotificationWithLrc(wrapper.lineOne.content);
+          }
+        }
+        UPDATE_NOTIFICATION -> {
+          musicService.updateNotification()
+        }
       }
     }
   }
@@ -1907,12 +1987,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         updateDesktopLyric(false)
         //重新开始更新桌面部件
         updateAppwidget()
+        updateStatusBarLyric()
       } else {
         screenOn = false
         //停止更新桌面部件
         stopUpdateAppWidget()
         //关闭桌面歌词
         stopUpdateLyric()
+        updateStatusBarLyric()
       }
     }
   }
@@ -1936,6 +2018,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     const val REMOVE_DESKTOP_LRC = 1005
     //添加桌面歌词
     const val CREATE_DESKTOP_LRC = 1006
+    //更新状态栏歌词
+    const val UPDATE_STATUS_BAR_LRC = 1007
+    //更新通知
+    const val UPDATE_NOTIFICATION = 1008
 
     private const val APLAYER_PACKAGE_NAME = "remix.myplayer"
     //媒体数据库变化
