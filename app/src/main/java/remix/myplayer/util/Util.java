@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Parcelable;
 import android.os.Vibrator;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
@@ -36,6 +37,7 @@ import java.util.List;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.misc.floatpermission.rom.RomUtils;
 import timber.log.Timber;
 
 /**
@@ -590,5 +592,12 @@ public class Util {
       }
     }
     return null;
+  }
+
+  /**
+   * 判断是否支持状态栏歌词
+   */
+  public static boolean isSupportStatusBarLyric(Context context) {
+    return RomUtils.checkIsMeizuRom() || Settings.System.getInt(context.getContentResolver(), "status_bar_show_lyric", 0) != 0;
   }
 }

@@ -207,6 +207,7 @@
   <string name="float_lrc">Desktop lyric</string>
   <string name="closed_desktop_lrc">Desktop lyric is off</string>
   <string name="opened_desktop_lrc">Desktop lyric is on</string>
+  <string name="statusbar_lrc">Statusbar Lyric</string>
   <string name="confirm_ignore_lrc">Confirm to ignore lyric?</string>
   <string name="confirm_cancel_ignore_lrc">Confirm to cancel ignore?</string>
   <string name="ignore_lrc">Ignore lyric</string>

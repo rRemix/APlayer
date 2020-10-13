@@ -25,6 +25,9 @@ import remix.myplayer.ui.activity.PlayerActivity
 abstract class Notify internal constructor(internal var service: MusicService) {
   protected var disposable: Disposable? = null
 
+  protected val FLAG_ALWAYS_SHOW_TICKER = 0x1000000
+  protected val FLAG_ONLY_UPDATE_TICKER = 0x2000000
+
   private val notificationManager: NotificationManager by lazy {
     service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
   }
@@ -64,6 +67,8 @@ abstract class Notify internal constructor(internal var service: MusicService) {
   }
 
   abstract fun updateForPlaying()
+
+  abstract fun updateWithLyric(lrc: String)
 
   internal fun pushNotify(notification: Notification) {
     if (service.stop)

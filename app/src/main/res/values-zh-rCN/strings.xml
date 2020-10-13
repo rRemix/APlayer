@@ -208,6 +208,7 @@
   <string name="closed_desktop_lrc">已关闭桌面歌词</string>
   <string name="opened_desktop_lrc">已开启桌面歌词</string>
   <string name="confirm_ignore_lrc">确认忽略歌词?</string>
+  <string name="statusbar_lrc">状态栏歌词</string>
   <string name="confirm_cancel_ignore_lrc">确认取消忽略歌词?</string>
   <string name="ignore_lrc">忽略歌词</string>
   <string name="cancel_ignore_lrc">取消忽略歌词</string>

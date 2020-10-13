@@ -945,7 +945,40 @@
             android:textOff=""
             android:textOn=""/>
         </RelativeLayout>
-
+        <RelativeLayout
+            android:id="@+id/setting_statusbar_lrc_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/d10_size"
+            android:paddingBottom="@dimen/d10_size"
+            android:background="?attr/background_rect_ripple">
+          <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginLeft="@dimen/d16_size"
+              android:layout_marginRight="@dimen/d16_size"
+              android:layout_alignParentLeft="true"
+              android:layout_centerVertical="true"
+              android:gravity="center_vertical"
+              android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/d2_size"
+                android:text="@string/statusbar_lrc"
+                android:textColor="?attr/text_color_primary"
+                android:textSize="@dimen/s16_size"/>
+          </LinearLayout>
+          <android.support.v7.widget.SwitchCompat
+              android:id="@+id/setting_statusbar_lrc_switch"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginRight="@dimen/d14_size"
+              android:layout_alignParentBottom="true"
+              android:layout_alignParentRight="true"
+              android:textOff=""
+              android:textOn=""/>
+        </RelativeLayout>
         <LinearLayout
           android:id="@+id/setting_lrc_priority_container"
           android:layout_width="match_parent"

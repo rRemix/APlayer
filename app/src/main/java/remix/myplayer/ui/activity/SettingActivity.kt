@@ -81,6 +81,7 @@ import remix.myplayer.ui.dialog.color.ColorChooserDialog
 import remix.myplayer.util.*
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN
+import remix.myplayer.util.Util.isSupportStatusBarLyric
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
 import java.io.File
@@ -155,6 +156,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   @BindViews(R.id.setting_eq_arrow, R.id.setting_feedback_arrow, R.id.setting_about_arrow, R.id.setting_update_arrow)
   lateinit var mArrows: Array<ImageView>
 
+  @BindView(R.id.setting_statusbar_lrc_switch)
+  lateinit var mShowStatusbarLyric: SwitchCompat
+
   //是否需要重建activity
   private var mNeedRecreate = false
 
@@ -190,11 +194,11 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       //            mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
     }
 
-    val keyWord = arrayOf(SETTING_KEY.COLOR_NAVIGATION, SETTING_KEY.SHAKE, SETTING_KEY.DESKTOP_LYRIC_SHOW,
+    val keyWord = arrayOf(SETTING_KEY.COLOR_NAVIGATION, SETTING_KEY.SHAKE, SETTING_KEY.DESKTOP_LYRIC_SHOW, SETTING_KEY.STATUSBAR_LYRIC_SHOW,
         SETTING_KEY.SCREEN_ALWAYS_ON, SETTING_KEY.NOTIFY_STYLE_CLASSIC, SETTING_KEY.IMMERSIVE_MODE,
         SETTING_KEY.PLAY_AT_BREAKPOINT, SETTING_KEY.IGNORE_MEDIA_STORE, SETTING_KEY.SHOW_DISPLAYNAME,
         SETTING_KEY.AUDIO_FOCUS)
-    ButterKnife.apply(arrayOf(mNaviSwitch, mShakeSwitch, mFloatLrcSwitch, mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch, mBreakpointSwitch, mIgnoreMediastoreSwitch, mShowDisplaynameSwitch, mAudioFocusSwitch)) { view, index ->
+    ButterKnife.apply(arrayOf(mNaviSwitch, mShakeSwitch, mFloatLrcSwitch, mShowStatusbarLyric, mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch, mBreakpointSwitch, mIgnoreMediastoreSwitch, mShowDisplaynameSwitch, mAudioFocusSwitch)) { view, index ->
       TintHelper.setTintAuto(view, getAccentColor(), false)
 
       view.isChecked = SPUtil.getValue(mContext, SETTING_KEY.NAME, keyWord[index], false)
@@ -238,6 +242,11 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
               intent.putExtra(EXTRA_DESKTOP_LYRIC, mFloatLrcSwitch.isChecked)
               sendLocalBroadcast(intent)
             }
+            //状态栏歌词
+            R.id.setting_statusbar_lrc_switch -> {
+              val intent = MusicUtil.makeCmdIntent(Command.TOGGLE_STATUS_BAR_LRC)
+              sendLocalBroadcast(intent)
+            }
             //沉浸式状态栏
             R.id.setting_immersive_switch -> {
               ThemeStore.sImmersiveMode = isChecked
@@ -263,6 +272,10 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     //桌面歌词
     mFloatLrcTip.setText(
         if (mFloatLrcSwitch.isChecked) R.string.opened_desktop_lrc else R.string.closed_desktop_lrc)
+
+    if (!isSupportStatusBarLyric(this)) {
+      findViewById<View>(R.id.setting_statusbar_lrc_container).visibility = View.GONE
+    }
 
     //主题颜色指示器
     (mPrimaryColorSrc.drawable as GradientDrawable)
