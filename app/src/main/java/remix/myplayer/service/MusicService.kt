@@ -364,8 +364,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   private var statusBarLyricTask : StatusBarLyricTask? = null
 
-  private var needShowDesktopLyric: Boolean = false
-
   /**
    * 创建桌面歌词悬浮窗
    */
@@ -1102,10 +1100,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       return
     }
     updateAppwidget()
-    if (needShowDesktopLyric) {
-      showDesktopLyric = true
-      needShowDesktopLyric = false
-    }
     updateDesktopLyric(false)
     updateStatusBarLyric()
     updateNotification()
@@ -1175,7 +1169,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
     }
 
-
     when (control) {
       //关闭通知栏
       Command.CLOSE_NOTIFY -> {
@@ -1184,8 +1177,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         //            return;
         //          }
         pause(false)
-        needShowDesktopLyric = true
-        showDesktopLyric = false
         uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
         stopUpdateLyric()
         uiHandler.postDelayed({ notify.cancelPlayingNotify() }, 300)
@@ -1756,13 +1747,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 //      uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
       Timber.tag(TAG_DESKTOP_LYRIC).v("停止更新桌面歌词")
       return super.cancel()
-    }
-
-    fun cancelByNotification() {
-      needShowDesktopLyric = true
-      showDesktopLyric = false
-      uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
-      cancel()
     }
   }
 

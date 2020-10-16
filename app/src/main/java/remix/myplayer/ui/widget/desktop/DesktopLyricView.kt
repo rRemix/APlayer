@@ -241,7 +241,6 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
   }
 
   fun setText(lrc1: LrcRow?, lrc2: LrcRow?) {
-    Timber.v("lrc1: $lrc1  lrc2: $lrc2")
     if (lrc1 != null) {
       if (TextUtils.isEmpty(lrc1.content)) {
         lrc1.content = "......"
