@@ -866,9 +866,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
               DiskCache.init(mContext, "lyric")
               //清除fresco缓存
               Fresco.getImagePipeline().clearCaches()
-              mHandler.sendEmptyMessage(CLEAR_FINISH)
-              mNeedRefreshAdapter = true
               ImageUriRequest.clearUriCache()
+              mNeedRefreshAdapter = true
+              mHandler.sendEmptyMessage(CLEAR_FINISH)
             }
           }.start()
         }.show()

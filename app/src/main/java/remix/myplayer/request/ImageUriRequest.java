@@ -174,12 +174,9 @@ public abstract class ImageUriRequest<T> {
   Observable<String> getCustomThumbObservable(UriRequest request) {
     return Observable.create(emitter -> {
       //是否设置过自定义封面
-      if (request.getSearchType() != URL_ALBUM) {
-        File customImage = ImageUriUtil
-            .getCustomThumbIfExist(request.getID(), request.getSearchType());
-        if (customImage != null && customImage.exists()) {
-          emitter.onNext(PREFIX_FILE + customImage.getAbsolutePath());
-        }
+      File customImage = ImageUriUtil.getCustomThumbIfExist(request.getID(), request.getSearchType());
+      if (customImage != null && customImage.exists()) {
+        emitter.onNext(PREFIX_FILE + customImage.getAbsolutePath());
       }
       emitter.onComplete();
     });
@@ -209,19 +206,7 @@ public abstract class ImageUriRequest<T> {
 
           }
         } else {
-          Uri uri;
-
-          /*
-          if (request.getSongId() > 0) {
-            uri = Uri
-                .parse("content://media/external/audio/media/" + request.getSongId() + "/albumart");
-          } else {
-            uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
-                request.getID());
-          }
-          */
-          uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
-                  request.getID());
+          Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getID());
           if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
             imageUrl = uri.toString();
           }

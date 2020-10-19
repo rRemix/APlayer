@@ -51,16 +51,12 @@ android {
         debug {
             v1SigningEnabled true
             v2SigningEnabled true
-            storeFile file(var)
-            storePassword properties['keystore.storePassword']
-            keyAlias = properties['keystore.keyAlias']
-            keyPassword properties['keystore.keyPassword']
         }
         release {
             def properties = getProperties('../local.properties')
             keyAlias properties['keystore.keyAlias']
             keyPassword properties['keystore.keyPassword']
-            storeFile file('C:\\Users\\tgvit\\tgvita.jks')
+            storeFile file(properties['keystore.storeFile'])
             storePassword properties['keystore.storePassword']
 
             v1SigningEnabled true
