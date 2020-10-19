@@ -206,9 +206,12 @@ public abstract class ImageUriRequest<T> {
           if (songs.size() > 0) {
 //                        imageUrl = resolveEmbeddedPicture(songs.get(0));
             imageUrl = PREFIX_EMBEDDED + songs.get(0).getUrl();
+
           }
         } else {
           Uri uri;
+
+          /*
           if (request.getSongId() > 0) {
             uri = Uri
                 .parse("content://media/external/audio/media/" + request.getSongId() + "/albumart");
@@ -216,6 +219,9 @@ public abstract class ImageUriRequest<T> {
             uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
                 request.getID());
           }
+          */
+          uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
+                  request.getID());
           if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
             imageUrl = uri.toString();
           }
