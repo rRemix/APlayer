@@ -73,13 +73,13 @@ public class ImageUriUtil {
   public static File getCustomThumbIfExist(long id, int type) {
     File img = type == ImageUriRequest.URL_ALBUM ? new File(
         DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/album") + "/" + Util
-            .hashKeyForDisk(id + ""))
+            .hashKeyForDisk(id + "") + ".jpg")
         : type == ImageUriRequest.URL_ARTIST ? new File(
             DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/artist") + "/" + Util
-                .hashKeyForDisk(id + ""))
+                .hashKeyForDisk(id + "") + ".jpg")
             : new File(
                 DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/playlist") + "/" + Util
-                    .hashKeyForDisk(id + ""));
+                    .hashKeyForDisk(id + "") + ".jpg");
     if (img.exists()) {
       return img;
     }

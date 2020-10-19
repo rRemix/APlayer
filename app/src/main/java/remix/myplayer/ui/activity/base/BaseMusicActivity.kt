@@ -300,7 +300,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
             ToastUtil.show(this, errorTxt)
             return
           }
-          val destination = Uri.fromFile(File(cacheDir, Util.hashKeyForDisk(id.toString() + "")))
+          val destination = Uri.fromFile(File(cacheDir, Util.hashKeyForDisk(id.toString() + "") + ".jpg"))
           Crop.of(data?.data, destination).asSquare().start(this)
         } else {
           //图片裁剪
