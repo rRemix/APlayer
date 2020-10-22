@@ -94,7 +94,7 @@
   <string name="screenshot_save_at">截圖檔案已儲存至%s</string>
   <string name="not_install_weibo">您還未安裝微博客戶端</string>
   <string name="create_dir_error">建立目錄失敗</string>
-  <string name="need_permission">應用程式需要必要的權限以執行</string>
+  <string name="need_permission">應用程式需要必要的權限以運作</string>
   <string name="play_now">正在播放: %s</string>
   <string name="default_lrc_path">預設掃描所有歌詞檔案</string>
   <string name="lrc_tip">%s</string>
@@ -139,8 +139,8 @@
   <string name="lrc_priority_tip">配置搜尋時各個資料源順序(長按並拖動排序)</string>
   <string name="navigation_color">導覽列變色</string>
   <string name="navigation_is_show">導覽列是否跟隨主題色變化</string>
-  <string name="shake">搖一搖</string>
-  <string name="shake_tip">搖一搖手機切換曲目</string>
+  <string name="shake">搖動切換</string>
+  <string name="shake_tip">搖動手機切換曲目</string>
   <string name="color">色彩</string>
   <string name="primary_color">主色調</string>
   <string name="primary_color_tip">所有頁面主色調</string>
@@ -193,8 +193,8 @@
   <string name="file_size">檔案大小:</string>
   <string name="format">格式:</string>
   <string name="length">長度:</string>
-  <string name="bitrate">比特率:</string>
-  <string name="sample_rate">採樣率:</string>
+  <string name="bitrate">位元率:</string>
+  <string name="sample_rate">頻率:</string>
   <string name="please_input_song_name">請輸入曲目名</string>
   <string name="please_input_album">請曲目專輯</string>
   <string name="please_input_artist">請輸入藝術家</string>
@@ -208,6 +208,7 @@
   <string name="closed_desktop_lrc">已關閉浮動歌詞</string>
   <string name="opened_desktop_lrc">已開啟浮動歌詞</string>
   <string name="confirm_ignore_lrc">確認忽略歌詞?</string>
+  <string name="statusbar_lrc">狀態列歌詞</string>
   <string name="confirm_cancel_ignore_lrc">確認取消忽略歌詞?</string>
   <string name="ignore_lrc">忽略歌詞</string>
   <string name="cancel_ignore_lrc">取消忽略歌詞</string>
@@ -361,7 +362,7 @@
   <string name="lyric_offset_reset">歌詞已還原</string>
   <string name="lyric_advance_x_second">提前%1$s秒</string>
   <string name="lyric_delay_x_second">延後%1$s秒</string>
-  <string name="speed">播放倍速</string>
+  <string name="speed">播放速度</string>
   <string name="whether_change_theme">當前為夜間模式，是否切換主題顏色?</string>
   <string name="embedded_lyric">內嵌</string>
   <string name="default_lyric_priority">預設</string>
