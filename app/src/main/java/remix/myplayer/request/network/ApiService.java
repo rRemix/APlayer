@@ -39,6 +39,17 @@ public interface ApiService {
       @Query("fmt") String fmt, @Query("charset") String charSet,
       @Query("id") int id, @Query("accesskey") String accessKey);
 
+  @GET("soso/fcgi-bin/client_search_cp")
+  Observable<ResponseBody> getQQSearch(@Query("n") int n,
+                                       @Query("w") String w,
+                                       @Query("format") String format);
+
+  @GET("lyric/fcgi-bin/fcg_query_lyric_new.fcg")
+  @Headers("Referer: https://y.qq.com/portal/player.html")
+  Observable<ResponseBody> getQQLyric(@Query("songmid") String songmid,
+                                      @Query("format") String format,
+                                      @Query("nobase64") int nobase64);
+
   String BASE_QUERY_PARAMETERS = "?format=json&autocorrect=1&api_key=" + BuildConfig.LASTFM_API_KEY;
 
   @GET(BASE_QUERY_PARAMETERS + "&method=album.getinfo")

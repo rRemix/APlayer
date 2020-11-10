@@ -18,12 +18,14 @@ public class HttpClient {
 
   private static final String NETEASE_BASE_URL = "http://music.163.com/api/";
   private static final String KUGOU_BASE_URL = "http://lyrics.kugou.com/";
+  private static final String QQ_BASE_URL = "https://c.y.qq.com/";
   private static final String LASTFM_BASE_URL = "http://ws.audioscrobbler.com/2.0/";
   private static final String GITHUB_BASE_URL = "https://api.github.com/";
   private static final long TIMEOUT = 10000;
 
   private ApiService mNeteaseApi;
   private ApiService mKuGouApi;
+  private ApiService mQQApi;
   private ApiService mLastfmApi;
   private ApiService mGithubApi;
 
@@ -60,6 +62,13 @@ public class HttpClient {
 
     mKuGouApi = retrofitBuilder
         .baseUrl(KUGOU_BASE_URL)
+        .client(okHttpClient)
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create())
+        .build().create(ApiService.class);
+
+    mQQApi = retrofitBuilder
+        .baseUrl(QQ_BASE_URL)
         .client(okHttpClient)
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .addConverterFactory(GsonConverterFactory.create())
@@ -157,6 +166,14 @@ public class HttpClient {
 
   public Observable<ResponseBody> getKuGouLyric(int id, String accessKey) {
     return mKuGouApi.getKuGouLyric(1, "pc", "lrc", "utf8", id, accessKey);
+  }
+
+  public Observable<ResponseBody> getQQSearch(String key) {
+    return mQQApi.getQQSearch(1, key, "json");
+  }
+
+  public Observable<ResponseBody> getQQLyric(String songmid) {
+    return mQQApi.getQQLyric(songmid, "json", 1);
   }
 
   public Observable<ResponseBody> getAlbumInfo(String albumName, String artistName, String lang) {
