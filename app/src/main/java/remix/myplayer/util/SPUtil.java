@@ -98,8 +98,11 @@ public class SPUtil {
     //歌词搜索优先级
     String PRIORITY_LYRIC = "priority_lyric";
     String DEFAULT_PRIORITY = new Gson().toJson(Arrays
-            .asList(LyricPriority.KUGOU, LyricPriority.NETEASE, LyricPriority.LOCAL,
-                LyricPriority.EMBEDED),
+            .asList(LyricPriority.KUGOU,
+                    LyricPriority.NETEASE,
+                    LyricPriority.QQ,
+                    LyricPriority.LOCAL,
+                    LyricPriority.EMBEDED),
         new TypeToken<List<LyricPriority>>() {
         }.getType());
 
@@ -107,6 +110,7 @@ public class SPUtil {
     int LYRIC_IGNORE = LyricPriority.IGNORE.getPriority();
     int LYRIC_NETEASE = LyricPriority.NETEASE.getPriority();
     int LYRIC_KUGOU = LyricPriority.KUGOU.getPriority();
+    int LYRIC_QQ = LyricPriority.QQ.getPriority();
     int LYRIC_LOCAL = LyricPriority.LOCAL.getPriority();
     int LYRIC_EMBEDDED = LyricPriority.EMBEDED.getPriority();
     int LYRIC_MANUAL = LyricPriority.MANUAL.getPriority();

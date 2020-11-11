@@ -50,6 +50,7 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
         getBaseDialog(ref.get())
             .items(getString(R.string.kugou),
                 getString(R.string.netease),
+                getString(R.string.qq),
                 getString(R.string.local),
                 getString(R.string.embedded_lyric),
                 getString(R.string.select_lrc),
@@ -57,17 +58,17 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
                 getString(R.string.change_offset))
             .itemsCallback { dialog, itemView, position, text ->
               when (position) {
-                0, 1, 2, 3 -> { //0酷狗 1网易 2本地 3内嵌
+                0, 1, 2, 3, 4 -> { //0酷狗 1网易 2QQ 3本地 4内嵌
                   SPUtil.putValue(ref.get(), SPUtil.LYRIC_KEY.NAME, song.id.toString(), position + 2)
                   lyricFragment.updateLrc(song, true)
                   sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
                 }
-                4 -> { //手动选择歌词
+                5 -> { //手动选择歌词
                   FileChooserDialog.Builder(activity)
                       .extensionsFilter(".lrc")
                       .show()
                 }
-                5 -> { //忽略或者取消忽略
+                6 -> { //忽略或者取消忽略
                   getBaseDialog(activity)
                       .title(if (!alreadyIgnore) R.string.confirm_ignore_lrc else R.string.confirm_cancel_ignore_lrc)
                       .negativeText(R.string.cancel)
@@ -86,7 +87,7 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
                       }
                       .show()
                 }
-                6 -> { //歌词时间轴调整
+                7 -> { //歌词时间轴调整
                   activity.showLyricOffsetView()
                 }
               }
