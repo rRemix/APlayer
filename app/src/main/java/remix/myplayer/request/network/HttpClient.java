@@ -173,7 +173,7 @@ public class HttpClient {
   }
 
   public Observable<ResponseBody> getQQLyric(String songmid) {
-    return mQQApi.getQQLyric(songmid, "json", 1);
+    return mQQApi.getQQLyric(songmid, 5381, "json", 1);
   }
 
   public Observable<ResponseBody> getAlbumInfo(String albumName, String artistName, String lang) {

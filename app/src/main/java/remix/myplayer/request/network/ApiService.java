@@ -47,6 +47,7 @@ public interface ApiService {
   @GET("lyric/fcgi-bin/fcg_query_lyric_new.fcg")
   @Headers("Referer: https://y.qq.com/portal/player.html")
   Observable<ResponseBody> getQQLyric(@Query("songmid") String songmid,
+                                      @Query("g_tk") int g_tk,
                                       @Query("format") String format,
                                       @Query("nobase64") int nobase64);
 
