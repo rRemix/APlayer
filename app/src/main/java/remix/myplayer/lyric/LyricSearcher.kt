@@ -360,8 +360,10 @@ class LyricSearcher {
                   val combine = lrcParser.getLrcRows(getBufferReader(lrcResponse.lyric.toByteArray()), false, cacheKey, searchKey)
                   if (lrcResponse.trans.isNotEmpty()) {
                     val translate = lrcParser.getLrcRows(getBufferReader(lrcResponse.trans.toByteArray()), false, cacheKey, searchKey)
-                    if (translate != null && translate.size > 0) {
+                    if (isCN && translate != null && translate.size > 0) {
                       for (i in translate.indices) {
+                        if (translate[i].content.isNullOrEmpty() || translate[i].content == "//")
+                          continue
                         for (j in combine.indices) {
                           if (translate[i].time == combine[j].time) {
                             combine[j].translate = translate[i].content
