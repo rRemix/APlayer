@@ -357,8 +357,25 @@ class LyricSearcher {
             HttpClient.getInstance().getQQLyric(searchResponse.data.song.list[0].songmid)
                 .map { lrcBody ->
                   val lrcResponse = Gson().fromJson(lrcBody.string(), QLrcResponse::class.java)
+                  val combine = lrcParser.getLrcRows(getBufferReader(lrcResponse.lyric.toByteArray()), false, cacheKey, searchKey)
+                  if (lrcResponse.trans.isNotEmpty()) {
+                    val translate = lrcParser.getLrcRows(getBufferReader(lrcResponse.trans.toByteArray()), false, cacheKey, searchKey)
+                    if (isCN && translate != null && translate.size > 0) {
+                      for (i in translate.indices) {
+                        if (translate[i].content.isNullOrEmpty() || translate[i].content == "//")
+                          continue
+                        for (j in combine.indices) {
+                          if (translate[i].time == combine[j].time) {
+                            combine[j].translate = translate[i].content
+                            break
+                          }
+                        }
+                      }
+                    }
+                  }
                   Timber.v("QQLyric")
-                  lrcParser.getLrcRows(getBufferReader(lrcResponse.lyric.toByteArray()), true, cacheKey, searchKey)
+                  lrcParser.saveLrcRows(combine, cacheKey, searchKey)
+                  combine
                 }
           } else {
             Observable.empty()
