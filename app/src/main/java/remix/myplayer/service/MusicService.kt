@@ -540,6 +540,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       override fun onFinish() {
         exitAfterCompletion = true
       }
+      override fun revert() {
+        exitAfterCompletion = false
+      }
     })
 
     setUpPlayer()

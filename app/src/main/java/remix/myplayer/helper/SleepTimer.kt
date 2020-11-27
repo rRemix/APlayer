@@ -7,7 +7,11 @@ import remix.myplayer.util.ToastUtil
 
 class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer(millisInFuture, countDownInterval) {
 
+  var isFinished = false
+    private set
+
   override fun onFinish() {
+    isFinished = true
     callbacks.forEach {
       it.onFinish()
     }
@@ -17,8 +21,15 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer
     millisUntilFinish = millisUntilFinished
   }
 
+  fun revert() {
+    callbacks.forEach {
+      it.revert()
+    }
+  }
+
   interface Callback {
     fun onFinish()
+    fun revert()
   }
 
   companion object {
@@ -59,7 +70,12 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer
         instance?.start()
       } else {
         if (instance != null) {
-          instance?.cancel()
+          val isFinished = instance?.isFinished
+          if (isFinished == true) {
+            instance?.revert()
+          } else {
+            instance?.cancel()
+          }
           instance = null
         }
         millisUntilFinish = 0
@@ -67,7 +83,7 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer
       ToastUtil.show(context, if (!start) context.getString(R.string.cancel_timer) else context.getString(R.string.will_stop_at_x, Math.ceil((duration / 1000 / 60).toDouble()).toInt()))
     }
 
-    public fun addCallback(callback: Callback) {
+    fun addCallback(callback: Callback) {
       callbacks.add(callback)
     }
 
