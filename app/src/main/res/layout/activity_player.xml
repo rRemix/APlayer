@@ -95,9 +95,7 @@
         android:progressDrawable="@drawable/bg_progress"
         android:paddingStart="@dimen/player_seekbar_padding"
         android:paddingEnd="@dimen/player_seekbar_padding"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/text_remain"
-        android:layout_toRightOf="@id/text_hasplay"
+        android:layout_centerInParent="true"
         android:layout_marginStart="@dimen/player_seekbar_margin"
         android:layout_marginEnd="@dimen/player_seekbar_margin"/>
     </RelativeLayout>

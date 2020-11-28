@@ -335,7 +335,8 @@
   <string name="export_fail">匯出失敗:%s</string>
   <string name="export_success">匯出成功</string>
   <string name="cover_download_source">封面下載源</string>
-  <string name="cover_download_source_tip">預設從 LastFM 下載</string>
+  <string name="cover_download_from_lastfm">從LastFm下載</string>
+  <string name="cover_download_from_netease">從網易下載</string>
   <string name="update_notification">更新通知</string>
   <string name="update_notification_description">更新通知用於展示下載進度</string>
   <string name="downloading">下載中</string>

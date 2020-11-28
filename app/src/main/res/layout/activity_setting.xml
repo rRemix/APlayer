@@ -880,9 +880,10 @@
             android:textColor="?attr/text_color_primary"
             android:textSize="@dimen/s16_size"/>
           <TextView
+            android:id="@+id/setting_cover_source_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/cover_download_source_tip"
+            android:text="@string/cover_download_from_lastfm"
             android:textColor="?attr/text_color_secondary"
             android:textSize="@dimen/s14_size"/>
         </LinearLayout>

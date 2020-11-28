@@ -56,10 +56,10 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     val notification = buildNotification(service, remoteView, remoteBigView)
 
     //设置歌手，歌曲名
-    remoteBigView.setTextViewText(R.id.notify_song, song.title)
+    remoteBigView.setTextViewText(R.id.notify_song, song.showName)
     remoteBigView.setTextViewText(R.id.notify_artist_album, song.artist + " - " + song.album)
 
-    remoteView.setTextViewText(R.id.notify_song, song.title)
+    remoteView.setTextViewText(R.id.notify_song, song.showName)
     remoteView.setTextViewText(R.id.notify_artist_album, song.artist + " - " + song.album)
 
     //非系统背景色 即黑色背景

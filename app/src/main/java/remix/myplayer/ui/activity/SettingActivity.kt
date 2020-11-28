@@ -31,6 +31,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import kotlinx.android.synthetic.main.activity_setting.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import remix.myplayer.App.IS_GOOGLEPLAY
@@ -294,6 +295,11 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
             mContext.getString(R.string.always))
     mAlbumCoverText.text = mOriginalAlbumChoice
+
+    // 封面下载源
+    val coverSource = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, 0)
+    setting_cover_source_text.text = getString(
+        if (coverSource == 0) R.string.cover_download_from_lastfm else R.string.cover_download_from_netease)
 
     //根据系统版本决定是否显示通知栏样式切换
     findViewById<View>(R.id.setting_classic_notify_container).visibility = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) View.VISIBLE else View.GONE
@@ -795,6 +801,8 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             ImageUriRequest.DOWNLOAD_SOURCE = which
             SPUtil.putValue(mContext, SETTING_KEY.NAME,
                 SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, which)
+            setting_cover_source_text.text = getString(
+                if (which == 0) R.string.cover_download_from_lastfm else R.string.cover_download_from_netease)
           }
           true
         }

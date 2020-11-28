@@ -336,7 +336,8 @@
   <string name="export_fail">导出失败:%s</string>
   <string name="export_success">导出成功</string>
   <string name="cover_download_source">封面下载源</string>
-  <string name="cover_download_source_tip">默认从LastFM下载</string>
+  <string name="cover_download_from_lastfm">从LastFm下载</string>
+  <string name="cover_download_from_netease">从网易下载</string>
   <string name="update_notification">更新通知</string>
   <string name="update_notification_description">更新通知用于展示下载进度</string>
   <string name="downloading">下载中</string>

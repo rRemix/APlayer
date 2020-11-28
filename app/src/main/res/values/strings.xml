@@ -336,7 +336,8 @@
   <string name="export_fail">Export failed:%s</string>
   <string name="export_success">Export success</string>
   <string name="cover_download_source">Cover download source</string>
-  <string name="cover_download_source_tip">Default behavior is download from LastFM</string>
+  <string name="cover_download_from_lastfm">Download from LastFm</string>
+  <string name="cover_download_from_netease">Download from Netease</string>
   <string name="update_notification">Notification for update</string>
   <string name="update_notification_description">Notification for update</string>
   <string name="downloading">Downloading</string>
