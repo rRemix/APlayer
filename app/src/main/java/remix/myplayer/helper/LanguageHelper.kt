@@ -75,7 +75,7 @@ object LanguageHelper {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       val localeList = LocaleList(locale ?: return)
       LocaleList.setDefault(localeList)
-      config.locales = localeList
+      config.setLocales(localeList)
       context.applicationContext.createConfigurationContext(config)
       Locale.setDefault(locale)
     }

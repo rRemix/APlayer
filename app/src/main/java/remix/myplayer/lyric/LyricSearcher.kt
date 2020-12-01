@@ -208,6 +208,9 @@ class LyricSearcher {
         getLocalSearchKey(),
         null)
         .use { filesCursor ->
+          if(filesCursor == null){
+            return ""
+          }
           while (filesCursor.moveToNext()) {
             val file = File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)))
             Timber.v("file: %s", file.absolutePath)

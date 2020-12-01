@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -108,28 +109,41 @@ public class MediaStoreUtil {
     if (!hasStoragePermissions()) {
       return new ArrayList<>();
     }
-    ArrayList<Artist> artists = new ArrayList<>();
+
+    final Map<Long, List<Artist>> artistMaps = new LinkedHashMap<>();
+    final List<Artist> artists = new ArrayList<>();
     try (Cursor cursor = mContext.getContentResolver()
         .query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             new String[]{MediaStore.Audio.Media.ARTIST_ID,
-                MediaStore.Audio.Media.ARTIST,
-                "count(" + Media.ARTIST_ID + ")"},
-            MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY ("
-                + MediaStore.Audio.Media.ARTIST_ID,
+                MediaStore.Audio.Media.ARTIST},
+            getBaseSelection(),
             null,
             SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
                 SortOrder.ArtistSortOrder.ARTIST_A_Z))) {
       if (cursor != null) {
         while (cursor.moveToNext()) {
           try {
-            artists.add(new Artist(cursor.getLong(0),
-                cursor.getString(1),
-                cursor.getInt(2)));
+            long artistId = cursor.getLong(0);
+            if (artistMaps.get(artistId) == null) {
+              artistMaps.put(artistId, new ArrayList<>());
+              artistMaps.get(artistId).add(new Artist(artistId, cursor.getString(1), 0));
+            }
           } catch (Exception ignored) {
+          }
+        }
 
+        for (Entry<Long, List<Artist>> entry : artistMaps.entrySet()) {
+          try {
+            final Artist artist = entry.getValue().get(0);
+            artist.setCount(entry.getValue().size());
+            artists.add(artist);
+          } catch (Exception e) {
+            Timber.v("addArtist failed: " + e);
           }
         }
       }
+    } catch (Exception e) {
+      Timber.v("getAllArtist failed: " + e);
     }
 
     return artists;
@@ -139,33 +153,47 @@ public class MediaStoreUtil {
     if (!hasStoragePermissions()) {
       return new ArrayList<>();
     }
-    ArrayList<Album> albums = new ArrayList<>();
+    final Map<Long, List<Album>> albumMaps = new LinkedHashMap<>();
+    final List<Album> albums = new ArrayList<>();
     try (Cursor cursor = mContext.getContentResolver()
         .query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             new String[]{MediaStore.Audio.Media.ALBUM_ID,
                 MediaStore.Audio.Media.ALBUM,
                 MediaStore.Audio.Media.ARTIST_ID,
-                MediaStore.Audio.Media.ARTIST,
-                "count(" + Media.ALBUM_ID + ")"},
-            MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY ("
-                + MediaStore.Audio.Media.ALBUM_ID,
+                MediaStore.Audio.Media.ARTIST},
+            getBaseSelection(),
             null,
             SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
                 SortOrder.AlbumSortOrder.ALBUM_A_Z))) {
       if (cursor != null) {
         while (cursor.moveToNext()) {
           try {
-            albums.add(new Album(cursor.getLong(0),
-                cursor.getString(1),
-                cursor.getLong(2),
-                cursor.getString(3),
-                cursor.getInt(4)));
+            long albumId = cursor.getLong(0);
+            if (albumMaps.get(albumId) == null) {
+              albumMaps.put(albumId, new ArrayList<>());
+              albumMaps.get(albumId).add(new Album(albumId,
+                  cursor.getString(1),
+                  cursor.getLong(2),
+                  cursor.getString(3),
+                  0));
+            }
           } catch (Exception ignored) {
-
           }
-
         }
+
+        for (Entry<Long, List<Album>> entry : albumMaps.entrySet()) {
+          try {
+            final Album album = entry.getValue().get(0);
+            album.setCount(entry.getValue().size());
+            albums.add(album);
+          } catch (Exception e) {
+            Timber.v("addAlbum failed: " + e);
+          }
+        }
+
       }
+    } catch (Exception e) {
+      Timber.v("getAllAlbum failed: " + e);
     }
     return albums;
   }
@@ -677,11 +705,11 @@ public class MediaStoreUtil {
 
   /**
    * 歌曲数量
-   * @return
    */
   public static int getCount() {
     try (Cursor cursor = mContext.getContentResolver()
-        .query(Media.EXTERNAL_CONTENT_URI, new String[]{Media._ID}, getBaseSelection(), null, null)) {
+        .query(Media.EXTERNAL_CONTENT_URI, new String[]{Media._ID}, getBaseSelection(), null,
+            null)) {
       if (cursor != null) {
         return cursor.getCount();
       }

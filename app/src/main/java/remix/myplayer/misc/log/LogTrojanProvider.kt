@@ -16,9 +16,10 @@ class LogTrojanProvider : ContentProvider() {
     return null
   }
 
-  override fun insert(uri: Uri, values: ContentValues): Uri? {
-    return null
+  override fun insert(uri: Uri, values: ContentValues?): Uri? {
+    return Uri.EMPTY
   }
+
 
   override fun onCreate(): Boolean {
     Timber.plant(LogTree())
