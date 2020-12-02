@@ -87,6 +87,9 @@ import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
 import java.io.File
 import java.util.*
+import kotlin.Comparator
+import kotlin.collections.ArrayList
+import kotlin.collections.LinkedHashSet
 
 /**
  * @ClassName SettingActivity
@@ -344,23 +347,8 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
   override fun onFolderSelection(dialog: FolderChooserDialog, folder: File) {
     var tag = dialog.tag ?: return
-    var playListName = ""
-    try {
-      if (tag.contains("ExportPlayList")) {
-        val tagAndName = tag.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        tag = tagAndName[0]
-        playListName = tagAndName[1]
-      }
-    } catch (e: Exception) {
-      e.printStackTrace()
-    }
 
     when (tag) {
-      //            case "Lrc":
-      //                boolean success = SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, folder.getAbsolutePath());
-      //                ToastUtil.show(this, success ? R.string.setting_success : R.string.setting_error, Toast.LENGTH_SHORT);
-      //                mLrcPath.setText(getString(R.string.lrc_tip, SPUtil.getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "")));
-      //                break;
       "Scan" -> {
         if (folder.exists() && folder.isDirectory && folder.list() != null) {
           SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.MANUAL_SCAN_FOLDER, folder.absolutePath)
@@ -370,6 +358,17 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         mNeedRefreshAdapter = true
       }
       "ExportPlayList" -> {
+        var playListName = ""
+        try {
+          if (tag.contains("ExportPlayList")) {
+            val tagAndName = tag.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            tag = tagAndName[0]
+            playListName = tagAndName[1]
+          }
+        } catch (e: Exception) {
+          e.printStackTrace()
+        }
+
         if (TextUtils.isEmpty(playListName)) {
           ToastUtil.show(mContext, R.string.export_fail)
           return
@@ -379,6 +378,15 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         }
         mDisposables
             .add(exportPlayListToFile(this, playListName, File(folder, "$playListName.m3u")))
+      }
+      "BlackList" -> {
+        val blackList = LinkedHashSet(SPUtil.getStringSet(this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST))
+        if (folder.exists() && folder.isDirectory) {
+          blackList.add(folder.absolutePath)
+          SPUtil.putStringSet(this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST, blackList)
+          contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
+        }
+        configBlackList(blackList)
       }
     }
   }
@@ -450,11 +458,21 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   }
 
   @SuppressLint("CheckResult")
-  @OnClick(R.id.setting_filter_container, R.id.setting_primary_color_container, R.id.setting_notify_color_container, R.id.setting_feedback_container, R.id.setting_about_container, R.id.setting_update_container, R.id.setting_lockscreen_container, R.id.setting_lrc_priority_container, R.id.setting_lrc_float_container, R.id.setting_navigation_container, R.id.setting_shake_container, R.id.setting_eq_container, R.id.setting_clear_container, R.id.setting_breakpoint_container, R.id.setting_screen_container, R.id.setting_scan_container, R.id.setting_classic_notify_container, R.id.setting_album_cover_container, R.id.setting_library_category_container, R.id.setting_immersive_container, R.id.setting_import_playlist_container, R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container, R.id.setting_cover_source_container, R.id.setting_player_bottom_container, R.id.setting_restore_delete_container, R.id.setting_displayname_container, R.id.setting_general_theme_container, R.id.setting_accent_color_container, R.id.setting_language_container, R.id.setting_auto_play_headset_container, R.id.setting_audio_focus_container)
+  @OnClick(R.id.setting_blacklist_container, R.id.setting_primary_color_container, R.id.setting_notify_color_container,
+      R.id.setting_feedback_container, R.id.setting_about_container, R.id.setting_update_container,
+      R.id.setting_lockscreen_container, R.id.setting_lrc_priority_container, R.id.setting_lrc_float_container,
+      R.id.setting_navigation_container, R.id.setting_shake_container, R.id.setting_eq_container,
+      R.id.setting_clear_container, R.id.setting_breakpoint_container, R.id.setting_screen_container,
+      R.id.setting_scan_container, R.id.setting_classic_notify_container, R.id.setting_album_cover_container,
+      R.id.setting_library_category_container, R.id.setting_immersive_container, R.id.setting_import_playlist_container,
+      R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container, R.id.setting_cover_source_container,
+      R.id.setting_player_bottom_container, R.id.setting_displayname_container, R.id.setting_general_theme_container,
+      R.id.setting_accent_color_container, R.id.setting_language_container, R.id.setting_auto_play_headset_container,
+      R.id.setting_audio_focus_container)
   fun onClick(v: View) {
     when (v.id) {
       //文件过滤
-      R.id.setting_filter_container -> configFilterSize()
+      R.id.setting_blacklist_container -> configBlackList()
       //曲库
       R.id.setting_library_category_container -> configLibraryCategory()
       //桌面歌词
@@ -536,8 +554,6 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       R.id.setting_ignore_mediastore_container -> mIgnoreMediastoreSwitch.isChecked = !mIgnoreMediastoreSwitch.isChecked
       //播放界面底部
       R.id.setting_player_bottom_container -> changeBottomOfPlayingScreen()
-      //恢复移除的歌曲
-      R.id.setting_restore_delete_container -> restoreDeleteSong()
       //文件名
       R.id.setting_displayname_container -> mShowDisplaynameSwitch.isChecked = !mShowDisplaynameSwitch.isChecked
       //全局主题
@@ -673,17 +689,6 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
           }
         }.show()
   }
-
-
-  /**
-   * 恢复移除的歌曲
-   */
-  private fun restoreDeleteSong() {
-    SPUtil.deleteValue(this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST_SONG)
-    contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
-    ToastUtil.show(mContext, R.string.alread_restore_songs)
-  }
-
 
   /**
    * 播放列表导出
@@ -975,27 +980,62 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   }
 
   /**
-   * 配置过滤大小
+   * 设置黑名单
    */
-  private fun configFilterSize() {
-    //读取以前设置
-    var position = 0
-    for (i in mScanSize.indices) {
-      position = i
-      if (mScanSize[i] == MediaStoreUtil.SCAN_SIZE) {
-        break
-      }
-    }
-    getBaseDialog(mContext)
-        .title(R.string.set_filter_size)
-        .items("0K", "500K", "1MB", "2MB", "5MB")
-        .itemsCallbackSingleChoice(position) { dialog, itemView, which, text ->
-          SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE,
-              mScanSize[which])
-          MediaStoreUtil.SCAN_SIZE = mScanSize[which]
-          contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
-          true
-        }.show()
+  private fun configBlackList(blackList: Set<String> = SPUtil.getStringSet(this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST)) {
+    val items = ArrayList<String>(blackList)
+    items.sortWith(Comparator { left, right -> File(left).name.compareTo(File(right).name) })
+
+    getBaseDialog(this)
+        .items(items)
+        .itemsCallback { dialog, itemView, position, text ->
+          getBaseDialog(this)
+              .title(R.string.remove_from_blacklist)
+              .content(getString(R.string.do_you_want_remove_from_blacklist, text))
+              .onPositive { dialog, which ->
+                val mutableSet = LinkedHashSet<String>(blackList)
+                val it = mutableSet.iterator()
+                while (it.hasNext()) {
+                  if (it.next().contentEquals(text)) {
+                    it.remove()
+                    break
+                  }
+                }
+                SPUtil.putStringSet(this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST, mutableSet)
+                contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
+              }
+              .positiveText(R.string.confirm)
+              .negativeText(R.string.cancel)
+              .show()
+        }
+        .title(R.string.blacklist)
+        .neutralText(R.string.clear)
+        .positiveText(R.string.add)
+        .onAny { dialog, which ->
+          when (which) {
+            DialogAction.NEUTRAL -> {
+              //clear
+              getBaseDialog(this)
+                  .title(R.string.clear_blacklist_title)
+                  .content(R.string.clear_blacklist_content)
+                  .negativeText(R.string.cancel)
+                  .positiveText(R.string.confirm)
+                  .onPositive { dialog, which ->
+                    SPUtil.putStringSet(this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST, LinkedHashSet<String>())
+                    contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
+                  }
+                  .show()
+            }
+            DialogAction.POSITIVE -> {
+              //add
+              val builder = Builder(this)
+                  .chooseButton(R.string.choose_folder)
+                  .tag("BlackList")
+              builder.show()
+            }
+          }
+        }
+        .show()
   }
 
   private fun changeBottomOfPlayingScreen() {

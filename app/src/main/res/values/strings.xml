@@ -411,4 +411,12 @@
   <string name="deleting">Deleting</string>
   <string name="adding">Adding</string>
   <string name="send_log">Whether to send log at the same time?</string>
+  <string name="clear">Clear</string>
+  <string name="add">Add</string>
+  <string name="clear_blacklist_title">Clear Blacklist</string>
+  <string name="clear_blacklist_content">Do you want to clear blacklist?</string>
+  <string name="blacklist">BlackList</string>
+  <string name="remove_from_blacklist">Remove from blacklist</string>
+  <string name="do_you_want_remove_from_blacklist">Do you want to remove %s from the blacklist?</string>
+  <string name="blacklist_tip">The content of these folder will be hidden from you library</string>
 </resources>

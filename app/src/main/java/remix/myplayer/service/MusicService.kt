@@ -904,12 +904,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
   override fun onMediaStoreChanged() {
-    launch {
-      val song = withContext(Dispatchers.IO) {
-        MediaStoreUtil.getSongById(playQueue.song.id)
-      }
-      playQueue.song = song
-    }
+//    launch {
+//      val song = withContext(Dispatchers.IO) {
+//        MediaStoreUtil.getSongById(playQueue.song.id)
+//      }
+//      playQueue.song = song
+//    }
   }
 
   override fun onPermissionChanged(has: Boolean) {
@@ -1535,8 +1535,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     uiHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
 
     //打开软件扫描
-    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-        .apply {
+    getExternalFilesDir(Environment.DIRECTORY_MUSIC)
+        ?.apply {
           if (exists() && isDirectory) {
             MediaScanner(this@MusicService).scanFilesSimply(this)
           }

@@ -33,6 +33,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,7 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
+import remix.myplayer.util.SPUtil.SETTING_KEY;
 import timber.log.Timber;
 
 /**
@@ -67,10 +69,7 @@ import timber.log.Timber;
  * 数据库工具类
  */
 public class MediaStoreUtil {
-
   private static final String TAG = "MediaStoreUtil";
-  //扫描文件默认大小设置
-  public static int SCAN_SIZE;
   @SuppressLint("StaticFieldLeak")
   private static Context mContext;
 
@@ -99,12 +98,6 @@ public class MediaStoreUtil {
       AudioColumns.ARTIST,
   };
 
-  static {
-    SCAN_SIZE = SPUtil
-        .getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE,
-            ByteConstants.MB);
-  }
-
   public static List<Artist> getAllArtist() {
     if (!hasStoragePermissions()) {
       return new ArrayList<>();
@@ -117,7 +110,7 @@ public class MediaStoreUtil {
             new String[]{MediaStore.Audio.Media.ARTIST_ID,
                 MediaStore.Audio.Media.ARTIST},
             getBaseSelection(),
-            null,
+            getBaseSelectionArgs(),
             SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
                 SortOrder.ArtistSortOrder.ARTIST_A_Z))) {
       if (cursor != null) {
@@ -162,7 +155,7 @@ public class MediaStoreUtil {
                 MediaStore.Audio.Media.ARTIST_ID,
                 MediaStore.Audio.Media.ARTIST},
             getBaseSelection(),
-            null,
+            getBaseSelectionArgs(),
             SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
                 SortOrder.AlbumSortOrder.ALBUM_A_Z))) {
       if (cursor != null) {
@@ -235,7 +228,7 @@ public class MediaStoreUtil {
 
     try (Cursor cursor = mContext.getContentResolver()
         .query(MediaStore.Files.getContentUri("external"),
-            null, getBaseSelection() + " and media_type = 2", null, null)) {
+            null, getBaseSelection() + " and media_type = 2", getBaseSelectionArgs(), null)) {
       if (cursor != null) {
         while (cursor.moveToNext()) {
           final String data = cursor
@@ -546,36 +539,31 @@ public class MediaStoreUtil {
    * 过滤移出的歌曲以及铃声等
    */
   public static String getBaseSelection() {
-//        Set<String> deleteId = SPUtil.getStringSet(mContext,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
-//        if(deleteId == null || deleteId.size() == 0)
-//            return BASE_SELECTION;
-//        StringBuilder stringBuilder = new StringBuilder();
-//        stringBuilder.append(" and ");
-//        int i = 0;
-//        for (String id : deleteId) {
-//            stringBuilder.append(MediaStore.Audio.Media._ID + " != ").append(id).append(i != deleteId.size() - 1 ?  " and " : " ");
-//            i++;
-//        }
-//        return stringBuilder.toString();
+    Set<String> blacklist = SPUtil
+        .getStringSet(mContext, SPUtil.SETTING_KEY.NAME, SETTING_KEY.BLACKLIST);
 
-    Set<String> deleteId = SPUtil
-        .getStringSet(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.BLACKLIST_SONG);
-    if (deleteId.size() == 0) {
-      return MediaStore.Audio.Media.SIZE + ">" + SCAN_SIZE;
-    }
-    StringBuilder blacklist = new StringBuilder();
-    blacklist.append(MediaStore.Audio.Media.SIZE + ">").append(SCAN_SIZE);
-    blacklist.append(" and ");
+    StringBuilder builder = new StringBuilder();
     int i = 0;
-    for (String id : deleteId) {
-      if (i == 0) {
-        blacklist.append(MediaStore.Audio.Media._ID).append(" not in (");
-      }
-      blacklist.append(id);
-      blacklist.append(i != deleteId.size() - 1 ? "," : ")");
+    for (String path : blacklist) {
+      builder.append(Media.DATA + " NOT LIKE ").append(" ? ");
+      builder.append(i != blacklist.size() - 1 ? " AND " : "");
       i++;
     }
-    return blacklist.append(BASE_SELECTION).toString();
+    return builder.toString();
+  }
+
+  public static String[] getBaseSelectionArgs() {
+    Set<String> blacklist = SPUtil
+        .getStringSet(mContext, SPUtil.SETTING_KEY.NAME, SETTING_KEY.BLACKLIST);
+
+    String[] selectionArgs = new String[blacklist.size()];
+    Iterator<String> iterator = blacklist.iterator();
+    int i = 0;
+    while (iterator.hasNext()){
+      selectionArgs[i] = iterator.next() + "%";
+      i++;
+    }
+    return selectionArgs;
   }
 
   /**
@@ -629,16 +617,30 @@ public class MediaStoreUtil {
   }
 
   @Nullable
-  public static Cursor makeSongCursor(@Nullable String selection, final String[] selectionValues,
+  public static Cursor makeSongCursor(@Nullable String selection, String[] selectionValues,
       final String sortOrder) {
+
     if (selection != null && !selection.trim().equals("")) {
       selection = getBaseSelection() + " AND " + selection;
     } else {
       selection = getBaseSelection();
     }
+
+    if (selectionValues == null) {
+      selectionValues = new String[0];
+    }
+
+    String[] baseSelectionArgs = getBaseSelectionArgs();
+    String[] newSelectionValues = new String[selectionValues.length + baseSelectionArgs.length];
+    System.arraycopy(selectionValues, 0, newSelectionValues, 0, selectionValues.length);
+    if (newSelectionValues.length - selectionValues.length >= 0)
+      System.arraycopy(baseSelectionArgs, 0,
+          newSelectionValues, selectionValues.length,
+          newSelectionValues.length - selectionValues.length);
+
     try {
       return mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-          BASE_PROJECTION, selection, selectionValues, sortOrder);
+          BASE_PROJECTION, selection, newSelectionValues, sortOrder);
     } catch (SecurityException e) {
       return null;
     }
@@ -708,7 +710,8 @@ public class MediaStoreUtil {
    */
   public static int getCount() {
     try (Cursor cursor = mContext.getContentResolver()
-        .query(Media.EXTERNAL_CONTENT_URI, new String[]{Media._ID}, getBaseSelection(), null,
+        .query(Media.EXTERNAL_CONTENT_URI, new String[]{Media._ID}, getBaseSelection(),
+            getBaseSelectionArgs(),
             null)) {
       if (cursor != null) {
         return cursor.getCount();

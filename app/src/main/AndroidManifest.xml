@@ -118,9 +118,6 @@
       android:theme="@style/ActivityStyle"/>
     <!-- 反馈 -->
     <!-- 扫描大小设置 -->
-    <activity
-      android:name=".ui.activity.ScanActivity"
-      android:theme="@style/ActivityStyle"/>
     <!-- 均衡器 -->
     <activity
       android:name=".ui.activity.EQActivity"

@@ -157,8 +157,6 @@ public class SPUtil {
     String STATUSBAR_LYRIC_SHOW = "statusbar_lyric_show";
     //沉浸式状态栏
     String IMMERSIVE_MODE = "immersive_mode";
-    //过滤大小
-    String SCAN_SIZE = "scan_size";
     //歌曲排序顺序
     String SONG_SORT_ORDER = "song_sort_order";
     //专辑排序顺序
@@ -177,6 +175,8 @@ public class SPUtil {
     String CHILD_PLAYLIST_SONG_SORT_ORDER = "child_playlist_song_sort_order";
     //移除歌曲
     String BLACKLIST_SONG = "black_list_song";
+    //黑名单
+    String BLACKLIST = "blacklist";
     //本地歌词搜索路径
     String LOCAL_LYRIC_SEARCH_DIR = "local_lyric_search_dir";
     //退出时播放时间

@@ -411,4 +411,12 @@
   <string name="deleting">删除中</string>
   <string name="adding">添加中</string>
   <string name="send_log">是否同时发送日志?</string>
+  <string name="clear">清除</string>
+  <string name="add">添加</string>
+  <string name="clear_blacklist_title">清除黑名单</string>
+  <string name="clear_blacklist_content">确定清除黑名单吗?</string>
+  <string name="blacklist">黑名单</string>
+  <string name="remove_from_blacklist">从黑名单移除</string>
+  <string name="do_you_want_remove_from_blacklist">你想从黑名单移除%s吗?</string>
+  <string name="blacklist_tip">这些文件夹中的内容将会从您的媒体库中隐藏</string>
 </resources>
