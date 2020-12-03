@@ -4,11 +4,11 @@ import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Audio.Media;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +21,6 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.UriRequest;
-import timber.log.Timber;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -256,26 +255,16 @@ public class ImageUriUtil {
 
 
   public static String getArtistArt(long artistId) {
-    try (Cursor cursor = App.getContext().getContentResolver().query(
-        MediaStore.Audio.Artists.Albums.getContentUri("external", artistId),
-        null,
-        null, null, null)) {
-      if (cursor != null && cursor.getCount() > 0) {
-
-        List<Integer> albumIds = new ArrayList<>();
-        while (cursor.moveToNext()) {
-          albumIds.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID)));
-        }
-        for (Integer albumId : albumIds) {
-          Uri uri = ContentUris
-              .withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId);
-          if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
-            return uri.toString();
-          }
+    final List<Song> songs = MediaStoreUtil.getSongs(Media.ARTIST_ID + " = " + artistId, null);
+    if (!songs.isEmpty()) {
+      for (Song song : songs) {
+        Uri uri = ContentUris
+            .withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
+                song.getAlbumId());
+        if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
+          return uri.toString();
         }
       }
-    } catch (Exception e) {
-      Timber.v(e);
     }
     return "";
   }

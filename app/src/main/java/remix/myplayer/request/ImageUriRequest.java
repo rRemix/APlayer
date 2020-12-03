@@ -174,7 +174,7 @@ public abstract class ImageUriRequest<T> {
   Observable<String> getCustomThumbObservable(UriRequest request) {
     return Observable.create(emitter -> {
       //是否设置过自定义封面
-      File customImage = ImageUriUtil.getCustomThumbIfExist(request.getID(), request.getSearchType());
+      File customImage = ImageUriUtil.getCustomThumbIfExist(request.getId(), request.getSearchType());
       if (customImage != null && customImage.exists()) {
         emitter.onNext(PREFIX_FILE + customImage.getAbsolutePath());
       }
@@ -192,8 +192,8 @@ public abstract class ImageUriRequest<T> {
         //忽略多媒体缓存
         if (IGNORE_MEDIA_STORE) {
           final String selection = TextUtils.isEmpty(request.getTitle()) ?
-              MediaStore.Audio.Media.ALBUM_ID + "=" + request.getID() :
-              MediaStore.Audio.Media.ALBUM_ID + "=" + request.getID() + " and " +
+              MediaStore.Audio.Media.ALBUM_ID + "=" + request.getId() :
+              MediaStore.Audio.Media.ALBUM_ID + "=" + request.getId() + " and " +
                   MediaStore.Audio.Media.TITLE + "=?";
           final String[] selectionValues = TextUtils.isEmpty(request.getTitle()) ?
               null :
@@ -206,14 +206,14 @@ public abstract class ImageUriRequest<T> {
 
           }
         } else {
-          Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getID());
+          Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getId());
           if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
             imageUrl = uri.toString();
           }
         }
 
       } else {//艺术家封面
-        imageUrl = ImageUriUtil.getArtistArt(request.getID());
+        imageUrl = ImageUriUtil.getArtistArt(request.getId());
       }
       if (!TextUtils.isEmpty(imageUrl)) {
         observer.onNext(imageUrl);

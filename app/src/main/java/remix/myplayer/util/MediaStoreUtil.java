@@ -25,10 +25,11 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
-import com.facebook.common.util.ByteConstants;
+import android.text.TextUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -69,6 +70,7 @@ import timber.log.Timber;
  * 数据库工具类
  */
 public class MediaStoreUtil {
+
   private static final String TAG = "MediaStoreUtil";
   @SuppressLint("StaticFieldLeak")
   private static Context mContext;
@@ -80,7 +82,7 @@ public class MediaStoreUtil {
   private MediaStoreUtil() {
   }
 
-  private static String BASE_SELECTION = " ";
+  private static String BASE_SELECTION = AudioColumns.IS_MUSIC + " =1 ";
   private static final String[] BASE_PROJECTION = new String[]{
       BaseColumns._ID,
       AudioColumns.TITLE,
@@ -119,8 +121,8 @@ public class MediaStoreUtil {
             long artistId = cursor.getLong(0);
             if (artistMaps.get(artistId) == null) {
               artistMaps.put(artistId, new ArrayList<>());
-              artistMaps.get(artistId).add(new Artist(artistId, cursor.getString(1), 0));
             }
+            artistMaps.get(artistId).add(new Artist(artistId, cursor.getString(1), 0));
           } catch (Exception ignored) {
           }
         }
@@ -164,12 +166,12 @@ public class MediaStoreUtil {
             long albumId = cursor.getLong(0);
             if (albumMaps.get(albumId) == null) {
               albumMaps.put(albumId, new ArrayList<>());
-              albumMaps.get(albumId).add(new Album(albumId,
-                  cursor.getString(1),
-                  cursor.getLong(2),
-                  cursor.getString(3),
-                  0));
             }
+            albumMaps.get(albumId).add(new Album(albumId,
+                cursor.getString(1),
+                cursor.getLong(2),
+                cursor.getString(3),
+                0));
           } catch (Exception ignored) {
           }
         }
@@ -226,9 +228,13 @@ public class MediaStoreUtil {
     }
     Map<Integer, List<String>> folderMap = new LinkedHashMap<>();
 
+    final String baseSelection = getBaseSelection();
+    final String selection =
+        !TextUtils.isEmpty(baseSelection) ? baseSelection + " and media_type = 2"
+            : "media_type = 2";
     try (Cursor cursor = mContext.getContentResolver()
         .query(MediaStore.Files.getContentUri("external"),
-            null, getBaseSelection() + " and media_type = 2", getBaseSelectionArgs(), null)) {
+            null, selection, getBaseSelectionArgs(), null)) {
       if (cursor != null) {
         while (cursor.moveToNext()) {
           final String data = cursor
@@ -248,7 +254,7 @@ public class MediaStoreUtil {
         for (Map.Entry<Integer, List<String>> entry : folderMap.entrySet()) {
           final String parentPath = entry.getValue().get(0);
           Folder folder = new Folder(
-              parentPath.substring(parentPath.lastIndexOf("/") + 1, parentPath.length()),
+              parentPath.substring(parentPath.lastIndexOf("/") + 1),
               folderMap.get(entry.getKey()).size(),
               parentPath,
               entry.getKey());
@@ -539,16 +545,40 @@ public class MediaStoreUtil {
    * 过滤移出的歌曲以及铃声等
    */
   public static String getBaseSelection() {
+    Set<String> deleteIds = SPUtil
+        .getStringSet(mContext, SPUtil.SETTING_KEY.NAME, SETTING_KEY.BLACKLIST_SONG);
     Set<String> blacklist = SPUtil
         .getStringSet(mContext, SPUtil.SETTING_KEY.NAME, SETTING_KEY.BLACKLIST);
 
-    StringBuilder builder = new StringBuilder();
-    int i = 0;
-    for (String path : blacklist) {
-      builder.append(Media.DATA + " NOT LIKE ").append(" ? ");
-      builder.append(i != blacklist.size() - 1 ? " AND " : "");
-      i++;
+    if (deleteIds.isEmpty() && blacklist.isEmpty()) {
+      return BASE_SELECTION;
     }
+
+    final StringBuilder builder = new StringBuilder(BASE_SELECTION);
+    int i = 0;
+    if (!deleteIds.isEmpty()) {
+      builder.append(" AND ");
+      for (String id : deleteIds) {
+        if (i == 0) {
+          builder.append(MediaStore.Audio.Media._ID).append(" not in (");
+        }
+        builder.append(id);
+        builder.append(i != deleteIds.size() - 1 ? "," : ")");
+        i++;
+      }
+
+    }
+
+    if (!blacklist.isEmpty()) {
+      builder.append(" AND ");
+      i = 0;
+      for (String path : blacklist) {
+        builder.append(Media.DATA + " NOT LIKE ").append(" ? ");
+        builder.append(i != blacklist.size() - 1 ? " AND " : "");
+        i++;
+      }
+    }
+
     return builder.toString();
   }
 
@@ -559,7 +589,7 @@ public class MediaStoreUtil {
     String[] selectionArgs = new String[blacklist.size()];
     Iterator<String> iterator = blacklist.iterator();
     int i = 0;
-    while (iterator.hasNext()){
+    while (iterator.hasNext()) {
       selectionArgs[i] = iterator.next() + "%";
       i++;
     }
@@ -621,7 +651,7 @@ public class MediaStoreUtil {
       final String sortOrder) {
 
     if (selection != null && !selection.trim().equals("")) {
-      selection = getBaseSelection() + " AND " + selection;
+      selection = selection + " AND " + getBaseSelection();
     } else {
       selection = getBaseSelection();
     }
@@ -633,10 +663,11 @@ public class MediaStoreUtil {
     String[] baseSelectionArgs = getBaseSelectionArgs();
     String[] newSelectionValues = new String[selectionValues.length + baseSelectionArgs.length];
     System.arraycopy(selectionValues, 0, newSelectionValues, 0, selectionValues.length);
-    if (newSelectionValues.length - selectionValues.length >= 0)
+    if (newSelectionValues.length - selectionValues.length >= 0) {
       System.arraycopy(baseSelectionArgs, 0,
           newSelectionValues, selectionValues.length,
           newSelectionValues.length - selectionValues.length);
+    }
 
     try {
       return mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -682,6 +713,7 @@ public class MediaStoreUtil {
 
   public static List<Song> getSongs(@Nullable String selection, String[] selectionValues,
       final String sortOrder) {
+    Timber.v("getSongs, selection: " + selection + " args: " + Arrays.toString(selectionValues));
     if (!hasStoragePermissions()) {
       return new ArrayList<>();
     }
@@ -694,8 +726,8 @@ public class MediaStoreUtil {
           songs.add(getSongInfo(cursor));
         }
       }
-    } catch (Exception ignore) {
-      Timber.v(ignore);
+    } catch (Exception e) {
+      Timber.v(e);
     }
     return songs;
   }

@@ -93,7 +93,7 @@ public class UriRequest implements Serializable {
     return "lastfm " + hashCode();
   }
 
-  public long getID() {
+  public long getId() {
     return mId;
   }
 

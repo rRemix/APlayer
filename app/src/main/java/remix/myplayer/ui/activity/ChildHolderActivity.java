@@ -276,7 +276,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
    * @return 对应歌曲信息列表
    */
   @WorkerThread
-  private List<Song> getMP3List() {
+  private List<Song> getSongs() {
     if (mId < 0) {
       return null;
     }
@@ -377,7 +377,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
       final ChildHolderActivity activity = mRef.get();
       List<Song> songs = new ArrayList<>();
       if (activity != null) {
-        songs = activity.getMP3List();
+        songs = activity.getSongs();
       }
       return songs != null ? songs : new ArrayList<>();
     }
