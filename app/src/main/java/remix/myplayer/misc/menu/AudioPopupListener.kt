@@ -3,6 +3,7 @@ package remix.myplayer.misc.menu
 import android.content.ContextWrapper
 import android.support.v7.widget.PopupMenu
 import android.view.MenuItem
+import android.widget.CompoundButton
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.afollestad.materialdialogs.MaterialDialog
 import remix.myplayer.App
@@ -121,19 +122,19 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
             .show(activity.supportFragmentManager, AddtoPlayListDialog::class.java.simpleName)
       }
       R.id.menu_delete -> {
+        val checked = arrayOf(SPUtil.getValue(activity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false))
+
         getBaseDialog(activity)
             .content(R.string.confirm_delete_from_library)
             .positiveText(R.string.confirm)
             .negativeText(R.string.cancel)
-            .checkBoxPromptRes(R.string.delete_source, SPUtil
-                .getValue(App.getContext(), SPUtil.SETTING_KEY.NAME,
-                    SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
+            .checkBoxPromptRes(R.string.delete_source, checked[0], CompoundButton.OnCheckedChangeListener { buttonView, isChecked -> checked[0] = isChecked })
             .onAny { dialog, which ->
               if (which == POSITIVE) {
-                DeleteHelper.deleteSong(song.id, dialog.isPromptCheckBoxChecked, false, "")
+                DeleteHelper.deleteSong(song.id, checked[0], false, "")
                     .compose<Boolean>(applySingleScheduler<Boolean>())
                     .subscribe({ success ->
-                      if (success!!) {
+                      if (success) {
                         //移除的是正在播放的歌曲
                         if (song.id == getCurrentSong().id) {
                           Util.sendCMDLocalBroadcast(Command.NEXT)

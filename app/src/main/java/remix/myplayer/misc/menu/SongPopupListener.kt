@@ -4,6 +4,7 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.PopupMenu
 import android.view.MenuItem
+import android.widget.CompoundButton
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.soundcloud.android.crop.Crop
 import remix.myplayer.App
@@ -16,8 +17,8 @@ import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.theme.Theme
-import remix.myplayer.ui.misc.Tag
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
+import remix.myplayer.ui.misc.Tag
 import remix.myplayer.util.*
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import java.lang.ref.WeakReference
@@ -83,17 +84,16 @@ class SongPopupListener(activity: AppCompatActivity,
       R.id.menu_delete -> {
         val title = activity.getString(R.string.confirm_delete_from_playlist_or_library,
             if (isDeletePlayList) playListName else "曲库")
+        val check = arrayOf(SPUtil.getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.DELETE_SOURCE, false));
         Theme.getBaseDialog(activity)
             .content(title)
             .positiveText(R.string.confirm)
             .negativeText(R.string.cancel)
-            .checkBoxPromptRes(R.string.delete_source, SPUtil
-                .getValue(App.getContext(), SETTING_KEY.NAME,
-                    SETTING_KEY.DELETE_SOURCE, false), null)
+            .checkBoxPromptRes(R.string.delete_source, check[0]) { buttonView, isChecked -> check[0] = isChecked }
             .onAny { dialog, which ->
               if (which == POSITIVE) {
                 DeleteHelper
-                    .deleteSong(song.id, dialog.isPromptCheckBoxChecked, isDeletePlayList, playListName)
+                    .deleteSong(song.id, check[0], isDeletePlayList, playListName)
                     .subscribe({ success -> ToastUtil.show(activity, if (success) R.string.delete_success else R.string.delete_error) }, { ToastUtil.show(activity, R.string.delete_error) })
               }
             }

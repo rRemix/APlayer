@@ -6,6 +6,7 @@ import android.content.Context
 import android.provider.MediaStore
 import android.support.v7.widget.PopupMenu
 import android.view.MenuItem
+import android.widget.CompoundButton
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.soundcloud.android.crop.Crop
 import io.reactivex.Single
@@ -114,14 +115,15 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
                 ToastUtil.show(context, R.string.mylove_cant_edit)
                 return@Consumer
               }
+              val check = arrayOf(SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false))
               Theme.getBaseDialog(context)
                   .content(if (type == Constants.PLAYLIST) R.string.confirm_delete_playlist else R.string.confirm_delete_from_library)
                   .positiveText(R.string.confirm)
                   .negativeText(R.string.cancel)
-                  .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
+                  .checkBoxPromptRes(R.string.delete_source, check[0]) { buttonView, isChecked -> check[0] = isChecked }
                   .onAny { dialog, which ->
                     if (which == POSITIVE) {
-                      DeleteHelper.deleteSongs(ids, dialog.isPromptCheckBoxChecked, id, type == Constants.PLAYLIST)
+                      DeleteHelper.deleteSongs(ids, check[0], id, type == Constants.PLAYLIST)
                           .compose(applySingleScheduler())
                           .subscribe({
                             ToastUtil.show(context, if (it) R.string.delete_success else R.string.delete_error)

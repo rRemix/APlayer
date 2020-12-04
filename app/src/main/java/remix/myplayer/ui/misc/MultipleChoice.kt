@@ -5,6 +5,7 @@ import android.app.Activity
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.View
+import android.widget.CompoundButton
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -34,10 +35,13 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
   private val disposableContainer = CompositeDisposable()
 
   private val databaseRepository = DatabaseRepository.getInstance()
+
   //所有选中的position
   private val checkPos = ArrayList<Int>()
+
   //所有选中的参数 歌曲 专辑 艺术家 播放列表 文件夹
   private val checkParam = ArrayList<T>()
+
   //是否正在显示顶部菜单
   var isActive: Boolean = false
   var adapter: RecyclerView.Adapter<*>? = null
@@ -138,19 +142,19 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
     }
 
     val dialog = Theme.getLoadingDialog(context, context.getString(R.string.deleting)).build()
-
+    val checked = arrayOf(SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false))
     getBaseDialog(context)
         .content(title)
         .positiveText(R.string.confirm)
         .negativeText(R.string.cancel)
-        .checkBoxPromptRes(R.string.delete_source, SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false), null)
+        .checkBoxPromptRes(R.string.delete_source, checked[0]) { buttonView, isChecked -> checked[0] = isChecked }
         .onPositive { _, which ->
           val disposable = getSongIdSingle()
               .flatMap { ids ->
                 getSongsSingle(ids)
               }
               .flatMap { songs ->
-                deleteSingle(dialog.isPromptCheckBoxChecked, songs)
+                deleteSingle(checked[0], songs)
               }
               .subscribeOn(Schedulers.io())
               .observeOn(AndroidSchedulers.mainThread())
