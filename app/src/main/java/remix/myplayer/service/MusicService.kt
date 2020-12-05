@@ -362,7 +362,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 状态栏歌词
    */
-  private var statusBarLyricTask : StatusBarLyricTask? = null
+  private var statusBarLyricTask: StatusBarLyricTask? = null
 
   /**
    * 创建桌面歌词悬浮窗
@@ -618,7 +618,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         return@setOnCompletionListener
       }
       if (playModel == MODE_REPEAT) {
-        prepare(playQueue.song.url)
+        prepare(playQueue.song)
       } else {
         playNextOrPrev(true)
       }
@@ -899,7 +899,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       ToastUtil.show(service, R.string.song_lose_effect)
       return
     }
-    prepare(playQueue.song.url)
+    prepare(playQueue.song)
     playQueue.updateNextSong()
   }
 
@@ -1267,7 +1267,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         intent.getParcelableExtra<Song>(EXTRA_SONG)?.let {
           operation = Command.PLAY_TEMP
           playQueue.song = it
-          prepare(playQueue.song.url)
+          prepare(playQueue.song)
         }
       }
       //解锁桌面歌词
@@ -1391,19 +1391,19 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 准备播放
    *
-   * @param path 播放歌曲的路径
+   * @param song 播放歌曲的路径
    */
-  private fun prepare(path: String, requestFocus: Boolean = true) {
+  private fun prepare(song: Song, requestFocus: Boolean = true) {
     tryLaunch(
         block = {
-          Timber.v("准备播放: %s", path)
-          if (TextUtils.isEmpty(path)) {
+          Timber.v("准备播放: %s", song)
+          if (TextUtils.isEmpty(song.url)) {
             ToastUtil.show(service, getString(R.string.path_empty))
             return@tryLaunch
           }
 
           val exist = withContext(Dispatchers.IO) {
-            File(path).exists()
+            File(song.url).exists()
           }
           if (!exist) {
             ToastUtil.show(service, getString(R.string.file_not_exist))
@@ -1431,11 +1431,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           }
           mediaPlayer.reset()
           withContext(Dispatchers.IO) {
-            mediaPlayer.setDataSource(path)
+            mediaPlayer.setDataSource(this@MusicService, song.contentUri)
           }
           mediaPlayer.prepareAsync()
           prepared = true
-          Timber.v("prepare finish: $path")
+          Timber.v("prepare finish: $song")
         },
         catch = {
           ToastUtil.show(service, getString(R.string.play_failed) + it.toString())
@@ -1465,7 +1465,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       return
     }
     setPlay(true)
-    prepare(playQueue.song.url)
+    prepare(playQueue.song)
   }
 
   /**
@@ -1529,7 +1529,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     //读取播放列表
     playQueue.restoreIfNecessary()
-    prepare(playQueue.song.url)
+    prepare(playQueue.song)
     loadFinished = true
 
     uiHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
@@ -1995,32 +1995,45 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     //更新桌面部件
     const val UPDATE_APPWIDGET = 1000
+
     //更新正在播放歌曲
     const val UPDATE_META_DATA = 1002
+
     //更新播放状态
     const val UPDATE_PLAY_STATE = 1003
+
     //更新桌面歌词内容
     const val UPDATE_DESKTOP_LRC_CONTENT = 1004
+
     //移除桌面歌词
     const val REMOVE_DESKTOP_LRC = 1005
+
     //添加桌面歌词
     const val CREATE_DESKTOP_LRC = 1006
+
     //更新状态栏歌词
     const val UPDATE_STATUS_BAR_LRC = 1007
+
     //更新通知
     const val UPDATE_NOTIFICATION = 1008
 
     private const val APLAYER_PACKAGE_NAME = "remix.myplayer"
+
     //媒体数据库变化
     const val MEDIA_STORE_CHANGE = "$APLAYER_PACKAGE_NAME.media_store.change"
+
     //读写权限变化
     const val PERMISSION_CHANGE = "$APLAYER_PACKAGE_NAME.permission.change"
+
     //播放列表变换
     const val PLAYLIST_CHANGE = "$APLAYER_PACKAGE_NAME.playlist.change"
+
     //播放数据变化
     const val META_CHANGE = "$APLAYER_PACKAGE_NAME.meta.change"
+
     //播放状态变化
     const val PLAY_STATE_CHANGE = "$APLAYER_PACKAGE_NAME.play_state.change"
+
     //歌曲标签变化
     const val TAG_CHANGE = "$APLAYER_PACKAGE_NAME.tag_change"
 

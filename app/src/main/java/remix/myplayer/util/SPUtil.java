@@ -241,8 +241,6 @@ public class SPUtil {
     String IMPORT_PLAYLIST_FOLDER = "import_playlist_folder";
     //导出m3u目录
     String EXPORT_PLAYLIST_FOLDER = "export_playlist_folder";
-    //兼容性提示
-    String COMPATIBILITY_RECOMMEND = "compatibility_recommend";
   }
 
   public interface LYRIC_OFFSET_KEY {

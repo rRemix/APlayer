@@ -162,15 +162,6 @@ open class MainActivity : MenuActivity() {
 
     //清除多选显示状态
     MultipleChoice.isActiveSomeWhere = false
-
-    if(SPUtil.getValue(this,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.COMPATIBILITY_RECOMMEND,true)){
-      SPUtil.putValue(this,SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.COMPATIBILITY_RECOMMEND,false)
-      Theme.getBaseDialog(this)
-        .content(R.string.compatibility_recommend_content)
-        .positiveText(R.string.confirm)
-        .show()
-    }
-
   }
 
   override fun setStatusBarColor() {

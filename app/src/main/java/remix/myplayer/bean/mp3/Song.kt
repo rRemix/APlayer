@@ -1,6 +1,9 @@
 package remix.myplayer.bean.mp3
 
+import android.content.ContentUris
+import android.net.Uri
 import android.os.Parcelable
+import android.provider.MediaStore
 import kotlinx.android.parcel.Parcelize
 import remix.myplayer.App
 import remix.myplayer.util.SPUtil
@@ -29,6 +32,8 @@ data class Song(
     val titleKey: String?,
     val addTime: Long) : Parcelable {
 
+  val contentUri: Uri
+    get() = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toLong())
 
   val showName: String?
     get() = if (!SHOW_DISPLAYNAME) title else displayName
