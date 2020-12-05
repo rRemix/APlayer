@@ -4,10 +4,10 @@ import static remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERM
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.Unbinder;
 import remix.myplayer.App;
 import remix.myplayer.util.Util;

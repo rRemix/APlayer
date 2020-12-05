@@ -3,7 +3,7 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
-  android:id="@+id/audio_holder_container"
+  android:id="@+id/player_container"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:background="?attr/background_color_main"
@@ -35,7 +35,7 @@
   </LinearLayout>
   <!-- viewpager保留 大小为零 -->
   <remix.myplayer.ui.widget.AudioViewPager
-    android:id="@+id/holder_pager"
+    android:id="@+id/view_pager"
     android:layout_width="0dp"
     android:layout_height="0dp"
     android:overScrollMode="never"
@@ -55,7 +55,7 @@
         android:id="@+id/top_actionbar"
         layout="@layout/layout_player_topbar"/>
 
-      <android.support.constraint.ConstraintLayout
+      <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/top_actionbar">
@@ -80,7 +80,7 @@
           app:layout_constraintTop_toTopOf="parent"/>
 
 
-      </android.support.constraint.ConstraintLayout>
+      </androidx.constraintlayout.widget.ConstraintLayout>
     </RelativeLayout>
 
     <RelativeLayout

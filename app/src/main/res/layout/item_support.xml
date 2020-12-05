@@ -7,7 +7,7 @@
   android:layout_width="match_parent"
   android:layout_height="wrap_content">
 
-  <android.support.v7.widget.CardView
+  <androidx.cardview.widget.CardView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/d4_size"
@@ -48,6 +48,6 @@
         android:textSize="@dimen/s14_size"
         tools:text="Title"/>
     </LinearLayout>
-  </android.support.v7.widget.CardView>
+  </androidx.cardview.widget.CardView>
 
 </FrameLayout>

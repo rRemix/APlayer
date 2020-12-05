@@ -40,14 +40,14 @@
   <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
   <style name="PlayerActivityStyle" parent="@style/AppTheme">
-    <item name="android:windowIsTranslucent">true</item>
-    <item name="android:windowBackground">@color/transparent</item>
+<!--    <item name="android:windowIsTranslucent">true</item>-->
+<!--    <item name="android:windowBackground">@color/transparent</item>-->
     <item name="android:windowAnimationStyle">@style/PlayerActivityAnim</item>
   </style>
 
   <style name="PlayerActivityStyle.Black" parent="@style/Theme.APlayer.Black">
-    <item name="android:windowIsTranslucent">true</item>
-    <item name="android:windowBackground">@color/transparent</item>
+<!--    <item name="android:windowIsTranslucent">true</item>-->
+<!--    <item name="android:windowBackground">@color/transparent</item>-->
     <item name="android:windowAnimationStyle">@style/PlayerActivityAnim</item>
   </style>
 

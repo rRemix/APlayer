@@ -35,7 +35,7 @@
       tools:visibility="visible"/>
   </remix.myplayer.ui.widget.WidthFitSquareLayout>
 
-  <android.support.constraint.ConstraintLayout
+  <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="@dimen/item_grid_text_container_height">
 
@@ -81,7 +81,7 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toEndOf="@id/item_text1"
       app:layout_constraintTop_toTopOf="parent"/>
-  </android.support.constraint.ConstraintLayout>
+  </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </LinearLayout>

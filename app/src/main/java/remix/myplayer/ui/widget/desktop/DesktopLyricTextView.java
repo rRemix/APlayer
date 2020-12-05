@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import remix.myplayer.lyric.bean.LrcRow;
@@ -18,7 +18,7 @@ import remix.myplayer.lyric.bean.LrcRow;
  * @Date 2017/5/11 14:22
  */
 
-public class DesktopLyricTextView extends android.support.v7.widget.AppCompatTextView {
+public class DesktopLyricTextView extends androidx.appcompat.widget.AppCompatTextView {
 
   private static final int DELAY_MAX = 100;
 

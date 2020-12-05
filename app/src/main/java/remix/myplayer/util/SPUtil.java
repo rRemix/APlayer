@@ -243,6 +243,8 @@ public class SPUtil {
     String EXPORT_PLAYLIST_FOLDER = "export_playlist_folder";
     //兼容性提示
     String COMPATIBILITY_RECOMMEND = "compatibility_recommend";
+    //播放界面变色
+    String ADAPTIVE_COLOR = "adaptive_color";
   }
 
   public interface LYRIC_OFFSET_KEY {

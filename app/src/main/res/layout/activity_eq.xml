@@ -4,15 +4,15 @@
   android:layout_height="match_parent"
   android:orientation="vertical">
 
-  <android.support.design.widget.AppBarLayout
+  <com.google.android.material.appbar.AppBarLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
       android:id="@+id/toolbar"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"></android.support.v7.widget.Toolbar>
-  </android.support.design.widget.AppBarLayout>
+      android:layout_height="wrap_content"></androidx.appcompat.widget.Toolbar>
+  </com.google.android.material.appbar.AppBarLayout>
 
   <LinearLayout
     android:layout_width="match_parent"
@@ -42,7 +42,7 @@
           android:textSize="@dimen/s14_size" />
       </LinearLayout>
 
-      <android.support.v7.widget.SwitchCompat
+      <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/eq_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
         android:text="@string/bass_boost"
         android:textColor="?attr/text_color_primary" />
 
-      <android.support.v7.widget.AppCompatSeekBar
+      <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/bass_seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -97,14 +97,14 @@
         android:text="@string/virtualizer"
         android:textColor="?attr/text_color_primary" />
 
-      <android.support.v7.widget.AppCompatSeekBar
+      <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/virtualizer_seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="1000" />
     </LinearLayout>
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
       android:layout_width="match_parent"
       android:layout_height="0dp"
       android:layout_weight="5">
@@ -117,7 +117,7 @@
         android:layout_marginBottom="@dimen/d20_size"
         android:gravity="center_horizontal"
         android:orientation="vertical" />
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 
     <LinearLayout

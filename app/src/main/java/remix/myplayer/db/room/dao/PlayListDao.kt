@@ -1,9 +1,9 @@
 package remix.myplayer.db.room.dao
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import remix.myplayer.db.room.model.PlayList
-import android.arch.persistence.db.SupportSQLiteQuery
-import android.arch.persistence.room.RawQuery
+import androidx.sqlite.db.SupportSQLiteQuery
+import androidx.room.RawQuery
 
 
 

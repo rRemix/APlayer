@@ -9,7 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Environment
-import android.support.v4.app.NotificationCompat
+import androidx.core.app.NotificationCompat
 import remix.myplayer.R
 import remix.myplayer.bean.github.Release
 import remix.myplayer.request.network.OkHttpHelper

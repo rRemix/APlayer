@@ -3,10 +3,10 @@ package remix.myplayer.ui.fragment;
 import static remix.myplayer.ui.adapter.HeaderAdapter.LIST_MODE;
 
 import android.content.Context;
-import android.support.v4.content.Loader;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.View;
 import butterknife.BindView;

@@ -12,8 +12,8 @@ import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
 import android.provider.Settings
-import android.support.v4.content.FileProvider
-import android.support.v7.widget.SwitchCompat
+import androidx.core.content.FileProvider
+import androidx.appcompat.widget.SwitchCompat
 import android.text.TextUtils
 import android.view.View
 import android.widget.CompoundButton

@@ -1,7 +1,7 @@
 package remix.myplayer.misc.tageditor
 
 import android.media.MediaScannerConnection
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.jaudiotagger.audio.AudioFile

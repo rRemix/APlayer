@@ -1,8 +1,8 @@
 package remix.myplayer.misc.menu
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.PopupMenu
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import android.view.MenuItem
 import android.widget.CompoundButton
 import com.afollestad.materialdialogs.DialogAction.POSITIVE

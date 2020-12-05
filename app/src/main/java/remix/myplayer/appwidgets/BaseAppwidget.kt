@@ -11,7 +11,7 @@ import android.graphics.Canvas
 import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import android.widget.RemoteViews
 import remix.myplayer.App
 import remix.myplayer.R

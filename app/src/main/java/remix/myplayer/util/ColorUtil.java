@@ -1,12 +1,12 @@
 package remix.myplayer.util;
 
 import android.graphics.Color;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.FloatRange;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.graphics.Palette;
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.annotation.FloatRange;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.palette.graphics.Palette;
 import java.util.Collections;
 import java.util.Comparator;
 import remix.myplayer.App;

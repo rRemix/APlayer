@@ -4,23 +4,23 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.annotation.CheckResult;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.WindowDecorActionBar;
-import android.support.v7.view.menu.BaseMenuPresenter;
-import android.support.v7.view.menu.ListMenuItemView;
-import android.support.v7.view.menu.MenuBuilder;
-import android.support.v7.view.menu.MenuPopupHelper;
-import android.support.v7.view.menu.MenuPresenter;
-import android.support.v7.view.menu.ShowableListMenu;
-import android.support.v7.widget.ActionMenuView;
-import android.support.v7.widget.AppCompatImageView;
-import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.ToolbarWidgetWrapper;
+import androidx.annotation.CheckResult;
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.WindowDecorActionBar;
+import androidx.appcompat.view.menu.BaseMenuPresenter;
+import androidx.appcompat.view.menu.ListMenuItemView;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.view.menu.MenuPopupHelper;
+import androidx.appcompat.view.menu.MenuPresenter;
+import androidx.appcompat.view.menu.ShowableListMenu;
+import androidx.appcompat.widget.ActionMenuView;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.widget.ToolbarWidgetWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -281,7 +281,7 @@ public final class ToolbarContentTintHelper {
           // Search view theming
           if (item.getActionView() != null && (
               item.getActionView() instanceof android.widget.SearchView || item
-                  .getActionView() instanceof android.support.v7.widget.SearchView)) {
+                  .getActionView() instanceof androidx.appcompat.widget.SearchView)) {
             SearchViewTintUtil.setSearchViewContentColor(item.getActionView(), color);
           }
         }

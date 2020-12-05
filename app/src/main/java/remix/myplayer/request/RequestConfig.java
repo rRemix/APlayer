@@ -1,6 +1,6 @@
 package remix.myplayer.request;
 
-import android.support.annotation.IntRange;
+import androidx.annotation.IntRange;
 
 /**
  * Created by Remix on 2017/12/1.

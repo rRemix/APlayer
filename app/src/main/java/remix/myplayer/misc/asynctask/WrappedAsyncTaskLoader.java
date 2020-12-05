@@ -1,7 +1,7 @@
 package remix.myplayer.misc.asynctask;
 
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
+import androidx.loader.content.AsyncTaskLoader;
 
 /**
  * <a href="http://code.google.com/p/android/issues/detail?id=14944">Issue

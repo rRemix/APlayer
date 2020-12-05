@@ -1,6 +1,6 @@
 package remix.myplayer.db.room
 
-import android.arch.persistence.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SimpleSQLiteQuery
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
