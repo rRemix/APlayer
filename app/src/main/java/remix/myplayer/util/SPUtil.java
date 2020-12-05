@@ -157,6 +157,8 @@ public class SPUtil {
     String STATUSBAR_LYRIC_SHOW = "statusbar_lyric_show";
     //沉浸式状态栏
     String IMMERSIVE_MODE = "immersive_mode";
+    //过滤大小
+    String SCAN_SIZE = "scan_size";
     //歌曲排序顺序
     String SONG_SORT_ORDER = "song_sort_order";
     //专辑排序顺序

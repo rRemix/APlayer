@@ -86,10 +86,6 @@ import remix.myplayer.util.Util.isSupportStatusBarLyric
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
 import java.io.File
-import java.util.*
-import kotlin.Comparator
-import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashSet
 
 /**
  * @ClassName SettingActivity
@@ -468,10 +464,12 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container, R.id.setting_cover_source_container,
       R.id.setting_player_bottom_container, R.id.setting_displayname_container, R.id.setting_general_theme_container,
       R.id.setting_accent_color_container, R.id.setting_language_container, R.id.setting_auto_play_headset_container,
-      R.id.setting_audio_focus_container)
+      R.id.setting_audio_focus_container, R.id.setting_restore_delete_container,R.id.setting_filter_container)
   fun onClick(v: View) {
     when (v.id) {
-      //文件过滤
+      //大小过滤
+      R.id.setting_filter_container -> configFilterSize()
+      //黑名单
       R.id.setting_blacklist_container -> configBlackList()
       //曲库
       R.id.setting_library_category_container -> configLibraryCategory()
@@ -554,6 +552,8 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       R.id.setting_ignore_mediastore_container -> mIgnoreMediastoreSwitch.isChecked = !mIgnoreMediastoreSwitch.isChecked
       //播放界面底部
       R.id.setting_player_bottom_container -> changeBottomOfPlayingScreen()
+      //恢复移除的歌曲
+      R.id.setting_restore_delete_container -> restoreDeleteSong()
       //文件名
       R.id.setting_displayname_container -> mShowDisplaynameSwitch.isChecked = !mShowDisplaynameSwitch.isChecked
       //全局主题
@@ -565,6 +565,29 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       //自动播放
       R.id.setting_auto_play_headset_container -> configAutoPlay()
     }
+  }
+
+  /**
+   * 配置过滤大小
+   */
+  private fun configFilterSize() {
+    //读取以前设置
+    var position = 0
+    for (i in mScanSize.indices) {
+      position = i
+      if (mScanSize[i] == MediaStoreUtil.SCAN_SIZE) {
+        break
+      }
+    }
+    getBaseDialog(mContext)
+        .title(R.string.set_filter_size)
+        .items("0K", "500K", "1MB", "2MB", "5MB")
+        .itemsCallbackSingleChoice(position) { dialog, itemView, which, text ->
+          SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE, mScanSize[which])
+          MediaStoreUtil.SCAN_SIZE = mScanSize[which]
+          contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
+          true
+        }.show()
   }
 
   private fun configAutoPlay() {
@@ -688,6 +711,15 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             recreate()
           }
         }.show()
+  }
+
+  /**
+   * 恢复移除的歌曲
+   */
+  private fun restoreDeleteSong() {
+    SPUtil.deleteValue(this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST_SONG)
+    contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
+    ToastUtil.show(mContext, R.string.alread_restore_songs)
   }
 
   /**

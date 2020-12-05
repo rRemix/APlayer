@@ -107,7 +107,7 @@ class MediaScanner(private val context: Context) {
 
 
   private fun getScanFiles(file: File, toScanFiles: ArrayList<File>) {
-    if (file.isFile) {
+    if (file.isFile && file.length() >= MediaStoreUtil.SCAN_SIZE) {
       if (isAudioFile(file))
         toScanFiles.add(file)
     } else {

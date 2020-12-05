@@ -26,10 +26,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
+import com.facebook.common.util.ByteConstants;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -75,14 +75,20 @@ public class MediaStoreUtil {
   @SuppressLint("StaticFieldLeak")
   private static Context mContext;
 
+  //扫描文件默认大小设置
+  public static int SCAN_SIZE;
+
   static {
     mContext = App.getContext();
+
+    SCAN_SIZE = SPUtil
+        .getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SCAN_SIZE,
+            ByteConstants.MB);
   }
 
   private MediaStoreUtil() {
   }
 
-  private static final String BASE_SELECTION = " _data != ''";
   private static final String[] BASE_PROJECTION = new String[]{
       BaseColumns._ID,
       AudioColumns.TITLE,
@@ -550,11 +556,12 @@ public class MediaStoreUtil {
     Set<String> blacklist = SPUtil
         .getStringSet(mContext, SPUtil.SETTING_KEY.NAME, SETTING_KEY.BLACKLIST);
 
+    String baseSelection = " _data != '' AND " + Media.SIZE + " > " + SCAN_SIZE;
     if (deleteIds.isEmpty() && blacklist.isEmpty()) {
-      return BASE_SELECTION;
+      return baseSelection;
     }
 
-    final StringBuilder builder = new StringBuilder(BASE_SELECTION);
+    final StringBuilder builder = new StringBuilder(baseSelection);
     int i = 0;
     if (!deleteIds.isEmpty()) {
       builder.append(" AND ");
