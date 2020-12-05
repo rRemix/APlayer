@@ -82,7 +82,7 @@ public class MediaStoreUtil {
   private MediaStoreUtil() {
   }
 
-  private static String BASE_SELECTION = AudioColumns.IS_MUSIC + " =1 ";
+  private static final String BASE_SELECTION = " _data != ''";
   private static final String[] BASE_PROJECTION = new String[]{
       BaseColumns._ID,
       AudioColumns.TITLE,
@@ -713,7 +713,6 @@ public class MediaStoreUtil {
 
   public static List<Song> getSongs(@Nullable String selection, String[] selectionValues,
       final String sortOrder) {
-    Timber.v("getSongs, selection: " + selection + " args: " + Arrays.toString(selectionValues));
     if (!hasStoragePermissions()) {
       return new ArrayList<>();
     }

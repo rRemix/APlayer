@@ -432,17 +432,17 @@ public class StatusBarUtil {
       try {
         mSetStatusBarColorIcon = Activity.class.getMethod("setStatusBarDarkIcon", int.class);
       } catch (NoSuchMethodException e) {
-        e.printStackTrace();
+//        e.printStackTrace();
       }
       try {
         mSetStatusBarDarkIcon = Activity.class.getMethod("setStatusBarDarkIcon", boolean.class);
       } catch (NoSuchMethodException e) {
-        e.printStackTrace();
+//        e.printStackTrace();
       }
       try {
         mStatusBarColorFiled = WindowManager.LayoutParams.class.getField("statusBarColor");
       } catch (NoSuchFieldException e) {
-        e.printStackTrace();
+//        e.printStackTrace();
       }
     }
 
@@ -481,9 +481,9 @@ public class StatusBarUtil {
         try {
           mSetStatusBarColorIcon.invoke(activity, color);
         } catch (IllegalAccessException e) {
-          e.printStackTrace();
+//          e.printStackTrace();
         } catch (InvocationTargetException e) {
-          e.printStackTrace();
+//          e.printStackTrace();
         }
       } else {
         boolean whiteColor = isBlackColor(color, 50);
@@ -509,7 +509,7 @@ public class StatusBarUtil {
           setStatusBarDarkIcon(window.getDecorView(), true);
         }
       } catch (Exception e) {
-        e.printStackTrace();
+//        e.printStackTrace();
       }
     }
 
@@ -543,13 +543,13 @@ public class StatusBarUtil {
           return true;
         }
       } catch (NoSuchFieldException e) {
-        e.printStackTrace();
+//        e.printStackTrace();
       } catch (IllegalAccessException e) {
-        e.printStackTrace();
+//        e.printStackTrace();
       } catch (IllegalArgumentException e) {
-        e.printStackTrace();
+//        e.printStackTrace();
       } catch (Throwable e) {
-        e.printStackTrace();
+//        e.printStackTrace();
       }
       return false;
     }

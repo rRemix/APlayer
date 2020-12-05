@@ -428,6 +428,9 @@ class DatabaseRepository private constructor() {
   private fun getSongsWithSort(sort: String, ids: List<Int>): Single<List<Song>> {
     return Single
         .fromCallable {
+          if(ids.isEmpty()){
+            return@fromCallable Collections.emptyList<Song>()
+          }
           val customSort = sort == CUSTOMSORT
           val inStr = makeInStr(ids)
           val songs = MediaStoreUtil.getSongs(
