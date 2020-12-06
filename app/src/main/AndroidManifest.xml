@@ -27,6 +27,7 @@
     android:name=".App"
     android:supportsRtl="true"
     android:theme="@style/AppTheme"
+    android:requestLegacyExternalStorage="true"
     android:networkSecurityConfig="@xml/network_security_config">
 
     <meta-data
