@@ -71,7 +71,7 @@ public class MusicUtil {
       }
     }
 
-    if (songs == null) {
+    if (songs == null || songs.size() == 0) {
       File songFile = null;
       if (uri.getAuthority() != null && uri.getAuthority()
           .equals("com.android.externalstorage.documents")) {
