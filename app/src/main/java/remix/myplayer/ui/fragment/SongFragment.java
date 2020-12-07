@@ -59,8 +59,8 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
       public void onItemClick(View view, int position) {
         final Song song = mAdapter.getDatas().get(position);
         if (getUserVisibleHint() && !mChoice.click(position, song)) {
-          if(song.equals(MusicServiceRemote.getCurrentSong())){
-            if(requireActivity() instanceof MainActivity){
+          if (MusicServiceRemote.isPlaying() && song.equals(MusicServiceRemote.getCurrentSong())) {
+            if (requireActivity() instanceof MainActivity) {
               ((MainActivity) requireActivity()).toPlayerActivity();
             }
           } else {

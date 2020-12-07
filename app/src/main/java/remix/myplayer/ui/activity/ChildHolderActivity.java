@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -112,9 +111,10 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
       public void onItemClick(View view, int position) {
         final Song song = mAdapter.getDatas().get(position);
 
-        if (song.equals(MusicServiceRemote.getCurrentSong())) {
-          final BottomActionBarFragment bottomActionBarFragment = (BottomActionBarFragment) getSupportFragmentManager().findFragmentByTag("BottomActionBarFragment");
-          if(bottomActionBarFragment != null){
+        if (MusicServiceRemote.isPlaying() && song.equals(MusicServiceRemote.getCurrentSong())) {
+          final BottomActionBarFragment bottomActionBarFragment = (BottomActionBarFragment) getSupportFragmentManager()
+              .findFragmentByTag("BottomActionBarFragment");
+          if (bottomActionBarFragment != null) {
             bottomActionBarFragment.startPlayerActivity();
           }
         } else {
