@@ -37,7 +37,8 @@
     <!-- 主页面 -->
     <activity
       android:name=".ui.activity.MainActivity"
-      android:theme="@style/ActivityStyle">
+      android:theme="@style/ActivityStyle"
+      android:launchMode="singleTask">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <action android:name="android.intent.action.MUSIC_PLAYER"/>

@@ -125,8 +125,19 @@ open class MainActivity : MenuActivity() {
 
   private var mForceDialog: MaterialDialog? = null
 
+  override fun onNewIntent(intent: Intent?) {
+    super.onNewIntent(intent)
+  }
+
   override fun onResume() {
     super.onResume()
+    if(hasNewIntent){
+      mRefreshHandler.postDelayed({ this.parseIntent() }, 500)
+      mRefreshHandler.post {
+        onMetaChanged()
+      }
+      hasNewIntent = false
+    }
   }
 
   override fun onPause() {
