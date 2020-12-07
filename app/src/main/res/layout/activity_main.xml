@@ -44,7 +44,8 @@
         android:name="remix.myplayer.ui.fragment.BottomActionBarFragment"
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_height"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom"
+        android:tag="BottomActionBarFragment"/>
 
       <ImageView
         android:id="@+id/add"

@@ -16,10 +16,12 @@ import butterknife.BindView;
 import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.adapter.SongAdapter;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView;
 import remix.myplayer.util.MediaStoreUtil;
@@ -55,15 +57,21 @@ public class SongFragment extends LibraryFragment<Song, SongAdapter> {
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(View view, int position) {
-        if (getUserVisibleHint() && !mChoice.click(position, mAdapter.getDatas().get(position))) {
-          //设置正在播放列表
-          final List<Song> songs = mAdapter.getDatas();
-          if (songs == null || songs.isEmpty()) {
-            return;
+        final Song song = mAdapter.getDatas().get(position);
+        if (getUserVisibleHint() && !mChoice.click(position, song)) {
+          if(song.equals(MusicServiceRemote.getCurrentSong())){
+            if(requireActivity() instanceof MainActivity){
+              ((MainActivity) requireActivity()).toPlayerActivity();
+            }
+          } else {
+            //设置正在播放列表
+            final List<Song> songs = mAdapter.getDatas();
+            if (songs == null || songs.isEmpty()) {
+              return;
+            }
+            setPlayQueue(songs, makeCmdIntent(Command.PLAYSELECTEDSONG)
+                .putExtra(EXTRA_POSITION, position));
           }
-          setPlayQueue(songs, makeCmdIntent(Command.PLAYSELECTEDSONG)
-              .putExtra(EXTRA_POSITION, position));
-
         }
       }
 

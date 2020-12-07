@@ -651,6 +651,11 @@ open class MainActivity : MenuActivity() {
     mForceDialog?.show()
   }
 
+  fun toPlayerActivity(){
+    val bottomActionBarFragment = supportFragmentManager.findFragmentByTag("BottomActionBarFragment") as BottomActionBarFragment?
+    bottomActionBarFragment?.startPlayerActivity()
+  }
+
   class MainReceiver internal constructor(mainActivity: MainActivity) : BroadcastReceiver() {
     private val mRef: WeakReference<MainActivity> = WeakReference(mainActivity)
 

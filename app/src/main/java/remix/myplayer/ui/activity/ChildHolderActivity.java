@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +31,7 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.db.room.model.PlayList;
+import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.handler.MsgHandler;
@@ -40,6 +42,7 @@ import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.ChildHolderAdapter;
+import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.ui.misc.MultipleChoice;
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.ColorUtil;
@@ -108,14 +111,22 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
       @Override
       public void onItemClick(View view, int position) {
         final Song song = mAdapter.getDatas().get(position);
-        if (!mChoice.click(position, song)) {
-          final List<Song> songs = mAdapter.getDatas();
-          if (songs.size() == 0) {
-            return;
+
+        if (song.equals(MusicServiceRemote.getCurrentSong())) {
+          final BottomActionBarFragment bottomActionBarFragment = (BottomActionBarFragment) getSupportFragmentManager().findFragmentByTag("BottomActionBarFragment");
+          if(bottomActionBarFragment != null){
+            bottomActionBarFragment.startPlayerActivity();
           }
-          //设置正在播放列表
-          setPlayQueue(songs, makeCmdIntent(Command.PLAYSELECTEDSONG)
-              .putExtra(EXTRA_POSITION, position));
+        } else {
+          if (!mChoice.click(position, song)) {
+            final List<Song> songs = mAdapter.getDatas();
+            if (songs.size() == 0) {
+              return;
+            }
+            //设置正在播放列表
+            setPlayQueue(songs, makeCmdIntent(Command.PLAYSELECTEDSONG)
+                .putExtra(EXTRA_POSITION, position));
+          }
         }
       }
 
