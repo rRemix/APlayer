@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
@@ -30,29 +30,25 @@
 
   <TextView
     android:id="@+id/item_text1"
-    android:layout_width="0dp"
+    android:layout_width="wrap_content"
     android:layout_height="@dimen/item_grid_text_container_height"
-    android:layout_marginLeft="@dimen/d10_size"
-    android:layout_marginRight="@dimen/d10_size"
+    android:layout_marginStart="@dimen/d10_size"
     android:ellipsize="end"
     android:gravity="center_vertical|start"
     android:maxLines="1"
     android:textColor="?attr/text_color_primary"
     android:textSize="@dimen/s16_size"
-    app:layout_constraintEnd_toStartOf="@id/item_button"
-    app:layout_constraintHorizontal_chainStyle="packed"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/item_simpleiview_container"
+    android:layout_below="@id/item_simpleiview_container"
+    android:layout_alignParentStart="true"
+    android:layout_toStartOf="@id/item_button"
     tools:text="111111"/>
 
   <ImageButton
     android:id="@+id/item_button"
+    android:layout_alignParentEnd="true"
     android:layout_width="@dimen/item_list_btn_size"
     android:layout_height="@dimen/item_list_btn_size"
     android:background="?attr/background_oval_ripple"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toEndOf="@id/item_text1"
-    app:layout_constraintTop_toBottomOf="@id/item_simpleiview_container"/>
+    android:layout_below="@id/item_simpleiview_container"/>
 
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>
