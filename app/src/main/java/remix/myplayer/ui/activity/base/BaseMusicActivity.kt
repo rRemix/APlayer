@@ -36,6 +36,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
   private var musicStateReceiver: MusicStateReceiver? = null
   private var receiverRegistered: Boolean = false
   private var pendingBindService = false
+  protected var hasNewIntent: Boolean = false
 
   private val TAG = this.javaClass.simpleName
 
@@ -56,6 +57,12 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
   override fun onRestart() {
     super.onRestart()
     Timber.tag(TAG).v("onRestart")
+  }
+
+  override fun onNewIntent(intent: Intent?) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    hasNewIntent = true
   }
 
   override fun onResume() {

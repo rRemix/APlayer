@@ -1328,7 +1328,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     mediaSession.setMetadata(MediaMetadataCompat.Builder().build())
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       mediaSession.setPlaybackState(
-          PlaybackStateCompat.Builder().setState(PlaybackState.STATE_NONE, 0, 1f).build())
+          PlaybackStateCompat.Builder().setState(PlaybackStateCompat.STATE_NONE, 0, 1f).build())
     } else {
       mediaSession.setPlaybackState(PlaybackStateCompat.Builder().build())
     }
