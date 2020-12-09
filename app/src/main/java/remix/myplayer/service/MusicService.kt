@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
@@ -540,6 +539,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       override fun onFinish() {
         exitAfterCompletion = true
       }
+
       override fun revert() {
         exitAfterCompletion = false
       }
@@ -1535,7 +1535,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     uiHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
 
     //打开软件扫描
-    getExternalFilesDir(Environment.DIRECTORY_MUSIC)
+    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
         ?.apply {
           if (exists() && isDirectory) {
             MediaScanner(this@MusicService).scanFilesSimply(this)

@@ -5,10 +5,7 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
-import io.reactivex.FlowableOnSubscribe
-import io.reactivex.FlowableSubscriber
+import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.reactivestreams.Subscription
@@ -16,10 +13,10 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.theme.Theme
 import remix.myplayer.util.MediaStoreUtil
+import remix.myplayer.util.MediaStoreUtil.getBaseSelectionArgs
 import remix.myplayer.util.ToastUtil
 import timber.log.Timber
 import java.io.File
-import java.util.concurrent.atomic.AtomicInteger
 
 
 /**
@@ -30,19 +27,27 @@ class MediaScanner(private val context: Context) {
 
   fun scanFilesSimply(folder: File) {
     val toScanFiles = ArrayList<File>()
-    val completed = AtomicInteger()
 
-    getScanFiles(folder, toScanFiles)
+    val dispose = Completable
+        .fromAction {
+          getScanFiles(folder, toScanFiles)
+          if (toScanFiles.isNotEmpty()) {
+            MediaScannerConnection.scanFile(
+                context,
+                toScanFiles.map { it.absolutePath }.toTypedArray(),
+                toScanFiles.map { "audio/*" }.toTypedArray()
+            ) { path, uri ->
+              Timber.tag(TAG).v("scanCompleted, path: $path uri: $uri")
+            }
+          }
+        }
+        .subscribeOn(Schedulers.io())
+        .subscribe({
+          Timber.tag(TAG).v("scanAll completed")
+        }, {
+          Timber.tag(TAG).w("scan err: $it")
+        })
 
-    if (toScanFiles.isNotEmpty()) {
-      MediaScannerConnection.scanFile(
-          context,
-          toScanFiles.map { it.absolutePath }.toTypedArray(),
-          toScanFiles.map { "audio/*" }.toTypedArray()
-      ) { path, uri ->
-        Timber.v("onScanCompleted, path: $path uri: $uri completed: $completed")
-      }
-    }
   }
 
   fun scanFiles(folder: File) {
@@ -98,24 +103,36 @@ class MediaScanner(private val context: Context) {
 
       override fun onScanCompleted(path: String, uri: Uri) {
         subscription?.request(1)
-        Timber.v("onScanCompleted, path: $path uri: $uri")
+        Timber.tag(TAG).v("onScanCompleted, path: $path uri: $uri")
       }
     })
     connection.connect()
-
   }
 
-
   private fun getScanFiles(file: File, toScanFiles: ArrayList<File>) {
-    if (file.isFile && file.length() >= MediaStoreUtil.SCAN_SIZE) {
-      if (isAudioFile(file))
-        toScanFiles.add(file)
-    } else {
-      val files = file.listFiles() ?: return
-      for (temp in files) {
-        getScanFiles(temp, toScanFiles)
+    val baseSelection = MediaStoreUtil.getBaseSelection()
+    val selection = "$baseSelection and media_type = 2"
+    val selectionArgs = getBaseSelectionArgs()
+
+    context.contentResolver.query(MediaStore.Files.getContentUri("external"),
+        arrayOf(MediaStore.Files.FileColumns.DATA),
+        selection, selectionArgs, null)?.use {
+      while (it.moveToNext()) {
+        val path = it.getString(0)
+        if (path.startsWith(file.absolutePath)) {
+          toScanFiles.add(File(path))
+        }
       }
     }
+//    if (file.isFile && file.length() >= MediaStoreUtil.SCAN_SIZE) {
+//      if (isAudioFile(file))
+//        toScanFiles.add(file)
+//    } else {
+//      val files = file.listFiles() ?: return
+//      for (temp in files) {
+//        getScanFiles(temp, toScanFiles)
+//      }
+//    }
   }
 
   private fun isAudioFile(file: File): Boolean {
