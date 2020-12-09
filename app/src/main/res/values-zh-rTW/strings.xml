@@ -92,9 +92,9 @@
   <string name="send_success">發送成功 感謝您的反饋!</string>
   <string name="send_error">發送失敗: %s</string>
   <string name="screenshot_save_at">截圖檔案已儲存至%s</string>
-  <string name="not_install_weibo">您還未安裝微博客戶端</string>
+  <string name="not_install_weibo">您還未安裝微博用戶端</string>
   <string name="create_dir_error">建立目錄失敗</string>
-  <string name="need_permission">應用程式需要必要的權限以運作</string>
+  <string name="need_permission">應用程式需要必要的運作權限</string>
   <string name="play_now">正在播放: %s</string>
   <string name="default_lrc_path">預設掃描所有歌詞檔案</string>
   <string name="lrc_tip">%s</string>
@@ -125,11 +125,11 @@
   <string name="no_update">當前已經是最新版本</string>
   <string name="search">搜尋</string>
   <string name="timer_close">定時關閉</string>
-  <string name="feedback_contact_hint">請輸入您的 WeChat 號/QQ號</string>
+  <string name="feedback_contact_hint">請輸入您的 WeChat ID/QQ ID</string>
   <string name="lrc_choose">選擇歌詞來源</string>
   <string name="song_detail">曲目詳情</string>
   <string name="song_edit">音樂標簽編輯</string>
-  <string name="common">常規</string>
+  <string name="common">一般</string>
   <string name="lrc">歌詞</string>
   <string name="music_filter">音訊排除</string>
   <string name="lrc_scan">歌詞掃描路徑</string>
@@ -219,7 +219,7 @@
   <string name="desktop_lyric__lock_ticker">浮動歌詞已鎖定,可在通知列解鎖</string>
   <string name="desktop_lyric__unlock">浮動歌詞已解除鎖定</string>
   <string name="mediaplayer_error">MediaPlayer{what:%1$d,extra:%2$d}\n正在重新初始化</string>
-  <string name="screen_always_on_title">歌詞頁面螢幕保持開啟</string>
+  <string name="screen_always_on_title">在歌詞頁面螢幕保持開啟</string>
   <string name="screen_always_on_tip">開啟後切換到歌詞頁面螢幕將暫停休眠</string>
   <string name="plz_give_float_permission">請在設定中授予顯示在其他應用程式上層權限</string>
   <string name="jump_alipay_error">跳轉失敗\n已複製支付寶賬戶(*博睿)</string>
@@ -233,7 +233,7 @@
   <string name="scanned_finish">掃描完成</string>
   <string name="scaning">正在掃描</string>
   <string name="no_audio_file">無音訊檔案</string>
-  <string name="manual_scan_tip">請確保掃描目錄下沒有 .nomedia 的隱藏文件</string>
+  <string name="manual_scan_tip">請確保掃描目錄下沒有 .nomedia 的隱藏檔案</string>
   <string name="playing_notification">正在播放通知</string>
   <string name="playing_notification_description">正在播放通知提供了播放/暫停等便捷操作</string>
   <string name="unlock_notification_description">解鎖浮動歌詞通知提供解鎖浮動歌詞功能</string>
@@ -336,7 +336,7 @@
   <string name="export_fail">匯出失敗:%s</string>
   <string name="export_success">匯出成功</string>
   <string name="cover_download_source">封面下載源</string>
-  <string name="cover_download_from_lastfm">從LastFm下載</string>
+  <string name="cover_download_from_lastfm">從 Last FM 下載</string>
   <string name="cover_download_from_netease">從網易下載</string>
   <string name="update_notification">更新通知</string>
   <string name="update_notification_description">更新通知用於展示下載進度</string>
@@ -348,7 +348,7 @@
   <string name="new_version_found">發現新版本</string>
   <string name="ignore_this_version">忽略該版本</string>
   <string name="ignore_check_update_forever">不再檢查更新</string>
-  <string name="empty_path_report_to_developer">安裝路徑為空,請回報問題給開發者</string>
+  <string name="empty_path_report_to_developer">安裝路徑為空,請回報問題給開發人員</string>
   <string name="rename">重新命名</string>
   <string name="no_equalizer">沒有找到等化器</string>
   <string name="clear_download_cover">是否清除已經下載的封面</string>
@@ -410,13 +410,13 @@
   <string name="auto_play_none">從不</string>
   <string name="deleting">刪除中</string>
   <string name="adding">新增中</string>
-  <string name="send_log">是否同時發送日誌?</string>
+  <string name="send_log">是否同時發送日誌檔?</string>
   <string name="clear">清除</string>
-  <string name="add">添加</string>
+  <string name="add">新增</string>
   <string name="clear_blacklist_title">清除黑名單</string>
   <string name="clear_blacklist_content">确定清除黑名單嗎?</string>
   <string name="blacklist">黑名單</string>
   <string name="remove_from_blacklist">從黑名单移除</string>
   <string name="do_you_want_remove_from_blacklist">你想從黑名單移除%s嗎?</string>
-  <string name="blacklist_tip">這些文件夾中的內容將會從您的媒體庫中隱藏</string>
+  <string name="blacklist_tip">這些資料夾中的內容將會從您的資料庫中隱藏</string>
 </resources>
