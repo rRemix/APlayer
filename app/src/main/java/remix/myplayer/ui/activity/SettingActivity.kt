@@ -344,6 +344,17 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   override fun onFolderSelection(dialog: FolderChooserDialog, folder: File) {
     var tag = dialog.tag ?: return
 
+    var playListName = ""
+    try {
+      if (tag.contains("ExportPlayList")) {
+        val tagAndName = tag.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        tag = tagAndName[0]
+        playListName = tagAndName[1]
+      }
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
+
     when (tag) {
       "Scan" -> {
         if (folder.exists() && folder.isDirectory && folder.list() != null) {
@@ -354,17 +365,6 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         mNeedRefreshAdapter = true
       }
       "ExportPlayList" -> {
-        var playListName = ""
-        try {
-          if (tag.contains("ExportPlayList")) {
-            val tagAndName = tag.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            tag = tagAndName[0]
-            playListName = tagAndName[1]
-          }
-        } catch (e: Exception) {
-          e.printStackTrace()
-        }
-
         if (TextUtils.isEmpty(playListName)) {
           ToastUtil.show(mContext, R.string.export_fail)
           return
