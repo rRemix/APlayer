@@ -77,6 +77,14 @@ class LyricSearcher {
     if (song == Song.EMPTY_SONG) {
       return Observable.error(Throwable("empty song"))
     }
+
+    val priority = Gson().fromJson<List<LyricPriority>>(SPUtil.getValue(App.getContext(), SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
+        object : TypeToken<List<LyricPriority>>() {}.type)
+    if (priority.firstOrNull() == LyricPriority.IGNORE) {
+      return Observable.error(Throwable("ignore lyric"))
+    }
+
+    //默认优先级排序 酷狗-网易-QQ-本地-内嵌-忽略
     val type = SPUtil.getValue(App.getContext(), SPUtil.LYRIC_KEY.NAME, song.id, SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
 
     val observable = when (type) {
@@ -103,10 +111,6 @@ class LyricSearcher {
         getManualObservable(manualPath)
       }
       SPUtil.LYRIC_KEY.LYRIC_DEFAULT -> {
-        //默认优先级排序 酷狗-网易-QQ-本地-内嵌
-        val priority = Gson().fromJson<List<LyricPriority>>(SPUtil.getValue(App.getContext(), SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
-            object : TypeToken<List<LyricPriority>>() {}.type)
-
         val observables = mutableListOf<Observable<List<LrcRow>>>()
         priority.forEach {
           when (it.priority) {
@@ -208,7 +212,7 @@ class LyricSearcher {
         getLocalSearchKey(),
         null)
         .use { filesCursor ->
-          if(filesCursor == null){
+          if (filesCursor == null) {
             return ""
           }
           while (filesCursor.moveToNext()) {

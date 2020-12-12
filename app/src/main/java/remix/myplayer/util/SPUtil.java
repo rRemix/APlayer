@@ -102,7 +102,8 @@ public class SPUtil {
                     LyricPriority.NETEASE,
                     LyricPriority.QQ,
                     LyricPriority.LOCAL,
-                    LyricPriority.EMBEDED),
+                    LyricPriority.EMBEDED,
+                    LyricPriority.IGNORE),
         new TypeToken<List<LyricPriority>>() {
         }.getType());
 
