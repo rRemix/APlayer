@@ -1013,7 +1013,8 @@
           android:paddingLeft="@dimen/d16_size"
           android:paddingRight="@dimen/d16_size"
           android:gravity="center_vertical"
-          android:orientation="vertical">
+          android:orientation="vertical"
+          android:background="?attr/background_rect_ripple">
 
           <TextView
             android:layout_width="wrap_content"
