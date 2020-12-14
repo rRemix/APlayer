@@ -41,15 +41,15 @@ public interface ApiService {
 
   @GET("soso/fcgi-bin/client_search_cp")
   Observable<ResponseBody> getQQSearch(@Query("n") int n,
-                                       @Query("w") String w,
-                                       @Query("format") String format);
+      @Query("w") String w,
+      @Query("format") String format);
 
   @GET("lyric/fcgi-bin/fcg_query_lyric_new.fcg")
   @Headers("Referer: https://y.qq.com/portal/player.html")
   Observable<ResponseBody> getQQLyric(@Query("songmid") String songmid,
-                                      @Query("g_tk") int g_tk,
-                                      @Query("format") String format,
-                                      @Query("nobase64") int nobase64);
+      @Query("g_tk") int g_tk,
+      @Query("format") String format,
+      @Query("nobase64") int nobase64);
 
   String BASE_QUERY_PARAMETERS = "?format=json&autocorrect=1&api_key=" + BuildConfig.LASTFM_API_KEY;
 
@@ -62,6 +62,6 @@ public interface ApiService {
       @Nullable @Query("lang") String language);
 
   @GET("repos/{owner}/{repo}/releases/latest")
-  @Headers("Authorization: token " + BuildConfig.GITHUB_SECRET_KEY)
+  @Headers({"token: " + BuildConfig.GITHUB_SECRET_KEY})
   Single<Release> getLatestRelease(@Path("owner") String owner, @Path("repo") String repo);
 }
