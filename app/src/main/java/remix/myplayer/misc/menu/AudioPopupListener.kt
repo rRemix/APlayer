@@ -164,7 +164,7 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
 
                   }
 
-                  if (speed > 1.5f || speed < 0.5f) {
+                  if (speed > 2f || speed < 0.5f) {
                     ToastUtil.show(activity, R.string.speed_range_tip)
                     return@InputCallback
                   }

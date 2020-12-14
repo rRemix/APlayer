@@ -371,7 +371,7 @@
   <string name="restore_songs">歌曲恢复</string>
   <string name="restore_songs_tip">恢复从曲库移除的歌曲</string>
   <string name="alread_restore_songs">已经恢复被移除的歌曲</string>
-  <string name="speed_range_tip">输入范围为0.5-1.5</string>
+  <string name="speed_range_tip">输入范围为0.5-2</string>
   <string name="show_displayname">歌曲列表显示文件名</string>
   <string name="show_displayname_tip">如果歌曲列表出现乱码可尝试开启该选项</string>
   <string name="accent_color">强调色</string>

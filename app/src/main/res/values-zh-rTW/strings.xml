@@ -371,7 +371,7 @@
   <string name="restore_songs">曲目恢復</string>
   <string name="restore_songs_tip">恢復從資料庫移除的曲目</string>
   <string name="alread_restore_songs">已經恢復被移除的曲目</string>
-  <string name="speed_range_tip">輸入範圍為0.5-1.5</string>
+  <string name="speed_range_tip">輸入範圍為0.5-2</string>
   <string name="show_displayname">曲目清單顯示檔案名</string>
   <string name="show_displayname_tip">如果曲目清單出現亂碼可嘗試開啟該選項</string>
   <string name="accent_color">強調色</string>
