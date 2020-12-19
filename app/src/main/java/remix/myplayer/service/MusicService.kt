@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.content.*
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
@@ -204,6 +206,22 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 当前是否获得AudioFocus
    */
   private var audioFocus = false
+
+  /**
+   * AudioFocusRequest
+   *
+   * Used by requestAudioFocus and abandonAudioFocusRequest
+   */
+  private val focusRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+    AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).run {
+      setAudioAttributes(AudioAttributes.Builder().run {
+        setUsage(AudioAttributes.USAGE_MEDIA)
+        setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+        build()
+      })
+      setOnAudioFocusChangeListener(audioFocusListener)
+      build()
+    } else null // 小于 API 26 没有 AudioFocusRequest
 
   /**
    * 更新相关Activity的Handler
@@ -697,7 +715,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     uiHandler.removeCallbacksAndMessages(null)
     showDesktopLyric = false
 
-    audioManager.abandonAudioFocus(audioFocusListener)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      audioManager.abandonAudioFocusRequest(focusRequest!!)
+    } else {
+      @Suppress("DEPRECATION")
+      audioManager.abandonAudioFocus(audioFocusListener)
+    }
     mediaSession.isActive = false
     mediaSession.release()
 
@@ -816,10 +839,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   override fun play(fadeIn: Boolean) {
     Timber.v("play: $fadeIn")
-    audioFocus = audioManager.requestAudioFocus(
-        audioFocusListener,
-        AudioManager.STREAM_MUSIC,
-        AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+    @Suppress("DEPRECATION")
+    audioFocus = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                    audioManager.requestAudioFocus(focusRequest!!)
+                  else audioManager
+                      .requestAudioFocus(audioFocusListener,
+                                         AudioManager.STREAM_MUSIC,
+                                         AudioManager.AUDIOFOCUS_GAIN)) ==
+                 AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     if (!audioFocus) {
       return
     }
@@ -1410,8 +1437,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             return@tryLaunch
           }
           if (requestFocus) {
-            audioFocus = audioManager.requestAudioFocus(audioFocusListener, AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+            @Suppress("DEPRECATION")
+            audioFocus = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            audioManager.requestAudioFocus(focusRequest!!)
+                          else audioManager
+                              .requestAudioFocus(audioFocusListener,
+                                                 AudioManager.STREAM_MUSIC,
+                                                 AudioManager.AUDIOFOCUS_GAIN)) ==
+                         AudioManager.AUDIOFOCUS_REQUEST_GRANTED
             if (!audioFocus) {
               ToastUtil.show(service, getString(R.string.cant_request_audio_focus))
               return@tryLaunch
