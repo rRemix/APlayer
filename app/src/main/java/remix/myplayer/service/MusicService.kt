@@ -1529,7 +1529,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     //读取播放列表
     playQueue.restoreIfNecessary()
-    prepare(playQueue.song)
+    prepare(playQueue.song, false)
     loadFinished = true
 
     uiHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
