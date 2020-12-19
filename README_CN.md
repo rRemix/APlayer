@@ -49,7 +49,7 @@
 ## 最后 
 - 如果喜欢或者能给你提供帮助，欢迎Star
 - 因为是刚学安卓的时候就开始做了，很多代码待完善或者重构，还有一些待开发的功能，欢迎Pull Request
-- 有任何问题可以提出Issue或者发邮件到我的邮箱: rRemix.me@gmail.com
+- 有任何问题可以发邮件到我的邮箱: rRemix.me@gmail.com,或者加[tg群](https://t.me/joinchat/PqrPPBbM4poRPDH7qnXxLw)
 
 
 
