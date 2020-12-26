@@ -625,7 +625,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   private fun setUpPlayer() {
     mediaPlayer = MediaPlayer()
 
-    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      mediaPlayer.setAudioAttributes(focusRequest!!.audioAttributes)
+    } else {
+      @Suppress("DEPRECATION")
+      mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
+    }
     mediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK)
 
     mediaPlayer.setOnCompletionListener { mp ->
@@ -839,14 +844,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   override fun play(fadeIn: Boolean) {
     Timber.v("play: $fadeIn")
-    @Suppress("DEPRECATION")
     audioFocus = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    audioManager.requestAudioFocus(focusRequest!!)
-                  else audioManager
-                      .requestAudioFocus(audioFocusListener,
-                                         AudioManager.STREAM_MUSIC,
-                                         AudioManager.AUDIOFOCUS_GAIN)) ==
-                 AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+      audioManager.requestAudioFocus(focusRequest!!)
+    else {
+      @Suppress("DEPRECATION")
+      audioManager.requestAudioFocus(audioFocusListener,
+          AudioManager.STREAM_MUSIC,
+          AudioManager.AUDIOFOCUS_GAIN)
+    }) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     if (!audioFocus) {
       return
     }
@@ -1437,14 +1442,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             return@tryLaunch
           }
           if (requestFocus) {
-            @Suppress("DEPRECATION")
             audioFocus = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            audioManager.requestAudioFocus(focusRequest!!)
-                          else audioManager
-                              .requestAudioFocus(audioFocusListener,
-                                                 AudioManager.STREAM_MUSIC,
-                                                 AudioManager.AUDIOFOCUS_GAIN)) ==
-                         AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+              audioManager.requestAudioFocus(focusRequest!!)
+            else {
+              @Suppress("DEPRECATION")
+              audioManager.requestAudioFocus(audioFocusListener,
+                  AudioManager.STREAM_MUSIC,
+                  AudioManager.AUDIOFOCUS_GAIN)
+            }) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
             if (!audioFocus) {
               ToastUtil.show(service, getString(R.string.cant_request_audio_focus))
               return@tryLaunch
