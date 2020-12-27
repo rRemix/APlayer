@@ -284,7 +284,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
     //初始化箭头颜色
     val accentColor = getAccentColor()
-    ButterKnife.apply(mArrows) { view, index -> Theme.tintDrawable(view, view.background, accentColor) }
+    ButterKnife.apply(mArrows) { view, index -> Theme.tintDrawable(view, view.drawable, accentColor) }
 
     //标题颜色
     ButterKnife.apply(mTitles) { view, index -> view.setTextColor(accentColor) }
