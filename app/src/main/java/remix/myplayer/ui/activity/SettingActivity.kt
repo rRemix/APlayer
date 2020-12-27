@@ -284,7 +284,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
     //初始化箭头颜色
     val accentColor = getAccentColor()
-    ButterKnife.apply(mArrows) { view, index -> Theme.tintDrawable(view, view.background, accentColor) }
+    ButterKnife.apply(mArrows) { view, index -> Theme.tintDrawable(view, view.drawable, accentColor) }
 
     //标题颜色
     ButterKnife.apply(mTitles) { view, index -> view.setTextColor(accentColor) }
@@ -630,69 +630,72 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   }
 
   private fun gotoEmail() {
+    fun send(sendLog: Boolean) {
+      val pm = packageManager
+      val pi = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
+      val feedBack = Feedback(
+          pi.versionName,
+          pi.versionCode.toString(),
+          Build.DISPLAY,
+          Build.CPU_ABI + "," + Build.CPU_ABI2,
+          Build.MANUFACTURER,
+          Build.MODEL,
+          Build.VERSION.RELEASE,
+          Build.VERSION.SDK_INT.toString()
+      )
+      val emailIntent = Intent()
+      emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback))
+      emailIntent.putExtra(Intent.EXTRA_TEXT, "\n\n\n" + feedBack)
+
+      tryLaunch(catch = {
+        Timber.w(it)
+        ToastUtil.show(this, R.string.send_error, it.toString())
+      }, block = {
+        if (sendLog) {
+          withContext(Dispatchers.IO) {
+            try {
+              val zipFile = File("${Environment.getExternalStorageDirectory().absolutePath}/Android/data/$packageName/logs.zip")
+              zipFile.delete()
+              zipFile.createNewFile()
+              zipFile.zipOutputStream()
+                  .zipFrom("${Environment.getExternalStorageDirectory().absolutePath}/Android/data/$packageName/logs",
+                      "${applicationInfo.dataDir}/shared_prefs")
+              if (zipFile.length() > 0) {
+                val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                  emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                  FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".fileprovider", zipFile)
+                } else {
+                  Uri.parse("file://${zipFile.absoluteFile}")
+                }
+                emailIntent.action = Intent.ACTION_SEND
+                emailIntent.type = "application/octet-stream"
+                emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(if (!IS_GOOGLEPLAY) "568920427@qq.com" else "rRemix.me@gmail.com"))
+              }
+            } catch (e: Exception) {
+              Timber.w(e)
+            }
+          }
+        } else {
+          emailIntent.action = Intent.ACTION_SENDTO
+          emailIntent.data = Uri.parse(if (!IS_GOOGLEPLAY) "mailto:568920427@qq.com" else "mailto:rRemix.me@gmail.com")
+        }
+
+        if (Util.isIntentAvailable(this, emailIntent)) {
+          startActivity(emailIntent)
+        } else {
+          ToastUtil.show(this, R.string.not_found_email)
+        }
+      })
+    }
     getBaseDialog(this)
         .title(getString(R.string.send_log))
-        .positiveText(R.string.confirm)
-        .negativeText(R.string.cancel)
-        .onAny { dialog, which ->
-          val pm = packageManager
-          val pi = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
-          val feedBack = Feedback(
-              pi.versionName,
-              pi.versionCode.toString(),
-              Build.DISPLAY,
-              Build.CPU_ABI + "," + Build.CPU_ABI2,
-              Build.MANUFACTURER,
-              Build.MODEL,
-              Build.VERSION.RELEASE,
-              Build.VERSION.SDK_INT.toString()
-          )
-          val emailIntent = Intent()
-          emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback))
-          emailIntent.putExtra(Intent.EXTRA_TEXT, "\n\n\n" + feedBack)
-
-          tryLaunch(catch = {
-            Timber.w(it)
-            ToastUtil.show(this, R.string.send_error, it.toString())
-          }, block = {
-            if (which == DialogAction.POSITIVE) {
-              withContext(Dispatchers.IO) {
-                try {
-                  val zipFile = File("${Environment.getExternalStorageDirectory().absolutePath}/Android/data/$packageName/logs.zip")
-                  zipFile.delete()
-                  zipFile.createNewFile()
-                  zipFile.zipOutputStream()
-                      .zipFrom("${Environment.getExternalStorageDirectory().absolutePath}/Android/data/$packageName/logs",
-                          "${applicationInfo.dataDir}/shared_prefs")
-                  if (zipFile.length() > 0) {
-                    val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                      emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                      FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".fileprovider", zipFile)
-                    } else {
-                      Uri.parse("file://${zipFile.absoluteFile}")
-                    }
-                    emailIntent.action = Intent.ACTION_SEND
-                    emailIntent.type = "application/octet-stream"
-                    emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
-                    emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(if (!IS_GOOGLEPLAY) "568920427@qq.com" else "rRemix.me@gmail.com"))
-                  }
-                } catch (e: Exception) {
-                  Timber.w(e)
-                }
-              }
-            } else {
-              emailIntent.action = Intent.ACTION_SENDTO
-              emailIntent.data = Uri.parse(if (!IS_GOOGLEPLAY) "mailto:568920427@qq.com" else "mailto:rRemix.me@gmail.com")
-            }
-
-            if (Util.isIntentAvailable(this, emailIntent)) {
-              startActivity(emailIntent)
-            } else {
-              ToastUtil.show(this, R.string.not_found_email)
-            }
-//            Intent.createChooser(data,"Email")
-          })
-        }
+        .positiveText(R.string.yes)
+        .negativeText(R.string.no)
+        .neutralText(R.string.cancel)
+        .onPositive { dialog, which -> send(true) }
+        .onNegative { dialog, which -> send(false) }
+        .onNeutral { dialog, which -> dialog.cancel() }
         .show()
   }
 
