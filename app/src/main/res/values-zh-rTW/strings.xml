@@ -419,4 +419,7 @@
   <string name="remove_from_blacklist">從黑名单移除</string>
   <string name="do_you_want_remove_from_blacklist">你想從黑名單移除%s嗎?</string>
   <string name="blacklist_tip">這些資料夾中的內容將會從您的資料庫中隱藏</string>
+
+  <string name="yes">是</string>
+  <string name="no">否</string>
 </resources>
