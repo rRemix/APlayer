@@ -420,4 +420,8 @@
   <string name="do_you_want_remove_from_blacklist">你想從黑名單移除%s嗎?</string>
   <string name="blacklist_tip">這些文件夾中的內容將會從您的媒體庫中隱藏</string>
   <string name="compatibility_recommend_content">為了避免兼容性問題，強烈建議將歌曲文件都移動到音樂目錄</string>
+  <string name="now_playing_screen_background">播放頁面背景</string>
+  <string name="now_playing_screen_theme">跟隨主題</string>
+  <string name="now_playing_screen_cover">跟隨專輯封面</string>
+  <string name="now_playing_screen_custom">自定義</string>
 </resources>

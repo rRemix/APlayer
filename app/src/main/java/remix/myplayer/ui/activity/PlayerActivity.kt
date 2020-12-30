@@ -11,6 +11,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.InsetDrawable
 import android.graphics.drawable.LayerDrawable
@@ -23,7 +24,9 @@ import android.view.*
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.SeekBar
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.FragmentManager
 import androidx.palette.graphics.Palette
@@ -38,7 +41,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_player.*
-import kotlinx.android.synthetic.main.fragment_lrc.*
 import kotlinx.android.synthetic.main.layout_player_control.*
 import kotlinx.android.synthetic.main.layout_player_topbar.*
 import kotlinx.android.synthetic.main.layout_player_volume.*
@@ -55,6 +57,7 @@ import remix.myplayer.helper.MusicServiceRemote.isPlaying
 import remix.myplayer.helper.MusicServiceRemote.setPlayModel
 import remix.myplayer.lyric.LrcView
 import remix.myplayer.lyric.LrcView.OnLrcClickListener
+import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
 import remix.myplayer.misc.interfaces.OnInflateFinishListener
@@ -65,7 +68,10 @@ import remix.myplayer.request.RequestConfig
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.theme.*
+import remix.myplayer.theme.DrawableGradient
+import remix.myplayer.theme.GradientDrawableMaker
+import remix.myplayer.theme.Theme
+import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.adapter.PagerAdapter
 import remix.myplayer.ui.dialog.FileChooserDialog
@@ -79,9 +85,6 @@ import remix.myplayer.util.*
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import timber.log.Timber
 import java.io.File
-import java.util.*
-import kotlin.Comparator
-import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 /**
@@ -158,8 +161,8 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   }
   private val receiver: Receiver = Receiver()
 
-  private val adaptiveColor by lazy {
-    SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.ADAPTIVE_COLOR, true)
+  private val background by lazy {
+    SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAYER_BACKGROUND, BACKGROUND_THEME)
   }
 
   override fun setUpTheme() {
@@ -193,10 +196,23 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   }
 
   override fun setStatusBarColor() {
-    if (adaptiveColor) {
-      StatusBarUtil.setTransparent(this)
-    } else {
-      StatusBarUtil.setColorNoTranslucent(this, ThemeStore.getBackgroundColorMain(this))
+    when (background) {
+      BACKGROUND_THEME -> {
+        StatusBarUtil.setColorNoTranslucent(this, ThemeStore.getBackgroundColorMain(this))
+      }
+      BACKGROUND_ADAPTIVE_COLOR -> {
+        StatusBarUtil.setTransparent(this)
+      }
+      BACKGROUND_CUSTOM_IMAGE -> {
+        StatusBarUtil.setTransparent(this)
+
+        val file = File(DiskCache.getDiskCacheDir(this, "thumbnail/player"), "player.jpg");
+        if (file.exists()) {
+          val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+          player_container.background = BitmapDrawable(resources,bitmap)
+          updateSwatch(bitmap, false)
+        }
+      }
     }
   }
 
@@ -884,7 +900,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   }
 
   @SuppressLint("CheckResult")
-  private fun updateSwatch(bitmap: Bitmap?) {
+  private fun updateSwatch(bitmap: Bitmap?, adaptiveBg: Boolean = true) {
     Single
         .fromCallable {
           bitmap ?: BitmapFactory.decodeResource(resources,
@@ -909,7 +925,9 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
           }
 
           updateViewsColorBySwatch(swatch)
-          startBGColorAnimation(swatch)
+          if (adaptiveBg) {
+            startBGColorAnimation(swatch)
+          }
 
         }) { t: Throwable? -> Timber.v(t) }
   }
@@ -958,7 +976,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     coverFragment.updateCover(song, coverUri, withAnimation)
     firstStart = false
 
-    if (adaptiveColor) {
+    if (background == BACKGROUND_ADAPTIVE_COLOR) {
       updateBackground()
     }
   }
@@ -1067,12 +1085,19 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     private const val UPDATE_BG = 1
     private const val UPDATE_TIME_ONLY = 2
     private const val UPDATE_TIME_ALL = 3
+
     const val BOTTOM_SHOW_NEXT = 0
     const val BOTTOM_SHOW_VOLUME = 1
     const val BOTTOM_SHOW_BOTH = 2
     const val BOTTOM_SHOW_NONE = 3
+
+    const val BACKGROUND_THEME = 0
+    const val BACKGROUND_ADAPTIVE_COLOR = 1
+    const val BACKGROUND_CUSTOM_IMAGE = 2
+
     private const val FRAGMENT_COUNT = 2
     private const val DELAY_SHOW_NEXT_SONG = 3000
+
     const val ACTION_UPDATE_NEXT = "remix.myplayer.update.next_song"
   }
 }

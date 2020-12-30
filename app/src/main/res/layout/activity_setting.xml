@@ -665,26 +665,49 @@
           android:background="?attr/divider_color"/>
       </RelativeLayout>
 
-      <RelativeLayout
+      <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
         <TextView
           android:id="@+id/setting_player_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_margin="@dimen/d14_size"
-          android:layout_alignParentLeft="true"
-          android:layout_alignParentTop="true"
           android:text="@string/player"
           android:textColor="?attr/colorAccent"
           android:textSize="@dimen/s16_size"/>
         <LinearLayout
+          android:id="@+id/setting_player_background"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_vertical"
+          android:paddingTop="@dimen/d10_size"
+          android:paddingBottom="@dimen/d10_size"
+          android:paddingLeft="@dimen/d16_size"
+          android:background="?attr/background_rect_ripple"
+          android:gravity="center_vertical"
+          android:orientation="vertical">
+          <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
+            android:text="@string/now_playing_screen_background"
+            android:textColor="?attr/text_color_primary"
+            android:textSize="@dimen/s16_size"/>
+          <TextView
+            android:id="@+id/setting_now_playing_screen_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/now_playing_screen_theme"
+            android:textColor="?attr/text_color_secondary"
+            android:textSize="@dimen/s14_size"/>
+        </LinearLayout>
+        <LinearLayout
           android:id="@+id/setting_player_bottom_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_alignParentLeft="true"
-          android:layout_below="@id/setting_player_title"
-          android:layout_centerVertical="true"
+          android:layout_gravity="center_vertical"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
           android:paddingLeft="@dimen/d16_size"
@@ -710,7 +733,6 @@
           android:id="@+id/setting_screen_container"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_below="@id/setting_player_bottom_container"
           android:paddingTop="@dimen/d10_size"
           android:paddingBottom="@dimen/d10_size"
           android:background="?attr/background_rect_ripple">
@@ -753,7 +775,7 @@
           android:layout_height="1px"
           android:layout_below="@id/setting_screen_container"
           android:background="?attr/divider_color"/>
-      </RelativeLayout>
+      </LinearLayout>
 
       <LinearLayout
         android:layout_width="match_parent"
