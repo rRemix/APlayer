@@ -9,8 +9,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.support.annotation.RequiresApi
-import android.support.v4.app.TaskStackBuilder
+import androidx.annotation.RequiresApi
+import androidx.core.app.TaskStackBuilder
 import io.reactivex.disposables.Disposable
 import remix.myplayer.R
 import remix.myplayer.service.Command

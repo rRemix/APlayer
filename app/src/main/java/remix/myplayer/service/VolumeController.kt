@@ -2,7 +2,7 @@ package remix.myplayer.service
 
 import android.os.CountDownTimer
 import android.os.Handler
-import android.support.annotation.FloatRange
+import androidx.annotation.FloatRange
 import timber.log.Timber
 import java.lang.ref.WeakReference
 

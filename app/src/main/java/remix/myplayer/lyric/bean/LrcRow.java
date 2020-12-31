@@ -1,13 +1,11 @@
 package remix.myplayer.lyric.bean;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 import remix.myplayer.App;
 import remix.myplayer.R;
-import timber.log.Timber;
 
 /**
  * 每行歌词的实体类，实现了Comparable接口，方便List<LrcRow>的sort排序

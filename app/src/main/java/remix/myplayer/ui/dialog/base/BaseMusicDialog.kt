@@ -16,12 +16,12 @@ import remix.myplayer.util.Util
 open class BaseMusicDialog : BaseDialog(), MusicEventCallback {
   private var musicActivity: BaseMusicActivity? = null
 
-  override fun onAttach(context: Context?) {
+  override fun onAttach(context: Context) {
     super.onAttach(context)
     try {
       musicActivity = context as BaseMusicActivity?
     } catch (e: ClassCastException) {
-      throw RuntimeException(context!!.javaClass.simpleName + " must be an instance of " + BaseMusicActivity::class.java.simpleName)
+      throw RuntimeException(context.javaClass.simpleName + " must be an instance of " + BaseMusicActivity::class.java.simpleName)
     }
 
   }

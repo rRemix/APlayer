@@ -5,9 +5,9 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 import android.annotation.SuppressLint;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageButton;

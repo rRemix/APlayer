@@ -2,7 +2,7 @@ package remix.myplayer.ui.activity
 
 import android.media.audiofx.AudioEffect
 import android.os.Bundle
-import android.support.v7.widget.AppCompatSeekBar
+import androidx.appcompat.widget.AppCompatSeekBar
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.SeekBar

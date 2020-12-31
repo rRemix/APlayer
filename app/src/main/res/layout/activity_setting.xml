@@ -8,16 +8,17 @@
   android:orientation="vertical"
   tools:ignore="TooManyViews">
 
-  <android.support.design.widget.AppBarLayout
+  <com.google.android.material.appbar.AppBarLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-
-    <android.support.v7.widget.Toolbar
-      android:id="@+id/toolbar"
+    <androidx.appcompat.widget.Toolbar
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_scrollFlags="scroll|enterAlways" />
-  </android.support.design.widget.AppBarLayout>
+      android:id="@+id/toolbar"
+      app:layout_scrollFlags="scroll|enterAlways">
+
+    </androidx.appcompat.widget.Toolbar>
+  </com.google.android.material.appbar.AppBarLayout>
 
   <ScrollView
     android:layout_width="match_parent"
@@ -284,7 +285,7 @@
               android:textSize="@dimen/s14_size" />
           </LinearLayout>
 
-          <android.support.v7.widget.SwitchCompat
+          <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setting_breakpoint_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -326,7 +327,7 @@
               android:textSize="@dimen/s14_size" />
           </LinearLayout>
 
-          <android.support.v7.widget.SwitchCompat
+          <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setting_shake_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -369,7 +370,7 @@
               android:textSize="@dimen/s14_size" />
           </LinearLayout>
 
-          <android.support.v7.widget.SwitchCompat
+          <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setting_displayname_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -433,7 +434,7 @@
               android:textSize="@dimen/s14_size" />
           </LinearLayout>
 
-          <android.support.v7.widget.SwitchCompat
+          <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setting_audio_focus_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -632,7 +633,7 @@
               android:textSize="@dimen/s14_size" />
           </LinearLayout>
 
-          <android.support.v7.widget.SwitchCompat
+          <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setting_immersive_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -675,7 +676,7 @@
               android:textSize="@dimen/s14_size" />
           </LinearLayout>
 
-          <android.support.v7.widget.SwitchCompat
+          <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setting_navaigation_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -752,7 +753,32 @@
           android:text="@string/player"
           android:textColor="?attr/colorAccent"
           android:textSize="@dimen/s16_size" />
-
+        <LinearLayout
+          android:id="@+id/setting_player_background"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_vertical"
+          android:paddingTop="@dimen/d10_size"
+          android:paddingBottom="@dimen/d10_size"
+          android:paddingLeft="@dimen/d16_size"
+          android:background="?attr/background_rect_ripple"
+          android:gravity="center_vertical"
+          android:orientation="vertical">
+          <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/d2_size"
+            android:text="@string/now_playing_screen_background"
+            android:textColor="?attr/text_color_primary"
+            android:textSize="@dimen/s16_size"/>
+          <TextView
+            android:id="@+id/setting_now_playing_screen_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/now_playing_screen_theme"
+            android:textColor="?attr/text_color_secondary"
+            android:textSize="@dimen/s14_size"/>
+        </LinearLayout>
         <LinearLayout
           android:id="@+id/setting_player_bottom_container"
           android:layout_width="match_parent"
@@ -811,7 +837,7 @@
               android:textSize="@dimen/s14_size" />
           </LinearLayout>
 
-          <android.support.v7.widget.SwitchCompat
+          <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setting_screen_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -875,7 +901,7 @@
               android:textSize="@dimen/s14_size" />
           </LinearLayout>
 
-          <android.support.v7.widget.SwitchCompat
+          <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setting_ignore_mediastore_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -993,7 +1019,7 @@
               android:textSize="@dimen/s14_size" />
           </LinearLayout>
 
-          <android.support.v7.widget.SwitchCompat
+          <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setting_lrc_float_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -1029,7 +1055,7 @@
               android:textSize="@dimen/s16_size" />
           </LinearLayout>
 
-          <android.support.v7.widget.SwitchCompat
+          <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setting_statusbar_lrc_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -1118,7 +1144,7 @@
               android:textSize="@dimen/s14_size" />
           </LinearLayout>
 
-          <android.support.v7.widget.SwitchCompat
+          <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/setting_notify_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

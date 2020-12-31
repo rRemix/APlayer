@@ -14,7 +14,7 @@ import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
@@ -378,6 +378,38 @@ public abstract class ImageUriRequest<T> {
     return imageUrl;
   }
 
+  protected Observable<Bitmap> getThumbBitmapObservable(final Uri uri){
+    if(uri == null){
+      return Observable.error(new Throwable("uri is null"));
+    }
+
+    return Observable.create(emitter -> {
+      ImageRequest imageRequest =
+          ImageRequestBuilder.newBuilderWithSource(uri)
+              .setResizeOptions(new ResizeOptions(mConfig.getWidth(), mConfig.getHeight()))
+              .build();
+      DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline()
+          .fetchDecodedImage(imageRequest, App.getContext());
+      dataSource.subscribe(new BaseBitmapDataSubscriber() {
+        @Override
+        protected void onNewResultImpl(Bitmap bitmap) {
+//                            Bitmap result = copy(bitmap);
+          if (bitmap == null) {
+            bitmap = BitmapFactory
+                .decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_day);
+          }
+          emitter.onNext(bitmap);
+          emitter.onComplete();
+        }
+
+        @Override
+        protected void onFailureImpl(
+            DataSource<CloseableReference<CloseableImage>> dataSource) {
+          emitter.onError(dataSource.getFailureCause());
+        }
+      }, CallerThreadExecutor.getInstance());
+    });
+  }
 
   protected Observable<Bitmap> getThumbBitmapObservable(UriRequest request) {
     return getCoverObservable(request)

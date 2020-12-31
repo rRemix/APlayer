@@ -4,14 +4,13 @@ import static remix.myplayer.theme.Theme.resolveColor;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.ColorInt;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.StyleRes;
+import androidx.annotation.ColorInt;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StyleRes;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
-import remix.myplayer.util.SPUtil.SETTING_KEY;
 
 /**
  * @ClassName

@@ -5,26 +5,26 @@
   android:layout_width="match_parent"
   android:layout_height="wrap_content">
 
-  <android.support.design.widget.TextInputLayout
+  <com.google.android.material.textfield.TextInputLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/d18_size"
     android:id="@+id/song_layout">
-    <android.support.design.widget.TextInputEditText
+    <com.google.android.material.textfield.TextInputEditText
       android:hint="@string/please_input_song_name"
       android:imeOptions="actionNext"
       android:maxLines="1"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:textColor="?attr/text_color_primary"/>
-  </android.support.design.widget.TextInputLayout>
+  </com.google.android.material.textfield.TextInputLayout>
 
-  <android.support.design.widget.TextInputLayout
+  <com.google.android.material.textfield.TextInputLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/d18_size"
     android:id="@+id/album_layout">
-    <android.support.design.widget.TextInputEditText
+    <com.google.android.material.textfield.TextInputEditText
       android:hint="@string/please_input_album"
       android:imeOptions="actionNext"
       android:maxLines="1"
@@ -32,28 +32,28 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:textColor="?attr/text_color_primary"/>
-  </android.support.design.widget.TextInputLayout>
+  </com.google.android.material.textfield.TextInputLayout>
 
-  <android.support.design.widget.TextInputLayout
+  <com.google.android.material.textfield.TextInputLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/d18_size"
     android:id="@+id/artist_layout">
-    <android.support.design.widget.TextInputEditText
+    <com.google.android.material.textfield.TextInputEditText
       android:hint="@string/please_input_artist"
       android:imeOptions="actionNext"
       android:maxLines="1"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:textColor="?attr/text_color_primary"/>
-  </android.support.design.widget.TextInputLayout>
+  </com.google.android.material.textfield.TextInputLayout>
 
-  <android.support.design.widget.TextInputLayout
+  <com.google.android.material.textfield.TextInputLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/d18_size"
     android:id="@+id/year_layout">
-    <android.support.design.widget.TextInputEditText
+    <com.google.android.material.textfield.TextInputEditText
       android:hint="@string/please_input_year"
       android:imeOptions="actionNext"
       android:maxLines="1"
@@ -61,14 +61,14 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:textColor="?attr/text_color_primary"/>
-  </android.support.design.widget.TextInputLayout>
+  </com.google.android.material.textfield.TextInputLayout>
 
-  <android.support.design.widget.TextInputLayout
+  <com.google.android.material.textfield.TextInputLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/d18_size"
     android:id="@+id/track_layout">
-    <android.support.design.widget.TextInputEditText
+    <com.google.android.material.textfield.TextInputEditText
       android:hint="@string/please_input_track_number"
       android:imeOptions="actionNext"
       android:maxLines="1"
@@ -76,19 +76,19 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:textColor="?attr/text_color_primary"/>
-  </android.support.design.widget.TextInputLayout>
+  </com.google.android.material.textfield.TextInputLayout>
 
-  <android.support.design.widget.TextInputLayout
+  <com.google.android.material.textfield.TextInputLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/d18_size"
     android:id="@+id/genre_layout">
-    <android.support.design.widget.TextInputEditText
+    <com.google.android.material.textfield.TextInputEditText
       android:hint="@string/please_input_genre"
       android:maxLines="1"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:textColor="?attr/text_color_primary"/>
-  </android.support.design.widget.TextInputLayout>
+  </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

@@ -7,16 +7,14 @@ import android.content.*
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Message
+import android.os.*
 import android.provider.Settings
-import android.support.design.widget.NavigationView
-import android.support.design.widget.TabLayout
-import android.support.v4.view.ViewPager
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.tabs.TabLayout
+import androidx.viewpager.widget.ViewPager
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.TextUtils
 import android.view.Menu
 import android.view.View
@@ -26,21 +24,25 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.afollestad.materialdialogs.MaterialDialog
+import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
 import com.facebook.rebound.SpringSystem
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.soundcloud.android.crop.Crop
 import remix.myplayer.App
 import remix.myplayer.App.IS_GOOGLEPLAY
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Category
+import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.helper.SortOrder
+import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
 import remix.myplayer.misc.interfaces.OnItemClickListener
@@ -69,6 +71,7 @@ import remix.myplayer.util.*
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import remix.myplayer.util.Util.*
 import timber.log.Timber
+import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -525,6 +528,61 @@ open class MainActivity : MenuActivity() {
           return
         }
         installApk(mContext, mInstallPath)
+      }
+
+      Crop.REQUEST_CROP, Crop.REQUEST_PICK -> {
+        val intent = intent
+
+        val customCover = intent.getParcelableExtra<CustomCover>("thumb") ?: return
+        val errorTxt = getString(
+            when (customCover.type) {
+              Constants.ALBUM -> R.string.set_album_cover_error
+              Constants.ARTIST -> R.string.set_artist_cover_error
+              else -> R.string.set_playlist_cover_error
+            })
+        val id = customCover.id //专辑、艺术家、播放列表封面
+
+        if (resultCode != Activity.RESULT_OK) {
+          ToastUtil.show(this, errorTxt)
+          return
+        }
+
+        if (requestCode == Crop.REQUEST_PICK) {
+          //选择图片
+          val cacheDir = DiskCache.getDiskCacheDir(this,
+              "thumbnail/" + when {
+                customCover.type == Constants.ALBUM -> "album"
+                customCover.type == Constants.ARTIST -> "artist"
+                else -> "playlist"
+              })
+          if (!cacheDir.exists() && !cacheDir.mkdirs()) {
+            ToastUtil.show(this, errorTxt)
+            return
+          }
+          val destination = Uri.fromFile(File(cacheDir, hashKeyForDisk(id.toString() + "") + ".jpg"))
+          Crop.of(data?.data, destination).asSquare().start(this)
+        } else {
+          //图片裁剪
+          //裁剪后的图片路径
+          if (data == null) {
+            return
+          }
+          if (Crop.getOutput(data) == null) {
+            return
+          }
+
+          val path = Crop.getOutput(data).encodedPath
+          if (TextUtils.isEmpty(path) || id == -1L) {
+            ToastUtil.show(mContext, errorTxt)
+            return
+          }
+
+          Handler(Looper.getMainLooper()).postDelayed({
+            Fresco.getImagePipeline().clearCaches()
+            ImageUriRequest.clearUriCache()
+            onMediaStoreChanged()
+          }, 500)
+        }
       }
     }
   }

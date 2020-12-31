@@ -10,7 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.v4.widget.DrawerLayout;
+import androidx.drawerlayout.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;

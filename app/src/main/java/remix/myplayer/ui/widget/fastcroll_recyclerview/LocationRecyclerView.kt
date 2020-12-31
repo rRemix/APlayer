@@ -1,8 +1,8 @@
 package remix.myplayer.ui.widget.fastcroll_recyclerview
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicServiceRemote

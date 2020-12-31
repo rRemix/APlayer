@@ -1,7 +1,7 @@
 package remix.myplayer.ui.dialog.base
 
 import android.content.Context
-import android.support.v4.app.DialogFragment
+import androidx.fragment.app.DialogFragment
 
 /**
  * Created by Remix on 2016/3/16.

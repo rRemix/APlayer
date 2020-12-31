@@ -12,14 +12,14 @@ import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
 import android.provider.Settings
-import android.support.v4.content.FileProvider
-import android.support.v7.widget.SwitchCompat
 import android.text.TextUtils
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
+import androidx.core.content.FileProvider
 import butterknife.BindView
 import butterknife.BindViews
 import butterknife.ButterKnife
@@ -29,6 +29,7 @@ import com.facebook.common.util.ByteConstants
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.soundcloud.android.crop.Crop
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_setting.*
@@ -42,7 +43,6 @@ import remix.myplayer.bean.misc.Feedback
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.EQHelper
-import remix.myplayer.helper.EQHelper.REQUEST_EQ
 import remix.myplayer.helper.LanguageHelper
 import remix.myplayer.helper.LanguageHelper.AUTO
 import remix.myplayer.helper.M3UHelper.exportPlayListToFile
@@ -74,6 +74,9 @@ import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_CATEGORY
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_RECREATE
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_REFRESH_ADAPTER
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_REFRESH_LIBRARY
+import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_ADAPTIVE_COLOR
+import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_CUSTOM_IMAGE
+import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_THEME
 import remix.myplayer.ui.dialog.FileChooserDialog
 import remix.myplayer.ui.dialog.FolderChooserDialog
 import remix.myplayer.ui.dialog.FolderChooserDialog.Builder
@@ -308,9 +311,13 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
     //锁屏样式
     val lockScreen = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN)
-    mLockScreenTip.setText(if (lockScreen == 0)
-      R.string.aplayer_lockscreen_tip
-    else if (lockScreen == 1) R.string.system_lockscreen_tip else R.string.lockscreen_off_tip)
+    mLockScreenTip.setText(when (lockScreen) {
+      0 -> R.string.aplayer_lockscreen_tip
+      1 -> R.string.system_lockscreen_tip
+      else -> R.string.lockscreen_off_tip
+    })
+
+    updatePlayerBackgroundText()
 
     //计算缓存大小
     object : Thread() {
@@ -325,6 +332,17 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     if (IS_GOOGLEPLAY) {
       findViewById<View>(R.id.setting_update_container).visibility = View.GONE
     }
+  }
+
+  private fun updatePlayerBackgroundText() {
+    //播放界面背景
+    val nowPlayingScreen = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAYER_BACKGROUND, BACKGROUND_THEME)
+    setting_now_playing_screen_text.setText(when (nowPlayingScreen) {
+      BACKGROUND_THEME -> R.string.now_playing_screen_theme
+      BACKGROUND_ADAPTIVE_COLOR -> R.string.now_playing_screen_cover
+      BACKGROUND_CUSTOM_IMAGE -> R.string.now_playing_screen_custom
+      else -> R.string.now_playing_screen_theme
+    })
   }
 
 
@@ -464,7 +482,8 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container, R.id.setting_cover_source_container,
       R.id.setting_player_bottom_container, R.id.setting_displayname_container, R.id.setting_general_theme_container,
       R.id.setting_accent_color_container, R.id.setting_language_container, R.id.setting_auto_play_headset_container,
-      R.id.setting_audio_focus_container, R.id.setting_restore_delete_container,R.id.setting_filter_container)
+      R.id.setting_audio_focus_container, R.id.setting_restore_delete_container,R.id.setting_filter_container,
+      R.id.setting_player_background)
   fun onClick(v: View) {
     when (v.id) {
       //大小过滤
@@ -564,7 +583,29 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       R.id.setting_audio_focus_container -> mAudioFocusSwitch.isChecked = !mAudioFocusSwitch.isChecked
       //自动播放
       R.id.setting_auto_play_headset_container -> configAutoPlay()
+      //自定义播放界面背景
+      R.id.setting_player_background -> configPlayerBackgroundConfig()
     }
+  }
+
+  private fun configPlayerBackgroundConfig() {
+    val current = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAYER_BACKGROUND, BACKGROUND_THEME)
+
+    getBaseDialog(this)
+        .items(R.array.player_background)
+        .itemsCallback { dialog, itemView, position, text ->
+          if (current == position && position != BACKGROUND_CUSTOM_IMAGE) {
+            return@itemsCallback
+          }
+
+          SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAYER_BACKGROUND, position)
+          updatePlayerBackgroundText()
+
+          if (position == BACKGROUND_CUSTOM_IMAGE) {
+            Crop.pickImage(this, Crop.REQUEST_PICK)
+          }
+        }
+        .show()
   }
 
   /**
@@ -1129,8 +1170,28 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
           mHandler.sendEmptyMessage(RECREATE)
         }
       }
-    } else if (requestCode == REQUEST_EQ) {
+    } else if (requestCode == Crop.REQUEST_PICK) {
+      //选择图片
+      val cacheDir = DiskCache.getDiskCacheDir(this,
+          "thumbnail/player")
+      if (data == null || !cacheDir.exists() && !cacheDir.mkdirs()) {
+        ToastUtil.show(this, R.string.setting_error)
+        return
+      }
 
+      val oldFile = File(cacheDir, "player.jpg")
+      if (oldFile.exists()) {
+        oldFile.delete()
+      }
+      val destination = Uri.fromFile(oldFile)
+      Crop.of(data.data, destination)
+          .withAspect(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels)
+          .start(this)
+    } else if (requestCode == Crop.REQUEST_CROP) {
+      if (data == null || Crop.getOutput(data) == null) {
+        ToastUtil.show(this, R.string.setting_error)
+        return
+      }
     }
   }
 

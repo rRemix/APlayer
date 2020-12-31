@@ -1,7 +1,7 @@
 package remix.myplayer.service
 
 import android.content.Intent
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository

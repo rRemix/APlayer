@@ -270,64 +270,6 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
   }
 
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-    when (requestCode) {
-      Crop.REQUEST_CROP, Crop.REQUEST_PICK -> {
-        val intent = intent
-        val customCover = intent.getParcelableExtra<CustomCover>("thumb") ?: return
-        val errorTxt = getString(
-            when {
-              customCover.type == Constants.ALBUM -> R.string.set_album_cover_error
-              customCover.type == Constants.ARTIST -> R.string.set_artist_cover_error
-              else -> R.string.set_playlist_cover_error
-            })
-        val id = customCover.id //专辑、艺术家、播放列表封面
-
-        if (resultCode != Activity.RESULT_OK) {
-          ToastUtil.show(this, errorTxt)
-          return
-        }
-        if (requestCode == Crop.REQUEST_PICK) {
-          //选择图片
-          val cacheDir = DiskCache.getDiskCacheDir(this,
-              "thumbnail/" + when {
-                customCover.type == Constants.ALBUM -> "album"
-                customCover.type == Constants.ARTIST -> "artist"
-                else -> "playlist"
-              })
-          if (!cacheDir.exists() && !cacheDir.mkdirs()) {
-            ToastUtil.show(this, errorTxt)
-            return
-          }
-          val destination = Uri.fromFile(File(cacheDir, Util.hashKeyForDisk(id.toString() + "") + ".jpg"))
-          Crop.of(data?.data, destination).asSquare().start(this)
-        } else {
-          //图片裁剪
-          //裁剪后的图片路径
-          if (data == null) {
-            return
-          }
-          if (Crop.getOutput(data) == null) {
-            return
-          }
-
-          val path = Crop.getOutput(data).encodedPath
-          if (TextUtils.isEmpty(path) || id == -1L) {
-            ToastUtil.show(mContext, errorTxt)
-            return
-          }
-
-          Handler(Looper.getMainLooper()).postDelayed({
-            Fresco.getImagePipeline().clearCaches()
-            ImageUriRequest.clearUriCache()
-            onMediaStoreChanged()
-          }, 500)
-        }
-      }
-    }
-  }
-
   companion object {
     const val EXTRA_PLAYLIST = "extra_playlist"
     const val EXTRA_PERMISSION = "extra_permission"

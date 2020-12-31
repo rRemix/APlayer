@@ -4,7 +4,7 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:fitsSystemWindows="true"
-  android:id="@+id/audio_holder_container"
+  android:id="@+id/player_container"
   android:background="?attr/background_color_main">
 
   <LinearLayout
@@ -51,7 +51,7 @@
         </LinearLayout>
         <!-- 中间三个页面 -->
         <remix.myplayer.ui.widget.AudioViewPager
-          android:id="@+id/holder_pager"
+          android:id="@+id/view_pager"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:layout_above="@id/holder_indicator"

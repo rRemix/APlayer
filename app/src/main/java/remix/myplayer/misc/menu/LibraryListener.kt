@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.provider.MediaStore
-import android.support.v7.widget.PopupMenu
+import androidx.appcompat.widget.PopupMenu
 import android.view.MenuItem
 import android.widget.CompoundButton
 import com.afollestad.materialdialogs.DialogAction.POSITIVE

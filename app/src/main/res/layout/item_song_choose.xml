@@ -20,7 +20,7 @@
     fresco:failureImage="@drawable/album_empty_bg_day"
     fresco:failureImageScaleType="centerCrop"/>
 
-  <android.support.v7.widget.AppCompatCheckBox
+  <androidx.appcompat.widget.AppCompatCheckBox
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/checkbox"

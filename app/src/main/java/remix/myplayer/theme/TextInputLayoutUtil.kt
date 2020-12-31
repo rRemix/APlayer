@@ -3,8 +3,8 @@ package remix.myplayer.theme
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
-import android.support.annotation.ColorInt
-import android.support.design.widget.TextInputLayout
+import androidx.annotation.ColorInt
+import com.google.android.material.textfield.TextInputLayout
 import timber.log.Timber
 
 /**

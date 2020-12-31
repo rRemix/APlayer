@@ -1,7 +1,7 @@
 package remix.myplayer.appwidgets
 
-import android.support.annotation.ColorInt
-import android.support.annotation.DrawableRes
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import remix.myplayer.R
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.ColorUtil

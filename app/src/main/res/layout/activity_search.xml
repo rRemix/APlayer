@@ -5,7 +5,7 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
-  <android.support.design.widget.AppBarLayout
+  <com.google.android.material.appbar.AppBarLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <!--<remix.myplayer.ui.widget.SearchToolBar-->
@@ -36,7 +36,7 @@
     <!--android:layout_gravity="center_vertical|right"/>-->
     <!--</FrameLayout>-->
     <!--</remix.myplayer.ui.widget.SearchToolBar>-->
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
       android:id="@+id/toolbar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content">
@@ -45,8 +45,8 @@
       <!--android:id="@+id/search_view"-->
       <!--android:layout_width="match_parent"-->
       <!--android:layout_height="wrap_content" />-->
-    </android.support.v7.widget.Toolbar>
-  </android.support.design.widget.AppBarLayout>
+    </androidx.appcompat.widget.Toolbar>
+  </com.google.android.material.appbar.AppBarLayout>
 
   <RelativeLayout
     android:layout_width="match_parent"
@@ -63,7 +63,7 @@
     android:id="@+id/search_result_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:id="@+id/search_result_native"
