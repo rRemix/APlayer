@@ -148,7 +148,6 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   /**
    * 更新封面与背景的Handler
    */
-  private var coverUri: Uri? = null
   private val audioManager: AudioManager by lazy {
     getSystemService(AUDIO_SERVICE) as AudioManager
   }
@@ -209,8 +208,8 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
         val file = File(DiskCache.getDiskCacheDir(this, "thumbnail/player"), "player.jpg");
         if (file.exists()) {
           val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-          player_container.background = BitmapDrawable(resources,bitmap)
-          updateSwatch(bitmap, false)
+          player_container.background = BitmapDrawable(resources, bitmap)
+          updateSwatch(bitmap)
         }
       }
     }
@@ -579,20 +578,17 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
         override fun onPageScrollStateChanged(state: Int) {}
       })
     } else {
-      //歌词界面常亮
-      if (SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.SCREEN_ALWAYS_ON,
-              false)) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-      }
-      coverFragment = CoverFragment()
-      setUpCoverFragment()
-      lyricFragment = LyricFragment()
-      setUpLyricFragment()
       fragmentManager
           .beginTransaction()
           .replace(R.id.container_cover, coverFragment)
           .replace(R.id.container_lyric, lyricFragment)
           .commit()
+    }
+
+    //歌词界面常亮
+    if (SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.SCREEN_ALWAYS_ON,
+            false)) {
+      window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
   }
 
@@ -617,84 +613,13 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   }
 
   private fun setUpCoverFragment() {
-//    mCoverFragment.setOnFirstLoadFinishListener(() -> mAnimationCover.setVisibility(View.INVISIBLE));
-//    mCoverFragment.setInflateFinishListener(view -> {
-//      //不启动动画 直接显示
-//      if (!mShowAnimation) {
-//        mCoverFragment.showImage();
-//        //隐藏动画用的封面并设置位置信息
-//        mAnimationCover.setVisibility(View.GONE);
-//        return;
-//      }
-//
-//      if (mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
-//        //获取传入的界面信息
-//        mOriginRect = getIntent().getParcelableExtra(EXTRA_RECT);
-//      }
-//
-//      if (mOriginRect == null) {
-//        return;
-//      }
-//      // 获取上一个界面中，图片的宽度和高度
-//      mOriginWidth = mOriginRect.width();
-//      mOriginHeight = mOriginRect.height();
-//
-//      // 设置 view 的位置，使其和上一个界面中图片的位置重合
-//      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
-//      params.setMargins(mOriginRect.left,
-//          mOriginRect.top - StatusBarUtil.getStatusBarHeight(mContext), mOriginRect.right,
-//          mOriginRect.bottom);
-//      mAnimationCover.setLayoutParams(params);
-//
-//      //获得终点控件的位置信息
-//      view.getGlobalVisibleRect(mDestRect);
-//      // 计算图片缩放比例和位移距离
-//      getMoveInfo(mDestRect);
-//
-//      mAnimationCover.setPivotX(0);
-//      mAnimationCover.setPivotY(0);
-//
-//      final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-//      final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-//      final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-//      final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-//
-//      final Spring spring = SpringSystem.create().createSpring();
-//      spring.setSpringConfig(COVER_IN_SPRING_CONFIG);
-//      spring.addListener(new SimpleSpringListener() {
-//        @Override
-//        public void onSpringUpdate(Spring spring) {
-//          if (mAnimationCover == null) {
-//            return;
-//          }
-//          final double currentVal = spring.getCurrentValue();
-//          mAnimationCover.setTranslationX((float) (transitionX * currentVal));
-//          mAnimationCover.setTranslationY((float) (transitionY * currentVal));
-//          mAnimationCover.setScaleX((float) (1 + scaleX * currentVal));
-//          mAnimationCover.setScaleY((float) (1 + scaleY * currentVal));
-//        }
-//
-//        @Override
-//        public void onSpringAtRest(Spring spring) {
-//          //入场动画结束时显示fragment中的封面
-//          mCoverFragment.showImage();
-////                    mHandler.postDelayed(() -> {
-////                        //隐藏动画用的封面
-////                        mAnimationCover.setVisibility(View.INVISIBLE);
-////                    },24);
-//
-//        }
-//
-//        @Override
-//        public void onSpringActivate(Spring spring) {
-//          overridePendingTransition(0, 0);
-//        }
-//      });
-//      spring.setOvershootClampingEnabled(true);
-//      spring.setCurrentValue(0);
-//      spring.setEndValue(1);
-//
-//    });
+    coverFragment.coverCallback = object : CoverFragment.CoverCallback {
+      override fun onResult(uri: Uri) {
+        if (background == BACKGROUND_ADAPTIVE_COLOR) {
+          updateBackground(uri)
+        }
+      }
+    }
   }
 
   override fun onMediaStoreChanged() {
@@ -703,7 +628,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     updateTopStatus(newSong)
     lyricFragment.updateLrc(newSong)
     song = newSong
-    requestCover(false)
+    coverFragment.requestCover(song, false, true)
   }
 
   override fun onMetaChanged() {
@@ -723,7 +648,9 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
       seekbar.max = duration
       //更新下一首歌曲
       next_song.text = getString(R.string.next_song, getNextSong().title)
-      requestCover(operation != Command.TOGGLE && !firstStart)
+      coverFragment.requestCover(song,
+          operation != Command.TOGGLE,
+          operation != Command.TOGGLE)
     }
   }
 
@@ -876,7 +803,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     seekBar.progressDrawable = progressDrawable
   }
 
-  private fun updateBackground() {
+  private fun updateBackground(uri: Uri) {
     object : ImageUriRequest<Bitmap>(RequestConfig.Builder(100, 100).build()) {
       override fun onError(throwable: Throwable?) {
         Timber.v("updateBackground failed: $throwable")
@@ -887,7 +814,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
       }
 
       override fun load(): Disposable {
-        return getThumbBitmapObservable(coverUri)
+        return getThumbBitmapObservable(uri)
             .compose(RxUtil.applyScheduler())
             .subscribe({
               onSuccess(it)
@@ -900,7 +827,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   }
 
   @SuppressLint("CheckResult")
-  private fun updateSwatch(bitmap: Bitmap?, adaptiveBg: Boolean = true) {
+  private fun updateSwatch(bitmap: Bitmap?) {
     Single
         .fromCallable {
           bitmap ?: BitmapFactory.decodeResource(resources,
@@ -925,9 +852,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
           }
 
           updateViewsColorBySwatch(swatch)
-          if (adaptiveBg) {
-            startBGColorAnimation(swatch)
-          }
+          startBGColorAnimation(swatch)
 
         }) { t: Throwable? -> Timber.v(t) }
   }
@@ -957,9 +882,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   }
 
   private fun startBGColorAnimation(swatch: Swatch) {
-    if (valueAnimator != null) {
-      valueAnimator?.cancel()
-    }
+    valueAnimator?.cancel()
 
     valueAnimator = ValueAnimator.ofObject(ArgbEvaluator(), Theme.resolveColor(this, R.attr.colorSurface), swatch.rgb)
 
@@ -970,39 +893,6 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
       player_container.background = drawable
     }
     valueAnimator?.setDuration(1000)?.start()
-  }
-
-  private fun updateCoverFragment(withAnimation: Boolean) {
-    coverFragment.updateCover(song, coverUri, withAnimation)
-    firstStart = false
-
-    if (background == BACKGROUND_ADAPTIVE_COLOR) {
-      updateBackground()
-    }
-  }
-
-  /**
-   * 更新封面
-   */
-  private fun requestCover(withAnimation: Boolean) {
-    //更新封面
-    object : ImageUriRequest<String?>() {
-      override fun onError(throwable: Throwable) {
-        coverUri = Uri.EMPTY
-        updateCoverFragment(withAnimation)
-      }
-
-      override fun onSuccess(result: String?) {
-        coverUri = Uri.parse(result)
-        updateCoverFragment(withAnimation)
-      }
-
-      override fun load(): Disposable {
-        return getCoverObservable(ImageUriUtil.getSearchRequestWithAlbumType(song))
-            .compose(RxUtil.applyScheduler())
-            .subscribe({ result: String? -> this.onSuccess(result) }) { throwable: Throwable -> onError(throwable) }
-      }
-    }.load()
   }
 
   override fun onDestroy() {
