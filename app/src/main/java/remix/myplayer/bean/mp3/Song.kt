@@ -69,10 +69,10 @@ data class Song(
           contentValues.put(MediaStore.Audio.Media.DURATION, duration)
           val updateCount = App.getContext().contentResolver.update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
               contentValues, MediaStore.Audio.Media._ID + "=?", arrayOf(id.toString() + ""))
-          Timber.v("updateCount: %s", updateCount)
+          Timber.tag("Song").v("updateDuration, dur: $duration  count: $updateCount")
         }
       } catch (e: Exception) {
-        Timber.v("updateDuration failed: $e")
+        Timber.tag("Song").v("updateDuration failed: $e")
       } finally {
         metadataRetriever.release()
       }

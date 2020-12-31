@@ -106,7 +106,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   var isDragSeekBarFromUser = false
 
   //歌词控件
-  private lateinit var lrcView: LrcView
+  private var lrcView: LrcView? = null
 
   //高亮与非高亮指示器
   private lateinit var highLightIndicator: GradientDrawable
@@ -418,9 +418,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
         }
         handler.sendEmptyMessage(UPDATE_TIME_ONLY)
         currentTime = progress
-        if (lrcView != null) {
-          lrcView.seekTo(progress, true, fromUser)
-        }
+        lrcView?.seekTo(progress, true, fromUser)
       }
 
       override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -595,20 +593,20 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   private fun setUpLyricFragment() {
     lyricFragment.setOnInflateFinishListener(OnInflateFinishListener { view: View? ->
       lrcView = view as LrcView
-      lrcView.setOnLrcClickListener(object : OnLrcClickListener {
+      lrcView?.setOnLrcClickListener(object : OnLrcClickListener {
         override fun onClick() {}
         override fun onLongClick() {}
       })
-      lrcView.setOnSeekToListener { progress: Int ->
+      lrcView?.setOnSeekToListener { progress: Int ->
         if (progress > 0 && progress < getDuration()) {
           MusicServiceRemote.setProgress(progress)
           currentTime = progress
           handler.sendEmptyMessage(UPDATE_TIME_ALL)
         }
       }
-      lrcView.setHighLightColor(ThemeStore.getTextColorPrimary())
-      lrcView.setOtherColor(ThemeStore.getTextColorSecondary())
-      lrcView.setTimeLineColor(ThemeStore.getTextColorSecondary())
+      lrcView?.setHighLightColor(ThemeStore.getTextColorPrimary())
+      lrcView?.setOtherColor(ThemeStore.getTextColorSecondary())
+      lrcView?.setTimeLineColor(ThemeStore.getTextColorSecondary())
     })
   }
 
