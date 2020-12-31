@@ -1,12 +1,15 @@
 package remix.myplayer.bean.mp3
 
 import android.content.ContentUris
+import android.content.ContentValues
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Parcelable
 import android.provider.MediaStore
 import kotlinx.android.parcel.Parcelize
 import remix.myplayer.App
 import remix.myplayer.util.SPUtil
+import timber.log.Timber
 
 /**
  * Created by Remix on 2015/11/30.
@@ -35,7 +38,7 @@ data class Song(
   val contentUri: Uri
     get() = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toLong())
 
-  val showName: String?
+  val showName: String
     get() = if (!SHOW_DISPLAYNAME) title else displayName
 
   override fun toString(): String {
@@ -56,6 +59,24 @@ data class Song(
 
 
   fun getDuration(): Long {
+    if (duration <= 0) {
+      val metadataRetriever = MediaMetadataRetriever()
+      try {
+        metadataRetriever.setDataSource(url)
+        duration = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLong()
+        if (duration > 0) {
+          val contentValues = ContentValues()
+          contentValues.put(MediaStore.Audio.Media.DURATION, duration)
+          val updateCount = App.getContext().contentResolver.update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+              contentValues, MediaStore.Audio.Media._ID + "=?", arrayOf(id.toString() + ""))
+          Timber.v("updateCount: %s", updateCount)
+        }
+      } catch (e: Exception) {
+        Timber.v("updateDuration failed: $e")
+      } finally {
+        metadataRetriever.release()
+      }
+    }
 //    if (duration <= 0) {
 //      val ijkMediaPlayer = IjkMediaPlayer()
 //      try {

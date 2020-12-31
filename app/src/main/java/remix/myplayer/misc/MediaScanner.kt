@@ -37,7 +37,7 @@ class MediaScanner(private val context: Context) {
                 toScanFiles.map { it.absolutePath }.toTypedArray(),
                 toScanFiles.map { "audio/*" }.toTypedArray()
             ) { path, uri ->
-              Timber.tag(TAG).v("scanCompleted, path: $path uri: $uri")
+//              Timber.tag(TAG).v("scanCompleted, path: $path uri: $uri")
             }
           }
         }

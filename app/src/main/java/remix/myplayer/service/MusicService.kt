@@ -105,9 +105,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   private var prepared = false
 
   /**
-   * 数据是否加载完成
+   * 数据加载
    */
-  private var loadFinished = false
+  @Volatile
+  private var load = 0
+  private val LOADING = 1
+  private val LOAD_SUCCESS = 2
 
   /**
    * 设置播放模式并更新下一首歌曲
@@ -266,7 +269,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   private var showDesktopLyric = false
     set(value) {
-      Timber.v(Throwable("设置桌面歌词开关, old: $field new: $value"))
+//      Timber.v(Throwable("设置桌面歌词开关, old: $field new: $value"))
       field = value
     }
 
@@ -287,13 +290,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     ScreenReceiver()
   }
   private var screenOn = true
-
-  /**
-   * shortcut
-   */
-  private val shortcutManager: DynamicShortcutManager by lazy {
-    DynamicShortcutManager(this)
-  }
 
   /**
    * 音量控制
@@ -446,12 +442,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     val control = commandIntent?.getIntExtra(EXTRA_CONTROL, -1)
     val action = commandIntent?.action
 
-    Timber.tag(TAG_LIFECYCLE).v("onStartCommand, control: $control action: $action flags: $flags startId: $startId")
+    Timber.v("onStartCommand, control: $control action: $action flags: $flags startId: $startId")
     stop = false
 
     tryLaunch(block = {
       hasPermission = hasPermissions(EXTERNAL_STORAGE_PERMISSIONS)
-      if (!loadFinished && hasPermission) {
+      if (load < LOADING && hasPermission) {
         withContext(Dispatchers.IO) {
           load()
         }
@@ -708,9 +704,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       pause(false)
     }
     mediaPlayer.release()
-    loadFinished = false
+    load = 0
     prepared = false
-    shortcutManager.updateContinueShortcut(this)
 
     timer.cancel()
     notify.cancelPlayingNotify()
@@ -1057,11 +1052,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           handleCommand(appwidgetIntent)
         }
       }
-      ACTION_SHORTCUT_CONTINUE_PLAY -> {
-        val continueIntent = Intent(ACTION_CMD)
-        continueIntent.putExtra(EXTRA_CONTROL, Command.TOGGLE)
-        handleCommand(continueIntent)
-      }
       ACTION_SHORTCUT_SHUFFLE -> {
         if (playModel != MODE_SHUFFLE) {
           playModel = MODE_SHUFFLE
@@ -1161,7 +1151,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
     //更新桌面歌词播放按钮
     desktopLyricView?.setPlayIcon(isPlaying)
-    shortcutManager.updateContinueShortcut(this)
     sendLocalBroadcast(Intent(PLAY_STATE_CHANGE))
   }
 
@@ -1455,9 +1444,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
               return@tryLaunch
             }
           }
-          if (isPlaying) {
-            pause(true)
-          }
+
+//          if (isPlaying) {
+//            pause(true)
+//          }
 
           prepared = false
           isLove = withContext(Dispatchers.IO) {
@@ -1539,6 +1529,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   @Synchronized
   private fun load() {
     Timber.v("load")
+    load = LOADING
     val isFirst = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, true)
     SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, false)
     //第一次启动软件
@@ -1568,8 +1559,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     //读取播放列表
     playQueue.restoreIfNecessary()
     prepare(playQueue.song, false)
-    loadFinished = true
 
+    load = LOAD_SUCCESS
     uiHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
 
     //打开软件扫描
@@ -2081,7 +2072,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     const val ACTION_SHORTCUT_SHUFFLE = "$APLAYER_PACKAGE_NAME.shortcut.shuffle"
     const val ACTION_SHORTCUT_MYLOVE = "$APLAYER_PACKAGE_NAME.shortcut.my_love"
     const val ACTION_SHORTCUT_LASTADDED = "$APLAYER_PACKAGE_NAME.shortcut.last_added"
-    const val ACTION_SHORTCUT_CONTINUE_PLAY = "$APLAYER_PACKAGE_NAME.shortcut.continue_play"
     const val ACTION_LOAD_FINISH = "$APLAYER_PACKAGE_NAME.load.finish"
     const val ACTION_CMD = "$APLAYER_PACKAGE_NAME.cmd"
     const val ACTION_WIDGET_UPDATE = "$APLAYER_PACKAGE_NAME.widget_update"
