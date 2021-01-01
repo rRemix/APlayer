@@ -13,7 +13,6 @@ import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
 import android.provider.Settings
-import androidx.annotation.WorkerThread
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -21,9 +20,9 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.annotation.WorkerThread
 import kotlinx.coroutines.*
 import remix.myplayer.R
-import remix.myplayer.appshortcuts.DynamicShortcutManager
 import remix.myplayer.appwidgets.BaseAppwidget
 import remix.myplayer.appwidgets.big.AppWidgetBig
 import remix.myplayer.appwidgets.medium.AppWidgetMedium
@@ -447,10 +446,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     tryLaunch(block = {
       hasPermission = hasPermissions(EXTERNAL_STORAGE_PERMISSIONS)
-      if (load < LOADING && hasPermission) {
-        withContext(Dispatchers.IO) {
-          load()
-        }
+      withContext(Dispatchers.IO) {
+        load()
       }
       handleStartCommandIntent(commandIntent, action)
     })
@@ -1157,7 +1154,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 接受控制命令 包括暂停、播放、上下首、改版播放模式等
    */
-  private var last = System.currentTimeMillis()
+  private var lastCommandTime = 0
 
   inner class ControlReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
@@ -1177,7 +1174,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     if (control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT
         || control == Command.TOGGLE || control == Command.PAUSE || control == Command.START) {
       //判断下间隔时间
-      if ((control == Command.PREV || control == Command.NEXT) && System.currentTimeMillis() - last < 500) {
+      if ((control == Command.PREV || control == Command.NEXT) && System.currentTimeMillis() - lastCommandTime < 500) {
         Timber.v("间隔小于500ms")
         return
       }
@@ -1415,60 +1412,56 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * @param song 播放歌曲的路径
    */
   private fun prepare(song: Song, requestFocus: Boolean = true) {
-    tryLaunch(
-        block = {
-          Timber.v("准备播放: %s", song)
-          if (TextUtils.isEmpty(song.url)) {
-            ToastUtil.show(service, getString(R.string.path_empty))
-            return@tryLaunch
-          }
+    try {
+      Timber.v("prepare: %s", song)
+      if (TextUtils.isEmpty(song.url)) {
+        ToastUtil.show(service, getString(R.string.path_empty))
+        return
+      }
 
-          val exist = withContext(Dispatchers.IO) {
-            File(song.url).exists()
-          }
-          if (!exist) {
-            ToastUtil.show(service, getString(R.string.file_not_exist))
-            return@tryLaunch
-          }
-          if (requestFocus) {
-            audioFocus = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-              audioManager.requestAudioFocus(focusRequest!!)
-            else {
-              @Suppress("DEPRECATION")
-              audioManager.requestAudioFocus(audioFocusListener,
-                  AudioManager.STREAM_MUSIC,
-                  AudioManager.AUDIOFOCUS_GAIN)
-            }) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
-            if (!audioFocus) {
-              ToastUtil.show(service, getString(R.string.cant_request_audio_focus))
-              return@tryLaunch
+      if (!File(song.url).exists()) {
+        ToastUtil.show(service, getString(R.string.file_not_exist))
+        return
+      }
+      if (requestFocus) {
+        audioFocus = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+          audioManager.requestAudioFocus(focusRequest!!)
+        else {
+          @Suppress("DEPRECATION")
+          audioManager.requestAudioFocus(audioFocusListener,
+              AudioManager.STREAM_MUSIC,
+              AudioManager.AUDIOFOCUS_GAIN)
+        }) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+        if (!audioFocus) {
+          ToastUtil.show(service, getString(R.string.cant_request_audio_focus))
+          return
+        }
+      }
+
+//      if (isPlaying) {
+//        pause(true)
+//      }
+
+      prepared = false
+      mediaPlayer.reset()
+      mediaPlayer.setDataSource(this@MusicService, song.contentUri)
+      mediaPlayer.prepareAsync()
+      prepared = true
+      Timber.v("prepare finish: $song")
+    } catch (e: Exception) {
+      ToastUtil.show(service, getString(R.string.play_failed) + e.toString())
+      prepared = false
+    }
+
+    tryLaunch {
+      isLove = withContext(Dispatchers.IO) {
+        repository.isMyLove(song.id)
+            .onErrorReturn {
+              false
             }
-          }
-
-//          if (isPlaying) {
-//            pause(true)
-//          }
-
-          prepared = false
-          isLove = withContext(Dispatchers.IO) {
-            repository.isMyLove(playQueue.song.id)
-                .onErrorReturn {
-                  false
-                }
-                .blockingGet()
-          }
-          mediaPlayer.reset()
-          withContext(Dispatchers.IO) {
-            mediaPlayer.setDataSource(this@MusicService, song.contentUri)
-          }
-          mediaPlayer.prepareAsync()
-          prepared = true
-          Timber.v("prepare finish: $song")
-        },
-        catch = {
-          ToastUtil.show(service, getString(R.string.play_failed) + it.toString())
-          prepared = false
-        })
+            .blockingGet()
+      }
+    }
   }
 
   /**
@@ -1528,6 +1521,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   @WorkerThread
   @Synchronized
   private fun load() {
+    if (load >= LOADING || !hasPermission) {
+      return
+    }
     Timber.v("load")
     load = LOADING
     val isFirst = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.FIRST_LOAD, true)
