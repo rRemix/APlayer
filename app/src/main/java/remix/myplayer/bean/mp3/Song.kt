@@ -59,49 +59,23 @@ data class Song(
 
 
   fun getDuration(): Long {
-    if (duration <= 0) {
-      val metadataRetriever = MediaMetadataRetriever()
-      try {
-        metadataRetriever.setDataSource(url)
-        duration = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLong()
-        if (duration > 0) {
-          val contentValues = ContentValues()
-          contentValues.put(MediaStore.Audio.Media.DURATION, duration)
-          val updateCount = App.getContext().contentResolver.update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-              contentValues, MediaStore.Audio.Media._ID + "=?", arrayOf(id.toString() + ""))
-          Timber.tag("Song").v("updateDuration, dur: $duration  count: $updateCount")
-        }
-      } catch (e: Exception) {
-        Timber.tag("Song").v("updateDuration failed: $e")
-      } finally {
-        metadataRetriever.release()
-      }
-    }
-//    if (duration <= 0) {
-//      val ijkMediaPlayer = IjkMediaPlayer()
+//    if (duration <= 0 && id > 0 && url.isNotEmpty()) {
+//      val metadataRetriever = MediaMetadataRetriever()
 //      try {
-//        val file = File(url)
-//        if (!file.exists()) {
-//          return duration
-//        }
-//        ijkMediaPlayer.dataSource = url
-//        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0)
-//        ijkMediaPlayer.prepareAsync()
-//        Thread.sleep(20)
-//        duration = ijkMediaPlayer.duration
-//        Timber.v("duration: %s", duration)
+//        metadataRetriever.setDataSource(url)
+//        duration = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLong()
 //        if (duration > 0) {
 //          val contentValues = ContentValues()
 //          contentValues.put(MediaStore.Audio.Media.DURATION, duration)
-//          val updateCount = App.getContext().contentResolver
-//              .update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-//                  contentValues, MediaStore.Audio.Media._ID + "=?", arrayOf(id.toString() + ""))
-//          Timber.v("UpdateCount: %s", updateCount)
+//          val updateCount = App.getContext().contentResolver.update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//              contentValues, MediaStore.Audio.Media._ID + "=?", arrayOf(id.toString() + ""))
+//          Timber.tag("Song").v("updateDuration, dur: $duration  count: $updateCount")
 //        }
 //      } catch (e: Exception) {
-//        Timber.v(e)
+//        Timber.tag("Song").v("updateDuration failed: $e")
+//      } finally {
+//        metadataRetriever.release()
 //      }
-//
 //    }
     return duration
   }

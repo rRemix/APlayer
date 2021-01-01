@@ -7,7 +7,6 @@ import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.TaskStackBuilder
@@ -16,6 +15,7 @@ import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.ui.activity.PlayerActivity
 
 /**
@@ -37,6 +37,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
   internal val contentIntent: PendingIntent
     get() {
       val result = Intent(service, PlayerActivity::class.java)
+      result.putExtra(EXTRA_SONG, service.currentSong)
 
       val stackBuilder = TaskStackBuilder.create(service)
       stackBuilder.addParentStack(PlayerActivity::class.java)

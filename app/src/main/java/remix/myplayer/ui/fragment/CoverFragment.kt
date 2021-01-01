@@ -1,10 +1,16 @@
 package remix.myplayer.ui.fragment
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.controller.ControllerListener
+import com.facebook.imagepipeline.image.CloseableBitmap
+import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
 import com.facebook.rebound.SpringSystem
@@ -16,7 +22,6 @@ import remix.myplayer.helper.MusicServiceRemote.getOperation
 import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.Command
-import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.fragment.base.BaseMusicFragment
 import remix.myplayer.util.ImageUriUtil
 
@@ -26,11 +31,11 @@ import remix.myplayer.util.ImageUriUtil
 /**
  * 专辑封面Fragment
  */
-class CoverFragment : BaseMusicFragment() {
-  var coverCallback: CoverCallback? = null
+class CoverFragment(private val coverCallback: CoverCallback) : BaseMusicFragment() {
   private var task: Disposable? = null
   private var width = 0
-  private var coverUri = Uri.EMPTY
+  private var cover = Cover(-1, Uri.EMPTY)
+  private var requestId = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -45,26 +50,20 @@ class CoverFragment : BaseMusicFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    cover_image.hierarchy.setFailureImage(if (ThemeStore.isLightTheme()) R.drawable.album_empty_bg_day else R.drawable.album_empty_bg_night)
   }
 
   //更新封面
-  fun requestCover(song: Song, playAnim: Boolean, updateBackground: Boolean) {
+  fun setImage(song: Song, playAnim: Boolean, updateBackground: Boolean) {
+    requestId = song.id
     task?.dispose()
     task = object : ImageUriRequest<String?>() {
       override fun onError(throwable: Throwable) {
-        coverUri = Uri.EMPTY
-        if (updateBackground) {
-          coverCallback?.onResult(coverUri)
-        }
+        cover = Cover(song.id, Uri.EMPTY)
         setImageUriInternal()
       }
 
       override fun onSuccess(result: String?) {
-        coverUri = Uri.parse(result)
-        if (updateBackground) {
-          coverCallback?.onResult(coverUri)
-        }
+        cover = Cover(song.id, Uri.parse(result))
         setImageUriInternal()
       }
 
@@ -76,17 +75,14 @@ class CoverFragment : BaseMusicFragment() {
     }.load()
 
     if (playAnim) {
-      playAnimation()
+      playAnimation(song)
     }
   }
 
   /**
    * 操作为上一首歌曲时，显示往左侧消失的动画 下一首歌曲时，显示往右侧消失的动画
-   *
-   * @param info 需要更新的歌曲
-   * @param withAnim 是否需要动画
    */
-  private fun playAnimation() {
+  private fun playAnimation(song: Song) {
     if (!isAdded) {
       return
     }
@@ -103,6 +99,9 @@ class CoverFragment : BaseMusicFragment() {
       }
 
       override fun onSpringAtRest(spring: Spring) {
+        if (cover_image.tag != requestId) {
+          cover_image.setImageURI("", null)
+        }
         cover_container.translationX = startValue.toFloat()
         val endVal = 1f
         val inAnim = SpringSystem.create().createSpring()
@@ -127,10 +126,42 @@ class CoverFragment : BaseMusicFragment() {
   }
 
   private fun setImageUriInternal() {
-    cover_image.setImageURI(coverUri)
+    cover_image.tag = cover.id
+    val controller = Fresco.newDraweeControllerBuilder()
+        .setUri(cover.url)
+        .setOldController(cover_image.controller)
+        .setControllerListener(object : ControllerListener<ImageInfo> {
+          override fun onSubmit(s: String?, o: Any?) {
+
+          }
+
+          override fun onFinalImageSet(s: String?, imageInfo: ImageInfo?,
+                                       animatable: Animatable?) {
+            if (imageInfo is CloseableBitmap) {
+              coverCallback.onBitmap(imageInfo.underlyingBitmap)
+            }
+          }
+
+          override fun onIntermediateImageSet(s: String?, imageInfo: ImageInfo?) {}
+
+          override fun onIntermediateImageFailed(s: String?, throwable: Throwable?) {
+          }
+
+          override fun onFailure(s: String?, throwable: Throwable?) {
+            coverCallback.onBitmap(null)
+          }
+
+          override fun onRelease(s: String?) {
+
+          }
+        })
+        .build()
+    cover_image.controller = controller
   }
 
   interface CoverCallback {
-    fun onResult(uri: Uri)
+    fun onBitmap(bitmap: Bitmap?)
   }
+
+  data class Cover(val id: Int, val url: Uri)
 }

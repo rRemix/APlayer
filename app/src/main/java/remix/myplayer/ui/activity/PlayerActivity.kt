@@ -68,6 +68,7 @@ import remix.myplayer.request.RequestConfig
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.theme.DrawableGradient
 import remix.myplayer.theme.GradientDrawableMaker
 import remix.myplayer.theme.Theme
@@ -222,6 +223,10 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     ButterKnife.bind(this)
 
     song = getCurrentSong()
+    if (song == Song.EMPTY_SONG && intent.hasExtra(EXTRA_SONG)) {
+      song = intent.getParcelableExtra(EXTRA_SONG) as Song
+    }
+
     setUpBottom()
     setUpTop()
     setUpFragments()
@@ -527,7 +532,13 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
         fragmentManager.beginTransaction().remove(fragment).commitNow()
       }
     }
-    coverFragment = CoverFragment()
+    coverFragment = CoverFragment(object : CoverFragment.CoverCallback {
+      override fun onBitmap(bitmap: Bitmap?) {
+        if (background == BACKGROUND_ADAPTIVE_COLOR) {
+          updateSwatch(bitmap)
+        }
+      }
+    })
     setUpCoverFragment()
     lyricFragment = LyricFragment()
     setUpLyricFragment()
@@ -611,13 +622,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   }
 
   private fun setUpCoverFragment() {
-    coverFragment.coverCallback = object : CoverFragment.CoverCallback {
-      override fun onResult(uri: Uri) {
-        if (background == BACKGROUND_ADAPTIVE_COLOR) {
-          updateBackground(uri)
-        }
-      }
-    }
+
   }
 
   override fun onMediaStoreChanged() {
@@ -626,7 +631,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     updateTopStatus(newSong)
     lyricFragment.updateLrc(newSong)
     song = newSong
-    coverFragment.requestCover(song, false, true)
+    coverFragment.setImage(song, false, true)
   }
 
   override fun onMetaChanged() {
@@ -646,9 +651,10 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
       seekbar.max = duration
       //更新下一首歌曲
       next_song.text = getString(R.string.next_song, getNextSong().title)
-      coverFragment.requestCover(song,
-          operation != Command.TOGGLE,
+      coverFragment.setImage(song,
+          operation != Command.TOGGLE && !firstStart,
           operation != Command.TOGGLE)
+      firstStart = false
     }
   }
 
@@ -805,6 +811,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     object : ImageUriRequest<Bitmap>(RequestConfig.Builder(100, 100).build()) {
       override fun onError(throwable: Throwable?) {
         Timber.v("updateBackground failed: $throwable")
+        updateSwatch(null)
       }
 
       override fun onSuccess(result: Bitmap?) {
@@ -828,8 +835,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   private fun updateSwatch(bitmap: Bitmap?) {
     Single
         .fromCallable {
-          bitmap ?: BitmapFactory.decodeResource(resources,
-              if (ThemeStore.isLightTheme()) R.drawable.album_empty_bg_day else R.drawable.album_empty_bg_night)
+          bitmap
         }
         .map { result: Bitmap ->
           val palette = Palette.from(result).generate()
