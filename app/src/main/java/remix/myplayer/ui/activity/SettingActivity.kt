@@ -2,7 +2,9 @@ package remix.myplayer.ui.activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
@@ -97,7 +99,10 @@ import java.io.File
  * @Date 2016/8/23 13:51
  */
 //todo 重构整个界面
-class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, FileChooserDialog.FileCallback, ColorChooserDialog.ColorCallback {
+class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, FileChooserDialog.FileCallback,
+    ColorChooserDialog.ColorCallback, SharedPreferences.OnSharedPreferenceChangeListener{
+
+  private lateinit var checkedChangedListener: OnCheckedChangeListener
 
   @BindView(R.id.setting_color_primary_indicator)
   lateinit var mPrimaryColorSrc: ImageView
@@ -209,7 +214,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       if (view.id == R.id.setting_navaigation_switch) {
         view.isEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
       }
-      view.setOnCheckedChangeListener(object : OnCheckedChangeListener {
+      checkedChangedListener = object : OnCheckedChangeListener {
         override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
           SPUtil.putValue(mContext, SETTING_KEY.NAME, keyWord[index], isChecked)
           when (buttonView.id) {
@@ -269,7 +274,8 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
           }
 
         }
-      })
+      }
+      view.setOnCheckedChangeListener(checkedChangedListener)
     }
 
     //桌面歌词
@@ -332,6 +338,8 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     if (IS_GOOGLEPLAY) {
       findViewById<View>(R.id.setting_update_container).visibility = View.GONE
     }
+
+    getSharedPreferences(SETTING_KEY.NAME, Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this)
   }
 
   private fun updatePlayerBackgroundText() {
@@ -1146,7 +1154,6 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
     outState.putBoolean(EXTRA_RECREATE, mNeedRecreate)
-    //        outState.putBoolean("fromColorChoose", mFromColorChoose);
     outState.putBoolean(EXTRA_REFRESH_ADAPTER, mNeedRefreshAdapter)
   }
 
@@ -1158,7 +1165,14 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         disposable.dispose()
       }
     }
+  }
 
+  override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String) {
+    if(key == SETTING_KEY.DESKTOP_LYRIC_SHOW){
+      setting_lrc_float_switch.setOnCheckedChangeListener(null)
+      setting_lrc_float_switch.isChecked = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW,false)
+      setting_lrc_float_switch.setOnCheckedChangeListener(checkedChangedListener)
+    }
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

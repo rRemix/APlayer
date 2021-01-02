@@ -22,8 +22,8 @@ class LyricFetcher(service: MusicService) {
   private val lrcRows = CopyOnWriteArrayList<LrcRow>()
   private val reference: WeakReference<MusicService> = WeakReference(service)
   private var disposable: Disposable? = null
-  private var song: Song = Song.EMPTY_SONG
   private var status = Status.SEARCHING
+  var song: Song = Song.EMPTY_SONG
   var offset = 0
   private val lyricSearcher = LyricSearcher()
 
@@ -75,9 +75,7 @@ class LyricFetcher(service: MusicService) {
         return LYRIC_WRAPPER_NO
       }
     }
-
   }
-
 
   fun updateLyricRows(song: Song) {
     this.song = song
@@ -97,7 +95,7 @@ class LyricFetcher(service: MusicService) {
           status = Status.SEARCHING
         }
         .subscribe({
-          Timber.v("updateLyricRows, lrc: $it")
+//          Timber.v("updateLyricRows, lrc: $it")
           if (id == song.id) {
             status = Status.NORMAL
             offset = SPUtil.getValue(App.getContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, id.toString(), 0)

@@ -27,6 +27,7 @@ import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import timber.log.Timber
 import java.util.*
+import kotlin.math.abs
 
 /**
  * Created by Remix on 2015/12/2.
@@ -178,7 +179,7 @@ class LyricFragment : BaseMusicFragment() {
       }
       MESSAGE_SHOW_TOAST -> {
         val newOffset = msg.arg1
-        if (newOffset != 0 && Math.abs(newOffset) <= 60000) {//最大偏移60s
+        if (newOffset != 0 && abs(newOffset) <= 60000) {//最大偏移60s
           ToastUtil.show(mContext, if (newOffset > 0) R.string.lyric_advance_x_second else R.string.lyric_delay_x_second,
               String.format(Locale.getDefault(), "%.1f", newOffset / 1000f))
         }
