@@ -86,6 +86,7 @@ import remix.myplayer.util.*
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import timber.log.Timber
 import java.io.File
+import java.lang.Exception
 import kotlin.math.abs
 
 /**
@@ -532,13 +533,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
         fragmentManager.beginTransaction().remove(fragment).commitNow()
       }
     }
-    coverFragment = CoverFragment(object : CoverFragment.CoverCallback {
-      override fun onBitmap(bitmap: Bitmap?) {
-        if (background == BACKGROUND_ADAPTIVE_COLOR) {
-          updateSwatch(bitmap)
-        }
-      }
-    })
+    coverFragment = CoverFragment()
     setUpCoverFragment()
     lyricFragment = LyricFragment()
     setUpLyricFragment()
@@ -622,7 +617,13 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   }
 
   private fun setUpCoverFragment() {
-
+    coverFragment.coverCallback = object : CoverFragment.CoverCallback {
+      override fun onBitmap(bitmap: Bitmap?) {
+        if (background == BACKGROUND_ADAPTIVE_COLOR) {
+          updateSwatch(bitmap)
+        }
+      }
+    }
   }
 
   override fun onMediaStoreChanged() {
@@ -671,25 +672,24 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   private inner class ProgressThread : Thread() {
     override fun run() {
       while (mIsForeground) {
-        //音量
-        if (volume_seekbar.visibility == View.VISIBLE) {
-          val max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-          val current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-          runOnUiThread { volume_seekbar.progress = (current * 1.0 / max * 100).toInt() }
-        }
-        if (!isPlaying()) {
-          continue
-        }
-        val progress = getProgress()
-        if (progress in 1 until duration) {
-          currentTime = progress
-          handler.sendEmptyMessage(UPDATE_TIME_ALL)
-          try {
-            //1000ms时间有点长
-            sleep(500)
-          } catch (e: Exception) {
-            e.printStackTrace()
+        try {
+          //音量
+          if (volume_seekbar.visibility == View.VISIBLE) {
+            val max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            val current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+            runOnUiThread { volume_seekbar.progress = (current * 1.0 / max * 100).toInt() }
           }
+          if (!isPlaying()) {
+            sleep(500)
+            continue
+          }
+          val progress = getProgress()
+          if (progress in 1 until duration) {
+            currentTime = progress
+            handler.sendEmptyMessage(UPDATE_TIME_ALL)
+            sleep(500)
+          }
+        } catch (ignore: Exception){
         }
       }
     }

@@ -1668,8 +1668,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     var force = false
 
     override fun run() {
-      if ((!showDesktopLyric && !showStatusBarLyric) || stop) {
-        return
+      if(!showDesktopLyric){
+        if (isDesktopLyricShowing) {
+          uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
+        }
+        if(!showStatusBarLyric || stop){
+          return
+        }
       }
 
       val currentSong = playQueue.song
@@ -1704,6 +1709,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
 
     override fun cancel(): Boolean {
+      Timber.tag(TAG_DESKTOP_LYRIC).v("cancel task")
       lyricFetcher.dispose()
       uiHandler.sendEmptyMessage(UPDATE_NOTIFICATION)
       return super.cancel()

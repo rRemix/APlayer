@@ -31,7 +31,8 @@ import remix.myplayer.util.ImageUriUtil
 /**
  * 专辑封面Fragment
  */
-class CoverFragment(private val coverCallback: CoverCallback) : BaseMusicFragment() {
+class CoverFragment : BaseMusicFragment() {
+  var coverCallback: CoverCallback? = null
   private var task: Disposable? = null
   private var width = 0
   private var cover = Cover(-1, Uri.EMPTY)
@@ -138,7 +139,7 @@ class CoverFragment(private val coverCallback: CoverCallback) : BaseMusicFragmen
           override fun onFinalImageSet(s: String?, imageInfo: ImageInfo?,
                                        animatable: Animatable?) {
             if (imageInfo is CloseableBitmap) {
-              coverCallback.onBitmap(imageInfo.underlyingBitmap)
+              coverCallback?.onBitmap(imageInfo.underlyingBitmap)
             }
           }
 
@@ -148,7 +149,7 @@ class CoverFragment(private val coverCallback: CoverCallback) : BaseMusicFragmen
           }
 
           override fun onFailure(s: String?, throwable: Throwable?) {
-            coverCallback.onBitmap(null)
+            coverCallback?.onBitmap(null)
           }
 
           override fun onRelease(s: String?) {
