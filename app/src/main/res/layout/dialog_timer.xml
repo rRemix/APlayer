@@ -1,217 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:CircleSeekBar="http://schemas.android.com/apk/res-auto"
-  android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/timer_content_container"
   android:layout_width="100dp"
-  android:layout_height="wrap_content">
+  android:layout_height="wrap_content"
+  android:orientation="vertical">
 
-  <LinearLayout
-    android:orientation="vertical"
+  <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/timer_info_container"
-    android:visibility="invisible">
-    <ImageButton
-      android:id="@+id/timer_info_close"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_margin="@dimen/d15_size"
-      android:src="@drawable/btn_timer_close"
-      android:background="@color/transparent"/>
+    android:layout_marginTop="@dimen/d24_size"
+    android:layout_marginBottom="@dimen/d36_size"
+    android:gravity="center">
 
-    <TextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:textSize="@dimen/s14_size"
-      android:textColor="#3c3c3c"
-      android:text="@string/timer_info_1"
-      android:layout_marginBottom="@dimen/d36_size"
-      android:layout_gravity="center_horizontal"/>
-
-    <TextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:textSize="@dimen/s12_size"
-      android:textColor="#b7b7b7"
-      android:text="@string/timer_info_2"
-      android:lineSpacingExtra="@dimen/d4_size"
-      android:layout_gravity="center_horizontal"
-      android:layout_marginLeft="@dimen/d22_size"
-      android:layout_marginRight="@dimen/d22_size"/>
-  </LinearLayout>
-
-
-  <LinearLayout
-    android:id="@+id/timer_content_container"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    <TextView
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="@string/timer"
-      android:textColor="#333333"
-      android:textSize="@dimen/s20_size"
-      android:gravity="center"
-      android:layout_gravity="center_horizontal"
-      android:layout_marginTop="@dimen/d12_size"
-      android:layout_marginBottom="@dimen/d12_size"/>
+    <remix.myplayer.ui.widget.CircleSeekBar
+      android:id="@+id/close_seekbar"
+      android:layout_width="@dimen/d180_size"
+      android:layout_height="@dimen/d180_size"
+      android:layout_centerInParent="true"
+      app:progress_max="7200"
+      app:progress_width="@dimen/d4_size" />
 
     <LinearLayout
-      android:layout_marginLeft="@dimen/d14_size"
-      android:layout_marginRight="@dimen/d14_size"
-      android:layout_width="match_parent"
-      android:layout_height="1px"
-      android:background="#ededed"/>
-
-    <FrameLayout
-      android:layout_width="match_parent"
+      android:id="@+id/timer_time_container"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
       android:gravity="center"
-      android:layout_marginTop="@dimen/d24_size"
-      android:layout_marginBottom="@dimen/d20_size">
-      <remix.myplayer.ui.widget.CircleSeekBar
-        android:layout_gravity="center"
-        android:id="@+id/close_seekbar"
-        android:layout_width="@dimen/d180_size"
-        android:layout_height="@dimen/d180_size"
-        CircleSeekBar:progress_max="7200"
-        CircleSeekBar:progress_width="@dimen/d4_size"/>
-      <RelativeLayout
-        android:layout_width="match_parent"
+      android:orientation="horizontal">
+
+      <FrameLayout
+        android:id="@+id/timer_minute_container"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_gravity="center">
-        <LinearLayout
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:orientation="horizontal"
-          android:gravity="center"
-          android:layout_centerInParent="true"
-          android:id="@+id/timer_time_container">
-          <FrameLayout
-            android:id="@+id/timer_minute_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center">
-            <TextView
-              android:layout_gravity="center"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:id="@+id/minute"
-              android:textSize="@dimen/s24_size"
-              android:textColor="@color/timer_text_color"
-              android:text="00"
-              android:maxLines="1"/>
-            <View
-              android:layout_gravity="center"
-              android:layout_width="@dimen/d30_size"
-              android:layout_height="@dimen/d1_size"
-              android:background="@color/white"
-              android:layout_margin="@dimen/d1_size"/>
-          </FrameLayout>
-
-          <FrameLayout
-            android:id="@+id/timer_second_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/d12_size">
-            <TextView
-              android:layout_gravity="center"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:id="@+id/second"
-              android:textSize="@dimen/s24_size"
-              android:textColor="@color/timer_text_color"
-              android:text="00"
-              android:maxLines="1"/>
-            <View
-              android:layout_gravity="center"
-              android:layout_width="@dimen/d30_size"
-              android:layout_height="@dimen/d1_size"
-              android:background="@color/white"
-              android:layout_margin="@dimen/d1_size"/>
-          </FrameLayout>
-        </LinearLayout>
 
         <TextView
-          android:layout_marginLeft="@dimen/d6_size"
-          android:layout_toRightOf="@id/timer_time_container"
-          android:layout_alignBottom="@id/timer_time_container"
+          android:id="@+id/minute"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:textSize="@dimen/s12_size"
-          android:textColor="#3c3c3c"
-          android:text="min"/>
-      </RelativeLayout>
+          android:layout_gravity="center"
+          android:maxLines="1"
+          android:text="00"
+          android:textColor="?attr/text_color_primary"
+          android:textSize="@dimen/s24_size"
+          tools:ignore="HardcodedText" />
 
-    </FrameLayout>
+        <View
+          android:layout_width="@dimen/d30_size"
+          android:layout_height="@dimen/d1_size"
+          android:layout_gravity="center"
+          android:layout_margin="@dimen/d1_size"
+          android:background="?attr/background_color_dialog" />
+      </FrameLayout>
 
-    <!-- 默认设置-->
-    <RelativeLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center_horizontal"
-      android:layout_marginBottom="@dimen/d40_size">
-      <LinearLayout
-        android:id="@+id/popup_timer_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_centerInParent="true"
-        android:gravity="center_vertical"
-        android:layout_marginRight="@dimen/d4_size">
-        <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:textColor="@color/timer_text_color"
-          android:textSize="@dimen/s14_size"
-          android:text="@string/as_default"
-          android:layout_marginRight="@dimen/d18_size"/>
-      </LinearLayout>
-      <ImageView
-        android:id="@+id/timer_info"
-        android:layout_toRightOf="@id/popup_timer_container"
-        android:layout_centerVertical="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/icon_timer_info"
-        android:background="@color/transparent"/>
-
-    </RelativeLayout>
-
-    <RelativeLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="@dimen/d28_size">
       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/close_toggle"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="@dimen/d16_size"
-        android:layout_marginLeft="@dimen/d2_size"
-        android:textSize="@dimen/s16_size"
-        android:text="@string/start_timer"
-        android:textColor="@color/light_text_color_primary"
-        android:paddingTop="@dimen/d6_size"
-        android:paddingBottom="@dimen/d6_size"
-        android:paddingRight="@dimen/d12_size"
-        android:paddingLeft="@dimen/d12_size"/>
+        android:layout_marginHorizontal="@dimen/d4_size"
+        android:text=":"
+        android:textColor="?attr/text_color_secondary"
+        android:textSize="@dimen/s20_size"
+        tools:ignore="HardcodedText" />
+
+      <FrameLayout
+        android:id="@+id/timer_second_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+          android:id="@+id/second"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:maxLines="1"
+          android:text="00"
+          android:textColor="?attr/text_color_primary"
+          android:textSize="@dimen/s24_size"
+          tools:ignore="HardcodedText" />
+
+        <View
+          android:layout_width="@dimen/d30_size"
+          android:layout_height="@dimen/d1_size"
+          android:layout_gravity="center"
+          android:layout_margin="@dimen/d1_size"
+          android:background="?attr/background_color_dialog" />
+      </FrameLayout>
+    </LinearLayout>
+  </RelativeLayout>
+
+  <!-- 默认设置-->
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginBottom="@dimen/d24_size">
+
+    <LinearLayout
+      android:id="@+id/timer_default_container"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      android:layout_marginEnd="@dimen/d4_size"
+      android:gravity="center_vertical"
+      android:orientation="horizontal">
+
       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/close_stop"
-        android:layout_toLeftOf="@id/close_toggle"
-        android:gravity="center"
-        android:textSize="@dimen/s16_size"
-        android:text="@string/close"
-        android:textColor="@color/light_text_color_secondary"
-        android:paddingTop="@dimen/d6_size"
-        android:paddingBottom="@dimen/d6_size"
-        android:paddingRight="@dimen/d12_size"
-        android:paddingLeft="@dimen/d12_size"/>
-    </RelativeLayout>
-  </LinearLayout>
-</FrameLayout>
+        android:layout_marginEnd="@dimen/d16_size"
+        android:text="@string/as_default"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/s14_size" />
+
+      <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/timer_default_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <ImageButton
+      android:id="@+id/timer_default_info"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerVertical="true"
+      android:layout_toEndOf="@id/timer_default_container"
+      android:background="?attr/background_oval_ripple"
+      app:srcCompat="@drawable/ic_info_24dp"
+      tools:ignore="ContentDescription" />
+  </RelativeLayout>
+</LinearLayout>

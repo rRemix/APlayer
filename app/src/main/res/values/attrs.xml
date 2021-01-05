@@ -8,7 +8,7 @@
   <declare-styleable name="CircleSeekBar">
     <attr format="reference" name="progress_thumb"/>
     <attr format="dimension|reference" name="progress_width"/>
-    <attr format="color" name="progress_color"/>
+    <attr format="color|reference" name="circle_color"/>
     <attr format="integer|reference" name="progress_max"/>
   </declare-styleable>
 

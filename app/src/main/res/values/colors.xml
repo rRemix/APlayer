@@ -65,6 +65,10 @@
   <color name="light_normal_tab_text_color">#99ffffff</color>
   <color name="dark_normal_tab_text_color">@color/dark_text_color_secondary</color>
 
+  <!-- CircleSeekBar 圆圈的颜色 -->
+  <color name="light_circle_color">#b7b7b7</color>
+  <color name="dark_circle_color">#656265</color>
+
   <color name="detail_text_color">#737373</color>
 
   <color name="default_accent_color">#555393</color>
