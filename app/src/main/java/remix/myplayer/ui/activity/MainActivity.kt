@@ -9,17 +9,15 @@ import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.tabs.TabLayout
-import androidx.viewpager.widget.ViewPager
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.text.TextUtils
 import android.view.Menu
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager.widget.ViewPager
 import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
@@ -29,6 +27,8 @@ import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
 import com.facebook.rebound.SpringSystem
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.soundcloud.android.crop.Crop
@@ -81,20 +81,28 @@ import java.util.*
 open class MainActivity : MenuActivity() {
   @BindView(R.id.tabs)
   lateinit var mTabLayout: TabLayout
+
   @BindView(R.id.ViewPager)
   lateinit var mViewPager: ViewPager
+
   @BindView(R.id.navigation_view)
   lateinit var mNavigationView: NavigationView
+
   @BindView(R.id.drawer_layout)
   lateinit var mDrawerLayout: DrawerLayout
+
   @BindView(R.id.add)
   lateinit var mAddButton: ImageView
+
   @BindView(R.id.header_txt)
   lateinit var mHeadText: TextView
+
   @BindView(R.id.header_img)
   lateinit var mHeadImg: SimpleDraweeView
+
   @BindView(R.id.header)
   lateinit var mHeadRoot: View
+
   @BindView(R.id.recyclerview)
   lateinit var mRecyclerView: RecyclerView
 
@@ -134,7 +142,7 @@ open class MainActivity : MenuActivity() {
 
   override fun onResume() {
     super.onResume()
-    if(hasNewIntent){
+    if (hasNewIntent) {
       mRefreshHandler.postDelayed({ this.parseIntent() }, 500)
       mRefreshHandler.post {
         onMetaChanged()
@@ -397,31 +405,22 @@ open class MainActivity : MenuActivity() {
   private fun setTabClickListener() {
     for (i in 0 until mTabLayout.tabCount) {
       val tab = mTabLayout.getTabAt(i) ?: return
-      val c = tab.javaClass
-      try {
-        val field = c.getDeclaredField("view")
-        field.isAccessible = true
-        val view = field.get(tab) as View
-        view.setOnClickListener(object : DoubleClickListener() {
-          override fun onDoubleClick(v: View) {
-            // 只有第一个标签可能是"歌曲"
-            if (mCurrentFragment is SongFragment) {
-              // 滚动到当前的歌曲
-              val fragments = supportFragmentManager.fragments
-              for (fragment in fragments) {
-                if (fragment is SongFragment) {
-                  fragment.scrollToCurrent()
-                }
+      tab.view.setOnClickListener(object : DoubleClickListener() {
+        override fun onDoubleClick(v: View) {
+          // 只有第一个标签可能是"歌曲"
+          if (mCurrentFragment is SongFragment) {
+            // 滚动到当前的歌曲
+            val fragments = supportFragmentManager.fragments
+            for (fragment in fragments) {
+              if (fragment is SongFragment) {
+                fragment.scrollToCurrent()
               }
             }
           }
-        })
-      } catch (e: Exception) {
-        Timber.w(e)
-      }
+        }
+      })
     }
   }
-
 
   private fun setUpDrawerLayout() {
     mDrawerAdapter.setOnItemClickListener(object : OnItemClickListener {
@@ -720,7 +719,7 @@ open class MainActivity : MenuActivity() {
     mForceDialog?.show()
   }
 
-  fun toPlayerActivity(){
+  fun toPlayerActivity() {
     val bottomActionBarFragment = supportFragmentManager.findFragmentByTag("BottomActionBarFragment") as BottomActionBarFragment?
     bottomActionBarFragment?.startPlayerActivity()
   }
@@ -751,8 +750,10 @@ open class MainActivity : MenuActivity() {
     const val EXTRA_REFRESH_ADAPTER = "needRefreshAdapter"
     const val EXTRA_REFRESH_LIBRARY = "needRefreshLibrary"
     const val EXTRA_CATEGORY = "Category"
+
     //设置界面
     private const val REQUEST_SETTING = 1
+
     //安装权限
     private const val REQUEST_INSTALL_PACKAGES = 2
 

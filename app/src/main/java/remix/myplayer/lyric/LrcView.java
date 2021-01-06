@@ -220,13 +220,11 @@ public class LrcView extends View implements ILrcView {
   @Override
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
-    if (TIMELINE_DRAWABLE_RECT == null)
-    //扩大点击区域
-    {
+    if (TIMELINE_DRAWABLE_RECT == null) { //扩大点击区域
       TIMELINE_DRAWABLE_RECT = new Rect(-TIMELINE_DRAWABLE.getIntrinsicWidth() / 2,
-          (getHeight() / 2 - TIMELINE_DRAWABLE.getIntrinsicHeight()),
-          TIMELINE_DRAWABLE.getIntrinsicWidth() + TIMELINE_DRAWABLE.getIntrinsicWidth() / 2,
-          (getHeight() / 2 + TIMELINE_DRAWABLE.getIntrinsicHeight()));
+          (getHeight() / 2 - TIMELINE_DRAWABLE.getIntrinsicHeight() * 2),
+          TIMELINE_DRAWABLE.getIntrinsicWidth() * 2,
+          (getHeight() / 2 + TIMELINE_DRAWABLE.getIntrinsicHeight() * 2));
     }
   }
 
