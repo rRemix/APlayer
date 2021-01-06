@@ -112,8 +112,8 @@
   <string name="timer">Sleep with music</string>
   <string name="as_default">Set as default</string>
   <string name="close">Close</string>
-  <string name="timer_info_1">"Sleep Timer" 时间设为默认</string>
-  <string name="timer_info_2">"Sleep Timer" 时间设为默认后，下次点击定时停止按钮后，将直接按之前设置好的时间开始计时。\n\n想要更改“定时停止”的时间，点击两次定时停止按钮即可进入设置页面。</string>
+  <string name="timer_default_info_title">"Sleep Timer" 时间设为默认</string>
+  <string name="timer_default_info_content">"Sleep Timer" 时间设为默认后，下次点击定时停止按钮后，将直接按之前设置好的时间开始计时。\n\n想要更改“定时停止”的时间，点击两次定时停止按钮即可进入设置页面。</string>
   <string name="input_feedback_content">Please input the feedback</string>
   <string name="playing">Now playing</string>
   <string name="set_filter_size">Set the size of filter</string>

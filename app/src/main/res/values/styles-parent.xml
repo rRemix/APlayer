@@ -19,6 +19,8 @@
     <item name="ripple_color">@color/light_ripple_color</item>
     <item name="divider_color">@color/light_divider_color</item>
 
+    <item name="circle_color">@color/light_circle_color</item>
+
     <item name="background_grid">@drawable/bg_grid_light</item>
     <item name="background_list">@drawable/bg_list_light</item>
     <item name="background_rect_ripple">@drawable/bg_rect_ripple_light</item>
@@ -48,6 +50,8 @@
 
     <item name="ripple_color">@color/dark_ripple_color</item>
     <item name="divider_color">@color/dark_divider_color</item>
+
+    <item name="circle_color">@color/dark_circle_color</item>
 
     <item name="background_grid">@drawable/bg_grid_dark</item>
     <item name="background_list">@drawable/bg_list_dark</item>

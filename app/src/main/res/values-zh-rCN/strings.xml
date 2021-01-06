@@ -112,8 +112,8 @@
   <string name="timer">伴着音乐入睡</string>
   <string name="as_default">设为默认</string>
   <string name="close">关闭</string>
-  <string name="timer_info_1">“定时停止”时间设为默认</string>
-  <string name="timer_info_2">“定时停止”时间设为默认后，下次点击定时停止按钮后，将直接按之前设置好的时间开始计时。\n\n想要更改“定时停止”的时间，点击两次定时停止按钮即可进入设置页面。</string>
+  <string name="timer_default_info_title">“定时停止”时间设为默认</string>
+  <string name="timer_default_info_content">“定时停止”时间设为默认后，下次点击定时停止按钮后，将直接按之前设置好的时间开始计时。\n\n想要更改“定时停止”的时间，点击两次定时停止按钮即可进入设置页面。</string>
   <string name="input_feedback_content">请填写反馈内容</string>
   <string name="playing">正在播放</string>
   <string name="set_filter_size">设置过滤文件大小</string>

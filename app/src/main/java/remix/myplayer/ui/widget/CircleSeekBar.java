@@ -90,6 +90,8 @@ public class CircleSeekBar extends AbsSeekBar {
    * 轨道颜色
    */
   private int mProgressColor;
+  private int mCircleColor;
+
   private Context mContext;
 
   /**
@@ -224,8 +226,8 @@ public class CircleSeekBar extends AbsSeekBar {
     mThumbDrawable = Theme.getTintThumb(mContext);
 
     //轨道颜色 宽度 最大值
-    mProgressColor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color,
-        ThemeStore.getAccentColor());
+    mProgressColor = ThemeStore.getAccentColor();
+    mCircleColor = typedArray.getColor(R.styleable.CircleSeekBar_circle_color, Color.GRAY);
     mProgressWidth = (int) typedArray.getDimension(R.styleable.CircleSeekBar_progress_width, 14);
     mProgressMax = typedArray.getInteger(R.styleable.CircleSeekBar_progress_max, 600);
     typedArray.recycle();
@@ -234,7 +236,7 @@ public class CircleSeekBar extends AbsSeekBar {
     mCirclePaint = new Paint();
     mCirclePaint.setAntiAlias(true);
     mCirclePaint.setStyle(Paint.Style.STROKE);
-    mCirclePaint.setColor(Color.parseColor("#b7b7b7"));
+    mCirclePaint.setColor(mCircleColor);
     mCirclePaint.setStrokeWidth(mProgressWidth);
 
     //圆弧画笔
@@ -248,10 +250,10 @@ public class CircleSeekBar extends AbsSeekBar {
     mShadowCirclePaint = new Paint();
     mShadowCirclePaint.setAntiAlias(true);
     mShadowCirclePaint.setStyle(Paint.Style.STROKE);
-    mShadowCirclePaint.setColor(Color.parseColor("#b7b7b7"));
+    mShadowCirclePaint.setColor(mCircleColor);
     mShadowCirclePaint.setStrokeWidth(mProgressWidth);
     mShadowCirclePaint
-        .setShadowLayer(DensityUtil.dip2px(mContext, 2.5f), 0, 0, Color.parseColor("#b7b7b7"));
+        .setShadowLayer(DensityUtil.dip2px(mContext, 2.5f), 0, 0, mCircleColor);
 
     setLayerType(LAYER_TYPE_SOFTWARE, mShadowCirclePaint);
 

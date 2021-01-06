@@ -9,11 +9,11 @@ import androidx.appcompat.widget.SwitchCompat;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,6 +30,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.theme.Theme;
 
 /**
  * Created by taeja on 16-1-15.
@@ -48,9 +49,6 @@ public class TimerDialog extends BaseDialog {
     return timerDialog;
   }
 
-  //提示信息
-  @BindView(R.id.timer_info_container)
-  View mInfoContainer;
   @BindView(R.id.timer_content_container)
   View mContentContainer;
   //分钟
@@ -60,16 +58,11 @@ public class TimerDialog extends BaseDialog {
   @BindView(R.id.second)
   TextView mSecond;
   //设置或取消默认
-  SwitchCompat mSwitch;
+  @BindView(R.id.timer_default_switch)
+  SwitchCompat mTimerDefaultSwitch;
   //圆形seekbar
   @BindView(R.id.close_seekbar)
   CircleSeekBar mSeekbar;
-  //开始或取消计时
-  @BindView(R.id.close_toggle)
-  TextView mToggle;
-  @BindView(R.id.close_stop)
-  TextView mCancel;
-
 
   //定时时间 单位秒
   private int mTime;
@@ -83,9 +76,14 @@ public class TimerDialog extends BaseDialog {
   @NonNull
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    MaterialDialog dialog = new MaterialDialog.Builder(getContext())
+    MaterialDialog dialog = Theme.getBaseDialog(getContext())
         .customView(R.layout.dialog_timer, false)
-        .theme(com.afollestad.materialdialogs.Theme.LIGHT)
+        .title(R.string.timer)
+        .titleGravity(GravityEnum.CENTER)
+        .positiveText(SleepTimer.isTicking() ? R.string.cancel_timer : R.string.start_timer)
+        .negativeText(R.string.close)
+        .onPositive((_dialog, which) -> toggle())
+        .onNegative((_dialog, which) -> dismiss())
         .build();
 
     View root = dialog.getCustomView();
@@ -126,9 +124,7 @@ public class TimerDialog extends BaseDialog {
     });
 
     //初始化switch
-    mSwitch = new SwitchCompat(getContext());
-    TintHelper.setTintAuto(mSwitch, ThemeStore.getAccentColor(), false);
-    ((LinearLayout) root.findViewById(R.id.popup_timer_container)).addView(mSwitch);
+    TintHelper.setTintAuto(mTimerDefaultSwitch, ThemeStore.getAccentColor(), false);
 
     //读取保存的配置
     boolean hasDefault = SPUtil
@@ -145,8 +141,8 @@ public class TimerDialog extends BaseDialog {
         toggle();
       }
     }
-    mSwitch.setChecked(hasDefault);
-    mSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+    mTimerDefaultSwitch.setChecked(hasDefault);
+    mTimerDefaultSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
       if (isChecked) {
         if (mSaveTime > 0) {
           ToastUtil.show(getContext(), R.string.set_success);
@@ -156,7 +152,7 @@ public class TimerDialog extends BaseDialog {
               mSaveTime);
         } else {
           ToastUtil.show(getContext(), R.string.plz_set_correct_time);
-          mSwitch.setChecked(false);
+          mTimerDefaultSwitch.setChecked(false);
         }
       } else {
         ToastUtil.show(getContext(), R.string.cancel_success);
@@ -164,8 +160,6 @@ public class TimerDialog extends BaseDialog {
         SPUtil.putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
       }
     });
-
-    mToggle.setText(SleepTimer.isTicking() ? R.string.cancel_timer : R.string.start_timer);
 
     //分钟 秒 背景框
     ButterKnife.apply(new View[]{root.findViewById(R.id.timer_minute_container),
@@ -206,24 +200,15 @@ public class TimerDialog extends BaseDialog {
     dismiss();
   }
 
-  @OnClick({R.id.timer_info, R.id.timer_info_close, R.id.close_stop, R.id.close_toggle})
-  public void OnClick(View view) {
-    switch (view.getId()) {
-      case R.id.timer_info:
-        mContentContainer.setVisibility(View.INVISIBLE);
-        mInfoContainer.setVisibility(View.VISIBLE);
-        break;
-      case R.id.timer_info_close:
-        mInfoContainer.setVisibility(View.INVISIBLE);
-        mContentContainer.setVisibility(View.VISIBLE);
-        break;
-      case R.id.close_stop:
-        dismiss();
-        break;
-      case R.id.close_toggle:
-        toggle();
-        break;
-    }
+  @OnClick(R.id.timer_default_info)
+  public void OnClick() {
+    Theme.getBaseDialog(getContext())
+        .title(R.string.timer_default_info_title)
+        .content(R.string.timer_default_info_content)
+        .positiveText(R.string.close)
+        .onPositive((dialog, which) -> dialog.dismiss())
+        .build()
+        .show();
   }
 
   @OnHandleMessage
