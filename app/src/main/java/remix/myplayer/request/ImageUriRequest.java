@@ -14,8 +14,9 @@ import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
-import androidx.annotation.Nullable;
+import android.provider.MediaStore.Audio.Media;
 import android.text.TextUtils;
+import androidx.annotation.Nullable;
 import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.common.util.UriUtil;
@@ -175,7 +176,8 @@ public abstract class ImageUriRequest<T> {
   Observable<String> getCustomThumbObservable(UriRequest request) {
     return Observable.create(emitter -> {
       //是否设置过自定义封面
-      File customImage = ImageUriUtil.getCustomThumbIfExist(request.getId(), request.getSearchType());
+      File customImage = ImageUriUtil
+          .getCustomThumbIfExist(request.getId(), request.getSearchType());
       if (customImage != null && customImage.exists()) {
         emitter.onNext(PREFIX_FILE + customImage.getAbsolutePath());
       }
@@ -192,22 +194,31 @@ public abstract class ImageUriRequest<T> {
       if (request.getSearchType() == URL_ALBUM) {//专辑封面
         //忽略多媒体缓存
         if (IGNORE_MEDIA_STORE) {
-          final String selection = TextUtils.isEmpty(request.getTitle()) ?
-              MediaStore.Audio.Media.ALBUM_ID + "=" + request.getId() :
-              MediaStore.Audio.Media.ALBUM_ID + "=" + request.getId() + " and " +
-                  MediaStore.Audio.Media.TITLE + "=?";
-          final String[] selectionValues = TextUtils.isEmpty(request.getTitle()) ?
-              null :
-              new String[]{request.getTitle()};
+          String selection;
+          String[] selectionValues;
+
+          if (request.getSongId() > 0) {
+            selection = Media._ID + "=" + request.getSongId();
+            selectionValues = null;
+          } else {
+            selection = TextUtils.isEmpty(request.getTitle()) ?
+                MediaStore.Audio.Media.ALBUM_ID + "=" + request.getId() :
+                MediaStore.Audio.Media.ALBUM_ID + "=" + request.getId() + " and " +
+                    MediaStore.Audio.Media.TITLE + "=?";
+            selectionValues = TextUtils.isEmpty(request.getTitle()) ?
+                null :
+                new String[]{request.getTitle()};
+          }
 
           List<Song> songs = MediaStoreUtil.getSongs(selection, selectionValues);
           if (songs.size() > 0) {
-//                        imageUrl = resolveEmbeddedPicture(songs.get(0));
             imageUrl = PREFIX_EMBEDDED + songs.get(0).getUrl();
 
           }
         } else {
-          Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getId());
+          Uri uri = ContentUris
+              .withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
+                  request.getId());
           if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
             imageUrl = uri.toString();
           }
@@ -379,8 +390,8 @@ public abstract class ImageUriRequest<T> {
     return imageUrl;
   }
 
-  protected Observable<Bitmap> getThumbBitmapObservable(final Uri uri){
-    if(uri == null){
+  protected Observable<Bitmap> getThumbBitmapObservable(final Uri uri) {
+    if (uri == null) {
       return Observable.error(new Throwable("uri is null"));
     }
 
