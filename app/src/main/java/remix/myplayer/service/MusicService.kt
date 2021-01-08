@@ -1081,7 +1081,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           val songs = withContext(Dispatchers.IO) {
             MediaStoreUtil.getLastAddedSong()
           }
-          if (songs == null || songs.size == 0) {
+          if (songs.size == 0) {
             ToastUtil.show(service, R.string.list_is_empty)
             return@tryLaunch
           }

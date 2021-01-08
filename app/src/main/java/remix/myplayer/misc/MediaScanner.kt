@@ -13,7 +13,6 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.theme.Theme
 import remix.myplayer.util.MediaStoreUtil
-import remix.myplayer.util.MediaStoreUtil.getBaseSelectionArgs
 import remix.myplayer.util.ToastUtil
 import timber.log.Timber
 import java.io.File
@@ -110,9 +109,9 @@ class MediaScanner(private val context: Context) {
   }
 
   private fun getScanFiles(file: File, toScanFiles: ArrayList<File>) {
-    val baseSelection = MediaStoreUtil.getBaseSelection()
+    val baseSelection = MediaStoreUtil.baseSelection
     val selection = "$baseSelection and media_type = 2"
-    val selectionArgs = getBaseSelectionArgs()
+    val selectionArgs = MediaStoreUtil.baseSelectionArgs
 
     context.contentResolver.query(MediaStore.Files.getContentUri("external"),
         arrayOf(MediaStore.Files.FileColumns.DATA),
