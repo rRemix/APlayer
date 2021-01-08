@@ -15,9 +15,7 @@ import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
 import com.facebook.rebound.SpringSystem
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.fragment_cover.*
-import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicServiceRemote.getOperation
@@ -26,7 +24,6 @@ import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.ui.fragment.base.BaseMusicFragment
 import remix.myplayer.util.ImageUriUtil
-import remix.myplayer.util.ToastUtil
 
 /**
  * Created by Remix on 2015/12/2.
@@ -35,6 +32,8 @@ import remix.myplayer.util.ToastUtil
  * 专辑封面Fragment
  */
 class CoverFragment : BaseMusicFragment() {
+  private var inAnim: Spring? = null
+  private var outAnim: Spring? = null
   var coverCallback: CoverCallback? = null
   private var task: Disposable? = null
   private var width = 0
@@ -52,8 +51,10 @@ class CoverFragment : BaseMusicFragment() {
     return inflater.inflate(R.layout.fragment_cover, container, false)
   }
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
+  override fun onDestroyView() {
+    super.onDestroyView()
+    outAnim?.destroy()
+    inAnim?.destroy()
   }
 
   //更新封面
@@ -87,7 +88,7 @@ class CoverFragment : BaseMusicFragment() {
    * 操作为上一首歌曲时，显示往左侧消失的动画 下一首歌曲时，显示往右侧消失的动画
    */
   private fun playAnimation(song: Song) {
-    if (!isAdded || container_cover == null) {
+    if (!isAdded) {
       return
     }
     val operation = getOperation()
@@ -96,8 +97,8 @@ class CoverFragment : BaseMusicFragment() {
     val endValue = if (operation == Command.PREV) offsetX.toDouble() else -offsetX.toDouble()
 
     //封面移动动画
-    val outAnim = SpringSystem.create().createSpring()
-    outAnim.addListener(object : SimpleSpringListener() {
+    outAnim = SpringSystem.create().createSpring()
+    outAnim?.addListener(object : SimpleSpringListener() {
       override fun onSpringUpdate(spring: Spring) {
         cover_container.translationX = spring.currentValue.toFloat()
       }
@@ -108,8 +109,8 @@ class CoverFragment : BaseMusicFragment() {
         }
         cover_container.translationX = startValue.toFloat()
         val endVal = 1f
-        val inAnim = SpringSystem.create().createSpring()
-        inAnim.addListener(object : SimpleSpringListener() {
+        inAnim = SpringSystem.create().createSpring()
+        inAnim?.addListener(object : SimpleSpringListener() {
           override fun onSpringUpdate(spring: Spring) {
             if (cover_image == null) {
               return
@@ -120,16 +121,19 @@ class CoverFragment : BaseMusicFragment() {
 
           override fun onSpringActivate(spring: Spring) {}
         })
-        inAnim.currentValue = 0.85
-        inAnim.endValue = endVal.toDouble()
+        inAnim?.currentValue = 0.85
+        inAnim?.endValue = endVal.toDouble()
       }
     })
-    outAnim.isOvershootClampingEnabled = true
-    outAnim.currentValue = startValue
-    outAnim.endValue = endValue
+    outAnim?.isOvershootClampingEnabled = true
+    outAnim?.currentValue = startValue
+    outAnim?.endValue = endValue
   }
 
   private fun setImageUriInternal() {
+    if (cover_image == null) {
+      return
+    }
     cover_image.tag = cover.id
     val controller = Fresco.newDraweeControllerBuilder()
         .setUri(cover.url)
