@@ -13,10 +13,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
 import butterknife.ButterKnife
 import com.afollestad.materialdialogs.MaterialDialog
 import com.anjlab.android.iab.v3.BillingProcessor
@@ -29,6 +26,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_support_develop.*
 import remix.myplayer.App
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
@@ -48,13 +46,9 @@ import java.lang.ref.WeakReference
 import java.util.*
 
 class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
-  @BindView(R.id.toolbar)
-  lateinit var mToolBar: Toolbar
-
-  @BindView(R.id.activity_support_recyclerView)
-  lateinit var mRecyclerView: RecyclerView
-
-  lateinit var mAdapter: PurchaseAdapter
+  private val mAdapter: PurchaseAdapter by lazy {
+    PurchaseAdapter(R.layout.item_support)
+  }
 
   val SKU_IDS = arrayListOf("price_3", "price_8", "price_15", "price_25", "price_40")
 
@@ -68,8 +62,6 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
     setContentView(R.layout.activity_support_develop)
     ButterKnife.bind(this)
     setUpToolbar(getString(R.string.support_develop))
-
-    mAdapter = PurchaseAdapter(R.layout.item_support)
 
     val beans = ArrayList<PurchaseBean>()
     if (!App.IS_GOOGLEPLAY) {
@@ -181,8 +173,8 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
       }
     })
 
-    mRecyclerView.layoutManager = GridLayoutManager(mContext, 2)
-    mRecyclerView.adapter = mAdapter
+    recyclerView.layoutManager = GridLayoutManager(mContext, 2)
+    recyclerView.adapter = mAdapter
 
     mLoading = Theme.getBaseDialog(mContext)
         .title(R.string.loading)

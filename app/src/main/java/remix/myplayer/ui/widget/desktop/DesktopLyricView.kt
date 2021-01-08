@@ -6,19 +6,17 @@ import android.graphics.PointF
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Message
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.text.TextUtils
-import android.view.*
-import android.widget.ImageView
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewTreeObserver
+import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.internal.MDTintHelper
+import kotlinx.android.synthetic.main.layout_desktop_lyric.view.*
 import remix.myplayer.R
 import remix.myplayer.lyric.bean.LrcRow
 import remix.myplayer.misc.handler.MsgHandler
@@ -49,75 +47,39 @@ import kotlin.math.abs
  * @Date 2017/3/22 15:47
  */
 
-class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
-
-  private lateinit var mWindowManager: WindowManager
-  private lateinit var mService: MusicService
-  private val mLastPoint = PointF()
+class DesktopLyricView(private val service: MusicService) : RelativeLayout(service), View.OnClickListener {
+  private val windowManager: WindowManager by lazy {
+    service.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+  }
+  private val lastPoint = PointF()
   var isLocked = false
     private set
-  private val mUIHandler = MsgHandler(this)
-  @BindView(R.id.widget_line1)
-  lateinit var mText1: DesktopLyricTextView
-  @BindView(R.id.widget_line2)
-  lateinit var mText2: TextView
-  @BindView(R.id.widget_pannel)
-  lateinit var mPanel: ViewGroup
-  @BindView(R.id.widget_lock)
-  lateinit var mLock: ImageView
-  @BindView(R.id.widget_close)
-  lateinit var mClose: ImageView
-  @BindView(R.id.widget_next)
-  lateinit var mNext: ImageView
-  @BindView(R.id.widget_play)
-  lateinit var mPlay: ImageView
-  @BindView(R.id.widget_prev)
-  lateinit var mPrev: ImageView
-  @BindView(R.id.widget_color_recyclerview)
-  lateinit var mColorRecyclerView: RecyclerView
-  @BindView(R.id.widget_control_container)
-  lateinit var mControlContainer: View
-  @BindView(R.id.widget_lrc_container)
-  lateinit var mLrcSettingContainer: View
-  @BindView(R.id.widget_root)
-  lateinit var mRoot: ViewGroup
-  @BindView(R.id.widget_seekbar_r)
-  lateinit var mSeekBarR: SeekBar
-  @BindView(R.id.widget_seekbar_g)
-  lateinit var mSeekBarG: SeekBar
-  @BindView(R.id.widget_seekbar_b)
-  lateinit var mSeekBarB: SeekBar
-  @BindView(R.id.widget_text_r)
-  lateinit var mTextR: TextView
-  @BindView(R.id.widget_text_g)
-  lateinit var mTextG: TextView
-  @BindView(R.id.widget_text_b)
-  lateinit var mTextB: TextView
+  private val handler = MsgHandler(this)
+  private val colorAdapter: DesktopLyricColorAdapter by lazy {
+    DesktopLyricColorAdapter(service, R.layout.item_float_lrc_color, widget_color_recyclerview.measuredWidth)
+  }
 
-
-  private lateinit var mColorAdapter: DesktopLyricColorAdapter
-
-  private var mTextSizeType = MEDIUM
-  private val mHideRunnable = Runnable {
-    mPanel.visibility = View.GONE
-    mLrcSettingContainer.visibility = View.GONE
+  private var textSizeType = MEDIUM
+  private val hideRunnable = Runnable {
+    widget_pannel.visibility = View.GONE
+    widget_lrc_container.visibility = View.GONE
   }
 
   private val mOnSeekBarChangeListener = object : OnSeekBarChangeListener {
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-      val temp = Color.rgb(mSeekBarR.progress, mSeekBarG.progress, mSeekBarB.progress)
+      val temp = Color.rgb(widget_seekbar_r.progress, widget_seekbar_g.progress, widget_seekbar_b.progress)
       val color = if (ColorUtil.isColorCloseToWhite(temp)) Color.parseColor("#F9F9F9") else temp
-      mText1.setTextColor(color)
-      MDTintHelper.setTint(mSeekBarR, color)
-      MDTintHelper.setTint(mSeekBarG, color)
-      MDTintHelper.setTint(mSeekBarB, color)
-      mTextR.setTextColor(color)
-      mTextG.setTextColor(color)
-      mTextB.setTextColor(color)
+      widget_line1.setTextColor(color)
+      MDTintHelper.setTint(widget_seekbar_r, color)
+      MDTintHelper.setTint(widget_seekbar_g, color)
+      MDTintHelper.setTint(widget_seekbar_b, color)
+      widget_text_r.setTextColor(color)
+      widget_text_g.setTextColor(color)
+      widget_text_b.setTextColor(color)
       resetHide()
 
-      mUIHandler.removeMessages(MESSAGE_SAVE_COLOR)
-      mUIHandler.sendMessageDelayed(Message.obtain(mUIHandler, MESSAGE_SAVE_COLOR, color, 0), 100)
+      handler.removeMessages(MESSAGE_SAVE_COLOR)
+      handler.sendMessageDelayed(Message.obtain(handler, MESSAGE_SAVE_COLOR, color, 0), 100)
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -128,37 +90,28 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
 
     }
   }
+
   /**
    * 当前是否正在拖动
    */
-  private var mIsDragging = false
+  private var isDragging = false
 
   init {
-    init(service)
-  }
-
-
-  private fun init(context: Context) {
-    mService = context as MusicService
-    //    mNotify = new UnLockNotify();
-    mWindowManager = mService.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-
-    ButterKnife.bind(this, View.inflate(mService, R.layout.layout_desktop_lyric, this))
+    View.inflate(service, R.layout.layout_desktop_lyric, this)
     setUpView()
   }
 
   private fun setUpColor() {
-    mColorRecyclerView.viewTreeObserver
+    widget_color_recyclerview.viewTreeObserver
         .addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
           override fun onPreDraw(): Boolean {
-            mColorRecyclerView.viewTreeObserver.removeOnPreDrawListener(this)
-            mColorAdapter = DesktopLyricColorAdapter(mService, R.layout.item_float_lrc_color, mColorRecyclerView.measuredWidth)
-            mColorAdapter.setOnItemClickListener(object : OnItemClickListener {
+            widget_color_recyclerview.viewTreeObserver.removeOnPreDrawListener(this)
+            colorAdapter.setOnItemClickListener(object : OnItemClickListener {
               override fun onItemClick(view: View, position: Int) {
                 val color = ColorUtil.getColor(COLORS[position])
-                mText1.setTextColor(color)
-                mColorAdapter.setCurrentColor(color)
-                mColorAdapter.notifyDataSetChanged()
+                widget_line1.setTextColor(color)
+                colorAdapter.setCurrentColor(color)
+                colorAdapter.notifyDataSetChanged()
                 resetHide()
               }
 
@@ -166,9 +119,9 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
 
               }
             })
-            mColorRecyclerView.layoutManager = LinearLayoutManager(mService, LinearLayoutManager.HORIZONTAL, false)
-            mColorRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
-            mColorRecyclerView.adapter = mColorAdapter
+            widget_color_recyclerview.layoutManager = LinearLayoutManager(service, LinearLayoutManager.HORIZONTAL, false)
+            widget_color_recyclerview.overScrollMode = View.OVER_SCROLL_NEVER
+            widget_color_recyclerview.adapter = colorAdapter
             return true
           }
         })
@@ -180,29 +133,29 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
     val red = color and 0xff0000 shr 16
     val green = color and 0x00ff00 shr 8
     val blue = color and 0x0000ff
-    mSeekBarR.max = 255
-    mSeekBarR.progress = red
-    mSeekBarG.max = 255
-    mSeekBarG.progress = green
-    mSeekBarB.max = 255
-    mSeekBarB.progress = blue
-    mTextR.setTextColor(color)
-    mTextG.setTextColor(color)
-    mTextB.setTextColor(color)
-    mSeekBarR.setOnSeekBarChangeListener(mOnSeekBarChangeListener)
-    mSeekBarG.setOnSeekBarChangeListener(mOnSeekBarChangeListener)
-    mSeekBarB.setOnSeekBarChangeListener(mOnSeekBarChangeListener)
-    MDTintHelper.setTint(mSeekBarR, color)
-    MDTintHelper.setTint(mSeekBarG, color)
-    MDTintHelper.setTint(mSeekBarB, color)
+    widget_seekbar_r.max = 255
+    widget_seekbar_r.progress = red
+    widget_seekbar_g.max = 255
+    widget_seekbar_g.progress = green
+    widget_seekbar_b.max = 255
+    widget_seekbar_b.progress = blue
+    widget_text_r.setTextColor(color)
+    widget_text_g.setTextColor(color)
+    widget_text_b.setTextColor(color)
+    widget_seekbar_r.setOnSeekBarChangeListener(mOnSeekBarChangeListener)
+    widget_seekbar_g.setOnSeekBarChangeListener(mOnSeekBarChangeListener)
+    widget_seekbar_b.setOnSeekBarChangeListener(mOnSeekBarChangeListener)
+    MDTintHelper.setTint(widget_seekbar_r, color)
+    MDTintHelper.setTint(widget_seekbar_g, color)
+    MDTintHelper.setTint(widget_seekbar_b, color)
 
-    mTextSizeType = SPUtil.getValue(mService, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_TEXT_SIZE, MEDIUM)
-    mText1.setTextColor(color)
-    mText1.textSize = getTextSize(TYPE_TEXT_SIZE_FIRST_LINE)
-    mText2.textSize = getTextSize(TYPE_TEXT_SIZE_SECOND_LINE)
-    isLocked = SPUtil.getValue(mService, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
+    textSizeType = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_TEXT_SIZE, MEDIUM)
+    widget_line1.setTextColor(color)
+    widget_line1.textSize = getTextSize(TYPE_TEXT_SIZE_FIRST_LINE)
+    widget_line2.textSize = getTextSize(TYPE_TEXT_SIZE_SECOND_LINE)
+    isLocked = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
 
-    setPlayIcon(mService.isPlaying)
+    setPlayIcon(service.isPlaying)
 
     viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
       override fun onPreDraw(): Boolean {
@@ -211,6 +164,11 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
         return true
       }
     })
+
+    listOf<View>(widget_close, widget_lock, widget_next, widget_play, widget_prev, widget_lrc_bigger, widget_lrc_smaller, widget_setting)
+        .forEach {
+          it.setOnClickListener(this)
+        }
   }
 
   /**
@@ -219,7 +177,7 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
   private fun getTextSize(type: Int): Float {
     return when (type) {
       TYPE_TEXT_SIZE_FIRST_LINE -> {
-        (when (mTextSizeType) {
+        (when (textSizeType) {
           TINY -> FIRST_LINE_TINY
           SMALL -> FIRST_LINE_SMALL
           MEDIUM -> FIRST_LINE_MEDIUM
@@ -228,7 +186,7 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
         }).toFloat()
       }
       TYPE_TEXT_SIZE_SECOND_LINE -> {
-        (when (mTextSizeType) {
+        (when (textSizeType) {
           TINY -> SECOND_LINE_TINY
           SMALL -> SECOND_LINE_SMALL
           MEDIUM -> SECOND_LINE_MEDIUM
@@ -245,56 +203,56 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
       if (TextUtils.isEmpty(lrc1.content)) {
         lrc1.content = "......"
       }
-      mText1.setLrcRow(lrc1)
+      widget_line1.setLrcRow(lrc1)
     }
     if (lrc2 != null) {
       if (TextUtils.isEmpty(lrc2.content)) {
         lrc2.content = "....."
       }
-      mText2.text = lrc2.content
+      widget_line2.text = lrc2.content
     }
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
     when (event.action) {
       MotionEvent.ACTION_DOWN -> if (!isLocked) {
-        mIsDragging = false
-        mLastPoint.set(event.rawX, event.rawY)
-        mUIHandler.removeCallbacks(mHideRunnable)
+        isDragging = false
+        lastPoint.set(event.rawX, event.rawY)
+        handler.removeCallbacks(hideRunnable)
       } else {
 //        mUIHandler.postDelayed(mLongClickRunnable, LONGCLICK_THRESHOLD);
       }
       MotionEvent.ACTION_MOVE -> if (!isLocked) {
         val params = layoutParams as WindowManager.LayoutParams
 
-        if (abs(event.rawY - mLastPoint.y) > DISTANCE_THRESHOLD) {
-          params.y += (event.rawY - mLastPoint.y).toInt()
-          mIsDragging = true
+        if (abs(event.rawY - lastPoint.y) > DISTANCE_THRESHOLD) {
+          params.y += (event.rawY - lastPoint.y).toInt()
+          isDragging = true
           if (VERSION.SDK_INT >= VERSION_CODES.KITKAT && isAttachedToWindow) {
-            mWindowManager.updateViewLayout(this, params)
+            windowManager.updateViewLayout(this, params)
           }
         }
-        mLastPoint.set(event.rawX, event.rawY)
+        lastPoint.set(event.rawX, event.rawY)
       }
       MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> if (!isLocked) {
-        if (!mIsDragging) {
+        if (!isDragging) {
           //点击后隐藏或者显示操作栏
-          if (mPanel.isShown) {
-            mPanel.visibility = View.INVISIBLE
+          if (widget_pannel.isShown) {
+            widget_pannel.visibility = View.INVISIBLE
           } else {
-            mPanel.visibility = View.VISIBLE
-            mUIHandler.postDelayed(mHideRunnable, DISMISS_THRESHOLD.toLong())
+            widget_pannel.visibility = View.VISIBLE
+            handler.postDelayed(hideRunnable, DISMISS_THRESHOLD.toLong())
           }
         } else {
           //滑动
-          if (mPanel.isShown) {
-            mUIHandler.postDelayed(mHideRunnable, DISMISS_THRESHOLD.toLong())
+          if (widget_pannel.isShown) {
+            handler.postDelayed(hideRunnable, DISMISS_THRESHOLD.toLong())
           }
-          mIsDragging = false
+          isDragging = false
         }
         //保存y坐标
         val params = layoutParams as WindowManager.LayoutParams
-        SPUtil.putValue(mService, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_Y, params.y)
+        SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_Y, params.y)
       } else {
 //        mUIHandler.removeCallbacks(mLongClickRunnable)
       }
@@ -303,20 +261,20 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
   }
 
   fun setPlayIcon(play: Boolean) {
-    mPlay.setImageResource(
+    widget_play.setImageResource(
         if (play) R.drawable.widget_btn_stop_normal else R.drawable.widget_btn_play_normal)
   }
 
   fun stopAnimation() {
-    mText1.stopAnimation()
+    widget_line1.stopAnimation()
   }
 
-  @OnClick(R.id.widget_close, R.id.widget_lock, R.id.widget_next, R.id.widget_play, R.id.widget_prev, R.id.widget_lrc_bigger, R.id.widget_lrc_smaller, R.id.widget_setting)
-  fun onViewClicked(view: View) {
+
+  override fun onClick(view: View) {
     when (view.id) {
       //关闭桌面歌词
       R.id.widget_close -> {
-        SPUtil.putValue(mService, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW,
+        SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW,
             false)
         sendLocalBroadcast(
             makeCmdIntent(Command.TOGGLE_DESKTOP_LYRIC).putExtra(EXTRA_DESKTOP_LYRIC, false))
@@ -324,12 +282,12 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
       //锁定
       R.id.widget_lock -> {
         saveLock(lock = true, toast = true)
-        mUIHandler.postDelayed(mHideRunnable, 0)
+        handler.postDelayed(hideRunnable, 0)
         Util.sendCMDLocalBroadcast(Command.LOCK_DESKTOP_LYRIC)
       }
       //歌词字体、大小设置
       R.id.widget_setting -> {
-        mLrcSettingContainer.visibility = if (mLrcSettingContainer.isShown) View.GONE else View.VISIBLE
+        widget_lrc_container.visibility = if (widget_lrc_container.isShown) View.GONE else View.VISIBLE
         setUpColor()
         //操作后重置消息的时间
         resetHide()
@@ -340,9 +298,9 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
           view.id == R.id.widget_prev -> Command.PREV
           else -> Command.TOGGLE
         }))
-        mUIHandler.postDelayed({
-          mPlay.setImageResource(
-              if (mService.isPlaying)
+        handler.postDelayed({
+          widget_play.setImageResource(
+              if (service.isPlaying)
                 R.drawable.widget_btn_stop_normal
               else
                 R.drawable.widget_btn_play_normal)
@@ -355,24 +313,24 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
         var needRefresh = false
         if (view.id == R.id.widget_lrc_bigger) {
           //当前已经是最大字体
-          if (mTextSizeType == HUGE) {
+          if (textSizeType == HUGE) {
             return
           }
-          mTextSizeType++
+          textSizeType++
           needRefresh = true
         }
         if (view.id == R.id.widget_lrc_smaller) {
           //当前已经是最小字体
-          if (mTextSizeType == TINY) {
+          if (textSizeType == TINY) {
             return
           }
-          mTextSizeType--
+          textSizeType--
           needRefresh = true
         }
         if (needRefresh) {
-          mText1.textSize = getTextSize(TYPE_TEXT_SIZE_FIRST_LINE)
-          mText2.textSize = getTextSize(TYPE_TEXT_SIZE_SECOND_LINE)
-          SPUtil.putValue(mService, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_TEXT_SIZE, mTextSizeType)
+          widget_line1.textSize = getTextSize(TYPE_TEXT_SIZE_FIRST_LINE)
+          widget_line2.textSize = getTextSize(TYPE_TEXT_SIZE_SECOND_LINE)
+          SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_TEXT_SIZE, textSizeType)
           //操作后重置消息的时间
           resetHide()
         }
@@ -382,9 +340,9 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
 
   fun saveLock(lock: Boolean, toast: Boolean) {
     isLocked = lock
-    SPUtil.putValue(mService, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_LOCK, isLocked)
+    SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_LOCK, isLocked)
     if (toast) {
-      ToastUtil.show(mService, if (!isLocked) R.string.desktop_lyric__unlock else R.string.desktop_lyric_lock)
+      ToastUtil.show(service, if (!isLocked) R.string.desktop_lyric__unlock else R.string.desktop_lyric_lock)
     }
     val params = layoutParams as WindowManager.LayoutParams?
     if (params != null) {
@@ -399,7 +357,7 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
         params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
       }
       if (VERSION.SDK_INT >= VERSION_CODES.KITKAT && isAttachedToWindow) {
-        mWindowManager.updateViewLayout(this, params)
+        windowManager.updateViewLayout(this, params)
       }
     }
   }
@@ -418,16 +376,16 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
    * 操作后重置消失的时间
    */
   private fun resetHide() {
-    mUIHandler.removeCallbacks(mHideRunnable)
-    mUIHandler.postDelayed(mHideRunnable, DISMISS_THRESHOLD.toLong())
+    handler.removeCallbacks(hideRunnable)
+    handler.postDelayed(hideRunnable, DISMISS_THRESHOLD.toLong())
   }
 
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
-    mUIHandler.removeCallbacksAndMessages(null)
-    mSeekBarR.setOnSeekBarChangeListener(null)
-    mSeekBarG.setOnSeekBarChangeListener(null)
-    mSeekBarB.setOnSeekBarChangeListener(null)
+    handler.removeCallbacksAndMessages(null)
+    widget_seekbar_r.setOnSeekBarChangeListener(null)
+    widget_seekbar_g.setOnSeekBarChangeListener(null)
+    widget_seekbar_b.setOnSeekBarChangeListener(null)
     Timber.v("onDetachedFromWindow")
   }
 
@@ -460,6 +418,7 @@ class DesktopLyricView(service: MusicService) : RelativeLayout(service) {
     private const val FIRST_LINE_MEDIUM = 18
     private const val FIRST_LINE_SMALL = 17
     private const val FIRST_LINE_TINY = 16
+
     //第二行歌词字体大小
     private const val SECOND_LINE_HUGE = 18
     private const val SECOND_LINE_BIG = 17

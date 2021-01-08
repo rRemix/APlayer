@@ -39,10 +39,6 @@ import kotlin.math.abs
 class LyricFragment : BaseMusicFragment() {
   private var onFindListener: OnInflateFinishListener? = null
   private var info: Song? = null
-  @BindView(R.id.lrcView)
-  lateinit var lrcView: LrcView
-  @BindView(R.id.offsetContainer)
-  lateinit var offsetContainer: View
 
   private var disposable: Disposable? = null
   private val msgHandler = MsgHandler(this)
@@ -60,16 +56,14 @@ class LyricFragment : BaseMusicFragment() {
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     val rootView = inflater.inflate(R.layout.fragment_lrc, container, false)
-    mUnBinder = ButterKnife.bind(this, rootView)
-
-    onFindListener?.onViewInflateFinish(lrcView)
-
 
     return rootView
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    onFindListener?.onViewInflateFinish(lrcView)
     //黑色主题着色按钮
     val themeRes = ThemeStore.getThemeRes()
     if(themeRes == R.style.Theme_APlayer_Black || themeRes == R.style.Theme_APlayer_Dark){

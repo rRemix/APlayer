@@ -9,7 +9,7 @@
   android:gravity="center_horizontal">
 
   <com.facebook.drawee.view.SimpleDraweeView
-    android:id="@+id/header_img"
+    android:id="@+id/iv_header"
     android:layout_marginTop="@dimen/d20_size"
     android:layout_width="108dp"
     android:layout_height="108dp"
@@ -24,7 +24,7 @@
     android:background="@color/transparent"/>
 
   <TextView
-    android:id="@+id/header_txt"
+    android:id="@+id/tv_header"
     android:layout_margin="@dimen/d20_size"
     android:paddingLeft="@dimen/d8_size"
     android:paddingRight="@dimen/d8_size"
