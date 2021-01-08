@@ -15,7 +15,9 @@ import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
 import com.facebook.rebound.SpringSystem
 import io.reactivex.disposables.Disposable
+import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.fragment_cover.*
+import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicServiceRemote.getOperation
@@ -24,6 +26,7 @@ import remix.myplayer.request.network.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.ui.fragment.base.BaseMusicFragment
 import remix.myplayer.util.ImageUriUtil
+import remix.myplayer.util.ToastUtil
 
 /**
  * Created by Remix on 2015/12/2.
@@ -84,7 +87,7 @@ class CoverFragment : BaseMusicFragment() {
    * 操作为上一首歌曲时，显示往左侧消失的动画 下一首歌曲时，显示往右侧消失的动画
    */
   private fun playAnimation(song: Song) {
-    if (!isAdded) {
+    if (!isAdded || container_cover == null) {
       return
     }
     val operation = getOperation()
