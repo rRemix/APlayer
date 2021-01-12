@@ -15,7 +15,6 @@ import android.view.View
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager.widget.ViewPager
-import butterknife.ButterKnife
 import butterknife.OnClick
 import com.afollestad.materialdialogs.MaterialDialog
 import com.facebook.drawee.backends.pipeline.Fresco
@@ -31,8 +30,8 @@ import kotlinx.android.synthetic.main.navigation_header.*
 import remix.myplayer.App
 import remix.myplayer.App.IS_GOOGLEPLAY
 import remix.myplayer.R
-import remix.myplayer.bean.misc.Category
 import remix.myplayer.bean.misc.CustomCover
+import remix.myplayer.bean.misc.Library
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
@@ -214,26 +213,24 @@ open class MainActivity : MenuActivity() {
 
   //初始化ViewPager
   private fun setUpPager() {
-    val categoryJson = SPUtil
-        .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY, "")
-    val categories = if (TextUtils.isEmpty(categoryJson))
+    val libraryJson = SPUtil
+        .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY, "")
+    val libraries = if (TextUtils.isEmpty(libraryJson))
       ArrayList()
     else
-      Gson().fromJson<ArrayList<Category>>(categoryJson, object : TypeToken<List<Category>>() {}.type)
-    if (categories.isEmpty()) {
-      val defaultCategories = Category.getDefaultLibrary(this)
-      categories.addAll(defaultCategories)
-      SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,
-          Gson().toJson(defaultCategories, object : TypeToken<List<Category>>() {
-
-          }.type))
+      Gson().fromJson<ArrayList<Library>>(libraryJson, object : TypeToken<List<Library>>() {}.type)
+    if (libraries.isEmpty()) {
+      val defaultLibraries = Library.getDefaultLibrary()
+      libraries.addAll(defaultLibraries)
+      SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY,
+          Gson().toJson(defaultLibraries, object : TypeToken<List<Library>>() {}.type))
     }
 
-    mPagerAdapter.list = categories
-    mMenuLayoutId = parseMenuId(mPagerAdapter.list[0].tag)
+    mPagerAdapter.list = libraries
+    mMenuLayoutId = parseMenuId(mPagerAdapter.list[0].mTag)
     //有且仅有一个tab
-    if (categories.size == 1) {
-      if (categories[0].isPlayList) {
+    if (libraries.size == 1) {
+      if (libraries[0].isPlayList()) {
         showViewWithAnim(btn_add, true)
       }
       tabs.visibility = View.GONE
@@ -248,10 +245,10 @@ open class MainActivity : MenuActivity() {
       override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
 
       override fun onPageSelected(position: Int) {
-        val category = mPagerAdapter.list[position]
-        showViewWithAnim(btn_add, category.isPlayList)
+        val library = mPagerAdapter.list[position]
+        showViewWithAnim(btn_add, library.isPlayList())
 
-        mMenuLayoutId = parseMenuId(mPagerAdapter.list[position].tag)
+        mMenuLayoutId = parseMenuId(mPagerAdapter.list[position].mTag)
         mCurrentFragment = mPagerAdapter.getFragment(position) as LibraryFragment<*, *>
 
         invalidateOptionsMenu()
@@ -265,11 +262,11 @@ open class MainActivity : MenuActivity() {
 
   fun parseMenuId(tag: Int): Int {
     return when (tag) {
-      Category.TAG_SONG -> R.menu.menu_main
-      Category.TAG_ALBUM -> R.menu.menu_album
-      Category.TAG_ARTIST -> R.menu.menu_artist
-      Category.TAG_PLAYLIST -> R.menu.menu_playlist
-      Category.TAG_FOLDER -> R.menu.menu_folder
+      Library.TAG_SONG -> R.menu.menu_main
+      Library.TAG_ALBUM -> R.menu.menu_album
+      Library.TAG_ARTIST -> R.menu.menu_artist
+      Library.TAG_PLAYLIST -> R.menu.menu_playlist
+      Library.TAG_FOLDER -> R.menu.menu_folder
       else -> R.menu.menu_main_simple
     }
   }
@@ -473,16 +470,16 @@ open class MainActivity : MenuActivity() {
           ImageUriRequest.clearUriCache()
           mRefreshHandler.sendEmptyMessage(MSG_UPDATE_ADAPTER)
         } else if (data.getBooleanExtra(EXTRA_REFRESH_LIBRARY, false)) { //刷新Library
-          val categories = data.getSerializableExtra(EXTRA_CATEGORY) as List<Category>?
-          if (categories != null && categories.isNotEmpty()) {
-            mPagerAdapter.list = categories
+          val libraries = data.getSerializableExtra(EXTRA_LIBRARY) as List<Library>?
+          if (libraries != null && libraries.isNotEmpty()) {
+            mPagerAdapter.list = libraries
             mPagerAdapter.notifyDataSetChanged()
-            view_pager.offscreenPageLimit = categories.size - 1
-            mMenuLayoutId = parseMenuId(mPagerAdapter.list[view_pager.currentItem].tag)
+            view_pager.offscreenPageLimit = libraries.size - 1
+            mMenuLayoutId = parseMenuId(mPagerAdapter.list[view_pager.currentItem].mTag)
             mCurrentFragment = mPagerAdapter.getFragment(view_pager.currentItem) as LibraryFragment<*, *>
             invalidateOptionsMenu()
             //如果只有一个Library,隐藏标签栏
-            if (categories.size == 1) {
+            if (libraries.size == 1) {
               tabs.visibility = View.GONE
             } else {
               tabs.visibility = View.VISIBLE
@@ -715,10 +712,10 @@ open class MainActivity : MenuActivity() {
   }
 
   companion object {
-    const val EXTRA_RECREATE = "needRecreate"
-    const val EXTRA_REFRESH_ADAPTER = "needRefreshAdapter"
-    const val EXTRA_REFRESH_LIBRARY = "needRefreshLibrary"
-    const val EXTRA_CATEGORY = "Category"
+    const val EXTRA_RECREATE = "extra_needRecreate"
+    const val EXTRA_REFRESH_ADAPTER = "extra_needRefreshAdapter"
+    const val EXTRA_REFRESH_LIBRARY = "extra_needRefreshLibrary"
+    const val EXTRA_LIBRARY = "extra_library"
 
     //设置界面
     private const val REQUEST_SETTING = 1

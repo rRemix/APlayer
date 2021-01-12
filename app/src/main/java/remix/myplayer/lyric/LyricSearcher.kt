@@ -302,13 +302,13 @@ class LyricSearcher {
         .getNeteaseSearch(searchKey, 0, 1, 1)
         .flatMap {
           HttpClient.getInstance()
-              .getNeteaseLyric(Gson().fromJson(it.string(), NSongSearchResponse::class.java).result.songs[0].id)
+              .getNeteaseLyric(Gson().fromJson(it.string(), NSongSearchResponse::class.java)?.result?.songs?.get(0)?.id ?: 0)
               .map {
                 val lrcResponse = Gson().fromJson(it.string(), NLrcResponse::class.java)
-                val combine = lrcParser.getLrcRows(getBufferReader(lrcResponse.lrc.lyric.toByteArray()), false, cacheKey, searchKey)
+                val combine = lrcParser.getLrcRows(getBufferReader(lrcResponse.lrc?.lyric?.toByteArray() ?: "".toByteArray()), false, cacheKey, searchKey)
                 if (isCN && lrcResponse.tlyric != null && !lrcResponse.tlyric.lyric.isNullOrEmpty()) {
                   val translate = lrcParser.getLrcRows(getBufferReader(lrcResponse.tlyric.lyric.toByteArray()), false, cacheKey, searchKey)
-                  if (translate != null && translate.size > 0) {
+                  if (translate.isNotEmpty()) {
                     for (i in translate.indices) {
                       for (j in combine.indices) {
                         if (translate[i].time == combine[j].time) {

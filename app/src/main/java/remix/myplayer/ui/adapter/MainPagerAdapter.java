@@ -1,17 +1,20 @@
 package remix.myplayer.ui.adapter;
 
-import static remix.myplayer.bean.misc.Category.TAG_SONG;
+import static remix.myplayer.bean.misc.Library.TAG_ALBUM;
+import static remix.myplayer.bean.misc.Library.TAG_ARTIST;
+import static remix.myplayer.bean.misc.Library.TAG_PLAYLIST;
+import static remix.myplayer.bean.misc.Library.TAG_SONG;
 
+import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import android.view.ViewGroup;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import remix.myplayer.bean.misc.Category;
+import remix.myplayer.bean.misc.Library;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.FolderFragment;
@@ -28,7 +31,7 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
 
   private static final String TAG = "MainPagerAdapter";
   private final FragmentManager mFM;
-  private List<Category> mCateGory = new ArrayList<>();
+  private List<Library> mLibraries = new ArrayList<>();
   private Map<Integer, WeakReference<Fragment>> mFragmentMap = new HashMap<>();
 
   public MainPagerAdapter(FragmentManager fm) {
@@ -38,16 +41,16 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
 
   @Override
   public long getItemId(int position) {
-    if (position >= mCateGory.size()) {
+    if (position >= mLibraries.size()) {
       return super.getItemId(position);
     }
-    return mCateGory.get(position).getTag();
+    return mLibraries.get(position).getMTag();
   }
 
   @Override
   public int getItemPosition(Object object) {
-    for (int i = 0; i < mCateGory.size(); i++) {
-      if (mCateGory.get(i).getClassName().equals(object.getClass().getName())) {
+    for (int i = 0; i < mLibraries.size(); i++) {
+      if (mLibraries.get(i).getMClassName().equals(object.getClass().getName())) {
         return i;
       }
     }
@@ -75,14 +78,14 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
   }
 
   public Fragment getFragment(final int position) {
-    if (position >= mCateGory.size()) {
+    if (position >= mLibraries.size()) {
       return new Fragment();
     }
 
-    final Category category = mCateGory.get(position);
+    final Library library = mLibraries.get(position);
     for (Fragment fragment : mFM.getFragments()) {
       if (fragment instanceof LibraryFragment && fragment.getClass().getName()
-          .equals(category.getClassName())) {
+          .equals(library.getMClassName())) {
         return fragment;
       }
     }
@@ -96,7 +99,7 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
 
   @Override
   public Fragment getItem(int position) {
-    if (position >= mCateGory.size()) {
+    if (position >= mLibraries.size()) {
       return new Fragment();
     }
 
@@ -105,19 +108,19 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
       return weakReference.get();
     }
 
-    Category category = mCateGory.get(position);
-    Fragment fragment = category.getTag() == TAG_SONG ? new SongFragment() :
-        category.getTag() == Category.TAG_ALBUM ? new AlbumFragment() :
-            category.getTag() == Category.TAG_ARTIST ? new ArtistFragment() :
-                category.getTag() == Category.TAG_PLAYLIST ? new PlayListFragment()
+    Library library = mLibraries.get(position);
+    Fragment fragment = library.getMTag() == TAG_SONG ? new SongFragment() :
+        library.getMTag() == TAG_ALBUM ? new AlbumFragment() :
+            library.getMTag() == TAG_ARTIST ? new ArtistFragment() :
+                library.getMTag() == TAG_PLAYLIST ? new PlayListFragment()
                     : new FolderFragment();
     WeakReference<Fragment> newWeakReference = new WeakReference<>(fragment);
     mFragmentMap.put(position, newWeakReference);
     return fragment;
   }
 
-  public void setList(List<Category> categories) {
-    mCateGory = categories;
+  public void setList(List<Library> categories) {
+    mLibraries = categories;
     alignCache();
   }
 
@@ -134,8 +137,8 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
       }
     }
 
-    for (int i = 0, size = mCateGory.size(); i < size; i++) {
-      WeakReference<Fragment> ref = mappings.get(mCateGory.get(i).getClassName());
+    for (int i = 0, size = mLibraries.size(); i < size; i++) {
+      WeakReference<Fragment> ref = mappings.get(mLibraries.get(i).getMClassName());
       if (ref != null) {
         mFragmentMap.put(i, ref);
       } else {
@@ -144,18 +147,18 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
     }
   }
 
-  public List<Category> getList() {
-    return mCateGory;
+  public List<Library> getList() {
+    return mLibraries;
   }
 
   @Override
   public CharSequence getPageTitle(int position) {
-    return mCateGory.get(position).getTitle();
+    return mLibraries.get(position).getTitle();
   }
 
   @Override
   public int getCount() {
-    return mCateGory != null ? mCateGory.size() : 0;
+    return mLibraries != null ? mLibraries.size() : 0;
   }
 
 }

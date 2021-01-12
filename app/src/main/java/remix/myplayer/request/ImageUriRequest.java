@@ -369,14 +369,14 @@ public abstract class ImageUriRequest<T> {
     if (request.getNeteaseType() == TYPE_NETEASE_SONG) {
       //搜索的是歌曲
       NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);
-      if (response.result.songs.get(0).score >= 60) {
-        imageUrl = response.result.songs.get(0).album.picUrl;
+      if (response.getResult().getSongs().get(0).getScore() >= 60) {
+        imageUrl = response.getResult().getSongs().get(0).getAlbum().getPicUrl();
       }
     } else if (request.getNeteaseType() == TYPE_NETEASE_ALBUM) {
       //搜索的是专辑
       NAlbumSearchResponse response = new Gson()
           .fromJson(body.string(), NAlbumSearchResponse.class);
-      imageUrl = response.result.albums.get(0).picUrl;
+      imageUrl = response.getResult().getAlbums().get(0).getPicUrl();
     } else if (request.getNeteaseType() == TYPE_NETEASE_ARTIST) {
       //搜索的是艺术家
       NArtistSearchResponse response = new Gson()

@@ -40,8 +40,9 @@ import kotlinx.coroutines.withContext
 import remix.myplayer.App.IS_GOOGLEPLAY
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
-import remix.myplayer.bean.misc.Category
 import remix.myplayer.bean.misc.Feedback
+import remix.myplayer.bean.misc.Library
+import remix.myplayer.bean.misc.Library.Companion.getAllLibraryString
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.EQHelper
@@ -72,7 +73,7 @@ import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.theme.ThemeStore.*
 import remix.myplayer.theme.TintHelper
-import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_CATEGORY
+import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_LIBRARY
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_RECREATE
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_REFRESH_ADAPTER
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_REFRESH_LIBRARY
@@ -100,7 +101,7 @@ import java.io.File
  */
 //todo 重构整个界面
 class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, FileChooserDialog.FileCallback,
-    ColorChooserDialog.ColorCallback, SharedPreferences.OnSharedPreferenceChangeListener{
+    ColorChooserDialog.ColorCallback, SharedPreferences.OnSharedPreferenceChangeListener {
 
   private lateinit var checkedChangedListener: OnCheckedChangeListener
 
@@ -490,7 +491,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container, R.id.setting_cover_source_container,
       R.id.setting_player_bottom_container, R.id.setting_displayname_container, R.id.setting_general_theme_container,
       R.id.setting_accent_color_container, R.id.setting_language_container, R.id.setting_auto_play_headset_container,
-      R.id.setting_audio_focus_container, R.id.setting_restore_delete_container,R.id.setting_filter_container,
+      R.id.setting_audio_focus_container, R.id.setting_restore_delete_container, R.id.setting_filter_container,
       R.id.setting_player_background)
   fun onClick(v: View) {
     when (v.id) {
@@ -499,7 +500,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       //黑名单
       R.id.setting_blacklist_container -> configBlackList()
       //曲库
-      R.id.setting_library_category_container -> configLibraryCategory()
+      R.id.setting_library_category_container -> configLibrary()
       //桌面歌词
       R.id.setting_lrc_float_container -> mFloatLrcSwitch.isChecked = !mFloatLrcSwitch.isChecked
       //歌词搜索优先级
@@ -1020,24 +1021,22 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   /**
    * 配置曲库目录
    */
-  private fun configLibraryCategory() {
-    val categoryJson = SPUtil
-        .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LIBRARY_CATEGORY, "")
+  private fun configLibrary() {
+    val libraryJson = SPUtil
+        .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LIBRARY, "")
 
-    val oldCategories = Gson()
-        .fromJson<List<Category>>(categoryJson, object : TypeToken<List<Category>>() {
-
-        }.type)
-    if (oldCategories == null || oldCategories.isEmpty()) {
+    val oldLibraries = Gson()
+        .fromJson<List<Library>>(libraryJson, object : TypeToken<List<Library>>() {}.type)
+    if (oldLibraries == null || oldLibraries.isEmpty()) {
       ToastUtil.show(mContext, getString(R.string.load_failed))
       return
     }
     val selected = ArrayList<Int>()
-    for (temp in oldCategories) {
-      selected.add(temp.order)
+    for (temp in oldLibraries) {
+      selected.add(temp.mOrder)
     }
 
-    val allLibraryStrings = Category.getAllLibraryString(this)
+    val allLibraryStrings = getAllLibraryString(this)
     getBaseDialog(mContext)
         .title(R.string.library_category)
         .positiveText(R.string.confirm)
@@ -1048,16 +1047,16 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             ToastUtil.show(mContext, getString(R.string.plz_choose_at_least_one_category))
             return@itemsCallbackMultiChoice true
           }
-          val newCategories = ArrayList<Category>()
+          val newLibraries = ArrayList<Library>()
           for (choose in which) {
-            newCategories.add(Category(choose))
+            newLibraries.add(Library(choose))
           }
-          if (newCategories != oldCategories) {
+          if (newLibraries != oldLibraries) {
             mNeedRefreshLibrary = true
-            intent.putExtra(EXTRA_CATEGORY, newCategories)
+            intent.putExtra(EXTRA_LIBRARY, newLibraries)
             SPUtil.putValue(mContext, SETTING_KEY.NAME,
-                SETTING_KEY.LIBRARY_CATEGORY,
-                Gson().toJson(newCategories, object : TypeToken<List<Category>>() {}.type))
+                SETTING_KEY.LIBRARY,
+                Gson().toJson(newLibraries, object : TypeToken<List<Library>>() {}.type))
           }
           true
         }.show()
@@ -1168,9 +1167,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   }
 
   override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String) {
-    if(key == SETTING_KEY.DESKTOP_LYRIC_SHOW){
+    if (key == SETTING_KEY.DESKTOP_LYRIC_SHOW) {
       setting_lrc_float_switch.setOnCheckedChangeListener(null)
-      setting_lrc_float_switch.isChecked = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW,false)
+      setting_lrc_float_switch.isChecked = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
       setting_lrc_float_switch.setOnCheckedChangeListener(checkedChangedListener)
     }
   }

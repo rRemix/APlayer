@@ -4,10 +4,10 @@ import io.reactivex.disposables.Disposable
 import remix.myplayer.App
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.lyric.bean.LrcRow
-import remix.myplayer.lyric.bean.LrcRow.LYRIC_EMPTY_ROW
+import remix.myplayer.lyric.bean.LrcRow.Companion.LYRIC_EMPTY_ROW
 import remix.myplayer.lyric.bean.LyricRowWrapper
-import remix.myplayer.lyric.bean.LyricRowWrapper.LYRIC_WRAPPER_NO
-import remix.myplayer.lyric.bean.LyricRowWrapper.LYRIC_WRAPPER_SEARCHING
+import remix.myplayer.lyric.bean.LyricRowWrapper.Companion.LYRIC_WRAPPER_NO
+import remix.myplayer.lyric.bean.LyricRowWrapper.Companion.LYRIC_WRAPPER_SEARCHING
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.SPUtil
 import timber.log.Timber

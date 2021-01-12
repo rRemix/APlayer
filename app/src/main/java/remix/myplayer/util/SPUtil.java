@@ -143,7 +143,7 @@ public class SPUtil {
     //是否自动下载艺术家封面
     String AUTO_DOWNLOAD_ARTIST_COVER = "auto_download_artist_cover";
     //曲库配置
-    String LIBRARY_CATEGORY = "library_category";
+    String LIBRARY = "library_category";
     //锁屏设置
     String LOCKSCREEN = "lockScreen";
     //导航浪变色

@@ -1,21 +1,18 @@
-package remix.myplayer.lyric;
+package remix.myplayer.lyric
 
-import java.util.List;
-import remix.myplayer.lyric.bean.LrcRow;
+import remix.myplayer.lyric.bean.LrcRow
 
-
-public interface ILrcView {
-
+interface ILrcView {
   /**
    * 初始化画笔，颜色，字体大小等设置
    */
-  void init();
+  fun init()
 
   /***
    * 设置数据源
    * @param lrcRows
    */
-  void setLrcRows(List<LrcRow> lrcRows);
+  fun setLrcRows(lrcRows: List<LrcRow>?)
 
   /**
    * 指定时间
@@ -23,16 +20,16 @@ public interface ILrcView {
    * @param progress 时间进度
    * @param fromSeekBarByUser 是否由用户触摸Seekbar触发
    */
-  void seekTo(int progress, boolean fromSeekBar, boolean fromSeekBarByUser);
+  fun seekTo(progress: Int, fromSeekBar: Boolean, fromSeekBarByUser: Boolean)
 
   /***
    * 设置歌词文字的缩放比例
    * @param scalingFactor
    */
-  void setLrcScalingFactor(float scalingFactor);
+  fun setLrcScalingFactor(scalingFactor: Float)
 
   /**
    * 重置
    */
-  void reset();
+  fun reset()
 }

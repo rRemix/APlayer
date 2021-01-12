@@ -18,54 +18,58 @@ import java.io.File
  */
 
 class DefaultLrcParser : ILrcParser {
-  override fun saveLrcRows(lrcRows: List<LrcRow>?, cacheKey: String, searchKey: String) {
+  override fun saveLrcRows(lrcRows: List<LrcRow>?, cacheKey: String?, searchKey: String?) {
     if (lrcRows == null || lrcRows.isEmpty())
       return
 
     //缓存
-    DiskCache.getLrcDiskCache()?.apply {
-      edit(cacheKey)?.apply {
-        newOutputStream(0)?.use { outStream ->
-          outStream.write(Gson().toJson(lrcRows, object : TypeToken<List<LrcRow>>() {}.type).toByteArray())
-        }
-      }?.commit()
-    }?.flush()
+    if (!cacheKey.isNullOrEmpty()) {
+      DiskCache.getLrcDiskCache()?.apply {
+        edit(cacheKey)?.apply {
+          newOutputStream(0)?.use { outStream ->
+            outStream.write(Gson().toJson(lrcRows, object : TypeToken<List<LrcRow>>() {}.type).toByteArray())
+          }
+        }?.commit()
+      }?.flush()
+    }
 
     //保存歌词原始文件
     if (TextUtils.isEmpty(searchKey) || Environment.MEDIA_MOUNTED != Environment.getExternalStorageState())
       return
 
-    File(Environment.getExternalStorageDirectory(), "Android/data/"
-        + App.getContext().packageName + "/lyric")
-        .run {
-          //目录
-          if (exists() || mkdirs())
-            File(this, searchKey.replace("/".toRegex(), "") + ".lrc")
-          else null
-        }?.run {
-          //文件不存在或者成功重新创建
-          if (!exists() || (delete() && createNewFile()))
-            this
-          else null
-        }?.run {
-          lrcRows.forEach { lrcRow ->
-            val strBuilder = StringBuilder(128)
-            strBuilder.append("[")
-            strBuilder.append(lrcRow.timeStr)
-            strBuilder.append("]")
-            strBuilder.append(lrcRow.content).append("\n")
-            if (lrcRow.hasTranslate()) {
+    if (!searchKey.isNullOrEmpty()) {
+      File(Environment.getExternalStorageDirectory(), "Android/data/"
+          + App.getContext().packageName + "/lyric")
+          .run {
+            //目录
+            if (exists() || mkdirs())
+              File(this, searchKey.replace("/".toRegex(), "") + ".lrc")
+            else null
+          }?.run {
+            //文件不存在或者成功重新创建
+            if (!exists() || (delete() && createNewFile()))
+              this
+            else null
+          }?.run {
+            lrcRows.forEach { lrcRow ->
+              val strBuilder = StringBuilder(128)
               strBuilder.append("[")
               strBuilder.append(lrcRow.timeStr)
               strBuilder.append("]")
-              strBuilder.append(lrcRow.translate).append("\n")
+              strBuilder.append(lrcRow.content).append("\n")
+              if (lrcRow.hasTranslate()) {
+                strBuilder.append("[")
+                strBuilder.append(lrcRow.timeStr)
+                strBuilder.append("]")
+                strBuilder.append(lrcRow.translate).append("\n")
+              }
+              appendText(strBuilder.toString())
             }
-            appendText(strBuilder.toString())
           }
-        }
+    }
   }
 
-  override fun getLrcRows(bufferedReader: BufferedReader?, needCache: Boolean, cacheKey: String, searchKey: String): List<LrcRow>? {
+  override fun getLrcRows(bufferedReader: BufferedReader?, needCache: Boolean, cacheKey: String?, searchKey: String?): List<LrcRow> {
 
     //解析歌词
     val lrcRows = ArrayList<LrcRow>()

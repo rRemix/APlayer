@@ -603,13 +603,17 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
         override fun onClick() {}
         override fun onLongClick() {}
       })
-      lrcView?.setOnSeekToListener { progress: Int ->
-        if (progress > 0 && progress < getDuration()) {
-          MusicServiceRemote.setProgress(progress)
-          currentTime = progress
-          handler.sendEmptyMessage(UPDATE_TIME_ALL)
+
+      lrcView?.setOnSeekToListener(object : LrcView.OnSeekToListener{
+        override fun onSeekTo(progress: Int) {
+          if (progress > 0 && progress < getDuration()) {
+            MusicServiceRemote.setProgress(progress)
+            currentTime = progress
+            handler.sendEmptyMessage(UPDATE_TIME_ALL)
+          }
         }
-      }
+
+      })
       lrcView?.setHighLightColor(ThemeStore.getTextColorPrimary())
       lrcView?.setOtherColor(ThemeStore.getTextColorSecondary())
       lrcView?.setTimeLineColor(ThemeStore.getTextColorSecondary())
@@ -644,7 +648,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
       //更新顶部信息
       updateTopStatus(song)
       //更新歌词
-      handler.postDelayed({ lyricFragment.updateLrc(song) }, 500)
+      handler.postDelayed({ lyricFragment.updateLrc(song) }, 50)
       //更新进度条
       val temp = getProgress()
       currentTime = if (temp in 1 until duration) temp else 0
