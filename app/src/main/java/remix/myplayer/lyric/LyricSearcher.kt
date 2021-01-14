@@ -366,16 +366,19 @@ class LyricSearcher {
                 .map { lrcBody ->
                   val lrcResponse = Gson().fromJson(lrcBody.string(), QLrcResponse::class.java)
                   val combine = lrcParser.getLrcRows(getBufferReader(lrcResponse.lyric.toByteArray()), false, cacheKey, searchKey)
+                  combine.forEach {
+                    it.content = Util.htmlToText(it.content)
+                  }
                   if (lrcResponse.trans.isNotEmpty()) {
                     val translate = lrcParser.getLrcRows(getBufferReader(lrcResponse.trans.toByteArray()), false, cacheKey, searchKey)
-                    if (isCN && translate != null && translate.size > 0) {
-                      for (i in translate.indices) {
-                        if (translate[i].content.isNullOrEmpty() || translate[i].content == "//")
-                          continue
-                        for (j in combine.indices) {
-                          if (translate[i].time == combine[j].time) {
-                            combine[j].translate = translate[i].content
-                            break
+                    if (isCN && translate.size > 0) {
+                      translate.forEach {
+                        if (it.content.isNotEmpty() && it.content != "//") {
+                          for (i in combine.indices) {
+                            if (it.time == combine[i].time) {
+                              combine[i].translate = Util.htmlToText(it.content)
+                              break
+                            }
                           }
                         }
                       }
