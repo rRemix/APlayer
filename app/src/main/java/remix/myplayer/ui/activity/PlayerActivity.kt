@@ -86,7 +86,6 @@ import remix.myplayer.util.*
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import timber.log.Timber
 import java.io.File
-import java.lang.Exception
 import kotlin.math.abs
 
 /**
@@ -553,15 +552,17 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
       val thresholdX = DensityUtil.dip2px(mContext, 60f)
       //下滑关闭
       view_pager.setOnTouchListener { v: View?, event: MotionEvent ->
-        if (event.action == MotionEvent.ACTION_DOWN) {
-          eventX1 = event.x
-          eventY1 = event.y
-        }
-        if (event.action == MotionEvent.ACTION_UP) {
-          eventX2 = event.x
-          eventY2 = event.y
-          if (eventY2 - eventY1 > thresholdY && abs(eventX1 - eventX2) < thresholdX) {
-            onBackPressed()
+        if (view_pager.currentItem == 0) {
+          if (event.action == MotionEvent.ACTION_DOWN) {
+            eventX1 = event.x
+            eventY1 = event.y
+          }
+          if (event.action == MotionEvent.ACTION_UP) {
+            eventX2 = event.x
+            eventY2 = event.y
+            if (eventY2 - eventY1 > thresholdY && abs(eventX1 - eventX2) < thresholdX) {
+              onBackPressed()
+            }
           }
         }
         false
@@ -604,7 +605,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
         override fun onLongClick() {}
       })
 
-      lrcView?.setOnSeekToListener(object : LrcView.OnSeekToListener{
+      lrcView?.setOnSeekToListener(object : LrcView.OnSeekToListener {
         override fun onSeekTo(progress: Int) {
           if (progress > 0 && progress < getDuration()) {
             MusicServiceRemote.setProgress(progress)
@@ -693,7 +694,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
             handler.sendEmptyMessage(UPDATE_TIME_ALL)
             sleep(500)
           }
-        } catch (ignore: Exception){
+        } catch (ignore: Exception) {
         }
       }
     }

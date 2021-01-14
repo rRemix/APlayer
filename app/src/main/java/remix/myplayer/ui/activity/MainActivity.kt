@@ -15,7 +15,6 @@ import android.view.View
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager.widget.ViewPager
-import butterknife.OnClick
 import com.afollestad.materialdialogs.MaterialDialog
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.rebound.SimpleSpringListener
@@ -73,26 +72,26 @@ import java.util.*
 /**
  *
  */
-open class MainActivity : MenuActivity() {
+open class MainActivity : MenuActivity(), View.OnClickListener {
 
-  private val mDrawerAdapter by lazy {
+  private val drawerAdapter by lazy {
     DrawerAdapter(R.layout.item_drawer)
   }
-  private val mPagerAdapter by lazy {
+  private val pagerAdapter by lazy {
     MainPagerAdapter(supportFragmentManager)
   }
 
-  private val mRefreshHandler by lazy {
+  private val handler by lazy {
     MsgHandler(this)
   }
-  private val mReceiver by lazy {
+  private val receiver by lazy {
     MainReceiver(this)
   }
 
   //当前选中的fragment
-  private var mCurrentFragment: LibraryFragment<*, *>? = null
+  private var currentFragment: LibraryFragment<*, *>? = null
 
-  private var mMenuLayoutId = R.menu.menu_main
+  private var menuLayoutId = R.menu.menu_main
 
   /**
    * 判断安卓版本，请求安装权限或者直接安装
@@ -100,10 +99,10 @@ open class MainActivity : MenuActivity() {
    * @param activity
    * @param path
    */
-  private var mInstallPath: String? = null
+  private var installPath: String? = null
 
 
-  private var mForceDialog: MaterialDialog? = null
+  private var forceDialog: MaterialDialog? = null
 
   override fun onNewIntent(intent: Intent?) {
     super.onNewIntent(intent)
@@ -112,8 +111,8 @@ open class MainActivity : MenuActivity() {
   override fun onResume() {
     super.onResume()
     if (hasNewIntent) {
-      mRefreshHandler.postDelayed({ this.parseIntent() }, 500)
-      mRefreshHandler.post {
+      handler.postDelayed({ this.parseIntent() }, 500)
+      handler.post {
         onMetaChanged()
       }
       hasNewIntent = false
@@ -126,7 +125,7 @@ open class MainActivity : MenuActivity() {
 
   override fun onDestroy() {
     super.onDestroy()
-    unregisterLocalReceiver(mReceiver)
+    unregisterLocalReceiver(receiver)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -138,17 +137,18 @@ open class MainActivity : MenuActivity() {
     intentFilter.addAction(ACTION_DOWNLOAD_COMPLETE)
     intentFilter.addAction(ACTION_SHOW_DIALOG)
     intentFilter.addAction(ACTION_DISMISS_DIALOG)
-    registerLocalReceiver(mReceiver, intentFilter)
+    registerLocalReceiver(receiver, intentFilter)
 
     //初始化控件
     setUpToolbar()
     setUpPager()
     setUpTab()
+    btn_add.setOnClickListener(this)
     //初始化测滑菜单
     setUpDrawerLayout()
     setUpViewColor()
     //handler
-    mRefreshHandler.postDelayed({ this.checkUpdate() }, 500)
+    handler.postDelayed({ this.checkUpdate() }, 500)
 
     //清除多选显示状态
     MultipleChoice.isActiveSomeWhere = false
@@ -172,8 +172,7 @@ open class MainActivity : MenuActivity() {
   /**
    * 新建播放列表
    */
-  @OnClick(R.id.btn_add)
-  fun onClick(v: View) {
+  override fun onClick(v: View) {
     when (v.id) {
       R.id.btn_add -> {
         if (MultipleChoice.isActiveSomeWhere) {
@@ -226,8 +225,8 @@ open class MainActivity : MenuActivity() {
           Gson().toJson(defaultLibraries, object : TypeToken<List<Library>>() {}.type))
     }
 
-    mPagerAdapter.list = libraries
-    mMenuLayoutId = parseMenuId(mPagerAdapter.list[0].mTag)
+    pagerAdapter.list = libraries
+    menuLayoutId = parseMenuId(pagerAdapter.list[0].mTag)
     //有且仅有一个tab
     if (libraries.size == 1) {
       if (libraries[0].isPlayList()) {
@@ -238,18 +237,18 @@ open class MainActivity : MenuActivity() {
       tabs.visibility = View.VISIBLE
     }
 
-    view_pager.adapter = mPagerAdapter
-    view_pager.offscreenPageLimit = mPagerAdapter.count - 1
+    view_pager.adapter = pagerAdapter
+    view_pager.offscreenPageLimit = pagerAdapter.count - 1
     view_pager.currentItem = 0
     view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
       override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
 
       override fun onPageSelected(position: Int) {
-        val library = mPagerAdapter.list[position]
+        val library = pagerAdapter.list[position]
         showViewWithAnim(btn_add, library.isPlayList())
 
-        mMenuLayoutId = parseMenuId(mPagerAdapter.list[position].mTag)
-        mCurrentFragment = mPagerAdapter.getFragment(position) as LibraryFragment<*, *>
+        menuLayoutId = parseMenuId(pagerAdapter.list[position].mTag)
+        currentFragment = pagerAdapter.getFragment(position) as LibraryFragment<*, *>
 
         invalidateOptionsMenu()
       }
@@ -257,7 +256,7 @@ open class MainActivity : MenuActivity() {
 
       override fun onPageScrollStateChanged(state: Int) {}
     })
-    mCurrentFragment = mPagerAdapter.getFragment(0) as LibraryFragment<*, *>
+    currentFragment = pagerAdapter.getFragment(0) as LibraryFragment<*, *>
   }
 
   fun parseMenuId(tag: Int): Int {
@@ -273,11 +272,11 @@ open class MainActivity : MenuActivity() {
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     super.onCreateOptionsMenu(menu)
-    if (mCurrentFragment is FolderFragment) {
+    if (currentFragment is FolderFragment) {
       return true
     }
     var sortOrder = ""
-    when (mCurrentFragment) {
+    when (currentFragment) {
       is SongFragment -> sortOrder = SPUtil
           .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER,
               SortOrder.SongSortOrder.SONG_A_Z)
@@ -301,11 +300,11 @@ open class MainActivity : MenuActivity() {
 
 
   override fun getMenuLayoutId(): Int {
-    return mMenuLayoutId
+    return menuLayoutId
   }
 
   override fun saveSortOrder(sortOrder: String?) {
-    when (mCurrentFragment) {
+    when (currentFragment) {
       is SongFragment -> SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER,
           sortOrder)
       is AlbumFragment -> SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
@@ -315,7 +314,7 @@ open class MainActivity : MenuActivity() {
       is PlayListFragment -> SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,
           sortOrder)
     }
-    mCurrentFragment?.onMediaStoreChanged()
+    currentFragment?.onMediaStoreChanged()
   }
 
   private fun showViewWithAnim(view: View, show: Boolean) {
@@ -374,7 +373,7 @@ open class MainActivity : MenuActivity() {
       tab.view.setOnClickListener(object : DoubleClickListener() {
         override fun onDoubleClick(v: View) {
           // 只有第一个标签可能是"歌曲"
-          if (mCurrentFragment is SongFragment) {
+          if (currentFragment is SongFragment) {
             // 滚动到当前的歌曲
             val fragments = supportFragmentManager.fragments
             for (fragment in fragments) {
@@ -389,7 +388,7 @@ open class MainActivity : MenuActivity() {
   }
 
   private fun setUpDrawerLayout() {
-    mDrawerAdapter.setOnItemClickListener(object : OnItemClickListener {
+    drawerAdapter.setOnItemClickListener(object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
         when (position) {
           //歌曲库
@@ -407,12 +406,12 @@ open class MainActivity : MenuActivity() {
                 .setComponent(ComponentName(mContext, ExitReceiver::class.java)))
           }
         }
-        mDrawerAdapter.setSelectIndex(position)
+        drawerAdapter.setSelectIndex(position)
       }
 
       override fun onItemLongClick(view: View, position: Int) {}
     })
-    recyclerview.adapter = mDrawerAdapter
+    recyclerview.adapter = drawerAdapter
     recyclerview.layoutManager = LinearLayoutManager(this)
 
     drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
@@ -421,7 +420,7 @@ open class MainActivity : MenuActivity() {
       override fun onDrawerOpened(drawerView: View) {}
 
       override fun onDrawerClosed(drawerView: View) {
-        mDrawerAdapter.setSelectIndex(0)
+        drawerAdapter.setSelectIndex(0)
       }
 
       override fun onDrawerStateChanged(newState: Int) {}
@@ -465,18 +464,18 @@ open class MainActivity : MenuActivity() {
           return
         }
         if (data.getBooleanExtra(EXTRA_RECREATE, false)) { //设置后需要重启activity
-          mRefreshHandler.sendEmptyMessage(MSG_RECREATE_ACTIVITY)
+          handler.sendEmptyMessage(MSG_RECREATE_ACTIVITY)
         } else if (data.getBooleanExtra(EXTRA_REFRESH_ADAPTER, false)) { //刷新adapter
           ImageUriRequest.clearUriCache()
-          mRefreshHandler.sendEmptyMessage(MSG_UPDATE_ADAPTER)
+          handler.sendEmptyMessage(MSG_UPDATE_ADAPTER)
         } else if (data.getBooleanExtra(EXTRA_REFRESH_LIBRARY, false)) { //刷新Library
           val libraries = data.getSerializableExtra(EXTRA_LIBRARY) as List<Library>?
           if (libraries != null && libraries.isNotEmpty()) {
-            mPagerAdapter.list = libraries
-            mPagerAdapter.notifyDataSetChanged()
+            pagerAdapter.list = libraries
+            pagerAdapter.notifyDataSetChanged()
             view_pager.offscreenPageLimit = libraries.size - 1
-            mMenuLayoutId = parseMenuId(mPagerAdapter.list[view_pager.currentItem].mTag)
-            mCurrentFragment = mPagerAdapter.getFragment(view_pager.currentItem) as LibraryFragment<*, *>
+            menuLayoutId = parseMenuId(pagerAdapter.list[view_pager.currentItem].mTag)
+            currentFragment = pagerAdapter.getFragment(view_pager.currentItem) as LibraryFragment<*, *>
             invalidateOptionsMenu()
             //如果只有一个Library,隐藏标签栏
             if (libraries.size == 1) {
@@ -492,7 +491,7 @@ open class MainActivity : MenuActivity() {
                 .canRequestPackageInstalls()) {
           return
         }
-        installApk(mContext, mInstallPath)
+        installApk(mContext, installPath)
       }
 
       Crop.REQUEST_CROP, Crop.REQUEST_PICK -> {
@@ -598,8 +597,8 @@ open class MainActivity : MenuActivity() {
 
   override fun onServiceConnected(service: MusicService) {
     super.onServiceConnected(service)
-    mRefreshHandler.postDelayed({ this.parseIntent() }, 500)
-    mRefreshHandler.post {
+    handler.postDelayed({ this.parseIntent() }, 500)
+    handler.post {
       onMetaChanged()
     }
   }
@@ -647,8 +646,8 @@ open class MainActivity : MenuActivity() {
   }
 
   private fun checkIsAndroidO(context: Context, path: String) {
-    if (!TextUtils.isEmpty(path) && path != mInstallPath) {
-      mInstallPath = path
+    if (!TextUtils.isEmpty(path) && path != installPath) {
+      installPath = path
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       val hasInstallPermission = context.packageManager.canRequestPackageInstalls()
@@ -667,22 +666,22 @@ open class MainActivity : MenuActivity() {
   }
 
   private fun dismissForceDialog() {
-    if (mForceDialog != null && mForceDialog?.isShowing == true) {
-      mForceDialog?.dismiss()
-      mForceDialog = null
+    if (forceDialog != null && forceDialog?.isShowing == true) {
+      forceDialog?.dismiss()
+      forceDialog = null
     }
   }
 
   private fun showForceDialog() {
     dismissForceDialog()
-    mForceDialog = Theme.getBaseDialog(mContext)
+    forceDialog = Theme.getBaseDialog(mContext)
         .canceledOnTouchOutside(false)
         .cancelable(false)
         .title(R.string.updating)
         .content(R.string.please_wait)
         .progress(true, 0)
         .progressIndeterminateStyle(false).build()
-    mForceDialog?.show()
+    forceDialog?.show()
   }
 
   fun toPlayerActivity() {

@@ -21,7 +21,6 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.annotation.WorkerThread
-import io.reactivex.functions.Consumer
 import kotlinx.coroutines.*
 import remix.myplayer.App
 import remix.myplayer.R
@@ -1152,7 +1151,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 接受控制命令 包括暂停、播放、上下首、改版播放模式等
    */
-  private var lastCommandTime = 0
+  private var lastCommandTime: Long = 0
 
   inner class ControlReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
@@ -1187,6 +1186,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         return
       }
     }
+    lastCommandTime = System.currentTimeMillis()
 
     when (control) {
       //关闭通知栏
@@ -1668,11 +1668,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     var force = false
 
     override fun run() {
-      if(!showDesktopLyric){
+      if (!showDesktopLyric) {
         if (isDesktopLyricShowing) {
           uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
         }
-        if(!showStatusBarLyric || stop){
+        if (!showStatusBarLyric || stop) {
           return
         }
       }
