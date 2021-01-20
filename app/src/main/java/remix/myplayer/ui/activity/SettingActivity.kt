@@ -345,7 +345,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
   private fun updatePlayerBackgroundText() {
     //播放界面背景
-    val nowPlayingScreen = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAYER_BACKGROUND, BACKGROUND_THEME)
+    val nowPlayingScreen = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAYER_BACKGROUND, BACKGROUND_ADAPTIVE_COLOR)
     setting_now_playing_screen_text.setText(when (nowPlayingScreen) {
       BACKGROUND_THEME -> R.string.now_playing_screen_theme
       BACKGROUND_ADAPTIVE_COLOR -> R.string.now_playing_screen_cover
@@ -598,7 +598,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   }
 
   private fun configPlayerBackgroundConfig() {
-    val current = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAYER_BACKGROUND, BACKGROUND_THEME)
+    val current = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAYER_BACKGROUND, BACKGROUND_ADAPTIVE_COLOR)
 
     getBaseDialog(this)
         .items(R.array.player_background)

@@ -448,7 +448,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
   override fun onSharedPreferenceChanged(sp: SharedPreferences, key: String) {
-    Timber.v("onSharedPreferenceChanged, key: $key")
+//    Timber.v("onSharedPreferenceChanged, key: $key")
     when (key) {
       //通知栏背景色
       SETTING_KEY.NOTIFY_SYSTEM_COLOR,
@@ -1686,15 +1686,19 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
       // 桌面歌词
       val wrapper = lyricFetcher.findCurrentLyric()
+      Timber.tag(TAG_DESKTOP_LYRIC).v("findCurrentLyric: $wrapper")
       if (!showDesktopLyric || !screenOn || checkNoPermission() || isAppOnForeground()) {
         if (isDesktopLyricShowing) {
+          Timber.tag(TAG_DESKTOP_LYRIC).v("remove desktop lyric")
           uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
         }
       } else {
         if (!isDesktopLyricShowing) {
+          Timber.tag(TAG_DESKTOP_LYRIC).v("create desktop lyric")
           uiHandler.removeMessages(CREATE_DESKTOP_LRC)
           uiHandler.sendEmptyMessageDelayed(CREATE_DESKTOP_LRC, 50)
         } else {
+          Timber.tag(TAG_DESKTOP_LYRIC).v("update desktop lyric")
           uiHandler.obtainMessage(UPDATE_DESKTOP_LRC_CONTENT, wrapper).sendToTarget()
         }
       }

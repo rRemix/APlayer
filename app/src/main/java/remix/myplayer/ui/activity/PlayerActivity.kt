@@ -75,13 +75,15 @@ import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.adapter.PagerAdapter
+import remix.myplayer.ui.blur.StackBlurManager
 import remix.myplayer.ui.dialog.FileChooserDialog
 import remix.myplayer.ui.dialog.FileChooserDialog.FileCallback
 import remix.myplayer.ui.dialog.PlayQueueDialog
 import remix.myplayer.ui.dialog.PlayQueueDialog.Companion.newInstance
-import remix.myplayer.ui.fragment.CoverFragment
 import remix.myplayer.ui.fragment.LyricFragment
 import remix.myplayer.ui.fragment.RecordFragment
+import remix.myplayer.ui.fragment.player.CoverFragment
+import remix.myplayer.ui.fragment.player.RoundCoverFragment
 import remix.myplayer.util.*
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import timber.log.Timber
@@ -162,7 +164,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   private val receiver: Receiver = Receiver()
 
   private val background by lazy {
-    SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAYER_BACKGROUND, BACKGROUND_THEME)
+    SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAYER_BACKGROUND, BACKGROUND_ADAPTIVE_COLOR)
   }
 
   override fun setUpTheme() {
@@ -208,9 +210,23 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
 
         val file = File(DiskCache.getDiskCacheDir(this, "thumbnail/player"), "player.jpg");
         if (file.exists()) {
-          val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-          player_container.background = BitmapDrawable(resources, bitmap)
-          updateSwatch(bitmap)
+          Single
+              .fromCallable {
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                val blurBitmap = StackBlurManager(bitmap).processNatively(10)
+
+                blurBitmap
+              }
+              .compose(RxUtil.applySingleScheduler())
+              .onErrorReturn {
+                return@onErrorReturn BitmapFactory.decodeResource(resources, R.drawable.album_empty_bg_day)
+              }
+              .subscribe({
+                player_container.background = BitmapDrawable(resources, it)
+                updateSwatch(it)
+              }, {
+
+              })
         }
       }
     }
@@ -532,13 +548,12 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
         fragmentManager.beginTransaction().remove(fragment).commitNow()
       }
     }
-    coverFragment = CoverFragment()
+    coverFragment = RoundCoverFragment()
     setUpCoverFragment()
     lyricFragment = LyricFragment()
     setUpLyricFragment()
 
     if (this.isPortraitOrientation()) {
-//      mRecordFragment = new RecordFragment();
 
       //Viewpager
       val adapter = PagerAdapter(supportFragmentManager)
