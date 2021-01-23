@@ -6,7 +6,6 @@ import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import butterknife.OnClick
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_lrc.*
@@ -33,7 +32,7 @@ import kotlin.math.abs
 /**
  * 歌词界面Fragment
  */
-class LyricFragment : BaseMusicFragment() {
+class LyricFragment : BaseMusicFragment(), View.OnClickListener {
   private var onFindListener: OnInflateFinishListener? = null
   private var info: Song? = null
 
@@ -58,6 +57,9 @@ class LyricFragment : BaseMusicFragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    offsetReduce.setOnClickListener(this)
+    offsetAdd.setOnClickListener(this)
+    offsetReset.setOnClickListener(this)
     onFindListener?.onViewInflateFinish(lrcView)
     //黑色主题着色按钮
     val themeRes = ThemeStore.getThemeRes()
@@ -125,8 +127,7 @@ class LyricFragment : BaseMusicFragment() {
         })
   }
 
-  @OnClick(R.id.offsetReduce, R.id.offsetAdd, R.id.offsetReset)
-  internal fun onClick(view: View) {
+  override fun onClick(view: View) {
     msgHandler.removeMessages(MESSAGE_HIDE)
     msgHandler.sendEmptyMessageDelayed(MESSAGE_HIDE, DELAY_HIDE)
 
@@ -180,7 +181,7 @@ class LyricFragment : BaseMusicFragment() {
 
   companion object {
     private const val DELAY_HIDE = 5000L
-    private const val DELAY_SHOW_TOAST = 500L
+    private const val DELAY_SHOW_TOAST = 100L
 
     private const val MESSAGE_HIDE = 1
     private const val MESSAGE_SHOW_TOAST = 2
