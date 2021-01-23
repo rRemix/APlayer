@@ -128,8 +128,8 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
     editDialog.show()
 
     editDialog.customView?.let { root ->
-      val textInputTintColor = ThemeStore.getAccentColor()
-      val editTintColor = ThemeStore.getAccentColor()
+      val textInputTintColor = ThemeStore.accentColor
+      val editTintColor = ThemeStore.accentColor
       TextInputLayoutUtil.setAccent(root.song_layout, textInputTintColor)
       TintHelper.setTintAuto(root.song_layout.editText!!, editTintColor, false)
       root.song_layout.editText?.addTextChangedListener(TextInputEditWatcher(root.song_layout, getString(R.string.song_not_empty)))

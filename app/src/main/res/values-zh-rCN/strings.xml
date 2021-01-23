@@ -376,10 +376,12 @@
   <string name="show_displayname_tip">如果歌曲列表出现乱码可尝试开启该选项</string>
   <string name="accent_color">强调色</string>
   <string name="accent_color_tip">选择你喜欢的强调色</string>
-  <string name="general_theme">全局主题</string>
-  <string name="light_theme">亮色</string>
-  <string name="dark_theme">暗色</string>
-  <string name="black_theme">黑色(A屏黑)</string>
+  <string name="dark_theme">深色主题</string>
+  <string name="always_off">总是关闭</string>
+  <string name="always_on">总是开启</string>
+  <string name="follow_system">跟随系统</string>
+  <string name="black_theme">黑色主题</string>
+  <string name="black_theme_tip">当深色主题启用时使用纯黑色主题</string>
 
   <string name="md_back_label">返回</string>
   <string name="md_done_label">完成</string>

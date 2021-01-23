@@ -100,7 +100,7 @@ class CustomSortActivity : ToolbarActivity() {
     custom_sort_recyclerView.adapter = adapter
 
 
-    val accentColor = ThemeStore.getAccentColor()
+    val accentColor = ThemeStore.accentColor
     custom_sort_recyclerView.setBubbleColor(accentColor)
     custom_sort_recyclerView.setHandleColor(accentColor)
     custom_sort_recyclerView.setBubbleTextColor(resources.getColor(if (isColorLight(accentColor))

@@ -165,7 +165,7 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
                           ToastUtil.show(context, R.string.save_error)
                         })
                   }
-                  .buttonRippleColor(ThemeStore.getRippleColor())
+                  .buttonRippleColor(ThemeStore.rippleColor)
                   .positiveText(R.string.confirm)
                   .negativeText(R.string.cancel)
                   .show()

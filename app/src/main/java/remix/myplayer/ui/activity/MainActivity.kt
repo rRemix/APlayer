@@ -54,8 +54,6 @@ import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
-import remix.myplayer.theme.ThemeStore.getMaterialPrimaryColor
-import remix.myplayer.theme.ThemeStore.getMaterialPrimaryColorReverse
 import remix.myplayer.ui.adapter.DrawerAdapter
 import remix.myplayer.ui.adapter.MainPagerAdapter
 import remix.myplayer.ui.fragment.*
@@ -157,7 +155,7 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
   override fun setStatusBarColor() {
     StatusBarUtil.setColorNoTranslucentForDrawerLayout(this,
         findViewById(R.id.drawer),
-        ThemeStore.getStatusBarColor())
+        ThemeStore.statusBarColor)
   }
 
   /**
@@ -341,12 +339,12 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
   //初始化custontab
   private fun setUpTab() {
     //添加tab选项卡
-    val isPrimaryColorCloseToWhite = ThemeStore.isMDColorCloseToWhite()
+    val isPrimaryColorCloseToWhite = ThemeStore.isMDColorCloseToWhite
     //        tabs = new TabLayout(new ContextThemeWrapper(this, !ColorUtil.isColorLight(ThemeStore.getMaterialPrimaryColor()) ? R.style.Custotabs_Light : R.style.Custotabs_Dark));
     //        tabs = new TabLayout(new ContextThemeWrapper(this,R.style.Custotabs_Light));
     //        tabs.setLayoutParams(new AppBarLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,DensityUtil.dip2px(this,48)));
     //        tabs = new TabLayout(this);
-    tabs.setBackgroundColor(getMaterialPrimaryColor())
+    tabs.setBackgroundColor(ThemeStore.materialPrimaryColor)
     tabs.addTab(tabs.newTab().setText(R.string.tab_song))
     tabs.addTab(tabs.newTab().setText(R.string.tab_album))
     tabs.addTab(tabs.newTab().setText(R.string.tab_artist))
@@ -433,19 +431,19 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
   private fun setUpViewColor() {
     //正在播放文字的背景
     val bg = GradientDrawable()
-    val primaryColor = getMaterialPrimaryColor()
+    val primaryColor = ThemeStore.materialPrimaryColor
 
     bg.setColor(ColorUtil.darkenColor(primaryColor))
     bg.cornerRadius = DensityUtil.dip2px(this, 4f).toFloat()
     tv_header.background = bg
-    tv_header.setTextColor(getMaterialPrimaryColorReverse())
+    tv_header.setTextColor(ThemeStore.materialPrimaryColorReverse)
     //抽屉
     header.setBackgroundColor(primaryColor)
-    navigation_view.setBackgroundColor(ThemeStore.getDrawerDefaultColor())
+    navigation_view.setBackgroundColor(ThemeStore.drawerDefaultColor)
 
     //这种图片不知道该怎么着色 暂时先这样处理
     btn_add.background = Theme.tintDrawable(R.drawable.bg_playlist_add,
-        ThemeStore.getAccentColor())
+        ThemeStore.accentColor)
     btn_add.setImageResource(R.drawable.icon_playlist_add)
   }
 
@@ -589,7 +587,7 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
 
   override fun onPlayStateChange() {
     super.onPlayStateChange()
-    iv_header.setBackgroundResource(if (MusicServiceRemote.isPlaying() && ThemeStore.isLightTheme())
+    iv_header.setBackgroundResource(if (MusicServiceRemote.isPlaying() && ThemeStore.isLightTheme)
       R.drawable.drawer_bg_album_shadow
     else
       R.color.transparent)
