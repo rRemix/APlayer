@@ -276,8 +276,10 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             }
             //黑色主题
             R.id.setting_black_theme_switch -> {
-              mNeedRecreate = true
-              recreate()
+              if (!ThemeStore.isLightTheme) {
+                mNeedRecreate = true
+                recreate()
+              }
             }
           }
 
