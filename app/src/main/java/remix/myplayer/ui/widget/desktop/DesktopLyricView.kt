@@ -25,8 +25,7 @@ import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRIC
-import remix.myplayer.theme.ThemeStore.getFloatLyricTextColor
-import remix.myplayer.theme.ThemeStore.saveFloatLyricTextColor
+import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.adapter.DesktopLyricColorAdapter
 import remix.myplayer.ui.adapter.DesktopLyricColorAdapter.COLORS
 import remix.myplayer.util.ColorUtil
@@ -128,7 +127,7 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
   }
 
   private fun setUpView() {
-    val temp = getFloatLyricTextColor()
+    val temp = ThemeStore.floatLyricTextColor
     val color = if (ColorUtil.isColorCloseToWhite(temp)) Color.parseColor("#F9F9F9") else temp
     val red = color and 0xff0000 shr 16
     val green = color and 0x00ff00 shr 8
@@ -397,7 +396,7 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
   @OnHandleMessage
   fun handleMsg(msg: Message) {
     when (msg.what) {
-      MESSAGE_SAVE_COLOR -> saveFloatLyricTextColor(msg.arg1)
+      MESSAGE_SAVE_COLOR -> ThemeStore.floatLyricTextColor = msg.arg1
     }
   }
 

@@ -1,8 +1,5 @@
 package remix.myplayer.ui.activity;
 
-import static remix.myplayer.theme.ThemeStore.getTextColorPrimary;
-import static remix.myplayer.theme.ThemeStore.getTextColorSecondary;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -75,9 +72,6 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdapter>
     }
     mPlayListName = getIntent().getStringExtra(EXTRA_NAME);
 
-    TextView cancel = findViewById(R.id.cancel);
-    cancel.setTextColor(getTextColorPrimary());
-    mConfirm.setTextColor(getTextColorSecondary());
     mAdapter = new SongChooseAdapter(R.layout.item_song_choose, isValid -> {
       mConfirm.setAlpha(isValid ? 1.0f : 0.6f);
       mConfirm.setClickable(isValid);

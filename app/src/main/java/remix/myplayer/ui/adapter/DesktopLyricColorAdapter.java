@@ -60,7 +60,7 @@ public class DesktopLyricColorAdapter extends BaseAdapter<Integer, DesktopLyricC
 
   public void setCurrentColor(int color) {
     mCurrentColor = color;
-    ThemeStore.saveFloatLyricTextColor(color);
+    ThemeStore.setFloatLyricTextColor(color);
   }
 
 

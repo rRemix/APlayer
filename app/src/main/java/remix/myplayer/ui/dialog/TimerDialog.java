@@ -93,34 +93,21 @@ public class TimerDialog extends BaseDialog {
 
     //如果正在计时，设置seekbar的进度
     if (SleepTimer.isTicking()) {
+      mSeekbar.setClickable(false);
       mTime = (int) (SleepTimer.getMillisUntilFinish() / 1000);
-      if (mTime > 0) {
-        mSeekbar.setProgress(mTime);
-        mSeekbar.setStart(true);
-      }
+      mSeekbar.setProgress(mTime);
+    } else {
+      mSeekbar.setClickable(true);
     }
 
-    mSeekbar.setOnSeekBarChangeListener(new CircleSeekBar.OnSeekBarChangeListener() {
-      @Override
-      public void onProgressChanged(CircleSeekBar seekBar, long progress, boolean fromUser) {
-        if (progress > 0) {
-          //记录倒计时时间和更新界面
-          int minute = (int) (progress / 60);
-          mMinute.setText(minute < 10 ? "0" + minute : "" + minute);
-          mSecond.setText("00");
-          //取整数分钟
-          mTime = minute * 60;
-          mSaveTime = minute * 60;
-        }
-      }
-
-      @Override
-      public void onStartTrackingTouch(CircleSeekBar seekBar) {
-      }
-
-      @Override
-      public void onStopTrackingTouch(CircleSeekBar seekBar) {
-      }
+    mSeekbar.setOnSeekBarChangeListener((seekBar, progress, fromUser) -> {
+      //记录倒计时时间和更新界面
+      int minute = progress / 60;
+      mMinute.setText(minute < 10 ? "0" + minute : "" + minute);
+      mSecond.setText("00");
+      //取整数分钟
+      mTime = minute * 60;
+      mSaveTime = minute * 60;
     });
 
     //初始化switch
@@ -169,7 +156,7 @@ public class TimerDialog extends BaseDialog {
               .color(Color.TRANSPARENT)
               .corner(DensityUtil.dip2px(1))
               .strokeSize(DensityUtil.dip2px(1))
-              .strokeColor(ColorUtil.getColor(R.color.timer_text_color))
+              .strokeColor(Theme.resolveColor(getContext(), R.attr.text_color_secondary))
               .make());
         });
 

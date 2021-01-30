@@ -55,14 +55,14 @@ class EQActivity : ToolbarActivity() {
       updateEnable(isChecked)
       eq_reset.isEnabled = EQHelper.enable
     }
-    TintHelper.setTintAuto(eq_switch, ThemeStore.getAccentColor(), false)
+    TintHelper.setTintAuto(eq_switch, ThemeStore.accentColor, false)
 
     //初始化重置按钮背景
-    TintHelper.setTintAuto(eq_reset, ThemeStore.getAccentColor(), false)
+    TintHelper.setTintAuto(eq_reset, ThemeStore.accentColor, false)
     eq_reset.isEnabled = EQHelper.enable
 
     val bandNumber = EQHelper.bandNumber
-    val accentColor = ThemeStore.getAccentColor()
+    val accentColor = ThemeStore.accentColor
 
     for (i in 0 until bandNumber) {
       val eqLayout = LayoutInflater.from(this).inflate(R.layout.layout_eq_seekbar, eq_container, false)

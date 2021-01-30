@@ -173,7 +173,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
 //    } else {
 //      setTheme(R.style.AudioHolderStyle_Night);
 //    }
-    val superThemeRes = ThemeStore.getThemeRes()
+    val superThemeRes = ThemeStore.themeRes
     val themeRes: Int
     themeRes = when (superThemeRes) {
       R.style.Theme_APlayer_Black -> R.style.PlayerActivityStyle_Black
@@ -305,7 +305,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
           Constants.MODE_LOOP -> R.drawable.play_btn_loop
           Constants.MODE_SHUFFLE -> R.drawable.play_btn_shuffle
           else -> R.drawable.play_btn_loop_one
-        }, ThemeStore.getPlayerBtnColor()))
+        }, ThemeStore.playerBtnColor))
         val msg = if (currentModel == Constants.MODE_LOOP) getString(R.string.model_normal) else if (currentModel == Constants.MODE_SHUFFLE) getString(R.string.model_random) else getString(R.string.model_repeat)
         //刷新下一首
         if (currentModel != Constants.MODE_SHUFFLE) {
@@ -392,12 +392,12 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     highLightIndicator = GradientDrawableMaker()
         .width(width)
         .height(height)
-        .color(ThemeStore.getAccentColor())
+        .color(ThemeStore.accentColor)
         .make()
     normalIndicator = GradientDrawableMaker()
         .width(width)
         .height(height)
-        .color(ThemeStore.getAccentColor())
+        .color(ThemeStore.accentColor)
         .alpha(0.3f)
         .make()
     indicators.add(findViewById(R.id.guide_01))
@@ -630,9 +630,9 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
         }
 
       })
-      lrcView?.setHighLightColor(ThemeStore.getTextColorPrimary())
-      lrcView?.setOtherColor(ThemeStore.getTextColorSecondary())
-      lrcView?.setTimeLineColor(ThemeStore.getTextColorSecondary())
+      lrcView?.setHighLightColor(ThemeStore.textColorPrimary)
+      lrcView?.setOtherColor(ThemeStore.textColorSecondary)
+      lrcView?.setTimeLineColor(ThemeStore.textColorSecondary)
     })
   }
 
@@ -755,8 +755,8 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
    * 根据主题颜色修改按钮颜色
    */
   private fun setUpViewColor() {
-    val accentColor = ThemeStore.getAccentColor()
-    val tintColor = ThemeStore.getPlayerBtnColor()
+    val accentColor = ThemeStore.accentColor
+    val tintColor = ThemeStore.playerBtnColor
     updateSeekBarColor(accentColor)
     //        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(context,10),DensityUtil.dip2px(context,10)));
 //        Drawable seekbarBackground = mProgressSeekBar.getBackground();
@@ -770,7 +770,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     playbar_play_pause.setBackgroundColor(accentColor)
 
     //歌曲名颜色
-    top_title.setTextColor(ThemeStore.getPlayerTitleColor())
+    top_title.setTextColor(ThemeStore.playerTitleColor)
 
     //修改顶部按钮颜色
     Theme.tintDrawable(top_hide, R.drawable.icon_player_back, tintColor)
@@ -788,12 +788,12 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
 //        Theme.tintDrawable(mVolumeUp,R.drawable.ic_volume_up_black_24dp,tintColor);
     //下一首背景
     next_song.background = GradientDrawableMaker()
-        .color(ThemeStore.getPlayerNextSongBgColor())
+        .color(ThemeStore.playerNextSongBgColor)
         .corner(DensityUtil.dip2px(2f).toFloat())
         .width(DensityUtil.dip2px(288f))
         .height(DensityUtil.dip2px(38f))
         .make()
-    next_song.setTextColor(ThemeStore.getPlayerNextSongTextColor())
+    next_song.setTextColor(ThemeStore.playerNextSongTextColor)
   }
 
   private fun updateSeekBarColor(color: Int) {
@@ -822,7 +822,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   private fun setProgressDrawable(seekBar: SeekBar, color: Int) {
     val progressDrawable = seekBar.progressDrawable as LayerDrawable
     //修改progress颜色
-    (progressDrawable.getDrawable(0) as GradientDrawable).setColor(ThemeStore.getPlayerProgressColor())
+    (progressDrawable.getDrawable(0) as GradientDrawable).setColor(ThemeStore.playerProgressColor)
     progressDrawable.getDrawable(1).setColorFilter(color, PorterDuff.Mode.SRC_IN)
     seekBar.progressDrawable = progressDrawable
   }

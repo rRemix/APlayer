@@ -6,10 +6,9 @@
   </declare-styleable>
 
   <declare-styleable name="CircleSeekBar">
-    <attr format="reference" name="progress_thumb"/>
-    <attr format="dimension|reference" name="progress_width"/>
-    <attr format="color|reference" name="circle_color"/>
-    <attr format="integer|reference" name="progress_max"/>
+    <attr format="integer|reference" name="progress_max" />
+    <attr format="dimension|reference" name="thumb_radius" />
+    <attr format="dimension|reference" name="track_width" />
   </declare-styleable>
 
   <!--<declare-styleable name="ColumnView">-->

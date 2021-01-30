@@ -1,9 +1,5 @@
 package remix.myplayer;
 
-import static remix.myplayer.theme.ThemeStore.KEY_THEME;
-import static remix.myplayer.theme.ThemeStore.LIGHT;
-import static remix.myplayer.theme.ThemeStore.NAME;
-
 import android.app.Activity;
 import android.app.Application.ActivityLifecycleCallbacks;
 import android.content.ComponentCallbacks2;
@@ -87,7 +83,6 @@ public class App extends MultiDexApplication implements ActivityLifecycleCallbac
         .fromAction(() -> {
           ThemeStore.sImmersiveMode = SPUtil
               .getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.IMMERSIVE_MODE, false);
-          ThemeStore.sTheme = SPUtil.getValue(App.getContext(), NAME, KEY_THEME, LIGHT);
           ThemeStore.sColoredNavigation = SPUtil.getValue(App.getContext(), SETTING_KEY.NAME,
               SETTING_KEY.COLOR_NAVIGATION, false);
         })

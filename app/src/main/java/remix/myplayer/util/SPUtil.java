@@ -246,6 +246,10 @@ public class SPUtil {
     String EXPORT_PLAYLIST_FOLDER = "export_playlist_folder";
     //自定义播放背景
     String PLAYER_BACKGROUND = "player_background";
+    // 深色主题
+    String DARK_THEME = "dark_theme";
+    // 黑色主题
+    String BLACK_THEME = "black_theme";
   }
 
   public interface LYRIC_OFFSET_KEY {

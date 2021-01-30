@@ -71,7 +71,6 @@ import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRIC
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.theme.ThemeStore
-import remix.myplayer.theme.ThemeStore.*
 import remix.myplayer.theme.TintHelper
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_LIBRARY
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_RECREATE
@@ -153,8 +152,11 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   @BindView(R.id.setting_displayname_switch)
   lateinit var mShowDisplaynameSwitch: SwitchCompat
 
-  @BindView(R.id.setting_general_theme_text)
-  lateinit var mThemeText: TextView
+  @BindView(R.id.setting_dark_theme_text)
+  lateinit var mDarkThemeText: TextView
+
+  @BindView(R.id.setting_black_theme_switch)
+  lateinit var mBlackThemeSwitch: SwitchCompat
 
   @BindView(R.id.setting_audio_focus_switch)
   lateinit var mAudioFocusSwitch: SwitchCompat
@@ -205,10 +207,10 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
     val keyWord = arrayOf(SETTING_KEY.COLOR_NAVIGATION, SETTING_KEY.SHAKE, SETTING_KEY.DESKTOP_LYRIC_SHOW, SETTING_KEY.STATUSBAR_LYRIC_SHOW,
         SETTING_KEY.SCREEN_ALWAYS_ON, SETTING_KEY.NOTIFY_STYLE_CLASSIC, SETTING_KEY.IMMERSIVE_MODE,
-        SETTING_KEY.PLAY_AT_BREAKPOINT, SETTING_KEY.IGNORE_MEDIA_STORE, SETTING_KEY.SHOW_DISPLAYNAME,
+        SETTING_KEY.PLAY_AT_BREAKPOINT, SETTING_KEY.IGNORE_MEDIA_STORE, SETTING_KEY.SHOW_DISPLAYNAME, SETTING_KEY.BLACK_THEME,
         SETTING_KEY.AUDIO_FOCUS)
-    ButterKnife.apply(arrayOf(mNaviSwitch, mShakeSwitch, mFloatLrcSwitch, mShowStatusbarLyric, mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch, mBreakpointSwitch, mIgnoreMediastoreSwitch, mShowDisplaynameSwitch, mAudioFocusSwitch)) { view, index ->
-      TintHelper.setTintAuto(view, getAccentColor(), false)
+    ButterKnife.apply(arrayOf(mNaviSwitch, mShakeSwitch, mFloatLrcSwitch, mShowStatusbarLyric, mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch, mBreakpointSwitch, mIgnoreMediastoreSwitch, mShowDisplaynameSwitch, mBlackThemeSwitch, mAudioFocusSwitch)) { view, index ->
+      TintHelper.setTintAuto(view, ThemeStore.accentColor, false)
 
       view.isChecked = SPUtil.getValue(mContext, SETTING_KEY.NAME, keyWord[index], false)
       //5.0以上才支持变色导航栏
@@ -272,6 +274,13 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
               Song.SHOW_DISPLAYNAME = isChecked
               mNeedRefreshAdapter = true
             }
+            //黑色主题
+            R.id.setting_black_theme_switch -> {
+              if (!ThemeStore.isLightTheme) {
+                mNeedRecreate = true
+                recreate()
+              }
+            }
           }
 
         }
@@ -289,11 +298,11 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
     //主题颜色指示器
     (mPrimaryColorSrc.drawable as GradientDrawable)
-        .setColor(getMaterialPrimaryColor())
-    (mAccentColorSrc.drawable as GradientDrawable).setColor(getAccentColor())
+        .setColor(ThemeStore.materialPrimaryColor)
+    (mAccentColorSrc.drawable as GradientDrawable).setColor(ThemeStore.accentColor)
 
     //初始化箭头颜色
-    val accentColor = getAccentColor()
+    val accentColor = ThemeStore.accentColor
     ButterKnife.apply(mArrows) { view, index -> Theme.tintDrawable(view, view.drawable, accentColor) }
 
     //标题颜色
@@ -313,8 +322,14 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     //根据系统版本决定是否显示通知栏样式切换
     findViewById<View>(R.id.setting_classic_notify_container).visibility = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) View.VISIBLE else View.GONE
 
-    //当前主题
-    mThemeText.text = getThemeText()
+    // 深色主题
+    val darkTheme = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.DARK_THEME, ThemeStore.FOLLOW_SYSTEM)
+    mDarkThemeText.text = getString(when(darkTheme) {
+      ThemeStore.ALWAYS_OFF -> R.string.always_off
+      ThemeStore.ALWAYS_ON -> R.string.always_on
+      ThemeStore.FOLLOW_SYSTEM -> R.string.follow_system
+      else -> R.string.follow_system
+    })
 
     //锁屏样式
     val lockScreen = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN)
@@ -473,26 +488,51 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
   override fun onColorSelection(dialog: ColorChooserDialog, selectedColor: Int) {
     when (dialog.title) {
-      R.string.primary_color -> saveMaterialPrimaryColor(selectedColor)
-      R.string.accent_color -> saveAccentColor(selectedColor)
+      R.string.primary_color -> ThemeStore.materialPrimaryColor = selectedColor
+      R.string.accent_color -> ThemeStore.accentColor = selectedColor
     }
     mNeedRecreate = true
     recreate()
   }
 
   @SuppressLint("CheckResult")
-  @OnClick(R.id.setting_blacklist_container, R.id.setting_primary_color_container, R.id.setting_notify_color_container,
-      R.id.setting_feedback_container, R.id.setting_about_container, R.id.setting_update_container,
-      R.id.setting_lockscreen_container, R.id.setting_lrc_priority_container, R.id.setting_lrc_float_container,
-      R.id.setting_navigation_container, R.id.setting_shake_container, R.id.setting_eq_container,
-      R.id.setting_clear_container, R.id.setting_breakpoint_container, R.id.setting_screen_container,
-      R.id.setting_scan_container, R.id.setting_classic_notify_container, R.id.setting_album_cover_container,
-      R.id.setting_library_category_container, R.id.setting_immersive_container, R.id.setting_import_playlist_container,
-      R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container, R.id.setting_cover_source_container,
-      R.id.setting_player_bottom_container, R.id.setting_displayname_container, R.id.setting_general_theme_container,
-      R.id.setting_accent_color_container, R.id.setting_language_container, R.id.setting_auto_play_headset_container,
-      R.id.setting_audio_focus_container, R.id.setting_restore_delete_container, R.id.setting_filter_container,
-      R.id.setting_player_background)
+  @OnClick(
+    R.id.setting_blacklist_container,
+    R.id.setting_primary_color_container,
+    R.id.setting_notify_color_container,
+    R.id.setting_feedback_container,
+    R.id.setting_about_container,
+    R.id.setting_update_container,
+    R.id.setting_lockscreen_container,
+    R.id.setting_lrc_priority_container,
+    R.id.setting_lrc_float_container,
+    R.id.setting_navigation_container,
+    R.id.setting_shake_container,
+    R.id.setting_eq_container,
+    R.id.setting_clear_container,
+    R.id.setting_breakpoint_container,
+    R.id.setting_screen_container,
+    R.id.setting_scan_container,
+    R.id.setting_classic_notify_container,
+    R.id.setting_album_cover_container,
+    R.id.setting_library_category_container,
+    R.id.setting_immersive_container,
+    R.id.setting_import_playlist_container,
+    R.id.setting_export_playlist_container,
+    R.id.setting_ignore_mediastore_container,
+    R.id.setting_cover_source_container,
+    R.id.setting_player_bottom_container,
+    R.id.setting_displayname_container,
+    R.id.setting_dark_theme_container,
+    R.id.setting_black_theme_container,
+    R.id.setting_accent_color_container,
+    R.id.setting_language_container,
+    R.id.setting_auto_play_headset_container,
+    R.id.setting_audio_focus_container,
+    R.id.setting_restore_delete_container,
+    R.id.setting_filter_container,
+    R.id.setting_player_background
+  )
   fun onClick(v: View) {
     when (v.id) {
       //大小过滤
@@ -535,14 +575,14 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       //选择主色调
       R.id.setting_primary_color_container -> ColorChooserDialog.Builder(this@SettingActivity, R.string.primary_color)
           .accentMode(false)
-          .preselect(getMaterialPrimaryColor())
+          .preselect(ThemeStore.materialPrimaryColor)
           .allowUserColorInput(true)
           .allowUserColorInputAlpha(false)
           .show()
       //选择强调色
       R.id.setting_accent_color_container -> ColorChooserDialog.Builder(this@SettingActivity, R.string.accent_color)
           .accentMode(true)
-          .preselect(getAccentColor())
+          .preselect(ThemeStore.accentColor)
           .allowUserColorInput(true)
           .allowUserColorInputAlpha(false)
           .show()
@@ -584,8 +624,10 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       R.id.setting_restore_delete_container -> restoreDeleteSong()
       //文件名
       R.id.setting_displayname_container -> mShowDisplaynameSwitch.isChecked = !mShowDisplaynameSwitch.isChecked
-      //全局主题
-      R.id.setting_general_theme_container -> configGeneralTheme()
+      //深色主题
+      R.id.setting_dark_theme_container -> configDarkTheme()
+      //黑色主题
+      R.id.setting_black_theme_container -> mBlackThemeSwitch.isChecked = !mBlackThemeSwitch.isChecked
       //语言
       R.id.setting_language_container -> changeLanguage()
       //音频焦点
@@ -750,20 +792,33 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   }
 
   /**
-   * 配置全局主题
+   * 设置深色主题
    */
-  private fun configGeneralTheme() {
-    getBaseDialog(this)
-        .items(R.array.general_theme)
-        .itemsCallback { dialog, itemView, position, text ->
-          val valTheme = getThemeText()
-          if (text != valTheme) {
-            setGeneralTheme(position)
-            mThemeText.text = text
-            mNeedRecreate = true
-            recreate()
-          }
-        }.show()
+  private fun configDarkTheme() {
+    val currentSetting = when (SPUtil.getValue(
+      this, SETTING_KEY.NAME, SETTING_KEY.DARK_THEME, ThemeStore.FOLLOW_SYSTEM
+    )) {
+      ThemeStore.ALWAYS_OFF -> 0
+      ThemeStore.ALWAYS_ON -> 1
+      ThemeStore.FOLLOW_SYSTEM -> 2
+      else -> 2
+    }
+    getBaseDialog(this).items(R.array.dark_theme)
+      .itemsCallbackSingleChoice(currentSetting) { dialog, itemView, which, text ->
+        if (which != currentSetting) {
+          SPUtil.putValue(
+            this, SETTING_KEY.NAME, SETTING_KEY.DARK_THEME, when (which) {
+              0 -> ThemeStore.ALWAYS_OFF
+              1 -> ThemeStore.ALWAYS_ON
+              2 -> ThemeStore.FOLLOW_SYSTEM
+              else -> ThemeStore.FOLLOW_SYSTEM
+            }
+          )
+          mNeedRecreate = true
+          recreate()
+        }
+        true
+      }.show()
   }
 
   /**
@@ -863,7 +918,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
                 })
           }
         }
-        .theme(getMDDialogTheme())
+        .theme(ThemeStore.mDDialogTheme)
         .show()
   }
 

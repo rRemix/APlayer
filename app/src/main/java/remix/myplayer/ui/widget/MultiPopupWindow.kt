@@ -20,14 +20,14 @@ class MultiPopupWindow(activity: Activity) : PopupWindow(activity) {
     val actionBarSize = ta.getDimensionPixelSize(0, 0)
     ta.recycle()
     height = StatusBarUtil.getStatusBarHeight(activity) + actionBarSize
-    setBackgroundDrawable(ColorDrawable(ThemeStore.getMaterialPrimaryColor()))
+    setBackgroundDrawable(ColorDrawable(ThemeStore.materialPrimaryColor))
     isFocusable = false
     isOutsideTouchable = false
 
 
     TintHelper.setTintAuto(contentView.findViewById(R.id.multi_close),
 //                if (ThemeStore.isMDColorCloseToWhite()) Color.BLACK else Color.WHITE,
-        ThemeStore.getMaterialPrimaryColorReverse(),
+        ThemeStore.materialPrimaryColorReverse,
         false)
   }
 
