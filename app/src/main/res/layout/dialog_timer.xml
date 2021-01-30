@@ -3,7 +3,7 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:id="@+id/timer_content_container"
-  android:layout_width="100dp"
+  android:layout_width="wrap_content"
   android:layout_height="wrap_content"
   android:orientation="vertical">
 
@@ -19,8 +19,7 @@
       android:layout_width="@dimen/d180_size"
       android:layout_height="@dimen/d180_size"
       android:layout_centerInParent="true"
-      app:progress_max="7200"
-      app:progress_width="@dimen/d4_size" />
+      app:progress_max="7200" />
 
     <LinearLayout
       android:id="@+id/timer_time_container"
@@ -30,11 +29,12 @@
       android:gravity="center"
       android:orientation="horizontal">
 
-      <FrameLayout
+      <RelativeLayout
         android:id="@+id/timer_minute_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:paddingHorizontal="@dimen/d1_size">
 
         <TextView
           android:id="@+id/minute"
@@ -48,12 +48,13 @@
           tools:ignore="HardcodedText" />
 
         <View
-          android:layout_width="@dimen/d30_size"
+          android:layout_width="wrap_content"
           android:layout_height="@dimen/d1_size"
-          android:layout_gravity="center"
-          android:layout_margin="@dimen/d1_size"
+          android:layout_alignStart="@+id/minute"
+          android:layout_alignEnd="@+id/minute"
+          android:layout_centerVertical="true"
           android:background="?attr/background_color_dialog" />
-      </FrameLayout>
+      </RelativeLayout>
 
       <TextView
         android:layout_width="wrap_content"
@@ -64,10 +65,12 @@
         android:textSize="@dimen/s20_size"
         tools:ignore="HardcodedText" />
 
-      <FrameLayout
+      <RelativeLayout
         android:id="@+id/timer_second_container"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingHorizontal="@dimen/d1_size">
 
         <TextView
           android:id="@+id/second"
@@ -81,12 +84,13 @@
           tools:ignore="HardcodedText" />
 
         <View
-          android:layout_width="@dimen/d30_size"
+          android:layout_width="wrap_content"
           android:layout_height="@dimen/d1_size"
-          android:layout_gravity="center"
-          android:layout_margin="@dimen/d1_size"
+          android:layout_alignStart="@+id/second"
+          android:layout_alignEnd="@+id/second"
+          android:layout_centerVertical="true"
           android:background="?attr/background_color_dialog" />
-      </FrameLayout>
+      </RelativeLayout>
     </LinearLayout>
   </RelativeLayout>
 

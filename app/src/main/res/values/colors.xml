@@ -65,16 +65,11 @@
   <color name="light_normal_tab_text_color">#99ffffff</color>
   <color name="dark_normal_tab_text_color">@color/dark_text_color_secondary</color>
 
-  <!-- CircleSeekBar 圆圈的颜色 -->
-  <color name="light_circle_color">#b7b7b7</color>
-  <color name="dark_circle_color">#656265</color>
-
   <color name="detail_text_color">#737373</color>
 
   <color name="default_accent_color">#555393</color>
   <color name="player_top_detail_text_color">#7e7e7e</color>
   <color name="player_time_text_color">#6b6b6b</color>
-  <color name="timer_text_color">#404040</color>
 
   <color name="desktop_lyric_text_color">#d4d4d4</color>
   <color name="desktop_lyric_control_color">#9f000000</color>
