@@ -362,7 +362,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
           BiFunction { max: Int, current: Int -> longArrayOf(max.toLong(), current.toLong()) })
           .subscribeOn(Schedulers.io())
           .observeOn(AndroidSchedulers.mainThread())
-          .subscribe { longs: LongArray -> volume_seekbar.progress = (longs[1] * 1.0 / longs[1] * 100).toInt() }
+          .subscribe { longs: LongArray -> volume_seekbar.progress = (longs[1] * 1.0 / longs[0] * 100).toInt() }
     }
   }
 
