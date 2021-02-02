@@ -38,7 +38,7 @@ abstract class LibraryFragment<D, A : BaseAdapter<D, *>?> : BaseMusicFragment(),
     initView()
 
     //recyclerView的滚动条
-    val accentColor = ThemeStore.getAccentColor()
+    val accentColor = ThemeStore.accentColor
     val recyclerView: RecyclerView? = view.findViewById(R.id.recyclerView)
     if (recyclerView is FastScrollRecyclerView) {
       recyclerView.setBubbleColor(accentColor)

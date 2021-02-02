@@ -47,7 +47,7 @@ class BottomActionBarFragment : BaseMusicFragment() {
 
     //设置整个背景着色
     Theme.tintDrawable(view, R.drawable.commom_playercontrols_bg, ThemeStore.getBackgroundColorDialog(mContext))
-    Theme.tintDrawable(playbar_next, R.drawable.bf_btn_next, ThemeStore.getBottomBarBtnColor())
+    Theme.tintDrawable(playbar_next, R.drawable.bf_btn_next, ThemeStore.bottomBarBtnColor)
 
     //手势检测
     gestureDetector = GestureDetector(mContext, GestureListener(this))
@@ -84,11 +84,11 @@ class BottomActionBarFragment : BaseMusicFragment() {
     if (isPlaying()) {
       Theme.tintDrawable(playbar_play,
           R.drawable.bf_btn_stop,
-          ThemeStore.getBottomBarBtnColor())
+          ThemeStore.bottomBarBtnColor)
     } else {
       Theme.tintDrawable(playbar_play,
           R.drawable.bf_btn_play,
-          ThemeStore.getBottomBarBtnColor())
+          ThemeStore.bottomBarBtnColor)
     }
   }
 

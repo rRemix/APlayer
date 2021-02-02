@@ -79,6 +79,8 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     //桌面歌词
     remoteBigView.setImageViewResource(R.id.notify_lyric,
         if (service.isDesktopLyricLocked) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)
+    remoteView.setImageViewResource(R.id.notify_lyric,
+        if (service.isDesktopLyricLocked) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)
 
     //设置播放按钮
     if (!isPlay) {
