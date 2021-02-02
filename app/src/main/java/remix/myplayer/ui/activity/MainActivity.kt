@@ -556,7 +556,7 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
       var closed = false
       for (fragment in supportFragmentManager.fragments) {
         if (fragment is LibraryFragment<*, *>) {
-          val choice = fragment.choice
+          val choice = fragment.choice ?: return
           if (choice.isActive) {
             closed = true
             choice.close()

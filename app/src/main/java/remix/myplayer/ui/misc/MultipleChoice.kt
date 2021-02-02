@@ -2,10 +2,9 @@ package remix.myplayer.ui.misc
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import androidx.recyclerview.widget.RecyclerView
 import android.text.TextUtils
 import android.view.View
-import android.widget.CompoundButton
+import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -304,7 +303,10 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
     disposableContainer.add(disposable)
   }
 
-  fun click(pos: Int, data: T): Boolean {
+  fun click(pos: Int, data: T?): Boolean {
+    if (data == null) {
+      return false
+    }
     if (!isActive)
       return false
     changeData(pos, data)
@@ -313,7 +315,10 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
     return true
   }
 
-  fun longClick(pos: Int, data: T): Boolean {
+  fun longClick(pos: Int, data: T?): Boolean {
+    if (data == null) {
+      return false
+    }
     //某个列表已经处于多选状态
     if (!isActive && isActiveSomeWhere) {
       return false
