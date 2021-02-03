@@ -145,7 +145,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 播放完当前歌曲后是否停止app
    */
-  private var exitAfterCompletion: Boolean = false
+  private var pendingClose: Boolean = false
 
   /**
    * MediaPlayer 负责歌曲的播放等
@@ -437,19 +437,24 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     Timber.v("onStartCommand, control: $control action: $action flags: $flags startId: $startId")
     stop = false
 
-    tryLaunch(block = {
+    tryLaunch {
       hasPermission = hasPermissions(EXTERNAL_STORAGE_PERMISSIONS)
       withContext(Dispatchers.IO) {
         load()
       }
+      delay(200)
       handleStartCommandIntent(commandIntent, action)
-    })
+    }
     return START_NOT_STICKY
   }
 
   override fun onSharedPreferenceChanged(sp: SharedPreferences, key: String) {
 //    Timber.v("onSharedPreferenceChanged, key: $key")
     when (key) {
+      //定时器
+      SETTING_KEY.TIMER_PENDING_CLOSE -> {
+        pendingClose = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.TIMER_PENDING_CLOSE, false)
+      }
       //通知栏背景色
       SETTING_KEY.NOTIFY_SYSTEM_COLOR,
         //通知栏样式
@@ -540,11 +545,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     //定时关闭
     SleepTimer.addCallback(object : SleepTimer.Callback {
       override fun onFinish() {
-        exitAfterCompletion = true
+        if (!pendingClose) {
+          sendBroadcast(Intent(ACTION_EXIT)
+              .setComponent(ComponentName(this@MusicService, ExitReceiver::class.java)))
+        }
       }
 
       override fun revert() {
-        exitAfterCompletion = false
+        pendingClose = false
       }
     })
 
@@ -619,7 +627,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     mediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK)
 
     mediaPlayer.setOnCompletionListener { mp ->
-      if (exitAfterCompletion) {
+      if (pendingClose) {
         Timber.v("发送Exit广播")
         sendBroadcast(Intent(ACTION_EXIT)
             .setComponent(ComponentName(this@MusicService, ExitReceiver::class.java)))
@@ -1074,7 +1082,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           val songs = withContext(Dispatchers.IO) {
             MediaStoreUtil.getLastAddedSong()
           }
-          if (songs.size == 0) {
+          if (songs.isEmpty()) {
             ToastUtil.show(service, R.string.list_is_empty)
             return@tryLaunch
           }
@@ -1095,12 +1103,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     if (intent == null) {
       return
     }
-    val action = intent.action
-    when {
-      MEDIA_STORE_CHANGE == action -> onMediaStoreChanged()
-      PERMISSION_CHANGE == action -> onPermissionChanged(intent.getBooleanExtra(EXTRA_PERMISSION, false))
-      PLAYLIST_CHANGE == action -> onPlayListChanged(intent.getStringExtra(EXTRA_PLAYLIST))
-      TAG_CHANGE == action -> {
+    when (intent.action) {
+      MEDIA_STORE_CHANGE -> onMediaStoreChanged()
+      PERMISSION_CHANGE -> onPermissionChanged(intent.getBooleanExtra(EXTRA_PERMISSION, false))
+      PLAYLIST_CHANGE -> onPlayListChanged(intent.getStringExtra(EXTRA_PLAYLIST) ?: "")
+      TAG_CHANGE -> {
         val newSong = intent.getParcelableExtra<Song?>(BaseMusicActivity.EXTRA_NEW_SONG)
         val oldSong = intent.getParcelableExtra<Song?>(BaseMusicActivity.EXTRA_OLD_SONG)
         if (newSong != null && oldSong != null) {
@@ -1118,7 +1125,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     updateNotification()
     updateMediaSession(operation)
     //桌面歌词与状态栏歌词
-    if(lyricTask == null){
+    if (lyricTask == null) {
       lyricTask = LyricTask()
       timer.schedule(lyricTask, LYRIC_FIND_INTERVAL, LYRIC_FIND_INTERVAL)
     }
@@ -1546,6 +1553,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     speed = java.lang.Float.parseFloat(SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
     playAtBreakPoint = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.PLAY_AT_BREAKPOINT, false)
     lastProgress = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_PLAY_PROGRESS, 0)
+    pendingClose = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.TIMER_PENDING_CLOSE, false)
 
     //读取播放列表
     playQueue.restoreIfNecessary()

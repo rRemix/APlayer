@@ -4,12 +4,14 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -22,15 +24,15 @@ import remix.myplayer.helper.SleepTimer;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.theme.GradientDrawableMaker;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.theme.TintHelper;
 import remix.myplayer.ui.dialog.base.BaseDialog;
 import remix.myplayer.ui.widget.CircleSeekBar;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.SPUtil.SETTING_KEY;
 import remix.myplayer.util.ToastUtil;
-import remix.myplayer.theme.Theme;
 
 /**
  * Created by taeja on 16-1-15.
@@ -45,8 +47,7 @@ public class TimerDialog extends BaseDialog {
   private static final String EXTRA_SECOND = "Second";
 
   public static TimerDialog newInstance() {
-    TimerDialog timerDialog = new TimerDialog();
-    return timerDialog;
+    return new TimerDialog();
   }
 
   @BindView(R.id.timer_content_container)
@@ -63,6 +64,8 @@ public class TimerDialog extends BaseDialog {
   //圆形seekbar
   @BindView(R.id.close_seekbar)
   CircleSeekBar mSeekbar;
+  @BindView(R.id.timer_pending_switch)
+  SwitchCompat mPendingCloseSwitch;
 
   //定时时间 单位秒
   private int mTime;
@@ -112,12 +115,15 @@ public class TimerDialog extends BaseDialog {
 
     //初始化switch
     TintHelper.setTintAuto(mTimerDefaultSwitch, ThemeStore.getAccentColor(), false);
+    TintHelper.setTintAuto(mPendingCloseSwitch, ThemeStore.getAccentColor(), false);
 
     //读取保存的配置
-    boolean hasDefault = SPUtil
-        .getValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
+    final boolean pendingClose = SPUtil
+        .getValue(getContext(), SETTING_KEY.NAME, SETTING_KEY.TIMER_PENDING_CLOSE, false);
+    final boolean hasDefault = SPUtil
+        .getValue(getContext(), SETTING_KEY.NAME, SETTING_KEY.TIMER_DEFAULT, false);
     final int time = SPUtil
-        .getValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
+        .getValue(getContext(), SETTING_KEY.NAME, SETTING_KEY.TIMER_DURATION, -1);
 
     //默认选项
     if (hasDefault && time > 0) {
@@ -128,13 +134,19 @@ public class TimerDialog extends BaseDialog {
         toggle();
       }
     }
+
+    mPendingCloseSwitch.setChecked(pendingClose);
+    mPendingCloseSwitch.setOnCheckedChangeListener(
+        (buttonView, isChecked) -> SPUtil.putValue(getContext(), SETTING_KEY.NAME, SETTING_KEY.TIMER_PENDING_CLOSE, isChecked));
+
     mTimerDefaultSwitch.setChecked(hasDefault);
     mTimerDefaultSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
       if (isChecked) {
         if (mSaveTime > 0) {
           ToastUtil.show(getContext(), R.string.set_success);
           SPUtil
-              .putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, true);
+              .putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT,
+                  true);
           SPUtil.putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION,
               mSaveTime);
         } else {
@@ -143,8 +155,10 @@ public class TimerDialog extends BaseDialog {
         }
       } else {
         ToastUtil.show(getContext(), R.string.cancel_success);
-        SPUtil.putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
-        SPUtil.putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
+        SPUtil.putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT,
+            false);
+        SPUtil
+            .putValue(getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
       }
     });
 

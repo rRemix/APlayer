@@ -115,6 +115,7 @@
   <string name="timer_default_info_title">「定時停止」時間設定為預設</string>
   <string name="timer_default_info_content">「定時停止」時間設定為預設後，下次點擊定時停止按鈕後，將直接按照之前設定好的時間開始計時。\n\n想要更改「定時停止」的時長，點擊兩次定時停止按鈕即可進入設定頁面。</string>
   <string name="input_feedback_content">請填寫回報內容</string>
+  <string name="timer_pending_close">歌曲播放完畢再退出應用</string>
   <string name="playing">正在播放</string>
   <string name="set_filter_size">設定排除檔案大小</string>
   <string name="delete">移除</string>

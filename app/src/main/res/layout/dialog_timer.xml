@@ -95,43 +95,56 @@
   </RelativeLayout>
 
   <!-- 默认设置-->
-  <RelativeLayout
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:layout_marginBottom="@dimen/d24_size">
-
-    <LinearLayout
-      android:id="@+id/timer_default_container"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_centerInParent="true"
-      android:layout_marginEnd="@dimen/d4_size"
-      android:gravity="center_vertical"
-      android:orientation="horizontal">
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/d16_size"
-        android:text="@string/as_default"
-        android:textColor="?attr/text_color_primary"
-        android:textSize="@dimen/s14_size" />
-
-      <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/timer_default_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    </LinearLayout>
+    android:gravity="center_vertical|end"
+    android:layout_marginBottom="@dimen/d16_size"
+    android:layout_marginEnd="@dimen/d20_size">
 
     <ImageButton
       android:id="@+id/timer_default_info"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_centerVertical="true"
-      android:layout_toEndOf="@id/timer_default_container"
       android:background="?attr/background_oval_ripple"
       app:srcCompat="@drawable/ic_info_24dp"
+      android:layout_marginEnd="@dimen/d4_size"
       tools:ignore="ContentDescription" />
-  </RelativeLayout>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/d8_size"
+      android:text="@string/as_default"
+      android:textColor="?attr/text_color_primary"
+      android:textSize="@dimen/s14_size" />
+
+    <androidx.appcompat.widget.SwitchCompat
+      android:id="@+id/timer_default_switch"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
+
+  </LinearLayout>
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical|end"
+    android:layout_marginEnd="@dimen/d20_size"
+    android:layout_marginBottom="@dimen/d16_size">
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/d8_size"
+      android:text="@string/timer_pending_close"
+      android:textColor="?attr/text_color_primary"
+      android:textSize="@dimen/s14_size"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+      android:id="@+id/timer_pending_switch"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
+  </LinearLayout>
+
 </LinearLayout>
