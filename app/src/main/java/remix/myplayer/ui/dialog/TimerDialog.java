@@ -19,6 +19,7 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.Timer;
 import java.util.TimerTask;
+import butterknife.ViewCollections;
 import remix.myplayer.R;
 import remix.myplayer.helper.SleepTimer;
 import remix.myplayer.misc.handler.MsgHandler;
@@ -163,7 +164,7 @@ public class TimerDialog extends BaseDialog {
     });
 
     //分钟 秒 背景框
-    ButterKnife.apply(new View[]{root.findViewById(R.id.timer_minute_container),
+    ViewCollections.run(new View[]{root.findViewById(R.id.timer_minute_container),
             root.findViewById(R.id.timer_second_container)},
         (view, index) -> {
           view.setBackground(new GradientDrawableMaker()

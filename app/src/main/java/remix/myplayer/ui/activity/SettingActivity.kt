@@ -26,6 +26,7 @@ import butterknife.BindView
 import butterknife.BindViews
 import butterknife.ButterKnife
 import butterknife.OnClick
+import butterknife.ViewCollections
 import com.afollestad.materialdialogs.DialogAction
 import com.facebook.common.util.ByteConstants
 import com.facebook.drawee.backends.pipeline.Fresco
@@ -209,7 +210,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         SETTING_KEY.SCREEN_ALWAYS_ON, SETTING_KEY.NOTIFY_STYLE_CLASSIC, SETTING_KEY.IMMERSIVE_MODE,
         SETTING_KEY.PLAY_AT_BREAKPOINT, SETTING_KEY.IGNORE_MEDIA_STORE, SETTING_KEY.SHOW_DISPLAYNAME, SETTING_KEY.BLACK_THEME,
         SETTING_KEY.AUDIO_FOCUS)
-    ButterKnife.apply(arrayOf(mNaviSwitch, mShakeSwitch, mFloatLrcSwitch, mShowStatusbarLyric, mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch, mBreakpointSwitch, mIgnoreMediastoreSwitch, mShowDisplaynameSwitch, mBlackThemeSwitch, mAudioFocusSwitch)) { view, index ->
+    ViewCollections.run(arrayOf(mNaviSwitch, mShakeSwitch, mFloatLrcSwitch, mShowStatusbarLyric, mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch, mBreakpointSwitch, mIgnoreMediastoreSwitch, mShowDisplaynameSwitch, mBlackThemeSwitch, mAudioFocusSwitch)) { view, index ->
       TintHelper.setTintAuto(view, ThemeStore.accentColor, false)
 
       view.isChecked = SPUtil.getValue(mContext, SETTING_KEY.NAME, keyWord[index], false)
@@ -303,10 +304,10 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
     //初始化箭头颜色
     val accentColor = ThemeStore.accentColor
-    ButterKnife.apply(mArrows) { view, index -> Theme.tintDrawable(view, view.drawable, accentColor) }
+    ViewCollections.run(mArrows) { view, index -> Theme.tintDrawable(view, view.drawable, accentColor) }
 
     //标题颜色
-    ButterKnife.apply(mTitles) { view, index -> view.setTextColor(accentColor) }
+    ViewCollections.run(mTitles) { view, index -> view.setTextColor(accentColor) }
 
     //封面
     mOriginalAlbumChoice = SPUtil

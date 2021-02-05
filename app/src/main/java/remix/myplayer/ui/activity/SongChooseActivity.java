@@ -5,20 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.databinding.ActivitySongChooseBinding;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
@@ -36,6 +32,7 @@ import remix.myplayer.util.ToastUtil;
  */
 
 public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdapter> {
+  private ActivitySongChooseBinding binding;
 
   public static final String TAG = SongChooseActivity.class.getSimpleName();
   public static final String EXTRA_NAME = "PlayListName";
@@ -43,14 +40,6 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdapter>
 
   private int mPlayListID;
   private String mPlayListName;
-  @BindView(R.id.confirm)
-  TextView mConfirm;
-  @BindView(R.id.cancel)
-  TextView mCancel;
-  @BindView(R.id.title)
-  TextView mTitle;
-  @BindView(R.id.recyclerview)
-  RecyclerView mRecyclerView;
 
   public static void start(Activity activity, int playListId, String playListName) {
     Intent intent = new Intent(activity, SongChooseActivity.class);
@@ -62,8 +51,8 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdapter>
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_song_choose);
-    ButterKnife.bind(this);
+    binding = ActivitySongChooseBinding.inflate(getLayoutInflater());
+    setContentView(binding.getRoot());
 
     mPlayListID = getIntent().getIntExtra(EXTRA_ID, -1);
     if (mPlayListID <= 0) {
@@ -73,43 +62,41 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdapter>
     mPlayListName = getIntent().getStringExtra(EXTRA_NAME);
 
     mAdapter = new SongChooseAdapter(R.layout.item_song_choose, isValid -> {
-      mConfirm.setAlpha(isValid ? 1.0f : 0.6f);
-      mConfirm.setClickable(isValid);
+      binding.confirm.setAlpha(isValid ? 1.0f : 0.6f);
+      binding.confirm.setClickable(isValid);
     });
 
-    mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-    mRecyclerView.setAdapter(mAdapter);
-    mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-    mConfirm.setAlpha(0.6f);
+    binding.recyclerview.setLayoutManager(new LinearLayoutManager(this));
+    binding.recyclerview.setAdapter(mAdapter);
+    binding.recyclerview.setItemAnimator(new DefaultItemAnimator());
+    binding.confirm.setAlpha(0.6f);
 
-    findViewById(R.id.header).setBackgroundColor(ThemeStore.getMaterialPrimaryColor());
-    ButterKnife
-        .apply(new TextView[]{mConfirm, mCancel, mTitle}, new ButterKnife.Action<TextView>() {
-          @Override
-          public void apply(@NonNull TextView view, int index) {
-            view.setTextColor(ThemeStore.getTextColorPrimaryReverse());
-          }
-        });
+    binding.header.setBackgroundColor(ThemeStore.getMaterialPrimaryColor());
+    for (TextView view : new TextView[]{binding.confirm, binding.cancel, binding.title}) {
+      view.setTextColor(ThemeStore.getTextColorPrimaryReverse());
+    }
+
+    binding.confirm.setOnClickListener(this::onClick);
+    binding.cancel.setOnClickListener(this::onClick);
   }
 
-  @OnClick({R.id.confirm, R.id.cancel})
   public void onClick(View v) {
-    switch (v.getId()) {
-      case R.id.cancel:
-        finish();
-        break;
-      case R.id.confirm:
-        if (mAdapter.getCheckedSong() == null || mAdapter.getCheckedSong().size() == 0) {
-          ToastUtil.show(this, R.string.choose_no_song);
-          return;
-        }
-        DatabaseRepository.getInstance()
-            .insertToPlayList(mAdapter.getCheckedSong(), mPlayListID)
-            .compose(RxUtil.applySingleScheduler())
-            .subscribe(num -> {
-              ToastUtil.show(mContext, getString(R.string.add_song_playlist_success, num, mPlayListName));
-              finish();
-            }, throwable -> finish());
+    int id = v.getId();
+    if (id == R.id.cancel) {
+      finish();
+    } else if (id == R.id.confirm) {
+      if (mAdapter.getCheckedSong() == null || mAdapter.getCheckedSong().size() == 0) {
+        ToastUtil.show(this, R.string.choose_no_song);
+        return;
+      }
+      DatabaseRepository.getInstance()
+          .insertToPlayList(mAdapter.getCheckedSong(), mPlayListID)
+          .compose(RxUtil.applySingleScheduler())
+          .subscribe(num -> {
+            ToastUtil.show(mContext, getString(R.string.add_song_playlist_success, num,
+                mPlayListName));
+            finish();
+          }, throwable -> finish());
     }
   }
 

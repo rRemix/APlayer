@@ -12,11 +12,10 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.View;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.databinding.ActivityRecentlyBinding;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
@@ -24,7 +23,6 @@ import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
 import remix.myplayer.service.Command;
 import remix.myplayer.ui.adapter.SongAdapter;
-import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -35,25 +33,21 @@ import remix.myplayer.util.MediaStoreUtil;
  * 最近添加歌曲的界面 目前为最近7天添加
  */
 public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
+  private ActivityRecentlyBinding binding;
 
   public static final String TAG = RecentlyActivity.class.getSimpleName();
-
-  @BindView(R.id.recently_placeholder)
-  View mPlaceHolder;
-  @BindView(R.id.recyclerview)
-  FastScrollRecyclerView mRecyclerView;
 
   private MsgHandler mHandler;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_recently);
-    ButterKnife.bind(this);
+    binding = ActivityRecentlyBinding.inflate(getLayoutInflater());
+    setContentView(binding.getRoot());
 
     mHandler = new MsgHandler(this);
 
-    mAdapter = new SongAdapter(R.layout.item_song_recycle, mChoice, mRecyclerView);
+    mAdapter = new SongAdapter(R.layout.item_song_recycle, mChoice, binding.recyclerview);
     mChoice.setAdapter(mAdapter);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
@@ -75,9 +69,9 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
       }
     });
 
-    mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-    mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-    mRecyclerView.setAdapter(mAdapter);
+    binding.recyclerview.setLayoutManager(new LinearLayoutManager(this));
+    binding.recyclerview.setItemAnimator(new DefaultItemAnimator());
+    binding.recyclerview.setAdapter(mAdapter);
 
     setUpToolbar(getString(R.string.recently));
   }
@@ -86,11 +80,11 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
   public void onLoadFinished(android.content.Loader<List<Song>> loader, List<Song> data) {
     super.onLoadFinished(loader, data);
     if (data != null) {
-      mRecyclerView.setVisibility(data.size() > 0 ? View.VISIBLE : View.GONE);
-      mPlaceHolder.setVisibility(data.size() > 0 ? View.GONE : View.VISIBLE);
+      binding.recyclerview.setVisibility(data.size() > 0 ? View.VISIBLE : View.GONE);
+      binding.recentlyPlaceholder.setVisibility(data.size() > 0 ? View.GONE : View.VISIBLE);
     } else {
-      mRecyclerView.setVisibility(View.GONE);
-      mPlaceHolder.setVisibility(View.VISIBLE);
+      binding.recyclerview.setVisibility(View.GONE);
+      binding.recentlyPlaceholder.setVisibility(View.VISIBLE);
     }
   }
 
