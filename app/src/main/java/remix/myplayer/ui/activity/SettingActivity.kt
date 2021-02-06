@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
@@ -801,13 +800,16 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
   private fun gotoEmail() {
     fun send(sendLog: Boolean) {
-      val pm = packageManager
-      val pi = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
       val feedBack = Feedback(
-        pi.versionName,
-        pi.versionCode.toString(),
+        BuildConfig.VERSION_NAME,
+        BuildConfig.VERSION_CODE.toString(),
         Build.DISPLAY,
-        Build.CPU_ABI + "," + Build.CPU_ABI2,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          Build.SUPPORTED_ABIS.joinToString(", ", "[", "]")
+        } else {
+          @Suppress("DEPRECATION")
+          "[" + Build.CPU_ABI + ", " + Build.CPU_ABI2 + "]"
+        },
         Build.MANUFACTURER,
         Build.MODEL,
         Build.VERSION.RELEASE,
