@@ -11,11 +11,9 @@ import android.os.Bundle;
 import android.os.Message;
 import androidx.annotation.Nullable;
 import android.text.TextUtils;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
-import butterknife.OnClick;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -148,6 +146,8 @@ public class RecordShareActivity extends BaseMusicActivity {
         .progress(true, 0)
         .progressIndeterminateStyle(false).build();
 
+    binding.recordshareCancel.setOnClickListener(v -> finish());
+    binding.recordshareShare.setOnClickListener(v -> new ProcessThread().start());
     mHandler = new MsgHandler(this);
   }
 
@@ -159,18 +159,6 @@ public class RecordShareActivity extends BaseMusicActivity {
 
   public static Bitmap getBg() {
     return mBackgroudCache;
-  }
-
-  @OnClick({R.id.recordshare_cancel, R.id.recordshare_share})
-  public void onClick(View v) {
-    switch (v.getId()) {
-      case R.id.recordshare_cancel:
-        finish();
-        break;
-      case R.id.recordshare_share:
-        new ProcessThread().start();
-        break;
-    }
   }
 
   /**

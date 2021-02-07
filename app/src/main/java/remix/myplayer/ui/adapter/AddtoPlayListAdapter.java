@@ -1,10 +1,7 @@
 package remix.myplayer.ui.adapter;
 
 import android.view.View;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import butterknife.BindView;
-import remix.myplayer.R;
+import remix.myplayer.databinding.ItemPlaylistAddtoBinding;
 import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.ui.adapter.holder.BaseViewHolder;
 
@@ -24,9 +21,9 @@ public class AddtoPlayListAdapter extends BaseAdapter<PlayList, AddtoPlayListAda
 
   @Override
   protected void convert(PlayListAddToHolder holder, PlayList playList, int position) {
-    holder.mText.setText(playList.getName());
-    holder.mText.setTag(playList.getId());
-    holder.mContainer.setOnClickListener(v -> {
+    holder.binding.playlistAddtoText.setText(playList.getName());
+    holder.binding.playlistAddtoText.setTag(playList.getId());
+    holder.binding.itemRoot.setOnClickListener(v -> {
       if (mOnItemClickListener != null) {
         mOnItemClickListener.onItemClick(v, position);
       }
@@ -36,13 +33,11 @@ public class AddtoPlayListAdapter extends BaseAdapter<PlayList, AddtoPlayListAda
 
   static class PlayListAddToHolder extends BaseViewHolder {
 
-    @BindView(R.id.playlist_addto_text)
-    TextView mText;
-    @BindView(R.id.item_root)
-    RelativeLayout mContainer;
+    private final ItemPlaylistAddtoBinding binding;
 
     PlayListAddToHolder(View itemView) {
       super(itemView);
+      binding = ItemPlaylistAddtoBinding.bind(itemView);
     }
   }
 }

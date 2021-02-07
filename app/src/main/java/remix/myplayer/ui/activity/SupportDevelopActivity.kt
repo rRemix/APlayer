@@ -14,7 +14,6 @@ import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
-import butterknife.ButterKnife
 import com.afollestad.materialdialogs.MaterialDialog
 import com.anjlab.android.iab.v3.BillingProcessor
 import com.anjlab.android.iab.v3.TransactionDetails
@@ -31,6 +30,7 @@ import remix.myplayer.App
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Purchase
+import remix.myplayer.databinding.ActivitySupportDevelopBinding
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.request.network.RxUtil
@@ -46,6 +46,8 @@ import java.lang.ref.WeakReference
 import java.util.*
 
 class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
+  private lateinit var binding: ActivitySupportDevelopBinding
+
   private val mAdapter: PurchaseAdapter by lazy {
     PurchaseAdapter(R.layout.item_support)
   }
@@ -59,8 +61,8 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_support_develop)
-    ButterKnife.bind(this)
+    binding = ActivitySupportDevelopBinding.inflate(layoutInflater)
+    setContentView(binding.root)
     setUpToolbar(getString(R.string.support_develop))
 
     val beans = ArrayList<Purchase>()

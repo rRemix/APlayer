@@ -15,12 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Artist;
+import remix.myplayer.databinding.ItemArtistRecycleGridBinding;
+import remix.myplayer.databinding.ItemArtistRecycleListBinding;
 import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -42,6 +43,7 @@ import remix.myplayer.util.ToastUtil;
  */
 public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> implements
     FastScroller.SectionIndexer {
+  private int viewType;
 
   public ArtistAdapter(int layoutId, MultipleChoice multiChoice,
       FastScrollRecyclerView recyclerView) {
@@ -51,15 +53,16 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
   @NonNull
   @Override
   public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    this.viewType = viewType;
     if (viewType == TYPE_HEADER) {
       return new HeaderHolder(
           LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_header_2, parent, false));
     }
     return viewType == HeaderAdapter.LIST_MODE ?
-        new ArtistAdapter.ArtistListHolder(LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.item_artist_recycle_list, parent, false)) :
-        new ArtistAdapter.ArtistGridHolder(LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.item_artist_recycle_grid, parent, false));
+        new ArtistAdapter.ArtistListHolder(ItemArtistRecycleListBinding
+            .inflate(LayoutInflater.from(parent.getContext()), parent, false)) :
+        new ArtistAdapter.ArtistGridHolder(ItemArtistRecycleGridBinding
+            .inflate(LayoutInflater.from(parent.getContext()), parent, false));
   }
 
   @Override
@@ -155,16 +158,11 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
   static class ArtistHolder extends BaseViewHolder {
 
-    @BindView(R.id.item_text1)
     TextView mText1;
-    @BindView(R.id.item_text2)
     @Nullable
     TextView mText2;
-    @BindView(R.id.item_simpleiview)
     SimpleDraweeView mImage;
-    @BindView(R.id.item_button)
     ImageButton mButton;
-    @BindView(R.id.item_container)
     ViewGroup mContainer;
 
     ArtistHolder(View v) {
@@ -174,15 +172,24 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
   static class ArtistListHolder extends ArtistHolder {
 
-    ArtistListHolder(View v) {
-      super(v);
+    ArtistListHolder(ItemArtistRecycleListBinding binding) {
+      super(binding.getRoot());
+      mText1 = binding.itemText1;
+      mText2 = binding.itemText2;
+      mImage = binding.itemSimpleiview;
+      mButton = binding.itemButton;
+      mContainer = binding.itemContainer;
     }
   }
 
   static class ArtistGridHolder extends ArtistHolder {
 
-    ArtistGridHolder(View v) {
-      super(v);
+    ArtistGridHolder(ItemArtistRecycleGridBinding binding) {
+      super(binding.getRoot());
+      mText1 = binding.itemText1;
+      mImage = binding.itemSimpleiview;
+      mButton = binding.itemButton;
+      mContainer = binding.itemContainer;
     }
   }
 

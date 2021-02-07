@@ -8,16 +8,13 @@ import android.text.TextUtils
 import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.View
-import android.widget.TextView
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.OnClick
 import com.afollestad.materialdialogs.MaterialDialog
 import remix.myplayer.R
+import remix.myplayer.databinding.DialogAddtoPlaylistBinding
 import remix.myplayer.db.room.DatabaseRepository.Companion.getInstance
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.misc.interfaces.OnItemClickListener
@@ -36,11 +33,8 @@ import java.util.*
  * 将歌曲添加到播放列表的对话框
  */
 class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<PlayList>> {
-  @BindView(R.id.playlist_addto_list)
-  lateinit var mRecyclerView: RecyclerView
-
-  @BindView(R.id.playlist_addto_new)
-  lateinit var mNew: TextView
+  private var _binding: DialogAddtoPlaylistBinding? = null
+  private val binding get() = _binding!!
 
   private val mAdapter: AddtoPlayListAdapter by lazy {
     AddtoPlayListAdapter(R.layout.item_playlist_addto)
@@ -51,6 +45,7 @@ class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<Lis
     val dialog = Theme.getBaseDialog(activity)
         .customView(R.layout.dialog_addto_playlist, false)
         .build()
+    _binding = DialogAddtoPlaylistBinding.bind(dialog.customView!!)
 
     mList = arguments!!.getSerializable(EXTRA_SONG_LIST) as List<Int>?
     if (mList == null) {
@@ -71,10 +66,42 @@ class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<Lis
 
       override fun onItemLongClick(view: View, position: Int) {}
     })
-    mRecyclerView.adapter = mAdapter
-    mRecyclerView.itemAnimator = DefaultItemAnimator()
-    mRecyclerView.layoutManager = LinearLayoutManager(context)
+    binding.playlistAddtoList.adapter = mAdapter
+    binding.playlistAddtoList.itemAnimator = DefaultItemAnimator()
+    binding.playlistAddtoList.layoutManager = LinearLayoutManager(context)
     loaderManager.initLoader<List<PlayList>>(LOADER_ID++, null, this)
+
+    binding.playlistAddtoNew.setOnClickListener {
+      getInstance()
+        .getAllPlaylist()
+        .compose(RxUtil.applySingleScheduler())
+        .subscribe { playLists ->
+          Theme.getBaseDialog(context)
+            .title(R.string.new_playlist)
+            .positiveText(R.string.create)
+            .negativeText(R.string.cancel)
+            .inputRange(1, 15)
+            .input("", getString(R.string.local_list) + playLists.size) { dialog: MaterialDialog?, input: CharSequence ->
+              if (TextUtils.isEmpty(input)) {
+                ToastUtil.show(context, R.string.add_error)
+                return@input
+              }
+              getInstance()
+                .insertPlayList(input.toString())
+                .flatMap { newId ->
+                  getInstance().insertToPlayList(mList!!, newId.toLong())
+                }
+                .compose(RxUtil.applySingleScheduler())
+                .subscribe({ num: Int? ->
+                  ToastUtil.show(context, R.string.add_playlist_success)
+                  ToastUtil
+                    .show(context, getString(R.string.add_song_playlist_success, num, input.toString()))
+                }, { throwable: Throwable? -> ToastUtil.show(context, R.string.add_error) })
+            }
+            .dismissListener { dialog: DialogInterface? -> dismiss() }
+            .show()
+        }
+    }
 
     //改变高度，并置于底部
     dialog.window?.let { window ->
@@ -89,40 +116,6 @@ class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<Lis
     }
 
     return dialog
-  }
-
-  @SuppressLint("CheckResult")
-  @OnClick(R.id.playlist_addto_new)
-  fun onClick(v: View?) {
-    getInstance()
-        .getAllPlaylist()
-        .compose(RxUtil.applySingleScheduler())
-        .subscribe { playLists ->
-          Theme.getBaseDialog(context)
-              .title(R.string.new_playlist)
-              .positiveText(R.string.create)
-              .negativeText(R.string.cancel)
-              .inputRange(1, 15)
-              .input("", getString(R.string.local_list) + playLists.size) { dialog: MaterialDialog?, input: CharSequence ->
-                if (TextUtils.isEmpty(input)) {
-                  ToastUtil.show(context, R.string.add_error)
-                  return@input
-                }
-                getInstance()
-                    .insertPlayList(input.toString())
-                    .flatMap { newId ->
-                      getInstance().insertToPlayList(mList!!, newId.toLong())
-                    }
-                    .compose(RxUtil.applySingleScheduler())
-                    .subscribe({ num: Int? ->
-                      ToastUtil.show(context, R.string.add_playlist_success)
-                      ToastUtil
-                          .show(context, getString(R.string.add_song_playlist_success, num, input.toString()))
-                    }, { throwable: Throwable? -> ToastUtil.show(context, R.string.add_error) })
-              }
-              .dismissListener { dialog: DialogInterface? -> dismiss() }
-              .show()
-        }
   }
 
   override fun onCreateLoader(id: Int, args: Bundle?): Loader<List<PlayList>?> {
@@ -142,6 +135,7 @@ class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<Lis
 
   override fun onDestroy() {
     super.onDestroy()
+    _binding = null
     mAdapter.setData(null)
   }
 

@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
-import butterknife.ButterKnife
 import kotlinx.android.synthetic.main.activity_eq.*
 import remix.myplayer.R
 import remix.myplayer.helper.EQHelper
@@ -39,7 +38,6 @@ class EQActivity : ToolbarActivity() {
     }
 
     setContentView(R.layout.activity_eq)
-    ButterKnife.bind(this)
 
     setUpToolbar(getString(R.string.eq))
 

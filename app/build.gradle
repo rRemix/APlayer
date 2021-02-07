@@ -149,8 +149,8 @@ android {
         }
     }
 
-    viewBinding {
-        enabled = true
+    buildFeatures {
+        viewBinding = true
     }
 
 //    packagingOptions {
@@ -199,10 +199,6 @@ dependencies {
 
     //leakCanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.0-beta-2'
-
-    //butterKnife
-    implementation 'com.jakewharton:butterknife:10.2.3'
-    kapt 'com.jakewharton:butterknife-compiler:10.2.3'
 
     //bugly
     implementation 'com.tencent.bugly:crashreport:3.3.3'

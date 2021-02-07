@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.ButterKnife
 import remix.myplayer.R
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.misc.isPortraitOrientation

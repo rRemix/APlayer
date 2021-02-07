@@ -2,7 +2,6 @@ package remix.myplayer.ui.adapter.holder;
 
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
-import butterknife.ButterKnife;
 
 /**
  * @ClassName
@@ -16,7 +15,6 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
 
   public BaseViewHolder(View itemView) {
     super(itemView);
-    ButterKnife.bind(this, itemView);
     mRoot = itemView;
   }
 }

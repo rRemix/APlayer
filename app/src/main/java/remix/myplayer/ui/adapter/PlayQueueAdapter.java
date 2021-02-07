@@ -1,14 +1,10 @@
 package remix.myplayer.ui.adapter;
 
-import android.content.Context;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import butterknife.BindView;
 import java.util.Collections;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.databinding.ItemPlayqueueBinding;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.request.network.RxUtil;
@@ -39,23 +35,23 @@ public class PlayQueueAdapter extends BaseAdapter<Song, PlayQueueAdapter.PlayQue
   protected void convert(final PlayQueueHolder holder, Song song, int position) {
     if (song == null) {
       //歌曲已经失效
-      holder.mSong.setText(R.string.song_lose_effect);
-      holder.mArtist.setVisibility(View.GONE);
+      holder.binding.playlistItemName.setText(R.string.song_lose_effect);
+      holder.binding.playlistItemArtist.setVisibility(View.GONE);
       return;
     }
     //设置歌曲与艺术家
-    holder.mSong.setText(song.getShowName());
-    holder.mArtist.setText(song.getArtist());
-    holder.mArtist.setVisibility(View.VISIBLE);
+    holder.binding.playlistItemName.setText(song.getShowName());
+    holder.binding.playlistItemArtist.setText(song.getArtist());
+    holder.binding.playlistItemArtist.setVisibility(View.VISIBLE);
     //高亮
     if (MusicServiceRemote.getCurrentSong().getId() == song.getId()) {
-      holder.mSong.setTextColor(mAccentColor);
+      holder.binding.playlistItemName.setTextColor(mAccentColor);
     } else {
 //                holder.mSong.setTextColor(Color.parseColor(ThemeStore.isDay() ? "#323335" : "#ffffff"));
-      holder.mSong.setTextColor(mTextColor);
+      holder.binding.playlistItemName.setTextColor(mTextColor);
     }
     //删除按钮
-    holder.mDelete.setOnClickListener(v -> {
+    holder.binding.playqueueDelete.setOnClickListener(v -> {
       DatabaseRepository.getInstance()
           .deleteFromPlayQueue(Collections.singletonList(song.getId()))
           .compose(RxUtil.applySingleScheduler())
@@ -67,7 +63,7 @@ public class PlayQueueAdapter extends BaseAdapter<Song, PlayQueueAdapter.PlayQue
           });
     });
     if (mOnItemClickListener != null) {
-      holder.mContainer.setOnClickListener(
+      holder.binding.itemRoot.setOnClickListener(
           v -> mOnItemClickListener.onItemClick(v, holder.getAdapterPosition()));
     }
 
@@ -75,17 +71,11 @@ public class PlayQueueAdapter extends BaseAdapter<Song, PlayQueueAdapter.PlayQue
 
   static class PlayQueueHolder extends BaseViewHolder {
 
-    @BindView(R.id.playlist_item_name)
-    TextView mSong;
-    @BindView(R.id.playlist_item_artist)
-    TextView mArtist;
-    @BindView(R.id.playqueue_delete)
-    ImageView mDelete;
-    @BindView(R.id.item_root)
-    RelativeLayout mContainer;
+    private final ItemPlayqueueBinding binding;
 
-    public PlayQueueHolder(View v) {
-      super(v);
+    public PlayQueueHolder(View view) {
+      super(view);
+      binding = ItemPlayqueueBinding.bind(view);
     }
   }
 }

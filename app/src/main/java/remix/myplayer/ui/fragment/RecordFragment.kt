@@ -3,11 +3,9 @@ package remix.myplayer.ui.fragment
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import butterknife.OnTextChanged
 import kotlinx.android.synthetic.main.fragment_record.*
 import remix.myplayer.R
 import remix.myplayer.helper.MusicServiceRemote

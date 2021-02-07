@@ -32,8 +32,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.palette.graphics.Palette
 import androidx.palette.graphics.Palette.Swatch
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
-import butterknife.ButterKnife
-import butterknife.OnClick
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -46,6 +44,7 @@ import kotlinx.android.synthetic.main.layout_player_topbar.*
 import kotlinx.android.synthetic.main.layout_player_volume.*
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.databinding.ActivityPlayerBinding
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.getDuration
@@ -97,6 +96,8 @@ import kotlin.math.abs
  * 播放界面
  */
 class PlayerActivity : BaseMusicActivity(), FileCallback {
+  private lateinit var binding: ActivityPlayerBinding
+
   private var valueAnimator: ValueAnimator? = null
 
   //上次选中的Fragment
@@ -235,8 +236,8 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   @SuppressLint("ClickableViewAccessibility")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_player)
-    ButterKnife.bind(this)
+    binding = ActivityPlayerBinding.inflate(layoutInflater)
+    setContentView(binding.root)
 
     song = getCurrentSong()
     if (song == Song.EMPTY_SONG && intent.hasExtra(EXTRA_SONG)) {
@@ -250,6 +251,29 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     setUpSeekBar()
     setUpViewColor()
     Util.registerLocalReceiver(receiver, IntentFilter(ACTION_UPDATE_NEXT))
+
+    arrayOf(
+      binding.layoutPlayerControl.playbarNext,
+      binding.layoutPlayerControl.playbarPrev,
+      binding.layoutPlayerControl.playbarPlayContainer
+    ).forEach {
+      it.setOnClickListener(onCtrlClick)
+    }
+    arrayOf(
+      binding.layoutPlayerControl.playbarModel,
+      binding.layoutPlayerControl.playbarPlayinglist,
+      binding.topActionbar.topHide,
+      binding.topActionbar.topMore
+    ).forEach {
+      it.setOnClickListener(onOtherClick)
+    }
+    arrayOf(
+      binding.layoutPlayerVolume.volumeDown,
+      binding.layoutPlayerVolume.volumeUp,
+      binding.layoutPlayerVolume.nextSong
+    ).forEach {
+      it.setOnClickListener(onVolumeClick)
+    }
   }
 
   public override fun onResume() {
@@ -280,8 +304,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   /**
    * 上一首 下一首 播放、暂停
    */
-  @OnClick(R.id.playbar_next, R.id.playbar_prev, R.id.playbar_play_container)
-  fun onCtrlClick(v: View) {
+  private val onCtrlClick = View.OnClickListener { v ->
     val intent = Intent(MusicService.ACTION_CMD)
     when (v.id) {
       R.id.playbar_prev -> intent.putExtra(MusicService.EXTRA_CONTROL, Command.PREV)
@@ -294,8 +317,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   /**
    * 播放模式 播放列表 关闭 隐藏
    */
-  @OnClick(R.id.playbar_model, R.id.playbar_playinglist, R.id.top_hide, R.id.top_more)
-  fun onOtherClick(v: View) {
+  private val onOtherClick = View.OnClickListener { v ->
     when (v.id) {
       R.id.playbar_model -> {
         var currentModel = getPlayModel()
@@ -330,9 +352,8 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   }
 
   @SuppressLint("CheckResult")
-  @OnClick(R.id.volume_down, R.id.volume_up, R.id.next_song)
-  fun onVolumeClick(view: View) {
-    when (view.id) {
+  private val onVolumeClick = View.OnClickListener { v ->
+    when (v.id) {
       R.id.volume_down -> Completable
           .fromAction {
             audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
@@ -356,7 +377,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
         handler.postDelayed(volumeRunnable, DELAY_SHOW_NEXT_SONG.toLong())
       }
     }
-    if (view.id != R.id.next_song) {
+    if (v.id != R.id.next_song) {
       Single.zip(Single.fromCallable { audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) },
           Single.fromCallable { audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) },
           BiFunction { max: Int, current: Int -> longArrayOf(max.toLong(), current.toLong()) })

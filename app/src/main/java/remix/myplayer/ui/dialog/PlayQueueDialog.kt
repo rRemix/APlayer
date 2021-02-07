@@ -10,11 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.View
-import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.databinding.DialogPlayqueueBinding
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayQueue
 import remix.myplayer.helper.MusicServiceRemote
@@ -25,7 +23,6 @@ import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.adapter.PlayQueueAdapter
 import remix.myplayer.ui.dialog.base.BaseMusicDialog
-import remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.MusicUtil.makeCmdIntent
 import remix.myplayer.util.Util.sendLocalBroadcast
@@ -40,10 +37,8 @@ import timber.log.Timber
  */
 
 class PlayQueueDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<Song>> {
-  @BindView(R.id.playqueue_recyclerview)
-  lateinit var recyclerView: LocationRecyclerView
-  @BindView(R.id.tv_title)
-  lateinit var tvTitle: TextView
+  private var _binding: DialogPlayqueueBinding? = null
+  private val binding get() = _binding!!
 
   val adapter: PlayQueueAdapter by lazy {
     PlayQueueAdapter(R.layout.item_playqueue)
@@ -53,13 +48,11 @@ class PlayQueueDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<So
     val dialog = Theme.getBaseDialog(activity)
         .customView(R.layout.dialog_playqueue, false)
         .build()
+    _binding = DialogPlayqueueBinding.bind(dialog.customView!!)
 
-    ButterKnife.bind(this, dialog)
-
-    recyclerView.adapter = adapter
-    recyclerView.layoutManager = LinearLayoutManager(context)
-    recyclerView.itemAnimator = DefaultItemAnimator()
-
+    binding.playqueueRecyclerview.adapter = adapter
+    binding.playqueueRecyclerview.layoutManager = LinearLayoutManager(context)
+    binding.playqueueRecyclerview.itemAnimator = DefaultItemAnimator()
 
     adapter.setOnItemClickListener(object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
@@ -98,13 +91,13 @@ class PlayQueueDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<So
     if (data == null) {
       return
     }
-    tvTitle.text = getString(R.string.play_queue, data.size)
+    binding.tvTitle.text = getString(R.string.play_queue, data.size)
     adapter.setData(data)
     val currentId = MusicServiceRemote.getCurrentSong().id
     if (currentId < 0) {
       return
     }
-    recyclerView.smoothScrollToCurrentSong(data)
+    binding.playqueueRecyclerview.smoothScrollToCurrentSong(data)
   }
 
   override fun onLoaderReset(loader: Loader<List<Song>>) {
@@ -126,6 +119,11 @@ class PlayQueueDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<So
         adapter.setData(null)
       }
     }
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
 

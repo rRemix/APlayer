@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.Unbinder
 import remix.myplayer.App
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.util.Util
@@ -17,8 +16,6 @@ import remix.myplayer.util.Util
  * @Date 2016/7/27 15:18
  */
 abstract class BaseFragment : Fragment() {
-  @JvmField
-  protected var mUnBinder: Unbinder? = null
   @JvmField
   protected var mContext: Context? = null
   protected var mHasPermission = false
@@ -37,7 +34,6 @@ abstract class BaseFragment : Fragment() {
 
   override fun onDestroyView() {
     super.onDestroyView()
-    mUnBinder?.unbind()
   }
 
   open val adapter: RecyclerView.Adapter<*>?

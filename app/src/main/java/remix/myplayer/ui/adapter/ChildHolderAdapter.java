@@ -18,13 +18,10 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.TextView;
-import butterknife.BindView;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.databinding.ItemSongRecycleBinding;
 import remix.myplayer.helper.MusicServiceRemote;
 import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.service.Command;
@@ -63,8 +60,8 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
             LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.layout_header_1, parent, false)) :
         new ChildHolderViewHolder(
-            LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_song_recycle, parent, false));
+            ItemSongRecycleBinding.inflate(LayoutInflater.from(parent.getContext()), parent,
+                false));
   }
 
 
@@ -81,18 +78,18 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
       final SongAdapter.HeaderHolder headerHolder = (SongAdapter.HeaderHolder) baseHolder;
       //没有歌曲时隐藏
       if (mDatas == null || mDatas.size() == 0) {
-        headerHolder.mRoot.setVisibility(View.GONE);
+        headerHolder.binding.getRoot().setVisibility(View.GONE);
         return;
       }
 
-      headerHolder.mIvShuffle.setImageDrawable(
+      headerHolder.binding.playShuffleButton.setImageDrawable(
           Theme.tintVectorDrawable(context, R.drawable.ic_shuffle_white_24dp,
               ThemeStore.getAccentColor())
       );
-      headerHolder.mTvShuffle.setText(context.getString(R.string.play_random, getItemCount() - 1));
+      headerHolder.binding.tvShuffleCount.setText(context.getString(R.string.play_random, getItemCount() - 1));
 
       //显示当前排序方式
-      headerHolder.mRoot.setOnClickListener(v -> {
+      headerHolder.binding.getRoot().setOnClickListener(v -> {
         //设置正在播放列表
         if (mDatas == null || mDatas.isEmpty()) {
           ToastUtil.show(context, R.string.no_song);
@@ -106,42 +103,42 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
     final ChildHolderViewHolder holder = (ChildHolderViewHolder) baseHolder;
     if (song == null || song.getId() < 0 || song.getTitle()
         .equals(context.getString(R.string.song_lose_effect))) {
-      holder.mName.setText(R.string.song_lose_effect);
-      holder.mButton.setVisibility(View.INVISIBLE);
+      holder.binding.songTitle.setText(R.string.song_lose_effect);
+      holder.binding.songButton.setVisibility(View.INVISIBLE);
     } else {
-      holder.mButton.setVisibility(View.VISIBLE);
+      holder.binding.songButton.setVisibility(View.VISIBLE);
 
       //封面
-      holder.mImage.setTag(
-          setImage(holder.mImage, getSearchRequestWithAlbumType(song), SMALL_IMAGE_SIZE, position));
+      holder.binding.songHeadImage.setTag(
+          setImage(holder.binding.songHeadImage, getSearchRequestWithAlbumType(song), SMALL_IMAGE_SIZE, position));
 
       //高亮
       if (MusicServiceRemote.getCurrentSong().getId() == song.getId()) {
         mLastPlaySong = song;
-        holder.mName.setTextColor(getHighLightTextColor());
-        holder.mIndicator.setVisibility(View.VISIBLE);
+        holder.binding.songTitle.setTextColor(getHighLightTextColor());
+        holder.binding.indicator.setVisibility(View.VISIBLE);
       } else {
-        holder.mName.setTextColor(getTextColorPrimary());
-        holder.mIndicator.setVisibility(View.GONE);
+        holder.binding.songTitle.setTextColor(getTextColorPrimary());
+        holder.binding.indicator.setVisibility(View.GONE);
       }
-      holder.mIndicator.setBackgroundColor(getHighLightTextColor());
+      holder.binding.indicator.setBackgroundColor(getHighLightTextColor());
 
       //设置标题
-      holder.mName.setText(song.getShowName());
+      holder.binding.songTitle.setText(song.getShowName());
 
       //艺术家与专辑
-      holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
+      holder.binding.songOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
 
-      if (holder.mButton != null) {
+      if (holder.binding.songButton != null) {
         //设置按钮着色
         int tintColor = ThemeStore.getLibraryBtnColor();
-        Theme.tintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
+        Theme.tintDrawable(holder.binding.songButton, R.drawable.icon_player_more, tintColor);
 
-        holder.mButton.setOnClickListener(v -> {
+        holder.binding.songButton.setOnClickListener(v -> {
           if (mChoice.isActive()) {
             return;
           }
-          final PopupMenu popupMenu = new PopupMenu(context, holder.mButton, Gravity.END);
+          final PopupMenu popupMenu = new PopupMenu(context, holder.binding.songButton, Gravity.END);
           popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
           popupMenu.setOnMenuItemClickListener(
               new SongPopupListener((AppCompatActivity) context, song, mType == Constants.PLAYLIST,
@@ -151,8 +148,8 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
       }
     }
 
-    if (holder.mContainer != null && mOnItemClickListener != null) {
-      holder.mContainer.setOnClickListener(v -> {
+    if (holder.binding.getRoot() != null && mOnItemClickListener != null) {
+      holder.binding.getRoot().setOnClickListener(v -> {
         if (holder.getAdapterPosition() - 1 < 0) {
           ToastUtil.show(context, R.string.illegal_arg);
           return;
@@ -161,7 +158,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
           mOnItemClickListener.onItemClick(v, holder.getAdapterPosition() - 1);
         }
       });
-      holder.mContainer.setOnLongClickListener(v -> {
+      holder.binding.getRoot().setOnLongClickListener(v -> {
         if (holder.getAdapterPosition() - 1 < 0) {
           ToastUtil.show(context, R.string.illegal_arg);
           return true;
@@ -171,7 +168,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
       });
     }
 
-    holder.mContainer.setSelected(mChoice.isPositionCheck(position - 1));
+    holder.binding.getRoot().setSelected(mChoice.isPositionCheck(position - 1));
   }
 
   @Override
@@ -194,7 +191,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
       return;
     }
 
-    if (mDatas != null && mDatas.indexOf(currentSong) >= 0) {
+    if (mDatas != null && mDatas.contains(currentSong)) {
       // 找到新的高亮歌曲
       final int index = mDatas.indexOf(currentSong) + 1;
       final int lastIndex = mDatas.indexOf(mLastPlaySong) + 1;
@@ -211,13 +208,13 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
       }
 
       if (newHolder != null) {
-        newHolder.mName.setTextColor(getHighLightTextColor());
-        newHolder.mIndicator.setVisibility(View.VISIBLE);
+        newHolder.binding.songTitle.setTextColor(getHighLightTextColor());
+        newHolder.binding.indicator.setVisibility(View.VISIBLE);
       }
 
       if (oldHolder != null) {
-        oldHolder.mName.setTextColor(getTextColorPrimary());
-        oldHolder.mIndicator.setVisibility(View.GONE);
+        oldHolder.binding.songTitle.setTextColor(getTextColorPrimary());
+        oldHolder.binding.indicator.setVisibility(View.GONE);
       }
       mLastPlaySong = currentSong;
     }
@@ -225,21 +222,11 @@ public class ChildHolderAdapter extends HeaderAdapter<Song, BaseViewHolder> impl
 
   static class ChildHolderViewHolder extends BaseViewHolder {
 
-    @BindView(R.id.song_head_image)
-    SimpleDraweeView mImage;
-    @BindView(R.id.song_title)
-    TextView mName;
-    @BindView(R.id.song_other)
-    TextView mOther;
-    @BindView(R.id.song_button)
-    public ImageButton mButton;
-    public View mContainer;
-    @BindView(R.id.indicator)
-    View mIndicator;
+    private final ItemSongRecycleBinding binding;
 
-    ChildHolderViewHolder(View itemView) {
-      super(itemView);
-      mContainer = itemView;
+    ChildHolderViewHolder(ItemSongRecycleBinding binding) {
+      super(binding.getRoot());
+      this.binding = binding;
     }
   }
 }
