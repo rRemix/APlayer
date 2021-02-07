@@ -28,7 +28,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 29
 
-        versionCode 15720
+        versionCode 15721
         versionName "1.5.7.2"
 
         flavorDimensions "default"
