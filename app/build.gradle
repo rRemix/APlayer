@@ -220,6 +220,9 @@ dependencies {
     //timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    kapt 'com.github.bumptech.glide:compiler:4.12.0'
+
     //other
     implementation 'com.facebook.rebound:rebound:0.3.8'
     implementation 'com.soundcloud.android:android-crop:1.0.1@aar'

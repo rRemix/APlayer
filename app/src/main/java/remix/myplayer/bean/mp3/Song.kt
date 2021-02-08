@@ -1,15 +1,14 @@
 package remix.myplayer.bean.mp3
 
 import android.content.ContentUris
-import android.content.ContentValues
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Parcelable
 import android.provider.MediaStore
+import com.bumptech.glide.load.Key
 import kotlinx.android.parcel.Parcelize
 import remix.myplayer.App
 import remix.myplayer.util.SPUtil
-import timber.log.Timber
+import java.security.MessageDigest
 
 /**
  * Created by Remix on 2015/11/30.
@@ -33,7 +32,7 @@ data class Song(
     val size: Long,
     val year: String?,
     val titleKey: String?,
-    val addTime: Long) : Parcelable {
+    val addTime: Long) : Parcelable, ImageUri {
 
   val contentUri: Uri
     get() = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toLong())
@@ -124,6 +123,14 @@ data class Song(
     return true
   }
 
+  override fun getImageUri(): Uri {
+    return ContentUris
+        .withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId)
+  }
+
+  override fun updateDiskCacheKey(messageDigest: MessageDigest) {
+    messageDigest.update(albumId.toString().toByteArray(Key.CHARSET))
+  }
 
   companion object {
     @JvmStatic

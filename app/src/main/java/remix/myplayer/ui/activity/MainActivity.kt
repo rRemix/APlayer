@@ -34,6 +34,7 @@ import remix.myplayer.bean.misc.Library
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.cache.DiskCache
@@ -48,8 +49,6 @@ import remix.myplayer.misc.update.DownloadService.Companion.ACTION_SHOW_DIALOG
 import remix.myplayer.misc.update.UpdateAgent
 import remix.myplayer.misc.update.UpdateListener
 import remix.myplayer.request.ImageUriRequest
-import remix.myplayer.request.LibraryUriRequest
-import remix.myplayer.request.RequestConfig
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme
@@ -60,7 +59,6 @@ import remix.myplayer.ui.fragment.*
 import remix.myplayer.ui.misc.DoubleClickListener
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.util.*
-import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import remix.myplayer.util.Util.*
 import timber.log.Timber
 import java.io.File
@@ -579,9 +577,9 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
     val currentSong = MusicServiceRemote.getCurrentSong()
     if (currentSong != Song.EMPTY_SONG) {
       tv_header.text = getString(R.string.play_now, currentSong.title)
-      LibraryUriRequest(iv_header,
-          getSearchRequestWithAlbumType(currentSong),
-          RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load()
+      GlideApp.with(this)
+          .load(currentSong)
+          .into(iv_header)
     }
   }
 
