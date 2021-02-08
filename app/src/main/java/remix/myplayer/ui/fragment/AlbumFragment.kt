@@ -7,8 +7,6 @@ import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
 import kotlinx.android.synthetic.main.fragment_album.*
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Album
@@ -18,7 +16,6 @@ import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.ui.activity.ChildHolderActivity
 import remix.myplayer.ui.adapter.AlbumAdapter
 import remix.myplayer.ui.adapter.HeaderAdapter
-import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
 import remix.myplayer.util.Constants
 import remix.myplayer.util.MediaStoreUtil.getAllAlbum
 import remix.myplayer.util.SPUtil

@@ -11,18 +11,10 @@ import android.os.Bundle;
 import android.os.Message;
 import androidx.annotation.Nullable;
 import android.text.TextUtils;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.facebook.drawee.view.SimpleDraweeView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,6 +23,7 @@ import java.util.Date;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.databinding.ActivityRecordshareBinding;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
@@ -52,29 +45,14 @@ import remix.myplayer.util.Util;
  * 将分享内容与专辑封面进行处理用于分享
  */
 public class RecordShareActivity extends BaseMusicActivity {
+  private ActivityRecordshareBinding binding;
 
   private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 268);
   public static final String EXTRA_SONG = "Song";
   public static final String EXTRA_CONTENT = "Content";
 
-  @BindView(R.id.recordshare_image)
-  SimpleDraweeView mImage;
-  //歌曲名与分享内容
-  @BindView(R.id.recordshare_name)
-  TextView mSong;
-  @BindView(R.id.recordshare_content)
-  TextView mContent;
-  //背景
-  @BindView(R.id.recordshare_background_1)
-  View mBackground1;
-  @BindView(R.id.recordshare_background_2)
-  LinearLayout mBackground2;
-  @BindView(R.id.recordshare_image_container)
-  FrameLayout mImageBackground;
   //保存截屏
   private static Bitmap mBackgroudCache;
-  @BindView(R.id.recordshare_container)
-  LinearLayout mContainer;
 
   //当前正在播放的歌曲
   private Song mInfo;
@@ -124,39 +102,39 @@ public class RecordShareActivity extends BaseMusicActivity {
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_recordshare);
-    ButterKnife.bind(this);
+    binding = ActivityRecordshareBinding.inflate(getLayoutInflater());
+    setContentView(binding.getRoot());
 
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
     //初始化控件
-    mContainer.setDrawingCacheEnabled(true);
+    binding.recordshareContainer.setDrawingCacheEnabled(true);
 
     mInfo = getIntent().getExtras().getParcelable(EXTRA_SONG);
     if (mInfo == null) {
       return;
     }
 
-    new LibraryUriRequest(mImage,
+    new LibraryUriRequest(binding.recordshareImage,
         getSearchRequestWithAlbumType(mInfo),
         new RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load();
 
     //设置歌曲名与分享内容
     String content = getIntent().getExtras().getString(EXTRA_CONTENT);
-    mContent.setText(TextUtils.isEmpty(content) ? "" : content);
-    mSong.setText(String.format("《%s》", mInfo.getTitle()));
+    binding.recordshareContent.setText(TextUtils.isEmpty(content) ? "" : content);
+    binding.recordshareName.setText(String.format("《%s》", mInfo.getTitle()));
     //背景
-    mBackground1.setBackground(new GradientDrawableMaker()
+    binding.recordshareBackground1.setBackground(new GradientDrawableMaker()
         .color(Color.WHITE)
         .strokeSize(DensityUtil.dip2px(2))
         .strokeColor(Color.parseColor("#2a2a2a"))
         .make());
-    mBackground2.setBackground(new GradientDrawableMaker()
+    binding.recordshareBackground2.setBackground(new GradientDrawableMaker()
         .color(Color.WHITE)
         .strokeSize(DensityUtil.dip2px(1))
         .strokeColor(Color.parseColor("#2a2a2a"))
         .make());
-    mImageBackground.setBackground(new GradientDrawableMaker()
+    binding.recordshareImageContainer.setBackground(new GradientDrawableMaker()
         .color(Color.WHITE)
         .strokeSize(DensityUtil.dip2px(1))
         .strokeColor(Color.parseColor("#f6f6f5"))
@@ -168,6 +146,8 @@ public class RecordShareActivity extends BaseMusicActivity {
         .progress(true, 0)
         .progressIndeterminateStyle(false).build();
 
+    binding.recordshareCancel.setOnClickListener(v -> finish());
+    binding.recordshareShare.setOnClickListener(v -> new ProcessThread().start());
     mHandler = new MsgHandler(this);
   }
 
@@ -179,18 +159,6 @@ public class RecordShareActivity extends BaseMusicActivity {
 
   public static Bitmap getBg() {
     return mBackgroudCache;
-  }
-
-  @OnClick({R.id.recordshare_cancel, R.id.recordshare_share})
-  public void onClick(View v) {
-    switch (v.getId()) {
-      case R.id.recordshare_cancel:
-        finish();
-        break;
-      case R.id.recordshare_share:
-        new ProcessThread().start();
-        break;
-    }
   }
 
   /**
@@ -212,7 +180,7 @@ public class RecordShareActivity extends BaseMusicActivity {
       }
       mHandler.sendEmptyMessage(START);
 
-      mBackgroudCache = mContainer.getDrawingCache(true);
+      mBackgroudCache = binding.recordshareContainer.getDrawingCache(true);
       mFile = null;
       try {
         //将截屏内容保存到文件

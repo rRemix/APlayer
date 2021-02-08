@@ -14,16 +14,11 @@ import android.provider.MediaStore;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.TextView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +26,7 @@ import java.util.Set;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.databinding.ActivitySearchBinding;
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.misc.interfaces.LoaderIds;
 import remix.myplayer.misc.interfaces.OnItemClickListener;
@@ -50,23 +46,16 @@ import remix.myplayer.util.ToastUtil;
  */
 public class SearchActivity extends LibraryActivity<Song, SearchAdapter> implements
     SearchView.OnQueryTextListener {
+  private ActivitySearchBinding binding;
 
   //搜索的关键字
   private String mkey;
-  //搜索结果的listview
-  @BindView(R.id.search_result_native)
-  RecyclerView mSearchResRecyclerView;
-  //无搜索结果
-  @BindView(R.id.search_result_blank)
-  TextView mSearchResBlank;
-  @BindView(R.id.search_result_container)
-  FrameLayout mSearchResContainer;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_search);
-    ButterKnife.bind(this);
+    binding = ActivitySearchBinding.inflate(getLayoutInflater());
+    setContentView(binding.getRoot());
     setUpToolbar("");
 
     mAdapter = new SearchAdapter(R.layout.item_search_reulst);
@@ -85,9 +74,9 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
       public void onItemLongClick(View view, int position) {
       }
     });
-    mSearchResRecyclerView.setAdapter(mAdapter);
-    mSearchResRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-    mSearchResRecyclerView.setItemAnimator(new DefaultItemAnimator());
+    binding.searchResultNative.setAdapter(mAdapter);
+    binding.searchResultNative.setLayoutManager(new LinearLayoutManager(this));
+    binding.searchResultNative.setItemAnimator(new DefaultItemAnimator());
 
     updateUI();
 
@@ -244,8 +233,8 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
    */
   private void updateUI() {
     boolean flag = mAdapter.getDatas() != null && mAdapter.getDatas().size() > 0;
-    mSearchResRecyclerView.setVisibility(flag ? View.VISIBLE : View.GONE);
-    mSearchResBlank.setVisibility(flag ? View.GONE : View.VISIBLE);
+    binding.searchResultNative.setVisibility(flag ? View.VISIBLE : View.GONE);
+    binding.searchResultBlank.setVisibility(flag ? View.GONE : View.VISIBLE);
   }
 
   @Override

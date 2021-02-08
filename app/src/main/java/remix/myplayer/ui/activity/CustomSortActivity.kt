@@ -3,20 +3,18 @@ package remix.myplayer.ui.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.ItemTouchHelper
 import android.view.View
-import butterknife.ButterKnife
-import butterknife.OnClick
 import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.activity_custom_sort.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.databinding.ActivityCustomSortBinding
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.theme.Theme
@@ -30,6 +28,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class CustomSortActivity : ToolbarActivity() {
+  private lateinit var binding: ActivityCustomSortBinding
 
   private val adapter: CustomSortAdapter by lazy {
     CustomSortAdapter(R.layout.item_custom_sort)
@@ -47,8 +46,8 @@ class CustomSortActivity : ToolbarActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_custom_sort)
-    ButterKnife.bind(this@CustomSortActivity)
+    binding = ActivityCustomSortBinding.inflate(layoutInflater)
+    setContentView(binding.root)
 
     playlistId = intent.getLongExtra(EXTRA_ID, -1)
     val playlistName = intent.getStringExtra(EXTRA_NAME) ?: ""
@@ -108,26 +107,24 @@ class CustomSortActivity : ToolbarActivity() {
     else
       R.color.dark_text_color_primary))
 
-    TintHelper.setTintAuto(findViewById<FloatingActionButton>(R.id.custom_sort_save), accentColor, true)
-  }
+    TintHelper.setTintAuto(binding.customSortSave, accentColor, true)
 
+    binding.customSortSave.setOnClickListener {
+      doAsync {
+        uiThread {
+          mdDialog.show()
+        }
 
-  @OnClick(R.id.custom_sort_save)
-  fun onClick() {
-    doAsync {
-      uiThread {
-        mdDialog.show()
-      }
-
-      Thread.sleep(500)
-      val result = DatabaseRepository.getInstance()
+        Thread.sleep(500)
+        val result = DatabaseRepository.getInstance()
           .updatePlayListAudios(playlistId, songs.map { it.id })
           .blockingGet()
 
-      uiThread {
-        ToastUtil.show(mContext, if (result > 0) R.string.save_success else R.string.save_error)
-        mdDialog.dismiss()
-        finish()
+        uiThread {
+          ToastUtil.show(mContext, if (result > 0) R.string.save_success else R.string.save_error)
+          mdDialog.dismiss()
+          finish()
+        }
       }
     }
   }

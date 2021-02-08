@@ -149,6 +149,10 @@ android {
         }
     }
 
+    buildFeatures {
+        viewBinding = true
+    }
+
 //    packagingOptions {
 //        exclude 'META-INF/proguard/coroutines.pro'
 //    }
@@ -196,12 +200,8 @@ dependencies {
     //leakCanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.0-beta-2'
 
-    //butterKnife
-    implementation 'com.jakewharton:butterknife:9.0.0'
-    kapt 'com.jakewharton:butterknife-compiler:9.0.0'
-
     //bugly
-    implementation 'com.tencent.bugly:crashreport:3.0.0'
+    implementation 'com.tencent.bugly:crashreport:3.3.3'
 
     //gp
     implementation 'com.anjlab.android.iab.v3:library:1.1.0'

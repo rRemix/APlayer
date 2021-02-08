@@ -13,13 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
-import android.widget.TextView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Function;
 import java.lang.ref.WeakReference;
@@ -28,6 +24,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.databinding.ActivityChildHolderBinding;
 import remix.myplayer.db.room.DatabaseRepository;
 import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.helper.MusicServiceRemote;
@@ -43,7 +40,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.adapter.ChildHolderAdapter;
 import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.ui.misc.MultipleChoice;
-import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -59,20 +55,13 @@ import remix.myplayer.util.ToastUtil;
  * 专辑、艺术家、文件夹、播放列表详情
  */
 public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapter> {
+  private ActivityChildHolderBinding binding;
 
   public final static String TAG = ChildHolderActivity.class.getSimpleName();
   //获得歌曲信息列表的参数
   private long mId;
   private int mType;
   private String mArg;
-
-  //歌曲数目与标题
-  @BindView(R.id.childholder_item_num)
-  TextView mNum;
-  @BindView(R.id.child_holder_recyclerView)
-  FastScrollRecyclerView mRecyclerView;
-  @BindView(R.id.toolbar)
-  Toolbar mToolBar;
 
   private String Title;
 //    private MaterialDialog mMDDialog;
@@ -84,8 +73,8 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_child_holder);
-    ButterKnife.bind(this);
+    binding = ActivityChildHolderBinding.inflate(getLayoutInflater());
+    setContentView(binding.getRoot());
 
     mRefreshHandler = new MsgHandler(this);
 
@@ -103,7 +92,7 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
         mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
 
     mAdapter = new ChildHolderAdapter(R.layout.item_song_recycle, mType, mArg, mChoice,
-        mRecyclerView);
+        binding.childHolderRecyclerView);
     mChoice.setAdapter(mAdapter);
     mChoice.setExtra(mId);
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
@@ -136,13 +125,13 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
       }
     });
 
-    mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-    mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-    mRecyclerView.setAdapter(mAdapter);
+    binding.childHolderRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+    binding.childHolderRecyclerView.setItemAnimator(new DefaultItemAnimator());
+    binding.childHolderRecyclerView.setAdapter(mAdapter);
     final int accentColor = ThemeStore.getAccentColor();
-    mRecyclerView.setBubbleColor(accentColor);
-    mRecyclerView.setHandleColor(accentColor);
-    mRecyclerView.setBubbleTextColor(ColorUtil.getColor(ColorUtil.isColorLight(accentColor) ?
+    binding.childHolderRecyclerView.setBubbleColor(accentColor);
+    binding.childHolderRecyclerView.setHandleColor(accentColor);
+    binding.childHolderRecyclerView.setBubbleTextColor(ColorUtil.getColor(ColorUtil.isColorLight(accentColor) ?
         R.color.dark_text_color_primary : R.color.light_text_color_primary));
 
     //标题
@@ -342,7 +331,8 @@ public class ChildHolderActivity extends LibraryActivity<Song, ChildHolderAdapte
   @Override
   public void onLoadFinished(Loader<List<Song>> loader, List<Song> data) {
     super.onLoadFinished(loader, data);
-    mNum.setText(getString(R.string.song_count, data != null ? data.size() : 0));
+    binding.childholderItemNum.setText(getString(R.string.song_count, data != null ? data.size()
+        : 0));
   }
 
   @Override

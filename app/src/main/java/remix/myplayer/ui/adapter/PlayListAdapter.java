@@ -14,10 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 import remix.myplayer.R;
+import remix.myplayer.databinding.ItemPlaylistRecycleGridBinding;
+import remix.myplayer.databinding.ItemPlaylistRecycleListBinding;
 import remix.myplayer.db.room.model.PlayList;
 import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.request.ImageUriRequest;
@@ -153,15 +154,10 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
   static class PlayListHolder extends BaseViewHolder {
 
-    @BindView(R.id.item_text1)
     TextView mName;
-    @BindView(R.id.item_text2)
     TextView mOther;
-    @BindView(R.id.item_simpleiview)
     SimpleDraweeView mImage;
-    @BindView(R.id.item_button)
     ImageView mButton;
-    @BindView(R.id.item_container)
     ViewGroup mContainer;
 
     PlayListHolder(View itemView) {
@@ -173,6 +169,13 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
     PlayListListHolder(View itemView) {
       super(itemView);
+
+      ItemPlaylistRecycleListBinding binding = ItemPlaylistRecycleListBinding.bind(itemView);
+      mName = binding.itemText1;
+      mOther = binding.itemText2;
+      mImage = binding.itemSimpleiview;
+      mButton = binding.itemButton;
+      mContainer = binding.itemContainer;
     }
   }
 
@@ -180,6 +183,13 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
     PlayListGridHolder(View itemView) {
       super(itemView);
+
+      ItemPlaylistRecycleGridBinding binding = ItemPlaylistRecycleGridBinding.bind(itemView);
+      mName = binding.itemText1;
+      mOther = binding.itemText2;
+      mImage = binding.itemSimpleiview;
+      mButton = binding.itemButton;
+      mContainer = binding.itemContainer;
     }
   }
 

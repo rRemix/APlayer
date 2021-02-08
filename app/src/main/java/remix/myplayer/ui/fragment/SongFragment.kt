@@ -6,7 +6,6 @@ import android.view.View
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import butterknife.BindView
 import kotlinx.android.synthetic.main.fragment_song.*
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
@@ -20,7 +19,6 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.MainActivity
 import remix.myplayer.ui.adapter.SongAdapter
-import remix.myplayer.ui.widget.fastcroll_recyclerview.LocationRecyclerView
 import remix.myplayer.util.MediaStoreUtil.getAllSong
 import remix.myplayer.util.MusicUtil
 

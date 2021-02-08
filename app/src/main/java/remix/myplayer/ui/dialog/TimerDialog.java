@@ -7,19 +7,14 @@ import android.os.Message;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import remix.myplayer.R;
+import remix.myplayer.databinding.DialogTimerBinding;
 import remix.myplayer.helper.SleepTimer;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
@@ -28,7 +23,6 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.theme.TintHelper;
 import remix.myplayer.ui.dialog.base.BaseDialog;
-import remix.myplayer.ui.widget.CircleSeekBar;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.SPUtil.SETTING_KEY;
@@ -42,6 +36,7 @@ import remix.myplayer.util.ToastUtil;
  * 定时关闭界面
  */
 public class TimerDialog extends BaseDialog {
+  private DialogTimerBinding binding;
 
   private static final String EXTRA_MINUTE = "Minute";
   private static final String EXTRA_SECOND = "Second";
@@ -49,23 +44,6 @@ public class TimerDialog extends BaseDialog {
   public static TimerDialog newInstance() {
     return new TimerDialog();
   }
-
-  @BindView(R.id.timer_content_container)
-  View mContentContainer;
-  //分钟
-  @BindView(R.id.minute)
-  TextView mMinute;
-  //秒
-  @BindView(R.id.second)
-  TextView mSecond;
-  //设置或取消默认
-  @BindView(R.id.timer_default_switch)
-  SwitchCompat mTimerDefaultSwitch;
-  //圆形seekbar
-  @BindView(R.id.close_seekbar)
-  CircleSeekBar mSeekbar;
-  @BindView(R.id.timer_pending_switch)
-  SwitchCompat mPendingCloseSwitch;
 
   //定时时间 单位秒
   private int mTime;
@@ -88,34 +66,32 @@ public class TimerDialog extends BaseDialog {
         .onPositive((_dialog, which) -> toggle())
         .onNegative((_dialog, which) -> dismiss())
         .build();
-
-    View root = dialog.getCustomView();
-    ButterKnife.bind(this, root);
+    binding = DialogTimerBinding.bind(Objects.requireNonNull(dialog.getCustomView()));
 
     mHandler = new MsgHandler(this);
 
     //如果正在计时，设置seekbar的进度
     if (SleepTimer.isTicking()) {
-      mSeekbar.setClickable(false);
+      binding.closeSeekbar.setClickable(false);
       mTime = (int) (SleepTimer.getMillisUntilFinish() / 1000);
-      mSeekbar.setProgress(mTime);
+      binding.closeSeekbar.setProgress(mTime);
     } else {
-      mSeekbar.setClickable(true);
+      binding.closeSeekbar.setClickable(true);
     }
 
-    mSeekbar.setOnSeekBarChangeListener((seekBar, progress, fromUser) -> {
+    binding.closeSeekbar.setOnSeekBarChangeListener((seekBar, progress, fromUser) -> {
       //记录倒计时时间和更新界面
       int minute = progress / 60;
-      mMinute.setText(minute < 10 ? "0" + minute : "" + minute);
-      mSecond.setText("00");
+      binding.minute.setText(minute < 10 ? "0" + minute : "" + minute);
+      binding.second.setText("00");
       //取整数分钟
       mTime = minute * 60;
       mSaveTime = minute * 60;
     });
 
     //初始化switch
-    TintHelper.setTintAuto(mTimerDefaultSwitch, ThemeStore.getAccentColor(), false);
-    TintHelper.setTintAuto(mPendingCloseSwitch, ThemeStore.getAccentColor(), false);
+    TintHelper.setTintAuto(binding.timerDefaultSwitch, ThemeStore.getAccentColor(), false);
+    TintHelper.setTintAuto(binding.timerPendingSwitch, ThemeStore.getAccentColor(), false);
 
     //读取保存的配置
     final boolean pendingClose = SPUtil
@@ -135,12 +111,13 @@ public class TimerDialog extends BaseDialog {
       }
     }
 
-    mPendingCloseSwitch.setChecked(pendingClose);
-    mPendingCloseSwitch.setOnCheckedChangeListener(
-        (buttonView, isChecked) -> SPUtil.putValue(getContext(), SETTING_KEY.NAME, SETTING_KEY.TIMER_PENDING_CLOSE, isChecked));
+    binding.timerPendingSwitch.setChecked(pendingClose);
+    binding.timerPendingSwitch.setOnCheckedChangeListener(
+        (buttonView, isChecked) -> SPUtil.putValue(getContext(), SETTING_KEY.NAME,
+            SETTING_KEY.TIMER_PENDING_CLOSE, isChecked));
 
-    mTimerDefaultSwitch.setChecked(hasDefault);
-    mTimerDefaultSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+    binding.timerDefaultSwitch.setChecked(hasDefault);
+    binding.timerDefaultSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
       if (isChecked) {
         if (mSaveTime > 0) {
           ToastUtil.show(getContext(), R.string.set_success);
@@ -151,7 +128,7 @@ public class TimerDialog extends BaseDialog {
               mSaveTime);
         } else {
           ToastUtil.show(getContext(), R.string.plz_set_correct_time);
-          mTimerDefaultSwitch.setChecked(false);
+          binding.timerDefaultSwitch.setChecked(false);
         }
       } else {
         ToastUtil.show(getContext(), R.string.cancel_success);
@@ -163,16 +140,14 @@ public class TimerDialog extends BaseDialog {
     });
 
     //分钟 秒 背景框
-    ButterKnife.apply(new View[]{root.findViewById(R.id.timer_minute_container),
-            root.findViewById(R.id.timer_second_container)},
-        (view, index) -> {
-          view.setBackground(new GradientDrawableMaker()
-              .color(Color.TRANSPARENT)
-              .corner(DensityUtil.dip2px(1))
-              .strokeSize(DensityUtil.dip2px(1))
-              .strokeColor(Theme.resolveColor(getContext(), R.attr.text_color_secondary))
-              .make());
-        });
+    for (View view : new View[]{binding.timerMinuteContainer, binding.timerSecondContainer}) {
+      view.setBackground(new GradientDrawableMaker()
+          .color(Color.TRANSPARENT)
+          .corner(DensityUtil.dip2px(1))
+          .strokeSize(DensityUtil.dip2px(1))
+          .strokeColor(Theme.resolveColor(getContext(), R.attr.text_color_secondary))
+          .make());
+    }
 
     //改变宽度
     Window window = dialog.getWindow();
@@ -201,31 +176,21 @@ public class TimerDialog extends BaseDialog {
     dismiss();
   }
 
-  @OnClick(R.id.timer_default_info)
-  public void OnClick() {
-    Theme.getBaseDialog(getContext())
-        .title(R.string.timer_default_info_title)
-        .content(R.string.timer_default_info_content)
-        .positiveText(R.string.close)
-        .onPositive((dialog, which) -> dialog.dismiss())
-        .build()
-        .show();
-  }
-
   @OnHandleMessage
   public void handlerInternal(Message msg) {
     if (msg != null) {
       if (msg.getData() != null) {
-        mMinute.setText(msg.getData().getString(EXTRA_MINUTE));
-        mSecond.setText(msg.getData().getString(EXTRA_SECOND));
+        binding.minute.setText(msg.getData().getString(EXTRA_MINUTE));
+        binding.second.setText(msg.getData().getString(EXTRA_SECOND));
       }
-      mSeekbar.setProgress(msg.arg1);
+      binding.closeSeekbar.setProgress(msg.arg1);
     }
   }
 
   @Override
   public void onDestroyView() {
     super.onDestroyView();
+    binding = null;
     mHandler.remove();
     if (mUpdateTimer != null) {
       mUpdateTimer.cancel();

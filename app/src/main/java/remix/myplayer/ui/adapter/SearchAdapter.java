@@ -10,14 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.ImageButton;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import butterknife.BindView;
-import com.facebook.drawee.view.SimpleDraweeView;
 import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.databinding.ItemSearchReulstBinding;
 import remix.myplayer.misc.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -41,59 +37,51 @@ public class SearchAdapter extends BaseAdapter<Song, SearchAdapter.SearchResHold
   @Override
   public void onViewRecycled(@NonNull SearchAdapter.SearchResHolder holder) {
     super.onViewRecycled(holder);
-    if ((holder).mImage.getTag() != null) {
-      Disposable disposable = (Disposable) (holder).mImage.getTag();
+    if ((holder).binding.searchImage.getTag() != null) {
+      Disposable disposable = (Disposable) (holder).binding.searchImage.getTag();
       if (!disposable.isDisposed()) {
         disposable.dispose();
       }
     }
-    holder.mImage.setImageURI(Uri.EMPTY);
+    holder.binding.searchImage.setImageURI(Uri.EMPTY);
   }
 
   @SuppressLint("RestrictedApi")
   @Override
   protected void convert(final SearchResHolder holder, Song song, int position) {
-    holder.mName.setText(song.getTitle());
-    holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
+    holder.binding.searchName.setText(song.getTitle());
+    holder.binding.searchDetail.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
     //封面
-    Disposable disposable = new LibraryUriRequest(holder.mImage,
+    Disposable disposable = new LibraryUriRequest(holder.binding.searchImage,
         getSearchRequestWithAlbumType(song),
         new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
-    holder.mImage.setTag(disposable);
+    holder.binding.searchImage.setTag(disposable);
 
     //设置按钮着色
     int tintColor = ThemeStore.getLibraryBtnColor();
-    Theme.tintDrawable(holder.mButton, R.drawable.icon_player_more, tintColor);
+    Theme.tintDrawable(holder.binding.searchButton, R.drawable.icon_player_more, tintColor);
 
-    holder.mButton.setOnClickListener(v -> {
-      final PopupMenu popupMenu = new PopupMenu(holder.itemView.getContext(), holder.mButton, Gravity.END);
+    holder.binding.searchButton.setOnClickListener(v -> {
+      final PopupMenu popupMenu = new PopupMenu(holder.itemView.getContext(), holder.binding.searchButton, Gravity.END);
       popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
       popupMenu.setOnMenuItemClickListener(
           new SongPopupListener((AppCompatActivity) holder.itemView.getContext(), song, false, ""));
       popupMenu.show();
     });
 
-    if (mOnItemClickListener != null && holder.mRooView != null) {
-      holder.mRooView.setOnClickListener(
+    if (mOnItemClickListener != null) {
+      holder.binding.reslistItem.setOnClickListener(
           v -> mOnItemClickListener.onItemClick(v, holder.getAdapterPosition()));
     }
   }
 
   static class SearchResHolder extends BaseViewHolder {
 
-    @BindView(R.id.reslist_item)
-    RelativeLayout mRooView;
-    @BindView(R.id.search_image)
-    SimpleDraweeView mImage;
-    @BindView(R.id.search_name)
-    TextView mName;
-    @BindView(R.id.search_detail)
-    TextView mOther;
-    @BindView(R.id.search_button)
-    ImageButton mButton;
+    private final ItemSearchReulstBinding binding;
 
     SearchResHolder(View itemView) {
       super(itemView);
+      binding = ItemSearchReulstBinding.bind(itemView);
     }
   }
 }

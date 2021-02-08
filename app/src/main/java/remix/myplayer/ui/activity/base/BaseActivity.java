@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import remix.myplayer.BuildConfig;
@@ -80,6 +81,13 @@ public class BaseActivity extends AppCompatActivity {
   @Override
   public void setContentView(int layoutResID) {
     super.setContentView(layoutResID);
+    setStatusBarColor();
+    setStatusBarMode();
+  }
+
+  @Override
+  public void setContentView(View view) {
+    super.setContentView(view);
     setStatusBarColor();
     setStatusBarMode();
   }

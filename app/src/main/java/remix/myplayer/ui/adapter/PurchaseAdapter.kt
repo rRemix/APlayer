@@ -2,12 +2,10 @@ package remix.myplayer.ui.adapter
 
 import android.annotation.SuppressLint
 import android.view.View
-import android.widget.TextView
-import butterknife.BindView
-import com.facebook.drawee.view.SimpleDraweeView
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Purchase
+import remix.myplayer.databinding.ItemSupportBinding
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
 
 class PurchaseAdapter(layoutId: Int) : BaseAdapter<Purchase, PurchaseAdapter.PurchaseHolder>(layoutId) {
@@ -19,37 +17,29 @@ class PurchaseAdapter(layoutId: Int) : BaseAdapter<Purchase, PurchaseAdapter.Pur
   override fun convert(holder: PurchaseHolder?, bean: Purchase?, position: Int) {
     if (holder == null || bean == null)
       return
-    holder.mTitle.text = bean.title.replace("(APlayer)", "")
+    holder.binding.itemTitle.text = bean.title.replace("(APlayer)", "")
     if (App.IS_GOOGLEPLAY) {
-      holder.mLogo.setActualImageResource(LOGOS_OTHERS[position])
-      holder.mPrice.text = bean.price
+      holder.binding.itemLogo.setActualImageResource(LOGOS_OTHERS[position])
+      holder.binding.itemPrice.text = bean.price
     } else {
       when (position) {
         0, 1, 2 -> {
-          holder.mLogo.setActualImageResource(LOGOS_DONATE[position])
-          holder.mPrice.text = ""
+          holder.binding.itemLogo.setActualImageResource(LOGOS_DONATE[position])
+          holder.binding.itemPrice.text = ""
         }
         3, 4, 5, 6, 7 -> {
-          holder.mLogo.setActualImageResource(LOGOS_OTHERS[position - 3])
-          holder.mPrice.text = bean.price
+          holder.binding.itemLogo.setActualImageResource(LOGOS_OTHERS[position - 3])
+          holder.binding.itemPrice.text = bean.price
         }
       }
     }
 
-    holder.mRoot.setOnClickListener {
+    holder.binding.root.setOnClickListener {
       mOnItemClickListener.onItemClick(it, position)
     }
   }
 
-  class PurchaseHolder(itemView: View) : BaseViewHolder(itemView) {
-    @BindView(R.id.item_price)
-    lateinit var mPrice: TextView
-
-    @BindView(R.id.item_logo)
-    lateinit var mLogo: SimpleDraweeView
-
-    @BindView(R.id.item_title)
-    lateinit var mTitle: TextView
+  class PurchaseHolder(view: View) : BaseViewHolder(view) {
+    val binding = ItemSupportBinding.bind(view)
   }
-
 }

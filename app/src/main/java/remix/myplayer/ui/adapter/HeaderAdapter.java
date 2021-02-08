@@ -107,16 +107,16 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
    */
   void setUpModeButton(HeaderHolder headerHolder) {
     if (mDatas == null || mDatas.size() == 0) {
-      headerHolder.mRoot.setVisibility(View.GONE);
+      headerHolder.binding.getRoot().setVisibility(View.GONE);
       return;
     }
     //设置图标
 
-    headerHolder.mDivider
+    headerHolder.binding.divider
         .setVisibility(mMode == HeaderAdapter.LIST_MODE ? View.VISIBLE : View.GONE);
-    headerHolder.mGridModeBtn.setOnClickListener(v -> switchMode(headerHolder, v));
-    headerHolder.mListModeBtn.setOnClickListener(v -> switchMode(headerHolder, v));
-    headerHolder.mDivider.setVisibility(mMode == LIST_MODE ? View.VISIBLE : View.GONE);
+    headerHolder.binding.gridModel.setOnClickListener(v -> switchMode(headerHolder, v));
+    headerHolder.binding.listModel.setOnClickListener(v -> switchMode(headerHolder, v));
+    headerHolder.binding.divider.setVisibility(mMode == LIST_MODE ? View.VISIBLE : View.GONE);
     tintModeButton(headerHolder);
   }
 
@@ -140,14 +140,14 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
   }
 
   private void tintModeButton(HeaderHolder headerHolder) {
-    headerHolder.mListModeBtn.setImageDrawable(
+    headerHolder.binding.listModel.setImageDrawable(
         Theme.tintVectorDrawable(headerHolder.itemView.getContext(),
             R.drawable.ic_format_list_bulleted_white_24dp,
             mMode == LIST_MODE ? ThemeStore.getAccentColor()
                 : ColorUtil.getColor(R.color.default_model_button_color))
     );
 
-    headerHolder.mGridModeBtn.setImageDrawable(
+    headerHolder.binding.gridModel.setImageDrawable(
         Theme.tintVectorDrawable(headerHolder.itemView.getContext(), R.drawable.ic_apps_white_24dp,
             mMode == GRID_MODE ? ThemeStore.getAccentColor()
                 : ColorUtil.getColor(R.color.default_model_button_color))

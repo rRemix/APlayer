@@ -17,12 +17,13 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import butterknife.BindView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Album;
+import remix.myplayer.databinding.ItemAlbumRecycleGridBinding;
+import remix.myplayer.databinding.ItemAlbumRecycleListBinding;
 import remix.myplayer.misc.menu.LibraryListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -57,10 +58,10 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
           LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_header_2, parent, false));
     }
     return viewType == HeaderAdapter.LIST_MODE ?
-        new AlbumListHolder(LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.item_album_recycle_list, parent, false)) :
-        new AlbumGridHolder(LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.item_album_recycle_grid, parent, false));
+        new AlbumListHolder(ItemAlbumRecycleListBinding
+            .inflate(LayoutInflater.from(parent.getContext()), parent, false)) :
+        new AlbumGridHolder(ItemAlbumRecycleGridBinding
+            .inflate(LayoutInflater.from(parent.getContext()), parent, false));
   }
 
   @Override
@@ -161,18 +162,12 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
 
   static class AlbumHolder extends BaseViewHolder {
 
-    @BindView(R.id.item_half_circle)
     @Nullable
     ImageView mHalfCircle;
-    @BindView(R.id.item_text1)
     TextView mText1;
-    @BindView(R.id.item_text2)
     TextView mText2;
-    @BindView(R.id.item_button)
     ImageButton mButton;
-    @BindView(R.id.item_simpleiview)
     SimpleDraweeView mImage;
-    @BindView(R.id.item_container)
     ViewGroup mContainer;
 
     AlbumHolder(View v) {
@@ -182,15 +177,26 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
 
   static class AlbumGridHolder extends AlbumHolder {
 
-    AlbumGridHolder(View v) {
-      super(v);
+    AlbumGridHolder(ItemAlbumRecycleGridBinding binding) {
+      super(binding.getRoot());
+      mHalfCircle = binding.itemHalfCircle;
+      mText1 = binding.itemText1;
+      mText2 = binding.itemText2;
+      mButton = binding.itemButton;
+      mImage = binding.itemSimpleiview;
+      mContainer = binding.itemContainer;
     }
   }
 
   static class AlbumListHolder extends AlbumHolder {
 
-    AlbumListHolder(View v) {
-      super(v);
+    AlbumListHolder(ItemAlbumRecycleListBinding binding) {
+      super(binding.getRoot());
+      mText1 = binding.itemText1;
+      mText2 = binding.itemText2;
+      mButton = binding.itemButton;
+      mImage = binding.itemSimpleiview;
+      mContainer = binding.itemContainer;
     }
   }
 
