@@ -203,7 +203,7 @@ public class SPUtil {
     //定时器时长
     String TIMER_DURATION = "timer_duration";
     //定时结束后等待当前歌曲播放完毕
-    String TIMER_PENDING_CLOSE = "timer_pending_close";
+    String TIMER_EXIT_AFTER_FINISH = "timer_exit_after_finish";
     //封面下载源
     String ALBUM_COVER_DOWNLOAD_SOURCE = "album_cover_download_source";
     //播放界面底部显示
