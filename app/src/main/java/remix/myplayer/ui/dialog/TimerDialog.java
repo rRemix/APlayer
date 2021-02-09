@@ -95,7 +95,7 @@ public class TimerDialog extends BaseDialog {
 
     //读取保存的配置
     final boolean pendingClose = SPUtil
-        .getValue(getContext(), SETTING_KEY.NAME, SETTING_KEY.TIMER_PENDING_CLOSE, false);
+        .getValue(getContext(), SETTING_KEY.NAME, SETTING_KEY.TIMER_EXIT_AFTER_FINISH, false);
     final boolean hasDefault = SPUtil
         .getValue(getContext(), SETTING_KEY.NAME, SETTING_KEY.TIMER_DEFAULT, false);
     final int time = SPUtil
@@ -114,7 +114,7 @@ public class TimerDialog extends BaseDialog {
     binding.timerPendingSwitch.setChecked(pendingClose);
     binding.timerPendingSwitch.setOnCheckedChangeListener(
         (buttonView, isChecked) -> SPUtil.putValue(getContext(), SETTING_KEY.NAME,
-            SETTING_KEY.TIMER_PENDING_CLOSE, isChecked));
+            SETTING_KEY.TIMER_EXIT_AFTER_FINISH, isChecked));
 
     binding.timerDefaultSwitch.setChecked(hasDefault);
     binding.timerDefaultSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
