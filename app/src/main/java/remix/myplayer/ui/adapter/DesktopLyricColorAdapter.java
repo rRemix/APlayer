@@ -6,6 +6,7 @@ import android.graphics.drawable.GradientDrawable;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import java.util.Arrays;
@@ -67,7 +68,7 @@ public class DesktopLyricColorAdapter extends BaseAdapter<Integer, DesktopLyricC
   public FloatColorHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     final Context context = parent.getContext();
     FloatColorHolder holder = new FloatColorHolder(
-        ItemFloatLrcColorBinding.inflate(LayoutInflater.from(context), parent, false));
+        LayoutInflater.from(context).inflate(R.layout.item_float_lrc_color, parent, false));
 
     RelativeLayout.LayoutParams imgLayoutParam = new RelativeLayout.LayoutParams(
         DensityUtil.dip2px(context, 18), DensityUtil.dip2px(context, 18));
@@ -112,9 +113,9 @@ public class DesktopLyricColorAdapter extends BaseAdapter<Integer, DesktopLyricC
 
     private final ItemFloatLrcColorBinding binding;
 
-    public FloatColorHolder(ItemFloatLrcColorBinding binding) {
-      super(binding.getRoot());
-      this.binding = binding;
+    public FloatColorHolder(View view) {
+      super(view);
+      this.binding = ItemFloatLrcColorBinding.bind(view);
     }
   }
 }
