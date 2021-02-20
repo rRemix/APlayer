@@ -129,7 +129,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
       final PopupMenu popupMenu = new PopupMenu(context, holder.mButton);
       popupMenu.getMenuInflater().inflate(R.menu.menu_artist_item, popupMenu.getMenu());
       popupMenu.setOnMenuItemClickListener(new LibraryListener(context,
-          artistId,
+          artistId + "",
           Constants.ARTIST,
           artist.getArtist()));
       popupMenu.setGravity(Gravity.END);

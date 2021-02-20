@@ -4,9 +4,8 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.provider.MediaStore
-import androidx.appcompat.widget.PopupMenu
 import android.view.MenuItem
-import android.widget.CompoundButton
+import androidx.appcompat.widget.PopupMenu
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.soundcloud.android.crop.Crop
 import io.reactivex.Single
@@ -28,7 +27,7 @@ import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.util.Constants
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.MediaStoreUtil.getSongIds
-import remix.myplayer.util.MediaStoreUtil.getSongIdsByParentId
+import remix.myplayer.util.MediaStoreUtil.getSongsByParentPath
 import remix.myplayer.util.MusicUtil.makeCmdIntent
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
@@ -36,25 +35,25 @@ import remix.myplayer.util.ToastUtil
 /**
  * Created by taeja on 16-1-25.
  */
-class LibraryListener(private val context: Context, //专辑id 艺术家id 歌曲id 文件夹position
-                      private val id: Long, //0:专辑 1:歌手 2:文件夹 3:播放列表
-                      private val type: Int, //专辑名 艺术家名 文件夹position或者播放列表名字
-                      private val key: String) : PopupMenu.OnMenuItemClickListener {
+class LibraryListener(private val context: Context,
+                      private val key: String,
+                      private val type: Int,
+                      private val extra: String) : PopupMenu.OnMenuItemClickListener {
 
   private fun getSongIdSingle(): Single<List<Int>> {
     return Single.fromCallable {
       when (type) {
         //专辑或者艺术家
-        Constants.ALBUM, Constants.ARTIST -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + id, null)
+        Constants.ALBUM, Constants.ARTIST -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + key, null)
         //播放列表
-        Constants.PLAYLIST -> DatabaseRepository.getInstance().getPlayList(id)
+        Constants.PLAYLIST -> DatabaseRepository.getInstance().getPlayList(key)
             .map {
               it.audioIds.toList()
             }
             .blockingGet()
         //文件夹
-        Constants.FOLDER -> getSongIdsByParentId(id)
-        else -> emptyList<Int>()
+        Constants.FOLDER -> getSongsByParentPath(key).map { it.id }
+        else -> emptyList()
       }
     }
   }
@@ -110,7 +109,7 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
             //删除
             R.id.menu_delete -> {
               R.string.my_favorite
-              if (key == context.getString(R.string.my_favorite)) {
+              if (extra == context.getString(R.string.my_favorite)) {
                 //我的收藏不可删除
                 ToastUtil.show(context, R.string.mylove_cant_edit)
                 return@Consumer
@@ -123,7 +122,7 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
                   .checkBoxPromptRes(R.string.delete_source, check[0]) { buttonView, isChecked -> check[0] = isChecked }
                   .onAny { dialog, which ->
                     if (which == POSITIVE) {
-                      DeleteHelper.deleteSongs(ids, check[0], id, type == Constants.PLAYLIST)
+                      DeleteHelper.deleteSongs(ids, check[0], key.toLong(), type == Constants.PLAYLIST)
                           .compose(applySingleScheduler())
                           .subscribe({
                             ToastUtil.show(context, if (it) R.string.delete_success else R.string.delete_error)
@@ -136,15 +135,15 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
             }
             //设置封面
             R.id.menu_album_thumb -> {
-              val thumbBean = CustomCover(id, type, key)
+              val customCover = CustomCover(key.toLong(), type, extra)
               val thumbIntent = (context as Activity).intent
-              thumbIntent.putExtra("thumb", thumbBean)
+              thumbIntent.putExtra("thumb", customCover)
               context.intent = thumbIntent
               Crop.pickImage(context, Crop.REQUEST_PICK)
             }
             //列表重命名
             R.id.menu_playlist_rename -> {
-              if (key == context.getString(R.string.my_favorite)) {
+              if (extra == context.getString(R.string.my_favorite)) {
                 //我的收藏不可删除
                 ToastUtil.show(context, R.string.mylove_cant_edit)
                 return@Consumer
@@ -153,7 +152,7 @@ class LibraryListener(private val context: Context, //专辑id 艺术家id 歌�
                   .title(R.string.rename)
                   .input("", "", false) { dialog, input ->
                     DatabaseRepository.getInstance()
-                        .getPlayList(id)
+                        .getPlayList(key)
                         .flatMap {
                           DatabaseRepository.getInstance()
                               .updatePlayList(it.copy(name = input.toString()))

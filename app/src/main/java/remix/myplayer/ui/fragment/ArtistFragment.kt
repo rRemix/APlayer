@@ -41,7 +41,7 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
       override fun onItemClick(view: View, position: Int) {
         val artist = mAdapter?.datas?.get(position) ?: return
         if (userVisibleHint && mChoice?.click(position, artist) == false) {
-          ChildHolderActivity.start(mContext, Constants.ARTIST, artist.artistID, artist.artist)
+          mContext?.let { ChildHolderActivity.start(it, Constants.ARTIST, artist.artistID.toString(), artist.artist) }
         }
       }
 

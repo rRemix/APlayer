@@ -35,7 +35,7 @@ class FolderFragment : LibraryFragment<Folder, FolderAdapter>() {
         val folder = mAdapter?.datas?.get(position) ?: return
         val path = folder.path
         if (userVisibleHint && !TextUtils.isEmpty(path) && mChoice?.click(position, folder) == false) {
-          ChildHolderActivity.start(mContext, Constants.FOLDER, folder.parentId, path)
+          mContext?.let { ChildHolderActivity.start(it, Constants.FOLDER, folder.path, path) }
         }
       }
 

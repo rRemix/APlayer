@@ -128,7 +128,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
       popupMenu.getMenuInflater().inflate(R.menu.menu_album_item, popupMenu.getMenu());
       popupMenu.setOnMenuItemClickListener(new LibraryListener(
           context,
-          albumId,
+          albumId + "",
           Constants.ALBUM,
           album.getAlbum()));
       popupMenu.show();

@@ -1,7 +1,10 @@
 package remix.myplayer.util
 
 import android.annotation.SuppressLint
-import android.content.*
+import android.content.ContentUris
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.media.RingtoneManager
 import android.net.Uri
@@ -11,7 +14,6 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Audio
 import android.provider.MediaStore.Audio.AudioColumns
 import android.provider.Settings
-import android.text.TextUtils
 import androidx.annotation.WorkerThread
 import com.facebook.common.util.ByteConstants
 import org.jaudiotagger.audio.AudioFileIO
@@ -187,44 +189,25 @@ object MediaStoreUtil {
 
   @JvmStatic
   fun getAllFolder(): List<Folder> {
-    val folders: MutableList<Folder> = ArrayList()
     if (!Util.hasStoragePermissions()) {
-      return folders
+      return Collections.emptyList()
     }
-    val folderMap: MutableMap<Int, MutableList<String>?> = LinkedHashMap()
-    val baseSelection = baseSelection
-    val selection = if (!TextUtils.isEmpty(baseSelection)) "$baseSelection and media_type = 2" else "media_type = 2"
-    try {
-      mContext.contentResolver
-          .query(MediaStore.Files.getContentUri("external"),
-              null, selection, baseSelectionArgs, null)
-          .use { cursor ->
-            if (cursor != null) {
-              while (cursor.moveToNext()) {
-                val data = cursor
-                    .getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA))
-                val parentId = cursor
-                    .getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.PARENT))
-                val parentPath = data.substring(0, data.lastIndexOf("/"))
-                if (!folderMap.containsKey(parentId)) {
-                  folderMap[parentId] = ArrayList(listOf(parentPath))
-                } else {
-                  folderMap[parentId]?.add(parentPath)
-                }
-              }
 
-              //转换
-              for ((key, value) in folderMap) {
-                val parentPath = value?.get(0) ?: ""
-                val folder = Folder(
-                    parentPath.substring(parentPath.lastIndexOf("/") + 1),
-                    folderMap[key]?.size ?: 0,
-                    parentPath,
-                    key.toLong())
-                folders.add(folder)
-              }
-            }
-          }
+    val songs = getSongs(null, null)
+    val folders: MutableList<Folder> = ArrayList()
+    val folderMap: MutableMap<String, MutableList<Song>> = LinkedHashMap()
+    try {
+      for (song in songs) {
+        val parentPath = song.url.substring(0, song.url.lastIndexOf("/"))
+        if (folderMap[parentPath] == null) {
+          folderMap[parentPath] = ArrayList()
+        }
+        folderMap[parentPath]?.add(song)
+      }
+
+      for ((path, songs) in folderMap) {
+        folders.add(Folder(path.substring(path.lastIndexOf("/") + 1), songs.size, path))
+      }
     } catch (e: Exception) {
       Timber.v(e)
     }
@@ -307,6 +290,15 @@ object MediaStoreUtil {
           }
         }
     return ids
+  }
+
+  @JvmStatic
+  fun getSongsByParentPath(parentPath: String): List<Song> {
+    val songs = getSongs(null, null,
+        SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z))
+    return songs.filter { song ->
+      song.url.substring(0, song.url.lastIndexOf("/")) == parentPath
+    }
   }
 
   /**

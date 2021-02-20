@@ -45,7 +45,7 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
             ToastUtil.show(mContext, getStringSafely(R.string.list_is_empty))
             return
           }
-          ChildHolderActivity.start(mContext, Constants.PLAYLIST, playList.id, playList.name)
+          mContext?.let { ChildHolderActivity.start(it, Constants.PLAYLIST, playList.id.toString(), playList.name) }
         }
       }
 

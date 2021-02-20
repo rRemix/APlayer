@@ -301,7 +301,7 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
     return menuLayoutId
   }
 
-  override fun saveSortOrder(sortOrder: String?) {
+  override fun saveSortOrder(sortOrder: String) {
     when (currentFragment) {
       is SongFragment -> SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER,
           sortOrder)

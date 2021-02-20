@@ -30,7 +30,7 @@ fun Artist.getSongIds(): List<Int> {
 }
 
 fun Folder.getSongIds(): List<Int> {
-  return MediaStoreUtil.getSongIdsByParentId(parentId)
+  return MediaStoreUtil.getSongsByParentPath(path).map { it.id }
 }
 
 fun Context.isPortraitOrientation(): Boolean {

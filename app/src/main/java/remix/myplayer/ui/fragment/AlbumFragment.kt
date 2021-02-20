@@ -40,7 +40,7 @@ class AlbumFragment : LibraryFragment<Album, AlbumAdapter>() {
       override fun onItemClick(view: View, position: Int) {
         val album = mAdapter?.datas?.get(position) ?: return
         if (userVisibleHint && mChoice?.click(position, album) == false) {
-          ChildHolderActivity.start(mContext, Constants.ALBUM, album.albumID, album.album)
+          mContext?.let { ChildHolderActivity.start(it, Constants.ALBUM, album.albumID.toString(), album.album) }
         }
       }
 

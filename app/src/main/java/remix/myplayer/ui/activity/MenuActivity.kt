@@ -31,7 +31,7 @@ abstract class MenuActivity : ToolbarActivity() {
           .show(supportFragmentManager, TimerDialog::class.java.simpleName)
       return true
     } else {
-      var sortOrder: String? = null
+      var sortOrder = ""
       when (item.itemId) {
         R.id.action_sort_order_title -> {
           sortOrder = SortOrder.SongSortOrder.SONG_A_Z
@@ -147,7 +147,7 @@ abstract class MenuActivity : ToolbarActivity() {
     ToolbarContentTintHelper.handleOnCreateOptionsMenu(this, toolbar, menu, getToolbarBackgroundColor(toolbar))
   }
 
-  protected open fun saveSortOrder(sortOrder: String?) {
+  protected open fun saveSortOrder(sortOrder: String) {
 
   }
 
