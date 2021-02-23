@@ -1,8 +1,7 @@
 package remix.myplayer.ui.adapter
 
 import android.net.Uri
-import android.view.LayoutInflater
-import android.view.ViewGroup
+import android.view.View
 import io.reactivex.disposables.Disposable
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemCustomSortBinding
@@ -24,21 +23,11 @@ class CustomSortAdapter(layoutId: Int) : BaseAdapter<Song, CustomSortAdapter.Cus
 
     //封面
     val disposable = LibraryUriRequest(
-      holder.binding.itemImg,
-      getSearchRequestWithAlbumType(song),
-      RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()
+        holder.binding.itemImg,
+        getSearchRequestWithAlbumType(song),
+        RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()
     ).load()
     holder.binding.itemImg.tag = disposable
-  }
-
-  override fun onCreateViewHolder(
-    parent: ViewGroup, viewType: Int
-  ): CustomSortHolder {
-    return CustomSortHolder(
-      ItemCustomSortBinding.inflate(
-        LayoutInflater.from(parent.context), parent, false
-      )
-    )
   }
 
   override fun onViewRecycled(holder: CustomSortHolder) {
@@ -53,6 +42,7 @@ class CustomSortAdapter(layoutId: Int) : BaseAdapter<Song, CustomSortAdapter.Cus
 
   }
 
-  class CustomSortHolder(val binding: ItemCustomSortBinding) :
-    BaseViewHolder(binding.root)
+  class CustomSortHolder(itemView: View) : BaseViewHolder(itemView) {
+    val binding = ItemCustomSortBinding.bind(itemView)
+  }
 }
