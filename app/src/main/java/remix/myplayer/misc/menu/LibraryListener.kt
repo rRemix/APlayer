@@ -46,7 +46,7 @@ class LibraryListener(private val context: Context,
         //专辑或者艺术家
         Constants.ALBUM, Constants.ARTIST -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + key, null)
         //播放列表
-        Constants.PLAYLIST -> DatabaseRepository.getInstance().getPlayList(key)
+        Constants.PLAYLIST -> DatabaseRepository.getInstance().getPlayList(key.toLong())
             .map {
               it.audioIds.toList()
             }
@@ -122,7 +122,7 @@ class LibraryListener(private val context: Context,
                   .checkBoxPromptRes(R.string.delete_source, check[0]) { buttonView, isChecked -> check[0] = isChecked }
                   .onAny { dialog, which ->
                     if (which == POSITIVE) {
-                      DeleteHelper.deleteSongs(ids, check[0], key.toLong(), type == Constants.PLAYLIST)
+                      DeleteHelper.deleteSongs(ids, check[0], if (type == Constants.PLAYLIST) key.toLong() else -1, type == Constants.PLAYLIST)
                           .compose(applySingleScheduler())
                           .subscribe({
                             ToastUtil.show(context, if (it) R.string.delete_success else R.string.delete_error)
@@ -152,7 +152,7 @@ class LibraryListener(private val context: Context,
                   .title(R.string.rename)
                   .input("", "", false) { dialog, input ->
                     DatabaseRepository.getInstance()
-                        .getPlayList(key)
+                        .getPlayList(key.toLong())
                         .flatMap {
                           DatabaseRepository.getInstance()
                               .updatePlayList(it.copy(name = input.toString()))

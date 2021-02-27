@@ -1374,7 +1374,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentSong.album)
         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentSong.artist)
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentSong.artist)
-        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currentSong.displayName)
         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.getDuration())
         .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (playQueue.position + 1).toLong())
         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.title)
