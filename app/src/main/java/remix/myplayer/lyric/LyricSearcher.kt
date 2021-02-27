@@ -165,7 +165,7 @@ class LyricSearcher {
    * @return
    */
   private fun getEmbeddedObservable(): Observable<List<LrcRow>> {
-    val tagEditor = TagEditor(song.url)
+    val tagEditor = TagEditor(song.data)
     return Observable.create { e ->
       val lyric = tagEditor.getFieldValueSingle(FieldKey.LYRICS).blockingGet()
       if (!lyric.isNullOrEmpty()) {

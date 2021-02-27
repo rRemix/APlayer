@@ -198,7 +198,7 @@ object MediaStoreUtil {
     val folderMap: MutableMap<String, MutableList<Song>> = LinkedHashMap()
     try {
       for (song in songs) {
-        val parentPath = song.url.substring(0, song.url.lastIndexOf("/"))
+        val parentPath = song.data.substring(0, song.data.lastIndexOf("/"))
         if (folderMap[parentPath] == null) {
           folderMap[parentPath] = ArrayList()
         }
@@ -297,7 +297,7 @@ object MediaStoreUtil {
     val songs = getSongs(null, null,
         SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z))
     return songs.filter { song ->
-      song.url.substring(0, song.url.lastIndexOf("/")) == parentPath
+      song.data.substring(0, song.data.lastIndexOf("/")) == parentPath
     }
   }
 
@@ -374,7 +374,7 @@ object MediaStoreUtil {
   @Throws(TagException::class, ReadOnlyFileException::class, CannotReadException::class, InvalidAudioFrameException::class, IOException::class, CannotWriteException::class)
   fun saveArtwork(context: Context, albumId: Long, artFile: File) {
     val song = getSongByAlbumId(albumId)
-    val audioFile = AudioFileIO.read(File(song.url))
+    val audioFile = AudioFileIO.read(File(song.data))
     val tag = audioFile.tagOrCreateAndSetDefault
     val artwork = ArtworkFactory.createArtworkFromFile(artFile)
     tag.deleteArtworkField()
@@ -470,7 +470,7 @@ object MediaStoreUtil {
     for (song in songs) {
       mContext.contentResolver.delete(Audio.Media.EXTERNAL_CONTENT_URI,
           Audio.Media._ID + "=?", arrayOf(song.toString() + ""))
-      Util.deleteFileSafely(File(song.url))
+      Util.deleteFileSafely(File(song.data))
     }
   }
 

@@ -14,7 +14,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.dialog_song_detail.view.*
 import kotlinx.android.synthetic.main.dialog_song_edit.view.*
 import org.jaudiotagger.tag.FieldKey
-import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
@@ -39,7 +38,7 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
   private val tagEditor: TagEditor
 
   init {
-    tagEditor = TagEditor(this.song.url)
+    tagEditor = TagEditor(this.song.data)
   }
 
   fun detail() {
@@ -56,7 +55,7 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
     detailDialog.show()
     detailDialog.customView?.let { root ->
       //歌曲路径
-      root.song_detail_path.text = song.url
+      root.song_detail_path.text = song.data
       //歌曲名称
       root.song_detail_name.text = song.displayName
       //歌曲大小

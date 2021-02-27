@@ -929,7 +929,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     playQueue.setPosition(position)
 
-    if (playQueue.song.url.isEmpty()) {
+    if (playQueue.song.data.isEmpty()) {
       ToastUtil.show(service, R.string.song_lose_effect)
       return
     }
@@ -1422,13 +1422,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     tryLaunch(
         block = {
           Timber.v("准备播放: %s", song)
-          if (TextUtils.isEmpty(song.url)) {
+          if (TextUtils.isEmpty(song.data)) {
             ToastUtil.show(service, getString(R.string.path_empty))
             return@tryLaunch
           }
 
           val exist = withContext(Dispatchers.IO) {
-            File(song.url).exists()
+            File(song.data).exists()
           }
           if (!exist) {
             ToastUtil.show(service, getString(R.string.file_not_exist))

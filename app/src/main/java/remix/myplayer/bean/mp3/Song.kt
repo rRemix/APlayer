@@ -29,7 +29,7 @@ data class Song(
     val artistId: Long,
     private var duration: Long,
     val realTime: String,
-    val url: String,
+    val data: String,
     val size: Long,
     val year: String?,
     val titleKey: String?,
@@ -51,7 +51,7 @@ data class Song(
         ", artist='" + artist + '\''.toString() +
         ", duration=" + duration +
         ", realTime='" + realTime + '\''.toString() +
-        ", url='" + url + '\''.toString() +
+        ", url='" + data + '\''.toString() +
         ", size=" + size +
         ", year=" + year +
         '}'.toString()
@@ -59,11 +59,11 @@ data class Song(
 
 
   fun getDuration(): Long {
-//    if (duration <= 0 && id > 0 && url.isNotEmpty()) {
-//      val metadataRetriever = MediaMetadataRetriever()
-//      try {
-//        metadataRetriever.setDataSource(url)
-//        duration = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLong()
+    if (duration <= 0 && id > 0 && data.isNotEmpty()) {
+      val metadataRetriever = MediaMetadataRetriever()
+      try {
+        metadataRetriever.setDataSource(data)
+        duration = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLong()
 //        if (duration > 0) {
 //          val contentValues = ContentValues()
 //          contentValues.put(MediaStore.Audio.Media.DURATION, duration)
@@ -71,17 +71,13 @@ data class Song(
 //              contentValues, MediaStore.Audio.Media._ID + "=?", arrayOf(id.toString() + ""))
 //          Timber.tag("Song").v("updateDuration, dur: $duration  count: $updateCount")
 //        }
-//      } catch (e: Exception) {
-//        Timber.tag("Song").v("updateDuration failed: $e")
-//      } finally {
-//        metadataRetriever.release()
-//      }
-//    }
+      } catch (e: Exception) {
+        Timber.tag("Song").v("updateDuration failed: $e")
+      } finally {
+        metadataRetriever.release()
+      }
+    }
     return duration
-  }
-
-  fun setDuration(duration: Long) {
-    this.duration = duration
   }
 
   override fun hashCode(): Int {
@@ -94,7 +90,7 @@ data class Song(
     result = 31 * result + artistId.hashCode()
     result = 31 * result + duration.hashCode()
     result = 31 * result + realTime.hashCode()
-    result = 31 * result + url.hashCode()
+    result = 31 * result + data.hashCode()
     result = 31 * result + size.hashCode()
     result = 31 * result + year.hashCode()
     result = 31 * result + titleKey.hashCode()
@@ -115,7 +111,7 @@ data class Song(
     if (artistId != other.artistId) return false
     if (duration != other.duration) return false
     if (realTime != other.realTime) return false
-    if (url != other.url) return false
+    if (data != other.data) return false
     if (size != other.size) return false
     if (year != other.year) return false
     if (titleKey != other.titleKey) return false
