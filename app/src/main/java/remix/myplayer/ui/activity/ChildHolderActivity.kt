@@ -109,7 +109,7 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
     val accentColor = accentColor
     binding.childHolderRecyclerView.setBubbleColor(accentColor)
     binding.childHolderRecyclerView.setHandleColor(accentColor)
-    binding.childHolderRecyclerView.setBubbleTextColor(ColorUtil.getColor(if (ColorUtil.isColorLight(accentColor)) R.color.dark_text_color_primary else R.color.light_text_color_primary))
+    binding.childHolderRecyclerView.setBubbleTextColor(ColorUtil.getColor(if (ColorUtil.isColorLight(accentColor)) R.color.light_text_color_primary else R.color.dark_text_color_primary))
 
     //标题
     var title = ""

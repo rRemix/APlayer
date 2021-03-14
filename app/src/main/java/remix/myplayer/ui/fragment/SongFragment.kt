@@ -17,8 +17,10 @@ import remix.myplayer.misc.interfaces.LoaderIds
 import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.MainActivity
 import remix.myplayer.ui.adapter.SongAdapter
+import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.MediaStoreUtil.getAllSong
 import remix.myplayer.util.MusicUtil
 
@@ -71,6 +73,17 @@ class SongFragment : LibraryFragment<Song, SongAdapter>() {
     location_recyclerView.itemAnimator = DefaultItemAnimator()
     location_recyclerView.adapter = mAdapter
     location_recyclerView.setHasFixedSize(true)
+
+    val accentColor = ThemeStore.accentColor
+    location_recyclerView.setBubbleColor(accentColor)
+    location_recyclerView.setHandleColor(accentColor)
+    location_recyclerView.setBubbleTextColor(
+      if (ColorUtil.isColorLight(accentColor)) {
+        ColorUtil.getColor(R.color.light_text_color_primary)
+      } else {
+        ColorUtil.getColor(R.color.dark_text_color_primary)
+      }
+    )
   }
 
   override fun loader(): Loader<List<Song>> {
