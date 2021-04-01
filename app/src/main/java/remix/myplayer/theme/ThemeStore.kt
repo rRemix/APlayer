@@ -299,6 +299,17 @@ object ThemeStore {
       SPUtil.putValue(App.getContext(), KEY_NAME, KEY_FLOAT_LYRIC_TEXT_COLOR, value)
     }
 
+  @get:ColorInt
+  val colorOnPrimary: Int
+    get() {
+      return ColorUtil.getColor(
+        if (isMDColorLight) {
+        R.color.design_dark_default_color_on_primary
+      } else {
+        R.color.design_default_color_on_primary
+      })
+    }
+
   @JvmStatic
   val mDDialogTheme: com.afollestad.materialdialogs.Theme
     get() = if (isMDColorLight) {

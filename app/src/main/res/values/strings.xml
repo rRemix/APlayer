@@ -46,6 +46,8 @@
   <string name="add_playlist_success">Create playlist success</string>
   <string name="add_playlist_error">Create playlist failed</string>
   <string name="playlist_already_exist">The playlist already exists</string>
+  <string name="more">More</string>
+  <string name="select_all">Select all</string>
 
   <string name="add_error">Add failed</string>
   <string name="add_to_playlist">Add to playlist</string>
@@ -428,4 +430,6 @@
   <string name="now_playing_screen_theme">Follow theme</string>
   <string name="now_playing_screen_cover">Follow album cover</string>
   <string name="now_playing_screen_custom">Custom</string>
+
+  <string name="song_list_select_title_format">%1$,d selected</string>
 </resources>

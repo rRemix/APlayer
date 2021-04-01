@@ -1,71 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   android:id="@+id/toolbar_multi"
   android:layout_width="match_parent"
-  android:layout_height="wrap_content">
+  android:layout_height="?attr/actionBarSize">
 
-  <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+  <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize">
 
-    <RelativeLayout
-      android:layout_width="0dp"
-      android:layout_height="match_parent"
-      android:layout_weight="1">
-      <ImageButton
-        android:id="@+id/multi_delete"
-        android:layout_width="@dimen/d56_size"
-        android:layout_height="match_parent"
-        android:src="@drawable/btn_tip_delete"
-        android:background="?attr/background_rect_ripple"
-        android:layout_centerInParent="true"/>
-      <ImageButton
-        android:id="@+id/multi_close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/btn_tip_close"
-        android:background="@color/transparent"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="@dimen/d6_size"
-        android:layout_centerVertical="true"/>
-    </RelativeLayout>
+    <ImageButton
+      android:id="@+id/multi_close"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentStart="true"
+      android:layout_centerVertical="true"
+      android:layout_marginStart="@dimen/d16_size"
+      android:background="?attr/background_oval_ripple"
+      android:contentDescription="@string/close"
+      android:paddingVertical="@dimen/d2_size"
+      app:srcCompat="@drawable/ic_close_white_24dp" />
 
-    <RelativeLayout
-      android:layout_width="0dp"
-      android:layout_height="match_parent"
-      android:layout_weight="1">
-      <ImageButton
-        android:id="@+id/multi_playlist"
-        android:layout_width="@dimen/d56_size"
-        android:layout_height="match_parent"
-        android:src="@drawable/btn_tip_playlist"
-        android:background="?attr/background_rect_ripple"
-        android:layout_centerInParent="true"/>
-    </RelativeLayout>
+    <TextView
+      android:id="@+id/multi_title"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_centerVertical="true"
+      android:layout_marginHorizontal="@dimen/d32_size"
+      android:layout_toEndOf="@+id/multi_close"
+      android:textSize="@dimen/s20_size" />
 
-    <RelativeLayout
-      android:layout_width="0dp"
-      android:layout_height="match_parent"
-      android:layout_weight="1">
-      <ImageButton
-        android:id="@+id/multi_playqueue"
-        android:layout_width="@dimen/d56_size"
-        android:layout_height="match_parent"
-        android:src="@drawable/btn_tip_playqueue"
-        android:background="?attr/background_rect_ripple"
-        android:layout_centerInParent="true"/>
-    </RelativeLayout>
-  </LinearLayout>
+    <ImageButton
+      android:id="@+id/multi_more"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentEnd="true"
+      android:layout_centerVertical="true"
+      android:layout_marginEnd="@dimen/d16_size"
+      android:background="?attr/background_oval_ripple"
+      android:contentDescription="@string/more"
+      android:paddingVertical="@dimen/d2_size"
+      app:srcCompat="@drawable/ic_more_vert_white_24dp" />
 
-  <ImageView
-    android:visibility="gone"
-    android:layout_height="1px"
-    android:layout_width="match_parent"
-    android:id="@+id/multi_divider"
-    android:background="?attr/background_color_main"
-    android:alpha="50"
-    android:layout_alignParentBottom="true"/>
+    <ImageButton
+      android:id="@+id/multi_delete"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      android:layout_marginEnd="@dimen/d24_size"
+      android:layout_toStartOf="@+id/multi_more"
+      android:background="?attr/background_oval_ripple"
+      android:contentDescription="@string/delete"
+      android:paddingVertical="@dimen/d2_size"
+      app:srcCompat="@drawable/ic_delete_white_24dp" />
+
+    <ImageButton
+      android:id="@+id/multi_queue"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      android:layout_marginEnd="@dimen/d24_size"
+      android:layout_toStartOf="@+id/multi_delete"
+      android:background="?attr/background_oval_ripple"
+      android:contentDescription="@string/add_to_play_queue"
+      android:paddingVertical="@dimen/d2_size"
+      app:srcCompat="@drawable/ic_playlist_add_white_24dp" />
+
+    <ImageButton
+      android:id="@+id/multi_playlist"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerVertical="true"
+      android:layout_marginEnd="@dimen/d24_size"
+      android:layout_toStartOf="@+id/multi_queue"
+      android:background="?attr/background_oval_ripple"
+      android:contentDescription="@string/add_to_playlist"
+      android:paddingVertical="@dimen/d2_size"
+      app:srcCompat="@drawable/ic_library_add_white_24dp" />
+  </RelativeLayout>
 
 </RelativeLayout>
