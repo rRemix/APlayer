@@ -46,6 +46,8 @@
   <string name="add_playlist_success">新建播放列表成功</string>
   <string name="add_playlist_error">新建播放列表失败</string>
   <string name="playlist_already_exist">该播放列表已存在</string>
+  <string name="more">更多</string>
+  <string name="select_all">全选</string>
 
   <string name="add_error">添加失败</string>
   <string name="add_to_playlist">添加到播放列表</string>
@@ -428,4 +430,6 @@
   <string name="now_playing_screen_theme">跟随主题</string>
   <string name="now_playing_screen_cover">跟随专辑封面</string>
   <string name="now_playing_screen_custom">自定义</string>
+
+  <string name="song_list_select_title_format">已选择 %1$,d</string>
 </resources>

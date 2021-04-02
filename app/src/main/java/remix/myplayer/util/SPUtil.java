@@ -214,8 +214,6 @@ public class SPUtil {
     String DELETE_SOURCE = "delete_source";
     //是否保存日志文件到sd卡
     String WRITE_LOG_TO_STORAGE = "write_log_to_storage";
-    //是否第一次显示多选
-    String FIRST_SHOW_MULTI = "first_show_multi";
     //列表歌曲名是否取代为文件夹名
     String SHOW_DISPLAYNAME = "show_displayname";
     //专辑列表的显示模式
