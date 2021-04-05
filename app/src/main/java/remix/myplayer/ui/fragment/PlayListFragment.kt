@@ -12,7 +12,7 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.db.room.DatabaseRepository.Companion.getInstance
 import remix.myplayer.db.room.model.PlayList
-import remix.myplayer.helper.SortOrder.PlayListSortOrder
+import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader
 import remix.myplayer.misc.interfaces.LoaderIds
 import remix.myplayer.misc.interfaces.OnItemClickListener
@@ -20,6 +20,7 @@ import remix.myplayer.ui.activity.ChildHolderActivity
 import remix.myplayer.ui.adapter.HeaderAdapter
 import remix.myplayer.ui.adapter.PlayListAdapter
 import remix.myplayer.util.Constants
+import remix.myplayer.util.ItemsSorter
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
@@ -81,10 +82,23 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
   override val loaderId: Int = LoaderIds.PLAYLIST_FRAGMENT
 
   class AsyncPlayListLoader(context: Context?) : WrappedAsyncTaskLoader<List<PlayList>>(context) {
-    override fun loadInBackground(): List<PlayList>? {
-      val sort = SPUtil.getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.PLAYLIST_SORT_ORDER,
-          PlayListSortOrder.PLAYLIST_A_Z)
-      return getInstance().getSortPlayList("SELECT * FROM PlayList ORDER BY $sort").blockingGet()
+    override fun loadInBackground(): List<PlayList> {
+      val sortOrder = SPUtil.getValue(
+        App.getContext(),
+        SETTING_KEY.NAME,
+        SETTING_KEY.PLAYLIST_SORT_ORDER,
+        SortOrder.PLAYLIST_A_Z
+      )
+      val forceSort =
+        SPUtil.getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.FORCE_SORT, false)
+      return getInstance().getSortPlayList("SELECT * FROM PlayList ORDER BY $sortOrder")
+        .blockingGet().let {
+        if (forceSort) {
+          ItemsSorter.sortedPlayLists(it, sortOrder)
+        } else {
+          it
+        }
+      }
     }
   }
 

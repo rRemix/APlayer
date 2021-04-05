@@ -133,19 +133,19 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
     sortOrder = when (type) {
       Constants.PLAYLIST -> {
         SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,
-            SortOrder.PlayListSongSortOrder.SONG_A_Z)
+            SortOrder.SONG_A_Z)
       }
       Constants.ALBUM -> {
         SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,
-            SortOrder.ChildHolderSongSortOrder.SONG_TRACK_NUMBER)
+            SortOrder.TRACK_NUMBER)
       }
       Constants.ARTIST -> {
         SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,
-            SortOrder.ChildHolderSongSortOrder.SONG_A_Z)
+            SortOrder.SONG_A_Z)
       }
       else -> {
         SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,
-            SortOrder.ChildHolderSongSortOrder.SONG_A_Z)
+            SortOrder.SONG_A_Z)
       }
     }
     if (TextUtils.isEmpty(sortOrder)) {
@@ -159,10 +159,10 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
     var update = false
     if (type == Constants.PLAYLIST) {
       //手动排序或者排序发生变化
-      if (sortOrder.equals(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM, ignoreCase = true) ||
+      if (sortOrder.equals(SortOrder.PLAYLIST_SONG_CUSTOM, ignoreCase = true) ||
           !this.sortOrder.equals(sortOrder, ignoreCase = true)) {
         //选择的是手动排序
-        if (sortOrder.equals(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM, ignoreCase = true)) {
+        if (sortOrder.equals(SortOrder.PLAYLIST_SONG_CUSTOM, ignoreCase = true)) {
           CustomSortActivity.start(mContext, key.toLong(), title, ArrayList(mAdapter!!.datas))
         } else {
           update = true

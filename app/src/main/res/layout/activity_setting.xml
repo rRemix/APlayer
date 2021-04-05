@@ -382,6 +382,49 @@
             android:textOn="" />
         </RelativeLayout>
 
+        <RelativeLayout
+          android:id="@+id/setting_force_sort_container"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="?attr/background_rect_ripple"
+          android:paddingVertical="@dimen/d10_size">
+
+          <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="@dimen/d16_size"
+            android:layout_toStartOf="@+id/setting_force_sort_switch"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/d2_size"
+              android:text="@string/force_sort"
+              android:textColor="?attr/text_color_primary"
+              android:textSize="@dimen/s16_size" />
+
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/force_sort_tip"
+              android:textColor="?attr/text_color_secondary"
+              android:textSize="@dimen/s14_size" />
+          </LinearLayout>
+
+          <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/setting_force_sort_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/d14_size"
+            android:textOff=""
+            android:textOn="" />
+        </RelativeLayout>
+
         <View
           android:layout_width="match_parent"
           android:layout_height="1px"

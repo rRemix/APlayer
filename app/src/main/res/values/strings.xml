@@ -377,6 +377,8 @@
   <string name="speed_range_tip">The range is 0.5 to 2</string>
   <string name="show_displayname">Display filename</string>
   <string name="show_displayname_tip">Replace the title with the filename in the song list</string>
+  <string name="force_sort">Force sort</string>
+  <string name="force_sort_tip">Force sort songs, albums, artists and playlists by Pinyin\nMay make load time much longer</string>
   <string name="accent_color">Accent color</string>
   <string name="accent_color_tip">Allow yourself to choose colors that you love</string>
   <string name="dark_theme">Dark theme</string>

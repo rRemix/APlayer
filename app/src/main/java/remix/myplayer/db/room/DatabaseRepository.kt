@@ -397,9 +397,9 @@ class DatabaseRepository private constructor() {
         .flatMap {
           val sort = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME,
               SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,
-              SortOrder.PlayListSongSortOrder.SONG_A_Z)
+              SortOrder.SONG_A_Z)
           //强制或者设置了自定义排序
-          val actualSort = if (force || sort == SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)
+          val actualSort = if (force || sort == SortOrder.PLAYLIST_SONG_CUSTOM)
             CUSTOMSORT else sort
 
           return@flatMap getSongsWithSort(actualSort, it.audioIds.toList())

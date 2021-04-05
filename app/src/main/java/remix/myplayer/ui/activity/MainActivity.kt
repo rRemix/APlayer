@@ -277,16 +277,16 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
     when (currentFragment) {
       is SongFragment -> sortOrder = SPUtil
           .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER,
-              SortOrder.SongSortOrder.SONG_A_Z)
+              SortOrder.SONG_A_Z)
       is AlbumFragment -> sortOrder = SPUtil
           .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
-              SortOrder.AlbumSortOrder.ALBUM_A_Z)
+              SortOrder.ALBUM_A_Z)
       is ArtistFragment -> sortOrder = SPUtil
           .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
-              SortOrder.ArtistSortOrder.ARTIST_A_Z)
+              SortOrder.ARTIST_A_Z)
       is PlayListFragment -> sortOrder = SPUtil
           .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,
-              SortOrder.PlayListSortOrder.PLAYLIST_DATE)
+              SortOrder.PLAYLIST_DATE)
     }
 
     if (TextUtils.isEmpty(sortOrder)) {
