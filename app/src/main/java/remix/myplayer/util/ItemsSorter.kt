@@ -1,6 +1,7 @@
 package remix.myplayer.util
 
 import com.github.promeg.pinyinhelper.Pinyin
+import kotlin.math.min
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Song
@@ -9,17 +10,24 @@ import remix.myplayer.helper.SortOrder
 
 object ItemsSorter {
   private fun compare(o1: String, o2: String): Int {
-    var i = 0
-    while (i < o1.length && i < o2.length) {
+    (0 until min(o1.length, o2.length)).forEach { i ->
       if (Pinyin.isChinese(o1[i]) != Pinyin.isChinese(o2[i]))
         return if (Pinyin.isChinese(o1[i])) -1 else 1
-      var t = Pinyin.toPinyin(o1[i]).compareTo(Pinyin.toPinyin(o2[i]))
-      if (t != 0)
-        return t
-      t = o1[i].compareTo(o2[i])
-      if (t != 0)
-        return t
-      ++i
+      if (Pinyin.isChinese(o1[i]) && Pinyin.isChinese(o2[i])) {
+        Pinyin.toPinyin(o1[i]).compareTo(Pinyin.toPinyin(o2[i])).let {
+          if (it != 0)
+            return it
+        }
+      } else {
+        o1[i].toLowerCase().compareTo(o2[i].toLowerCase()).let {
+          if (it != 0)
+            return it
+        }
+      }
+      o1[i].compareTo(o2[i]).let {
+        if (it != 0)
+          return it
+      }
     }
     return o1.length.compareTo(o2.length)
   }
