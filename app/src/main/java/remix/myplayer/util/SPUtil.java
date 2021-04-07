@@ -160,6 +160,8 @@ public class SPUtil {
     String IMMERSIVE_MODE = "immersive_mode";
     //过滤大小
     String SCAN_SIZE = "scan_size";
+    //强制按拼音排序
+    String FORCE_SORT = "force_sort";
     //歌曲排序顺序
     String SONG_SORT_ORDER = "song_sort_order";
     //专辑排序顺序

@@ -34,71 +34,71 @@ abstract class MenuActivity : ToolbarActivity() {
       var sortOrder = ""
       when (item.itemId) {
         R.id.action_sort_order_title -> {
-          sortOrder = SortOrder.SongSortOrder.SONG_A_Z
+          sortOrder = SortOrder.SONG_A_Z
           item.isChecked = true
         }
         R.id.action_sort_order_title_desc -> {
-          sortOrder = SortOrder.SongSortOrder.SONG_Z_A
+          sortOrder = SortOrder.SONG_Z_A
           item.isChecked = true
         }
         R.id.action_sort_order_display_title -> {
-          sortOrder = SortOrder.SongSortOrder.SONG_DISPLAY_TITLE_A_Z
+          sortOrder = SortOrder.DISPLAY_NAME_A_Z
           item.isChecked = true
         }
         R.id.action_sort_order_display_title_desc -> {
-          sortOrder = SortOrder.SongSortOrder.SONG_DISPLAY_TITLE_Z_A
+          sortOrder = SortOrder.DISPLAY_NAME_Z_A
           item.isChecked = true
         }
         R.id.action_sort_order_album -> {
-          sortOrder = SortOrder.SongSortOrder.SONG_ALBUM_A_Z
+          sortOrder = SortOrder.ALBUM_A_Z
           item.isChecked = true
         }
         R.id.action_sort_order_album_desc -> {
-          sortOrder = SortOrder.SongSortOrder.SONG_ALBUM_Z_A
+          sortOrder = SortOrder.ALBUM_Z_A
           item.isChecked = true
         }
         R.id.action_sort_order_artist -> {
-          sortOrder = SortOrder.SongSortOrder.SONG_ARTIST_A_Z
+          sortOrder = SortOrder.ARTIST_A_Z
           item.isChecked = true
         }
         R.id.action_sort_order_artist_desc -> {
-          sortOrder = SortOrder.SongSortOrder.SONG_ARTIST_Z_A
+          sortOrder = SortOrder.ARTIST_Z_A
           item.isChecked = true
         }
         R.id.action_sort_order_date -> {
-          sortOrder = SortOrder.SongSortOrder.SONG_DATE
+          sortOrder = SortOrder.DATE
           item.isChecked = true
         }
         R.id.action_sort_order_date_desc -> {
-          sortOrder = SortOrder.SongSortOrder.SONG_DATE_DESC
+          sortOrder = SortOrder.DATE_DESC
           item.isChecked = true
         }
         //                case R.id.action_sort_order_duration:
-        //                    sortOrder = SortOrder.SongSortOrder.SONG_DURATION;
+        //                    sortOrder = SortOrder.DURATION;
         //                    item.setChecked(true);
         //                    break;
         //                case R.id.action_sort_order_year:
-        //                    sortOrder = SortOrder.SongSortOrder.SONG_YEAR;
+        //                    sortOrder = SortOrder.YEAR;
         //                    item.setChecked(true);
         //                    break;
         R.id.action_sort_order_playlist_name -> {
-          sortOrder = SortOrder.PlayListSortOrder.PLAYLIST_A_Z
+          sortOrder = SortOrder.PLAYLIST_A_Z
           item.isChecked = true
         }
         R.id.action_sort_order_playlist_name_desc -> {
-          sortOrder = SortOrder.PlayListSortOrder.PLAYLIST_Z_A
+          sortOrder = SortOrder.PLAYLIST_Z_A
           item.isChecked = true
         }
         R.id.action_sort_order_playlist_date -> {
-          sortOrder = SortOrder.PlayListSortOrder.PLAYLIST_DATE
+          sortOrder = SortOrder.PLAYLIST_DATE
           item.isChecked = true
         }
         R.id.action_sort_order_custom -> {
-          sortOrder = SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM
+          sortOrder = SortOrder.PLAYLIST_SONG_CUSTOM
           item.isChecked = true
         }
         R.id.action_sort_order_track_number -> {
-          sortOrder = SortOrder.ChildHolderSongSortOrder.SONG_TRACK_NUMBER
+          sortOrder = SortOrder.TRACK_NUMBER
           item.isChecked = true
         }
       }
@@ -119,27 +119,27 @@ abstract class MenuActivity : ToolbarActivity() {
   protected fun setUpMenuItem(menu: Menu, sortOrder: String) {
     val subMenu = menu.findItem(R.id.action_sort_order).subMenu
     when (sortOrder) {
-      SortOrder.SongSortOrder.SONG_A_Z -> subMenu.findItem(R.id.action_sort_order_title).isChecked = true
-      SortOrder.SongSortOrder.SONG_Z_A -> subMenu.findItem(R.id.action_sort_order_title_desc).isChecked = true
-      SortOrder.SongSortOrder.SONG_DISPLAY_TITLE_A_Z -> subMenu.findItem(R.id.action_sort_order_display_title).isChecked = true
-      SortOrder.SongSortOrder.SONG_DISPLAY_TITLE_Z_A -> subMenu.findItem(R.id.action_sort_order_display_title_desc).isChecked = true
-      SortOrder.SongSortOrder.SONG_ALBUM_A_Z -> subMenu.findItem(R.id.action_sort_order_album).isChecked = true
-      SortOrder.SongSortOrder.SONG_ALBUM_Z_A -> subMenu.findItem(R.id.action_sort_order_album_desc).isChecked = true
-      SortOrder.SongSortOrder.SONG_ARTIST_A_Z -> subMenu.findItem(R.id.action_sort_order_artist).isChecked = true
-      SortOrder.SongSortOrder.SONG_ARTIST_Z_A -> subMenu.findItem(R.id.action_sort_order_artist_desc).isChecked = true
-      SortOrder.SongSortOrder.SONG_DATE -> subMenu.findItem(R.id.action_sort_order_date).isChecked = true
-      SortOrder.SongSortOrder.SONG_DATE_DESC -> subMenu.findItem(R.id.action_sort_order_date_desc).isChecked = true
-      //            case SortOrder.SongSortOrder.SONG_DURATION:
+      SortOrder.SONG_A_Z -> subMenu.findItem(R.id.action_sort_order_title).isChecked = true
+      SortOrder.SONG_Z_A -> subMenu.findItem(R.id.action_sort_order_title_desc).isChecked = true
+      SortOrder.DISPLAY_NAME_A_Z -> subMenu.findItem(R.id.action_sort_order_display_title).isChecked = true
+      SortOrder.DISPLAY_NAME_Z_A -> subMenu.findItem(R.id.action_sort_order_display_title_desc).isChecked = true
+      SortOrder.ALBUM_A_Z -> subMenu.findItem(R.id.action_sort_order_album).isChecked = true
+      SortOrder.ALBUM_Z_A -> subMenu.findItem(R.id.action_sort_order_album_desc).isChecked = true
+      SortOrder.ARTIST_A_Z -> subMenu.findItem(R.id.action_sort_order_artist).isChecked = true
+      SortOrder.ARTIST_Z_A -> subMenu.findItem(R.id.action_sort_order_artist_desc).isChecked = true
+      SortOrder.DATE -> subMenu.findItem(R.id.action_sort_order_date).isChecked = true
+      SortOrder.DATE_DESC -> subMenu.findItem(R.id.action_sort_order_date_desc).isChecked = true
+      //            case SortOrder.DURATION:
       //                subMenu.findItem(R.id.action_sort_order_duration).setChecked(true);
       //                break;
-      //            case SortOrder.SongSortOrder.SONG_YEAR:
+      //            case SortOrder.YEAR:
       //                subMenu.findItem(R.id.action_sort_order_year).setChecked(true);
       //                break;
-      SortOrder.PlayListSortOrder.PLAYLIST_A_Z -> subMenu.findItem(R.id.action_sort_order_playlist_name).isChecked = true
-      SortOrder.PlayListSortOrder.PLAYLIST_Z_A -> subMenu.findItem(R.id.action_sort_order_playlist_name_desc).isChecked = true
-      SortOrder.PlayListSortOrder.PLAYLIST_DATE -> subMenu.findItem(R.id.action_sort_order_playlist_date).isChecked = true
-      SortOrder.ChildHolderSongSortOrder.SONG_TRACK_NUMBER -> subMenu.findItem(R.id.action_sort_order_track_number).isChecked = true
-      SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM -> subMenu.findItem(R.id.action_sort_order_custom).isChecked = true
+      SortOrder.PLAYLIST_A_Z -> subMenu.findItem(R.id.action_sort_order_playlist_name).isChecked = true
+      SortOrder.PLAYLIST_Z_A -> subMenu.findItem(R.id.action_sort_order_playlist_name_desc).isChecked = true
+      SortOrder.PLAYLIST_DATE -> subMenu.findItem(R.id.action_sort_order_playlist_date).isChecked = true
+      SortOrder.TRACK_NUMBER -> subMenu.findItem(R.id.action_sort_order_track_number).isChecked = true
+      SortOrder.PLAYLIST_SONG_CUSTOM -> subMenu.findItem(R.id.action_sort_order_custom).isChecked = true
     }
   }
 

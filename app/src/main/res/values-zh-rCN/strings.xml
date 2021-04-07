@@ -377,6 +377,8 @@
   <string name="speed_range_tip">输入范围为0.5-2</string>
   <string name="show_displayname">歌曲列表显示文件名</string>
   <string name="show_displayname_tip">如果歌曲列表出现乱码可尝试开启该选项</string>
+  <string name="force_sort">强制排序</string>
+  <string name="force_sort_tip">强制将歌曲、专辑、歌手、播放列表按拼音排序\n可能使加载时间大幅延长</string>
   <string name="accent_color">强调色</string>
   <string name="accent_color_tip">选择你喜欢的强调色</string>
   <string name="dark_theme">深色主题</string>

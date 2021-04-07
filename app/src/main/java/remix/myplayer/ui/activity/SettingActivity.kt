@@ -60,6 +60,7 @@ import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM
 import remix.myplayer.request.network.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
+import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRIC
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
@@ -144,6 +145,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       SETTING_KEY.PLAY_AT_BREAKPOINT,
       SETTING_KEY.IGNORE_MEDIA_STORE,
       SETTING_KEY.SHOW_DISPLAYNAME,
+      SETTING_KEY.FORCE_SORT,
       SETTING_KEY.BLACK_THEME,
       SETTING_KEY.AUDIO_FOCUS
     )
@@ -158,6 +160,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       binding.settingBreakpointSwitch,
       binding.settingIgnoreMediastoreSwitch,
       binding.settingDisplaynameSwitch,
+      binding.settingForceSortSwitch,
       binding.settingBlackThemeSwitch,
       binding.settingAudioFocusSwitch
     ).forEachIndexed { index, view ->
@@ -234,6 +237,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
               Song.SHOW_DISPLAYNAME = isChecked
               mNeedRefreshAdapter = true
             }
+            R.id.setting_force_sort_switch -> {
+              sendLocalBroadcast(Intent(MusicService.MEDIA_STORE_CHANGE))
+            }
             //黑色主题
             R.id.setting_black_theme_switch -> {
               if (!ThemeStore.isLightTheme) {
@@ -254,8 +260,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     )
 
     if (!isSupportStatusBarLyric(this)) {
-      findViewById<View>(R.id.setting_statusbar_lrc_container).visibility =
-        View.GONE
+      binding.settingStatusbarLrcContainer.visibility = View.GONE
     }
 
     //主题颜色指示器
@@ -308,7 +313,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     )
 
     //根据系统版本决定是否显示通知栏样式切换
-    findViewById<View>(R.id.setting_classic_notify_container).visibility = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) View.VISIBLE else View.GONE
+    binding.settingClassicNotifyContainer.visibility = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) View.VISIBLE else View.GONE
 
     // 深色主题
     val darkTheme = SPUtil.getValue(
@@ -354,7 +359,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     }.start()
 
     if (IS_GOOGLEPLAY) {
-      findViewById<View>(R.id.setting_update_container).visibility = View.GONE
+      binding.settingUpdateContainer.visibility = View.GONE
     }
 
     getSharedPreferences(
@@ -391,6 +396,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       binding.settingCoverSourceContainer,
       binding.settingPlayerBottomContainer,
       binding.settingDisplaynameContainer,
+      binding.settingForceSortContainer,
       binding.settingDarkThemeContainer,
       binding.settingBlackThemeContainer,
       binding.settingAccentColorContainer,
@@ -509,6 +515,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             //文件名
             R.id.setting_displayname_container -> binding.settingDisplaynameSwitch.isChecked =
               !binding.settingDisplaynameSwitch.isChecked
+            //强制排序
+            R.id.setting_force_sort_container -> binding.settingForceSortSwitch.isChecked =
+              !binding.settingForceSortSwitch.isChecked
             //深色主题
             R.id.setting_dark_theme_container -> configDarkTheme()
             //黑色主题
