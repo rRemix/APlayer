@@ -9,7 +9,7 @@ object SortOrder {
   const val ARTIST_Z_A = "$ARTIST_A_Z DESC"
   const val ALBUM_A_Z = Audio.Albums.DEFAULT_SORT_ORDER
   const val ALBUM_Z_A = "$ALBUM_A_Z DESC"
-  const val DATE = Audio.Media.DATE_ADDED
+  const val DATE = Audio.Media.DATE_MODIFIED
   const val DATE_DESC = "$DATE DESC"
   const val DISPLAY_NAME_A_Z = Audio.Media.DISPLAY_NAME
   const val DISPLAY_NAME_Z_A = "$DISPLAY_NAME_A_Z DESC"
