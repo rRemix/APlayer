@@ -4,8 +4,10 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'bugly'
 
+def properties = getProperties('../local.properties')
+
 bugly {
-    appId = "${getProperty(getProperties('../local.properties'), 'BUGLY_APPID')}"
+    appId = "${getProperty(properties, 'BUGLY_APPID')}"
     appKey = "04ab39c8-86fc-4ed6-b28b-6fdfee6e19d9"
 }
 
@@ -37,23 +39,24 @@ android {
         }
         multiDexEnabled true
 
-        buildConfigField("String", "LASTFM_API_KEY", "\"${getProperty(getProperties('../local.properties'), 'LASTFM_API_KEY')}\"")
-        buildConfigField("String", "GOOGLE_PLAY_LICENSE_KEY", "\"${getProperty(getProperties('../local.properties'), 'GOOGLE_PLAY_LICENSE_KEY')}\"")
-        buildConfigField("String", "BUGLY_APPID", "\"${getProperty(getProperties('../local.properties'), 'BUGLY_APPID')}\"")
-        buildConfigField("String", "GITHUB_SECRET_KEY", "\"${getProperty(getProperties('../local.properties'), 'GITHUB_SECRET_KEY')}\"")
+        buildConfigField("String", "LASTFM_API_KEY", "\"${getProperty(properties, 'LASTFM_API_KEY')}\"")
+        buildConfigField("String", "GOOGLE_PLAY_LICENSE_KEY", "\"${getProperty(properties, 'GOOGLE_PLAY_LICENSE_KEY')}\"")
+        buildConfigField("String", "BUGLY_APPID", "\"${getProperty(properties, 'BUGLY_APPID')}\"")
+        buildConfigField("String", "GITHUB_SECRET_KEY", "\"${getProperty(properties, 'GITHUB_SECRET_KEY')}\"")
     }
 
     signingConfigs {
         debug {
-            v1SigningEnabled true
-            v2SigningEnabled true
+            storeFile file("Debug.jks")
+            storePassword "123456"
+            keyAlias "Debug"
+            keyPassword "123456"
         }
         release {
-            def properties = getProperties('../local.properties')
-            keyAlias properties['keystore.keyAlias']
-            keyPassword properties['keystore.keyPassword']
-            storeFile file(properties['keystore.storeFile'])
-            storePassword properties['keystore.storePassword']
+            keyAlias getProperty(properties, 'keystore.keyAlias')
+            keyPassword getProperty(properties, 'keystore.keyPassword')
+            storeFile file(getProperty(properties, 'keystore.storeFile'))
+            storePassword getProperty(properties, 'keystore.storePassword')
 
             v1SigningEnabled true
             v2SigningEnabled true
@@ -62,7 +65,7 @@ android {
 
     buildTypes {
         debug {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
             debuggable true
             minifyEnabled false
 
