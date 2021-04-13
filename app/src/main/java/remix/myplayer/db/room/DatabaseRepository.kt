@@ -1,9 +1,9 @@
 package remix.myplayer.db.room
 
-import androidx.sqlite.db.SimpleSQLiteQuery
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.google.gson.Gson
 import com.tencent.bugly.crashreport.CrashReport
 import io.reactivex.Completable
@@ -428,7 +428,7 @@ class DatabaseRepository private constructor() {
   private fun getSongsWithSort(sort: String, ids: List<Int>): Single<List<Song>> {
     return Single
         .fromCallable {
-          if(ids.isEmpty()){
+          if (ids.isEmpty()) {
             return@fromCallable Collections.emptyList<Song>()
           }
           val customSort = sort == CUSTOMSORT
@@ -473,6 +473,23 @@ class DatabaseRepository private constructor() {
           db.historyDao().update(it.copy(play_count = it.play_count + 1, last_play = Date().time))
         }
 
+  }
+
+  fun getHistorySongs(): Single<List<Song>> {
+    return Single
+        .fromCallable {
+          db.historyDao().selectAll()
+        }
+        .map {
+          val songs = ArrayList<Song>()
+          for (history in it) {
+            val song = MediaStoreUtil.getSongById(history.audio_id)
+            if (song != Song.EMPTY_SONG) {
+              songs.add(song)
+            }
+          }
+          songs
+        }
   }
 
   /**

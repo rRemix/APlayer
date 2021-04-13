@@ -90,7 +90,7 @@ class SongFragment : LibraryFragment<Song, SongAdapter>() {
     return AsyncSongLoader(mContext)
   }
 
-  override val loaderId: Int = LoaderIds.SONG_FRAGMENT
+  override val loaderId: Int = LoaderIds.FRAGMENT_SONG
 
   override val adapter: SongAdapter? = mAdapter
 

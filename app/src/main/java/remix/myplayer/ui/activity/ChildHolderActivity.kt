@@ -199,7 +199,7 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
   }
 
   override fun getLoaderId(): Int {
-    return LoaderIds.CHILDHOLDER_ACTIVITY
+    return LoaderIds.ACTIVITY_CHILDHOLDER
   }
 
   override fun getLoader(): Loader<List<Song?>?> {

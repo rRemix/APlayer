@@ -60,7 +60,7 @@ class FolderFragment : LibraryFragment<Folder, FolderAdapter>() {
     return AsyncFolderLoader(mContext)
   }
 
-  override val loaderId: Int = LoaderIds.FOLDER_FRAGMENT
+  override val loaderId: Int = LoaderIds.FRAGMENT_FOLDER
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

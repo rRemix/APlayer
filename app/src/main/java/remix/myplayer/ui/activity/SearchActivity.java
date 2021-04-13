@@ -148,7 +148,7 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
 
   @Override
   protected int getLoaderId() {
-    return LoaderIds.SEARCH_ACTIVITY;
+    return LoaderIds.ACTIVITY_SEARCH;
   }
 
 
@@ -159,7 +159,7 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
    */
   private void search(String key) {
     mkey = key;
-    getLoaderManager().restartLoader(LoaderIds.SEARCH_ACTIVITY, null, this);
+    getLoaderManager().restartLoader(LoaderIds.ACTIVITY_SEARCH, null, this);
   }
 
   @Override

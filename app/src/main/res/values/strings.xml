@@ -9,9 +9,10 @@
   <string name="tab_folder">Folder</string>
 
   <string name="drawer_song">Library</string>
-  <string name="drawer_recently">Recently</string>
+  <string name="drawer_recently_add">Recently</string>
   <string name="drawer_folder">Folder</string>
   <string name="drawer_setting">Settings</string>
+  <string name="drawer_history">History</string>
 
   <string name="from_aplayer">From APlayer</string>
   <string name="about">About APlayer</string>

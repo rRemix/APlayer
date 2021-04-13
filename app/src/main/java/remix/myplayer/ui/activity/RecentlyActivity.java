@@ -131,7 +131,7 @@ public class RecentlyActivity extends LibraryActivity<Song, SongAdapter> {
 
   @Override
   protected int getLoaderId() {
-    return LoaderIds.RECENTLY_ACTIVITY;
+    return LoaderIds.ACTIVITY_RECENTLY;
   }
 
   private static class AsyncRecentlySongLoader extends AppWrappedAsyncTaskLoader<List<Song>> {

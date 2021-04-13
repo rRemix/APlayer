@@ -65,7 +65,7 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
     return AsyncArtistLoader(mContext)
   }
 
-  override val loaderId: Int = LoaderIds.ARTIST_FRAGMENT
+  override val loaderId: Int = LoaderIds.FRAGMENT_ARTIST
 
   override val adapter: ArtistAdapter? = mAdapter
 

@@ -102,7 +102,7 @@ public class SongChooseActivity extends LibraryActivity<Song, SongChooseAdapter>
 
   @Override
   protected int getLoaderId() {
-    return LoaderIds.SONGCHOOSE_ACTIVITY;
+    return LoaderIds.ACTIVITY_SONGCHOOSE;
   }
 
 

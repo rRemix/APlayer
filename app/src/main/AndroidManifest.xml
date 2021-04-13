@@ -147,7 +147,9 @@
       android:launchMode="singleInstance"
       android:name=".appshortcuts.AppShortcutActivity"
       android:theme="@style/AppShortcut"/>
-
+    <activity
+      android:name=".ui.activity.HistoryActivity"
+      android:theme="@style/ActivityStyle"/>
     <!-- 图片裁剪 -->
     <activity android:name="com.soundcloud.android.crop.CropImageActivity"/>
 

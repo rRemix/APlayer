@@ -79,7 +79,7 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
     return AsyncPlayListLoader(mContext)
   }
 
-  override val loaderId: Int = LoaderIds.PLAYLIST_FRAGMENT
+  override val loaderId: Int = LoaderIds.FRAGMENT_PLAYLIST
 
   class AsyncPlayListLoader(context: Context?) : WrappedAsyncTaskLoader<List<PlayList>>(context) {
     override fun loadInBackground(): List<PlayList> {

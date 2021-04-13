@@ -11,15 +11,15 @@
       android:title="@string/drawer_song"/>
     <item
       android:id="@+id/nav_recently"
-      android:icon="@drawable/drawer_icon_recently"
-      android:title="@string/drawer_recently"/>
+      android:icon="@drawable/drawer_icon_recently_add"
+      android:title="@string/drawer_recently_add"/>
     <item
       android:id="@+id/nav_support"
       android:icon="@drawable/darwer_icon_support"
       android:title="@string/support_develop"/>
     <item
       android:id="@+id/nav_setting"
-      android:icon="@drawable/drawer_icon_recently"
+      android:icon="@drawable/drawer_icon_recently_add"
       android:title="@string/drawer_setting"/>
     <item
       android:id="@+id/nav_exit"

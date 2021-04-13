@@ -22,10 +22,18 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
 
   //当前选中项
   private int mSelectIndex = 0;
-  private int[] IMAGES = new int[]{R.drawable.drawer_icon_musicbox, R.drawable.drawer_icon_recently,
-      R.drawable.darwer_icon_support, R.drawable.darwer_icon_set, R.drawable.drawer_icon_exit};
-  private int[] TITLES = new int[]{R.string.drawer_song, R.string.drawer_recently,
-      R.string.support_develop, R.string.drawer_setting, R.string.exit};
+  private int[] IMAGES = new int[]{R.drawable.drawer_icon_musicbox,
+      R.drawable.ic_history_24dp,
+      R.drawable.drawer_icon_recently_add,
+      R.drawable.darwer_icon_support,
+      R.drawable.darwer_icon_set,
+      R.drawable.drawer_icon_exit};
+  private int[] TITLES = new int[]{R.string.drawer_song,
+      R.string.drawer_history,
+      R.string.drawer_recently_add,
+      R.string.support_develop,
+      R.string.drawer_setting,
+      R.string.exit};
 
   public DrawerAdapter(int layoutId) {
     super(layoutId);
@@ -46,7 +54,8 @@ public class DrawerAdapter extends BaseAdapter<Integer, DrawerAdapter.DrawerHold
     Theme.tintDrawable(holder.binding.itemImg, IMAGES[position], ThemeStore.getAccentColor());
 
     holder.binding.itemText.setText(titleRes);
-    holder.binding.itemText.setTextColor(Theme.resolveColor(holder.itemView.getContext(), R.attr.text_color_primary));
+    holder.binding.itemText
+        .setTextColor(Theme.resolveColor(holder.itemView.getContext(), R.attr.text_color_primary));
     holder.binding.itemRoot
         .setOnClickListener(v -> mOnItemClickListener.onItemClick(v, position));
     holder.binding.itemRoot.setSelected(mSelectIndex == position);

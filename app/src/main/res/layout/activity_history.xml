@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <com.google.android.material.appbar.AppBarLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <include layout="@layout/toolbar"/>
+  </com.google.android.material.appbar.AppBarLayout>
+
+  <View
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/d1_size"
+    android:background="?attr/divider_color"/>
+
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
+      android:id="@+id/recyclerview"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      app:bubbleColor="?attr/colorAccent"
+      app:handleColor="?attr/colorAccent"
+      app:hideScrollbar="true"
+      app:showTrack="true"/>
+
+  </RelativeLayout>
+
+</LinearLayout>

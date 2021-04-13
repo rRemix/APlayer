@@ -9,9 +9,10 @@
   <string name="tab_folder">資料夾</string>
 
   <string name="drawer_song">音樂庫</string>
-  <string name="drawer_recently">最近新增</string>
+  <string name="drawer_recently_add">最近新增</string>
   <string name="drawer_folder">資料夾</string>
   <string name="drawer_setting">設定</string>
+  <string name="drawer_history">最近播放</string>
 
   <string name="from_aplayer">來自 APlayer 播放器</string>
   <string name="about">關於 APlayer</string>
