@@ -63,7 +63,7 @@ data class Song(
       val metadataRetriever = MediaMetadataRetriever()
       try {
         metadataRetriever.setDataSource(data)
-        duration = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLong()
+        duration = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong()
 //        if (duration > 0) {
 //          val contentValues = ContentValues()
 //          contentValues.put(MediaStore.Audio.Media.DURATION, duration)

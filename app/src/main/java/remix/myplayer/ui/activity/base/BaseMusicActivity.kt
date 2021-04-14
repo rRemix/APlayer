@@ -201,8 +201,8 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
   private class MusicStateHandler(activity: BaseMusicActivity) : Handler() {
     private val ref: WeakReference<BaseMusicActivity> = WeakReference(activity)
 
-    override fun handleMessage(msg: Message?) {
-      val action = msg?.obj?.toString()
+    override fun handleMessage(msg: Message) {
+      val action = msg.obj?.toString()
       val activity = ref.get()
       if (action != null && activity != null) {
         when (action) {
