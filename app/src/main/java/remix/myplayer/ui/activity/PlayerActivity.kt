@@ -241,7 +241,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
 
     song = getCurrentSong()
     if (song == Song.EMPTY_SONG && intent.hasExtra(EXTRA_SONG)) {
-      song = intent.getParcelableExtra(EXTRA_SONG) as Song
+      song = intent.getParcelableExtra(EXTRA_SONG)!!
     }
 
     setUpBottom()

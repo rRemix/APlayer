@@ -701,7 +701,7 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
       }
       val mainActivity = mRef.get() ?: return
       when (action) {
-        ACTION_DOWNLOAD_COMPLETE -> mainActivity.checkIsAndroidO(context, intent.getStringExtra(DownloadService.EXTRA_PATH))
+        ACTION_DOWNLOAD_COMPLETE -> mainActivity.checkIsAndroidO(context, intent.getStringExtra(DownloadService.EXTRA_PATH)!!)
         ACTION_SHOW_DIALOG -> mainActivity.showForceDialog()
         ACTION_DISMISS_DIALOG -> mainActivity.dismissForceDialog()
       }

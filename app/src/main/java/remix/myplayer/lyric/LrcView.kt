@@ -352,7 +352,7 @@ class LrcView : View, ILrcView {
           }
         }
         longPressRunnable = LongPressRunnable()
-        mHandler.postDelayed(longPressRunnable, ViewConfiguration.getLongPressTimeout().toLong())
+        mHandler.postDelayed(longPressRunnable!!, ViewConfiguration.getLongPressTimeout().toLong())
       }
       MotionEvent.ACTION_MOVE -> if (hasLrc()) {
         if (!canDrag) {
@@ -367,7 +367,7 @@ class LrcView : View, ILrcView {
         }
         if (canDrag) {
           timeLineWaiting = false
-          mHandler.removeCallbacks(longPressRunnable)
+          longPressRunnable?.let { mHandler.removeCallbacks(it) }
           val offset = event.rawY - lastY //偏移量
           if (scrollY - offset < 0) {
             if (offset > 0) {
@@ -392,13 +392,13 @@ class LrcView : View, ILrcView {
         }
         lastY = event.rawY
       } else {
-        mHandler.removeCallbacks(longPressRunnable)
+        longPressRunnable?.let { mHandler.removeCallbacks(it) }
       }
       MotionEvent.ACTION_UP -> if (!canDrag) {
         if (longPressRunnable == null && mOnLrcClickListener != null) {
           mOnLrcClickListener?.onClick()
         }
-        mHandler.removeCallbacks(longPressRunnable)
+        longPressRunnable?.let { mHandler.removeCallbacks(it) }
         longPressRunnable = null
       } else {
         //显示三秒TimeLine
@@ -415,7 +415,7 @@ class LrcView : View, ILrcView {
         invalidate()
       }
       MotionEvent.ACTION_CANCEL -> {
-        mHandler.removeCallbacks(longPressRunnable)
+        longPressRunnable?.let { mHandler.removeCallbacks(it) }
         longPressRunnable = null
       }
     }
@@ -596,7 +596,7 @@ class LrcView : View, ILrcView {
     curRow = 0
     totalRow = 0
     lrcRows = null
-    mHandler.removeCallbacks(longPressRunnable)
+    longPressRunnable?.let { mHandler.removeCallbacks(it) }
     mHandler.removeCallbacks(timeLineDisableRunnable)
     mHandler.post(timeLineDisableRunnable)
     scrollTo(scrollX, 0)
