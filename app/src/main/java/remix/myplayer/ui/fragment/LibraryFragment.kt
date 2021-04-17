@@ -23,9 +23,10 @@ import java.util.*
 /**
  * Created by Remix on 2016/12/23.
  */
-abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>?> : BaseMusicFragment(), MusicEventCallback, LoaderManager.LoaderCallbacks<List<Data>> {
-  var mAdapter: A? = null
+abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>> : BaseMusicFragment(), MusicEventCallback, LoaderManager.LoaderCallbacks<List<Data>> {
+  lateinit var adapter: A
   lateinit var multiChoice: MultipleChoice<Data>
+    private set
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -44,7 +45,7 @@ abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>?> : BaseMusicFragm
       recyclerView.setBubbleTextColor(ColorUtil.getColor(if (ColorUtil.isColorLight(accentColor)) R.color.light_text_color_primary else R.color.dark_text_color_primary))
     }
 
-    multiChoice.adapter = mAdapter
+    multiChoice.adapter = adapter
 
     if (mHasPermission) {
       loaderManager.initLoader(loaderId, null, this)
@@ -61,14 +62,14 @@ abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>?> : BaseMusicFragm
   protected abstract fun initView()
   override fun onDestroy() {
     super.onDestroy()
-    mAdapter?.setDataList(Collections.emptyList())
+    adapter.setDataList(Collections.emptyList())
   }
 
   override fun onMediaStoreChanged() {
     if (mHasPermission) {
       loaderManager.restartLoader(loaderId, null, this)
     } else {
-      mAdapter?.setDataList(Collections.emptyList())
+      adapter.setDataList(Collections.emptyList())
     }
   }
 
@@ -84,11 +85,11 @@ abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>?> : BaseMusicFragm
   }
 
   override fun onLoadFinished(loader: Loader<List<Data>>, data: List<Data>?) {
-    mAdapter?.setDataList(data)
+    adapter.setDataList(data)
   }
 
   override fun onLoaderReset(loader: Loader<List<Data>>) {
-    mAdapter?.setDataList(Collections.emptyList())
+    adapter.setDataList(Collections.emptyList())
   }
 
   protected val spanCount: Int

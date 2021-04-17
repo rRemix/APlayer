@@ -36,9 +36,6 @@ abstract class BaseFragment : Fragment() {
     super.onDestroyView()
   }
 
-  open val adapter: RecyclerView.Adapter<*>?
-    get() = null
-
   override fun onResume() {
     super.onResume()
   }

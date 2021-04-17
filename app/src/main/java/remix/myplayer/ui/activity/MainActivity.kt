@@ -604,17 +604,17 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
 
   @OnHandleMessage
   fun handleInternal(msg: Message) {
-    when {
-      msg.what == MSG_RECREATE_ACTIVITY -> recreate()
-      msg.what == MSG_RESET_MULTI -> for (temp in supportFragmentManager.fragments) {
+    when (msg.what) {
+      MSG_RECREATE_ACTIVITY -> recreate()
+      MSG_RESET_MULTI -> for (temp in supportFragmentManager.fragments) {
         if (temp is LibraryFragment<*, *>) {
-          temp.adapter?.notifyDataSetChanged()
+          temp.adapter.notifyDataSetChanged()
         }
       }
-      msg.what == MSG_UPDATE_ADAPTER -> //刷新适配器
+      MSG_UPDATE_ADAPTER -> //刷新适配器
         for (temp in supportFragmentManager.fragments) {
           if (temp is LibraryFragment<*, *>) {
-            temp.adapter?.notifyDataSetChanged()
+            temp.adapter.notifyDataSetChanged()
           }
         }
     }

@@ -36,10 +36,10 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
   override val layoutID: Int = R.layout.fragment_artist
 
   override fun initAdapter() {
-    mAdapter = ArtistAdapter(R.layout.item_artist_recycle_grid, multiChoice, recyclerView)
-    mAdapter?.onItemClickListener = object : OnItemClickListener {
+    adapter = ArtistAdapter(R.layout.item_artist_recycle_grid, multiChoice, recyclerView)
+    adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val artist = mAdapter?.dataList?.get(position) ?: return
+        val artist = adapter.dataList[position]
         if (userVisibleHint && !multiChoice.click(position, artist)) {
           mContext?.let { ChildHolderActivity.start(it, Constants.ARTIST, artist.artistID.toString(), artist.artist) }
         }
@@ -47,7 +47,7 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
 
       override fun onItemLongClick(view: View, position: Int) {
         if (userVisibleHint) {
-          multiChoice.longClick(position, mAdapter?.dataList?.get(position))
+          multiChoice.longClick(position, adapter.dataList.get(position))
         }
       }
     }
@@ -57,7 +57,7 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
     val model = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ARTIST, HeaderAdapter.GRID_MODE)
     recyclerView.layoutManager = if (model == HeaderAdapter.LIST_MODE) LinearLayoutManager(mContext) else GridLayoutManager(activity, spanCount)
     recyclerView.itemAnimator = DefaultItemAnimator()
-    recyclerView.adapter = mAdapter
+    recyclerView.adapter = adapter
     recyclerView.setHasFixedSize(true)
   }
 
@@ -66,8 +66,6 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
   }
 
   override val loaderId: Int = LoaderIds.FRAGMENT_ARTIST
-
-  override val adapter: ArtistAdapter? = mAdapter
 
   private class AsyncArtistLoader(context: Context?) : WrappedAsyncTaskLoader<List<Artist>>(context) {
     override fun loadInBackground(): List<Artist> {

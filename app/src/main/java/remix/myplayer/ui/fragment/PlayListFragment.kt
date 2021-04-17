@@ -35,8 +35,8 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
   override val layoutID: Int = R.layout.fragment_playlist
 
   override fun initAdapter() {
-    mAdapter = PlayListAdapter(R.layout.item_playlist_recycle_grid, multiChoice, recyclerView)
-    mAdapter?.onItemClickListener = object : OnItemClickListener {
+    adapter = PlayListAdapter(R.layout.item_playlist_recycle_grid, multiChoice, recyclerView)
+    adapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
         val playList = adapter?.dataList?.get(position) ?: return
         if ((!TextUtils.isEmpty(playList.name) && userVisibleHint) && !multiChoice.click(position, playList)) {
@@ -50,7 +50,7 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
 
       override fun onItemLongClick(view: View, position: Int) {
         if (userVisibleHint) {
-          multiChoice.longClick(position, mAdapter?.dataList?.get(position))
+          multiChoice.longClick(position, adapter?.dataList?.get(position))
         }
       }
     }
@@ -60,12 +60,9 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
     val model = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.MODE_FOR_PLAYLIST, HeaderAdapter.GRID_MODE)
     recyclerView.itemAnimator = DefaultItemAnimator()
     recyclerView.layoutManager = if (model == HeaderAdapter.LIST_MODE) LinearLayoutManager(mContext) else GridLayoutManager(activity, spanCount)
-    recyclerView.adapter = mAdapter
+    recyclerView.adapter = adapter
     recyclerView.setHasFixedSize(true)
   }
-
-  override val adapter: PlayListAdapter?
-    get() = mAdapter
 
   override fun onPlayListChanged(name: String) {
     if (name == PlayList.TABLE_NAME) {
