@@ -39,10 +39,10 @@ class SongFragment : LibraryFragment<Song, SongAdapter>() {
   override val layoutID: Int = R.layout.fragment_song
 
   override fun initAdapter() {
-    mAdapter = SongAdapter(R.layout.item_song_recycle, multiChoice, location_recyclerView)
-    mAdapter?.onItemClickListener = object : OnItemClickListener {
+    adapter = SongAdapter(R.layout.item_song_recycle, multiChoice, location_recyclerView)
+    adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val song = mAdapter?.dataList?.get(position) ?: return
+        val song = adapter.dataList[position]
         if (userVisibleHint && !multiChoice.click(position, song)) {
           if (isPlaying() && song == getCurrentSong()) {
             if (requireActivity() is MainActivity) {
@@ -50,8 +50,8 @@ class SongFragment : LibraryFragment<Song, SongAdapter>() {
             }
           } else {
             //设置正在播放列表
-            val songs = mAdapter?.dataList
-            if (songs == null || songs.isEmpty()) {
+            val songs = adapter.dataList
+            if (songs.isEmpty()) {
               return
             }
             setPlayQueue(songs, MusicUtil.makeCmdIntent(Command.PLAYSELECTEDSONG)
@@ -62,7 +62,7 @@ class SongFragment : LibraryFragment<Song, SongAdapter>() {
 
       override fun onItemLongClick(view: View, position: Int) {
         if (userVisibleHint) {
-          multiChoice.longClick(position, mAdapter?.dataList?.get(position))
+          multiChoice.longClick(position, adapter.dataList.get(position))
         }
       }
     }
@@ -71,7 +71,7 @@ class SongFragment : LibraryFragment<Song, SongAdapter>() {
   override fun initView() {
     location_recyclerView.layoutManager = LinearLayoutManager(context)
     location_recyclerView.itemAnimator = DefaultItemAnimator()
-    location_recyclerView.adapter = mAdapter
+    location_recyclerView.adapter = adapter
     location_recyclerView.setHasFixedSize(true)
 
     val accentColor = ThemeStore.accentColor
@@ -92,15 +92,15 @@ class SongFragment : LibraryFragment<Song, SongAdapter>() {
 
   override val loaderId: Int = LoaderIds.FRAGMENT_SONG
 
-  override val adapter: SongAdapter? = mAdapter
+//  override val adapter: SongAdapter? = adapter
 
   override fun onMetaChanged() {
     super.onMetaChanged()
-    mAdapter?.updatePlayingSong()
+    adapter.updatePlayingSong()
   }
 
   fun scrollToCurrent() {
-    location_recyclerView.smoothScrollToCurrentSong(mAdapter?.dataList ?: return)
+    location_recyclerView.smoothScrollToCurrentSong(adapter.dataList)
   }
 
   private class AsyncSongLoader(context: Context?) : WrappedAsyncTaskLoader<List<Song>>(context) {

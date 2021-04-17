@@ -35,10 +35,10 @@ class AlbumFragment : LibraryFragment<Album, AlbumAdapter>() {
   override val layoutID: Int = R.layout.fragment_album
 
   override fun initAdapter() {
-    mAdapter = AlbumAdapter(R.layout.item_album_recycle_grid, multiChoice, recyclerView)
-    mAdapter?.onItemClickListener = object : OnItemClickListener {
+    adapter = AlbumAdapter(R.layout.item_album_recycle_grid, multiChoice, recyclerView)
+    adapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val album = mAdapter?.dataList?.get(position) ?: return
+        val album = adapter?.dataList?.get(position) ?: return
         if (userVisibleHint && !multiChoice.click(position, album)) {
           mContext?.let { ChildHolderActivity.start(it, Constants.ALBUM, album.albumID.toString(), album.album) }
         }
@@ -46,7 +46,7 @@ class AlbumFragment : LibraryFragment<Album, AlbumAdapter>() {
 
       override fun onItemLongClick(view: View, position: Int) {
         if (userVisibleHint) {
-          multiChoice.longClick(position, mAdapter?.dataList?.get(position))
+          multiChoice.longClick(position, adapter?.dataList?.get(position))
         }
       }
     }
@@ -56,11 +56,10 @@ class AlbumFragment : LibraryFragment<Album, AlbumAdapter>() {
     val mode = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ALBUM, HeaderAdapter.GRID_MODE)
     recyclerView.itemAnimator = DefaultItemAnimator()
     recyclerView.layoutManager = if (mode == HeaderAdapter.LIST_MODE) LinearLayoutManager(mContext) else GridLayoutManager(mContext, spanCount)
-    recyclerView.adapter = mAdapter
+    recyclerView.adapter = adapter
     recyclerView.setHasFixedSize(true)
   }
 
-  override val adapter: AlbumAdapter? = mAdapter
 
   override fun loader(): Loader<List<Album>> {
     return AsyncAlbumLoader(mContext)
