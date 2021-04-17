@@ -14,13 +14,14 @@ class PurchaseAdapter(layoutId: Int) : BaseAdapter<Purchase, PurchaseAdapter.Pur
   private val LOGOS_DONATE = listOf(R.drawable.icon_wechat_donate, R.drawable.icon_alipay_donate, R.drawable.icon_paypal_donate)
 
   @SuppressLint("SetTextI18n")
-  override fun convert(holder: PurchaseHolder?, bean: Purchase?, position: Int) {
-    if (holder == null || bean == null)
+  override fun convert(holder: PurchaseHolder, purchase: Purchase?, position: Int) {
+    if(purchase == null){
       return
-    holder.binding.itemTitle.text = bean.title.replace("(APlayer)", "")
+    }
+    holder.binding.itemTitle.text = purchase.title.replace("(APlayer)", "")
     if (App.IS_GOOGLEPLAY) {
       holder.binding.itemLogo.setActualImageResource(LOGOS_OTHERS[position])
-      holder.binding.itemPrice.text = bean.price
+      holder.binding.itemPrice.text = purchase.price
     } else {
       when (position) {
         0, 1, 2 -> {
@@ -29,13 +30,13 @@ class PurchaseAdapter(layoutId: Int) : BaseAdapter<Purchase, PurchaseAdapter.Pur
         }
         3, 4, 5, 6, 7 -> {
           holder.binding.itemLogo.setActualImageResource(LOGOS_OTHERS[position - 3])
-          holder.binding.itemPrice.text = bean.price
+          holder.binding.itemPrice.text = purchase.price
         }
       }
     }
 
     holder.binding.root.setOnClickListener {
-      mOnItemClickListener.onItemClick(it, position)
+      onItemClickListener?.onItemClick(it, position)
     }
   }
 

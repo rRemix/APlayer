@@ -19,7 +19,7 @@ class RoundCoverFragment : CoverFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = RoundCoverFragment::class.java.simpleName
+    pageName = RoundCoverFragment::class.java.simpleName
   }
 
   /**

@@ -35,13 +35,11 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
   override val layoutID: Int = R.layout.fragment_playlist
 
   override fun initAdapter() {
-    mAdapter = PlayListAdapter(R.layout.item_playlist_recycle_grid, mChoice, recyclerView)
-    mAdapter?.setOnItemClickListener(object : OnItemClickListener {
+    mAdapter = PlayListAdapter(R.layout.item_playlist_recycle_grid, multiChoice, recyclerView)
+    mAdapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val playList = adapter?.datas?.get(position) ?: return
-        if (!TextUtils.isEmpty(playList.name)
-            && userVisibleHint
-            && mChoice?.click(position, playList) == false) {
+        val playList = adapter?.dataList?.get(position) ?: return
+        if ((!TextUtils.isEmpty(playList.name) && userVisibleHint) && !multiChoice.click(position, playList)) {
           if (playList.audioIds.isEmpty()) {
             ToastUtil.show(mContext, getStringSafely(R.string.list_is_empty))
             return
@@ -52,10 +50,10 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
 
       override fun onItemLongClick(view: View, position: Int) {
         if (userVisibleHint) {
-          mChoice?.longClick(position, mAdapter?.datas?.get(position))
+          multiChoice.longClick(position, mAdapter?.dataList?.get(position))
         }
       }
-    })
+    }
   }
 
   override fun initView() {
@@ -84,21 +82,21 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
   class AsyncPlayListLoader(context: Context?) : WrappedAsyncTaskLoader<List<PlayList>>(context) {
     override fun loadInBackground(): List<PlayList> {
       val sortOrder = SPUtil.getValue(
-        App.getContext(),
-        SETTING_KEY.NAME,
-        SETTING_KEY.PLAYLIST_SORT_ORDER,
-        SortOrder.PLAYLIST_A_Z
+          App.getContext(),
+          SETTING_KEY.NAME,
+          SETTING_KEY.PLAYLIST_SORT_ORDER,
+          SortOrder.PLAYLIST_A_Z
       )
       val forceSort =
-        SPUtil.getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.FORCE_SORT, false)
+          SPUtil.getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.FORCE_SORT, false)
       return getInstance().getSortPlayList("SELECT * FROM PlayList ORDER BY $sortOrder")
-        .blockingGet().let {
-        if (forceSort) {
-          ItemsSorter.sortedPlayLists(it, sortOrder)
-        } else {
-          it
-        }
-      }
+          .blockingGet().let {
+            if (forceSort) {
+              ItemsSorter.sortedPlayLists(it, sortOrder)
+            } else {
+              it
+            }
+          }
     }
   }
 

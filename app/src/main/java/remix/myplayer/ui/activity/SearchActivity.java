@@ -62,9 +62,9 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
     mAdapter.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(View view, int position) {
-        if (mAdapter != null && mAdapter.getDatas() != null && position >= 0 && position < mAdapter.getDatas().size()) {
+        if (mAdapter != null && mAdapter.getDataList() != null && position >= 0 && position < mAdapter.getDataList().size()) {
           sendLocalBroadcast(makeCmdIntent(Command.PLAY_TEMP)
-              .putExtra(EXTRA_SONG, mAdapter.getDatas().get(position)));
+              .putExtra(EXTRA_SONG, mAdapter.getDataList().get(position)));
         } else {
           ToastUtil.show(mContext, R.string.illegal_arg);
         }
@@ -232,7 +232,7 @@ public class SearchActivity extends LibraryActivity<Song, SearchAdapter> impleme
    * 更新界面
    */
   private void updateUI() {
-    boolean flag = mAdapter.getDatas() != null && mAdapter.getDatas().size() > 0;
+    boolean flag = mAdapter.getDataList() != null && mAdapter.getDataList().size() > 0;
     binding.searchResultNative.setVisibility(flag ? View.VISIBLE : View.GONE);
     binding.searchResultBlank.setVisibility(flag ? View.GONE : View.VISIBLE);
   }

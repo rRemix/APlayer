@@ -386,7 +386,7 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
   }
 
   private fun setUpDrawerLayout() {
-    drawerAdapter.setOnItemClickListener(object : OnItemClickListener {
+    drawerAdapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
         when (position) {
           //歌曲库
@@ -409,7 +409,7 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
       }
 
       override fun onItemLongClick(view: View, position: Int) {}
-    })
+    }
     recyclerview.adapter = drawerAdapter
     recyclerview.layoutManager = LinearLayoutManager(this)
 
@@ -557,7 +557,7 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
       var closed = false
       for (fragment in supportFragmentManager.fragments) {
         if (fragment is LibraryFragment<*, *>) {
-          val choice = fragment.choice ?: return
+          val choice = fragment.multiChoice
           if (choice.isActive) {
             closed = true
             choice.close()

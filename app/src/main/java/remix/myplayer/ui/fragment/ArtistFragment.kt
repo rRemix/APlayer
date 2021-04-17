@@ -30,27 +30,27 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = TAG
+    pageName = TAG
   }
 
   override val layoutID: Int = R.layout.fragment_artist
 
   override fun initAdapter() {
-    mAdapter = ArtistAdapter(R.layout.item_artist_recycle_grid, mChoice, recyclerView)
-    mAdapter?.setOnItemClickListener(object : OnItemClickListener {
+    mAdapter = ArtistAdapter(R.layout.item_artist_recycle_grid, multiChoice, recyclerView)
+    mAdapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val artist = mAdapter?.datas?.get(position) ?: return
-        if (userVisibleHint && mChoice?.click(position, artist) == false) {
+        val artist = mAdapter?.dataList?.get(position) ?: return
+        if (userVisibleHint && !multiChoice.click(position, artist)) {
           mContext?.let { ChildHolderActivity.start(it, Constants.ARTIST, artist.artistID.toString(), artist.artist) }
         }
       }
 
       override fun onItemLongClick(view: View, position: Int) {
         if (userVisibleHint) {
-          mChoice?.longClick(position, mAdapter?.datas?.get(position))
+          multiChoice.longClick(position, mAdapter?.dataList?.get(position))
         }
       }
-    })
+    }
   }
 
   override fun initView() {

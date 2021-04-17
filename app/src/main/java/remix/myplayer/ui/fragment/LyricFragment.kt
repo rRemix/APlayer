@@ -47,7 +47,7 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = LyricFragment::class.java.simpleName
+    pageName = LyricFragment::class.java.simpleName
   }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

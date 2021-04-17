@@ -61,8 +61,8 @@ class CustomSortActivity : ToolbarActivity() {
 
     setUpToolbar(playlistName)
 
-    adapter.setData(songs)
-    adapter.setOnItemClickListener(object : OnItemClickListener {
+    adapter.setDataList(songs)
+    adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemLongClick(view: View?, position: Int) {
         Util.vibrate(mContext, 100)
       }
@@ -71,7 +71,7 @@ class CustomSortActivity : ToolbarActivity() {
 
       }
 
-    })
+    }
 
     ItemTouchHelper(object : ItemTouchHelper.Callback() {
       override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -80,7 +80,7 @@ class CustomSortActivity : ToolbarActivity() {
       }
 
       override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        Collections.swap(adapter.datas, if (viewHolder.adapterPosition >= 0) viewHolder.adapterPosition else 0,
+        Collections.swap(adapter.dataList, if (viewHolder.adapterPosition >= 0) viewHolder.adapterPosition else 0,
             if (target.adapterPosition >= 0) target.adapterPosition else 0)
         adapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
         return true
