@@ -72,8 +72,8 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
       beans.add(Purchase("paypal", "icon_paypal_donate", getString(R.string.paypal), ""))
     }
 
-    mAdapter.setData(beans)
-    mAdapter.setOnItemClickListener(object : OnItemClickListener {
+    mAdapter.setDataList(beans)
+    mAdapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemLongClick(view: View?, position: Int) {
       }
 
@@ -173,7 +173,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
         }
 
       }
-    })
+    }
 
     recyclerView.layoutManager = GridLayoutManager(mContext, 2)
     recyclerView.adapter = mAdapter
@@ -189,7 +189,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
   }
 
   private fun loadSkuDetails() {
-    if (mAdapter.datas.size > 3)
+    if (mAdapter.dataList.size > 3)
       return
     mDisposable = Single.fromCallable { mBillingProcessor?.getPurchaseListingDetails(SKU_IDS) }
         .map {
@@ -206,7 +206,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
         .observeOn(AndroidSchedulers.mainThread())
         .subscribeWith(object : DisposableSingleObserver<List<Purchase>>() {
           override fun onSuccess(datas: List<Purchase>) {
-            mAdapter.datas.addAll(datas)
+            mAdapter.dataList.addAll(datas)
             mAdapter.notifyDataSetChanged()
           }
 

@@ -79,16 +79,16 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
     if (TextUtils.isDigitsOnly(key)) {
       mChoice.extra = key.toLong()
     }
-    mAdapter?.setOnItemClickListener(object : OnItemClickListener {
+    mAdapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val song = mAdapter?.datas?.get(position)
+        val song = mAdapter?.dataList?.get(position)
         if (isPlaying() && song == getCurrentSong()) {
           val bottomActionBarFragment = supportFragmentManager
               .findFragmentByTag("BottomActionBarFragment") as BottomActionBarFragment?
           bottomActionBarFragment?.startPlayerActivity()
         } else {
           if (!mChoice.click(position, song)) {
-            val songs = mAdapter?.datas
+            val songs = mAdapter?.dataList
             if (songs.isNullOrEmpty()) {
               return
             }
@@ -100,9 +100,9 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
       }
 
       override fun onItemLongClick(view: View, position: Int) {
-        mChoice.longClick(position, mAdapter!!.datas[position])
+        mChoice.longClick(position, mAdapter!!.dataList[position])
       }
-    })
+    }
     binding.childHolderRecyclerView.layoutManager = LinearLayoutManager(this)
     binding.childHolderRecyclerView.itemAnimator = DefaultItemAnimator()
     binding.childHolderRecyclerView.adapter = mAdapter
@@ -163,7 +163,7 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
           !this.sortOrder.equals(sortOrder, ignoreCase = true)) {
         //选择的是手动排序
         if (sortOrder.equals(SortOrder.PLAYLIST_SONG_CUSTOM, ignoreCase = true)) {
-          CustomSortActivity.start(mContext, key.toLong(), title, ArrayList(mAdapter!!.datas))
+          CustomSortActivity.start(mContext, key.toLong(), title, ArrayList(mAdapter!!.dataList))
         } else {
           update = true
         }

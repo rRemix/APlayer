@@ -33,24 +33,24 @@ import remix.myplayer.util.MusicUtil
 class SongFragment : LibraryFragment<Song, SongAdapter>() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = TAG
+    pageName = TAG
   }
 
   override val layoutID: Int = R.layout.fragment_song
 
   override fun initAdapter() {
-    mAdapter = SongAdapter(R.layout.item_song_recycle, mChoice, location_recyclerView)
-    mAdapter?.setOnItemClickListener(object : OnItemClickListener {
+    mAdapter = SongAdapter(R.layout.item_song_recycle, multiChoice, location_recyclerView)
+    mAdapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val song = mAdapter?.datas?.get(position) ?: return
-        if (userVisibleHint && mChoice?.click(position, song) == false) {
+        val song = mAdapter?.dataList?.get(position) ?: return
+        if (userVisibleHint && !multiChoice.click(position, song)) {
           if (isPlaying() && song == getCurrentSong()) {
             if (requireActivity() is MainActivity) {
               (requireActivity() as MainActivity).toPlayerActivity()
             }
           } else {
             //设置正在播放列表
-            val songs = mAdapter?.datas
+            val songs = mAdapter?.dataList
             if (songs == null || songs.isEmpty()) {
               return
             }
@@ -62,10 +62,10 @@ class SongFragment : LibraryFragment<Song, SongAdapter>() {
 
       override fun onItemLongClick(view: View, position: Int) {
         if (userVisibleHint) {
-          mChoice?.longClick(position, mAdapter?.datas?.get(position))
+          multiChoice.longClick(position, mAdapter?.dataList?.get(position))
         }
       }
-    })
+    }
   }
 
   override fun initView() {
@@ -100,7 +100,7 @@ class SongFragment : LibraryFragment<Song, SongAdapter>() {
   }
 
   fun scrollToCurrent() {
-    location_recyclerView.smoothScrollToCurrentSong(mAdapter?.datas ?: return)
+    location_recyclerView.smoothScrollToCurrentSong(mAdapter?.dataList ?: return)
   }
 
   private class AsyncSongLoader(context: Context?) : WrappedAsyncTaskLoader<List<Song>>(context) {

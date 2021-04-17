@@ -17,7 +17,6 @@ import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.adapter.SongAdapter
-import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.MusicUtil
 
 class HistoryActivity : LibraryActivity<Song, SongAdapter>() {
@@ -32,12 +31,12 @@ class HistoryActivity : LibraryActivity<Song, SongAdapter>() {
 
     mAdapter = SongAdapter(R.layout.item_song_recycle, mChoice, binding.recyclerview)
     mChoice.adapter = mAdapter
-    mAdapter.setOnItemClickListener(object : OnItemClickListener {
+    mAdapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val song = mAdapter.datas[position]
-        if (song != null && !mChoice.click(position, song)) {
-          val songs = mAdapter.datas
-          if (songs == null || songs.isEmpty()) {
+        val song = mAdapter.dataList[position]
+        if (!mChoice.click(position, song)) {
+          val songs = mAdapter.dataList
+          if (songs.isEmpty()) {
             return
           }
           setPlayQueue(songs, MusicUtil.makeCmdIntent(Command.PLAYSELECTEDSONG)
@@ -46,9 +45,9 @@ class HistoryActivity : LibraryActivity<Song, SongAdapter>() {
       }
 
       override fun onItemLongClick(view: View, position: Int) {
-        mChoice.longClick(position, mAdapter.datas[position])
+        mChoice.longClick(position, mAdapter.dataList[position])
       }
-    })
+    }
 
     binding.recyclerview.layoutManager = LinearLayoutManager(this)
     binding.recyclerview.itemAnimator = DefaultItemAnimator()

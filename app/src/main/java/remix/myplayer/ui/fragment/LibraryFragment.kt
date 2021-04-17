@@ -18,21 +18,20 @@ import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.Constants
 import remix.myplayer.util.DensityUtil
+import java.util.*
 
 /**
  * Created by Remix on 2016/12/23.
  */
-abstract class LibraryFragment<D, A : BaseAdapter<D, *>?> : BaseMusicFragment(), MusicEventCallback, LoaderManager.LoaderCallbacks<List<D>> {
-  @JvmField
-  protected var mAdapter: A? = null
-  @JvmField
-  protected var mChoice: MultipleChoice<D>? = null
+abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>?> : BaseMusicFragment(), MusicEventCallback, LoaderManager.LoaderCallbacks<List<Data>> {
+  var mAdapter: A? = null
+  lateinit var multiChoice: MultipleChoice<Data>
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
     val type = if (this is SongFragment) Constants.SONG else if (this is AlbumFragment) Constants.ALBUM else if (this is ArtistFragment) Constants.ARTIST else if (this is PlayListFragment) Constants.PLAYLIST else Constants.FOLDER
-    mChoice = MultipleChoice(requireActivity(), type)
+    multiChoice = MultipleChoice(requireActivity(), type)
     initAdapter()
     initView()
 
@@ -44,15 +43,13 @@ abstract class LibraryFragment<D, A : BaseAdapter<D, *>?> : BaseMusicFragment(),
       recyclerView.setHandleColor(accentColor)
       recyclerView.setBubbleTextColor(ColorUtil.getColor(if (ColorUtil.isColorLight(accentColor)) R.color.light_text_color_primary else R.color.dark_text_color_primary))
     }
-    mChoice?.adapter = mAdapter
+
+    multiChoice.adapter = mAdapter
 
     if (mHasPermission) {
       loaderManager.initLoader(loaderId, null, this)
     }
   }
-
-  val choice: MultipleChoice<*>?
-    get() = mChoice
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                             savedInstanceState: Bundle?): View? {
@@ -64,14 +61,14 @@ abstract class LibraryFragment<D, A : BaseAdapter<D, *>?> : BaseMusicFragment(),
   protected abstract fun initView()
   override fun onDestroy() {
     super.onDestroy()
-    mAdapter?.setData(null)
+    mAdapter?.setDataList(Collections.emptyList())
   }
 
   override fun onMediaStoreChanged() {
     if (mHasPermission) {
       loaderManager.restartLoader(loaderId, null, this)
     } else {
-      mAdapter?.setData(null)
+      mAdapter?.setDataList(Collections.emptyList())
     }
   }
 
@@ -82,16 +79,16 @@ abstract class LibraryFragment<D, A : BaseAdapter<D, *>?> : BaseMusicFragment(),
     }
   }
 
-  override fun onCreateLoader(id: Int, args: Bundle?): Loader<List<D>> {
+  override fun onCreateLoader(id: Int, args: Bundle?): Loader<List<Data>> {
     return loader()
   }
 
-  override fun onLoadFinished(loader: Loader<List<D>>, data: List<D>?) {
-    mAdapter?.setData(data)
+  override fun onLoadFinished(loader: Loader<List<Data>>, data: List<Data>?) {
+    mAdapter?.setDataList(data)
   }
 
-  override fun onLoaderReset(loader: Loader<List<D>>) {
-    mAdapter?.setData(null)
+  override fun onLoaderReset(loader: Loader<List<Data>>) {
+    mAdapter?.setDataList(Collections.emptyList())
   }
 
   protected val spanCount: Int
@@ -105,7 +102,7 @@ abstract class LibraryFragment<D, A : BaseAdapter<D, *>?> : BaseMusicFragment(),
       }
     }
 
-  protected abstract fun loader():Loader<List<D>>
+  protected abstract fun loader(): Loader<List<Data>>
   protected abstract val loaderId: Int
 
   companion object {

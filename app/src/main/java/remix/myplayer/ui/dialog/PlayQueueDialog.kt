@@ -54,14 +54,14 @@ class PlayQueueDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<So
     binding.playqueueRecyclerview.layoutManager = LinearLayoutManager(context)
     binding.playqueueRecyclerview.itemAnimator = DefaultItemAnimator()
 
-    adapter.setOnItemClickListener(object : OnItemClickListener {
+    adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
         sendLocalBroadcast(makeCmdIntent(Command.PLAYSELECTEDSONG)
             .putExtra(EXTRA_POSITION, position))
       }
 
       override fun onItemLongClick(view: View, position: Int) {}
-    })
+    }
 
     //改变播放列表高度，并置于底部
     val window = dialog.window
@@ -92,7 +92,7 @@ class PlayQueueDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<So
       return
     }
     binding.tvTitle.text = getString(R.string.play_queue, data.size)
-    adapter.setData(data)
+    adapter.setDataList(data)
     val currentId = MusicServiceRemote.getCurrentSong().id
     if (currentId < 0) {
       return
@@ -101,7 +101,7 @@ class PlayQueueDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<So
   }
 
   override fun onLoaderReset(loader: Loader<List<Song>>) {
-    adapter.setData(null)
+    adapter.setDataList(null)
   }
 
 
@@ -116,7 +116,7 @@ class PlayQueueDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<So
       if (hasPermission) {
         loaderManager.restartLoader(LOADER_ID, null, this)
       } else {
-        adapter.setData(null)
+        adapter.setDataList(null)
       }
     }
   }

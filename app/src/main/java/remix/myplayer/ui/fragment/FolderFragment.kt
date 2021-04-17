@@ -29,24 +29,24 @@ class FolderFragment : LibraryFragment<Folder, FolderAdapter>() {
   override val layoutID = R.layout.fragment_folder
 
   override fun initAdapter() {
-    mAdapter = FolderAdapter(R.layout.item_folder_recycle, mChoice)
-    mAdapter?.setOnItemClickListener(object : OnItemClickListener {
+    mAdapter = FolderAdapter(R.layout.item_folder_recycle, multiChoice)
+    mAdapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val folder = mAdapter?.datas?.get(position) ?: return
+        val folder = mAdapter?.dataList?.get(position) ?: return
         val path = folder.path
-        if (userVisibleHint && !TextUtils.isEmpty(path) && mChoice?.click(position, folder) == false) {
+        if (userVisibleHint && !TextUtils.isEmpty(path) && !multiChoice.click(position, folder)) {
           mContext?.let { ChildHolderActivity.start(it, Constants.FOLDER, folder.path, path) }
         }
       }
 
       override fun onItemLongClick(view: View, position: Int) {
-        val folder = mAdapter?.datas?.get(position)
-        val path = mAdapter?.datas?.get(position)?.path
+        val folder = mAdapter?.dataList?.get(position)
+        val path = mAdapter?.dataList?.get(position)?.path
         if (userVisibleHint && !TextUtils.isEmpty(path)) {
-          mChoice?.longClick(position, folder)
+          multiChoice.longClick(position, folder)
         }
       }
-    })
+    }
   }
 
   override fun initView() {
@@ -64,7 +64,7 @@ class FolderFragment : LibraryFragment<Folder, FolderAdapter>() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = TAG
+    pageName = TAG
   }
 
   override val adapter: FolderAdapter? = mAdapter

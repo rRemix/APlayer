@@ -304,7 +304,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
   private fun selectAll() {
     checkPos.clear()
     checkParam.clear()
-    val datas = adapter!!.datas
+    val datas = adapter!!.dataList
     checkPos.addAll(0 until datas.size)
     checkParam.addAll(datas)
     updateTitle()

@@ -16,15 +16,17 @@ import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
  */
 class CustomSortAdapter(layoutId: Int) : BaseAdapter<Song, CustomSortAdapter.CustomSortHolder>(layoutId) {
 
-  override fun convert(holder: CustomSortHolder?, song: Song?, position: Int) {
-    if (song == null || holder == null) return
-    holder.binding.itemSong.text = song.title
-    holder.binding.itemAlbum.text = song.album
+  override fun convert(holder: CustomSortHolder, data: Song?, position: Int) {
+    if(data == null){
+      return
+    }
+    holder.binding.itemSong.text = data.title
+    holder.binding.itemAlbum.text = data.album
 
     //封面
     val disposable = LibraryUriRequest(
         holder.binding.itemImg,
-        getSearchRequestWithAlbumType(song),
+        getSearchRequestWithAlbumType(data),
         RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()
     ).load()
     holder.binding.itemImg.tag = disposable

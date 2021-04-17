@@ -33,7 +33,7 @@ import java.lang.ref.WeakReference
 class BottomActionBarFragment : BaseMusicFragment() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = BottomActionBarFragment::class.java.simpleName
+    pageName = BottomActionBarFragment::class.java.simpleName
   }
 
   @SuppressLint("ClickableViewAccessibility")

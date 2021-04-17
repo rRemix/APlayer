@@ -20,7 +20,7 @@ import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.theme.Theme
-import remix.myplayer.ui.adapter.AddtoPlayListAdapter
+import remix.myplayer.ui.adapter.AddToPlayListAdapter
 import remix.myplayer.ui.dialog.base.BaseMusicDialog
 import remix.myplayer.ui.fragment.PlayListFragment.AsyncPlayListLoader
 import remix.myplayer.util.ToastUtil
@@ -34,8 +34,8 @@ import java.util.*
  */
 class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<List<PlayList>> {
 
-  private val adapter: AddtoPlayListAdapter by lazy {
-    AddtoPlayListAdapter(R.layout.item_playlist_addto)
+  private val adapter: AddToPlayListAdapter by lazy {
+    AddToPlayListAdapter(R.layout.item_playlist_addto)
   }
   private var songIds: List<Int>? = null
 
@@ -50,10 +50,10 @@ class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<Lis
       ToastUtil.show(context, R.string.add_song_playlist_error)
       dismiss()
     }
-    adapter.setOnItemClickListener(object : OnItemClickListener {
+    adapter.onItemClickListener = object : OnItemClickListener {
       @SuppressLint("CheckResult")
       override fun onItemClick(view: View, position: Int) {
-        val (playListId, name) = adapter.datas[position]
+        val (playListId, name) = adapter.dataList[position]
         getInstance()
             .insertToPlayList(songIds ?: return, playListId)
             .compose(RxUtil.applySingleScheduler())
@@ -63,7 +63,7 @@ class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<Lis
       }
 
       override fun onItemLongClick(view: View, position: Int) {}
-    })
+    }
 
     val recyclerView = rootView.findViewById<RecyclerView>(R.id.playlist_addto_list)
 
@@ -131,16 +131,16 @@ class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<Lis
     if (data == null) {
       return
     }
-    adapter.setData(data)
+    adapter.setDataList(data)
   }
 
   override fun onLoaderReset(loader: Loader<List<PlayList>?>) {
-    adapter.setData(null)
+    adapter.setDataList(null)
   }
 
   override fun onDestroy() {
     super.onDestroy()
-    adapter.setData(null)
+    adapter.setDataList(null)
   }
 
   companion object {

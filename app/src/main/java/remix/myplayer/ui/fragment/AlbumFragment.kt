@@ -29,27 +29,27 @@ import remix.myplayer.util.SPUtil
 class AlbumFragment : LibraryFragment<Album, AlbumAdapter>() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = TAG
+    pageName = TAG
   }
 
   override val layoutID: Int = R.layout.fragment_album
 
   override fun initAdapter() {
-    mAdapter = AlbumAdapter(R.layout.item_album_recycle_grid, mChoice, recyclerView)
-    mAdapter?.setOnItemClickListener(object : OnItemClickListener {
+    mAdapter = AlbumAdapter(R.layout.item_album_recycle_grid, multiChoice, recyclerView)
+    mAdapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val album = mAdapter?.datas?.get(position) ?: return
-        if (userVisibleHint && mChoice?.click(position, album) == false) {
+        val album = mAdapter?.dataList?.get(position) ?: return
+        if (userVisibleHint && !multiChoice.click(position, album)) {
           mContext?.let { ChildHolderActivity.start(it, Constants.ALBUM, album.albumID.toString(), album.album) }
         }
       }
 
       override fun onItemLongClick(view: View, position: Int) {
         if (userVisibleHint) {
-          mChoice?.longClick(position, mAdapter?.datas?.get(position))
+          multiChoice.longClick(position, mAdapter?.dataList?.get(position))
         }
       }
-    })
+    }
   }
 
   override fun initView() {

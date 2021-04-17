@@ -25,7 +25,7 @@ class RecordFragment : BaseMusicFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = RecordFragment::class.java.simpleName
+    pageName = RecordFragment::class.java.simpleName
   }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

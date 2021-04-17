@@ -20,7 +20,7 @@ abstract class BaseFragment : Fragment() {
   protected var mContext: Context? = null
   protected var mHasPermission = false
   @JvmField
-  protected var mPageName = BaseFragment::class.java.simpleName
+  protected var pageName = BaseFragment::class.java.simpleName
 
   override fun onAttach(context: Context) {
     super.onAttach(context)

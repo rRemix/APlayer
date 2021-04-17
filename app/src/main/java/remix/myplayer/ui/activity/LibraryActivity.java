@@ -34,7 +34,7 @@ public abstract class LibraryActivity<D, A extends BaseAdapter> extends MenuActi
       getLoaderManager().restartLoader(getLoaderId(), null, this);
     } else {
       if (mAdapter != null) {
-        mAdapter.setData(null);
+        mAdapter.setDataList(null);
       }
     }
   }
@@ -60,14 +60,14 @@ public abstract class LibraryActivity<D, A extends BaseAdapter> extends MenuActi
   @Override
   public void onLoadFinished(android.content.Loader<List<D>> loader, List<D> data) {
     if (mAdapter != null) {
-      mAdapter.setData(data);
+      mAdapter.setDataList(data);
     }
   }
 
   @Override
   public void onLoaderReset(android.content.Loader<List<D>> loader) {
     if (mAdapter != null) {
-      mAdapter.setData(null);
+      mAdapter.setDataList(null);
     }
   }
 

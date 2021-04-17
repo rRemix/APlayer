@@ -37,7 +37,7 @@ class LyricPriorityDialog : BaseMusicDialog() {
       }
 
       override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        Collections.swap(adapter.datas, if (viewHolder.adapterPosition >= 0) viewHolder.adapterPosition else 0,
+        Collections.swap(adapter.dataList, if (viewHolder.adapterPosition >= 0) viewHolder.adapterPosition else 0,
             if (target.adapterPosition >= 0) target.adapterPosition else 0)
         adapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
         return true
@@ -61,7 +61,7 @@ class LyricPriorityDialog : BaseMusicDialog() {
             DiskCache.init(App.getContext(), "lyric")
             SPUtil.deleteFile(App.getContext(), SPUtil.LYRIC_KEY.NAME)
             SPUtil.putValue(activity, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC,
-                Gson().toJson(adapter.datas))
+                Gson().toJson(adapter.dataList))
             ToastUtil.show(context, R.string.save_success)
           } catch (e: Exception) {
             ToastUtil.show(context, R.string.save_error_arg, e.message)
