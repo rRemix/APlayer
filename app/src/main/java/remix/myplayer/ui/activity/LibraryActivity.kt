@@ -12,8 +12,8 @@ import remix.myplayer.util.Constants
  */
 abstract class LibraryActivity<Data, Adapter : BaseAdapter<Data, *>?> : MenuActivity(), LoaderManager.LoaderCallbacks<List<Data>> {
   @JvmField
-  protected var mAdapter: Adapter? = null
-  protected var mChoice = MultipleChoice<Data>(this, Constants.SONG)
+  protected var adapter: Adapter? = null
+  protected var choice = MultipleChoice<Data>(this, Constants.SONG)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -30,7 +30,7 @@ abstract class LibraryActivity<Data, Adapter : BaseAdapter<Data, *>?> : MenuActi
     if (hasPermission) {
       loaderManager.restartLoader(loaderId, null, this)
     } else {
-      mAdapter?.setDataList(null)
+      adapter?.setDataList(null)
     }
   }
 
@@ -44,11 +44,11 @@ abstract class LibraryActivity<Data, Adapter : BaseAdapter<Data, *>?> : MenuActi
   override fun onPlayListChanged(name: String) {}
 
   override fun onLoadFinished(loader: Loader<List<Data>>, data: List<Data>?) {
-    mAdapter?.setDataList(data)
+    adapter?.setDataList(data)
   }
 
   override fun onLoaderReset(loader: Loader<List<Data>>) {
-    mAdapter?.setDataList(null)
+    adapter?.setDataList(null)
   }
 
   override fun onCreateLoader(id: Int, args: Bundle?): Loader<List<Data>> {
@@ -56,8 +56,8 @@ abstract class LibraryActivity<Data, Adapter : BaseAdapter<Data, *>?> : MenuActi
   }
 
   override fun onBackPressed() {
-    if (mChoice.isActive) {
-      mChoice.close()
+    if (choice.isActive) {
+      choice.close()
     } else {
       finish()
     }

@@ -44,10 +44,10 @@ class SearchActivity : LibraryActivity<Song, SearchAdapter>(), SearchView.OnQuer
     binding = ActivitySearchBinding.inflate(layoutInflater)
     setContentView(binding.root)
     setUpToolbar("")
-    mAdapter = SearchAdapter(R.layout.item_search_reulst)
-    mAdapter?.onItemClickListener = object : OnItemClickListener {
+    adapter = SearchAdapter(R.layout.item_search_reulst)
+    adapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        mAdapter?.let { adapter ->
+        adapter?.let { adapter ->
           if (position >= 0 && position < adapter.getDataList().size) {
             Util.sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.PLAY_TEMP)
                 .putExtra(MusicService.EXTRA_SONG, adapter.getDataList()[position]))
@@ -60,7 +60,7 @@ class SearchActivity : LibraryActivity<Song, SearchAdapter>(), SearchView.OnQuer
 
       override fun onItemLongClick(view: View, position: Int) {}
     }
-    binding.searchResultNative.adapter = mAdapter
+    binding.searchResultNative.adapter = adapter
     binding.searchResultNative.layoutManager = LinearLayoutManager(this)
     binding.searchResultNative.itemAnimator = DefaultItemAnimator()
     updateUI()
@@ -111,7 +111,7 @@ class SearchActivity : LibraryActivity<Song, SearchAdapter>(), SearchView.OnQuer
    * 更新界面
    */
   private fun updateUI() {
-    mAdapter?.let { adapter ->
+    adapter?.let { adapter ->
       binding.searchResultNative.visibility = if (adapter.getDataList().isNotEmpty()) View.VISIBLE else View.GONE
       binding.searchResultBlank.visibility = if (adapter.getDataList().isNotEmpty()) View.GONE else View.VISIBLE
     }

@@ -44,12 +44,12 @@ class SongChooseActivity : LibraryActivity<Song, SongChooseAdapter>() {
       return
     }
     mPlayListName = intent.getStringExtra(EXTRA_NAME)
-    mAdapter = SongChooseAdapter(R.layout.item_song_choose, OnSongChooseListener { isValid: Boolean ->
+    adapter = SongChooseAdapter(R.layout.item_song_choose, OnSongChooseListener { isValid: Boolean ->
       binding.confirm.alpha = if (isValid) 1.0f else 0.6f
       binding.confirm.isClickable = isValid
     })
     binding.recyclerview.layoutManager = LinearLayoutManager(this)
-    binding.recyclerview.adapter = mAdapter
+    binding.recyclerview.adapter = adapter
     binding.recyclerview.itemAnimator = DefaultItemAnimator()
     binding.confirm.alpha = 0.6f
     binding.header.setBackgroundColor(materialPrimaryColor)
@@ -65,12 +65,12 @@ class SongChooseActivity : LibraryActivity<Song, SongChooseAdapter>() {
     if (id == R.id.cancel) {
       finish()
     } else if (id == R.id.confirm) {
-      if (mAdapter?.checkedSong?.size == 0) {
+      if (adapter?.checkedSong?.size == 0) {
         ToastUtil.show(this, R.string.choose_no_song)
         return
       }
       getInstance()
-          .insertToPlayList(mAdapter!!.checkedSong, mPlayListID.toLong())
+          .insertToPlayList(adapter!!.checkedSong, mPlayListID.toLong())
           .compose(RxUtil.applySingleScheduler())
           .subscribe({ num: Int? ->
             ToastUtil.show(this, getString(R.string.add_song_playlist_success, num,

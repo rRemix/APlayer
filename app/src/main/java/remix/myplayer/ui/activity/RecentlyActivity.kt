@@ -39,14 +39,14 @@ class RecentlyActivity : LibraryActivity<Song, SongAdapter>() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
-    mAdapter = SongAdapter(R.layout.item_song_recycle, mChoice, binding.recyclerview)
-    mChoice.adapter = mAdapter
-    mAdapter?.onItemClickListener = object : OnItemClickListener {
+    adapter = SongAdapter(R.layout.item_song_recycle, choice, binding.recyclerview)
+    choice.adapter = adapter
+    adapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val song = mAdapter?.getDataList()?.get(position) ?: return
+        val song = adapter?.getDataList()?.get(position) ?: return
 
-        if (!mChoice.click(position, song)) {
-          val songs = mAdapter?.getDataList() ?: return
+        if (!choice.click(position, song)) {
+          val songs = adapter?.getDataList() ?: return
           if (songs.isEmpty()) {
             return
           }
@@ -56,12 +56,12 @@ class RecentlyActivity : LibraryActivity<Song, SongAdapter>() {
       }
 
       override fun onItemLongClick(view: View, position: Int) {
-        mChoice.longClick(position, mAdapter!!.getDataList()[position])
+        choice.longClick(position, adapter!!.getDataList()[position])
       }
     }
     binding.recyclerview.layoutManager = LinearLayoutManager(this)
     binding.recyclerview.itemAnimator = DefaultItemAnimator()
-    binding.recyclerview.adapter = mAdapter
+    binding.recyclerview.adapter = adapter
     setUpToolbar(getString(R.string.recently))
   }
 
@@ -79,11 +79,11 @@ class RecentlyActivity : LibraryActivity<Song, SongAdapter>() {
   @OnHandleMessage
   fun handleMessage(msg: Message) {
     when (msg.what) {
-      MSG_RESET_MULTI -> if (mAdapter != null) {
-        mAdapter!!.notifyDataSetChanged()
+      MSG_RESET_MULTI -> if (adapter != null) {
+        adapter!!.notifyDataSetChanged()
       }
-      MSG_UPDATE_ADAPTER -> if (mAdapter != null) {
-        mAdapter!!.notifyDataSetChanged()
+      MSG_UPDATE_ADAPTER -> if (adapter != null) {
+        adapter!!.notifyDataSetChanged()
       }
     }
   }
