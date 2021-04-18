@@ -84,7 +84,7 @@ class SongPopupListener(activity: AppCompatActivity,
       R.id.menu_delete -> {
         val title = activity.getString(R.string.confirm_delete_from_playlist_or_library,
             if (isDeletePlayList) playListName else "曲库")
-        val check = arrayOf(SPUtil.getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.DELETE_SOURCE, false));
+        val check = arrayOf(SPUtil.getValue(App.context, SETTING_KEY.NAME, SETTING_KEY.DELETE_SOURCE, false));
         Theme.getBaseDialog(activity)
             .content(title)
             .positiveText(R.string.confirm)

@@ -44,7 +44,7 @@ abstract class BaseFragment : Fragment() {
     return if (isAdded) {
       getString(res)
     } else {
-      App.getContext().getString(res)
+      App.context.getString(res)
     }
   }
 
@@ -52,7 +52,7 @@ abstract class BaseFragment : Fragment() {
     return if (isAdded) {
       getString(res, *args)
     } else {
-      App.getContext().getString(res, *args)
+      App.context.getString(res, *args)
     }
   }
 }

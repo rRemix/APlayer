@@ -39,7 +39,7 @@ class DefaultLrcParser : ILrcParser {
 
     if (!searchKey.isNullOrEmpty()) {
       File(Environment.getExternalStorageDirectory(), "Android/data/"
-          + App.getContext().packageName + "/lyric")
+          + App.context.packageName + "/lyric")
           .run {
             //目录
             if (exists() || mkdirs())

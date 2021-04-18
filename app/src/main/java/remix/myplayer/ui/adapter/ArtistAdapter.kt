@@ -74,7 +74,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
       if (artist.count > 0) {
         holder.tv2.text = context.getString(R.string.song_count_1, artist.count)
       } else {
-        holder.tv2.text = App.getContext().getString(R.string.song_count_1, artist.count)
+        holder.tv2.text = App.context.getString(R.string.song_count_1, artist.count)
       }
     }
     //设置封面
@@ -124,7 +124,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
     if (position in 1..dataList.size) {
       val data = dataList[position - 1]
       val key = when (SPUtil.getValue(
-        App.getContext(),
+        App.context,
         SETTING_KEY.NAME,
         SETTING_KEY.ARTIST_SORT_ORDER,
         SortOrder.ARTIST_A_Z

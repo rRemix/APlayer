@@ -84,7 +84,7 @@ object M3UHelper {
         .subscribe(
             {
               dialog.dismiss()
-              ToastUtil.show(context, App.getContext().getString(R.string.import_playlist_to_count, playlistName, it))
+              ToastUtil.show(context, App.context.getString(R.string.import_playlist_to_count, playlistName, it))
             },
             {
               dialog.dismiss()

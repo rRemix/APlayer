@@ -48,7 +48,7 @@ object MediaStoreUtil {
   private const val TAG = "MediaStoreUtil"
 
   private val context: Context
-    get() = App.getContext()
+    get() = App.context
 
   private val forceSort: Boolean
     get() = SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.FORCE_SORT, false)
@@ -451,7 +451,7 @@ object MediaStoreUtil {
   @WorkerThread
   fun delete(songs: List<Song>?, deleteSource: Boolean): Int {
     //保存是否删除源文件
-    SPUtil.putValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.DELETE_SOURCE,
+    SPUtil.putValue(App.context, SETTING_KEY.NAME, SETTING_KEY.DELETE_SOURCE,
         deleteSource)
     if (songs == null || songs.isEmpty()) {
       return 0
@@ -717,7 +717,7 @@ object MediaStoreUtil {
 
   init {
     SCAN_SIZE = SPUtil
-        .getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE,
+        .getValue(App.context, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE,
             ByteConstants.MB)
   }
 }

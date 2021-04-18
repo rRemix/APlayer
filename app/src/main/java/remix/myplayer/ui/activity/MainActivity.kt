@@ -27,7 +27,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_timer.view.*
 import kotlinx.android.synthetic.main.navigation_header.*
 import remix.myplayer.App
-import remix.myplayer.App.IS_GOOGLEPLAY
+import remix.myplayer.App.Companion.IS_GOOGLEPLAY
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.misc.Library
@@ -636,10 +636,10 @@ class MainActivity : MenuActivity(), View.OnClickListener {
   }
 
   private fun checkUpdate() {
-    if (!IS_GOOGLEPLAY && !mAlreadyCheck) {
+    if (!IS_GOOGLEPLAY && !alreadyCheck) {
       UpdateAgent.forceCheck = false
       UpdateAgent.listener = UpdateListener(this)
-      mAlreadyCheck = true
+      alreadyCheck = true
       UpdateAgent.check(this)
     }
   }
@@ -721,12 +721,12 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     //安装权限
     private const val REQUEST_INSTALL_PACKAGES = 2
 
-    private val IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 108f)
+    private val IMAGE_SIZE = DensityUtil.dip2px(App.context, 108f)
 
     /**
      * 检查更新
      */
-    private var mAlreadyCheck: Boolean = false
+    private var alreadyCheck: Boolean = false
   }
 }
 

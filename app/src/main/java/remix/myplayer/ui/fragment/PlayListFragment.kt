@@ -79,13 +79,13 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
   class AsyncPlayListLoader(context: Context?) : WrappedAsyncTaskLoader<List<PlayList>>(context) {
     override fun loadInBackground(): List<PlayList> {
       val sortOrder = SPUtil.getValue(
-          App.getContext(),
+          App.context,
           SETTING_KEY.NAME,
           SETTING_KEY.PLAYLIST_SORT_ORDER,
           SortOrder.PLAYLIST_A_Z
       )
       val forceSort =
-          SPUtil.getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.FORCE_SORT, false)
+          SPUtil.getValue(App.context, SETTING_KEY.NAME, SETTING_KEY.FORCE_SORT, false)
       return getInstance().getSortPlayList("SELECT * FROM PlayList ORDER BY $sortOrder")
           .blockingGet().let {
             if (forceSort) {

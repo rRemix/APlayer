@@ -29,7 +29,7 @@ import kotlin.collections.LinkedHashSet
  */
 class DatabaseRepository private constructor() {
 
-  private val db = AppDatabase.getInstance(App.getContext().applicationContext)
+  private val db = AppDatabase.getInstance(App.context.applicationContext)
 
   private val executors = Executors.newSingleThreadExecutor()
 
@@ -501,14 +501,14 @@ class DatabaseRepository private constructor() {
       var playlistCursor: Cursor? = null
       var songCursor: Cursor? = null
       try {
-        playlistCursor = App.getContext().contentResolver
+        playlistCursor = App.context.contentResolver
             .query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, null, null, null, null)
         if (playlistCursor == null || playlistCursor.count == 0) {
           return map
         }
         while (playlistCursor.moveToNext()) {
           val helperList = java.util.ArrayList<Int>()
-          songCursor = App.getContext().contentResolver.query(MediaStore.Audio.Playlists.Members
+          songCursor = App.context.contentResolver.query(MediaStore.Audio.Playlists.Members
               .getContentUri("external", playlistCursor
                   .getInt(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists.Members._ID)).toLong()), null, null, null, null)
           if (songCursor != null) {

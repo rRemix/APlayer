@@ -163,7 +163,7 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
       if (settingKey != null) {
         val data = dataList[position - 1]
         val key = when (SPUtil.getValue(
-          App.getContext(),
+          App.context,
           SETTING_KEY.NAME,
           settingKey,
           SortOrder.SONG_A_Z

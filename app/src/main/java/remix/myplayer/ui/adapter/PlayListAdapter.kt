@@ -116,7 +116,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
     if (position in 1..dataList.size) {
       val data = dataList[position - 1]
       val key = when (SPUtil.getValue(
-        App.getContext(),
+        App.context,
         SETTING_KEY.NAME,
         SETTING_KEY.PLAYLIST_SORT_ORDER,
         SortOrder.PLAYLIST_A_Z

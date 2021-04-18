@@ -98,7 +98,7 @@ class LyricFetcher(service: MusicService) {
 //          Timber.v("updateLyricRows, lrc: $it")
           if (id == song.id) {
             status = Status.NORMAL
-            offset = SPUtil.getValue(App.getContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, id.toString(), 0)
+            offset = SPUtil.getValue(App.context, SPUtil.LYRIC_OFFSET_KEY.NAME, id.toString(), 0)
             lrcRows.clear()
             lrcRows.addAll(it)
           } else {

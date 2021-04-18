@@ -58,8 +58,8 @@ class LyricPriorityDialog : BaseMusicDialog() {
         .onPositive { dialog, which ->
           try {
             DiskCache.getLrcDiskCache().delete()
-            DiskCache.init(App.getContext(), "lyric")
-            SPUtil.deleteFile(App.getContext(), SPUtil.LYRIC_KEY.NAME)
+            DiskCache.init(App.context, "lyric")
+            SPUtil.deleteFile(App.context, SPUtil.LYRIC_KEY.NAME)
             SPUtil.putValue(activity, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC,
                 Gson().toJson(adapter.dataList))
             ToastUtil.show(context, R.string.save_success)

@@ -114,10 +114,10 @@ class TagEditor(path: String) {
 
         audioFile?.commit()
 
-        MediaScannerConnection.scanFile(App.getContext(),
+        MediaScannerConnection.scanFile(App.context,
             arrayOf(song.data), null
         ) { path, uri ->
-          App.getContext().contentResolver.notifyChange(uri, null)
+          App.context.contentResolver.notifyChange(uri, null)
           e.onNext(MediaStoreUtil.getSongById(song.id))
           e.onComplete()
         }

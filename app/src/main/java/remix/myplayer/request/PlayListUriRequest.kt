@@ -29,7 +29,7 @@ open class PlayListUriRequest(image: SimpleDraweeView, request: UriRequest, conf
         .getPlayList(request.id)
         .flatMap { playList ->
           DatabaseRepository.getInstance()
-              .getPlayListSongs(App.getContext(), playList, true)
+              .getPlayListSongs(App.context, playList, true)
         }
         .flatMapObservable(Function<List<Song>, ObservableSource<Song>> { songs ->
           Observable.create { emitter ->

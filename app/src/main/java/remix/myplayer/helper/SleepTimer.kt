@@ -59,7 +59,7 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer
      */
     @JvmStatic
     fun toggleTimer(duration: Long) {
-      val context = App.getContext()
+      val context = App.context
       val start = instance == null
       if (start) {
         if (duration <= 0) {
