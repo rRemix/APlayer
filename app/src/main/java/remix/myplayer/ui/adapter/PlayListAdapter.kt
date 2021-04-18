@@ -1,7 +1,6 @@
 package remix.myplayer.ui.adapter
 
 import android.annotation.SuppressLint
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +10,12 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.github.promeg.pinyinhelper.Pinyin
+import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.databinding.ItemPlaylistRecycleGridBinding
 import remix.myplayer.databinding.ItemPlaylistRecycleListBinding
 import remix.myplayer.db.room.model.PlayList
+import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
 import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.request.PlayListUriRequest
@@ -27,7 +28,10 @@ import remix.myplayer.ui.adapter.holder.HeaderHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
 import remix.myplayer.util.Constants
+import remix.myplayer.util.SPUtil
+import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
+import java.util.*
 
 /**
  * Created by taeja on 16-1-15.
@@ -109,13 +113,19 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
   }
 
   override fun getSectionText(position: Int): String {
-    if (position == 0) {
-      return ""
-    }
-    if (position - 1 < dataList.size) {
-      val title = dataList[position - 1].name
-      return if (!TextUtils.isEmpty(title)) Pinyin.toPinyin(title[0]).toUpperCase()
-          .substring(0, 1) else ""
+    if (position in 1..dataList.size) {
+      val data = dataList[position - 1]
+      val key = when (SPUtil.getValue(
+        App.getContext(),
+        SETTING_KEY.NAME,
+        SETTING_KEY.PLAYLIST_SORT_ORDER,
+        SortOrder.PLAYLIST_A_Z
+      )) {
+        SortOrder.PLAYLIST_A_Z, SortOrder.PLAYLIST_Z_A -> data.name
+        else -> ""
+      }
+      if (key.isNotEmpty())
+        return Pinyin.toPinyin(key[0]).toUpperCase(Locale.getDefault()).substring(0, 1)
     }
     return ""
   }

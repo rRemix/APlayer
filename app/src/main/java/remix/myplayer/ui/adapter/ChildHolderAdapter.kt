@@ -1,7 +1,6 @@
 package remix.myplayer.ui.adapter
 
 import android.annotation.SuppressLint
-import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -10,11 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.github.promeg.pinyinhelper.Pinyin
+import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemSongRecycleBinding
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
+import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.SongPopupListener
 import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.service.Command
@@ -29,6 +30,8 @@ import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
 import remix.myplayer.util.Constants
 import remix.myplayer.util.ImageUriUtil
 import remix.myplayer.util.MusicUtil
+import remix.myplayer.util.SPUtil
+import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
 import java.util.*
 
@@ -149,13 +152,31 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
   }
 
   override fun getSectionText(position: Int): String {
-    if (position == 0) {
-      return ""
-    }
-    if (dataList.size > 0 && position < dataList.size && dataList[position - 1] != null) {
-      val title = dataList[position - 1]!!.title
-      return if (!TextUtils.isEmpty(title)) Pinyin.toPinyin(title[0]).toUpperCase(Locale.ROOT)
-          .substring(0, 1) else ""
+    if (position in 1..dataList.size) {
+      val settingKey = when (type) {
+        Constants.ALBUM -> SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER
+        Constants.ARTIST -> SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER
+        Constants.FOLDER -> SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER
+        Constants.PLAYLIST -> SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER
+        else -> null
+      }
+      if (settingKey != null) {
+        val data = dataList[position - 1]
+        val key = when (SPUtil.getValue(
+          App.getContext(),
+          SETTING_KEY.NAME,
+          settingKey,
+          SortOrder.SONG_A_Z
+        )) {
+          SortOrder.SONG_A_Z, SortOrder.SONG_Z_A -> data.title
+          SortOrder.ARTIST_A_Z, SortOrder.ARTIST_Z_A -> data.artist
+          SortOrder.ALBUM_A_Z, SortOrder.ALBUM_Z_A -> data.album
+          SortOrder.DISPLAY_NAME_A_Z, SortOrder.DISPLAY_NAME_Z_A -> data.displayName
+          else -> ""
+        }
+        if (key.isNotEmpty())
+          return Pinyin.toPinyin(key[0]).toUpperCase(Locale.getDefault()).substring(0, 1)
+      }
     }
     return ""
   }
