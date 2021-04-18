@@ -29,13 +29,13 @@ class HistoryActivity : LibraryActivity<Song, SongAdapter>() {
     binding = ActivityHistoryBinding.inflate(layoutInflater)
     setContentView(binding.root)
 
-    mAdapter = SongAdapter(R.layout.item_song_recycle, mChoice, binding.recyclerview)
-    mChoice.adapter = mAdapter
-    mAdapter?.onItemClickListener = object : OnItemClickListener {
+    adapter = SongAdapter(R.layout.item_song_recycle, choice, binding.recyclerview)
+    choice.adapter = adapter
+    adapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        mAdapter?.let { adapter ->
+        adapter?.let { adapter ->
           val song = adapter.dataList[position]
-          if (!mChoice.click(position, song)) {
+          if (!choice.click(position, song)) {
             val songs = adapter.dataList
             if (songs.isEmpty()) {
               return
@@ -48,13 +48,13 @@ class HistoryActivity : LibraryActivity<Song, SongAdapter>() {
       }
 
       override fun onItemLongClick(view: View, position: Int) {
-        mChoice.longClick(position, mAdapter?.dataList?.get(position))
+        choice.longClick(position, adapter?.dataList?.get(position))
       }
     }
 
     binding.recyclerview.layoutManager = LinearLayoutManager(this)
     binding.recyclerview.itemAnimator = DefaultItemAnimator()
-    binding.recyclerview.adapter = mAdapter
+    binding.recyclerview.adapter = adapter
 
     setUpToolbar(getString(R.string.drawer_history))
   }

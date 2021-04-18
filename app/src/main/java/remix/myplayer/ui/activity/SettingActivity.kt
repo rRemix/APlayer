@@ -100,25 +100,25 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   private lateinit var checkedChangedListener: OnCheckedChangeListener
 
   //是否需要重建activity
-  private var mNeedRecreate = false
+  private var needRecreate = false
 
   //是否需要刷新adapter
-  private var mNeedRefreshAdapter = false
+  private var needRefreshAdapter = false
 
   //是否需要刷新library
-  private var mNeedRefreshLibrary: Boolean = false
+  private var needRefreshLibrary: Boolean = false
 
   //    //是否从主题颜色选择对话框返回
   //    private boolean mFromColorChoose = false;
   //缓存大小
-  private var mCacheSize: Long = 0
-  private val mHandler: MsgHandler by lazy {
+  private var cacheSize: Long = 0
+  private val handler: MsgHandler by lazy {
     MsgHandler(this)
   }
-  private val mScanSize = intArrayOf(0, 500 * ByteConstants.KB, ByteConstants.MB, 2 * ByteConstants.MB, 5 * ByteConstants.MB)
-  private var mOriginalAlbumChoice: String? = null
+  private val scanSize = intArrayOf(0, 500 * ByteConstants.KB, ByteConstants.MB, 2 * ByteConstants.MB, 5 * ByteConstants.MB)
+  private var originalAlbumChoice: String? = null
 
-  private val mDisposables = ArrayList<Disposable>()
+  private val disposables = ArrayList<Disposable>()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -129,8 +129,8 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
     //读取重启aitivity之前的数据
     if (savedInstanceState != null) {
-      mNeedRecreate = savedInstanceState.getBoolean(EXTRA_RECREATE)
-      mNeedRefreshAdapter = savedInstanceState.getBoolean(EXTRA_REFRESH_ADAPTER)
+      needRecreate = savedInstanceState.getBoolean(EXTRA_RECREATE)
+      needRefreshAdapter = savedInstanceState.getBoolean(EXTRA_REFRESH_ADAPTER)
       //            mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
     }
 
@@ -181,9 +181,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
           when (buttonView.id) {
             //变色导航栏
             R.id.setting_navaigation_switch -> {
-              mNeedRecreate = true
+              needRecreate = true
               ThemeStore.sColoredNavigation = isChecked
-              mHandler.sendEmptyMessage(RECREATE)
+              handler.sendEmptyMessage(RECREATE)
             }
             //摇一摇
             R.id.setting_shake_switch -> if (isChecked) {
@@ -222,18 +222,18 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             //沉浸式状态栏
             R.id.setting_immersive_switch -> {
               ThemeStore.sImmersiveMode = isChecked
-              mNeedRecreate = true
-              mHandler.sendEmptyMessage(RECREATE)
+              needRecreate = true
+              handler.sendEmptyMessage(RECREATE)
             }
             //忽略内嵌
             R.id.setting_ignore_mediastore_switch -> {
               ImageUriRequest.IGNORE_MEDIA_STORE = isChecked
-              mNeedRefreshAdapter = true
+              needRefreshAdapter = true
             }
             //文件名
             R.id.setting_displayname_switch -> {
               Song.SHOW_DISPLAYNAME = isChecked
-              mNeedRefreshAdapter = true
+              needRefreshAdapter = true
             }
             R.id.setting_force_sort_switch -> {
               sendLocalBroadcast(Intent(MusicService.MEDIA_STORE_CHANGE))
@@ -241,7 +241,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             //黑色主题
             R.id.setting_black_theme_switch -> {
               if (!ThemeStore.isLightTheme) {
-                mNeedRecreate = true
+                needRecreate = true
                 recreate()
               }
             }
@@ -294,13 +294,13 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     }
 
     //封面
-    mOriginalAlbumChoice = SPUtil.getValue(
+    originalAlbumChoice = SPUtil.getValue(
       this,
       SETTING_KEY.NAME,
       SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
       getString(R.string.always)
     )
-    binding.settingCoverSourceText.text = mOriginalAlbumChoice
+    binding.settingCoverSourceText.text = originalAlbumChoice
 
     // 封面下载源
     val coverSource = SPUtil.getValue(
@@ -349,10 +349,10 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     //计算缓存大小
     object : Thread() {
       override fun run() {
-        mCacheSize = 0
-        mCacheSize += Util.getFolderSize(externalCacheDir)
-        mCacheSize += Util.getFolderSize(cacheDir)
-        mHandler.sendEmptyMessage(CACHE_SIZE)
+        cacheSize = 0
+        cacheSize += Util.getFolderSize(externalCacheDir)
+        cacheSize += Util.getFolderSize(cacheDir)
+        handler.sendEmptyMessage(CACHE_SIZE)
       }
     }.start()
 
@@ -557,9 +557,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
   override fun onBackPressed() {
     val intent = intent
-    intent.putExtra(EXTRA_RECREATE, mNeedRecreate)
-    intent.putExtra(EXTRA_REFRESH_ADAPTER, mNeedRefreshAdapter)
-    intent.putExtra(EXTRA_REFRESH_LIBRARY, mNeedRefreshLibrary)
+    intent.putExtra(EXTRA_RECREATE, needRecreate)
+    intent.putExtra(EXTRA_REFRESH_ADAPTER, needRefreshAdapter)
+    intent.putExtra(EXTRA_REFRESH_LIBRARY, needRefreshLibrary)
     setResult(Activity.RESULT_OK, intent)
     finish()
   }
@@ -594,7 +594,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         }
 
         MediaScanner(this).scanFiles(folder)
-        mNeedRefreshAdapter = true
+        needRefreshAdapter = true
       }
       "ExportPlayList" -> {
         if (TextUtils.isEmpty(playListName)) {
@@ -609,7 +609,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             folder.absolutePath
           )
         }
-        mDisposables.add(
+        disposables.add(
           exportPlayListToFile(
             this, playListName, File(
               folder, "$playListName.m3u"
@@ -679,7 +679,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
                 val chooseNew = position == 0 && text.toString().endsWith(
                   "(" + getString(R.string.new_create) + ")"
                 )
-                mDisposables.add(
+                disposables.add(
                   importM3UFile(
                     this@SettingActivity,
                     file,
@@ -704,7 +704,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       R.string.primary_color -> ThemeStore.materialPrimaryColor = selectedColor
       R.string.accent_color -> ThemeStore.accentColor = selectedColor
     }
-    mNeedRecreate = true
+    needRecreate = true
     recreate()
   }
 
@@ -740,9 +740,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   private fun configFilterSize() {
     //读取以前设置
     var position = 0
-    for (i in mScanSize.indices) {
+    for (i in scanSize.indices) {
       position = i
-      if (mScanSize[i] == MediaStoreUtil.SCAN_SIZE) {
+      if (scanSize[i] == MediaStoreUtil.SCAN_SIZE) {
         break
       }
     }
@@ -751,9 +751,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         .items("0K", "500K", "1MB", "2MB", "5MB")
         .itemsCallbackSingleChoice(position) { dialog, itemView, which, text ->
           SPUtil.putValue(
-            this, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE, mScanSize[which]
+            this, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE, scanSize[which]
           )
-          MediaStoreUtil.SCAN_SIZE = mScanSize[which]
+          MediaStoreUtil.SCAN_SIZE = scanSize[which]
           contentResolver.notifyChange(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null
           )
@@ -911,7 +911,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
               else -> ThemeStore.FOLLOW_SYSTEM
             }
           )
-          mNeedRecreate = true
+          needRecreate = true
           recreate()
         }
         true
@@ -933,7 +933,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
    * 播放列表导出
    */
   private fun exportPlayList() {
-    mDisposables.add(DatabaseRepository.getInstance().getAllPlaylist()
+    disposables.add(DatabaseRepository.getInstance().getAllPlaylist()
       .map<List<String>> { playLists ->
         val allplayListNames = ArrayList<String>()
         for ((_, name) in playLists) {
@@ -1012,7 +1012,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
                     .itemsCallbackMultiChoice(
                       selectedIndices.toTypedArray()
                     ) { dialog1, which, allSelects ->
-                      mDisposables.add(
+                      disposables.add(
                         importLocalPlayList(
                           this, localPlayLists, allSelects
                         )
@@ -1056,7 +1056,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         oldChoice
       ) { dialog, view, which, text ->
         if (oldChoice != which) {
-          mNeedRefreshAdapter = true
+          needRefreshAdapter = true
           ImageUriRequest.DOWNLOAD_SOURCE = which
           SPUtil.putValue(
             this,
@@ -1098,8 +1098,8 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         ) { dialog, view, which, text ->
           binding.settingAlbumCoverText.text = text
           //仅从从不改变到仅在wifi下或者总是的情况下，才刷新Adapter
-          mNeedRefreshAdapter =
-            mNeedRefreshAdapter || (getString(R.string.wifi_only) == text && getString(R.string.always) == text && mOriginalAlbumChoice != text)
+          needRefreshAdapter =
+            needRefreshAdapter || (getString(R.string.wifi_only) == text && getString(R.string.always) == text && originalAlbumChoice != text)
           clearDownloadCover(text)
           ImageUriRequest.AUTO_DOWNLOAD_ALBUM = text.toString()
           SPUtil.putValue(
@@ -1124,7 +1124,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
           .onPositive { clearDialog, action ->
             SPUtil.deleteFile(this, SPUtil.COVER_KEY.NAME)
             Fresco.getImagePipeline().clearCaches()
-            mNeedRefreshAdapter = true
+            needRefreshAdapter = true
           }.show()
     }
   }
@@ -1148,8 +1148,8 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
               //清除fresco缓存
               Fresco.getImagePipeline().clearCaches()
               ImageUriRequest.clearUriCache()
-              mNeedRefreshAdapter = true
-              mHandler.sendEmptyMessage(CLEAR_FINISH)
+              needRefreshAdapter = true
+              handler.sendEmptyMessage(CLEAR_FINISH)
             }
           }.start()
         }.show()
@@ -1254,7 +1254,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             newLibraries.add(Library(choose))
           }
           if (newLibraries != oldLibraries) {
-            mNeedRefreshLibrary = true
+            needRefreshLibrary = true
             intent.putExtra(EXTRA_LIBRARY, newLibraries)
             SPUtil.putValue(
               this, SETTING_KEY.NAME, SETTING_KEY.LIBRARY, Gson().toJson(
@@ -1375,7 +1375,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     }
     if (msg.what == CACHE_SIZE) {
       binding.settingClearText.text = getString(
-        R.string.cache_size, mCacheSize.toFloat() / 1024f / 1024f
+        R.string.cache_size, cacheSize.toFloat() / 1024f / 1024f
       )
     }
     if (msg.what == CLEAR_FINISH) {
@@ -1386,14 +1386,14 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    outState.putBoolean(EXTRA_RECREATE, mNeedRecreate)
-    outState.putBoolean(EXTRA_REFRESH_ADAPTER, mNeedRefreshAdapter)
+    outState.putBoolean(EXTRA_RECREATE, needRecreate)
+    outState.putBoolean(EXTRA_REFRESH_ADAPTER, needRefreshAdapter)
   }
 
   override fun onDestroy() {
     super.onDestroy()
-    mHandler.remove()
-    for (disposable in mDisposables) {
+    handler.remove()
+    for (disposable in disposables) {
       if (!disposable.isDisposed) {
         disposable.dispose()
       }
@@ -1418,9 +1418,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     super.onActivityResult(requestCode, resultCode, data)
     if (requestCode == REQUEST_THEME_COLOR) {
       if (data != null) {
-        mNeedRecreate = data.getBooleanExtra(EXTRA_RECREATE, false)
-        if (mNeedRecreate) {
-          mHandler.sendEmptyMessage(RECREATE)
+        needRecreate = data.getBooleanExtra(EXTRA_RECREATE, false)
+        if (needRecreate) {
+          handler.sendEmptyMessage(RECREATE)
         }
       }
     } else if (requestCode == Crop.REQUEST_PICK) {

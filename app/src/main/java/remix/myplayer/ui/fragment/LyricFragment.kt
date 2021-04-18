@@ -34,7 +34,7 @@ import kotlin.math.abs
  */
 class LyricFragment : BaseMusicFragment(), View.OnClickListener {
   private var onFindListener: OnInflateFinishListener? = null
-  private var info: Song? = null
+  private var song: Song? = null
 
   private var disposable: Disposable? = null
   private val msgHandler = MsgHandler(this)
@@ -81,7 +81,7 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
 
   @JvmOverloads
   fun updateLrc(song: Song, clearCache: Boolean = false) {
-    info = song
+    this.song = song
     getLrc("", clearCache)
   }
 
@@ -92,35 +92,35 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
   private fun getLrc(manualPath: String, clearCache: Boolean) {
     if (!isVisible)
       return
-    if (info == null) {
+    if (song == null) {
       lrcView.setText(getStringSafely(R.string.no_lrc))
       return
     }
     if (clearCache) {
       //清除offset
-      SPUtil.putValue(App.context, SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", 0)
+      SPUtil.putValue(App.context, SPUtil.LYRIC_OFFSET_KEY.NAME, song?.id.toString() + "", 0)
       lrcView.setOffset(0)
     }
-    val id = info?.id
+    val id = song?.id
 
     disposable?.dispose()
     Timber.v("setSearching")
     lrcView.setText(getStringSafely(R.string.searching))
-    disposable = lyricSearcher.setSong(info ?: return)
+    disposable = lyricSearcher.setSong(song ?: return)
         .getLyricObservable(manualPath, clearCache)
         .subscribe(Consumer {
           Timber.v("setLrcRows")
-          if (id == info?.id) {
+          if (id == song?.id) {
             if (it == null || it.isEmpty()) {
               lrcView.setText(getStringSafely(R.string.no_lrc))
               return@Consumer
             }
-            lrcView.setOffset(SPUtil.getValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", 0))
+            lrcView.setOffset(SPUtil.getValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, song?.id.toString() + "", 0))
             lrcView.setLrcRows(it)
           }
         }, Consumer {
           Timber.v(it)
-          if (id == info?.id) {
+          if (id == song?.id) {
             lrcView.setLrcRows(null)
             lrcView.setText(getStringSafely(R.string.no_lrc))
           }
@@ -131,7 +131,7 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
     msgHandler.removeMessages(MESSAGE_HIDE)
     msgHandler.sendEmptyMessageDelayed(MESSAGE_HIDE, DELAY_HIDE)
 
-    val originalOffset = SPUtil.getValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", 0)
+    val originalOffset = SPUtil.getValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, song?.id.toString() + "", 0)
     var newOffset = originalOffset
     when (view.id) {
       R.id.offsetReset -> {
@@ -142,7 +142,7 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
       R.id.offsetReduce -> newOffset -= 500
     }
     if (originalOffset != newOffset) {
-      SPUtil.putValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", newOffset)
+      SPUtil.putValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, song?.id.toString() + "", newOffset)
       val toastMsg = msgHandler.obtainMessage(MESSAGE_SHOW_TOAST)
       toastMsg.arg1 = newOffset
       msgHandler.removeMessages(MESSAGE_SHOW_TOAST)

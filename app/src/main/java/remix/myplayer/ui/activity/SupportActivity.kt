@@ -48,7 +48,7 @@ import java.util.*
 class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
   private lateinit var binding: ActivitySupportDevelopBinding
 
-  private val mAdapter: PurchaseAdapter by lazy {
+  private val adapter: PurchaseAdapter by lazy {
     PurchaseAdapter(R.layout.item_support)
   }
 
@@ -72,8 +72,8 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
       beans.add(Purchase("paypal", "icon_paypal_donate", getString(R.string.paypal), ""))
     }
 
-    mAdapter.setDataList(beans)
-    mAdapter.onItemClickListener = object : OnItemClickListener {
+    adapter.setDataList(beans)
+    adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemLongClick(view: View?, position: Int) {
       }
 
@@ -176,7 +176,7 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
     }
 
     recyclerView.layoutManager = GridLayoutManager(this, 2)
-    recyclerView.adapter = mAdapter
+    recyclerView.adapter = adapter
 
     mLoading = Theme.getBaseDialog(this)
         .title(R.string.loading)
@@ -189,7 +189,7 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
   }
 
   private fun loadSkuDetails() {
-    if (mAdapter.dataList.size > 3)
+    if (adapter.dataList.size > 3)
       return
     mDisposable = Single.fromCallable { mBillingProcessor?.getPurchaseListingDetails(SKU_IDS) }
         .map {
@@ -206,8 +206,8 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
         .observeOn(AndroidSchedulers.mainThread())
         .subscribeWith(object : DisposableSingleObserver<List<Purchase>>() {
           override fun onSuccess(datas: List<Purchase>) {
-            mAdapter.dataList.addAll(datas)
-            mAdapter.notifyDataSetChanged()
+            adapter.dataList.addAll(datas)
+            adapter.notifyDataSetChanged()
           }
 
           override fun onError(e: Throwable) {

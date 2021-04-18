@@ -72,23 +72,23 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
       finish()
       return
     }
-    mChoice = MultipleChoice(this,
+    choice = MultipleChoice(this,
         if (type == Constants.PLAYLIST) Constants.PLAYLISTSONG else Constants.SONG)
-    mAdapter = ChildHolderAdapter(R.layout.item_song_recycle, type, title, mChoice, binding.childHolderRecyclerView)
-    mChoice.adapter = mAdapter
+    adapter = ChildHolderAdapter(R.layout.item_song_recycle, type, title, choice, binding.childHolderRecyclerView)
+    choice.adapter = adapter
     if (TextUtils.isDigitsOnly(key)) {
-      mChoice.extra = key.toLong()
+      choice.extra = key.toLong()
     }
-    mAdapter?.onItemClickListener = object : OnItemClickListener {
+    adapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val song = mAdapter?.dataList?.get(position)
+        val song = adapter?.dataList?.get(position)
         if (isPlaying() && song == getCurrentSong()) {
           val bottomActionBarFragment = supportFragmentManager
               .findFragmentByTag("BottomActionBarFragment") as BottomActionBarFragment?
           bottomActionBarFragment?.startPlayerActivity()
         } else {
-          if (!mChoice.click(position, song)) {
-            val songs = mAdapter?.dataList
+          if (!choice.click(position, song)) {
+            val songs = adapter?.dataList
             if (songs.isNullOrEmpty()) {
               return
             }
@@ -100,12 +100,12 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
       }
 
       override fun onItemLongClick(view: View, position: Int) {
-        mChoice.longClick(position, mAdapter!!.dataList[position])
+        choice.longClick(position, adapter!!.dataList[position])
       }
     }
     binding.childHolderRecyclerView.layoutManager = LinearLayoutManager(this)
     binding.childHolderRecyclerView.itemAnimator = DefaultItemAnimator()
-    binding.childHolderRecyclerView.adapter = mAdapter
+    binding.childHolderRecyclerView.adapter = adapter
     val accentColor = accentColor
     binding.childHolderRecyclerView.setBubbleColor(accentColor)
     binding.childHolderRecyclerView.setHandleColor(accentColor)
@@ -163,7 +163,7 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
           !this.sortOrder.equals(sortOrder, ignoreCase = true)) {
         //选择的是手动排序
         if (sortOrder.equals(SortOrder.PLAYLIST_SONG_CUSTOM, ignoreCase = true)) {
-          CustomSortActivity.start(this, key.toLong(), title, ArrayList(mAdapter!!.dataList))
+          CustomSortActivity.start(this, key.toLong(), title, ArrayList(adapter!!.dataList))
         } else {
           update = true
         }
@@ -266,14 +266,14 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
   @OnHandleMessage
   fun handleInternal(msg: Message) {
     when (msg.what) {
-      MSG_RESET_MULTI -> mAdapter!!.notifyDataSetChanged()
+      MSG_RESET_MULTI -> adapter!!.notifyDataSetChanged()
     }
   }
 
   override fun onMetaChanged() {
     super.onMetaChanged()
-    if (mAdapter != null) {
-      mAdapter!!.updatePlayingSong()
+    if (adapter != null) {
+      adapter!!.updatePlayingSong()
     }
   }
 
