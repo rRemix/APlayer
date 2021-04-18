@@ -339,9 +339,9 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
           .show(supportFragmentManager, PlayQueueDialog::class.java.simpleName)
       R.id.top_hide -> onBackPressed()
       R.id.top_more -> {
-        @SuppressLint("RestrictedApi") val popupMenu = PopupMenu(mContext, v, Gravity.TOP)
+        @SuppressLint("RestrictedApi") val popupMenu = PopupMenu(this, v, Gravity.TOP)
         popupMenu.menuInflater.inflate(R.menu.menu_audio_item, popupMenu.menu)
-        popupMenu.setOnMenuItemClickListener(AudioPopupListener<PlayerActivity>(this, song))
+        popupMenu.setOnMenuItemClickListener(AudioPopupListener(this, song))
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
           popupMenu.menu.removeItem(R.id.menu_speed)

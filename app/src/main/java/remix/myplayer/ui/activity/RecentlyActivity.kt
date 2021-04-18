@@ -97,13 +97,9 @@ class RecentlyActivity : LibraryActivity<Song, SongAdapter>() {
     super.onMediaStoreChanged()
   }
 
-  override fun getLoader(): Loader<List<Song>> {
-    return AsyncRecentlySongLoader(this)
-  }
+  override val loader: Loader<List<Song>> = AsyncRecentlySongLoader(this)
 
-  override fun getLoaderId(): Int {
-    return LoaderIds.ACTIVITY_RECENTLY
-  }
+  override val loaderId: Int = LoaderIds.ACTIVITY_RECENTLY
 
   private class AsyncRecentlySongLoader(context: Context) : AppWrappedAsyncTaskLoader<List<Song>>(context) {
     override fun loadInBackground(): List<Song> {

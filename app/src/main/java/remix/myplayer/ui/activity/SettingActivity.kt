@@ -300,7 +300,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       mContext,
       SETTING_KEY.NAME,
       SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
-      mContext.getString(R.string.always)
+      getString(R.string.always)
     )
     binding.settingCoverSourceText.text = mOriginalAlbumChoice
 
@@ -595,7 +595,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
           )
         }
 
-        MediaScanner(mContext).scanFiles(folder)
+        MediaScanner(this).scanFiles(folder)
         mNeedRefreshAdapter = true
       }
       "ExportPlayList" -> {
@@ -795,7 +795,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             mContext, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO
           )
         ) { dialog, itemView, which, text ->
-          LanguageHelper.saveSelectLanguage(mContext, which)
+          LanguageHelper.saveSelectLanguage(this, which)
 
           val intent = Intent(mContext, MainActivity::class.java)
           intent.action = Intent.ACTION_MAIN
@@ -847,7 +847,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
                 val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                   emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                   FileProvider.getUriForFile(
-                    mContext,
+                    this@SettingActivity,
                     BuildConfig.APPLICATION_ID + ".fileprovider",
                     zipFile
                   )
@@ -1016,7 +1016,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
                     ) { dialog1, which, allSelects ->
                       mDisposables.add(
                         importLocalPlayList(
-                          mContext, localPlayLists, allSelects
+                          this, localPlayLists, allSelects
                         )
                       )
                       true
@@ -1080,10 +1080,10 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
    */
   private fun configCoverDownload() {
     val choice = SPUtil.getValue(
-      mContext,
+      this,
       SETTING_KEY.NAME,
       SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
-      mContext.getString(R.string.always)
+      getString(R.string.always)
     )
     getBaseDialog(mContext).title(R.string.auto_download_album_artist_cover)
       .items(
@@ -1093,17 +1093,15 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       )
         .itemsCallbackSingleChoice(
           when (choice) {
-            mContext.getString(R.string.wifi_only) -> 1
-            mContext.getString(R.string.always) -> 0
+            getString(R.string.wifi_only) -> 1
+            getString(R.string.always) -> 0
             else -> 2
           }
         ) { dialog, view, which, text ->
           binding.settingAlbumCoverText.text = text
           //仅从从不改变到仅在wifi下或者总是的情况下，才刷新Adapter
           mNeedRefreshAdapter =
-            mNeedRefreshAdapter || (mContext.getString(R.string.wifi_only) == text && mContext.getString(
-              R.string.always
-            ) == text && mOriginalAlbumChoice != text)
+            mNeedRefreshAdapter || (getString(R.string.wifi_only) == text && getString(R.string.always) == text && mOriginalAlbumChoice != text)
           clearDownloadCover(text)
           ImageUriRequest.AUTO_DOWNLOAD_ALBUM = text.toString()
           SPUtil.putValue(

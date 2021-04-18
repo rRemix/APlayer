@@ -163,7 +163,7 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
           !this.sortOrder.equals(sortOrder, ignoreCase = true)) {
         //选择的是手动排序
         if (sortOrder.equals(SortOrder.PLAYLIST_SONG_CUSTOM, ignoreCase = true)) {
-          CustomSortActivity.start(mContext, key.toLong(), title, ArrayList(mAdapter!!.dataList))
+          CustomSortActivity.start(this, key.toLong(), title, ArrayList(mAdapter!!.dataList))
         } else {
           update = true
         }
@@ -198,15 +198,13 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
     return if (type == Constants.PLAYLIST) R.menu.menu_child_for_playlist else if (type == Constants.ALBUM) R.menu.menu_child_for_album else if (type == Constants.ARTIST) R.menu.menu_child_for_artist else R.menu.menu_child_for_folder
   }
 
-  override fun getLoaderId(): Int {
-    return LoaderIds.ACTIVITY_CHILDHOLDER
-  }
+  override val loaderId: Int = LoaderIds.ACTIVITY_CHILDHOLDER
 
-  override fun getLoader(): Loader<List<Song?>?> {
-    return AsyncChildSongLoader(this)
-  }
+  override val loader: Loader<List<Song>>
+    get() = AsyncChildSongLoader(this)
 
-  override fun onLoadFinished(loader: Loader<List<Song?>?>, data: List<Song?>) {
+
+  override fun onLoadFinished(loader: Loader<List<Song>>, data: List<Song>?) {
     super.onLoadFinished(loader, data)
     binding.childholderItemNum.text = getString(R.string.song_count, data?.size ?: 0)
   }
@@ -253,7 +251,7 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
             .getPlayList(key.toLong())
             .flatMap { playList: PlayList? ->
               getInstance()
-                  .getPlayListSongs(mContext, playList!!, false)
+                  .getPlayListSongs(this, playList!!, false)
             }
             .blockingGet()
       }
@@ -279,7 +277,7 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
     }
   }
 
-  private class AsyncChildSongLoader(childHolderActivity: ChildHolderActivity) : AppWrappedAsyncTaskLoader<List<Song?>?>(childHolderActivity) {
+  private class AsyncChildSongLoader(childHolderActivity: ChildHolderActivity) : AppWrappedAsyncTaskLoader<List<Song>>(childHolderActivity) {
     private val ref: WeakReference<ChildHolderActivity> = WeakReference(childHolderActivity)
     override fun loadInBackground(): List<Song> {
       return childSongs
