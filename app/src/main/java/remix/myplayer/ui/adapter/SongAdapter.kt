@@ -147,7 +147,7 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
     if (position in 1..dataList.size) {
       val data = dataList[position - 1]
       val key = when (SPUtil.getValue(
-        App.getContext(),
+        App.context,
         SPUtil.SETTING_KEY.NAME,
         SPUtil.SETTING_KEY.SONG_SORT_ORDER,
         SortOrder.SONG_A_Z

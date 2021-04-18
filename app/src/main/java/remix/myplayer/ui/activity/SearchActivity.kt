@@ -163,7 +163,7 @@ class SearchActivity : LibraryActivity<Song, SearchAdapter>(), SearchView.OnQuer
                 null,
                 selection, arrayOf("%$key%", "%$key%", "%$key%"), null)
         if (cursor != null && cursor.count > 0) {
-          val blackList = SPUtil.getStringSet(App.getContext(), SPUtil.SETTING_KEY.NAME,
+          val blackList = SPUtil.getStringSet(App.context, SPUtil.SETTING_KEY.NAME,
               SPUtil.SETTING_KEY.BLACKLIST_SONG)
           while (cursor.moveToNext()) {
             if (!blackList

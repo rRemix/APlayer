@@ -532,7 +532,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     val screenFilter = IntentFilter()
     screenFilter.addAction(Intent.ACTION_SCREEN_ON)
     screenFilter.addAction(Intent.ACTION_SCREEN_OFF)
-    App.getContext().registerReceiver(screenReceiver, screenFilter)
+    App.context.registerReceiver(screenReceiver, screenFilter)
 
     //监听数据库变化
     contentResolver.registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mediaStoreObserver)

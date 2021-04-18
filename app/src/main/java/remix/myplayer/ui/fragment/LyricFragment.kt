@@ -98,7 +98,7 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
     }
     if (clearCache) {
       //清除offset
-      SPUtil.putValue(App.getContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", 0)
+      SPUtil.putValue(App.context, SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", 0)
       lrcView.setOffset(0)
     }
     val id = info?.id

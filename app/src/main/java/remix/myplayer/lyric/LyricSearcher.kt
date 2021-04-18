@@ -78,7 +78,7 @@ class LyricSearcher {
       return Observable.error(Throwable("empty song"))
     }
 
-    val type = SPUtil.getValue(App.getContext(), SPUtil.LYRIC_KEY.NAME, song.id, SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
+    val type = SPUtil.getValue(App.context, SPUtil.LYRIC_KEY.NAME, song.id, SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
 
     val observable = when (type) {
       SPUtil.LYRIC_KEY.LYRIC_IGNORE -> {
@@ -106,7 +106,7 @@ class LyricSearcher {
       SPUtil.LYRIC_KEY.LYRIC_DEFAULT -> {
         //默认优先级排序 酷狗-网易-QQ-本地-内嵌-忽略
 
-        val priority = Gson().fromJson<List<LyricPriority>>(SPUtil.getValue(App.getContext(), SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
+        val priority = Gson().fromJson<List<LyricPriority>>(SPUtil.getValue(App.context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
             object : TypeToken<List<LyricPriority>>() {}.type)
         if (priority.firstOrNull() == LyricPriority.IGNORE) {
           return Observable.error(Throwable("ignore lyric"))
@@ -203,7 +203,7 @@ class LyricSearcher {
   private fun getLocalLyricPath(): String? {
     var path = ""
     //没有设置歌词路径 搜索所有可能的歌词文件
-    App.getContext().contentResolver.query(MediaStore.Files.getContentUri("external"), null,
+    App.context.contentResolver.query(MediaStore.Files.getContentUri("external"), null,
         MediaStore.Files.FileColumns.DATA + " like ? or " +
             MediaStore.Files.FileColumns.DATA + " like ? or " +
             MediaStore.Files.FileColumns.DATA + " like ? or " +
@@ -257,7 +257,7 @@ class LyricSearcher {
   private fun getContentObservable(type: Int): Observable<List<LrcRow>> {
     val networkObservable = getNetworkObservable(type)
     val localObservable = getLocalObservable()
-    val onlineFirst = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST, false)
+    val onlineFirst = SPUtil.getValue(App.context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST, false)
     return Observable.concat(if (onlineFirst) networkObservable else localObservable, if (onlineFirst) localObservable else networkObservable).firstOrError().toObservable()
   }
 

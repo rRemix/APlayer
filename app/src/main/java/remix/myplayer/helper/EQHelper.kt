@@ -42,9 +42,9 @@ object EQHelper {
     get() = enable && bassBoost?.strengthSupported == true
 
   var bassBoostStrength: Int
-    get() = SPUtil.getValue(App.getContext(), NAME, BASS_BOOST_STRENGTH, 0)
+    get() = SPUtil.getValue(App.context, NAME, BASS_BOOST_STRENGTH, 0)
     set(strength) {
-      SPUtil.putValue(App.getContext(), NAME, BASS_BOOST_STRENGTH, strength)
+      SPUtil.putValue(App.context, NAME, BASS_BOOST_STRENGTH, strength)
       if (isBassBoostEnabled) {
         tryRun({
           bassBoost?.setStrength(strength.toShort())
@@ -79,7 +79,7 @@ object EQHelper {
     }
 
     //是否启用音效设置
-    enable = SPUtil.getValue(App.getContext(), NAME, ENABLE_EQ, false)
+    enable = SPUtil.getValue(App.context, NAME, ENABLE_EQ, false)
     // 不需要初始化
     if (!enable && !force) {
       builtEqualizerInit = false
@@ -106,7 +106,7 @@ object EQHelper {
 
         //得到之前存储的每个频率的db值
         for (i in 0 until bandNumber) {
-          val bangLevel = SPUtil.getValue(App.getContext(), NAME, "band$i", 0)
+          val bangLevel = SPUtil.getValue(App.context, NAME, "band$i", 0)
           bandLevels.add(bangLevel.toShort())
         }
 
@@ -135,7 +135,7 @@ object EQHelper {
     } else {
       Timber.v("open built-in")
       //是否启用音效设置
-      enable = SPUtil.getValue(App.getContext(), NAME, ENABLE_EQ, false)
+      enable = SPUtil.getValue(App.context, NAME, ENABLE_EQ, false)
       if (!enable) {
         return
       }
@@ -227,12 +227,12 @@ object EQHelper {
       releaseEqualizer()
     })
     bandLevels[band] = level.toShort()
-    SPUtil.putValue(App.getContext(), NAME, "band$band", level)
+    SPUtil.putValue(App.context, NAME, "band$band", level)
   }
 
   fun updateEnable(enable: Boolean) {
     this.enable = enable
-    SPUtil.putValue(App.getContext(), NAME, ENABLE_EQ, enable)
+    SPUtil.putValue(App.context, NAME, ENABLE_EQ, enable)
 
     tryRun({
       equalizer?.enabled = enable

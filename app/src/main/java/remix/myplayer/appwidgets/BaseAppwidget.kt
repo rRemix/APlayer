@@ -209,8 +209,8 @@ abstract class BaseAppwidget
     val SKIN_WHITE_1F = 1//白色不带透明
     val SKIN_TRANSPARENT = 2//透明
     private val TAG = "桌面部件"
-    private val IMAGE_SIZE_BIG = DensityUtil.dip2px(App.getContext(), 270f)
-    private val IMAGE_SIZE_MEDIUM = DensityUtil.dip2px(App.getContext(), 72f)
+    private val IMAGE_SIZE_BIG = DensityUtil.dip2px(App.context, 270f)
+    private val IMAGE_SIZE_MEDIUM = DensityUtil.dip2px(App.context, 72f)
 
     fun drawableToBitmap(drawable: Drawable): Bitmap {
       // 取 drawable 的长宽

@@ -7,7 +7,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 object LogWriter {
-  private val file = File(App.getContext().externalCacheDir, "playQueue.log")
+  private val file = File(App.context.externalCacheDir, "playQueue.log")
 
   fun write(log: String) {
     Completable

@@ -54,7 +54,7 @@ class BottomActionBarFragment : BaseMusicFragment() {
     bottom_action_bar.setOnTouchListener { v: View?, event: MotionEvent? -> gestureDetector.onTouchEvent(event) }
 
     //播放按钮
-    val listener = CtrlButtonListener(App.getContext())
+    val listener = CtrlButtonListener(App.context)
     playbar_play.setOnClickListener(listener)
     playbar_next.setOnClickListener(listener)
   }
@@ -169,7 +169,7 @@ class BottomActionBarFragment : BaseMusicFragment() {
     }
 
     companion object {
-      private val Y_THRESHOLD = DensityUtil.dip2px(App.getContext(), 10f)
+      private val Y_THRESHOLD = DensityUtil.dip2px(App.context, 10f)
     }
 
   }

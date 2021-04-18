@@ -94,7 +94,7 @@ class MediaScanner(private val context: Context) {
               override fun onComplete() {
                 loadingDialog.dismiss()
                 ToastUtil.show(context, context.getString(R.string.scanned_finish))
-                App.getContext().contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
+                App.context.contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
               }
             })
       }

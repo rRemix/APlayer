@@ -34,7 +34,7 @@ class ShakeDetector private constructor() : SensorEventListener, Runnable {
     if (begin)
       return
     begin = true
-    sensorManager = App.getContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    sensorManager = App.context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     sensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     sensorManager?.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
   }

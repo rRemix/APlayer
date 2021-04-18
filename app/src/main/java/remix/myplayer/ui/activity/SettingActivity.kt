@@ -29,7 +29,7 @@ import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_setting.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import remix.myplayer.App.IS_GOOGLEPLAY
+import remix.myplayer.App.Companion.IS_GOOGLEPLAY
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Feedback

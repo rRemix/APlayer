@@ -88,7 +88,7 @@ object UpdateAgent {
   private fun getLocalVersionCode(): Int {
     var versionCode = 0
     try {
-      versionCode = App.getContext().packageManager.getPackageInfo(App.getContext().packageName, 0).versionCode
+      versionCode = App.context.packageManager.getPackageInfo(App.context.packageName, 0).versionCode
     } catch (e: PackageManager.NameNotFoundException) {
       Timber.v(e)
     }

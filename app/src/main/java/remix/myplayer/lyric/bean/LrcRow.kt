@@ -159,10 +159,10 @@ class LrcRow : Comparable<LrcRow> {
 
     @JvmField
     var LYRIC_NO_ROW = LrcRow("", 0,
-        App.getContext().getString(R.string.no_lrc))
+        App.context.getString(R.string.no_lrc))
 
     @JvmField
     var LYRIC_SEARCHING_ROW = LrcRow("", 0,
-        App.getContext().getString(R.string.searching))
+        App.context.getString(R.string.searching))
   }
 }

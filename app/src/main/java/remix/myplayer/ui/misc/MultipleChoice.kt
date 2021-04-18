@@ -139,7 +139,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
     }
 
     val dialog = Theme.getLoadingDialog(context, context.getString(R.string.deleting)).build()
-    val checked = arrayOf(SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false))
+    val checked = arrayOf(SPUtil.getValue(App.context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false))
     getBaseDialog(context)
         .content(title)
         .positiveText(R.string.confirm)
@@ -336,7 +336,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
       open()
       isActive = true
       isActiveSomeWhere = true
-      Util.vibrate(App.getContext(), 100)
+      Util.vibrate(App.context, 100)
     }
 
     changeData(pos, data)

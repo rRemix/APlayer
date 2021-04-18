@@ -75,7 +75,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
     holder.iv.tag = setImage(holder.iv, ImageUriUtil.getSearchRequest(album), imageSize, position)
     if (holder is AlbumListHolder) {
-      holder.tv2.text = App.getContext().getString(R.string.song_count_2, album.artist, album.count)
+      holder.tv2.text = App.context.getString(R.string.song_count_2, album.artist, album.count)
     } else {
       holder.tv2.text = album.artist
     }
@@ -127,7 +127,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     if (position in 1..dataList.size) {
       val data = dataList[position - 1]
       val key = when (SPUtil.getValue(
-        App.getContext(),
+        App.context,
         SETTING_KEY.NAME,
         SETTING_KEY.ALBUM_SORT_ORDER,
         SortOrder.ALBUM_A_Z

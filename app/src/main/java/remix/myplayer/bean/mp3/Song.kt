@@ -128,7 +128,7 @@ data class Song(
     //所有列表是否显示文件名
     @JvmStatic
     var SHOW_DISPLAYNAME = SPUtil
-        .getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SHOW_DISPLAYNAME,
+        .getValue(App.context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SHOW_DISPLAYNAME,
             false)
   }
 }
