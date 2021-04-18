@@ -31,21 +31,24 @@ class HistoryActivity : LibraryActivity<Song, SongAdapter>() {
 
     mAdapter = SongAdapter(R.layout.item_song_recycle, mChoice, binding.recyclerview)
     mChoice.adapter = mAdapter
-    mAdapter.onItemClickListener = object : OnItemClickListener {
+    mAdapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val song = mAdapter.dataList[position]
-        if (!mChoice.click(position, song)) {
-          val songs = mAdapter.dataList
-          if (songs.isEmpty()) {
-            return
+        mAdapter?.let { adapter ->
+          val song = adapter.dataList[position]
+          if (!mChoice.click(position, song)) {
+            val songs = adapter.dataList
+            if (songs.isEmpty()) {
+              return
+            }
+            setPlayQueue(songs, MusicUtil.makeCmdIntent(Command.PLAYSELECTEDSONG)
+                .putExtra(MusicService.EXTRA_POSITION, position))
           }
-          setPlayQueue(songs, MusicUtil.makeCmdIntent(Command.PLAYSELECTEDSONG)
-              .putExtra(MusicService.EXTRA_POSITION, position))
         }
+
       }
 
       override fun onItemLongClick(view: View, position: Int) {
-        mChoice.longClick(position, mAdapter.dataList[position])
+        mChoice.longClick(position, mAdapter?.dataList?.get(position))
       }
     }
 
@@ -56,17 +59,10 @@ class HistoryActivity : LibraryActivity<Song, SongAdapter>() {
     setUpToolbar(getString(R.string.drawer_history))
   }
 
-  override fun onLoadFinished(loader: Loader<List<Song>>, data: List<Song>?) {
-    super.onLoadFinished(loader, data)
-  }
+  override val loader: Loader<List<Song>>
+    get() = AsyncHistorySongLoader(this)
 
-  override fun getLoaderId(): Int {
-    return ACTIVITY_HISTORY
-  }
-
-  override fun getLoader(): Loader<List<Song>> {
-    return AsyncHistorySongLoader(this)
-  }
+  override val loaderId: Int = ACTIVITY_HISTORY
 
   private class AsyncHistorySongLoader(context: Context) : AppWrappedAsyncTaskLoader<List<Song>>(context) {
     override fun loadInBackground(): List<Song> {

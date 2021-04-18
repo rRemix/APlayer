@@ -70,7 +70,7 @@ import java.util.*
 /**
  *
  */
-open class MainActivity : MenuActivity(), View.OnClickListener {
+class MainActivity : MenuActivity(), View.OnClickListener {
 
   private val drawerAdapter by lazy {
     DrawerAdapter(R.layout.item_drawer)
@@ -163,8 +163,8 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
    */
   private fun setUpToolbar() {
     super.setUpToolbar("")
-    toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp)
-    toolbar.setNavigationOnClickListener { v -> drawer.openDrawer(navigation_view) }
+    toolbar?.setNavigationIcon(R.drawable.ic_menu_white_24dp)
+    toolbar?.setNavigationOnClickListener { v -> drawer.openDrawer(navigation_view) }
   }
 
   /**
@@ -402,7 +402,7 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
           5 -> {
             Timber.v("发送Exit广播")
             sendBroadcast(Intent(Constants.ACTION_EXIT)
-                .setComponent(ComponentName(mContext, ExitReceiver::class.java)))
+                .setComponent(ComponentName(this@MainActivity, ExitReceiver::class.java)))
           }
         }
         drawerAdapter.setSelectIndex(position)
@@ -638,7 +638,7 @@ open class MainActivity : MenuActivity(), View.OnClickListener {
   private fun checkUpdate() {
     if (!IS_GOOGLEPLAY && !mAlreadyCheck) {
       UpdateAgent.forceCheck = false
-      UpdateAgent.listener = UpdateListener(mContext)
+      UpdateAgent.listener = UpdateListener(this)
       mAlreadyCheck = true
       UpdateAgent.check(this)
     }

@@ -57,7 +57,7 @@ import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24
 import remix.myplayer.ui.activity.LockScreenActivity
-import remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS
+import remix.myplayer.ui.activity.base.BaseActivity.Companion.EXTERNAL_STORAGE_PERMISSIONS
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
@@ -219,11 +219,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
   private val focusRequest =
-    AudioFocusRequestCompat.Builder(AudioManagerCompat.AUDIOFOCUS_GAIN).run {
-      setAudioAttributes(audioAttributes)
-      setOnAudioFocusChangeListener(audioFocusListener)
-      build()
-    }
+      AudioFocusRequestCompat.Builder(AudioManagerCompat.AUDIOFOCUS_GAIN).run {
+        setAudioAttributes(audioAttributes)
+        setOnAudioFocusChangeListener(audioFocusListener)
+        build()
+      }
 
   /**
    * 更新相关Activity的Handler
@@ -541,20 +541,20 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     SleepTimer.addCallback(object : SleepTimer.Callback {
       override fun onFinish() {
         if (SPUtil.getValue(
-            this@MusicService,
-            SETTING_KEY.NAME,
-            SETTING_KEY.TIMER_EXIT_AFTER_FINISH,
-            false
-          )
+                this@MusicService,
+                SETTING_KEY.NAME,
+                SETTING_KEY.TIMER_EXIT_AFTER_FINISH,
+                false
+            )
         ) {
           pendingClose = true
         } else {
           sendBroadcast(
-            Intent(ACTION_EXIT).setComponent(
-              ComponentName(
-                this@MusicService, ExitReceiver::class.java
+              Intent(ACTION_EXIT).setComponent(
+                  ComponentName(
+                      this@MusicService, ExitReceiver::class.java
+                  )
               )
-            )
           )
         }
       }
@@ -842,8 +842,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   override fun play(fadeIn: Boolean) {
     Timber.v("play: $fadeIn")
     audioFocus = AudioManagerCompat.requestAudioFocus(
-      audioManager,
-      focusRequest
+        audioManager,
+        focusRequest
     ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     if (!audioFocus) {
       return
@@ -1426,8 +1426,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           }
           if (requestFocus) {
             audioFocus = AudioManagerCompat.requestAudioFocus(
-              audioManager,
-              focusRequest
+                audioManager,
+                focusRequest
             ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
             if (!audioFocus) {
               ToastUtil.show(service, getString(R.string.cant_request_audio_focus))
