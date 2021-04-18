@@ -1,7 +1,6 @@
 package remix.myplayer.ui.adapter
 
 import android.annotation.SuppressLint
-import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +17,7 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.databinding.ItemAlbumRecycleGridBinding
 import remix.myplayer.databinding.ItemAlbumRecycleListBinding
+import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
 import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.theme.Theme
@@ -29,6 +29,8 @@ import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
 import remix.myplayer.util.Constants
 import remix.myplayer.util.ImageUriUtil
+import remix.myplayer.util.SPUtil
+import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
 import java.util.*
 
@@ -122,13 +124,20 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
   }
 
   override fun getSectionText(position: Int): String {
-    if (position == 0) {
-      return ""
-    }
-    if (position - 1 < dataList.size) {
-      val album = dataList[position - 1].album
-      return if (!TextUtils.isEmpty(album)) Pinyin.toPinyin(album[0]).toUpperCase(Locale.ROOT)
-          .substring(0, 1) else ""
+    if (position in 1..dataList.size) {
+      val data = dataList[position - 1]
+      val key = when (SPUtil.getValue(
+        App.getContext(),
+        SETTING_KEY.NAME,
+        SETTING_KEY.ALBUM_SORT_ORDER,
+        SortOrder.ALBUM_A_Z
+      )) {
+        SortOrder.ALBUM_A_Z, SortOrder.ALBUM_Z_A -> data.album
+        SortOrder.ARTIST_A_Z, SortOrder.ARTIST_Z_A -> data.artist
+        else -> ""
+      }
+      if (key.isNotEmpty())
+        return Pinyin.toPinyin(key[0]).toUpperCase(Locale.getDefault()).substring(0, 1)
     }
     return ""
   }
