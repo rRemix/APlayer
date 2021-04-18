@@ -24,7 +24,7 @@ abstract class MenuActivity : ToolbarActivity() {
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     if (item.itemId == R.id.action_search) {
-      startActivity(Intent(mContext, SearchActivity::class.java))
+      startActivity(Intent(this, SearchActivity::class.java))
       return true
     } else if (item.itemId == R.id.action_timer) {
       TimerDialog.newInstance()

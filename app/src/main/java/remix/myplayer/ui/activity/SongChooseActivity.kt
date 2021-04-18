@@ -73,7 +73,7 @@ class SongChooseActivity : LibraryActivity<Song, SongChooseAdapter>() {
           .insertToPlayList(mAdapter!!.checkedSong, mPlayListID.toLong())
           .compose(RxUtil.applySingleScheduler())
           .subscribe({ num: Int? ->
-            ToastUtil.show(mContext, getString(R.string.add_song_playlist_success, num,
+            ToastUtil.show(this, getString(R.string.add_song_playlist_success, num,
                 mPlayListName))
             finish()
           }) { throwable: Throwable? -> finish() }

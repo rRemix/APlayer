@@ -181,7 +181,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
             .getAllPlaylist()
             .compose<List<PlayList>>(applySingleScheduler<List<PlayList>>())
             .subscribe { playLists ->
-              Theme.getBaseDialog(mContext)
+              Theme.getBaseDialog(this)
                   .title(R.string.new_playlist)
                   .positiveText(R.string.create)
                   .negativeText(R.string.cancel)
@@ -196,7 +196,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
                             SongChooseActivity.start(this@MainActivity, id, input.toString())
                           }, { throwable ->
                             ToastUtil
-                                .show(mContext, R.string.create_playlist_fail, throwable.toString())
+                                .show(this, R.string.create_playlist_fail, throwable.toString())
                           })
                     }
                   }
@@ -211,7 +211,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
   //初始化ViewPager
   private fun setUpPager() {
     val libraryJson = SPUtil
-        .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY, "")
+        .getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY, "")
     val libraries = if (TextUtils.isEmpty(libraryJson))
       ArrayList()
     else
@@ -219,7 +219,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     if (libraries.isEmpty()) {
       val defaultLibraries = Library.getDefaultLibrary()
       libraries.addAll(defaultLibraries)
-      SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY,
+      SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY,
           Gson().toJson(defaultLibraries, object : TypeToken<List<Library>>() {}.type))
     }
 
@@ -276,16 +276,16 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     var sortOrder = ""
     when (currentFragment) {
       is SongFragment -> sortOrder = SPUtil
-          .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER,
+          .getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER,
               SortOrder.SONG_A_Z)
       is AlbumFragment -> sortOrder = SPUtil
-          .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
+          .getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
               SortOrder.ALBUM_A_Z)
       is ArtistFragment -> sortOrder = SPUtil
-          .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
+          .getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
               SortOrder.ARTIST_A_Z)
       is PlayListFragment -> sortOrder = SPUtil
-          .getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,
+          .getValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,
               SortOrder.PLAYLIST_DATE)
     }
 
@@ -303,13 +303,13 @@ class MainActivity : MenuActivity(), View.OnClickListener {
 
   override fun saveSortOrder(sortOrder: String) {
     when (currentFragment) {
-      is SongFragment -> SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER,
+      is SongFragment -> SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SONG_SORT_ORDER,
           sortOrder)
-      is AlbumFragment -> SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
+      is AlbumFragment -> SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,
           sortOrder)
-      is ArtistFragment -> SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
+      is ArtistFragment -> SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,
           sortOrder)
-      is PlayListFragment -> SPUtil.putValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,
+      is PlayListFragment -> SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,
           sortOrder)
     }
     currentFragment?.onMediaStoreChanged()
@@ -391,13 +391,13 @@ class MainActivity : MenuActivity(), View.OnClickListener {
         when (position) {
           //歌曲库
           0 -> drawer.closeDrawer(navigation_view)
-          1 -> startActivity(Intent(mContext, HistoryActivity::class.java))
+          1 -> startActivity(Intent(this@MainActivity, HistoryActivity::class.java))
           //最近添加
-          2 -> startActivity(Intent(mContext, RecentlyActivity::class.java))
+          2 -> startActivity(Intent(this@MainActivity, RecentlyActivity::class.java))
           //捐赠
-          3 -> startActivity(Intent(mContext, SupportDevelopActivity::class.java))
+          3 -> startActivity(Intent(this@MainActivity, SupportActivity::class.java))
           //设置
-          4 -> startActivityForResult(Intent(mContext, SettingActivity::class.java), REQUEST_SETTING)
+          4 -> startActivityForResult(Intent(this@MainActivity, SettingActivity::class.java), REQUEST_SETTING)
           //退出
           5 -> {
             Timber.v("发送Exit广播")
@@ -490,7 +490,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
                 .canRequestPackageInstalls()) {
           return
         }
-        installApk(mContext, installPath)
+        installApk(this, installPath)
       }
 
       Crop.REQUEST_CROP, Crop.REQUEST_PICK -> {
@@ -536,7 +536,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
 
           val path = Crop.getOutput(data).encodedPath
           if (TextUtils.isEmpty(path) || id == -1L) {
-            ToastUtil.show(mContext, errorTxt)
+            ToastUtil.show(this, errorTxt)
             return
           }
 
@@ -654,7 +654,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
         installApk(context, path)
       } else {
         //请求安装未知应用来源的权限
-        ToastUtil.show(mContext, R.string.plz_give_install_permission)
+        ToastUtil.show(this, R.string.plz_give_install_permission)
         val packageURI = Uri.parse("package:$packageName")
         val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageURI)
         startActivityForResult(intent, REQUEST_INSTALL_PACKAGES)
@@ -673,7 +673,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
 
   private fun showForceDialog() {
     dismissForceDialog()
-    forceDialog = Theme.getBaseDialog(mContext)
+    forceDialog = Theme.getBaseDialog(this)
         .canceledOnTouchOutside(false)
         .cancelable(false)
         .title(R.string.updating)

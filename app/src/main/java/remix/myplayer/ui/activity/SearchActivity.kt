@@ -52,7 +52,7 @@ class SearchActivity : LibraryActivity<Song, SearchAdapter>(), SearchView.OnQuer
             Util.sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.PLAY_TEMP)
                 .putExtra(MusicService.EXTRA_SONG, adapter.getDataList()[position]))
           } else {
-            ToastUtil.show(mContext, R.string.illegal_arg)
+            ToastUtil.show(this@SearchActivity, R.string.illegal_arg)
           }
         }
 

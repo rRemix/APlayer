@@ -27,13 +27,11 @@ import remix.myplayer.util.Util
  */
 @SuppressLint("Registered")
 open class BaseActivity : AppCompatActivity() {
-  @JvmField
-  protected var mContext: Context? = null
-  private var mIsDestroyed = false
-  protected var mIsForeground = false
+  private var isDestroyed = false
+  protected var isForeground = false
 
   @JvmField
-  protected var mHasPermission = false
+  protected var hasPermission = false
 
   /**
    * 设置主题
@@ -43,8 +41,7 @@ open class BaseActivity : AppCompatActivity() {
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    mContext = this
-    mHasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS)
+    hasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS)
     //严格模式
     if (BuildConfig.DEBUG) {
 //      StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -111,21 +108,21 @@ open class BaseActivity : AppCompatActivity() {
   override fun onDestroy() {
     super.onDestroy()
     ActivityManager.RemoveActivity(this)
-    mIsDestroyed = true
+    isDestroyed = true
   }
 
   override fun isDestroyed(): Boolean {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) super.isDestroyed() else mIsDestroyed
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) super.isDestroyed() else isDestroyed
   }
 
   @SuppressLint("CheckResult")
   override fun onResume() {
     super.onResume()
-    mIsForeground = true
+    isForeground = true
     RxPermissions(this)
         .request(*EXTERNAL_STORAGE_PERMISSIONS)
         .subscribe { has: Boolean ->
-          if (has != mHasPermission) {
+          if (has != hasPermission) {
             val intent = Intent(MusicService.PERMISSION_CHANGE)
             intent.putExtra(BaseMusicActivity.EXTRA_PERMISSION, has)
             Util.sendLocalBroadcast(intent)
@@ -135,7 +132,7 @@ open class BaseActivity : AppCompatActivity() {
 
   override fun onPause() {
     super.onPause()
-    mIsForeground = false
+    isForeground = false
   }
 
   override fun attachBaseContext(newBase: Context) {

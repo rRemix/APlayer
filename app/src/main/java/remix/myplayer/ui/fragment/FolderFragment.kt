@@ -30,18 +30,18 @@ class FolderFragment : LibraryFragment<Folder, FolderAdapter>() {
 
   override fun initAdapter() {
     adapter = FolderAdapter(R.layout.item_folder_recycle, multiChoice)
-    adapter?.onItemClickListener = object : OnItemClickListener {
+    adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val folder = adapter?.dataList?.get(position) ?: return
+        val folder = adapter.dataList[position]
         val path = folder.path
         if (userVisibleHint && !TextUtils.isEmpty(path) && !multiChoice.click(position, folder)) {
-          mContext?.let { ChildHolderActivity.start(it, Constants.FOLDER, folder.path, path) }
+          ChildHolderActivity.start(requireContext(), Constants.FOLDER, folder.path, path)
         }
       }
 
       override fun onItemLongClick(view: View, position: Int) {
-        val folder = adapter?.dataList?.get(position)
-        val path = adapter?.dataList?.get(position)?.path
+        val folder = adapter.dataList[position]
+        val path = adapter.dataList[position].path
         if (userVisibleHint && !TextUtils.isEmpty(path)) {
           multiChoice.longClick(position, folder)
         }
@@ -57,7 +57,7 @@ class FolderFragment : LibraryFragment<Folder, FolderAdapter>() {
   }
 
   override fun loader(): Loader<List<Folder>> {
-    return AsyncFolderLoader(mContext)
+    return AsyncFolderLoader(requireContext())
   }
 
   override val loaderId: Int = LoaderIds.FRAGMENT_FOLDER

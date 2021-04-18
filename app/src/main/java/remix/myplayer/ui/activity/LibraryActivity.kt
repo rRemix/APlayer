@@ -17,7 +17,7 @@ abstract class LibraryActivity<Data, Adapter : BaseAdapter<Data, *>?> : MenuActi
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    if (mHasPermission) {
+    if (hasPermission) {
       loaderManager.initLoader(loaderId, null, this)
     }
   }
@@ -27,7 +27,7 @@ abstract class LibraryActivity<Data, Adapter : BaseAdapter<Data, *>?> : MenuActi
 
   override fun onMediaStoreChanged() {
     super.onMediaStoreChanged()
-    if (mHasPermission) {
+    if (hasPermission) {
       loaderManager.restartLoader(loaderId, null, this)
     } else {
       mAdapter?.setDataList(null)
@@ -35,8 +35,8 @@ abstract class LibraryActivity<Data, Adapter : BaseAdapter<Data, *>?> : MenuActi
   }
 
   override fun onPermissionChanged(has: Boolean) {
-    if (has != mHasPermission) {
-      mHasPermission = has
+    if (has != hasPermission) {
+      hasPermission = has
       onMediaStoreChanged()
     }
   }
