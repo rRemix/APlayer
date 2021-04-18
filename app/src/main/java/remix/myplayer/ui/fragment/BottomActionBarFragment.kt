@@ -46,11 +46,11 @@ class BottomActionBarFragment : BaseMusicFragment() {
     super.onViewCreated(view, savedInstanceState)
 
     //设置整个背景着色
-    Theme.tintDrawable(view, R.drawable.commom_playercontrols_bg, ThemeStore.getBackgroundColorDialog(mContext))
+    Theme.tintDrawable(view, R.drawable.commom_playercontrols_bg, ThemeStore.getBackgroundColorDialog(requireContext()))
     Theme.tintDrawable(playbar_next, R.drawable.bf_btn_next, ThemeStore.bottomBarBtnColor)
 
     //手势检测
-    gestureDetector = GestureDetector(mContext, GestureListener(this))
+    gestureDetector = GestureDetector(requireContext(), GestureListener(this))
     bottom_action_bar.setOnTouchListener { v: View?, event: MotionEvent? -> gestureDetector.onTouchEvent(event) }
 
     //播放按钮
@@ -117,7 +117,7 @@ class BottomActionBarFragment : BaseMusicFragment() {
     if (getCurrentSong().id < 0) {
       return
     }
-    val intent = Intent(mContext, PlayerActivity::class.java)
+    val intent = Intent(requireContext(), PlayerActivity::class.java)
     val bundle = Bundle()
     intent.putExtras(bundle)
     val activity: Activity? = activity

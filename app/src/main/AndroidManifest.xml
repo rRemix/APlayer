@@ -124,7 +124,7 @@
       android:name=".ui.activity.EQActivity"
       android:theme="@style/ActivityStyle"/>
     <activity
-      android:name=".ui.activity.SupportDevelopActivity"
+      android:name=".ui.activity.SupportActivity"
       android:theme="@style/ActivityStyle"/>
     <!-- 设置 -->
     <activity

@@ -36,15 +36,15 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
 
   override fun initAdapter() {
     adapter = PlayListAdapter(R.layout.item_playlist_recycle_grid, multiChoice, recyclerView)
-    adapter?.onItemClickListener = object : OnItemClickListener {
+    adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val playList = adapter?.dataList?.get(position) ?: return
+        val playList = adapter.dataList[position]
         if ((!TextUtils.isEmpty(playList.name) && userVisibleHint) && !multiChoice.click(position, playList)) {
           if (playList.audioIds.isEmpty()) {
-            ToastUtil.show(mContext, getStringSafely(R.string.list_is_empty))
+            ToastUtil.show(requireContext(), getStringSafely(R.string.list_is_empty))
             return
           }
-          mContext?.let { ChildHolderActivity.start(it, Constants.PLAYLIST, playList.id.toString(), playList.name) }
+          ChildHolderActivity.start(requireContext(), Constants.PLAYLIST, playList.id.toString(), playList.name)
         }
       }
 
@@ -57,9 +57,9 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
   }
 
   override fun initView() {
-    val model = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.MODE_FOR_PLAYLIST, HeaderAdapter.GRID_MODE)
+    val model = SPUtil.getValue(requireContext(), SETTING_KEY.NAME, SETTING_KEY.MODE_FOR_PLAYLIST, HeaderAdapter.GRID_MODE)
     recyclerView.itemAnimator = DefaultItemAnimator()
-    recyclerView.layoutManager = if (model == HeaderAdapter.LIST_MODE) LinearLayoutManager(mContext) else GridLayoutManager(activity, spanCount)
+    recyclerView.layoutManager = if (model == HeaderAdapter.LIST_MODE) LinearLayoutManager(requireContext()) else GridLayoutManager(activity, spanCount)
     recyclerView.adapter = adapter
     recyclerView.setHasFixedSize(true)
   }
@@ -71,7 +71,7 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
   }
 
   override fun loader(): Loader<List<PlayList>> {
-    return AsyncPlayListLoader(mContext)
+    return AsyncPlayListLoader(requireContext())
   }
 
   override val loaderId: Int = LoaderIds.FRAGMENT_PLAYLIST

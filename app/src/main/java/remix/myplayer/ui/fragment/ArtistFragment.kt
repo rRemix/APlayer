@@ -41,7 +41,7 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
       override fun onItemClick(view: View, position: Int) {
         val artist = adapter.dataList[position]
         if (userVisibleHint && !multiChoice.click(position, artist)) {
-          mContext?.let { ChildHolderActivity.start(it, Constants.ARTIST, artist.artistID.toString(), artist.artist) }
+          ChildHolderActivity.start(requireContext(), Constants.ARTIST, artist.artistID.toString(), artist.artist)
         }
       }
 
@@ -54,15 +54,15 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
   }
 
   override fun initView() {
-    val model = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ARTIST, HeaderAdapter.GRID_MODE)
-    recyclerView.layoutManager = if (model == HeaderAdapter.LIST_MODE) LinearLayoutManager(mContext) else GridLayoutManager(activity, spanCount)
+    val model = SPUtil.getValue(requireContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ARTIST, HeaderAdapter.GRID_MODE)
+    recyclerView.layoutManager = if (model == HeaderAdapter.LIST_MODE) LinearLayoutManager(requireContext()) else GridLayoutManager(activity, spanCount)
     recyclerView.itemAnimator = DefaultItemAnimator()
     recyclerView.adapter = adapter
     recyclerView.setHasFixedSize(true)
   }
 
   override fun loader(): Loader<List<Artist>> {
-    return AsyncArtistLoader(mContext)
+    return AsyncArtistLoader(requireContext())
   }
 
   override val loaderId: Int = LoaderIds.FRAGMENT_ARTIST

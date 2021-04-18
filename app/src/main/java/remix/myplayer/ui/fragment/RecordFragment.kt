@@ -39,7 +39,7 @@ class RecordFragment : BaseMusicFragment() {
 //                ToastUtil.show(mContext,R.string.plz_input_sharecontent);
 //                return;
 //            }
-      val intent = Intent(mContext, RecordShareActivity::class.java)
+      val intent = Intent(requireContext(), RecordShareActivity::class.java)
       val arg = Bundle()
       arg.putString(RecordShareActivity.EXTRA_CONTENT, edit_record.text.toString())
       arg.putParcelable(RecordShareActivity.EXTRA_SONG, MusicServiceRemote.getCurrentSong())

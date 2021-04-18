@@ -115,7 +115,7 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
               lrcView.setText(getStringSafely(R.string.no_lrc))
               return@Consumer
             }
-            lrcView.setOffset(SPUtil.getValue(mContext, SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", 0))
+            lrcView.setOffset(SPUtil.getValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", 0))
             lrcView.setLrcRows(it)
           }
         }, Consumer {
@@ -131,18 +131,18 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
     msgHandler.removeMessages(MESSAGE_HIDE)
     msgHandler.sendEmptyMessageDelayed(MESSAGE_HIDE, DELAY_HIDE)
 
-    val originalOffset = SPUtil.getValue(mContext, SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", 0)
+    val originalOffset = SPUtil.getValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", 0)
     var newOffset = originalOffset
     when (view.id) {
       R.id.offsetReset -> {
         newOffset = 0
-        ToastUtil.show(mContext, R.string.lyric_offset_reset)
+        ToastUtil.show(requireContext(), R.string.lyric_offset_reset)
       }
       R.id.offsetAdd -> newOffset += 500
       R.id.offsetReduce -> newOffset -= 500
     }
     if (originalOffset != newOffset) {
-      SPUtil.putValue(mContext, SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", newOffset)
+      SPUtil.putValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, info?.id.toString() + "", newOffset)
       val toastMsg = msgHandler.obtainMessage(MESSAGE_SHOW_TOAST)
       toastMsg.arg1 = newOffset
       msgHandler.removeMessages(MESSAGE_SHOW_TOAST)
@@ -155,7 +155,7 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
 
   fun showLyricOffsetView() {
     if (lrcView.getLrcRows() == null || lrcView.getLrcRows()?.isEmpty() == true) {
-      ToastUtil.show(mContext, R.string.no_lrc)
+      ToastUtil.show(requireContext(), R.string.no_lrc)
       return
     }
     offsetContainer.visibility = View.VISIBLE
@@ -171,7 +171,7 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
       MESSAGE_SHOW_TOAST -> {
         val newOffset = msg.arg1
         if (newOffset != 0 && abs(newOffset) <= 60000) {//最大偏移60s
-          ToastUtil.show(mContext, if (newOffset > 0) R.string.lyric_advance_x_second else R.string.lyric_delay_x_second,
+          ToastUtil.show(requireContext(), if (newOffset > 0) R.string.lyric_advance_x_second else R.string.lyric_delay_x_second,
               String.format(Locale.getDefault(), "%.1f", newOffset / 1000f))
         }
       }

@@ -45,7 +45,7 @@ import java.io.OutputStream
 import java.lang.ref.WeakReference
 import java.util.*
 
-class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
+class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
   private lateinit var binding: ActivitySupportDevelopBinding
 
   private val mAdapter: PurchaseAdapter by lazy {
@@ -79,7 +79,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
 
       override fun onItemClick(view: View?, position: Int) {
         if (App.IS_GOOGLEPLAY) {
-          mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position])
+          mBillingProcessor?.purchase(this@SupportActivity, SKU_IDS[position])
         } else {
           when (position) {
             0 -> {
@@ -93,7 +93,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
                         it.onError(Throwable("Invalid Bitmap"))
                         return@ObservableSource
                       }
-                      val dir = DiskCache.getDiskCacheDir(mContext, "qrCode")
+                      val dir = DiskCache.getDiskCacheDir(this@SupportActivity, "qrCode")
                       if (!dir.exists())
                         dir.mkdirs()
                       val qrCodeFile = File(dir, "qrCode.png")
@@ -147,27 +147,27 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
                     outputStream?.close()
                   }
                   .subscribe({
-                    ToastUtil.show(mContext, R.string.save_wechat_qrcode_success, it.absolutePath)
+                    ToastUtil.show(this@SupportActivity, R.string.save_wechat_qrcode_success, it.absolutePath)
                   }, {
-                    ToastUtil.show(mContext, R.string.save_error)
+                    ToastUtil.show(this@SupportActivity, R.string.save_error)
                   })
             }
             1 -> {
-              Theme.getBaseDialog(mContext)
+              Theme.getBaseDialog(this@SupportActivity)
                   .title(R.string.support_develop)
                   .positiveText(R.string.jump_alipay_account)
                   .negativeText(R.string.cancel)
                   .content(R.string.donate_tip)
-                  .onPositive { _, _ -> AlipayUtil.startAlipayClient(mContext as Activity) }
+                  .onPositive { _, _ -> AlipayUtil.startAlipayClient(this@SupportActivity as Activity) }
                   .show()
             }
             2 -> {
               val intent = Intent("android.intent.action.VIEW")
               intent.data = Uri.parse("https://www.paypal.me/rRemix")
-              Util.startActivitySafely(this@SupportDevelopActivity, intent)
+              Util.startActivitySafely(this@SupportActivity, intent)
             }
             else -> {
-              mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position - 3])
+              mBillingProcessor?.purchase(this@SupportActivity, SKU_IDS[position - 3])
             }
           }
         }
@@ -175,10 +175,10 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
       }
     }
 
-    recyclerView.layoutManager = GridLayoutManager(mContext, 2)
+    recyclerView.layoutManager = GridLayoutManager(this, 2)
     recyclerView.adapter = mAdapter
 
-    mLoading = Theme.getBaseDialog(mContext)
+    mLoading = Theme.getBaseDialog(this)
         .title(R.string.loading)
         .content(R.string.please_wait)
         .canceledOnTouchOutside(false)
@@ -211,7 +211,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
           }
 
           override fun onError(e: Throwable) {
-            ToastUtil.show(mContext, R.string.error_occur, e)
+            ToastUtil.show(this@SupportActivity, R.string.error_occur, e)
           }
 
           override fun onStart() {
@@ -255,7 +255,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
 
   override fun onBillingError(errorCode: Int, error: Throwable?) {
     Timber.v("onBillingError")
-    ToastUtil.show(mContext, R.string.error_occur, "code = $errorCode err =  $error")
+    ToastUtil.show(this, R.string.error_occur, "code = $errorCode err =  $error")
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

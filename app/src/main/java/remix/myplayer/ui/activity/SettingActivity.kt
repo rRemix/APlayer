@@ -167,7 +167,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       TintHelper.setTintAuto(view, ThemeStore.accentColor, false)
 
       view.isChecked = SPUtil.getValue(
-        mContext, SETTING_KEY.NAME, keyWord[index], false
+        this, SETTING_KEY.NAME, keyWord[index], false
       )
       //5.0以上才支持变色导航栏
       if (view.id == R.id.setting_navaigation_switch) {
@@ -177,7 +177,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         override fun onCheckedChanged(
           buttonView: CompoundButton, isChecked: Boolean
         ) {
-          SPUtil.putValue(mContext, SETTING_KEY.NAME, keyWord[index], isChecked)
+          SPUtil.putValue(this@SettingActivity, SETTING_KEY.NAME, keyWord[index], isChecked)
           when (buttonView.id) {
             //变色导航栏
             R.id.setting_navaigation_switch -> {
@@ -193,9 +193,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             }
             //桌面歌词
             R.id.setting_lrc_float_switch -> {
-              if (isChecked && !FloatWindowManager.getInstance()
-                  .checkPermission(mContext)
-              ) {
+              if (isChecked && !FloatWindowManager.getInstance().checkPermission(this@SettingActivity)) {
                 binding.settingLrcFloatSwitch.setOnCheckedChangeListener(null)
                 binding.settingLrcFloatSwitch.isChecked = false
                 binding.settingLrcFloatSwitch.setOnCheckedChangeListener(this)
@@ -203,9 +201,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
                   val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
                   intent.data = Uri.parse("package:$packageName")
                   intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                  Util.startActivitySafely(mContext, intent)
+                  Util.startActivitySafely(this@SettingActivity, intent)
                 }
-                ToastUtil.show(mContext, R.string.plz_give_float_permission)
+                ToastUtil.show(this@SettingActivity, R.string.plz_give_float_permission)
                 return
               }
               binding.settingLrcFloatTip.setText(if (isChecked) R.string.opened_desktop_lrc else R.string.closed_desktop_lrc)
@@ -297,7 +295,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
     //封面
     mOriginalAlbumChoice = SPUtil.getValue(
-      mContext,
+      this,
       SETTING_KEY.NAME,
       SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
       getString(R.string.always)
@@ -306,7 +304,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
     // 封面下载源
     val coverSource = SPUtil.getValue(
-      mContext, SETTING_KEY.NAME, SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, 0
+      this, SETTING_KEY.NAME, SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, 0
     )
     setting_cover_source_text.text = getString(
       if (coverSource == 0) R.string.cover_download_from_lastfm else R.string.cover_download_from_netease
@@ -317,7 +315,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
     // 深色主题
     val darkTheme = SPUtil.getValue(
-      mContext,
+      this,
       SETTING_KEY.NAME,
       SETTING_KEY.DARK_THEME,
       ThemeStore.FOLLOW_SYSTEM
@@ -333,7 +331,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
     //锁屏样式
     val lockScreen = SPUtil.getValue(
-      mContext,
+      this,
       SETTING_KEY.NAME,
       SETTING_KEY.LOCKSCREEN,
       Constants.APLAYER_LOCKSCREEN
@@ -600,7 +598,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       }
       "ExportPlayList" -> {
         if (TextUtils.isEmpty(playListName)) {
-          ToastUtil.show(mContext, R.string.export_fail)
+          ToastUtil.show(this, R.string.export_fail)
           return
         }
         if (folder.exists() && folder.isDirectory && folder.list() != null) {
@@ -675,7 +673,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
             allPlayListsName
           }.compose(applySingleScheduler()).subscribe { allPlayListsName ->
-            getBaseDialog(mContext).title(R.string.import_playlist_to)
+            getBaseDialog(this).title(R.string.import_playlist_to)
               .items(allPlayListsName)
               .itemsCallback { dialog1, itemView, position, text ->
                 val chooseNew = position == 0 && text.toString().endsWith(
@@ -748,12 +746,12 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         break
       }
     }
-    getBaseDialog(mContext)
+    getBaseDialog(this)
         .title(R.string.set_filter_size)
         .items("0K", "500K", "1MB", "2MB", "5MB")
         .itemsCallbackSingleChoice(position) { dialog, itemView, which, text ->
           SPUtil.putValue(
-            mContext, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE, mScanSize[which]
+            this, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE, mScanSize[which]
           )
           MediaStoreUtil.SCAN_SIZE = mScanSize[which]
           contentResolver.notifyChange(
@@ -792,12 +790,12 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         .items(auto, zhSimple, zhTraditional, english)
         .itemsCallbackSingleChoice(
           SPUtil.getValue(
-            mContext, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO
+            this, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO
           )
         ) { dialog, itemView, which, text ->
           LanguageHelper.saveSelectLanguage(this, which)
 
-          val intent = Intent(mContext, MainActivity::class.java)
+          val intent = Intent(this, MainActivity::class.java)
           intent.action = Intent.ACTION_MAIN
           intent.addCategory(Intent.CATEGORY_LAUNCHER)
           intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -928,7 +926,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     contentResolver.notifyChange(
       MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null
     )
-    ToastUtil.show(mContext, R.string.alread_restore_songs)
+    ToastUtil.show(this, R.string.alread_restore_songs)
   }
 
   /**
@@ -943,12 +941,12 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         }
         allplayListNames
       }.compose(applySingleScheduler()).subscribe { allPlayListNames ->
-        getBaseDialog(mContext).title(R.string.choose_playlist_to_export)
+        getBaseDialog(this).title(R.string.choose_playlist_to_export)
           .negativeText(R.string.cancel).items(allPlayListNames)
           .itemsCallback { dialog, itemView, position, text ->
             val initialFile = File(
               SPUtil.getValue(
-                mContext,
+                this,
                 SETTING_KEY.NAME,
                 SETTING_KEY.EXPORT_PLAYLIST_FOLDER,
                 ""
@@ -971,7 +969,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
    */
   @SuppressLint("CheckResult")
   private fun importPlayList() {
-    getBaseDialog(mContext).title(R.string.choose_import_way)
+    getBaseDialog(this).title(R.string.choose_import_way)
       .negativeText(R.string.cancel).items(
         getString(R.string.import_from_external_storage),
         getString(R.string.import_from_others)
@@ -999,7 +997,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
                 .subscribe({ localPlayLists ->
                   if (localPlayLists == null || localPlayLists.isEmpty()) {
                     ToastUtil.show(
-                      mContext,
+                      this,
                       R.string.import_fail,
                       getString(R.string.no_playlist_can_import)
                     )
@@ -1009,7 +1007,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
                   for (i in 0 until localPlayLists.size) {
                     selectedIndices.add(i)
                   }
-                  getBaseDialog(mContext).title(R.string.choose_import_playlist)
+                  getBaseDialog(this).title(R.string.choose_import_playlist)
                     .positiveText(R.string.choose).items(localPlayLists.keys)
                     .itemsCallbackMultiChoice(
                       selectedIndices.toTypedArray()
@@ -1024,7 +1022,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
                 }, { throwable ->
                   ToastUtil.show(
-                    mContext, R.string.import_fail, throwable.toString()
+                    this, R.string.import_fail, throwable.toString()
                   )
                 })
           }
@@ -1047,12 +1045,12 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
    */
   private fun configCoverDownloadSource() {
     val oldChoice = SPUtil.getValue(
-      mContext,
+      this,
       SETTING_KEY.NAME,
       SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,
       DOWNLOAD_LASTFM
     )
-    getBaseDialog(mContext).title(R.string.cover_download_source)
+    getBaseDialog(this).title(R.string.cover_download_source)
       .items(getString(R.string.lastfm), getString(R.string.netease))
       .itemsCallbackSingleChoice(
         oldChoice
@@ -1061,7 +1059,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
           mNeedRefreshAdapter = true
           ImageUriRequest.DOWNLOAD_SOURCE = which
           SPUtil.putValue(
-            mContext,
+            this,
             SETTING_KEY.NAME,
             SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,
             which
@@ -1085,7 +1083,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
       getString(R.string.always)
     )
-    getBaseDialog(mContext).title(R.string.auto_download_album_artist_cover)
+    getBaseDialog(this).title(R.string.auto_download_album_artist_cover)
       .items(
         getString(R.string.always), getString(R.string.wifi_only), getString(
           R.string.never
@@ -1105,7 +1103,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
           clearDownloadCover(text)
           ImageUriRequest.AUTO_DOWNLOAD_ALBUM = text.toString()
           SPUtil.putValue(
-            mContext,
+            this,
             SETTING_KEY.NAME,
             SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
             text.toString()
@@ -1119,12 +1117,12 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
    */
   private fun clearDownloadCover(text: CharSequence) {
     if (getString(R.string.never) == text) {
-      getBaseDialog(mContext)
+      getBaseDialog(this)
           .title(R.string.clear_download_cover)
           .positiveText(R.string.confirm)
           .negativeText(R.string.cancel)
           .onPositive { clearDialog, action ->
-            SPUtil.deleteFile(mContext, SPUtil.COVER_KEY.NAME)
+            SPUtil.deleteFile(this, SPUtil.COVER_KEY.NAME)
             Fresco.getImagePipeline().clearCaches()
             mNeedRefreshAdapter = true
           }.show()
@@ -1135,7 +1133,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
    * 清除缓存
    */
   private fun clearCache() {
-    getBaseDialog(mContext)
+    getBaseDialog(this)
         .content(R.string.confirm_clear_cache)
         .positiveText(R.string.confirm)
         .negativeText(R.string.cancel)
@@ -1146,7 +1144,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
               //清除配置文件、数据库等缓存
               Util.deleteFilesByDirectory(cacheDir)
               Util.deleteFilesByDirectory(externalCacheDir)
-              DiskCache.init(mContext, "lyric")
+              DiskCache.init(this@SettingActivity, "lyric")
               //清除fresco缓存
               Fresco.getImagePipeline().clearCaches()
               ImageUriRequest.clearUriCache()
@@ -1162,22 +1160,22 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
    */
   private fun configNotifyBackgroundColor() {
     if (!SPUtil.getValue(
-        mContext, SETTING_KEY.NAME, SETTING_KEY.NOTIFY_STYLE_CLASSIC, false
+        this, SETTING_KEY.NAME, SETTING_KEY.NOTIFY_STYLE_CLASSIC, false
       )
     ) {
-      ToastUtil.show(mContext, R.string.notify_bg_color_warnning)
+      ToastUtil.show(this, R.string.notify_bg_color_warnning)
       return
     }
-    getBaseDialog(mContext).title(R.string.notify_bg_color).items(
+    getBaseDialog(this).title(R.string.notify_bg_color).items(
       getString(R.string.use_system_color), getString(R.string.use_black_color)
     ).itemsCallbackSingleChoice(
       if (SPUtil.getValue(
-          mContext, SETTING_KEY.NAME, SETTING_KEY.NOTIFY_SYSTEM_COLOR, true
+          this, SETTING_KEY.NAME, SETTING_KEY.NOTIFY_SYSTEM_COLOR, true
         )
       ) 0 else 1
     ) { dialog, view, which, text ->
         SPUtil.putValue(
-          mContext,
+          this,
           SETTING_KEY.NAME,
           SETTING_KEY.NOTIFY_SYSTEM_COLOR,
           which == 0
@@ -1192,7 +1190,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
    */
   private fun configLockScreen() {
     //0:APlayer锁屏 1:系统锁屏 2:关闭
-    getBaseDialog(mContext).title(R.string.lockscreen_show).items(
+    getBaseDialog(this).title(R.string.lockscreen_show).items(
       getString(R.string.aplayer_lockscreen),
       getString(R.string.system_lockscreen),
       getString(
@@ -1200,14 +1198,14 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       )
     ).itemsCallbackSingleChoice(
       SPUtil.getValue(
-        mContext,
+        this,
         SETTING_KEY.NAME,
         SETTING_KEY.LOCKSCREEN,
         Constants.APLAYER_LOCKSCREEN
       )
     ) { dialog, view, which, text ->
         SPUtil.putValue(
-          mContext, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, which
+          this, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, which
         )
         binding.settingLockscreenText.setText(
           when (which) {
@@ -1225,13 +1223,13 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
    */
   private fun configLibrary() {
     val libraryJson = SPUtil
-        .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.LIBRARY, "")
+        .getValue(this, SETTING_KEY.NAME, SETTING_KEY.LIBRARY, "")
 
     val oldLibraries = Gson().fromJson<List<Library>>(
       libraryJson, object : TypeToken<List<Library>>() {}.type
     )
     if (oldLibraries == null || oldLibraries.isEmpty()) {
-      ToastUtil.show(mContext, getString(R.string.load_failed))
+      ToastUtil.show(this, getString(R.string.load_failed))
       return
     }
     val selected = ArrayList<Int>()
@@ -1240,14 +1238,14 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     }
 
     val allLibraryStrings = getAllLibraryString(this)
-    getBaseDialog(mContext).title(R.string.library_category)
+    getBaseDialog(this).title(R.string.library_category)
       .positiveText(R.string.confirm).items(allLibraryStrings)
       .itemsCallbackMultiChoice(
         selected.toTypedArray()
       ) { dialog, which, text ->
         if (text.isEmpty()) {
           ToastUtil.show(
-            mContext, getString(R.string.plz_choose_at_least_one_category)
+            this, getString(R.string.plz_choose_at_least_one_category)
           )
           return@itemsCallbackMultiChoice true
         }
@@ -1259,7 +1257,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             mNeedRefreshLibrary = true
             intent.putExtra(EXTRA_LIBRARY, newLibraries)
             SPUtil.putValue(
-              mContext, SETTING_KEY.NAME, SETTING_KEY.LIBRARY, Gson().toJson(
+              this, SETTING_KEY.NAME, SETTING_KEY.LIBRARY, Gson().toJson(
                 newLibraries, object : TypeToken<List<Library>>() {}.type
               )
             )
@@ -1347,12 +1345,12 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
   private fun changeBottomOfPlayingScreen() {
     val position = SPUtil.getValue(
-      mContext,
+      this,
       SETTING_KEY.NAME,
       BOTTOM_OF_NOW_PLAYING_SCREEN,
       PlayerActivity.BOTTOM_SHOW_BOTH
     )
-    getBaseDialog(mContext).title(R.string.show_on_bottom).items(
+    getBaseDialog(this).title(R.string.show_on_bottom).items(
       getString(R.string.show_next_song_only),
       getString(R.string.show_vol_control_only),
       getString(
@@ -1363,7 +1361,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         .itemsCallbackSingleChoice(position) { dialog, itemView, which, text ->
           if (position != which) {
             SPUtil.putValue(
-              mContext, SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, which
+              this, SETTING_KEY.NAME, BOTTOM_OF_NOW_PLAYING_SCREEN, which
             )
           }
           true
@@ -1381,7 +1379,7 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       )
     }
     if (msg.what == CLEAR_FINISH) {
-      ToastUtil.show(mContext, getString(R.string.clear_success))
+      ToastUtil.show(this, getString(R.string.clear_success))
       binding.settingClearText.setText(R.string.zero_size)
     }
   }

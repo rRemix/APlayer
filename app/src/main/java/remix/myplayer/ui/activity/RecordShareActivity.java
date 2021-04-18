@@ -9,11 +9,11 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
+import androidx.annotation.Nullable;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,6 +45,7 @@ import remix.myplayer.util.Util;
  * 将分享内容与专辑封面进行处理用于分享
  */
 public class RecordShareActivity extends BaseMusicActivity {
+
   private ActivityRecordshareBinding binding;
 
   private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(), 268);
@@ -82,7 +83,7 @@ public class RecordShareActivity extends BaseMusicActivity {
       //处理完成
       case COMPLETE:
         if (mFile != null) {
-          ToastUtil.show(mContext, R.string.screenshot_save_at, mFile.getAbsoluteFile(),
+          ToastUtil.show(this, R.string.screenshot_save_at, mFile.getAbsoluteFile(),
               Toast.LENGTH_LONG);
         }
         break;
@@ -140,7 +141,7 @@ public class RecordShareActivity extends BaseMusicActivity {
         .strokeColor(Color.parseColor("#f6f6f5"))
         .make());
 
-    mProgressDialog = Theme.getBaseDialog(mContext)
+    mProgressDialog = Theme.getBaseDialog(this)
         .title(R.string.please_wait)
         .content(R.string.processing_picture)
         .progress(true, 0)
@@ -172,9 +173,9 @@ public class RecordShareActivity extends BaseMusicActivity {
     @Override
     public void run() {
       //开始处理,显示进度条
-      if (!mHasPermission) {
+      if (!hasPermission) {
         Message errMsg = mHandler.obtainMessage(ERROR);
-        errMsg.obj = mContext.getString(R.string.plz_give_access_external_storage_permission);
+        errMsg.obj = getString(R.string.plz_give_access_external_storage_permission);
         mHandler.sendMessage(errMsg);
         return;
       }
@@ -184,11 +185,11 @@ public class RecordShareActivity extends BaseMusicActivity {
       mFile = null;
       try {
         //将截屏内容保存到文件
-        File shareDir = DiskCache.getDiskCacheDir(mContext, "share");
+        File shareDir = DiskCache.getDiskCacheDir(RecordShareActivity.this, "share");
         if (!shareDir.exists()) {
           shareDir.mkdirs();
         }
-        mFile = new File(String.format("%s/%s.png", DiskCache.getDiskCacheDir(mContext, "share"),
+        mFile = new File(String.format("%s/%s.png", DiskCache.getDiskCacheDir(RecordShareActivity.this, "share"),
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 .format(new Date(System.currentTimeMillis()))));
         if (!mFile.exists()) {
@@ -203,14 +204,14 @@ public class RecordShareActivity extends BaseMusicActivity {
         mHandler.sendEmptyMessage(STOP);
 
         //打开分享的Dialog
-//                Intent intent = new Intent(mContext, ShareDialog.class);
+//                Intent intent = new Intent(this, ShareDialog.class);
 //                Bundle arg = new Bundle();
 //                arg.putInt("Type", Constants.SHARERECORD);
 //                arg.putString("Url",mFile.getAbsolutePath());
 //                arg.putParcelable("Song",mInfo);
 //                intent.putExtras(arg);
 //                startActivityForResult(intent,REQUEST_SHARE);
-        startActivity(Intent.createChooser(Util.createShareImageFileIntent(mFile, mContext), null));
+        startActivity(Intent.createChooser(Util.createShareImageFileIntent(mFile, RecordShareActivity.this), null));
       } catch (Exception e) {
         Message errMsg = mHandler.obtainMessage(ERROR);
         errMsg.obj = e.toString();
@@ -235,7 +236,7 @@ public class RecordShareActivity extends BaseMusicActivity {
 
   private void dismissLoading(String error) {
     if (!TextUtils.isEmpty(error)) {
-      ToastUtil.show(mContext, error);
+      ToastUtil.show(this, error);
     }
     if (mProgressDialog != null) {
       mProgressDialog.dismiss();

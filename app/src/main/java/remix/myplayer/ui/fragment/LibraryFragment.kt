@@ -47,7 +47,7 @@ abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>> : BaseMusicFragme
 
     multiChoice.adapter = adapter
 
-    if (mHasPermission) {
+    if (hasPermission) {
       loaderManager.initLoader(loaderId, null, this)
     }
   }
@@ -66,7 +66,7 @@ abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>> : BaseMusicFragme
   }
 
   override fun onMediaStoreChanged() {
-    if (mHasPermission) {
+    if (hasPermission) {
       loaderManager.restartLoader(loaderId, null, this)
     } else {
       adapter.setDataList(Collections.emptyList())
@@ -74,8 +74,8 @@ abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>> : BaseMusicFragme
   }
 
   override fun onPermissionChanged(has: Boolean) {
-    if (has != mHasPermission) {
-      mHasPermission = has
+    if (has != hasPermission) {
+      hasPermission = has
       onMediaStoreChanged()
     }
   }

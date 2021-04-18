@@ -10,12 +10,12 @@ import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 
 open class BaseMusicFragment : BaseFragment(), MusicEventCallback {
-  private var mMusicActivity: BaseMusicActivity? = null
+  private var musicActivity: BaseMusicActivity? = null
 
   override fun onAttach(context: Context) {
     super.onAttach(context)
     try {
-      mMusicActivity = context as BaseMusicActivity?
+      musicActivity = context as BaseMusicActivity?
     } catch (e: ClassCastException) {
       throw RuntimeException(context.javaClass.simpleName + " must be an instance of " + BaseMusicActivity::class.java.simpleName)
     }
@@ -24,19 +24,19 @@ open class BaseMusicFragment : BaseFragment(), MusicEventCallback {
 
   override fun onDetach() {
     super.onDetach()
-    mMusicActivity = null
+    musicActivity = null
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 //        MusicEventHelper.addCallback(this)
-    mMusicActivity?.addMusicServiceEventListener(this)
+    musicActivity?.addMusicServiceEventListener(this)
   }
 
   override fun onDestroyView() {
     super.onDestroyView()
 //        MusicEventHelper.removeCallback(this)
-    mMusicActivity?.removeMusicServiceEventListener(this)
+    musicActivity?.removeMusicServiceEventListener(this)
   }
 
   override fun onMediaStoreChanged() {
@@ -44,7 +44,7 @@ open class BaseMusicFragment : BaseFragment(), MusicEventCallback {
   }
 
   override fun onPermissionChanged(has: Boolean) {
-    mHasPermission = has
+    hasPermission = has
   }
 
   override fun onPlayListChanged(name: String) {

@@ -132,19 +132,19 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
     super.onCreateOptionsMenu(menu)
     sortOrder = when (type) {
       Constants.PLAYLIST -> {
-        SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,
+        SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,
             SortOrder.SONG_A_Z)
       }
       Constants.ALBUM -> {
-        SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,
+        SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,
             SortOrder.TRACK_NUMBER)
       }
       Constants.ARTIST -> {
-        SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,
+        SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,
             SortOrder.SONG_A_Z)
       }
       else -> {
-        SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,
+        SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,
             SortOrder.SONG_A_Z)
       }
     }
@@ -176,16 +176,16 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
     }
     when (type) {
       Constants.PLAYLIST -> {
-        SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, sortOrder)
+        SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, sortOrder)
       }
       Constants.ALBUM -> {
-        SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, sortOrder)
+        SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, sortOrder)
       }
       Constants.ARTIST -> {
-        SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, sortOrder)
+        SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, sortOrder)
       }
       else -> {
-        SPUtil.putValue(mContext, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, sortOrder)
+        SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, sortOrder)
       }
     }
     this.sortOrder = sortOrder
