@@ -253,24 +253,24 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     Util.registerLocalReceiver(receiver, IntentFilter(ACTION_UPDATE_NEXT))
 
     arrayOf(
-      binding.layoutPlayerControl.playbarNext,
-      binding.layoutPlayerControl.playbarPrev,
-      binding.layoutPlayerControl.playbarPlayContainer
+        binding.layoutPlayerControl.playbarNext,
+        binding.layoutPlayerControl.playbarPrev,
+        binding.layoutPlayerControl.playbarPlayContainer
     ).forEach {
       it.setOnClickListener(onCtrlClick)
     }
     arrayOf(
-      binding.layoutPlayerControl.playbarModel,
-      binding.layoutPlayerControl.playbarPlayinglist,
-      binding.topActionbar.topHide,
-      binding.topActionbar.topMore
+        binding.layoutPlayerControl.playbarModel,
+        binding.layoutPlayerControl.playbarPlayinglist,
+        binding.topActionbar.topHide,
+        binding.topActionbar.topMore
     ).forEach {
       it.setOnClickListener(onOtherClick)
     }
     arrayOf(
-      binding.layoutPlayerVolume.volumeDown,
-      binding.layoutPlayerVolume.volumeUp,
-      binding.layoutPlayerVolume.nextSong
+        binding.layoutPlayerVolume.volumeDown,
+        binding.layoutPlayerVolume.volumeUp,
+        binding.layoutPlayerVolume.nextSong
     ).forEach {
       it.setOnClickListener(onVolumeClick)
     }
@@ -634,26 +634,28 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   }
 
   private fun setUpLyricFragment() {
-    lyricFragment.setOnInflateFinishListener(OnInflateFinishListener { view: View? ->
-      lrcView = view as LrcView
-      lrcView?.setOnLrcClickListener(object : OnLrcClickListener {
-        override fun onClick() {}
-        override fun onLongClick() {}
-      })
+    lyricFragment.setOnInflateFinishListener(object : OnInflateFinishListener {
+      override fun onViewInflateFinish(view: View) {
+        lrcView = view as LrcView
+        lrcView?.setOnLrcClickListener(object : OnLrcClickListener {
+          override fun onClick() {}
+          override fun onLongClick() {}
+        })
 
-      lrcView?.setOnSeekToListener(object : LrcView.OnSeekToListener {
-        override fun onSeekTo(progress: Int) {
-          if (progress > 0 && progress < getDuration()) {
-            MusicServiceRemote.setProgress(progress)
-            currentTime = progress
-            handler.sendEmptyMessage(UPDATE_TIME_ALL)
+        lrcView?.setOnSeekToListener(object : LrcView.OnSeekToListener {
+          override fun onSeekTo(progress: Int) {
+            if (progress > 0 && progress < getDuration()) {
+              MusicServiceRemote.setProgress(progress)
+              currentTime = progress
+              handler.sendEmptyMessage(UPDATE_TIME_ALL)
+            }
           }
-        }
 
-      })
-      lrcView?.setHighLightColor(ThemeStore.textColorPrimary)
-      lrcView?.setOtherColor(ThemeStore.textColorSecondary)
-      lrcView?.setTimeLineColor(ThemeStore.textColorSecondary)
+        })
+        lrcView?.setHighLightColor(ThemeStore.textColorPrimary)
+        lrcView?.setOtherColor(ThemeStore.textColorSecondary)
+        lrcView?.setTimeLineColor(ThemeStore.textColorSecondary)
+      }
     })
   }
 

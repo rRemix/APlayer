@@ -124,7 +124,7 @@ class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<Lis
   }
 
   override fun onCreateLoader(id: Int, args: Bundle?): Loader<List<PlayList>?> {
-    return AsyncPlayListLoader(context)
+    return AsyncPlayListLoader(requireContext())
   }
 
   override fun onLoadFinished(loader: Loader<List<PlayList>?>, data: List<PlayList>?) {

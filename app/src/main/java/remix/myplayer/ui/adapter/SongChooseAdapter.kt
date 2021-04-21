@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.CompoundButton
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemSongChooseBinding
-import remix.myplayer.misc.interfaces.OnSongChooseListener
 import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.request.LibraryUriRequest
 import remix.myplayer.request.RequestConfig
@@ -23,7 +22,7 @@ import java.util.*
  * @Author Xiaoborui
  * @Date 2016/10/21 10:02
  */
-class SongChooseAdapter(layoutID: Int, private val checkListener: OnSongChooseListener) : BaseAdapter<Song, SongChooseHolder>(layoutID) {
+class SongChooseAdapter(layoutID: Int, private val checkListener: OnCheckChangeListener) : BaseAdapter<Song, SongChooseHolder>(layoutID) {
 
   val checkedSong: ArrayList<Int> = ArrayList()
 
@@ -44,7 +43,7 @@ class SongChooseAdapter(layoutID: Int, private val checkListener: OnSongChooseLi
     //选中歌曲
     holder.binding.root.setOnClickListener { v: View? ->
       holder.binding.checkbox.isChecked = !holder.binding.checkbox.isChecked
-      checkListener.OnSongChoose(checkedSong.size > 0)
+      checkListener.onCheckChange(checkedSong)
     }
     val audioId = song.id
     TintHelper.setTint(holder.binding.checkbox, accentColor, !isLightTheme)
@@ -56,12 +55,15 @@ class SongChooseAdapter(layoutID: Int, private val checkListener: OnSongChooseLi
       } else if (!isChecked) {
         checkedSong.remove(Integer.valueOf(audioId))
       }
-      checkListener.OnSongChoose(checkedSong.size > 0)
+      checkListener.onCheckChange(checkedSong)
     }
   }
 
   class SongChooseHolder(itemView: View) : BaseViewHolder(itemView) {
     val binding: ItemSongChooseBinding = ItemSongChooseBinding.bind(itemView)
+  }
 
+  interface OnCheckChangeListener{
+    fun onCheckChange(songs: List<Int>)
   }
 }

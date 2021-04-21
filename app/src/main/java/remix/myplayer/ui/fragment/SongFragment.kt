@@ -103,7 +103,7 @@ class SongFragment : LibraryFragment<Song, SongAdapter>() {
     location_recyclerView.smoothScrollToCurrentSong(adapter.dataList)
   }
 
-  private class AsyncSongLoader(context: Context?) : WrappedAsyncTaskLoader<List<Song>>(context) {
+  private class AsyncSongLoader(context: Context) : WrappedAsyncTaskLoader<List<Song>>(context) {
     override fun loadInBackground(): List<Song> {
       return getAllSong()
     }

@@ -73,7 +73,7 @@ class DesktopLyricColorAdapter(context: Context?, layoutId: Int, width: Int) : B
           .height(SIZE)
           .make()
     }
-    holder.binding.root.setOnClickListener { v: View? -> onItemClickListener?.onItemClick(v, position) }
+    holder.binding.root.setOnClickListener { v: View -> onItemClickListener?.onItemClick(v, position) }
   }
 
   class FloatColorHolder(view: View) : BaseViewHolder(view) {

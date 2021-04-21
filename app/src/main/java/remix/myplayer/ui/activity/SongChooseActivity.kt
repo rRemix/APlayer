@@ -15,7 +15,6 @@ import remix.myplayer.databinding.ActivitySongChooseBinding
 import remix.myplayer.db.room.DatabaseRepository.Companion.getInstance
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader
 import remix.myplayer.misc.interfaces.LoaderIds
-import remix.myplayer.misc.interfaces.OnSongChooseListener
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.theme.ThemeStore.materialPrimaryColor
 import remix.myplayer.theme.ThemeStore.textColorPrimaryReverse
@@ -32,21 +31,23 @@ import remix.myplayer.util.ToastUtil
 class SongChooseActivity : LibraryActivity<Song, SongChooseAdapter>() {
   lateinit var binding: ActivitySongChooseBinding
 
-  private var mPlayListID = 0
-  private var mPlayListName: String? = null
+  private var playListID = 0
+  private var playListName: String? = null
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = ActivitySongChooseBinding.inflate(layoutInflater)
     setContentView(binding.root)
-    mPlayListID = intent.getIntExtra(EXTRA_ID, -1)
-    if (mPlayListID <= 0) {
+    playListID = intent.getIntExtra(EXTRA_ID, -1)
+    if (playListID <= 0) {
       ToastUtil.show(this, R.string.add_error, Toast.LENGTH_SHORT)
       return
     }
-    mPlayListName = intent.getStringExtra(EXTRA_NAME)
-    adapter = SongChooseAdapter(R.layout.item_song_choose, OnSongChooseListener { isValid: Boolean ->
-      binding.confirm.alpha = if (isValid) 1.0f else 0.6f
-      binding.confirm.isClickable = isValid
+    adapter = SongChooseAdapter(R.layout.item_song_choose, object : SongChooseAdapter.OnCheckChangeListener {
+      override fun onCheckChange(songs: List<Int>) {
+        binding.confirm.alpha = if (songs.isNotEmpty()) 1.0f else 0.6f
+        binding.confirm.isClickable = songs.isNotEmpty()
+      }
     })
     binding.recyclerview.layoutManager = LinearLayoutManager(this)
     binding.recyclerview.adapter = adapter
@@ -70,11 +71,11 @@ class SongChooseActivity : LibraryActivity<Song, SongChooseAdapter>() {
         return
       }
       getInstance()
-          .insertToPlayList(adapter!!.checkedSong, mPlayListID.toLong())
+          .insertToPlayList(adapter!!.checkedSong, playListID.toLong())
           .compose(RxUtil.applySingleScheduler())
           .subscribe({ num: Int? ->
             ToastUtil.show(this, getString(R.string.add_song_playlist_success, num,
-                mPlayListName))
+                playListName))
             finish()
           }) { throwable: Throwable? -> finish() }
     }
@@ -99,6 +100,7 @@ class SongChooseActivity : LibraryActivity<Song, SongChooseAdapter>() {
     val TAG = SongChooseActivity::class.java.simpleName
     const val EXTRA_NAME = "PlayListName"
     const val EXTRA_ID = "PlayListID"
+
     fun start(activity: Activity, playListId: Int, playListName: String?) {
       val intent = Intent(activity, SongChooseActivity::class.java)
       intent.putExtra(EXTRA_ID, playListId)

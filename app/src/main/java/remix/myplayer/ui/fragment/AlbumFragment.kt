@@ -67,7 +67,7 @@ class AlbumFragment : LibraryFragment<Album, AlbumAdapter>() {
 
   override val loaderId: Int = LoaderIds.FRAGMENT_ALBUM
 
-  private class AsyncAlbumLoader(context: Context?) : WrappedAsyncTaskLoader<List<Album>>(context) {
+  private class AsyncAlbumLoader(context: Context) : WrappedAsyncTaskLoader<List<Album>>(context) {
     override fun loadInBackground(): List<Album> {
       return getAllAlbum()
     }

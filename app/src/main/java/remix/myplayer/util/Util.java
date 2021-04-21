@@ -38,7 +38,7 @@ import java.util.List;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.misc.floatpermission.rom.RomUtils;
+import remix.myplayer.util.floatpermission.rom.RomUtils;
 import timber.log.Timber;
 
 /**

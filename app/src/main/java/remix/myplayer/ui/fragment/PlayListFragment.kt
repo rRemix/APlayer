@@ -76,7 +76,7 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
 
   override val loaderId: Int = LoaderIds.FRAGMENT_PLAYLIST
 
-  class AsyncPlayListLoader(context: Context?) : WrappedAsyncTaskLoader<List<PlayList>>(context) {
+  class AsyncPlayListLoader(context: Context) : WrappedAsyncTaskLoader<List<PlayList>>(context) {
     override fun loadInBackground(): List<PlayList> {
       val sortOrder = SPUtil.getValue(
           App.context,

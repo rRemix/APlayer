@@ -53,8 +53,8 @@ class FolderAdapter(layoutId: Int, private val multiChoice: MultipleChoice<Folde
       popupMenu.show()
     }
     if (onItemClickListener != null) {
-      holder.binding.root.setOnClickListener { v: View? -> onItemClickListener?.onItemClick(v, position) }
-      holder.binding.root.setOnLongClickListener { v: View? ->
+      holder.binding.root.setOnClickListener { v: View -> onItemClickListener?.onItemClick(v, position) }
+      holder.binding.root.setOnLongClickListener { v: View ->
         onItemClickListener?.onItemLongClick(v, position)
         true
       }

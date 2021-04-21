@@ -67,7 +67,7 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
 
   override val loaderId: Int = LoaderIds.FRAGMENT_ARTIST
 
-  private class AsyncArtistLoader(context: Context?) : WrappedAsyncTaskLoader<List<Artist>>(context) {
+  private class AsyncArtistLoader(context: Context) : WrappedAsyncTaskLoader<List<Artist>>(context) {
     override fun loadInBackground(): List<Artist> {
       return getAllArtist()
     }

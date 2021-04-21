@@ -63,11 +63,11 @@ class CustomSortActivity : ToolbarActivity() {
 
     adapter.setDataList(songs)
     adapter.onItemClickListener = object : OnItemClickListener {
-      override fun onItemLongClick(view: View?, position: Int) {
+      override fun onItemLongClick(view: View, position: Int) {
         Util.vibrate(this@CustomSortActivity, 100)
       }
 
-      override fun onItemClick(view: View?, position: Int) {
+      override fun onItemClick(view: View, position: Int) {
 
       }
 

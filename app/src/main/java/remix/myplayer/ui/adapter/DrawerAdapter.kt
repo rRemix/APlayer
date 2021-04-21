@@ -52,7 +52,7 @@ class DrawerAdapter(layoutId: Int) : BaseAdapter<Int, DrawerHolder>(layoutId) {
     holder.binding.itemText
         .setTextColor(Theme.resolveColor(holder.itemView.context, R.attr.text_color_primary))
     holder.binding.itemRoot
-        .setOnClickListener { v: View? -> onItemClickListener?.onItemClick(v, position) }
+        .setOnClickListener { v: View -> onItemClickListener?.onItemClick(v, position) }
     holder.binding.itemRoot.isSelected = selectIndex == position
     holder.binding.itemRoot.background = Theme.getPressAndSelectedStateListRippleDrawable(
         holder.itemView.context,

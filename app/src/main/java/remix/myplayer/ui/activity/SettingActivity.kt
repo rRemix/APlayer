@@ -47,7 +47,7 @@ import remix.myplayer.helper.M3UHelper.importM3UFile
 import remix.myplayer.helper.ShakeDetector
 import remix.myplayer.misc.MediaScanner
 import remix.myplayer.misc.cache.DiskCache
-import remix.myplayer.misc.floatpermission.FloatWindowManager
+import remix.myplayer.util.floatpermission.FloatWindowManager
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver

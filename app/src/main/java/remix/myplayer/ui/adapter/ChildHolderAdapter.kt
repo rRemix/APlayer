@@ -130,7 +130,7 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
       }
     }
     if (onItemClickListener != null) {
-      holder.binding.root.setOnClickListener { v: View? ->
+      holder.binding.root.setOnClickListener { v: View ->
         if (holder.adapterPosition - 1 < 0) {
           ToastUtil.show(context, R.string.illegal_arg)
           return@setOnClickListener
@@ -139,7 +139,7 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
           onItemClickListener?.onItemClick(v, holder.adapterPosition - 1)
         }
       }
-      holder.binding.root.setOnLongClickListener { v: View? ->
+      holder.binding.root.setOnLongClickListener { v: View ->
         if (holder.adapterPosition - 1 < 0) {
           ToastUtil.show(context, R.string.illegal_arg)
           return@setOnLongClickListener true

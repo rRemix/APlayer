@@ -104,7 +104,7 @@ class LockScreenActivity : BaseMusicActivity() {
     attr.flags = attr.flags or WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
 
     //初始化按钮
-    val listener = CtrlButtonListener(applicationContext)
+    val listener = CtrlButtonListener()
     lockscreen_prev.setOnClickListener(listener)
     lockscreen_next.setOnClickListener(listener)
     lockscreen_play.setOnClickListener(listener)

@@ -41,7 +41,7 @@ import remix.myplayer.lyric.LyricFetcher
 import remix.myplayer.lyric.LyricFetcher.Companion.LYRIC_FIND_INTERVAL
 import remix.myplayer.lyric.bean.LyricRowWrapper
 import remix.myplayer.misc.MediaScanner
-import remix.myplayer.misc.floatpermission.FloatWindowManager
+import remix.myplayer.util.floatpermission.FloatWindowManager
 import remix.myplayer.misc.log.LogObserver
 import remix.myplayer.misc.observer.MediaStoreObserver
 import remix.myplayer.misc.receiver.ExitReceiver

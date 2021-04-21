@@ -16,11 +16,11 @@ abstract class BaseService : Service() {
 
   override fun onCreate() {
     super.onCreate()
-    ServiceManager.AddService(this)
+    ServiceManager.addService(this)
   }
 
   override fun onDestroy() {
     super.onDestroy()
-    ServiceManager.RemoveService(this)
+    ServiceManager.removeService(this)
   }
 }

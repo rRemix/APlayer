@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2016 Facishare Technology Co., Ltd. All Rights Reserved.
  */
-package remix.myplayer.misc.floatpermission.rom;
+package remix.myplayer.util.floatpermission.rom;
 
 import android.annotation.TargetApi;
 import android.app.AppOpsManager;

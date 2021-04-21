@@ -74,10 +74,10 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
 
     adapter.setDataList(beans)
     adapter.onItemClickListener = object : OnItemClickListener {
-      override fun onItemLongClick(view: View?, position: Int) {
+      override fun onItemLongClick(view: View, position: Int) {
       }
 
-      override fun onItemClick(view: View?, position: Int) {
+      override fun onItemClick(view: View, position: Int) {
         if (App.IS_GOOGLEPLAY) {
           mBillingProcessor?.purchase(this@SupportActivity, SKU_IDS[position])
         } else {

@@ -20,7 +20,7 @@ class AddToPlayListAdapter(layoutId: Int) : BaseAdapter<PlayList, PlayListAddToH
     }
     holder.binding.playlistAddtoText.text = data.name
     holder.binding.playlistAddtoText.tag = data.id
-    holder.binding.itemRoot.setOnClickListener { v: View? ->
+    holder.binding.itemRoot.setOnClickListener { v: View ->
       onItemClickListener?.onItemClick(v, position)
     }
   }

@@ -67,7 +67,7 @@ class FolderFragment : LibraryFragment<Folder, FolderAdapter>() {
     pageName = TAG
   }
 
-  private class AsyncFolderLoader(context: Context?) : WrappedAsyncTaskLoader<List<Folder>>(context) {
+  private class AsyncFolderLoader(context: Context) : WrappedAsyncTaskLoader<List<Folder>>(context) {
     override fun loadInBackground(): List<Folder> {
       return getAllFolder()
     }

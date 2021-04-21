@@ -125,14 +125,14 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
           SongPopupListener((context as AppCompatActivity), song, false, ""))
       popupMenu.show()
     }
-    holder.binding.itemRoot.setOnClickListener { v: View? ->
+    holder.binding.itemRoot.setOnClickListener { v: View ->
       if (position - 1 < 0) {
         ToastUtil.show(context, R.string.illegal_arg)
         return@setOnClickListener
       }
       onItemClickListener?.onItemClick(v, position - 1)
     }
-    holder.binding.itemRoot.setOnLongClickListener { v: View? ->
+    holder.binding.itemRoot.setOnLongClickListener { v: View ->
       if (position - 1 < 0) {
         ToastUtil.show(context, R.string.illegal_arg)
         return@setOnLongClickListener true

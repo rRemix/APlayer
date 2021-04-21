@@ -62,7 +62,7 @@ class SearchAdapter(layoutId: Int) : BaseAdapter<Song, SearchResHolder>(layoutId
       popupMenu.show()
     }
     if (onItemClickListener != null) {
-      holder.binding.reslistItem.setOnClickListener { v: View? -> onItemClickListener?.onItemClick(v, holder.adapterPosition) }
+      holder.binding.reslistItem.setOnClickListener { v: View -> onItemClickListener?.onItemClick(v, holder.adapterPosition) }
     }
   }
 

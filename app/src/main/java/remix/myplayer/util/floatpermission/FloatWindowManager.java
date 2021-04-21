@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2016 Facishare Technology Co., Ltd. All Rights Reserved.
  */
-package remix.myplayer.misc.floatpermission;
+package remix.myplayer.util.floatpermission;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -15,11 +15,11 @@ import android.util.Log;
 import android.view.WindowManager;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import remix.myplayer.misc.floatpermission.rom.HuaweiUtils;
-import remix.myplayer.misc.floatpermission.rom.MeizuUtils;
-import remix.myplayer.misc.floatpermission.rom.MiuiUtils;
-import remix.myplayer.misc.floatpermission.rom.QikuUtils;
-import remix.myplayer.misc.floatpermission.rom.RomUtils;
+import remix.myplayer.util.floatpermission.rom.HuaweiUtils;
+import remix.myplayer.util.floatpermission.rom.MeizuUtils;
+import remix.myplayer.util.floatpermission.rom.MiuiUtils;
+import remix.myplayer.util.floatpermission.rom.QikuUtils;
+import remix.myplayer.util.floatpermission.rom.RomUtils;
 
 /**
  * Description:

@@ -57,7 +57,7 @@ class PlayQueueAdapter(layoutId: Int) : BaseAdapter<Song, PlayQueueHolder>(layou
             }
           }
     }
-    holder.binding.itemRoot.setOnClickListener { v: View? -> onItemClickListener?.onItemClick(v, holder.adapterPosition) }
+    holder.binding.itemRoot.setOnClickListener { v: View -> onItemClickListener?.onItemClick(v, holder.adapterPosition) }
   }
 
   class PlayQueueHolder(view: View) : BaseViewHolder(view) {
