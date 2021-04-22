@@ -5,12 +5,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
-import androidx.palette.graphics.Palette
 import android.util.DisplayMetrics
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
+import androidx.palette.graphics.Palette
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -50,12 +50,14 @@ import java.lang.ref.WeakReference
 class LockScreenActivity : BaseMusicActivity() {
   //高斯模糊后的bitmap
   private var blurBitMap: Bitmap? = null
+
   //高斯模糊之前的bitmap
   private var rawBitMap: Bitmap? = null
   private var width: Int = 0
 
   //是否正在播放
   private var disposable: Disposable? = null
+
   @Volatile
   private var curLyric: LyricRowWrapper? = null
   private var updateLyricThread: UpdateLockScreenLyricThread? = null
@@ -63,6 +65,7 @@ class LockScreenActivity : BaseMusicActivity() {
   //前后两次触摸的X
   private var scrollX1: Float = 0f
   private var scrollX2: Float = 0f
+
   //一次移动的距离
   private var distance: Float = 0f
 
@@ -90,7 +93,7 @@ class LockScreenActivity : BaseMusicActivity() {
     setContentView(R.layout.activity_lockscreen)
     try {
       requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-    } catch (e: Exception){
+    } catch (e: Exception) {
       Timber.v(e)
     }
 
@@ -256,11 +259,13 @@ class LockScreenActivity : BaseMusicActivity() {
       e.onComplete()
       return
     }
-    val stackBlurManager = StackBlurManager(rawBitMap)
-    blurBitMap = stackBlurManager.processNatively(40)
-    val palette = Palette.from(rawBitMap ?: return).generate()
-    e.onNext(palette)
-    e.onComplete()
+    rawBitMap?.let {
+      val stackBlurManager = StackBlurManager(it)
+      blurBitMap = stackBlurManager.processNatively(40)
+      val palette = Palette.from(rawBitMap ?: return).generate()
+      e.onNext(palette)
+      e.onComplete()
+    }
   }
 
   private fun setCurrentLyric(wrapper: LyricRowWrapper) {

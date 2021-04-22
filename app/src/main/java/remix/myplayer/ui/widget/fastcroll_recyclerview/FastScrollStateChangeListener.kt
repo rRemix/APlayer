@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package remix.myplayer.ui.widget.fastcroll_recyclerview
 
-package remix.myplayer.ui.widget.fastcroll_recyclerview;
-
-public interface FastScrollStateChangeListener {
-
+interface FastScrollStateChangeListener {
   /**
    * Called when fast scrolling begins
    */
-  void onFastScrollStart();
+  fun onFastScrollStart()
 
   /**
    * Called when fast scrolling ends
    */
-  void onFastScrollStop();
+  fun onFastScrollStop()
 }
