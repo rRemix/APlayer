@@ -6,6 +6,8 @@ import io.reactivex.Single;
 import okhttp3.ResponseBody;
 import remix.myplayer.BuildConfig;
 import remix.myplayer.bean.github.Release;
+import remix.myplayer.bean.lastfm.LastFmAlbum;
+import remix.myplayer.bean.netease.NSongSearchResponse;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
@@ -64,4 +66,14 @@ public interface ApiService {
   @GET("repos/{owner}/{repo}/releases/latest")
   @Headers({"token: " + BuildConfig.GITHUB_SECRET_KEY})
   Single<Release> getLatestRelease(@Path("owner") String owner, @Path("repo") String repo);
+
+  //TODO New Api
+  @GET(BASE_QUERY_PARAMETERS + "&method=album.getinfo")
+  Single<LastFmAlbum> searchLastFMAlbum(@Query("album") String albumName,
+      @Query("artist") String artistName, @Nullable @Query("lang") String language);
+
+  @POST("search/pc")
+  @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
+  Single<NSongSearchResponse> searchNeteaseSong(@Query("s") String key, @Query("offset") int offset,
+      @Query("limit") int limit, @Query("type") int type);
 }

@@ -6,6 +6,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import org.jetbrains.annotations.NotNull;
 import remix.myplayer.bean.github.Release;
+import remix.myplayer.bean.lastfm.LastFmAlbum;
+import remix.myplayer.bean.netease.NSongSearchResponse;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -182,6 +184,14 @@ public class HttpClient {
 
   public Observable<ResponseBody> getArtistInfo(String artistName, String lang) {
     return mLastfmApi.getArtistInfo(artistName, lang);
+  }
+
+  public Single<LastFmAlbum> searchLastFMAlbum(String albumName, String artistName, String lang) {
+    return mLastfmApi.searchLastFMAlbum(albumName, artistName, lang);
+  }
+
+  public Single<NSongSearchResponse> searchNeteaseSong(String key, int offset, int limit){
+    return mNeteaseApi.searchNeteaseSong(key,offset,limit,1);
   }
 
   public Single<Release> getLatestRelease(@NotNull String owner, @NotNull String repo) {

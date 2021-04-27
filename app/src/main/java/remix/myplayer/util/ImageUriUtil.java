@@ -5,8 +5,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.Media;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
+import androidx.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -253,7 +253,6 @@ public class ImageUriUtil {
     return null;
   }
 
-
   public static String getArtistArt(long artistId) {
     final List<Song> songs = MediaStoreUtil.getSongs(Media.ARTIST_ID + " = " + artistId, null);
     if (!songs.isEmpty()) {
@@ -264,6 +263,43 @@ public class ImageUriUtil {
         if (ImageUriUtil.isAlbumThumbExistInMediaCache(uri)) {
           return uri.toString();
         }
+      }
+    }
+    return "";
+  }
+
+  public static String getNeteaseSearchKey(Object model) {
+    if (model instanceof Song) {
+      final Song song = (Song) model;
+      return getNeteaseSearchKey(song.getTitle(), song.getAlbum(), song.getArtist(), true);
+    }
+
+    return "";
+  }
+
+  private static String getNeteaseSearchKey(String title, String album, String artist, boolean searchAlbum) {
+    boolean isTitleAvailable = !ImageUriUtil.isSongNameUnknownOrEmpty(title);
+    boolean isAlbumAvailable = !ImageUriUtil.isAlbumNameUnknownOrEmpty(album);
+    boolean isArtistAvailable = !ImageUriUtil.isArtistNameUnknownOrEmpty(artist);
+    if (searchAlbum) {
+      //歌曲名合法
+      if (isTitleAvailable) {
+        //艺术家合法
+        if (isArtistAvailable) {
+          return title + "-" + artist;
+        }
+        //专辑名合法
+        if (isAlbumAvailable) {
+          return title + "-" + artist;
+        }
+      }
+      //根据专辑名字查询
+      if (isAlbumAvailable && isArtistAvailable) {
+        return artist + "-" + album;
+      }
+    } else {
+      if (isArtistAvailable) {
+        return artist;
       }
     }
     return "";

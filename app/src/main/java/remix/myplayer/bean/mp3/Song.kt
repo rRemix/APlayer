@@ -4,11 +4,10 @@ import android.content.ContentUris
 import android.net.Uri
 import android.os.Parcelable
 import android.provider.MediaStore
-import com.bumptech.glide.load.Key
 import kotlinx.android.parcel.Parcelize
 import remix.myplayer.App
+import remix.myplayer.util.ImageUriUtil
 import remix.myplayer.util.SPUtil
-import java.security.MessageDigest
 
 /**
  * Created by Remix on 2015/11/30.
@@ -32,10 +31,13 @@ data class Song(
     val size: Long,
     val year: String?,
     val titleKey: String?,
-    val addTime: Long) : Parcelable, ImageUri {
+    val addTime: Long) : Parcelable {
 
   val contentUri: Uri
     get() = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toLong())
+
+  val artUri: Uri
+    get() = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId)
 
   val showName: String
     get() = if (!SHOW_DISPLAYNAME) title else displayName
@@ -121,15 +123,6 @@ data class Song(
     if (addTime != other.addTime) return false
 
     return true
-  }
-
-  override fun getImageUri(): Uri {
-    return ContentUris
-        .withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId)
-  }
-
-  override fun updateDiskCacheKey(messageDigest: MessageDigest) {
-    messageDigest.update(albumId.toString().toByteArray(Key.CHARSET))
   }
 
   companion object {
