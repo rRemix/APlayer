@@ -6,7 +6,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.GlideBuilder
 import com.bumptech.glide.Registry
 import com.bumptech.glide.annotation.GlideModule
-import com.bumptech.glide.load.model.*
+import com.bumptech.glide.load.engine.executor.GlideExecutor
+import com.bumptech.glide.load.model.ModelLoader
+import com.bumptech.glide.load.model.ModelLoaderFactory
+import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.module.AppGlideModule
 import remix.myplayer.bean.mp3.Song
 import java.io.InputStream
@@ -28,5 +31,11 @@ class APlayerGlideModule : AppGlideModule() {
 
   override fun applyOptions(context: Context, builder: GlideBuilder) {
     super.applyOptions(context, builder)
+    builder.setDiskCacheExecutor(GlideExecutor.newSourceBuilder()
+        .setName("custom-disk-cache")
+        .setThreadCount(1)
+        .setThreadTimeoutMillis(10000)
+        .setUncaughtThrowableStrategy(GlideExecutor.UncaughtThrowableStrategy.LOG)
+        .build())
   }
 }

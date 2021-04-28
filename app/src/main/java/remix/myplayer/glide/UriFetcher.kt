@@ -56,16 +56,15 @@ class UriFetcher {
     }
 
     // 内置
-//    if (IGNORE_MEDIA_STORE) {
-//      return Uri.parse(PREFIX_EMBEDDED + song.url)
-//    } else if (ImageUriUtil.isAlbumThumbExistInMediaCache(song.artUri)) {
-//      return song.artUri
-//    }
+    if (IGNORE_MEDIA_STORE) {
+      return Uri.parse(PREFIX_EMBEDDED + song.url)
+    } else if (ImageUriUtil.isAlbumThumbExistInMediaCache(song.artUri)) {
+      return song.artUri
+    }
 
     // 网络
     try {
-      //TODO RuntimeException??
-      if (false /**DOWNLOAD_SOURCE == DOWNLOAD_LASTFM*/) {
+      if (DOWNLOAD_SOURCE == DOWNLOAD_LASTFM) {
         val lastFmAlbum = HttpClient.getInstance().searchLastFMAlbum(song.album, song.artist, null).blockingGet()
         val lastFMUri = ImageUriUtil.getLargestAlbumImageUrl(lastFmAlbum.album?.image)
         if (!TextUtils.isEmpty(lastFMUri) && UriUtil.isNetworkUri(Uri.parse(lastFMUri))) {

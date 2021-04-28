@@ -5,6 +5,7 @@ import android.net.Uri
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.data.DataFetcher
+import com.bumptech.glide.load.engine.GlideException
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -20,10 +21,14 @@ class EmbeddedFetcher(private val fileUri: Uri) : DataFetcher<InputStream> {
     try {
       mediaDataRetriever.setDataSource(fileUri.path)
       val bytes = mediaDataRetriever.embeddedPicture
-      if (bytes != null) {
-        stream = ByteArrayInputStream(bytes)
-        callback.onDataReady(stream)
+      stream = if (bytes != null) {
+        ByteArrayInputStream(bytes)
+      } else{
+        AudioFileCoverUtils.fallback(fileUri.path)
       }
+      callback.onDataReady(stream)
+    } catch (e: Exception) {
+      callback.onLoadFailed(GlideException(e.message, e))
     } finally {
       mediaDataRetriever.release()
     }
