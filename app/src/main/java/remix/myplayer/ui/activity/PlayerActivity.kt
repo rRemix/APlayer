@@ -64,7 +64,7 @@ import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.misc.menu.AudioPopupListener
 import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG

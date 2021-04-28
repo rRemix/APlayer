@@ -6,14 +6,13 @@ import android.view.MenuItem
 import android.widget.CompoundButton
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.afollestad.materialdialogs.MaterialDialog
-import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.ui.activity.PlayerActivity

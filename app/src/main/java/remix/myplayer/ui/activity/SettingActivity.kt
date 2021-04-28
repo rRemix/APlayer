@@ -58,7 +58,7 @@ import remix.myplayer.misc.zipFrom
 import remix.myplayer.misc.zipOutputStream
 import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRIC

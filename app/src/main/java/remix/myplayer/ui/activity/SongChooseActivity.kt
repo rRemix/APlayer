@@ -16,7 +16,7 @@ import remix.myplayer.db.room.DatabaseRepository.Companion.getInstance
 import remix.myplayer.misc.asynctask.AppWrappedAsyncTaskLoader
 import remix.myplayer.misc.interfaces.LoaderIds
 import remix.myplayer.misc.interfaces.OnSongChooseListener
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.theme.ThemeStore.materialPrimaryColor
 import remix.myplayer.theme.ThemeStore.textColorPrimaryReverse
 import remix.myplayer.ui.adapter.SongChooseAdapter

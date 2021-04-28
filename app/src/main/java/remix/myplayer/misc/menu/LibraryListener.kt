@@ -17,7 +17,7 @@ import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.theme.Theme

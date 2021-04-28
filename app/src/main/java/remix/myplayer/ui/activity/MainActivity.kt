@@ -50,7 +50,7 @@ import remix.myplayer.misc.update.UpdateListener
 import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.request.LibraryUriRequest
 import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore

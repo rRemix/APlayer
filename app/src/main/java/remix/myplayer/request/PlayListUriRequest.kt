@@ -10,7 +10,7 @@ import io.reactivex.observers.DisposableObserver
 import remix.myplayer.App
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 
 /**

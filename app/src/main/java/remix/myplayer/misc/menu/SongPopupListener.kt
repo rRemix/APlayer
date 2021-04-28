@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import android.view.MenuItem
-import android.widget.CompoundButton
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.soundcloud.android.crop.Crop
 import remix.myplayer.App
@@ -13,7 +12,7 @@ import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.theme.Theme

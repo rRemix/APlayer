@@ -33,7 +33,7 @@ import remix.myplayer.bean.misc.Purchase
 import remix.myplayer.databinding.ActivitySupportDevelopBinding
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.interfaces.OnItemClickListener
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.adapter.PurchaseAdapter
 import remix.myplayer.util.AlipayUtil

@@ -19,7 +19,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.misc.getSongIds
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.ui.adapter.*

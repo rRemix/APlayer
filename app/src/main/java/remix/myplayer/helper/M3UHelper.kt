@@ -11,7 +11,7 @@ import org.jetbrains.anko.collections.forEachWithIndex
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.theme.Theme
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.ToastUtil

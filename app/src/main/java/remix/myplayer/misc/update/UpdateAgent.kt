@@ -10,7 +10,7 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.github.Release
 import remix.myplayer.request.network.HttpClient
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.Util
 import timber.log.Timber

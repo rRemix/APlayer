@@ -6,7 +6,7 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.misc.log.LogObserver
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.util.Constants.MODE_SHUFFLE
 import remix.myplayer.util.MediaStoreUtil
@@ -15,7 +15,6 @@ import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
 import java.lang.ref.WeakReference
-import kotlin.math.max
 
 /**
  * created by Remix on 2019-09-26

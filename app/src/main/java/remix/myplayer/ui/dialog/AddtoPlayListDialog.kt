@@ -18,7 +18,7 @@ import remix.myplayer.R
 import remix.myplayer.db.room.DatabaseRepository.Companion.getInstance
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.misc.interfaces.OnItemClickListener
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.adapter.AddToPlayListAdapter
 import remix.myplayer.ui.dialog.base.BaseMusicDialog

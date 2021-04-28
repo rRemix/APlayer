@@ -52,7 +52,7 @@ import remix.myplayer.misc.receiver.MediaButtonReceiver
 import remix.myplayer.misc.tryLaunch
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24

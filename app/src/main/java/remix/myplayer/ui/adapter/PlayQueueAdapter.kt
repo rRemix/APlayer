@@ -6,7 +6,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemPlayqueueBinding
 import remix.myplayer.db.room.DatabaseRepository.Companion.getInstance
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.theme.ThemeStore.textColorPrimary

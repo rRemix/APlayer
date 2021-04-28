@@ -28,7 +28,7 @@ import remix.myplayer.misc.menu.CtrlButtonListener
 import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.request.LibraryUriRequest
 import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.blur.StackBlurManager

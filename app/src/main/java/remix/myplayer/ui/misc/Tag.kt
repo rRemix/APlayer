@@ -18,7 +18,7 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.misc.tageditor.TagEditor
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.TextInputLayoutUtil

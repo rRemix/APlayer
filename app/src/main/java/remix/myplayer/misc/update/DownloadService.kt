@@ -78,7 +78,7 @@ class DownloadService : IntentService("DownloadService") {
       if (isForce(release)) {
         sendLocalBroadcast(Intent(ACTION_SHOW_DIALOG))
       }
-      HttpsURLConnection.setDefaultSSLSocketFactory(OkHttpHelper.getSSLSocketFactory())
+      HttpsURLConnection.setDefaultSSLSocketFactory(OkHttpHelper.sSLSocketFactory)
       val url = URL(downloadUrl)
 
       val conn = url.openConnection()

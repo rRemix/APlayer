@@ -2,7 +2,7 @@ package remix.myplayer.request
 
 import android.graphics.Bitmap
 import io.reactivex.disposables.Disposable
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 
 /**
  * Created by Remix on 2017/12/10.
