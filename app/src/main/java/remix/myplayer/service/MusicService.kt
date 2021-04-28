@@ -6,7 +6,6 @@ import android.content.*
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.media.AudioAttributes
-import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
@@ -21,6 +20,9 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.annotation.WorkerThread
+import androidx.media.AudioAttributesCompat
+import androidx.media.AudioFocusRequestCompat
+import androidx.media.AudioManagerCompat
 import kotlinx.coroutines.*
 import remix.myplayer.App
 import remix.myplayer.R
@@ -50,12 +52,12 @@ import remix.myplayer.misc.receiver.MediaButtonReceiver
 import remix.myplayer.misc.tryLaunch
 import remix.myplayer.request.RemoteUriRequest
 import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24
 import remix.myplayer.ui.activity.LockScreenActivity
-import remix.myplayer.ui.activity.base.BaseActivity.EXTERNAL_STORAGE_PERMISSIONS
+import remix.myplayer.ui.activity.base.BaseActivity.Companion.EXTERNAL_STORAGE_PERMISSIONS
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
@@ -210,21 +212,18 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   private var audioFocus = false
 
-  /**
-   * AudioFocusRequest
-   *
-   * Used by requestAudioFocus and abandonAudioFocusRequest
-   */
-  private val focusRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-    AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).run {
-      setAudioAttributes(AudioAttributes.Builder().run {
-        setUsage(AudioAttributes.USAGE_MEDIA)
-        setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+  private val audioAttributes = AudioAttributesCompat.Builder().run {
+    setUsage(AudioAttributesCompat.USAGE_MEDIA)
+    setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
+    build()
+  }
+
+  private val focusRequest =
+      AudioFocusRequestCompat.Builder(AudioManagerCompat.AUDIOFOCUS_GAIN).run {
+        setAudioAttributes(audioAttributes)
+        setOnAudioFocusChangeListener(audioFocusListener)
         build()
-      })
-      setOnAudioFocusChangeListener(audioFocusListener)
-      build()
-    } else null // 小于 API 26 没有 AudioFocusRequest
+      }
 
   /**
    * 更新相关Activity的Handler
@@ -451,10 +450,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   override fun onSharedPreferenceChanged(sp: SharedPreferences, key: String) {
 //    Timber.v("onSharedPreferenceChanged, key: $key")
     when (key) {
-      //定时器
-      SETTING_KEY.TIMER_PENDING_CLOSE -> {
-        pendingClose = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.TIMER_PENDING_CLOSE, false)
-      }
       //通知栏背景色
       SETTING_KEY.NOTIFY_SYSTEM_COLOR,
         //通知栏样式
@@ -537,7 +532,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     val screenFilter = IntentFilter()
     screenFilter.addAction(Intent.ACTION_SCREEN_ON)
     screenFilter.addAction(Intent.ACTION_SCREEN_OFF)
-    App.getContext().registerReceiver(screenReceiver, screenFilter)
+    App.context.registerReceiver(screenReceiver, screenFilter)
 
     //监听数据库变化
     contentResolver.registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mediaStoreObserver)
@@ -545,9 +540,22 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     //定时关闭
     SleepTimer.addCallback(object : SleepTimer.Callback {
       override fun onFinish() {
-        if (!pendingClose) {
-          sendBroadcast(Intent(ACTION_EXIT)
-              .setComponent(ComponentName(this@MusicService, ExitReceiver::class.java)))
+        if (SPUtil.getValue(
+                this@MusicService,
+                SETTING_KEY.NAME,
+                SETTING_KEY.TIMER_EXIT_AFTER_FINISH,
+                false
+            )
+        ) {
+          pendingClose = true
+        } else {
+          sendBroadcast(
+              Intent(ACTION_EXIT).setComponent(
+                  ComponentName(
+                      this@MusicService, ExitReceiver::class.java
+                  )
+              )
+          )
         }
       }
 
@@ -618,11 +626,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   private fun setUpPlayer() {
     mediaPlayer = MediaPlayer()
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      mediaPlayer.setAudioAttributes(focusRequest!!.audioAttributes)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      mediaPlayer.setAudioAttributes(audioAttributes.unwrap() as AudioAttributes)
     } else {
       @Suppress("DEPRECATION")
-      mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
+      mediaPlayer.setAudioStreamType(audioAttributes.legacyStreamType)
     }
     mediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK)
 
@@ -713,12 +721,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     showDesktopLyric = false
     lyricTask?.cancel()
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      audioManager.abandonAudioFocusRequest(focusRequest!!)
-    } else {
-      @Suppress("DEPRECATION")
-      audioManager.abandonAudioFocus(audioFocusListener)
-    }
+    AudioManagerCompat.abandonAudioFocusRequest(audioManager, focusRequest)
+
     mediaSession.isActive = false
     mediaSession.release()
 
@@ -837,14 +841,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   override fun play(fadeIn: Boolean) {
     Timber.v("play: $fadeIn")
-    audioFocus = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-      audioManager.requestAudioFocus(focusRequest!!)
-    else {
-      @Suppress("DEPRECATION")
-      audioManager.requestAudioFocus(audioFocusListener,
-          AudioManager.STREAM_MUSIC,
-          AudioManager.AUDIOFOCUS_GAIN)
-    }) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+    audioFocus = AudioManagerCompat.requestAudioFocus(
+        audioManager,
+        focusRequest
+    ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     if (!audioFocus) {
       return
     }
@@ -920,7 +920,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     playQueue.setPosition(position)
 
-    if (playQueue.song.url.isEmpty()) {
+    if (playQueue.song.data.isEmpty()) {
       ToastUtil.show(service, R.string.song_lose_effect)
       return
     }
@@ -1365,7 +1365,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentSong.album)
         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentSong.artist)
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentSong.artist)
-        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currentSong.displayName)
         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.getDuration())
         .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (playQueue.position + 1).toLong())
         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.title)
@@ -1413,27 +1412,23 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     tryLaunch(
         block = {
           Timber.v("准备播放: %s", song)
-          if (TextUtils.isEmpty(song.url)) {
+          if (TextUtils.isEmpty(song.data)) {
             ToastUtil.show(service, getString(R.string.path_empty))
             return@tryLaunch
           }
 
           val exist = withContext(Dispatchers.IO) {
-            File(song.url).exists()
+            File(song.data).exists()
           }
           if (!exist) {
             ToastUtil.show(service, getString(R.string.file_not_exist))
             return@tryLaunch
           }
           if (requestFocus) {
-            audioFocus = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-              audioManager.requestAudioFocus(focusRequest!!)
-            else {
-              @Suppress("DEPRECATION")
-              audioManager.requestAudioFocus(audioFocusListener,
-                  AudioManager.STREAM_MUSIC,
-                  AudioManager.AUDIOFOCUS_GAIN)
-            }) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+            audioFocus = AudioManagerCompat.requestAudioFocus(
+                audioManager,
+                focusRequest
+            ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
             if (!audioFocus) {
               ToastUtil.show(service, getString(R.string.cant_request_audio_focus))
               return@tryLaunch
@@ -1553,7 +1548,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     speed = java.lang.Float.parseFloat(SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
     playAtBreakPoint = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.PLAY_AT_BREAKPOINT, false)
     lastProgress = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_PLAY_PROGRESS, 0)
-    pendingClose = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.TIMER_PENDING_CLOSE, false)
 
     //读取播放列表
     playQueue.restoreIfNecessary()

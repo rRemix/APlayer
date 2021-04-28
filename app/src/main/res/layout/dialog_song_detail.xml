@@ -23,7 +23,8 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:textSize="@dimen/s16_size"
-      android:textColor="@color/detail_text_color"/>
+      android:textColor="@color/detail_text_color"
+      android:textIsSelectable="true"/>
   </LinearLayout>
 
   <LinearLayout
@@ -43,7 +44,8 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:textSize="@dimen/s16_size"
-      android:textColor="@color/detail_text_color"/>
+      android:textColor="@color/detail_text_color"
+      android:textIsSelectable="true"/>
   </LinearLayout>
 
   <LinearLayout
@@ -63,7 +65,8 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:textSize="@dimen/s16_size"
-      android:textColor="@color/detail_text_color"/>
+      android:textColor="@color/detail_text_color"
+      android:textIsSelectable="true"/>
   </LinearLayout>
 
   <LinearLayout
@@ -83,7 +86,8 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:textSize="@dimen/s16_size"
-      android:textColor="@color/detail_text_color"/>
+      android:textColor="@color/detail_text_color"
+      android:textIsSelectable="true"/>
   </LinearLayout>
 
   <LinearLayout
@@ -104,7 +108,7 @@
       android:layout_height="wrap_content"
       android:textSize="@dimen/s16_size"
       android:textColor="@color/detail_text_color"
-      tools:text="123123123123123"/>
+      android:textIsSelectable="true"/>
   </LinearLayout>
 
   <LinearLayout
@@ -124,7 +128,8 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:textSize="@dimen/s16_size"
-      android:textColor="@color/detail_text_color"/>
+      android:textColor="@color/detail_text_color"
+      android:textIsSelectable="true"/>
   </LinearLayout>
 
   <LinearLayout
@@ -145,7 +150,8 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:textSize="@dimen/s16_size"
-      android:textColor="@color/detail_text_color"/>
+      android:textColor="@color/detail_text_color"
+      android:textIsSelectable="true"/>
   </LinearLayout>
 
 </LinearLayout>

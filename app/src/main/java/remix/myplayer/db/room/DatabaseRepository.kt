@@ -1,9 +1,9 @@
 package remix.myplayer.db.room
 
-import androidx.sqlite.db.SimpleSQLiteQuery
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.google.gson.Gson
 import com.tencent.bugly.crashreport.CrashReport
 import io.reactivex.Completable
@@ -29,7 +29,7 @@ import kotlin.collections.LinkedHashSet
  */
 class DatabaseRepository private constructor() {
 
-  private val db = AppDatabase.getInstance(App.getContext().applicationContext)
+  private val db = AppDatabase.getInstance(App.context.applicationContext)
 
   private val executors = Executors.newSingleThreadExecutor()
 
@@ -397,9 +397,9 @@ class DatabaseRepository private constructor() {
         .flatMap {
           val sort = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME,
               SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,
-              SortOrder.PlayListSongSortOrder.SONG_A_Z)
+              SortOrder.SONG_A_Z)
           //强制或者设置了自定义排序
-          val actualSort = if (force || sort == SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)
+          val actualSort = if (force || sort == SortOrder.PLAYLIST_SONG_CUSTOM)
             CUSTOMSORT else sort
 
           return@flatMap getSongsWithSort(actualSort, it.audioIds.toList())
@@ -428,7 +428,7 @@ class DatabaseRepository private constructor() {
   private fun getSongsWithSort(sort: String, ids: List<Int>): Single<List<Song>> {
     return Single
         .fromCallable {
-          if(ids.isEmpty()){
+          if (ids.isEmpty()) {
             return@fromCallable Collections.emptyList<Song>()
           }
           val customSort = sort == CUSTOMSORT
@@ -475,6 +475,23 @@ class DatabaseRepository private constructor() {
 
   }
 
+  fun getHistorySongs(): Single<List<Song>> {
+    return Single
+        .fromCallable {
+          db.historyDao().selectAll()
+        }
+        .map {
+          val songs = ArrayList<Song>()
+          for (history in it) {
+            val song = MediaStoreUtil.getSongById(history.audio_id)
+            if (song != Song.EMPTY_SONG) {
+              songs.add(song)
+            }
+          }
+          songs
+        }
+  }
+
   /**
    * 获取本机的播放列表 播放列表名字-歌曲ID列表
    */
@@ -484,14 +501,14 @@ class DatabaseRepository private constructor() {
       var playlistCursor: Cursor? = null
       var songCursor: Cursor? = null
       try {
-        playlistCursor = App.getContext().contentResolver
+        playlistCursor = App.context.contentResolver
             .query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, null, null, null, null)
         if (playlistCursor == null || playlistCursor.count == 0) {
           return map
         }
         while (playlistCursor.moveToNext()) {
           val helperList = java.util.ArrayList<Int>()
-          songCursor = App.getContext().contentResolver.query(MediaStore.Audio.Playlists.Members
+          songCursor = App.context.contentResolver.query(MediaStore.Audio.Playlists.Members
               .getContentUri("external", playlistCursor
                   .getInt(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists.Members._ID)).toLong()), null, null, null, null)
           if (songCursor != null) {

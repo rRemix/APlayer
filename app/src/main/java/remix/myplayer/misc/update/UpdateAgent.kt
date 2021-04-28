@@ -10,7 +10,7 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.github.Release
 import remix.myplayer.request.network.HttpClient
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
@@ -88,7 +88,7 @@ object UpdateAgent {
   private fun getLocalVersionCode(): Int {
     var versionCode = 0
     try {
-      versionCode = App.getContext().packageManager.getPackageInfo(App.getContext().packageName, 0).versionCode
+      versionCode = App.context.packageManager.getPackageInfo(App.context.packageName, 0).versionCode
     } catch (e: PackageManager.NameNotFoundException) {
       Timber.v(e)
     }

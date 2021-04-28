@@ -27,7 +27,7 @@ import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRIC
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.adapter.DesktopLyricColorAdapter
-import remix.myplayer.ui.adapter.DesktopLyricColorAdapter.COLORS
+import remix.myplayer.ui.adapter.DesktopLyricColorAdapter.Companion.COLORS
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.MusicUtil.makeCmdIntent
 import remix.myplayer.util.SPUtil
@@ -105,7 +105,7 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
         .addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
           override fun onPreDraw(): Boolean {
             widget_color_recyclerview.viewTreeObserver.removeOnPreDrawListener(this)
-            colorAdapter.setOnItemClickListener(object : OnItemClickListener {
+            colorAdapter.onItemClickListener = object : OnItemClickListener {
               override fun onItemClick(view: View, position: Int) {
                 val color = ColorUtil.getColor(COLORS[position])
                 widget_line1.setTextColor(color)
@@ -117,7 +117,7 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
               override fun onItemLongClick(view: View, position: Int) {
 
               }
-            })
+            }
             widget_color_recyclerview.layoutManager = LinearLayoutManager(service, LinearLayoutManager.HORIZONTAL, false)
             widget_color_recyclerview.overScrollMode = View.OVER_SCROLL_NEVER
             widget_color_recyclerview.adapter = colorAdapter

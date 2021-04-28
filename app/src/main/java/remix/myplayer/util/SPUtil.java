@@ -160,6 +160,8 @@ public class SPUtil {
     String IMMERSIVE_MODE = "immersive_mode";
     //过滤大小
     String SCAN_SIZE = "scan_size";
+    //强制按拼音排序
+    String FORCE_SORT = "force_sort";
     //歌曲排序顺序
     String SONG_SORT_ORDER = "song_sort_order";
     //专辑排序顺序
@@ -203,7 +205,7 @@ public class SPUtil {
     //定时器时长
     String TIMER_DURATION = "timer_duration";
     //定时结束后等待当前歌曲播放完毕
-    String TIMER_PENDING_CLOSE = "timer_pending_close";
+    String TIMER_EXIT_AFTER_FINISH = "timer_exit_after_finish";
     //封面下载源
     String ALBUM_COVER_DOWNLOAD_SOURCE = "album_cover_download_source";
     //播放界面底部显示
@@ -214,8 +216,6 @@ public class SPUtil {
     String DELETE_SOURCE = "delete_source";
     //是否保存日志文件到sd卡
     String WRITE_LOG_TO_STORAGE = "write_log_to_storage";
-    //是否第一次显示多选
-    String FIRST_SHOW_MULTI = "first_show_multi";
     //列表歌曲名是否取代为文件夹名
     String SHOW_DISPLAYNAME = "show_displayname";
     //专辑列表的显示模式

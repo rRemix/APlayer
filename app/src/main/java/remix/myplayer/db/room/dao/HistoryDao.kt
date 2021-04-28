@@ -20,7 +20,7 @@ interface HistoryDao {
   fun insertHistory(history: History): Long
 
   @Query("""
-    SELECT * FROM History
+    SELECT * FROM History ORDER BY last_play DESC LIMIT 30
   """)
   fun selectAll(): List<History>
 

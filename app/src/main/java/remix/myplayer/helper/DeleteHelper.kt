@@ -2,7 +2,7 @@ package remix.myplayer.helper
 
 import io.reactivex.Single
 import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.MediaStoreUtil
 
 object DeleteHelper {

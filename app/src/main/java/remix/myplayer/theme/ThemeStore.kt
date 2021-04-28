@@ -32,14 +32,14 @@ object ThemeStore {
   val theme: String
     get() {
       val darkTheme = SPUtil.getValue(
-        App.getContext(),
+        App.context,
         SPUtil.SETTING_KEY.NAME,
         SPUtil.SETTING_KEY.DARK_THEME,
         FOLLOW_SYSTEM
       )
-      return if (darkTheme == ALWAYS_ON || (darkTheme == FOLLOW_SYSTEM && (App.getContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)) {
+      return if (darkTheme == ALWAYS_ON || (darkTheme == FOLLOW_SYSTEM && (App.context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)) {
         if (SPUtil.getValue(
-            App.getContext(),
+            App.context,
             SPUtil.SETTING_KEY.NAME,
             SPUtil.SETTING_KEY.BLACK_THEME,
             false
@@ -82,10 +82,10 @@ object ThemeStore {
   @get:ColorInt
   var materialPrimaryColor: Int
     get() = SPUtil.getValue(
-      App.getContext(), KEY_NAME, KEY_PRIMARY_COLOR, Color.parseColor("#698cf6")
+      App.context, KEY_NAME, KEY_PRIMARY_COLOR, Color.parseColor("#698cf6")
     )
     set(@ColorInt value) {
-      SPUtil.putValue(App.getContext(), KEY_NAME, KEY_PRIMARY_COLOR, value)
+      SPUtil.putValue(App.context, KEY_NAME, KEY_PRIMARY_COLOR, value)
     }
 
   @get:ColorInt
@@ -97,7 +97,7 @@ object ThemeStore {
   var accentColor: Int
     get() {
       var accentColor = SPUtil.getValue(
-        App.getContext(), KEY_NAME, KEY_ACCENT_COLOR, Color.parseColor("#698cf6")
+        App.context, KEY_NAME, KEY_ACCENT_COLOR, Color.parseColor("#698cf6")
       )
       if (ColorUtil.isColorCloseToWhite(accentColor)) {
         accentColor = ColorUtil.getColor(R.color.accent_gray_color)
@@ -105,7 +105,7 @@ object ThemeStore {
       return accentColor
     }
     set(value) {
-      SPUtil.putValue(App.getContext(), KEY_NAME, KEY_ACCENT_COLOR, value)
+      SPUtil.putValue(App.context, KEY_NAME, KEY_ACCENT_COLOR, value)
     }
 
   @JvmStatic
@@ -287,7 +287,7 @@ object ThemeStore {
   var floatLyricTextColor: Int
     get() {
       val temp = SPUtil.getValue(
-        App.getContext(), KEY_NAME, KEY_FLOAT_LYRIC_TEXT_COLOR, materialPrimaryColor
+        App.context, KEY_NAME, KEY_FLOAT_LYRIC_TEXT_COLOR, materialPrimaryColor
       )
       return if (ColorUtil.isColorCloseToWhite(temp)) {
         Color.parseColor("#F9F9F9")
@@ -296,7 +296,18 @@ object ThemeStore {
       }
     }
     set(value) {
-      SPUtil.putValue(App.getContext(), KEY_NAME, KEY_FLOAT_LYRIC_TEXT_COLOR, value)
+      SPUtil.putValue(App.context, KEY_NAME, KEY_FLOAT_LYRIC_TEXT_COLOR, value)
+    }
+
+  @get:ColorInt
+  val colorOnPrimary: Int
+    get() {
+      return ColorUtil.getColor(
+        if (isMDColorLight) {
+        R.color.design_dark_default_color_on_primary
+      } else {
+        R.color.design_default_color_on_primary
+      })
     }
 
   @JvmStatic

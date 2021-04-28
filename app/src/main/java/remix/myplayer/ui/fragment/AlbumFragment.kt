@@ -29,44 +29,43 @@ import remix.myplayer.util.SPUtil
 class AlbumFragment : LibraryFragment<Album, AlbumAdapter>() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = TAG
+    pageName = TAG
   }
 
   override val layoutID: Int = R.layout.fragment_album
 
   override fun initAdapter() {
-    mAdapter = AlbumAdapter(R.layout.item_album_recycle_grid, mChoice, recyclerView)
-    mAdapter?.setOnItemClickListener(object : OnItemClickListener {
+    adapter = AlbumAdapter(R.layout.item_album_recycle_grid, multiChoice, recyclerView)
+    adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val album = mAdapter?.datas?.get(position) ?: return
-        if (userVisibleHint && mChoice?.click(position, album) == false) {
-          ChildHolderActivity.start(mContext, Constants.ALBUM, album.albumID, album.album)
+        val album = adapter.dataList[position]
+        if (userVisibleHint && !multiChoice.click(position, album)) {
+          ChildHolderActivity.start(requireContext(), Constants.ALBUM, album.albumID.toString(), album.album)
         }
       }
 
       override fun onItemLongClick(view: View, position: Int) {
         if (userVisibleHint) {
-          mChoice?.longClick(position, mAdapter?.datas?.get(position))
+          multiChoice.longClick(position, adapter.dataList.get(position))
         }
       }
-    })
+    }
   }
 
   override fun initView() {
-    val mode = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ALBUM, HeaderAdapter.GRID_MODE)
+    val mode = SPUtil.getValue(requireContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ALBUM, HeaderAdapter.GRID_MODE)
     recyclerView.itemAnimator = DefaultItemAnimator()
-    recyclerView.layoutManager = if (mode == HeaderAdapter.LIST_MODE) LinearLayoutManager(mContext) else GridLayoutManager(mContext, spanCount)
-    recyclerView.adapter = mAdapter
+    recyclerView.layoutManager = if (mode == HeaderAdapter.LIST_MODE) LinearLayoutManager(requireContext()) else GridLayoutManager(requireContext(), spanCount)
+    recyclerView.adapter = adapter
     recyclerView.setHasFixedSize(true)
   }
 
-  override val adapter: AlbumAdapter? = mAdapter
 
   override fun loader(): Loader<List<Album>> {
-    return AsyncAlbumLoader(mContext)
+    return AsyncAlbumLoader(requireContext())
   }
 
-  override val loaderId: Int = LoaderIds.ALBUM_FRAGMENT
+  override val loaderId: Int = LoaderIds.FRAGMENT_ALBUM
 
   private class AsyncAlbumLoader(context: Context?) : WrappedAsyncTaskLoader<List<Album>>(context) {
     override fun loadInBackground(): List<Album> {

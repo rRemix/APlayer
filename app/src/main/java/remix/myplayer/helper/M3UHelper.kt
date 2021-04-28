@@ -11,7 +11,7 @@ import org.jetbrains.anko.collections.forEachWithIndex
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.theme.Theme
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.ToastUtil
@@ -84,7 +84,7 @@ object M3UHelper {
         .subscribe(
             {
               dialog.dismiss()
-              ToastUtil.show(context, App.getContext().getString(R.string.import_playlist_to_count, playlistName, it))
+              ToastUtil.show(context, App.context.getString(R.string.import_playlist_to_count, playlistName, it))
             },
             {
               dialog.dismiss()
@@ -141,7 +141,7 @@ object M3UHelper {
               bw.newLine()
               bw.write(ENTRY + song.getDuration() + DURATION_SEPARATOR + song.artist + " - " + song.title)
               bw.newLine()
-              bw.write(song.url)
+              bw.write(song.data)
             }
             bw.close()
             it.onComplete()

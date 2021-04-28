@@ -57,7 +57,7 @@ class UriFetcher {
 
     // 内置
     if (IGNORE_MEDIA_STORE) {
-      return Uri.parse(PREFIX_EMBEDDED + song.url)
+      return Uri.parse(PREFIX_EMBEDDED + song.data)
     } else if (ImageUriUtil.isAlbumThumbExistInMediaCache(song.artUri)) {
       return song.artUri
     }
@@ -106,10 +106,10 @@ class UriFetcher {
       INSTANCE ?: UriFetcher().also { INSTANCE = it }
     }
 
-    var IGNORE_MEDIA_STORE = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME,
+    var IGNORE_MEDIA_STORE = SPUtil.getValue(App.context, SPUtil.SETTING_KEY.NAME,
         SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE, false)
 
-    var DOWNLOAD_SOURCE = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME,
+    var DOWNLOAD_SOURCE = SPUtil.getValue(App.context, SPUtil.SETTING_KEY.NAME,
         SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, DOWNLOAD_LASTFM)
 
     const val PREFIX_EMBEDDED = "embedded://"

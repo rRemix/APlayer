@@ -11,8 +11,9 @@ import remix.myplayer.util.SPUtil
 
 
 class LyricPriorityAdapter(context: Context?, layoutId: Int) : BaseAdapter<LyricPriority, LyricPriorityAdapter.LyricPriorityHolder>(layoutId) {
+
   init {
-    mDatas = Gson().fromJson(SPUtil.getValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
+    val temp:ArrayList<LyricPriority> = Gson().fromJson(SPUtil.getValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
         object : TypeToken<List<LyricPriority>>() {}.type)
 
     val all = listOf(LyricPriority.KUGOU,
@@ -21,20 +22,26 @@ class LyricPriorityAdapter(context: Context?, layoutId: Int) : BaseAdapter<Lyric
         LyricPriority.LOCAL,
         LyricPriority.EMBEDED,
         LyricPriority.IGNORE)
-    if (mDatas.size < all.size) {
-      if (!mDatas.contains(LyricPriority.QQ)) {
-        mDatas.add(2,LyricPriority.QQ)
+    if (temp.size < all.size) {
+      if (!temp.contains(LyricPriority.QQ)) {
+        temp.add(2,LyricPriority.QQ)
       }
-      if (!mDatas.contains(LyricPriority.IGNORE)) {
-        mDatas.add(mDatas.size, LyricPriority.IGNORE)
+      if (!temp.contains(LyricPriority.IGNORE)) {
+        temp.add(temp.size, LyricPriority.IGNORE)
       }
 
     }
+
+    setDataList(temp)
   }
 
-  override fun convert(holder: LyricPriorityHolder?, d: LyricPriority?, position: Int) {
-    holder?.view?.item_title?.text = d?.desc
-    holder?.view?.setOnClickListener {
+  override fun convert(holder: LyricPriorityHolder, lyricPriority: LyricPriority?, position: Int) {
+    if(lyricPriority == null){
+      return
+    }
+
+    holder.view.item_title?.text = lyricPriority.desc
+    holder.view.setOnClickListener {
 
     }
   }

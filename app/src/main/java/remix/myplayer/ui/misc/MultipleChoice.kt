@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.text.TextUtils
 import android.view.View
-import androidx.recyclerview.widget.RecyclerView
+import android.widget.PopupMenu
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -19,17 +19,15 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.misc.getSongIds
-import remix.myplayer.request.network.RxUtil.applySingleScheduler
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
-import remix.myplayer.ui.activity.MainActivity
 import remix.myplayer.ui.adapter.*
 import remix.myplayer.ui.widget.MultiPopupWindow
-import remix.myplayer.ui.widget.TipPopupwindow
 import remix.myplayer.util.*
 import java.lang.ref.WeakReference
 
-class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListener {
+class MultipleChoice<T>(activity: Activity, val type: Int) {
   private val activityRef = WeakReference(activity)
   private val disposableContainer = CompositeDisposable()
 
@@ -43,7 +41,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
 
   //是否正在显示顶部菜单
   var isActive: Boolean = false
-  var adapter: RecyclerView.Adapter<*>? = null
+  var adapter: BaseAdapter<T, *>? = null
   private var popup: MultiPopupWindow? = null
   var extra: Long = 0
 
@@ -141,7 +139,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
     }
 
     val dialog = Theme.getLoadingDialog(context, context.getString(R.string.deleting)).build()
-    val checked = arrayOf(SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false))
+    val checked = arrayOf(SPUtil.getValue(App.context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false))
     getBaseDialog(context)
         .content(title)
         .positiveText(R.string.confirm)
@@ -303,6 +301,16 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
     disposableContainer.add(disposable)
   }
 
+  private fun selectAll() {
+    checkPos.clear()
+    checkParam.clear()
+    val datas = adapter!!.dataList
+    checkPos.addAll(0 until datas.size)
+    checkParam.addAll(datas)
+    updateTitle()
+    adapter?.notifyDataSetChanged()
+  }
+
   fun click(pos: Int, data: T?): Boolean {
     if (data == null) {
       return false
@@ -311,6 +319,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
       return false
     changeData(pos, data)
     closeIfNeed()
+    updateTitle()
     adapter?.notifyItemChanged(if (isLibraryAdapter()) pos + 1 else pos)
     return true
   }
@@ -327,11 +336,12 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
       open()
       isActive = true
       isActiveSomeWhere = true
-      Util.vibrate(App.getContext(), 100)
+      Util.vibrate(App.context, 100)
     }
 
     changeData(pos, data)
     closeIfNeed()
+    updateTitle()
     adapter?.notifyItemChanged(if (isLibraryAdapter()) pos + 1 else pos)
     return true
   }
@@ -345,6 +355,12 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
     if (checkPos.isEmpty()) {
       close()
     }
+  }
+
+  private fun updateTitle() {
+    val activity = activityRef.get() ?: return
+    popup?.binding?.multiTitle?.text =
+      activity.getString(R.string.song_list_select_title_format, checkPos.size)
   }
 
   private fun clearCheck() {
@@ -367,18 +383,23 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
   fun open() {
     val activity = activityRef.get() ?: return
     popup = MultiPopupWindow(activity)
-    popup?.show(View(activity))
-    if (SPUtil.getValue(activity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FIRST_SHOW_MULTI, true)) {
-      SPUtil.putValue(activity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.FIRST_SHOW_MULTI, false)
-      val tipPopup = TipPopupwindow(activity)
-      tipPopup.show(activity.window.decorView)
+    popup!!.binding.multiClose.setOnClickListener { close() }
+    popup!!.binding.multiPlaylist.setOnClickListener { addToPlayList() }
+    popup!!.binding.multiQueue.setOnClickListener { addToPlayQueue() }
+    popup!!.binding.multiDelete.setOnClickListener { delete() }
+    popup!!.binding.multiMore.setOnClickListener {
+      PopupMenu(activity, popup!!.binding.multiMore).run {
+        inflate(R.menu.menu_multi_select_more)
+        setOnMenuItemClickListener {
+          when (it.itemId) {
+            R.id.select_all -> selectAll()
+          }
+          true
+        }
+        show()
+      }
     }
-    //MainActivity显示分割线
-    popup?.contentView?.findViewById<View>(R.id.multi_divider)?.visibility = if (activity is MainActivity) View.VISIBLE else View.GONE
-    popup?.contentView?.findViewById<View>(R.id.multi_playqueue)?.setOnClickListener(this)
-    popup?.contentView?.findViewById<View>(R.id.multi_delete)?.setOnClickListener(this)
-    popup?.contentView?.findViewById<View>(R.id.multi_playlist)?.setOnClickListener(this)
-    popup?.contentView?.findViewById<View>(R.id.multi_close)?.setOnClickListener(this)
+    popup!!.show(View(activity))
   }
 
   fun close() {
@@ -392,23 +413,6 @@ class MultipleChoice<T>(activity: Activity, val type: Int) : View.OnClickListene
 
   fun isPositionCheck(pos: Int): Boolean {
     return checkPos.contains(pos)
-  }
-
-  override fun onClick(v: View?) {
-    when (v?.id) {
-      R.id.multi_playqueue -> {
-        addToPlayQueue()
-      }
-      R.id.multi_delete -> {
-        delete()
-      }
-      R.id.multi_playlist -> {
-        addToPlayList()
-      }
-      R.id.multi_close -> {
-        close()
-      }
-    }
   }
 
   override fun toString(): String {

@@ -9,9 +9,10 @@
   <string name="tab_folder">資料夾</string>
 
   <string name="drawer_song">音樂庫</string>
-  <string name="drawer_recently">最近新增</string>
+  <string name="drawer_recently_add">最近新增</string>
   <string name="drawer_folder">資料夾</string>
   <string name="drawer_setting">設定</string>
+  <string name="drawer_history">最近播放</string>
 
   <string name="from_aplayer">來自 APlayer 播放器</string>
   <string name="about">關於 APlayer</string>
@@ -46,6 +47,8 @@
   <string name="add_playlist_success">建立播放清單成功</string>
   <string name="add_playlist_error">建立播放清單失敗</string>
   <string name="playlist_already_exist">該播放清單已存在</string>
+  <string name="more">更多</string>
+  <string name="select_all">全選</string>
 
   <string name="add_error">新增失敗</string>
   <string name="add_to_playlist">新增到播放清單</string>
@@ -374,6 +377,8 @@
   <string name="speed_range_tip">輸入範圍為0.5-2</string>
   <string name="show_displayname">曲目清單顯示檔案名</string>
   <string name="show_displayname_tip">如果曲目清單出現亂碼可嘗試開啟該選項</string>
+  <string name="force_sort">強制排序</string>
+  <string name="force_sort_tip">強制將歌曲、專輯、歌手、播放列表按拼音排序\n可能使加載時間大幅延長</string>
   <string name="accent_color">強調色</string>
   <string name="accent_color_tip">選擇你喜歡的強調色</string>
   <string name="dark_theme">深色主題</string>
@@ -427,4 +432,6 @@
   <string name="now_playing_screen_theme">跟隨主題</string>
   <string name="now_playing_screen_cover">跟隨專輯封面</string>
   <string name="now_playing_screen_custom">自定義</string>
+
+  <string name="song_list_select_title_format">已選取 %1$,d</string>
 </resources>

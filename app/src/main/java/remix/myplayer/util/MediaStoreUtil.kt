@@ -1,7 +1,9 @@
 package remix.myplayer.util
 
-import android.annotation.SuppressLint
-import android.content.*
+import android.content.ContentUris
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.media.RingtoneManager
 import android.net.Uri
@@ -11,7 +13,6 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Audio
 import android.provider.MediaStore.Audio.AudioColumns
 import android.provider.Settings
-import android.text.TextUtils
 import androidx.annotation.WorkerThread
 import com.facebook.common.util.ByteConstants
 import org.jaudiotagger.audio.AudioFileIO
@@ -46,8 +47,11 @@ import java.util.*
 object MediaStoreUtil {
   private const val TAG = "MediaStoreUtil"
 
-  @SuppressLint("StaticFieldLeak")
-  private val mContext: Context = App.getContext()
+  private val context: Context
+    get() = App.context
+
+  private val forceSort: Boolean
+    get() = SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.FORCE_SORT, false)
 
   //扫描文件默认大小设置
   var SCAN_SIZE = 0
@@ -74,14 +78,19 @@ object MediaStoreUtil {
     }
     val artistMaps: MutableMap<Long, MutableList<Artist>> = LinkedHashMap()
     val artists: MutableList<Artist> = ArrayList()
+    val sortOrder = SPUtil.getValue(
+      context,
+      SETTING_KEY.NAME,
+      SETTING_KEY.ARTIST_SORT_ORDER,
+      SortOrder.ARTIST_A_Z
+    )
     try {
-      mContext.contentResolver
+      context.contentResolver
           .query(Audio.Media.EXTERNAL_CONTENT_URI, arrayOf(Audio.Media.ARTIST_ID,
               Audio.Media.ARTIST),
               baseSelection,
               baseSelectionArgs,
-              SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.ARTIST_SORT_ORDER,
-                  SortOrder.ArtistSortOrder.ARTIST_A_Z)).use { cursor ->
+              sortOrder).use { cursor ->
             if (cursor != null) {
               while (cursor.moveToNext()) {
                 try {
@@ -107,7 +116,11 @@ object MediaStoreUtil {
     } catch (e: Exception) {
       Timber.v("getAllArtist failed: $e")
     }
-    return artists
+    return if (forceSort) {
+      ItemsSorter.sortedArtists(artists, sortOrder)
+    } else {
+      artists
+    }
   }
 
   @JvmStatic
@@ -117,16 +130,21 @@ object MediaStoreUtil {
     }
     val albumMaps: MutableMap<Long, MutableList<Album>> = LinkedHashMap()
     val albums: MutableList<Album> = ArrayList()
+    val sortOrder = SPUtil.getValue(
+      context,
+      SETTING_KEY.NAME,
+      SETTING_KEY.ALBUM_SORT_ORDER,
+      SortOrder.ALBUM_A_Z
+    )
     try {
-      mContext.contentResolver
+      context.contentResolver
           .query(Audio.Media.EXTERNAL_CONTENT_URI, arrayOf(Audio.Media.ALBUM_ID,
               Audio.Media.ALBUM,
               Audio.Media.ARTIST_ID,
               Audio.Media.ARTIST),
               baseSelection,
               baseSelectionArgs,
-              SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.ALBUM_SORT_ORDER,
-                  SortOrder.AlbumSortOrder.ALBUM_A_Z)).use { cursor ->
+              sortOrder).use { cursor ->
             if (cursor != null) {
               while (cursor.moveToNext()) {
                 try {
@@ -156,15 +174,19 @@ object MediaStoreUtil {
     } catch (e: Exception) {
       Timber.v("getAllAlbum failed: $e")
     }
-    return albums
+    return if (forceSort) {
+      ItemsSorter.sortedAlbums(albums, sortOrder)
+    } else {
+      albums
+    }
   }
 
   @JvmStatic
   fun getAllSong(): List<Song> {
     return getSongs(null,
         null,
-        SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.SONG_SORT_ORDER,
-            SortOrder.SongSortOrder.SONG_A_Z))
+        SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.SONG_SORT_ORDER,
+            SortOrder.SONG_A_Z))
   }
 
   @JvmStatic
@@ -182,49 +204,30 @@ object MediaStoreUtil {
     get() = getSongIds(
         null,
         null,
-        SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.SONG_SORT_ORDER,
-            SortOrder.SongSortOrder.SONG_A_Z))
+        SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.SONG_SORT_ORDER,
+            SortOrder.SONG_A_Z))
 
   @JvmStatic
   fun getAllFolder(): List<Folder> {
-    val folders: MutableList<Folder> = ArrayList()
     if (!Util.hasStoragePermissions()) {
-      return folders
+      return Collections.emptyList()
     }
-    val folderMap: MutableMap<Int, MutableList<String>?> = LinkedHashMap()
-    val baseSelection = baseSelection
-    val selection = if (!TextUtils.isEmpty(baseSelection)) "$baseSelection and media_type = 2" else "media_type = 2"
-    try {
-      mContext.contentResolver
-          .query(MediaStore.Files.getContentUri("external"),
-              null, selection, baseSelectionArgs, null)
-          .use { cursor ->
-            if (cursor != null) {
-              while (cursor.moveToNext()) {
-                val data = cursor
-                    .getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA))
-                val parentId = cursor
-                    .getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.PARENT))
-                val parentPath = data.substring(0, data.lastIndexOf("/"))
-                if (!folderMap.containsKey(parentId)) {
-                  folderMap[parentId] = ArrayList(listOf(parentPath))
-                } else {
-                  folderMap[parentId]?.add(parentPath)
-                }
-              }
 
-              //转换
-              for ((key, value) in folderMap) {
-                val parentPath = value?.get(0) ?: ""
-                val folder = Folder(
-                    parentPath.substring(parentPath.lastIndexOf("/") + 1),
-                    folderMap[key]?.size ?: 0,
-                    parentPath,
-                    key.toLong())
-                folders.add(folder)
-              }
-            }
-          }
+    val songs = getSongs(null, null)
+    val folders: MutableList<Folder> = ArrayList()
+    val folderMap: MutableMap<String, MutableList<Song>> = LinkedHashMap()
+    try {
+      for (song in songs) {
+        val parentPath = song.data.substring(0, song.data.lastIndexOf("/"))
+        if (folderMap[parentPath] == null) {
+          folderMap[parentPath] = ArrayList()
+        }
+        folderMap[parentPath]?.add(song)
+      }
+
+      for ((path, songs) in folderMap) {
+        folders.add(Folder(path.substring(path.lastIndexOf("/") + 1), songs.size, path))
+      }
     } catch (e: Exception) {
       Timber.v(e)
     }
@@ -246,16 +249,16 @@ object MediaStoreUtil {
     if (type == Constants.ALBUM) {
       selection = Audio.Media.ALBUM_ID + "=?"
       selectionValues = arrayOf(id.toString() + "")
-      sortOrder = SPUtil.getValue(mContext, SETTING_KEY.NAME,
+      sortOrder = SPUtil.getValue(context, SETTING_KEY.NAME,
           SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,
-          SortOrder.ChildHolderSongSortOrder.SONG_A_Z)
+          SortOrder.SONG_A_Z)
     }
     if (type == Constants.ARTIST) {
       selection = Audio.Media.ARTIST_ID + "=?"
       selectionValues = arrayOf(id.toString() + "")
-      sortOrder = SPUtil.getValue(mContext, SETTING_KEY.NAME,
+      sortOrder = SPUtil.getValue(context, SETTING_KEY.NAME,
           SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,
-          SortOrder.ChildHolderSongSortOrder.SONG_A_Z)
+          SortOrder.SONG_A_Z)
     }
     return getSongs(selection, selectionValues, sortOrder)
   }
@@ -298,7 +301,7 @@ object MediaStoreUtil {
 
   fun getSongIdsByParentId(parentId: Long): List<Int> {
     val ids: MutableList<Int> = ArrayList()
-    mContext.contentResolver
+    context.contentResolver
         .query(MediaStore.Files.getContentUri("external"), arrayOf("_id"), "parent = $parentId", null, null).use { cursor ->
           if (cursor != null) {
             while (cursor.moveToNext()) {
@@ -307,6 +310,15 @@ object MediaStoreUtil {
           }
         }
     return ids
+  }
+
+  @JvmStatic
+  fun getSongsByParentPath(parentPath: String): List<Song> {
+    val songs = getSongs(null, null,
+        SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, SortOrder.SONG_A_Z))
+    return songs.filter { song ->
+      song.data.substring(0, song.data.lastIndexOf("/")) == parentPath
+    }
   }
 
   /**
@@ -323,9 +335,9 @@ object MediaStoreUtil {
     for (i in ids.indices) {
       selection.append(ids[i]).append(if (i == ids.size - 1) ") " else ",")
     }
-    return getSongs(selection.toString(), null, SPUtil.getValue(mContext, SETTING_KEY.NAME,
+    return getSongs(selection.toString(), null, SPUtil.getValue(context, SETTING_KEY.NAME,
         SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,
-        SortOrder.ChildHolderSongSortOrder.SONG_A_Z))
+        SortOrder.SONG_A_Z))
   }
 
   /**
@@ -382,7 +394,7 @@ object MediaStoreUtil {
   @Throws(TagException::class, ReadOnlyFileException::class, CannotReadException::class, InvalidAudioFrameException::class, IOException::class, CannotWriteException::class)
   fun saveArtwork(context: Context, albumId: Long, artFile: File) {
     val song = getSongByAlbumId(albumId)
-    val audioFile = AudioFileIO.read(File(song.url))
+    val audioFile = AudioFileIO.read(File(song.data))
     val tag = audioFile.tagOrCreateAndSetDefault
     val artwork = ArtworkFactory.createArtworkFromFile(artFile)
     tag.deleteArtworkField()
@@ -439,7 +451,7 @@ object MediaStoreUtil {
   @WorkerThread
   fun delete(songs: List<Song>?, deleteSource: Boolean): Int {
     //保存是否删除源文件
-    SPUtil.putValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.DELETE_SOURCE,
+    SPUtil.putValue(App.context, SETTING_KEY.NAME, SETTING_KEY.DELETE_SOURCE,
         deleteSource)
     if (songs == null || songs.isEmpty()) {
       return 0
@@ -447,12 +459,12 @@ object MediaStoreUtil {
 
     //删除之前保存的所有移除歌曲id
     val deleteId: MutableSet<String> = HashSet(
-        SPUtil.getStringSet(mContext, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST_SONG))
+        SPUtil.getStringSet(context, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST_SONG))
     //保存到sp
     for (temp in songs) {
       deleteId.add(temp.id.toString() + "")
     }
-    SPUtil.putStringSet(mContext, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST_SONG,
+    SPUtil.putStringSet(context, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST_SONG,
         deleteId)
     //从播放队列和全部歌曲移除
     deleteFromService(songs)
@@ -464,7 +476,7 @@ object MediaStoreUtil {
     }
 
     //刷新界面
-    mContext.contentResolver.notifyChange(Audio.Media.EXTERNAL_CONTENT_URI, null)
+    context.contentResolver.notifyChange(Audio.Media.EXTERNAL_CONTENT_URI, null)
     return songs.size
   }
 
@@ -476,9 +488,9 @@ object MediaStoreUtil {
       return
     }
     for (song in songs) {
-      mContext.contentResolver.delete(Audio.Media.EXTERNAL_CONTENT_URI,
+      context.contentResolver.delete(Audio.Media.EXTERNAL_CONTENT_URI,
           Audio.Media._ID + "=?", arrayOf(song.toString() + ""))
-      Util.deleteFileSafely(File(song.url))
+      Util.deleteFileSafely(File(song.data))
     }
   }
 
@@ -489,9 +501,9 @@ object MediaStoreUtil {
   val baseSelection: String
     get() {
       val deleteIds = SPUtil
-          .getStringSet(mContext, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST_SONG)
+          .getStringSet(context, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST_SONG)
       val blacklist = SPUtil
-          .getStringSet(mContext, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST)
+          .getStringSet(context, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST)
       val baseSelection = " _data != '' AND " + Audio.Media.SIZE + " > " + SCAN_SIZE
       if (deleteIds.isEmpty() && blacklist.isEmpty()) {
         return baseSelection
@@ -524,7 +536,7 @@ object MediaStoreUtil {
   val baseSelectionArgs: Array<String?>
     get() {
       val blacklist = SPUtil
-          .getStringSet(mContext, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST)
+          .getStringSet(context, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST)
       val selectionArgs = arrayOfNulls<String>(blacklist.size)
       val iterator: Iterator<String> = blacklist.iterator()
       var i = 0
@@ -559,7 +571,7 @@ object MediaStoreUtil {
       cv.put(Audio.Media.IS_ALARM, false)
       cv.put(Audio.Media.IS_MUSIC, true)
       // 把需要设为铃声的歌曲更新铃声库
-      if (mContext.contentResolver.update(Audio.Media.EXTERNAL_CONTENT_URI, cv,
+      if (this.context.contentResolver.update(Audio.Media.EXTERNAL_CONTENT_URI, cv,
               MediaStore.MediaColumns._ID + "=?", arrayOf(audioId.toString() + "")) > 0) {
         val newUri = ContentUris
             .withAppendedId(Audio.Media.EXTERNAL_CONTENT_URI, audioId.toLong())
@@ -573,12 +585,12 @@ object MediaStoreUtil {
       if (e is SecurityException) {
         ToastUtil.show(context, R.string.please_give_write_settings_permission)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-          if (!Settings.System.canWrite(mContext)) {
+          if (!Settings.System.canWrite(this.context)) {
             val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-            intent.data = Uri.parse("package:" + mContext.packageName)
+            intent.data = Uri.parse("package:" + this.context.packageName)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            if (Util.isIntentAvailable(mContext, intent)) {
-              mContext.startActivity(intent)
+            if (Util.isIntentAvailable(this.context, intent)) {
+              this.context.startActivity(intent)
             }
           }
         }
@@ -608,7 +620,7 @@ object MediaStoreUtil {
     }
 
     return try {
-      mContext.contentResolver.query(Audio.Media.EXTERNAL_CONTENT_URI,
+      context.contentResolver.query(Audio.Media.EXTERNAL_CONTENT_URI,
           BASE_PROJECTION, selection, newSelectionValues, sortOrder)
     } catch (e: SecurityException) {
       null
@@ -670,13 +682,17 @@ object MediaStoreUtil {
     } catch (e: Exception) {
       Timber.v(e)
     }
-    return songs
+    return if (forceSort) {
+      ItemsSorter.sortedSongs(songs, sortOrder)
+    } else {
+      songs
+    }
   }
 
   @JvmStatic
   fun getSongs(selection: String?, selectionValues: Array<String?>?): List<Song> {
     return getSongs(selection, selectionValues, SPUtil
-        .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.SONG_SORT_ORDER, null))
+        .getValue(context, SETTING_KEY.NAME, SETTING_KEY.SONG_SORT_ORDER, null))
   }
 
   /**
@@ -685,7 +701,7 @@ object MediaStoreUtil {
   val count: Int
     get() {
       try {
-        mContext.contentResolver
+        context.contentResolver
             .query(Audio.Media.EXTERNAL_CONTENT_URI, arrayOf(Audio.Media._ID), baseSelection,
                 baseSelectionArgs,
                 null).use { cursor ->
@@ -701,7 +717,7 @@ object MediaStoreUtil {
 
   init {
     SCAN_SIZE = SPUtil
-        .getValue(App.getContext(), SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE,
+        .getValue(App.context, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE,
             ByteConstants.MB)
   }
 }

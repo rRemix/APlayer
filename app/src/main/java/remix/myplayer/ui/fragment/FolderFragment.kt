@@ -29,45 +29,43 @@ class FolderFragment : LibraryFragment<Folder, FolderAdapter>() {
   override val layoutID = R.layout.fragment_folder
 
   override fun initAdapter() {
-    mAdapter = FolderAdapter(R.layout.item_folder_recycle, mChoice)
-    mAdapter?.setOnItemClickListener(object : OnItemClickListener {
+    adapter = FolderAdapter(R.layout.item_folder_recycle, multiChoice)
+    adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val folder = mAdapter?.datas?.get(position) ?: return
+        val folder = adapter.dataList[position]
         val path = folder.path
-        if (userVisibleHint && !TextUtils.isEmpty(path) && mChoice?.click(position, folder) == false) {
-          ChildHolderActivity.start(mContext, Constants.FOLDER, folder.parentId, path)
+        if (userVisibleHint && !TextUtils.isEmpty(path) && !multiChoice.click(position, folder)) {
+          ChildHolderActivity.start(requireContext(), Constants.FOLDER, folder.path, path)
         }
       }
 
       override fun onItemLongClick(view: View, position: Int) {
-        val folder = mAdapter?.datas?.get(position)
-        val path = mAdapter?.datas?.get(position)?.path
+        val folder = adapter.dataList[position]
+        val path = adapter.dataList[position].path
         if (userVisibleHint && !TextUtils.isEmpty(path)) {
-          mChoice?.longClick(position, folder)
+          multiChoice.longClick(position, folder)
         }
       }
-    })
+    }
   }
 
   override fun initView() {
     recyclerView.layoutManager = LinearLayoutManager(context)
     recyclerView.setHasFixedSize(true)
     recyclerView.itemAnimator = DefaultItemAnimator()
-    recyclerView.adapter = mAdapter
+    recyclerView.adapter = adapter
   }
 
   override fun loader(): Loader<List<Folder>> {
-    return AsyncFolderLoader(mContext)
+    return AsyncFolderLoader(requireContext())
   }
 
-  override val loaderId: Int = LoaderIds.FOLDER_FRAGMENT
+  override val loaderId: Int = LoaderIds.FRAGMENT_FOLDER
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = TAG
+    pageName = TAG
   }
-
-  override val adapter: FolderAdapter? = mAdapter
 
   private class AsyncFolderLoader(context: Context?) : WrappedAsyncTaskLoader<List<Folder>>(context) {
     override fun loadInBackground(): List<Folder> {

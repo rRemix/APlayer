@@ -33,7 +33,7 @@ import java.lang.ref.WeakReference
 class BottomActionBarFragment : BaseMusicFragment() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = BottomActionBarFragment::class.java.simpleName
+    pageName = BottomActionBarFragment::class.java.simpleName
   }
 
   @SuppressLint("ClickableViewAccessibility")
@@ -46,15 +46,15 @@ class BottomActionBarFragment : BaseMusicFragment() {
     super.onViewCreated(view, savedInstanceState)
 
     //设置整个背景着色
-    Theme.tintDrawable(view, R.drawable.commom_playercontrols_bg, ThemeStore.getBackgroundColorDialog(mContext))
+    Theme.tintDrawable(view, R.drawable.commom_playercontrols_bg, ThemeStore.getBackgroundColorDialog(requireContext()))
     Theme.tintDrawable(playbar_next, R.drawable.bf_btn_next, ThemeStore.bottomBarBtnColor)
 
     //手势检测
-    gestureDetector = GestureDetector(mContext, GestureListener(this))
+    gestureDetector = GestureDetector(requireContext(), GestureListener(this))
     bottom_action_bar.setOnTouchListener { v: View?, event: MotionEvent? -> gestureDetector.onTouchEvent(event) }
 
     //播放按钮
-    val listener = CtrlButtonListener(App.getContext())
+    val listener = CtrlButtonListener(App.context)
     playbar_play.setOnClickListener(listener)
     playbar_next.setOnClickListener(listener)
   }
@@ -117,7 +117,7 @@ class BottomActionBarFragment : BaseMusicFragment() {
     if (getCurrentSong().id < 0) {
       return
     }
-    val intent = Intent(mContext, PlayerActivity::class.java)
+    val intent = Intent(requireContext(), PlayerActivity::class.java)
     val bundle = Bundle()
     intent.putExtras(bundle)
     val activity: Activity? = activity
@@ -169,7 +169,7 @@ class BottomActionBarFragment : BaseMusicFragment() {
     }
 
     companion object {
-      private val Y_THRESHOLD = DensityUtil.dip2px(App.getContext(), 10f)
+      private val Y_THRESHOLD = DensityUtil.dip2px(App.context, 10f)
     }
 
   }

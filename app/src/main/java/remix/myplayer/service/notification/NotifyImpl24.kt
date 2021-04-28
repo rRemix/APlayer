@@ -75,7 +75,7 @@ class NotifyImpl24(context: MusicService) : Notify(context) {
             buildPendingIntent(service, if (desktopLyricLock) Command.UNLOCK_DESKTOP_LYRIC else Command.TOGGLE_DESKTOP_LYRIC))
         .setDeleteIntent(buildPendingIntent(service, Command.CLOSE_NOTIFY))
         .setContentIntent(contentIntent)
-        .setContentTitle(song.showName)
+        .setContentTitle(song.title)
         .setLargeIcon(bitmap)
         .setShowWhen(false)
         .setOngoing(service.isPlaying)
@@ -93,7 +93,7 @@ class NotifyImpl24(context: MusicService) : Notify(context) {
     val song = service.currentSong
     val builder = NotificationCompat.Builder(service, PLAYING_NOTIFICATION_CHANNEL_ID)
     builder.setContentText(song.artist + " - " + song.album)
-            .setContentTitle(song.showName)
+            .setContentTitle(song.title)
             .setShowWhen(false)
             .setTicker(lrc)
             .setOngoing(service.isPlaying)

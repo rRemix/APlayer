@@ -4,5 +4,6 @@
 *.iml
 /build
 .DS_Store
+*.hprof
 
 

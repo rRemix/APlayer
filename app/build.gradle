@@ -4,8 +4,10 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'bugly'
 
+def properties = getProperties('../local.properties')
+
 bugly {
-    appId = "${getProperty(getProperties('../local.properties'), 'BUGLY_APPID')}"
+    appId = "${getProperty(properties, 'BUGLY_APPID')}"
     appKey = "04ab39c8-86fc-4ed6-b28b-6fdfee6e19d9"
 }
 
@@ -15,12 +17,8 @@ repositories {
     }
 }
 
-ext {
-    supportLibVersion = '28.0.0'
-}
-
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 //    buildToolsVersion '28.0.3'
 
     defaultConfig {
@@ -28,8 +26,8 @@ android {
         minSdkVersion 17
         targetSdkVersion 29
 
-        versionCode 15721
-        versionName "1.5.7.2"
+        versionCode 15750
+        versionName "1.5.7.5"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
@@ -41,23 +39,24 @@ android {
         }
         multiDexEnabled true
 
-        buildConfigField("String", "LASTFM_API_KEY", "\"${getProperty(getProperties('../local.properties'), 'LASTFM_API_KEY')}\"")
-        buildConfigField("String", "GOOGLE_PLAY_LICENSE_KEY", "\"${getProperty(getProperties('../local.properties'), 'GOOGLE_PLAY_LICENSE_KEY')}\"")
-        buildConfigField("String", "BUGLY_APPID", "\"${getProperty(getProperties('../local.properties'), 'BUGLY_APPID')}\"")
-        buildConfigField("String", "GITHUB_SECRET_KEY", "\"${getProperty(getProperties('../local.properties'), 'GITHUB_SECRET_KEY')}\"")
+        buildConfigField("String", "LASTFM_API_KEY", "\"${getProperty(properties, 'LASTFM_API_KEY')}\"")
+        buildConfigField("String", "GOOGLE_PLAY_LICENSE_KEY", "\"${getProperty(properties, 'GOOGLE_PLAY_LICENSE_KEY')}\"")
+        buildConfigField("String", "BUGLY_APPID", "\"${getProperty(properties, 'BUGLY_APPID')}\"")
+        buildConfigField("String", "GITHUB_SECRET_KEY", "\"${getProperty(properties, 'GITHUB_SECRET_KEY')}\"")
     }
 
     signingConfigs {
         debug {
-            v1SigningEnabled true
-            v2SigningEnabled true
+            storeFile file("Debug.jks")
+            storePassword "123456"
+            keyAlias "Debug"
+            keyPassword "123456"
         }
         release {
-            def properties = getProperties('../local.properties')
-            keyAlias properties['keystore.keyAlias']
-            keyPassword properties['keystore.keyPassword']
-            storeFile file(properties['keystore.storeFile'])
-            storePassword properties['keystore.storePassword']
+            keyAlias getProperty(properties, 'keystore.keyAlias')
+            keyPassword getProperty(properties, 'keystore.keyPassword')
+            storeFile file(getProperty(properties, 'keystore.storeFile'))
+            storePassword getProperty(properties, 'keystore.storePassword')
 
             v1SigningEnabled true
             v2SigningEnabled true
@@ -66,7 +65,7 @@ android {
 
     buildTypes {
         debug {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
             debuggable true
             minifyEnabled false
 
@@ -87,7 +86,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             ndk {
-                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'
+                abiFilters 'armeabi-v7a', 'arm64-v8a'
             }
         }
 
@@ -125,17 +124,6 @@ android {
         abortOnError false
         disable 'MissingTranslation'
         disable 'InvalidPackage'
-    }
-
-    configurations.all {
-        resolutionStrategy.eachDependency {DependencyResolveDetails details ->
-            def requested = details.requested
-            if (requested.group == 'com.android.support') {
-                if (!requested.name.startsWith("multidex")) {
-                    details.useVersion "$supportLibVersion"
-                }
-            }
-        }
     }
 
     compileOptions {
@@ -195,7 +183,7 @@ dependencies {
 
     //kotlin
     implementation 'org.jetbrains.anko:anko-common:0.10.4'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     //leakCanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.0-beta-2'

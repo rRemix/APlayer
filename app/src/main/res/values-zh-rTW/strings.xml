@@ -4,14 +4,15 @@
 
   <string name="tab_song">歌曲</string>
   <string name="tab_album">專輯</string>
-  <string name="tab_artist">歌手</string>
+  <string name="tab_artist">演出者</string>
   <string name="tab_playlist">清單</string>
   <string name="tab_folder">資料夾</string>
 
   <string name="drawer_song">音樂庫</string>
-  <string name="drawer_recently">最近新增</string>
+  <string name="drawer_recently_add">最近新增</string>
   <string name="drawer_folder">資料夾</string>
   <string name="drawer_setting">設定</string>
+  <string name="drawer_history">最近播放</string>
 
   <string name="from_aplayer">來自 APlayer 播放器</string>
   <string name="about">關於 APlayer</string>
@@ -19,7 +20,7 @@
   <string name="model_repeat">單曲播放</string>
   <string name="model_normal">順序播放</string>
   <string name="unknown_song">未知曲目</string>
-  <string name="unknown_artist">未知藝術家</string>
+  <string name="unknown_artist">未知演出者</string>
   <string name="unknown_album">未知專輯</string>
   <string name="eq_initial_failed">等化器初始化失敗</string>
   <string name="use_eq">使用等化器</string>
@@ -46,12 +47,14 @@
   <string name="add_playlist_success">建立播放清單成功</string>
   <string name="add_playlist_error">建立播放清單失敗</string>
   <string name="playlist_already_exist">該播放清單已存在</string>
+  <string name="more">更多</string>
+  <string name="select_all">全選</string>
 
   <string name="add_error">新增失敗</string>
   <string name="add_to_playlist">新增到播放清單</string>
-  <string name="add_song_playlist_success">新增%1$d首曲目到%2$s</string>
+  <string name="add_song_playlist_success">新增%1$d首曲目至%2$s</string>
   <string name="delete_multi_song">移除%d首曲目</string>
-  <string name="add_song_playqueue_success">新增%d首曲目到播放佇列</string>
+  <string name="add_song_playqueue_success">新增%d首曲目至播放佇列</string>
   <string name="add_song_playlist_error">新增歌曲到播放清單失敗</string>
 
   <string name="load_playlist_error">載入播放清單失敗</string>
@@ -66,7 +69,7 @@
   <string name="cancel_success">取消成功</string>
   <string name="play_random">隨機播放全部(%d)</string>
   <string name="scan_tip">僅大於此設定數值的音訊檔案將出現在音樂庫中</string>
-  <string name="search_hint">搜尋曲目 藝術家 專輯</string>
+  <string name="search_hint">搜尋曲目 演出者 專輯</string>
   <string name="no_search_result">無搜尋結果</string>
   <string name="create_playlist">建立播放清單...</string>
   <string name="use_system_color">使用系統背景色</string>
@@ -76,7 +79,7 @@
   <string name="choose_song">選擇曲目</string>
   <string name="choose_no_song">未選擇任何曲目</string>
   <string name="set_album_cover_error">設定專輯封面失敗</string>
-  <string name="set_artist_cover_error">設定藝術家封面失敗</string>
+  <string name="set_artist_cover_error">設定演出者封面失敗</string>
   <string name="set_playlist_cover_error">設定播放清單封面失敗</string>
 
   <string name="new_folder">建立目錄</string>
@@ -110,12 +113,12 @@
   <string name="record_share">以海報分享</string>
   <string name="share">分享</string>
   <string name="timer">伴隨音樂入睡</string>
-  <string name="as_default">設定為預設</string>
+  <string name="as_default">作為預設</string>
   <string name="close">關閉</string>
-  <string name="timer_default_info_title">「定時停止」時間設定為預設</string>
-  <string name="timer_default_info_content">「定時停止」時間設定為預設後，下次點擊定時停止按鈕後，將直接按照之前設定好的時間開始計時。\n\n想要更改「定時停止」的時長，點擊兩次定時停止按鈕即可進入設定頁面。</string>
+  <string name="timer_default_info_title">「定時停止」時間作為預設</string>
+  <string name="timer_default_info_content">「定時停止」時間作為預設後，下次點擊定時停止按鈕後，將直接按照之前設定好的時間開始計時。\n\n想要更改「定時停止」的時長，點擊兩次定時停止按鈕即可進入設定頁面。</string>
   <string name="input_feedback_content">請填寫回報內容</string>
-  <string name="timer_pending_close">歌曲播放完畢再退出應用</string>
+  <string name="timer_pending_close">曲目播放完畢再退出應用程式</string>
   <string name="playing">正在播放</string>
   <string name="set_filter_size">設定排除檔案大小</string>
   <string name="delete">移除</string>
@@ -173,7 +176,7 @@
 
   <string name="choose_or_close_lockscreen">選擇螢幕保護程式或者關閉此功能</string>
   <string name="cant_play_this_sont">無法播放該曲目</string>
-  <string name="illegal_arg">參數錯誤</string>
+  <string name="illegal_arg">引數錯誤</string>
   <string name="song_count">%d首曲目</string>
   <string name="song_count_1">%d首</string>
   <string name="song_count_2">%1$s    %2$d首</string>
@@ -187,7 +190,7 @@
   <string name="setting">設定</string>
   <string name="reset">重置</string>
   <string name="submit">提交</string>
-  <string name="add_local_list">新增到本地播放清單</string>
+  <string name="add_local_list">新增至本地播放清單</string>
   <string name="new_list">新增播放清單...</string>
   <string name="song_path">曲目路徑:</string>
   <string name="song_name">曲目名:</string>
@@ -198,7 +201,7 @@
   <string name="sample_rate">採樣頻率:</string>
   <string name="please_input_song_name">請輸入曲目名</string>
   <string name="please_input_album">請曲目專輯</string>
-  <string name="please_input_artist">請輸入藝術家</string>
+  <string name="please_input_artist">請輸入演出者</string>
   <string name="please_input_year">請輸入年代</string>
   <string name="please_input_genre">請輸入流派</string>
   <string name="write_something">每當想起這首歌的時候</string>
@@ -213,7 +216,7 @@
   <string name="confirm_cancel_ignore_lrc">確認取消忽略歌詞?</string>
   <string name="ignore_lrc">忽略歌詞</string>
   <string name="cancel_ignore_lrc">取消忽略歌詞</string>
-  <string name="select_lrc">手動選擇</string>
+  <string name="select_lrc">手動選取</string>
   <string name="path_empty">播放路徑為空</string>
   <string name="file_not_exist">音樂檔案不存在</string>
   <string name="desktop_lyric_lock">浮動歌詞已鎖定</string>
@@ -253,7 +256,7 @@
   <string name="always">總是</string>
   <string name="never">從不</string>
   <string name="wifi_only">僅在 WiFi 下</string>
-  <string name="auto_download_album_artist_cover">自動下載專輯與藝術家封面</string>
+  <string name="auto_download_album_artist_cover">自動下載專輯與演出者封面</string>
   <string name="zero_size">0MB</string>
   <string name="library">資料庫</string>
   <string name="library_category">資料庫目錄</string>
@@ -263,7 +266,7 @@
   <string name="play">播放</string>
   <string name="add_to_play_queue">加入播放佇列</string>
   <string name="set_album_cover">設定專輯封面</string>
-  <string name="set_artist_cover">設定藝術家封面</string>
+  <string name="set_artist_cover">設定演出者封面</string>
   <string name="set_playlist_cover">設定播放清單封面</string>
   <string name="already_add_to_next_song">已新增至下一首播放</string>
   <string name="add_to_next_song">下一首播放</string>
@@ -282,8 +285,8 @@
   <string name="title_desc">標題降序</string>
   <string name="display_title">檔案名</string>
   <string name="display_title_desc">檔案名降序</string>
-  <string name="artist">藝術家</string>
-  <string name="artist_desc">藝術家降序</string>
+  <string name="artist">演出者</string>
+  <string name="artist_desc">演出者降序</string>
   <string name="date">新增時間</string>
   <string name="date_desc">新增時間降序</string>
   <string name="duration">時長</string>
@@ -337,7 +340,7 @@
   <string name="export_fail">匯出失敗:%s</string>
   <string name="export_success">匯出成功</string>
   <string name="cover_download_source">封面下載源</string>
-  <string name="cover_download_from_lastfm">從 Last FM 下載</string>
+  <string name="cover_download_from_lastfm">從 Last.FM 下載</string>
   <string name="cover_download_from_netease">從 Netease 下載</string>
   <string name="update_notification">更新通知</string>
   <string name="update_notification_description">更新通知用於展示下載進度</string>
@@ -366,15 +369,17 @@
   <string name="lyric_delay_x_second">延後%1$s秒</string>
   <string name="speed">播放速度</string>
   <string name="whether_change_theme">當前為夜間模式，是否切換主題顏色?</string>
-  <string name="embedded_lyric">內嵌</string>
+  <string name="embedded_lyric">曲目內嵌</string>
   <string name="default_lyric_priority">預設</string>
-  <string name="local">本地</string>
+  <string name="local">本地檔案</string>
   <string name="restore_songs">曲目恢復</string>
   <string name="restore_songs_tip">恢復從資料庫移除的曲目</string>
   <string name="alread_restore_songs">已經恢復被移除的曲目</string>
   <string name="speed_range_tip">輸入範圍為0.5-2</string>
   <string name="show_displayname">曲目清單顯示檔案名</string>
   <string name="show_displayname_tip">如果曲目清單出現亂碼可嘗試開啟該選項</string>
+  <string name="force_sort">強制拼音排序</string>
+  <string name="force_sort_tip">強制將曲目、專輯、演出者、播放清單按拼音排序\n可能使載入時間大幅度延長</string>
   <string name="accent_color">強調色</string>
   <string name="accent_color_tip">選擇你喜歡的強調色</string>
   <string name="dark_theme">深色主題</string>
@@ -428,4 +433,6 @@
   <string name="now_playing_screen_theme">跟隨主題</string>
   <string name="now_playing_screen_cover">跟隨專輯封面</string>
   <string name="now_playing_screen_custom">自訂</string>
+
+  <string name="song_list_select_title_format">已選取 %1$,d</string>
 </resources>

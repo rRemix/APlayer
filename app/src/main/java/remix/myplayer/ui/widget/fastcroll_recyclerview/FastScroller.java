@@ -23,15 +23,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import androidx.annotation.ColorInt;
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.recyclerview.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -42,6 +34,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import androidx.annotation.ColorInt;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import remix.myplayer.R;
 
 public class FastScroller extends LinearLayout {
@@ -373,7 +374,13 @@ public class FastScroller extends LinearLayout {
       mRecyclerView.getLayoutManager().scrollToPosition(targetPos);
 
       if (mSectionIndexer != null) {
-        mBubbleView.setText(mSectionIndexer.getSectionText(targetPos));
+        String sectionText = mSectionIndexer.getSectionText(targetPos);
+        if (TextUtils.isEmpty(sectionText)) {
+          mBubbleView.setVisibility(INVISIBLE);
+        } else {
+          mBubbleView.setVisibility(VISIBLE);
+          mBubbleView.setText(sectionText);
+        }
       }
     }
   }

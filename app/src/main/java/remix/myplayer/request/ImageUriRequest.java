@@ -212,7 +212,7 @@ public abstract class ImageUriRequest<T> {
 
           List<Song> songs = MediaStoreUtil.getSongs(selection, selectionValues);
           if (songs.size() > 0) {
-            imageUrl = PREFIX_EMBEDDED + songs.get(0).getUrl();
+            imageUrl = PREFIX_EMBEDDED + songs.get(0).getData();
 
           }
         } else {
@@ -255,7 +255,7 @@ public abstract class ImageUriRequest<T> {
         imageUrl = PREFIX_FILE + original.getAbsolutePath();
       } else {
         retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(song.getUrl());
+        retriever.setDataSource(song.getData());
         byte[] picture = retriever.getEmbeddedPicture();
         if (picture != null) {
           Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
@@ -468,7 +468,7 @@ public abstract class ImageUriRequest<T> {
       "album.png", "folder.png"};
 
   private File fallback(Song song) {
-    File parent = new File(song.getUrl()).getParentFile();
+    File parent = new File(song.getData()).getParentFile();
 
     File sameJPG = new File(parent, song.getArtist() + " - " + song.getTitle() + ".jpg");
     if (sameJPG.exists()) {

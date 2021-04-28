@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.fragment_cover_round.*
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.request.ImageUriRequest
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.ui.fragment.base.BaseMusicFragment
 import remix.myplayer.util.ImageUriUtil
 

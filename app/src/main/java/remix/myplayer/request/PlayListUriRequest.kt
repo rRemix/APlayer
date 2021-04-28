@@ -10,7 +10,7 @@ import io.reactivex.observers.DisposableObserver
 import remix.myplayer.App
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 
 /**
@@ -29,7 +29,7 @@ open class PlayListUriRequest(image: SimpleDraweeView, request: UriRequest, conf
         .getPlayList(request.id)
         .flatMap { playList ->
           DatabaseRepository.getInstance()
-              .getPlayListSongs(App.getContext(), playList, true)
+              .getPlayListSongs(App.context, playList, true)
         }
         .flatMapObservable(Function<List<Song>, ObservableSource<Song>> { songs ->
           Observable.create { emitter ->

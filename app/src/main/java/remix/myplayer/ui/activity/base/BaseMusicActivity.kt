@@ -1,31 +1,20 @@
 package remix.myplayer.ui.activity.base
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.*
-import android.net.Uri
 import android.os.*
-import android.text.TextUtils
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.soundcloud.android.crop.Crop
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import remix.myplayer.R
-import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.helper.MusicServiceRemote
-import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.service.MusicService
-import remix.myplayer.util.Constants
-import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import remix.myplayer.util.Util.registerLocalReceiver
 import remix.myplayer.util.Util.unregisterLocalReceiver
 import timber.log.Timber
-import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -131,7 +120,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
 
   override fun onPermissionChanged(has: Boolean) {
     Timber.tag(TAG).v("onPermissionChanged(), $has")
-    mHasPermission = has
+    hasPermission = has
     for (listener in serviceEventListeners) {
       listener.onPermissionChanged(has)
     }
@@ -201,8 +190,8 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
   private class MusicStateHandler(activity: BaseMusicActivity) : Handler() {
     private val ref: WeakReference<BaseMusicActivity> = WeakReference(activity)
 
-    override fun handleMessage(msg: Message?) {
-      val action = msg?.obj?.toString()
+    override fun handleMessage(msg: Message) {
+      val action = msg.obj?.toString()
       val activity = ref.get()
       if (action != null && activity != null) {
         when (action) {

@@ -12,13 +12,12 @@
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
   <uses-permission android:name="android.permission.VIBRATE"/>
   <uses-permission android:name="android.permission.WAKE_LOCK"/>
-  <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
-  <uses-permission android:name="android.permission.READ_LOGS"/>
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
   <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
-  <uses-permission android:name="android.hardware.sensor.accelerometer"/>
   <uses-permission android:name="com.android.vending.BILLING"/>
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+  <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false"/>
 
   <application
     android:allowBackup="true"
@@ -125,7 +124,7 @@
       android:name=".ui.activity.EQActivity"
       android:theme="@style/ActivityStyle"/>
     <activity
-      android:name=".ui.activity.SupportDevelopActivity"
+      android:name=".ui.activity.SupportActivity"
       android:theme="@style/ActivityStyle"/>
     <!-- 设置 -->
     <activity
@@ -148,7 +147,9 @@
       android:launchMode="singleInstance"
       android:name=".appshortcuts.AppShortcutActivity"
       android:theme="@style/AppShortcut"/>
-
+    <activity
+      android:name=".ui.activity.HistoryActivity"
+      android:theme="@style/ActivityStyle"/>
     <!-- 图片裁剪 -->
     <activity android:name="com.soundcloud.android.crop.CropImageActivity"/>
 

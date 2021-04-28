@@ -30,44 +30,42 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = TAG
+    pageName = TAG
   }
 
   override val layoutID: Int = R.layout.fragment_artist
 
   override fun initAdapter() {
-    mAdapter = ArtistAdapter(R.layout.item_artist_recycle_grid, mChoice, recyclerView)
-    mAdapter?.setOnItemClickListener(object : OnItemClickListener {
+    adapter = ArtistAdapter(R.layout.item_artist_recycle_grid, multiChoice, recyclerView)
+    adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
-        val artist = mAdapter?.datas?.get(position) ?: return
-        if (userVisibleHint && mChoice?.click(position, artist) == false) {
-          ChildHolderActivity.start(mContext, Constants.ARTIST, artist.artistID, artist.artist)
+        val artist = adapter.dataList[position]
+        if (userVisibleHint && !multiChoice.click(position, artist)) {
+          ChildHolderActivity.start(requireContext(), Constants.ARTIST, artist.artistID.toString(), artist.artist)
         }
       }
 
       override fun onItemLongClick(view: View, position: Int) {
         if (userVisibleHint) {
-          mChoice?.longClick(position, mAdapter?.datas?.get(position))
+          multiChoice.longClick(position, adapter.dataList.get(position))
         }
       }
-    })
+    }
   }
 
   override fun initView() {
-    val model = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ARTIST, HeaderAdapter.GRID_MODE)
-    recyclerView.layoutManager = if (model == HeaderAdapter.LIST_MODE) LinearLayoutManager(mContext) else GridLayoutManager(activity, spanCount)
+    val model = SPUtil.getValue(requireContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ARTIST, HeaderAdapter.GRID_MODE)
+    recyclerView.layoutManager = if (model == HeaderAdapter.LIST_MODE) LinearLayoutManager(requireContext()) else GridLayoutManager(activity, spanCount)
     recyclerView.itemAnimator = DefaultItemAnimator()
-    recyclerView.adapter = mAdapter
+    recyclerView.adapter = adapter
     recyclerView.setHasFixedSize(true)
   }
 
   override fun loader(): Loader<List<Artist>> {
-    return AsyncArtistLoader(mContext)
+    return AsyncArtistLoader(requireContext())
   }
 
-  override val loaderId: Int = LoaderIds.ARTIST_FRAGMENT
-
-  override val adapter: ArtistAdapter? = mAdapter
+  override val loaderId: Int = LoaderIds.FRAGMENT_ARTIST
 
   private class AsyncArtistLoader(context: Context?) : WrappedAsyncTaskLoader<List<Artist>>(context) {
     override fun loadInBackground(): List<Artist> {

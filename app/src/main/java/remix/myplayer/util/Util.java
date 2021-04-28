@@ -496,7 +496,7 @@ public class Util {
     try {
       Parcelable parcelable = FileProvider.getUriForFile(context,
           context.getPackageName() + ".fileprovider",
-          new File(song.getUrl()));
+          new File(song.getData()));
       return new Intent()
           .setAction(Intent.ACTION_SEND)
           .putExtra(Intent.EXTRA_STREAM,

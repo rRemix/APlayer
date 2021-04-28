@@ -9,9 +9,10 @@
   <string name="tab_folder">Folder</string>
 
   <string name="drawer_song">Library</string>
-  <string name="drawer_recently">Recently</string>
+  <string name="drawer_recently_add">Recently</string>
   <string name="drawer_folder">Folder</string>
   <string name="drawer_setting">Settings</string>
+  <string name="drawer_history">History</string>
 
   <string name="from_aplayer">From APlayer</string>
   <string name="about">About APlayer</string>
@@ -46,6 +47,8 @@
   <string name="add_playlist_success">Create playlist success</string>
   <string name="add_playlist_error">Create playlist failed</string>
   <string name="playlist_already_exist">The playlist already exists</string>
+  <string name="more">More</string>
+  <string name="select_all">Select all</string>
 
   <string name="add_error">Add failed</string>
   <string name="add_to_playlist">Add to playlist</string>
@@ -375,6 +378,8 @@
   <string name="speed_range_tip">The range is 0.5 to 2</string>
   <string name="show_displayname">Display filename</string>
   <string name="show_displayname_tip">Replace the title with the filename in the song list</string>
+  <string name="force_sort">Force sort</string>
+  <string name="force_sort_tip">Force sort songs, albums, artists and playlists by Pinyin\nMay make load time much longer</string>
   <string name="accent_color">Accent color</string>
   <string name="accent_color_tip">Allow yourself to choose colors that you love</string>
   <string name="dark_theme">Dark theme</string>
@@ -428,4 +433,6 @@
   <string name="now_playing_screen_theme">Follow theme</string>
   <string name="now_playing_screen_cover">Follow album cover</string>
   <string name="now_playing_screen_custom">Custom</string>
+
+  <string name="song_list_select_title_format">%1$,d selected</string>
 </resources>

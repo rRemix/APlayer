@@ -34,7 +34,7 @@ class CustomSortActivity : ToolbarActivity() {
     CustomSortAdapter(R.layout.item_custom_sort)
   }
   private val mdDialog: MaterialDialog by lazy {
-    Theme.getBaseDialog(mContext)
+    Theme.getBaseDialog(this)
         .title(R.string.saveing)
         .content(R.string.please_wait)
         .progress(true, 0)
@@ -61,17 +61,17 @@ class CustomSortActivity : ToolbarActivity() {
 
     setUpToolbar(playlistName)
 
-    adapter.setData(songs)
-    adapter.setOnItemClickListener(object : OnItemClickListener {
+    adapter.setDataList(songs)
+    adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemLongClick(view: View?, position: Int) {
-        Util.vibrate(mContext, 100)
+        Util.vibrate(this@CustomSortActivity, 100)
       }
 
       override fun onItemClick(view: View?, position: Int) {
 
       }
 
-    })
+    }
 
     ItemTouchHelper(object : ItemTouchHelper.Callback() {
       override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -80,7 +80,7 @@ class CustomSortActivity : ToolbarActivity() {
       }
 
       override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        Collections.swap(adapter.datas, if (viewHolder.adapterPosition >= 0) viewHolder.adapterPosition else 0,
+        Collections.swap(adapter.dataList, if (viewHolder.adapterPosition >= 0) viewHolder.adapterPosition else 0,
             if (target.adapterPosition >= 0) target.adapterPosition else 0)
         adapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
         return true
@@ -121,7 +121,7 @@ class CustomSortActivity : ToolbarActivity() {
           .blockingGet()
 
         uiThread {
-          ToastUtil.show(mContext, if (result > 0) R.string.save_success else R.string.save_error)
+          ToastUtil.show(this@CustomSortActivity, if (result > 0) R.string.save_success else R.string.save_error)
           mdDialog.dismiss()
           finish()
         }

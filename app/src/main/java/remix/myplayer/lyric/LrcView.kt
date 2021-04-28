@@ -133,7 +133,7 @@ class LrcView : View, ILrcView {
   /**
    * 错误提示文字
    */
-  private var text = App.getContext().getString(R.string.no_lrc)
+  private var text = App.context.getString(R.string.no_lrc)
 
   /**
    * 当前纵坐标
@@ -144,7 +144,7 @@ class LrcView : View, ILrcView {
    * 时间线的图标
    */
   private val timelineDrawable = Theme
-      .getDrawable(App.getContext(), R.drawable.icon_lyric_timeline)
+      .getDrawable(App.context, R.drawable.icon_lyric_timeline)
 
   /**
    * 初始状态时间线图标所在的位置
@@ -352,7 +352,7 @@ class LrcView : View, ILrcView {
           }
         }
         longPressRunnable = LongPressRunnable()
-        mHandler.postDelayed(longPressRunnable, ViewConfiguration.getLongPressTimeout().toLong())
+        mHandler.postDelayed(longPressRunnable!!, ViewConfiguration.getLongPressTimeout().toLong())
       }
       MotionEvent.ACTION_MOVE -> if (hasLrc()) {
         if (!canDrag) {
@@ -367,7 +367,7 @@ class LrcView : View, ILrcView {
         }
         if (canDrag) {
           timeLineWaiting = false
-          mHandler.removeCallbacks(longPressRunnable)
+          longPressRunnable?.let { mHandler.removeCallbacks(it) }
           val offset = event.rawY - lastY //偏移量
           if (scrollY - offset < 0) {
             if (offset > 0) {
@@ -392,13 +392,13 @@ class LrcView : View, ILrcView {
         }
         lastY = event.rawY
       } else {
-        mHandler.removeCallbacks(longPressRunnable)
+        longPressRunnable?.let { mHandler.removeCallbacks(it) }
       }
       MotionEvent.ACTION_UP -> if (!canDrag) {
         if (longPressRunnable == null && mOnLrcClickListener != null) {
           mOnLrcClickListener?.onClick()
         }
-        mHandler.removeCallbacks(longPressRunnable)
+        longPressRunnable?.let { mHandler.removeCallbacks(it) }
         longPressRunnable = null
       } else {
         //显示三秒TimeLine
@@ -415,7 +415,7 @@ class LrcView : View, ILrcView {
         invalidate()
       }
       MotionEvent.ACTION_CANCEL -> {
-        mHandler.removeCallbacks(longPressRunnable)
+        longPressRunnable?.let { mHandler.removeCallbacks(it) }
         longPressRunnable = null
       }
     }
@@ -596,7 +596,7 @@ class LrcView : View, ILrcView {
     curRow = 0
     totalRow = 0
     lrcRows = null
-    mHandler.removeCallbacks(longPressRunnable)
+    longPressRunnable?.let { mHandler.removeCallbacks(it) }
     mHandler.removeCallbacks(timeLineDisableRunnable)
     mHandler.post(timeLineDisableRunnable)
     scrollTo(scrollX, 0)
@@ -697,7 +697,7 @@ class LrcView : View, ILrcView {
     /**
      * 歌词间默认的行距
      */
-    val DEFAULT_PADDING = DensityUtil.dip2px(App.getContext(), 10f).toFloat()
+    val DEFAULT_PADDING = DensityUtil.dip2px(App.context, 10f).toFloat()
 
     /**
      * 跨行歌词之间额外的行距

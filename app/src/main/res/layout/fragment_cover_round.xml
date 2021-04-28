@@ -15,7 +15,8 @@
     android:layout_marginRight="16dp"
     android:layout_marginBottom="16dp"
     android:layout_marginTop="4dp"
-    app:cardElevation="8dp">
+    app:cardElevation="@dimen/d8_size"
+    app:cardCornerRadius="@dimen/d8_size">
     <com.facebook.drawee.view.SimpleDraweeView
       android:id="@+id/cover_image"
       android:visibility="visible"

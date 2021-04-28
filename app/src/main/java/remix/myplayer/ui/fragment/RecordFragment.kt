@@ -21,11 +21,11 @@ import remix.myplayer.ui.fragment.base.BaseMusicFragment
 class RecordFragment : BaseMusicFragment() {
   //  @BindView(R.id.edit_record)
 //  var mEdit: EditText? = null
-  private var mShareSuccess = false
+  private var shareSuccess = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mPageName = RecordFragment::class.java.simpleName
+    pageName = RecordFragment::class.java.simpleName
   }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -39,7 +39,7 @@ class RecordFragment : BaseMusicFragment() {
 //                ToastUtil.show(mContext,R.string.plz_input_sharecontent);
 //                return;
 //            }
-      val intent = Intent(mContext, RecordShareActivity::class.java)
+      val intent = Intent(requireContext(), RecordShareActivity::class.java)
       val arg = Bundle()
       arg.putString(RecordShareActivity.EXTRA_CONTENT, edit_record.text.toString())
       arg.putParcelable(RecordShareActivity.EXTRA_SONG, MusicServiceRemote.getCurrentSong())
@@ -51,7 +51,7 @@ class RecordFragment : BaseMusicFragment() {
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
     if (data != null && requestCode == REQUEST_SHARE && resultCode == Activity.RESULT_OK) {
-      mShareSuccess = data.getBooleanExtra("ShareSuccess", false)
+      shareSuccess = data.getBooleanExtra("ShareSuccess", false)
     }
   }
 

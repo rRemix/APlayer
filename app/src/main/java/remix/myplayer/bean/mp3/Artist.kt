@@ -6,7 +6,7 @@ package remix.myplayer.bean.mp3
 
 data class Artist(val artistID: Long,
                   val artist: String,
-                  var count: Int){
+                  var count: Int) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false

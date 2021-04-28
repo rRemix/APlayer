@@ -64,7 +64,7 @@ import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.misc.menu.AudioPopupListener
 import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
@@ -241,7 +241,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
 
     song = getCurrentSong()
     if (song == Song.EMPTY_SONG && intent.hasExtra(EXTRA_SONG)) {
-      song = intent.getParcelableExtra(EXTRA_SONG) as Song
+      song = intent.getParcelableExtra(EXTRA_SONG)!!
     }
 
     setUpBottom()
@@ -339,9 +339,9 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
           .show(supportFragmentManager, PlayQueueDialog::class.java.simpleName)
       R.id.top_hide -> onBackPressed()
       R.id.top_more -> {
-        @SuppressLint("RestrictedApi") val popupMenu = PopupMenu(mContext, v, Gravity.TOP)
+        @SuppressLint("RestrictedApi") val popupMenu = PopupMenu(this, v, Gravity.TOP)
         popupMenu.menuInflater.inflate(R.menu.menu_audio_item, popupMenu.menu)
-        popupMenu.setOnMenuItemClickListener(AudioPopupListener<PlayerActivity>(this, song))
+        popupMenu.setOnMenuItemClickListener(AudioPopupListener(this, song))
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
           popupMenu.menu.removeItem(R.id.menu_speed)
@@ -584,8 +584,8 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
       view_pager.adapter = adapter
       view_pager.offscreenPageLimit = adapter.count - 1
       view_pager.currentItem = 0
-      val thresholdY = DensityUtil.dip2px(mContext, 40f)
-      val thresholdX = DensityUtil.dip2px(mContext, 60f)
+      val thresholdY = DensityUtil.dip2px(this, 40f)
+      val thresholdX = DensityUtil.dip2px(this, 60f)
       //下滑关闭
       view_pager.setOnTouchListener { v: View?, event: MotionEvent ->
         if (view_pager.currentItem == 0) {
@@ -611,7 +611,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
           prevPosition = position
           //歌词界面常亮
           if (position == 1 && SPUtil
-                  .getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.SCREEN_ALWAYS_ON, false)) {
+                  .getValue(this@PlayerActivity, SETTING_KEY.NAME, SETTING_KEY.SCREEN_ALWAYS_ON, false)) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
           }
         }
@@ -627,7 +627,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     }
 
     //歌词界面常亮
-    if (SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.SCREEN_ALWAYS_ON,
+    if (SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SCREEN_ALWAYS_ON,
             false)) {
       window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
@@ -712,7 +712,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   //更新进度条线程
   private inner class ProgressThread : Thread() {
     override fun run() {
-      while (mIsForeground) {
+      while (isForeground) {
         try {
           //音量
           if (volume_seekbar.visibility == View.VISIBLE) {
@@ -744,7 +744,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
    * 初始化底部区域
    */
   private fun setUpBottom() {
-    bottomConfig = SPUtil.getValue(mContext, SETTING_KEY.NAME, SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN, BOTTOM_SHOW_BOTH)
+    bottomConfig = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN, BOTTOM_SHOW_BOTH)
     if (!this.isPortraitOrientation()) { //横屏不显示底部
       bottomConfig = BOTTOM_SHOW_NONE
     }
@@ -822,7 +822,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     setProgressDrawable(volume_seekbar, color)
 
     //修改thumb
-    val inset = DensityUtil.dip2px(mContext, 6f)
+    val inset = DensityUtil.dip2px(this, 6f)
     val width = DensityUtil.dip2px(this, 2f)
     val height = DensityUtil.dip2px(this, 6f)
     seekbar.thumb = InsetDrawable(
@@ -961,7 +961,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
 //                }
 //            }
 //        }
-    SPUtil.putValue(mContext, SPUtil.LYRIC_KEY.NAME, song.id.toString() + "",
+    SPUtil.putValue(this, SPUtil.LYRIC_KEY.NAME, song.id.toString() + "",
         SPUtil.LYRIC_KEY.LYRIC_MANUAL)
     lyricFragment.updateLrc(file.absolutePath)
     Util.sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))

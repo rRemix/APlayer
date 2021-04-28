@@ -28,7 +28,7 @@ data class Library(
   }
 
   fun getTitle(): String {
-    return App.getContext().getString(
+    return App.context.getString(
         when (mTag) {
           TAG_SONG -> R.string.tab_song
           TAG_ALBUM -> R.string.tab_album

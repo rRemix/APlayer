@@ -2,7 +2,6 @@ package remix.myplayer.request
 
 import android.graphics.drawable.Animatable
 import android.net.Uri
-import android.text.TextUtils
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.ControllerListener
 import com.facebook.drawee.view.SimpleDraweeView
@@ -11,7 +10,7 @@ import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableObserver
-import remix.myplayer.request.network.RxUtil
+import remix.myplayer.util.RxUtil
 import timber.log.Timber
 import java.lang.ref.WeakReference
 

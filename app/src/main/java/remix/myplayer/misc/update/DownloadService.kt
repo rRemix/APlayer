@@ -54,7 +54,7 @@ class DownloadService : IntentService("DownloadService") {
     }
 
     try {
-      val release: Release = intent.getParcelableExtra(EXTRA_RESPONSE) as Release
+      val release: Release = intent.getParcelableExtra(EXTRA_RESPONSE)!!
       val asset = release.assets ?: arrayListOf()
       val downloadUrl = asset[0].browser_download_url
       val downloadDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
@@ -78,7 +78,7 @@ class DownloadService : IntentService("DownloadService") {
       if (isForce(release)) {
         sendLocalBroadcast(Intent(ACTION_SHOW_DIALOG))
       }
-      HttpsURLConnection.setDefaultSSLSocketFactory(OkHttpHelper.getSSLSocketFactory())
+      HttpsURLConnection.setDefaultSSLSocketFactory(OkHttpHelper.sSLSocketFactory)
       val url = URL(downloadUrl)
 
       val conn = url.openConnection()

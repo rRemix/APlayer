@@ -38,7 +38,7 @@
 - [RxAndroid](https://github.com/ReactiveX/RxAndroid)
 - [Rxpermissions](https://github.com/tbruyelle/RxPermissions)
 - [Retrofit](https://github.com/square/retrofit)
-- [Butter Knife](https://github.com/JakeWharton/butterknife)
+- [Butter Knife](https://github.com/JakeWharton/butterknife) （已不使用）
 - [Timber](https://github.com/JakeWharton/timber)
 - [Leakcanary](https://github.com/square/leakcanary)
 - [Rebound](https://github.com/facebook/rebound)
