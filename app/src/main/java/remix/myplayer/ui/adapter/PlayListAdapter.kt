@@ -8,6 +8,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.facebook.drawee.view.SimpleDraweeView
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
@@ -29,6 +33,7 @@ import remix.myplayer.ui.adapter.holder.HeaderHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
 import remix.myplayer.util.Constants
+import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
@@ -73,13 +78,17 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
     holder.tvOther.text = context.getString(R.string.song_count, data.audioIds.size)
 
     //设置专辑封面
-//    val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
-//    object : PlayListUriRequest(holder.iv,
-//        UriRequest(data.id, URL_PLAYLIST, UriRequest.TYPE_NETEASE_SONG),
-//        RequestConfig.Builder(imageSize, imageSize).build()) {}.load()
+    val options = RequestOptions()
+        .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+        .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+
+    if (mode == GRID_MODE) {
+      options.transform(MultiTransformation(CenterCrop(), RoundedCorners(DensityUtil.dip2px(2f))))
+    }
+
     GlideApp.with(holder.itemView)
         .load(data)
-        .centerCrop()
+        .apply(options)
         .into(holder.iv)
 
     holder.container.setOnClickListener { v: View? ->
@@ -149,7 +158,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
       val binding = ItemPlaylistRecycleListBinding.bind(itemView)
       tvName = binding.itemText1
       tvOther = binding.itemText2
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       btn = binding.itemButton
       container = binding.itemContainer
     }

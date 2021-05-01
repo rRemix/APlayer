@@ -9,6 +9,10 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.facebook.drawee.view.SimpleDraweeView
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
@@ -27,11 +31,8 @@ import remix.myplayer.ui.adapter.holder.HeaderHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
-import remix.myplayer.util.Constants
-import remix.myplayer.util.ImageUriUtil
-import remix.myplayer.util.SPUtil
+import remix.myplayer.util.*
 import remix.myplayer.util.SPUtil.SETTING_KEY
-import remix.myplayer.util.ToastUtil
 import java.util.*
 
 /**
@@ -80,11 +81,17 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
       }
     }
     //设置封面
-//    val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
-//    holder.iv.tag = setImage(holder.iv, ImageUriUtil.getSearchRequest(artist), imageSize, position)
+    val options = RequestOptions()
+        .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_artist))
+        .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_artist))
+
+    if (mode == GRID_MODE) {
+      options.transform(MultiTransformation(CenterCrop(), RoundedCorners(DensityUtil.dip2px(2f))))
+    }
+
     GlideApp.with(holder.itemView)
         .load(artist)
-        .centerCrop()
+        .apply(options)
         .into(holder.iv)
 
     holder.container.setOnClickListener { v: View? ->
@@ -157,7 +164,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
     init {
       tv1 = binding.itemText1
       tv2 = binding.itemText2
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       btn = binding.itemButton
       container = binding.itemContainer
     }

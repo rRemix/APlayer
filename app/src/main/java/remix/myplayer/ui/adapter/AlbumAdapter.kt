@@ -10,6 +10,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
 import remix.myplayer.R
@@ -19,7 +23,6 @@ import remix.myplayer.databinding.ItemAlbumRecycleListBinding
 import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
-import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.getBackgroundColorMain
 import remix.myplayer.theme.ThemeStore.libraryBtnColor
@@ -28,10 +31,12 @@ import remix.myplayer.ui.adapter.holder.HeaderHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
 import remix.myplayer.util.Constants
+import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
 import java.util.*
+
 
 /**
  * Created by Remix on 2015/12/20.
@@ -71,11 +76,18 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
 
     //设置封面
     val albumId = album.albumID
-    val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
-//    holder.iv.tag = setImage(holder.iv, ImageUriUtil.getSearchRequest(album), imageSize, position)
+
+    val options = RequestOptions()
+        .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+        .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+
+    if (mode == GRID_MODE) {
+      options.transform(MultiTransformation(CenterCrop(), RoundedCorners(DensityUtil.dip2px(2f))))
+    }
+
     GlideApp.with(holder.itemView)
         .load(album)
-        .centerCrop()
+        .apply(options)
         .into(holder.iv)
 
     if (holder is AlbumListHolder) {
@@ -171,7 +183,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
       tv1 = binding.itemText1
       tv2 = binding.itemText2
       btn = binding.itemButton
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       container = binding.itemContainer
     }
   }

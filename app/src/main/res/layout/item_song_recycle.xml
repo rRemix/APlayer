@@ -17,29 +17,11 @@
     app:layout_constraintLeft_toLeftOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
 
-  <!--  <com.facebook.drawee.view.SimpleDraweeView-->
-  <!--    android:id="@+id/song_head_image"-->
-  <!--    android:layout_width="@dimen/d40_size"-->
-  <!--    android:layout_height="@dimen/d40_size"-->
-  <!--    android:layout_marginStart="16dp"-->
-  <!--    android:visibility="visible"-->
-  <!--    app:actualImageScaleType="centerCrop"-->
-  <!--    app:fadeDuration="@integer/FadeDuration"-->
-  <!--    app:failureImage="?attr/default_album"-->
-  <!--    app:failureImageScaleType="centerCrop"-->
-  <!--    app:layout_constraintBottom_toBottomOf="parent"-->
-  <!--    app:layout_constraintRight_toLeftOf="@id/song_title"-->
-  <!--    app:layout_constraintStart_toStartOf="parent"-->
-  <!--    app:layout_constraintTop_toTopOf="parent"-->
-  <!--    app:placeholderImage="?attr/default_album"-->
-  <!--    app:placeholderImageScaleType="centerCrop"-->
-  <!--    app:roundAsCircle="true"/>-->
-  <ImageView
+  <remix.myplayer.ui.widget.CircleImageView
     android:id="@+id/iv"
     android:layout_width="@dimen/d40_size"
     android:layout_height="@dimen/d40_size"
     android:layout_marginStart="@dimen/d16_size"
-    android:scaleType="centerCrop"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintRight_toLeftOf="@id/song_title"
     app:layout_constraintStart_toStartOf="parent"

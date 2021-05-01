@@ -19,7 +19,6 @@ import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.SongPopupListener
-import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.service.Command
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.accentColor
@@ -29,7 +28,6 @@ import remix.myplayer.theme.ThemeStore.textColorPrimary
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
-import remix.myplayer.util.ImageUriUtil
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
@@ -88,10 +86,10 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
     }
 
     //封面
-//    holder.binding.songHeadImage.tag = setImage(holder.binding.songHeadImage, ImageUriUtil.getSearchRequestWithAlbumType(song), ImageUriRequest.SMALL_IMAGE_SIZE, position)
     GlideApp.with(holder.itemView)
         .load(song)
-        .circleCrop()
+        .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+        .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
         .into(holder.binding.iv)
 
 //        //是否为无损
@@ -152,10 +150,10 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
     if (position in 1..dataList.size) {
       val data = dataList[position - 1]
       val key = when (SPUtil.getValue(
-        App.context,
-        SPUtil.SETTING_KEY.NAME,
-        SPUtil.SETTING_KEY.SONG_SORT_ORDER,
-        SortOrder.SONG_A_Z
+          App.context,
+          SPUtil.SETTING_KEY.NAME,
+          SPUtil.SETTING_KEY.SONG_SORT_ORDER,
+          SortOrder.SONG_A_Z
       )) {
         SortOrder.SONG_A_Z, SortOrder.SONG_Z_A -> data.title
         SortOrder.ARTIST_A_Z, SortOrder.ARTIST_Z_A -> data.artist

@@ -147,21 +147,21 @@ abstract class HeaderAdapter<Data, ViewHolder : RecyclerView.ViewHolder> (
 
   fun disposeLoad(holder: RecyclerView.ViewHolder) {
     //
-    val parent = if (holder.itemView is ViewGroup) holder.itemView as ViewGroup else null
-    if (parent != null) {
-      for (i in 0 until parent.childCount) {
-        val childView = parent.getChildAt(i)
-        if (childView is SimpleDraweeView) {
-          val tag = childView.getTag()
-          if (tag is Disposable) {
-            if (!tag.isDisposed) {
-              tag.dispose()
-            }
-            childView.setTag(null)
-          }
-        }
-      }
-    }
+//    val parent = if (holder.itemView is ViewGroup) holder.itemView as ViewGroup else null
+//    if (parent != null) {
+//      for (i in 0 until parent.childCount) {
+//        val childView = parent.getChildAt(i)
+//        if (childView is SimpleDraweeView) {
+//          val tag = childView.getTag()
+//          if (tag is Disposable) {
+//            if (!tag.isDisposed) {
+//              tag.dispose()
+//            }
+//            childView.setTag(null)
+//          }
+//        }
+//      }
+//    }
   }
 
   companion object {

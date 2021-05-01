@@ -95,10 +95,10 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
       holder.binding.songButton.visibility = View.VISIBLE
 
       //封面
-//      holder.binding.songHeadImage.tag = setImage(holder.binding.songHeadImage, ImageUriUtil.getSearchRequestWithAlbumType(data), ImageUriRequest.SMALL_IMAGE_SIZE, position)
       GlideApp.with(holder.itemView)
           .load(data)
-          .circleCrop()
+          .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+          .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
           .into(holder.binding.iv)
 
       //高亮
