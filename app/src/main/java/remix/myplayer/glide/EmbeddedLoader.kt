@@ -6,7 +6,7 @@ import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.signature.ObjectKey
-import remix.myplayer.glide.UriFetcher.Companion.SCHEME_EMBEDDED
+import remix.myplayer.glide.UriFetcher.SCHEME_EMBEDDED
 import java.io.InputStream
 
 /**

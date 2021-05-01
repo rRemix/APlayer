@@ -3,6 +3,7 @@ package remix.myplayer.db.room.model
 import androidx.room.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import remix.myplayer.bean.mp3.APlayerModel
 
 /**
  * Created by remix on 2019/1/12
@@ -16,7 +17,7 @@ data class PlayList(
 //    val count: Int,
     val audioIds: LinkedHashSet<Int>,
     val date: Long
-) {
+) : APlayerModel {
 
   class Converter {
     @TypeConverter

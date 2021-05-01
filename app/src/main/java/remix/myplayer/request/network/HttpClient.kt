@@ -5,6 +5,9 @@ import io.reactivex.Single
 import okhttp3.ResponseBody
 import remix.myplayer.bean.github.Release
 import remix.myplayer.bean.lastfm.LastFmAlbum
+import remix.myplayer.bean.lastfm.LastFmArtist
+import remix.myplayer.bean.netease.NAlbumSearchResponse
+import remix.myplayer.bean.netease.NArtistSearchResponse
 import remix.myplayer.bean.netease.NSongSearchResponse
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -117,14 +120,27 @@ class HttpClient private constructor() {
     return githubApi.getLatestRelease(owner, repo)
   }
 
-  //TODO New Api
+  //New Api
   fun searchLastFMAlbum(albumName: String?, artistName: String?, lang: String?): Single<LastFmAlbum> {
     return lastfmApi.searchLastFMAlbum(albumName, artistName, lang)
+  }
+
+  fun searchLastFMArtist(artistName: String?, language: String?): Single<LastFmArtist> {
+    return lastfmApi.searchLastFMArtist(artistName, language)
   }
 
   fun searchNeteaseSong(key: String?, offset: Int, limit: Int): Single<NSongSearchResponse> {
     return neteaseApi.searchNeteaseSong(key, offset, limit, 1)
   }
+
+  fun searchNeteaseAlbum(key: String?, offset: Int, limit: Int): Single<NAlbumSearchResponse> {
+    return neteaseApi.searchNeteaseAlbum(key, offset, limit, 10)
+  }
+
+  fun searchNeteaseArtist(key: String?, offset: Int, limit: Int): Single<NArtistSearchResponse> {
+    return neteaseApi.searchNeteaseArtist(key, offset, limit, 100)
+  }
+
 
   private object SingletonHolder {
     val instance = HttpClient()

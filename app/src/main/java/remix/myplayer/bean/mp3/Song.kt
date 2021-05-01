@@ -32,7 +32,7 @@ data class Song(
     val size: Long,
     val year: String?,
     val titleKey: String?,
-    val addTime: Long) : Parcelable {
+    val addTime: Long) : Parcelable, APlayerModel {
 
   val contentUri: Uri
     get() = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toLong())

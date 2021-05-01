@@ -6,6 +6,9 @@ import okhttp3.ResponseBody
 import remix.myplayer.BuildConfig
 import remix.myplayer.bean.github.Release
 import remix.myplayer.bean.lastfm.LastFmAlbum
+import remix.myplayer.bean.lastfm.LastFmArtist
+import remix.myplayer.bean.netease.NAlbumSearchResponse
+import remix.myplayer.bean.netease.NArtistSearchResponse
 import remix.myplayer.bean.netease.NSongSearchResponse
 import retrofit2.http.*
 
@@ -58,16 +61,29 @@ interface ApiService {
   @Headers("token: " + BuildConfig.GITHUB_SECRET_KEY)
   fun getLatestRelease(@Path("owner") owner: String?, @Path("repo") repo: String?): Single<Release>
 
-  //TODO New Api
+  //New Api
   @GET("$BASE_QUERY_PARAMETERS&method=album.getinfo")
   fun searchLastFMAlbum(@Query("album") albumName: String?,
                         @Query("artist") artistName: String?, @Query("lang") language: String?): Single<LastFmAlbum>
+
+  @GET("$BASE_QUERY_PARAMETERS&method=artist.getinfo")
+  fun searchLastFMArtist(@Query("artist") artistName: String?,
+                    @Query("lang") language: String?): Single<LastFmArtist>
 
   @POST("search/pc")
   @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
   fun searchNeteaseSong(@Query("s") key: String?, @Query("offset") offset: Int,
                         @Query("limit") limit: Int, @Query("type") type: Int): Single<NSongSearchResponse>
 
+  @POST("search/pc")
+  @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
+  fun searchNeteaseAlbum(@Query("s") key: String?, @Query("offset") offset: Int,
+                        @Query("limit") limit: Int, @Query("type") type: Int): Single<NAlbumSearchResponse>
+
+  @POST("search/pc")
+  @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
+  fun searchNeteaseArtist(@Query("s") key: String?, @Query("offset") offset: Int,
+                          @Query("limit") limit: Int, @Query("type") type: Int): Single<NArtistSearchResponse>
 
   companion object {
     const val BASE_QUERY_PARAMETERS = "?format=json&autocorrect=1&api_key=" + BuildConfig.LASTFM_API_KEY

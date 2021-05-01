@@ -272,6 +272,12 @@ public class ImageUriUtil {
     if (model instanceof Song) {
       final Song song = (Song) model;
       return getNeteaseSearchKey(song.getTitle(), song.getAlbum(), song.getArtist(), true);
+    } else if (model instanceof Album) {
+      final Album album = (Album) model;
+      return getNeteaseSearchKey("", album.getAlbum(), album.getArtist(), true);
+    } else if (model instanceof Artist) {
+      final Artist artist = (Artist) model;
+      return getNeteaseSearchKey("", "", artist.getArtist(), false);
     }
 
     return "";

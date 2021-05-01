@@ -10,13 +10,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.view.SimpleDraweeView
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.databinding.ItemAlbumRecycleGridBinding
 import remix.myplayer.databinding.ItemAlbumRecycleListBinding
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
 import remix.myplayer.request.ImageUriRequest
@@ -28,7 +28,6 @@ import remix.myplayer.ui.adapter.holder.HeaderHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
 import remix.myplayer.util.Constants
-import remix.myplayer.util.ImageUriUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
@@ -73,7 +72,12 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     //设置封面
     val albumId = album.albumID
     val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
-    holder.iv.tag = setImage(holder.iv, ImageUriUtil.getSearchRequest(album), imageSize, position)
+//    holder.iv.tag = setImage(holder.iv, ImageUriUtil.getSearchRequest(album), imageSize, position)
+    GlideApp.with(holder.itemView)
+        .load(album)
+        .centerCrop()
+        .into(holder.iv)
+
     if (holder is AlbumListHolder) {
       holder.tv2.text = App.context.getString(R.string.song_count_2, album.artist, album.count)
     } else {
@@ -127,10 +131,10 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     if (position in 1..dataList.size) {
       val data = dataList[position - 1]
       val key = when (SPUtil.getValue(
-        App.context,
-        SETTING_KEY.NAME,
-        SETTING_KEY.ALBUM_SORT_ORDER,
-        SortOrder.ALBUM_A_Z
+          App.context,
+          SETTING_KEY.NAME,
+          SETTING_KEY.ALBUM_SORT_ORDER,
+          SortOrder.ALBUM_A_Z
       )) {
         SortOrder.ALBUM_A_Z, SortOrder.ALBUM_Z_A -> data.album
         SortOrder.ARTIST_A_Z, SortOrder.ARTIST_Z_A -> data.artist
@@ -147,7 +151,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     lateinit var tv1: TextView
     lateinit var tv2: TextView
     lateinit var btn: ImageButton
-    lateinit var iv: SimpleDraweeView
+    lateinit var iv: ImageView
     lateinit var container: ViewGroup
   }
 
@@ -157,7 +161,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
       tv1 = binding.itemText1
       tv2 = binding.itemText2
       btn = binding.itemButton
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       container = binding.itemContainer
     }
   }

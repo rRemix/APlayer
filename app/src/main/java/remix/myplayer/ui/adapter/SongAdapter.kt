@@ -14,6 +14,7 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemSongRecycleBinding
 import remix.myplayer.databinding.LayoutHeader1Binding
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.helper.SortOrder
@@ -87,7 +88,11 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
     }
 
     //封面
-    holder.binding.songHeadImage.tag = setImage(holder.binding.songHeadImage, ImageUriUtil.getSearchRequestWithAlbumType(song), ImageUriRequest.SMALL_IMAGE_SIZE, position)
+//    holder.binding.songHeadImage.tag = setImage(holder.binding.songHeadImage, ImageUriUtil.getSearchRequestWithAlbumType(song), ImageUriRequest.SMALL_IMAGE_SIZE, position)
+    GlideApp.with(holder.itemView)
+        .load(song)
+        .circleCrop()
+        .into(holder.binding.iv)
 
 //        //是否为无损
 //        if(!TextUtils.isEmpty(song.getDisplayName())){

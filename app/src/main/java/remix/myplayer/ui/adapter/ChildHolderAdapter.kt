@@ -13,11 +13,11 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemSongRecycleBinding
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.SongPopupListener
-import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.service.Command
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.accentColor
@@ -28,7 +28,6 @@ import remix.myplayer.ui.adapter.holder.BaseViewHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
 import remix.myplayer.util.Constants
-import remix.myplayer.util.ImageUriUtil
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
@@ -96,7 +95,11 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
       holder.binding.songButton.visibility = View.VISIBLE
 
       //封面
-      holder.binding.songHeadImage.tag = setImage(holder.binding.songHeadImage, ImageUriUtil.getSearchRequestWithAlbumType(data), ImageUriRequest.SMALL_IMAGE_SIZE, position)
+//      holder.binding.songHeadImage.tag = setImage(holder.binding.songHeadImage, ImageUriUtil.getSearchRequestWithAlbumType(data), ImageUriRequest.SMALL_IMAGE_SIZE, position)
+      GlideApp.with(holder.itemView)
+          .load(data)
+          .circleCrop()
+          .into(holder.binding.iv)
 
       //高亮
       if (getCurrentSong().id == data.id) {
@@ -163,10 +166,10 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
       if (settingKey != null) {
         val data = dataList[position - 1]
         val key = when (SPUtil.getValue(
-          App.context,
-          SETTING_KEY.NAME,
-          settingKey,
-          SortOrder.SONG_A_Z
+            App.context,
+            SETTING_KEY.NAME,
+            settingKey,
+            SortOrder.SONG_A_Z
         )) {
           SortOrder.SONG_A_Z, SortOrder.SONG_Z_A -> data.title
           SortOrder.ARTIST_A_Z, SortOrder.ARTIST_Z_A -> data.artist

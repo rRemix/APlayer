@@ -13,18 +13,24 @@
     android:id="@+id/item_simpleiview_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.facebook.drawee.view.SimpleDraweeView
-      android:id="@+id/item_simpleiview"
+<!--    <com.facebook.drawee.view.SimpleDraweeView-->
+<!--      android:id="@+id/item_simpleiview"-->
+<!--      android:layout_width="match_parent"-->
+<!--      android:layout_height="match_parent"-->
+<!--      android:layout_gravity="center"-->
+<!--      app:actualImageScaleType="centerCrop"-->
+<!--      app:fadeDuration="@integer/FadeDuration"-->
+<!--      app:failureImage="?attr/default_album"-->
+<!--      app:failureImageScaleType="centerCrop"-->
+<!--      app:placeholderImage="?attr/default_album"-->
+<!--      app:placeholderImageScaleType="centerCrop"-->
+<!--      app:roundedCornerRadius="@dimen/d2_size"/>-->
+    <ImageView
+      android:id="@+id/iv"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_gravity="center"
-      app:actualImageScaleType="centerCrop"
-      app:fadeDuration="@integer/FadeDuration"
-      app:failureImage="?attr/default_album"
-      app:failureImageScaleType="centerCrop"
-      app:placeholderImage="?attr/default_album"
-      app:placeholderImageScaleType="centerCrop"
-      app:roundedCornerRadius="@dimen/d2_size"/>
+      android:scaleType="centerCrop"/>
     <ImageView
       android:id="@+id/item_half_circle"
       android:layout_width="wrap_content"

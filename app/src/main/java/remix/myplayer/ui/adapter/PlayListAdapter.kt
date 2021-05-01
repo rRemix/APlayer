@@ -15,6 +15,7 @@ import remix.myplayer.R
 import remix.myplayer.databinding.ItemPlaylistRecycleGridBinding
 import remix.myplayer.databinding.ItemPlaylistRecycleListBinding
 import remix.myplayer.db.room.model.PlayList
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
 import remix.myplayer.request.ImageUriRequest
@@ -72,10 +73,15 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
     holder.tvOther.text = context.getString(R.string.song_count, data.audioIds.size)
 
     //设置专辑封面
-    val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
-    object : PlayListUriRequest(holder.iv,
-        UriRequest(data.id, URL_PLAYLIST, UriRequest.TYPE_NETEASE_SONG),
-        RequestConfig.Builder(imageSize, imageSize).build()) {}.load()
+//    val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
+//    object : PlayListUriRequest(holder.iv,
+//        UriRequest(data.id, URL_PLAYLIST, UriRequest.TYPE_NETEASE_SONG),
+//        RequestConfig.Builder(imageSize, imageSize).build()) {}.load()
+    GlideApp.with(holder.itemView)
+        .load(data)
+        .centerCrop()
+        .into(holder.iv)
+
     holder.container.setOnClickListener { v: View? ->
       if (position - 1 < 0) {
         ToastUtil.show(context, R.string.illegal_arg)
@@ -133,7 +139,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
   internal open class PlayListHolder(itemView: View) : BaseViewHolder(itemView) {
     lateinit var tvName: TextView
     lateinit var tvOther: TextView
-    lateinit var iv: SimpleDraweeView
+    lateinit var iv: ImageView
     lateinit var btn: ImageView
     lateinit var container: ViewGroup
   }
@@ -154,7 +160,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
       val binding = ItemPlaylistRecycleGridBinding.bind(itemView)
       tvName = binding.itemText1
       tvOther = binding.itemText2
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       btn = binding.itemButton
       container = binding.itemContainer
     }

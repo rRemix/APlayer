@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import com.facebook.drawee.view.SimpleDraweeView
@@ -15,6 +16,7 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.databinding.ItemArtistRecycleGridBinding
 import remix.myplayer.databinding.ItemArtistRecycleListBinding
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
 import remix.myplayer.request.ImageUriRequest
@@ -78,8 +80,13 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
       }
     }
     //设置封面
-    val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
-    holder.iv.tag = setImage(holder.iv, ImageUriUtil.getSearchRequest(artist), imageSize, position)
+//    val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
+//    holder.iv.tag = setImage(holder.iv, ImageUriUtil.getSearchRequest(artist), imageSize, position)
+    GlideApp.with(holder.itemView)
+        .load(artist)
+        .centerCrop()
+        .into(holder.iv)
+
     holder.container.setOnClickListener { v: View? ->
       if (holder.adapterPosition - 1 < 0) {
         ToastUtil.show(context, R.string.illegal_arg)
@@ -141,7 +148,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
   internal open class ArtistHolder(v: View) : BaseViewHolder(v) {
     lateinit var tv1: TextView
     lateinit var tv2: TextView
-    lateinit var iv: SimpleDraweeView
+    lateinit var iv: ImageView
     lateinit var btn: ImageButton
     lateinit var container: ViewGroup
   }
@@ -159,7 +166,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
   internal class ArtistGridHolder(binding: ItemArtistRecycleGridBinding) : ArtistHolder(binding.root) {
     init {
       tv1 = binding.itemText1
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       btn = binding.itemButton
       container = binding.itemContainer
     }
