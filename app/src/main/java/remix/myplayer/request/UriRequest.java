@@ -3,6 +3,7 @@ package remix.myplayer.request;
 import java.io.Serializable;
 import remix.myplayer.util.ImageUriUtil;
 
+@Deprecated
 public class UriRequest implements Serializable {
 
   private static final long serialVersionUID = 3225464659169043757L;

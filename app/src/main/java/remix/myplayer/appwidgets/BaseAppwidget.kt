@@ -11,21 +11,19 @@ import android.graphics.Canvas
 import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
 import android.os.Build
-import androidx.annotation.DrawableRes
+import android.os.Bundle
 import android.widget.RemoteViews
+import com.bumptech.glide.request.target.AppWidgetTarget
 import remix.myplayer.App
 import remix.myplayer.R
-import remix.myplayer.appwidgets.AppWidgetSkin.WHITE_1F
 import remix.myplayer.appwidgets.big.AppWidgetBig
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.request.RemoteUriRequest
-import remix.myplayer.request.RequestConfig
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
 import remix.myplayer.ui.activity.MainActivity
 import remix.myplayer.util.DensityUtil
-import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import timber.log.Timber
 
 /**
@@ -39,11 +37,10 @@ abstract class BaseAppwidget
   : AppWidgetProvider() {
 
   protected lateinit var skin: AppWidgetSkin
-  protected var bitmap: Bitmap? = null
 
-  private val defaultDrawableRes: Int
-    @DrawableRes
-    get() = if (skin == WHITE_1F) R.drawable.album_empty_bg_night else R.drawable.album_empty_bg_day
+//  private val defaultDrawableRes: Int
+//    @DrawableRes
+//    get() = if (skin == WHITE_1F) R.drawable.album_empty_bg_night else R.drawable.album_empty_bg_day
 
   private fun buildServicePendingIntent(context: Context, componentName: ComponentName, cmd: Int): PendingIntent {
     val intent = Intent(MusicService.ACTION_APPWIDGET_OPERATE)
@@ -73,30 +70,13 @@ abstract class BaseAppwidget
   protected fun updateCover(service: MusicService, remoteViews: RemoteViews, appWidgetIds: IntArray?, reloadCover: Boolean) {
     val song = service.currentSong
     val size = if (this.javaClass.simpleName == AppWidgetBig::class.java.simpleName) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
-    object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
-      override fun onError(throwable: Throwable) {
-        Timber.v("onError: $throwable")
-//        bitmap = null
-        remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
-        pushUpdate(service, appWidgetIds, remoteViews)
-      }
 
-      override fun onSuccess(result: Bitmap?) {
-        try {
-          val bitmap = MusicService.copy(result)
-          if (bitmap != null) {
-            remoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap)
-          } else {
-            remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
-          }
-          pushUpdate(service, appWidgetIds, remoteViews)
-        } catch (e: Exception) {
-          Timber.v("onSuccess --- 发生异常: $e")
-        } finally {
-
-        }
-      }
-    }.load()
+    GlideApp.with(service)
+        .asBitmap()
+        .load(song)
+        .centerCrop()
+        .override(size, size)
+        .into(AppWidgetTarget(service, size, size, R.id.appwidget_image, remoteViews, ComponentName(service, javaClass)))
   }
 
   protected fun buildAction(context: Context, views: RemoteViews) {
@@ -126,7 +106,7 @@ abstract class BaseAppwidget
   }
 
   protected fun pushPartiallyUpdate(context: Context, appWidgetId: IntArray?, remoteViews: RemoteViews) {
-    if(!hasInstances(context)){
+    if (!hasInstances(context)) {
       return
     }
     val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -143,8 +123,8 @@ abstract class BaseAppwidget
     updateArtist(remoteViews, song)
     //        updateSkin(remoteViews);
     updatePlayPause(service, remoteViews)
-    updateLove(service,remoteViews, song)
-    updateModel(service,remoteViews)
+    updateLove(service, remoteViews, song)
+    updateModel(service, remoteViews)
     updateNextAndPrev(remoteViews)
     updateProgress(service, remoteViews, song)
     updateTimer(remoteViews)
@@ -161,8 +141,8 @@ abstract class BaseAppwidget
     remoteViews.setProgressBar(R.id.appwidget_seekbar, song.getDuration().toInt(), service.progress, false)
   }
 
-  private fun updateLove(service: MusicService,remoteViews: RemoteViews, song: Song) {
-    remoteViews.setImageViewResource(R.id.appwidget_love,if(service.isLove) skin.lovedRes else skin.loveRes)
+  private fun updateLove(service: MusicService, remoteViews: RemoteViews, song: Song) {
+    remoteViews.setImageViewResource(R.id.appwidget_love, if (service.isLove) skin.lovedRes else skin.loveRes)
   }
 
   private fun updateNextAndPrev(remoteViews: RemoteViews) {
@@ -171,7 +151,7 @@ abstract class BaseAppwidget
     remoteViews.setImageViewResource(R.id.appwidget_prev, skin.prevRes)
   }
 
-  private fun updateModel(service: MusicService,remoteViews: RemoteViews) {
+  private fun updateModel(service: MusicService, remoteViews: RemoteViews) {
     //播放模式
     remoteViews.setImageViewResource(R.id.appwidget_model, skin.getModeRes(service))
   }
@@ -208,28 +188,9 @@ abstract class BaseAppwidget
 
     val SKIN_WHITE_1F = 1//白色不带透明
     val SKIN_TRANSPARENT = 2//透明
-    private val TAG = "桌面部件"
+
     private val IMAGE_SIZE_BIG = DensityUtil.dip2px(App.context, 270f)
     private val IMAGE_SIZE_MEDIUM = DensityUtil.dip2px(App.context, 72f)
 
-    fun drawableToBitmap(drawable: Drawable): Bitmap {
-      // 取 drawable 的长宽
-      val w = drawable.intrinsicWidth
-      val h = drawable.intrinsicHeight
-
-      // 取 drawable 的颜色格式
-      val config = if (drawable.opacity != PixelFormat.OPAQUE)
-        Bitmap.Config.ARGB_8888
-      else
-        Bitmap.Config.RGB_565
-      // 建立对应 bitmap
-      val bitmap = Bitmap.createBitmap(w, h, config)
-      // 建立对应 bitmap 的画布
-      val canvas = Canvas(bitmap)
-      drawable.setBounds(0, 0, w, h)
-      // 把 drawable 内容画到画布中
-      drawable.draw(canvas)
-      return bitmap
-    }
   }
 }

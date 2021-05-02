@@ -5,19 +5,23 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
-import androidx.palette.graphics.Palette
 import android.util.DisplayMetrics
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.android.schedulers.AndroidSchedulers
+import androidx.palette.graphics.Palette
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_lockscreen.*
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.lyric.LyricFetcher
 import remix.myplayer.lyric.LyricFetcher.Companion.LYRIC_FIND_INTERVAL
@@ -25,16 +29,11 @@ import remix.myplayer.lyric.bean.LyricRowWrapper
 import remix.myplayer.lyric.bean.LyricRowWrapper.Companion.LYRIC_WRAPPER_NO
 import remix.myplayer.lyric.bean.LyricRowWrapper.Companion.LYRIC_WRAPPER_SEARCHING
 import remix.myplayer.misc.menu.CtrlButtonListener
-import remix.myplayer.request.ImageUriRequest
-import remix.myplayer.request.LibraryUriRequest
-import remix.myplayer.request.RequestConfig
-import remix.myplayer.util.RxUtil
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.blur.StackBlurManager
 import remix.myplayer.util.ColorUtil
-import remix.myplayer.util.DensityUtil
-import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
+import remix.myplayer.util.RxUtil
 import remix.myplayer.util.StatusBarUtil
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -50,12 +49,13 @@ import java.lang.ref.WeakReference
 class LockScreenActivity : BaseMusicActivity() {
   //高斯模糊后的bitmap
   private var blurBitMap: Bitmap? = null
+
   //高斯模糊之前的bitmap
   private var rawBitMap: Bitmap? = null
   private var width: Int = 0
 
-  //是否正在播放
   private var disposable: Disposable? = null
+
   @Volatile
   private var curLyric: LyricRowWrapper? = null
   private var updateLyricThread: UpdateLockScreenLyricThread? = null
@@ -63,20 +63,12 @@ class LockScreenActivity : BaseMusicActivity() {
   //前后两次触摸的X
   private var scrollX1: Float = 0f
   private var scrollX2: Float = 0f
+
   //一次移动的距离
   private var distance: Float = 0f
 
   private val DEFAULT_BITMAP by lazy {
     BitmapFactory.decodeResource(resources, R.drawable.album_empty_bg_night)
-  }
-  private val IMAGE_SIZE by lazy {
-    DensityUtil.dip2px(this, 210f)
-  }
-  private val BLUR_SIZE by lazy {
-    DensityUtil.dip2px(this, 100f)
-  }
-  private val CONFIG by lazy {
-    RequestConfig.Builder(BLUR_SIZE, BLUR_SIZE).build()
   }
 
   override fun setUpTheme() {}
@@ -90,7 +82,7 @@ class LockScreenActivity : BaseMusicActivity() {
     setContentView(R.layout.activity_lockscreen)
     try {
       requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-    } catch (e: Exception){
+    } catch (e: Exception) {
       Timber.v(e)
     }
 
@@ -166,9 +158,8 @@ class LockScreenActivity : BaseMusicActivity() {
       updateLyricThread?.interrupt()
       updateLyricThread = null
     }
-    if (disposable != null) {
-      disposable?.dispose()
-    }
+    disposable?.dispose()
+    disposable = null
   }
 
   override fun onServiceConnected(service: MusicService) {
@@ -195,35 +186,26 @@ class LockScreenActivity : BaseMusicActivity() {
     //艺术家
     lockscreen_artist.text = song.artist
     //封面
-    LibraryUriRequest(lockscreen_image,
-        getSearchRequestWithAlbumType(song),
-        RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load()
+    GlideApp.with(this)
+        .asBitmap()
+        .load(song)
+        .centerCrop()
+        .dontAnimate()
+        .placeholder(R.drawable.album_empty_bg_night)
+        .error(R.drawable.album_empty_bg_night)
+        .addListener(object : RequestListener<Bitmap> {
+          override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Bitmap>?, isFirstResource: Boolean): Boolean {
+            startProcess(DEFAULT_BITMAP)
+            return false
+          }
 
-    if (disposable != null) {
-      disposable?.dispose()
-    }
-    disposable = object : ImageUriRequest<Palette>(CONFIG) {
-      override fun onError(throwable: Throwable) {
-//        ToastUtil.show(mContext, throwable.message)
-      }
+          override fun onResourceReady(resource: Bitmap?, model: Any?, target: Target<Bitmap>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+            startProcess(resource)
+            return false
+          }
 
-      override fun onSuccess(result: Palette?) {
-        setResult(result)
-      }
-
-      override fun load(): Disposable {
-        return getThumbBitmapObservable(getSearchRequestWithAlbumType(song))
-            .compose(RxUtil.applySchedulerToIO())
-            .flatMap { bitmap ->
-              Observable.create<Palette> { e ->
-                processBitmap(e, bitmap)
-              }
-            }
-            .onErrorResumeNext(Observable.create { processBitmap(it, DEFAULT_BITMAP) })
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ this.onSuccess(it) }, { this.onError(it) })
-      }
-    }.load()
+        })
+        .into(iv)
   }
 
   override fun onPlayStateChange() {
@@ -246,21 +228,31 @@ class LockScreenActivity : BaseMusicActivity() {
     lockscreen_lyric.setTextColor(swatch.bodyTextColor)
   }
 
-  private fun processBitmap(e: ObservableEmitter<Palette>, raw: Bitmap?) {
+  private fun startProcess(resource: Bitmap?) {
+    disposable?.dispose()
+    disposable = Single
+        .fromCallable {
+          blurBitmap(resource ?: DEFAULT_BITMAP)
+        }
+        .compose(RxUtil.applySingleScheduler())
+        .subscribe(Consumer {
+          setResult(it)
+        })
+  }
+
+  private fun blurBitmap(raw: Bitmap): Palette? {
     if (isFinishing) {
-      e.onComplete()
-      return
+      return null
     }
+
     rawBitMap = MusicService.copy(raw)
     if (rawBitMap == null || rawBitMap?.isRecycled == true) {
-      e.onComplete()
-      return
+      return null
     }
+
     val stackBlurManager = StackBlurManager(rawBitMap)
     blurBitMap = stackBlurManager.processNatively(40)
-    val palette = Palette.from(rawBitMap ?: return).generate()
-    e.onNext(palette)
-    e.onComplete()
+    return Palette.from(rawBitMap ?: return null).generate()
   }
 
   private fun setCurrentLyric(wrapper: LyricRowWrapper) {

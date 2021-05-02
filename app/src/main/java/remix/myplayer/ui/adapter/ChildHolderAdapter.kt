@@ -99,6 +99,7 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
           .load(data)
           .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
           .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+          .centerCrop()
           .into(holder.binding.iv)
 
       //高亮

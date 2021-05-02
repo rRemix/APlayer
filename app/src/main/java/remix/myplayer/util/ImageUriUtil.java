@@ -191,6 +191,9 @@ public class ImageUriUtil {
 
   public static String getLargestAlbumImageUrl(List<Image> images) {
     HashMap<ImageSize, String> imageUrls = new HashMap<>();
+    if(imageUrls == null){
+      return "";
+    }
     for (Image image : images) {
       ImageSize size = null;
       final String attribute = image.getSize();

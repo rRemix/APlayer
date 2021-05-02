@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.*
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
+import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -23,6 +24,8 @@ import androidx.annotation.WorkerThread
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.*
 import remix.myplayer.App
 import remix.myplayer.R
@@ -36,6 +39,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayQueue
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.*
 import remix.myplayer.lyric.LyricFetcher
 import remix.myplayer.lyric.LyricFetcher.Companion.LYRIC_FIND_INTERVAL
@@ -50,12 +54,10 @@ import remix.myplayer.misc.receiver.HeadsetPlugReceiver.Companion.NEVER
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver.Companion.OPEN_SOFTWARE
 import remix.myplayer.misc.receiver.MediaButtonReceiver
 import remix.myplayer.misc.tryLaunch
-import remix.myplayer.request.RemoteUriRequest
-import remix.myplayer.request.RequestConfig
-import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24
+import remix.myplayer.theme.Theme
 import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.ui.activity.base.BaseActivity.Companion.EXTERNAL_STORAGE_PERMISSIONS
 import remix.myplayer.ui.activity.base.BaseMusicActivity
@@ -63,8 +65,9 @@ import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISS
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
 import remix.myplayer.ui.widget.desktop.DesktopLyricView
 import remix.myplayer.util.Constants.*
-import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
+import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.MediaStoreUtil
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
@@ -1375,26 +1378,37 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     if (updatePlayStateOnly(control)) {
       mediaSession.setMetadata(builder.build())
     } else {
-      object : RemoteUriRequest(getSearchRequestWithAlbumType(currentSong),
-          RequestConfig.Builder(400, 400).build()) {
-        override fun onError(throwable: Throwable) {
-          setMediaSessionData(null)
-        }
+      GlideApp.with(this)
+          .asBitmap()
+          .load(currentSong)
+          .placeholder(Theme.resolveDrawable(this, R.attr.default_album))
+          .centerCrop()
+          .override(DensityUtil.dip2px(160f), DensityUtil.dip2px(160f))
+          .into(object : CustomTarget<Bitmap>() {
+            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+              setMediaSessionData(resource)
+            }
 
-        override fun onSuccess(result: Bitmap?) {
-          setMediaSessionData(result)
-        }
+            override fun onLoadFailed(errorDrawable: Drawable?) {
+              super.onLoadFailed(errorDrawable)
+              setMediaSessionData(null)
+            }
 
-        private fun setMediaSessionData(result: Bitmap?) {
-          val bitmap = copy(result)
-          builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
-          mediaSession.setMetadata(builder.build())
-        }
-      }.load()
+            private fun setMediaSessionData(result: Bitmap?) {
+              val bitmap = copy(result)
+              builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
+              mediaSession.setMetadata(builder.build())
+            }
+
+            override fun onLoadCleared(placeholder: Drawable?) {
+
+            }
+          })
     }
 
     updatePlaybackState()
   }
+
 
   private fun updatePlaybackState() {
     mediaSession.setPlaybackState(PlaybackStateCompat.Builder()

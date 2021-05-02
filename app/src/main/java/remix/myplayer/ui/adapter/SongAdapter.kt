@@ -88,6 +88,7 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
     //封面
     GlideApp.with(holder.itemView)
         .load(song)
+        .centerCrop()
         .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
         .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
         .into(holder.binding.iv)

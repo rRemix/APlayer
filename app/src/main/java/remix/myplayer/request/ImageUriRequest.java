@@ -62,6 +62,7 @@ import remix.myplayer.util.SPUtil;
  * Created by Remix on 2017/11/30.
  */
 
+@Deprecated
 public abstract class ImageUriRequest<T> {
 
   private static final ConcurrentHashMap<Integer, String> MEMORY_CACHE = new ConcurrentHashMap<>();

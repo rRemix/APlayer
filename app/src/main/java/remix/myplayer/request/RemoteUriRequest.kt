@@ -8,6 +8,7 @@ import remix.myplayer.util.RxUtil
  * Created by Remix on 2017/12/10.
  */
 
+@Deprecated("replace with glide")
 public abstract class RemoteUriRequest(private val request: UriRequest, config: RequestConfig) : ImageUriRequest<Bitmap>(config) {
 
   override fun load(): Disposable {

@@ -6,6 +6,7 @@ import androidx.annotation.IntRange;
  * Created by Remix on 2017/12/1.
  */
 
+@Deprecated
 public class RequestConfig {
 
   private int mWidth;

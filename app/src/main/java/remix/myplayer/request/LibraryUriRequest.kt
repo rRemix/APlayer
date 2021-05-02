@@ -18,6 +18,7 @@ import java.lang.ref.WeakReference
  * Created by Remix on 2017/12/4.
  */
 
+@Deprecated("replace with glide")
 open class LibraryUriRequest(image: SimpleDraweeView, protected val request: UriRequest,
                              config: RequestConfig) : ImageUriRequest<String>(config) {
 

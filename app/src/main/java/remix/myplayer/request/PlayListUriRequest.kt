@@ -17,6 +17,7 @@ import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
  * Created by Remix on 2017/11/30.
  */
 
+@Deprecated("replace with glide")
 open class PlayListUriRequest(image: SimpleDraweeView, request: UriRequest, config: RequestConfig) : LibraryUriRequest(image, request, config) {
 
   override fun onError(throwable: Throwable?) {

@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.*
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.*
@@ -17,10 +16,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
@@ -54,7 +49,6 @@ import remix.myplayer.misc.update.DownloadService.Companion.ACTION_SHOW_DIALOG
 import remix.myplayer.misc.update.UpdateAgent
 import remix.myplayer.misc.update.UpdateListener
 import remix.myplayer.request.ImageUriRequest
-import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
@@ -64,6 +58,7 @@ import remix.myplayer.ui.fragment.*
 import remix.myplayer.ui.misc.DoubleClickListener
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.util.*
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.Util.*
 import timber.log.Timber
 import java.io.File
@@ -582,20 +577,12 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     super.onMetaChanged()
     val currentSong = MusicServiceRemote.getCurrentSong()
     if (currentSong != Song.EMPTY_SONG) {
-      //TODO error placeHolder
       tv_header.text = getString(R.string.play_now, currentSong.title)
       GlideApp.with(this)
           .load(currentSong)
-          .addListener(object : RequestListener<Drawable> {
-            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-              return false
-            }
-
-            override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-              Timber.v("onResourceReady")
-              return false
-            }
-          })
+          .centerCrop()
+          .placeholder(Theme.resolveDrawable(this, R.attr.default_album))
+          .error(Theme.resolveDrawable(this, R.attr.default_album))
           .into(iv_header)
     }
   }
