@@ -344,6 +344,13 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
       }
     )
 
+    // 是否自动下载封面
+    binding.settingAlbumCoverText.text = SPUtil.getValue(this,
+        SETTING_KEY.NAME,
+        SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
+        getString(R.string.always)
+    )
+
     updatePlayerBackgroundText()
 
     //计算缓存大小
