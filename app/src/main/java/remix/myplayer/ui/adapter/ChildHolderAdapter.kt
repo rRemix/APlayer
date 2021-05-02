@@ -51,11 +51,6 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
             false))
   }
 
-  override fun onViewRecycled(holder: BaseViewHolder) {
-    super.onViewRecycled(holder)
-    disposeLoad(holder)
-  }
-
   override fun convert(holder: BaseViewHolder, data: Song?, position: Int) {
     val context = holder.itemView.context
     if (position == 0) {

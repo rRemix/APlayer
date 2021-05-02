@@ -62,8 +62,6 @@ import remix.myplayer.misc.handler.OnHandleMessage
 import remix.myplayer.misc.interfaces.OnInflateFinishListener
 import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.misc.menu.AudioPopupListener
-import remix.myplayer.request.ImageUriRequest
-import remix.myplayer.request.RequestConfig
 import remix.myplayer.util.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -849,26 +847,26 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   }
 
   private fun updateBackground(uri: Uri) {
-    object : ImageUriRequest<Bitmap>(RequestConfig.Builder(100, 100).build()) {
-      override fun onError(throwable: Throwable?) {
-        Timber.v("updateBackground failed: $throwable")
-        updateSwatch(null)
-      }
-
-      override fun onSuccess(result: Bitmap?) {
-        updateSwatch(result)
-      }
-
-      override fun load(): Disposable {
-        return getThumbBitmapObservable(uri)
-            .compose(RxUtil.applyScheduler())
-            .subscribe({
-              onSuccess(it)
-            }, {
-              onError(it)
-            })
-      }
-    }.load()
+//    object : ImageUriRequest<Bitmap>(RequestConfig.Builder(100, 100).build()) {
+//      override fun onError(throwable: Throwable?) {
+//        Timber.v("updateBackground failed: $throwable")
+//        updateSwatch(null)
+//      }
+//
+//      override fun onSuccess(result: Bitmap?) {
+//        updateSwatch(result)
+//      }
+//
+//      override fun load(): Disposable {
+//        return getThumbBitmapObservable(uri)
+//            .compose(RxUtil.applyScheduler())
+//            .subscribe({
+//              onSuccess(it)
+//            }, {
+//              onError(it)
+//            })
+//      }
+//    }.load()
 
   }
 

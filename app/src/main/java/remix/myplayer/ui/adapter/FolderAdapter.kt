@@ -46,7 +46,7 @@ class FolderAdapter(layoutId: Int, private val multiChoice: MultipleChoice<Folde
       val popupMenu = PopupMenu(context, holder.binding.folderButton)
       popupMenu.menuInflater.inflate(R.menu.menu_folder_item, popupMenu.menu)
       popupMenu.setOnMenuItemClickListener(LibraryListener(context,
-          folder.path,
+          folder,
           Constants.FOLDER,
           folder.path))
       popupMenu.gravity = Gravity.END

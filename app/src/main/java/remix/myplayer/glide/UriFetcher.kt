@@ -4,16 +4,14 @@ import android.net.Uri
 import android.provider.MediaStore.Audio
 import android.text.TextUtils
 import android.util.LruCache
-import com.facebook.common.util.UriUtil
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
+import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
-import remix.myplayer.request.ImageUriRequest
-import remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM
 import remix.myplayer.request.network.HttpClient
 import remix.myplayer.util.ImageUriUtil
 import remix.myplayer.util.MediaStoreUtil.getSongs
@@ -35,6 +33,9 @@ object UriFetcher {
   const val TYPE_ARTIST = 100
   const val TYPE_PLAYLIST = 1000
 
+  const val DOWNLOAD_LASTFM = 0
+  const val DOWNLOAD_NETEASE = 1
+
   const val PREFIX_EMBEDDED = "embedded://"
 
   const val SCHEME_EMBEDDED = "embedded"
@@ -46,6 +47,7 @@ object UriFetcher {
 
     val fromCache = getFromCache(key)
     if (fromCache != null) {
+      Timber.v("from cache: $fromCache")
       return fromCache
     }
 
@@ -71,11 +73,22 @@ object UriFetcher {
       return Uri.EMPTY
     }
 
+    Timber.v("uri: $uri")
     memoryCache.put(key, uri)
     SPUtil.putValue(context, SPUtil.COVER_KEY.NAME, key.toString(), uri.toString())
 
     return uri
   }
+
+  fun clearAllCache() {
+    memoryCache.evictAll()
+    SPUtil.deleteFile(context, SPUtil.COVER_KEY.NAME)
+  }
+
+//  fun clearCache(model: APlayerModel) {
+//    memoryCache.remove(model.hashCode())
+//    SPUtil.putValue(context, SPUtil.COVER_KEY.NAME, model.hashCode().toString(), "")
+//  }
 
   private fun getFromCache(key: Int): Uri? {
     val uri: Uri? = getFromMemory(key)
@@ -89,7 +102,7 @@ object UriFetcher {
   private fun getFromMemory(key: Int): Uri? {
     val cache = memoryCache.get(key)
     if (cache != null) {
-      Timber.v("get from memory, uri: $cache")
+//      Timber.v("get from memory, uri: $cache")
     }
     return cache
   }
@@ -99,7 +112,7 @@ object UriFetcher {
     if (cache.isNotEmpty()) {
       val uri = Uri.parse(cache)
       memoryCache.put(key, uri)
-      Timber.v("get from sp, uri: $uri")
+//      Timber.v("get from sp, uri: $uri")
       return uri
     }
     return null
@@ -128,7 +141,7 @@ object UriFetcher {
         if (downloadFromLastFM()) {
           val lastFMAlbum = HttpClient.getInstance().searchLastFMAlbum(song.album, song.artist, null).blockingGet()
           val lastFMUri = ImageUriUtil.getLargestAlbumImageUrl(lastFMAlbum.album?.image)
-          if (!TextUtils.isEmpty(lastFMUri) && UriUtil.isNetworkUri(Uri.parse(lastFMUri))) {
+          if (!TextUtils.isEmpty(lastFMUri)) {
             return Uri.parse(lastFMUri)
           }
         } else {
@@ -169,7 +182,7 @@ object UriFetcher {
         if (downloadFromLastFM()) {
           val lastFMAlbum = HttpClient.getInstance().searchLastFMAlbum(album.album, album.artist, null).blockingGet()
           val lastFMUri = ImageUriUtil.getLargestAlbumImageUrl(lastFMAlbum.album?.image)
-          if (!TextUtils.isEmpty(lastFMUri) && UriUtil.isNetworkUri(Uri.parse(lastFMUri))) {
+          if (!TextUtils.isEmpty(lastFMUri)) {
             return Uri.parse(lastFMUri)
           }
         } else {
@@ -206,7 +219,7 @@ object UriFetcher {
         if (downloadFromLastFM()) {
           val lastFMArtist = HttpClient.getInstance().searchLastFMArtist(artist.artist, null).blockingGet()
           val lastFMUri = ImageUriUtil.getLargestArtistImageUrl(lastFMArtist.artist?.image)
-          if (!TextUtils.isEmpty(lastFMUri) && UriUtil.isNetworkUri(Uri.parse(lastFMUri))) {
+          if (!TextUtils.isEmpty(lastFMUri)) {
             return Uri.parse(lastFMUri)
           }
         } else {
@@ -260,8 +273,8 @@ object UriFetcher {
   }
 
   private fun canDownloadCover(): Boolean {
-    return (context.getString(R.string.always) == ImageUriRequest.AUTO_DOWNLOAD_ALBUM || context.getString(R.string.wifi_only) == ImageUriRequest.AUTO_DOWNLOAD_ALBUM)
-        && Util.isWifi(context)
+    val current = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, context.getString(R.string.always))
+    return context.getString(R.string.always) == current || (context.getString(R.string.wifi_only) == current && Util.isWifi(context))
   }
 
 }

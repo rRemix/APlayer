@@ -3,11 +3,10 @@ package remix.myplayer.ui.misc
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import com.google.android.material.textfield.TextInputLayout
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
-import com.facebook.common.util.ByteConstants
+import com.google.android.material.textfield.TextInputLayout
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
@@ -18,7 +17,6 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.misc.tageditor.TagEditor
-import remix.myplayer.util.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.TextInputLayoutUtil
@@ -27,6 +25,8 @@ import remix.myplayer.theme.ThemeStore
 import remix.myplayer.theme.TintHelper
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_NEW_SONG
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_OLD_SONG
+import remix.myplayer.util.Constants.MB
+import remix.myplayer.util.RxUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import remix.myplayer.util.Util.sendCMDLocalBroadcast
@@ -59,7 +59,7 @@ class Tag(context: Context, song: Song?) : ContextWrapper(context) {
       //歌曲名称
       root.song_detail_name.text = song.displayName
       //歌曲大小
-      root.song_detail_size.text = getString(R.string.cache_size, 1.0f * song.size / ByteConstants.MB)
+      root.song_detail_size.text = getString(R.string.cache_size, 1.0f * song.size / MB)
       //歌曲时长
       root.song_detail_duration.text = Util.getTime(song.getDuration())
       //歌曲格式

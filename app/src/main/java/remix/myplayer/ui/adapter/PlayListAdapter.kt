@@ -12,7 +12,6 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
-import com.facebook.drawee.view.SimpleDraweeView
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
 import remix.myplayer.R
@@ -22,10 +21,6 @@ import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
-import remix.myplayer.request.ImageUriRequest
-import remix.myplayer.request.PlayListUriRequest
-import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.UriRequest
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.libraryBtnColor
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
@@ -55,11 +50,6 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
     }
     return if (viewType == LIST_MODE) PlayListListHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_playlist_recycle_list, parent, false))
     else PlayListGridHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_playlist_recycle_grid, parent, false))
-  }
-
-  override fun onViewRecycled(holder: BaseViewHolder) {
-    super.onViewRecycled(holder)
-    disposeLoad(holder)
   }
 
   @SuppressLint("RestrictedApi")
@@ -118,7 +108,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
       val popupMenu = PopupMenu(context, holder.btn)
       popupMenu.menuInflater.inflate(R.menu.menu_playlist_item, popupMenu.menu)
       popupMenu.setOnMenuItemClickListener(
-          LibraryListener(context, data.id.toString() + "", Constants.PLAYLIST, data.name))
+          LibraryListener(context, data, Constants.PLAYLIST, data.name))
       popupMenu.show()
     }
 
@@ -131,10 +121,10 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
     if (position in 1..dataList.size) {
       val data = dataList[position - 1]
       val key = when (SPUtil.getValue(
-        App.context,
-        SETTING_KEY.NAME,
-        SETTING_KEY.PLAYLIST_SORT_ORDER,
-        SortOrder.PLAYLIST_A_Z
+          App.context,
+          SETTING_KEY.NAME,
+          SETTING_KEY.PLAYLIST_SORT_ORDER,
+          SortOrder.PLAYLIST_A_Z
       )) {
         SortOrder.PLAYLIST_A_Z, SortOrder.PLAYLIST_Z_A -> data.name
         else -> ""

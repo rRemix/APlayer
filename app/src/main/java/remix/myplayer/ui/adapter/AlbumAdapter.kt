@@ -56,10 +56,6 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     else AlbumGridHolder(ItemAlbumRecycleGridBinding.inflate(LayoutInflater.from(parent.context), parent, false))
   }
 
-  override fun onViewRecycled(holder: BaseViewHolder) {
-    super.onViewRecycled(holder)
-    disposeLoad(holder)
-  }
 
   @SuppressLint("RestrictedApi")
   override fun convert(holder: BaseViewHolder, album: Album?, position: Int) {
@@ -75,8 +71,6 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     holder.tv1.text = album.album
 
     //设置封面
-    val albumId = album.albumID
-
     val options = RequestOptions()
         .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
         .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
@@ -122,7 +116,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
       val popupMenu = PopupMenu(context, holder.btn, Gravity.END)
       popupMenu.menuInflater.inflate(R.menu.menu_album_item, popupMenu.menu)
       popupMenu.setOnMenuItemClickListener(LibraryListener(
-          context, albumId.toString() + "",
+          context, album,
           Constants.ALBUM,
           album.album))
       popupMenu.show()

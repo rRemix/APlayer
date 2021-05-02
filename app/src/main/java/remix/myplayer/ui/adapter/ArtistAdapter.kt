@@ -13,7 +13,6 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
-import com.facebook.drawee.view.SimpleDraweeView
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
 import remix.myplayer.R
@@ -23,7 +22,6 @@ import remix.myplayer.databinding.ItemArtistRecycleListBinding
 import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
-import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.libraryBtnColor
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
@@ -53,11 +51,6 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
     else ArtistGridHolder(ItemArtistRecycleGridBinding.inflate(LayoutInflater.from(parent.context), parent, false))
   }
 
-  override fun onViewRecycled(holder: BaseViewHolder) {
-    super.onViewRecycled(holder)
-    disposeLoad(holder)
-  }
-
   @SuppressLint("RestrictedApi", "CheckResult")
   override fun convert(holder: BaseViewHolder, artist: Artist?, position: Int) {
     if (position == 0) {
@@ -72,7 +65,6 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
     val context = holder.itemView.context
     //设置歌手名
     holder.tv1.text = artist.artist
-    val artistId = artist.artistID
     if (holder is ArtistListHolder) {
       if (artist.count > 0) {
         holder.tv2.text = context.getString(R.string.song_count_1, artist.count)
@@ -120,7 +112,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
       }
       val popupMenu = PopupMenu(context, holder.btn)
       popupMenu.menuInflater.inflate(R.menu.menu_artist_item, popupMenu.menu)
-      popupMenu.setOnMenuItemClickListener(LibraryListener(context, artistId.toString() + "",
+      popupMenu.setOnMenuItemClickListener(LibraryListener(context, artist,
           Constants.ARTIST,
           artist.artist))
       popupMenu.gravity = Gravity.END

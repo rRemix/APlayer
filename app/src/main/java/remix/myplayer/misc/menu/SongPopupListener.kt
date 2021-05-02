@@ -1,9 +1,9 @@
 package remix.myplayer.misc.menu
 
 import android.content.Intent
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
-import android.view.MenuItem
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.soundcloud.android.crop.Crop
 import remix.myplayer.App
@@ -12,13 +12,14 @@ import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
-import remix.myplayer.util.RxUtil.applySingleScheduler
+import remix.myplayer.misc.menu.LibraryListener.Companion.EXTRA_COVER
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.ui.misc.Tag
 import remix.myplayer.util.*
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import java.lang.ref.WeakReference
 
@@ -58,10 +59,9 @@ class SongPopupListener(activity: AppCompatActivity,
         tag.edit()
       }
       R.id.menu_album_thumb -> {
-        val customCover = CustomCover(song.albumId, Constants.ALBUM,
-            song.album)
+        val customCover = CustomCover(song, Constants.ALBUM)
         val coverIntent = activity.intent
-        coverIntent.putExtra("thumb", customCover)
+        coverIntent.putExtra(EXTRA_COVER, customCover)
         activity.intent = coverIntent
         Crop.pickImage(activity, Crop.REQUEST_PICK)
       }

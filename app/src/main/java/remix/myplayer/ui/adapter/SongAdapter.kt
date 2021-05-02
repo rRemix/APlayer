@@ -49,11 +49,6 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
     else SongViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_song_recycle, parent, false))
   }
 
-  override fun onViewRecycled(holder: BaseViewHolder) {
-    super.onViewRecycled(holder)
-    disposeLoad(holder)
-  }
-
   @SuppressLint("RestrictedApi")
   override fun convert(holder: BaseViewHolder, song: Song?, position: Int) {
     val context = holder.itemView.context

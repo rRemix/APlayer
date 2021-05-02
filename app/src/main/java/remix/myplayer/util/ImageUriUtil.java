@@ -1,5 +1,8 @@
 package remix.myplayer.util;
 
+import static remix.myplayer.glide.UriFetcher.TYPE_ALBUM;
+import static remix.myplayer.glide.UriFetcher.TYPE_ARTIST;
+
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
@@ -19,8 +22,6 @@ import remix.myplayer.bean.mp3.Album;
 import remix.myplayer.bean.mp3.Artist;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.cache.DiskCache;
-import remix.myplayer.request.ImageUriRequest;
-import remix.myplayer.request.UriRequest;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -70,10 +71,10 @@ public class ImageUriUtil {
    * 返回自定义的封面
    */
   public static File getCustomThumbIfExist(long id, int type) {
-    File img = type == ImageUriRequest.URL_ALBUM ? new File(
+    File img = type == TYPE_ALBUM ? new File(
         DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/album") + "/" + Util
             .hashKeyForDisk(id + "") + ".jpg")
-        : type == ImageUriRequest.URL_ARTIST ? new File(
+        : type == TYPE_ARTIST ? new File(
             DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/artist") + "/" + Util
                 .hashKeyForDisk(id + "") + ".jpg")
             : new File(
@@ -115,50 +116,50 @@ public class ImageUriUtil {
 //        return SearchRequest.DEFAULT_REQUEST;
 //    }
 
-  /**
-   * 根据专辑信息构建请求参数
-   */
-  public static UriRequest getSearchRequest(Album album) {
-//        if(album == null)
-//            return SearchRequest.DEFAULT_REQUEST;
-//        boolean isAlbumAvailable = !TextUtils.isEmpty(album.getAlbum()) && !album.getAlbum().contains(mContext.getString(R.string.unknown_album));
-//        boolean isArtistAvailable = !TextUtils.isEmpty(album.getArtist()) && !album.getArtist().contains(mContext.getString(R.string.unknown_artist));
-//        if(isAlbumAvailable && isArtistAvailable){
-//            return new SearchRequest(album.getAlbumID(),album.getArtist() + "-" + album.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,ImageUriRequest.URL_ALBUM);
-//        }
-//        return SearchRequest.DEFAULT_REQUEST;
-    if (album == null) {
-      return UriRequest.DEFAULT_REQUEST;
-    }
-    return new UriRequest(album.getAlbumID(), ImageUriRequest.URL_ALBUM,
-        UriRequest.TYPE_NETEASE_ALBUM, album.getAlbum(), album.getArtist());
-  }
-
-  /**
-   * 根据艺术家信息构建请求参数
-   */
-  public static UriRequest getSearchRequest(Artist artist) {
-//        if(artist == null)
-//            return SearchRequest.DEFAULT_REQUEST;
-//        boolean isArtistAvailable = !TextUtils.isEmpty(artist.getArtist()) && !artist.getArtist().contains(mContext.getString(R.string.unknown_artist));
-//        if(isArtistAvailable){
-//            return new SearchRequest(artist.getArtistID(),artist.getArtist(), SearchRequest.TYPE_NETEASE_ARTIST,ImageUriRequest.URL_ARTIST);
-//        }
-//        return SearchRequest.DEFAULT_REQUEST;
-    if (artist == null) {
-      return UriRequest.DEFAULT_REQUEST;
-    }
-    return new UriRequest(artist.getArtistID(), ImageUriRequest.URL_ARTIST,
-        UriRequest.TYPE_NETEASE_ARTIST, artist.getArtist());
-  }
-
-  public static UriRequest getSearchRequestWithAlbumType(Song song) {
-    return new UriRequest(song.getAlbumId(),
-        song.getId(),
-        ImageUriRequest.URL_ALBUM,
-        UriRequest.TYPE_NETEASE_SONG,
-        song.getTitle(), song.getAlbum(), song.getArtist());
-  }
+//  /**
+//   * 根据专辑信息构建请求参数
+//   */
+//  public static UriRequest getSearchRequest(Album album) {
+////        if(album == null)
+////            return SearchRequest.DEFAULT_REQUEST;
+////        boolean isAlbumAvailable = !TextUtils.isEmpty(album.getAlbum()) && !album.getAlbum().contains(mContext.getString(R.string.unknown_album));
+////        boolean isArtistAvailable = !TextUtils.isEmpty(album.getArtist()) && !album.getArtist().contains(mContext.getString(R.string.unknown_artist));
+////        if(isAlbumAvailable && isArtistAvailable){
+////            return new SearchRequest(album.getAlbumID(),album.getArtist() + "-" + album.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,ImageUriRequest.URL_ALBUM);
+////        }
+////        return SearchRequest.DEFAULT_REQUEST;
+//    if (album == null) {
+//      return UriRequest.DEFAULT_REQUEST;
+//    }
+//    return new UriRequest(album.getAlbumID(), ImageUriRequest.URL_ALBUM,
+//        UriRequest.TYPE_NETEASE_ALBUM, album.getAlbum(), album.getArtist());
+//  }
+//
+//  /**
+//   * 根据艺术家信息构建请求参数
+//   */
+//  public static UriRequest getSearchRequest(Artist artist) {
+////        if(artist == null)
+////            return SearchRequest.DEFAULT_REQUEST;
+////        boolean isArtistAvailable = !TextUtils.isEmpty(artist.getArtist()) && !artist.getArtist().contains(mContext.getString(R.string.unknown_artist));
+////        if(isArtistAvailable){
+////            return new SearchRequest(artist.getArtistID(),artist.getArtist(), SearchRequest.TYPE_NETEASE_ARTIST,ImageUriRequest.URL_ARTIST);
+////        }
+////        return SearchRequest.DEFAULT_REQUEST;
+//    if (artist == null) {
+//      return UriRequest.DEFAULT_REQUEST;
+//    }
+//    return new UriRequest(artist.getArtistID(), ImageUriRequest.URL_ARTIST,
+//        UriRequest.TYPE_NETEASE_ARTIST, artist.getArtist());
+//  }
+//
+//  public static UriRequest getSearchRequestWithAlbumType(Song song) {
+//    return new UriRequest(song.getAlbumId(),
+//        song.getId(),
+//        ImageUriRequest.URL_ALBUM,
+//        UriRequest.TYPE_NETEASE_SONG,
+//        song.getTitle(), song.getAlbum(), song.getArtist());
+//  }
 
   public static boolean isArtistNameUnknownOrEmpty(@Nullable String artistName) {
     if (TextUtils.isEmpty(artistName)) {
@@ -191,7 +192,7 @@ public class ImageUriUtil {
 
   public static String getLargestAlbumImageUrl(List<Image> images) {
     HashMap<ImageSize, String> imageUrls = new HashMap<>();
-    if(imageUrls == null){
+    if (images == null || images.isEmpty()) {
       return "";
     }
     for (Image image : images) {
@@ -286,7 +287,8 @@ public class ImageUriUtil {
     return "";
   }
 
-  private static String getNeteaseSearchKey(String title, String album, String artist, boolean searchAlbum) {
+  private static String getNeteaseSearchKey(String title, String album, String artist,
+      boolean searchAlbum) {
     boolean isTitleAvailable = !ImageUriUtil.isSongNameUnknownOrEmpty(title);
     boolean isAlbumAvailable = !ImageUriUtil.isAlbumNameUnknownOrEmpty(album);
     boolean isArtistAvailable = !ImageUriUtil.isArtistNameUnknownOrEmpty(artist);

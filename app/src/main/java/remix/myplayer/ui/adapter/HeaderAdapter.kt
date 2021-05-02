@@ -2,19 +2,13 @@ package remix.myplayer.ui.adapter
 
 import android.content.Context
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.view.SimpleDraweeView
-import io.reactivex.disposables.Disposable
 import remix.myplayer.R
 import remix.myplayer.misc.isPortraitOrientation
-import remix.myplayer.request.LibraryUriRequest
-import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.UriRequest
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.accentColor
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
@@ -30,7 +24,7 @@ import remix.myplayer.util.SPUtil
  * @Author Xiaoborui
  * @Date 2017/1/17 16:36
  */
-abstract class HeaderAdapter<Data, ViewHolder : RecyclerView.ViewHolder> (
+abstract class HeaderAdapter<Data, ViewHolder : RecyclerView.ViewHolder>(
     layoutId: Int,
     var choice: MultipleChoice<Data>,
     var recyclerView: RecyclerView) : BaseAdapter<Data, BaseViewHolder>(layoutId) {
@@ -136,17 +130,16 @@ abstract class HeaderAdapter<Data, ViewHolder : RecyclerView.ViewHolder> (
     }
   }
 
-  fun setImage(simpleDraweeView: SimpleDraweeView,
-               uriRequest: UriRequest,
-               imageSize: Int,
-               position: Int): Disposable {
-    return object : LibraryUriRequest(simpleDraweeView,
-        uriRequest,
-        RequestConfig.Builder(imageSize, imageSize).build()) {}.load()
-  }
+//  fun setImage(simpleDraweeView: SimpleDraweeView,
+//               uriRequest: UriRequest,
+//               imageSize: Int,
+//               position: Int): Disposable {
+//    return object : LibraryUriRequest(simpleDraweeView,
+//        uriRequest,
+//        RequestConfig.Builder(imageSize, imageSize).build()) {}.load()
+//  }
 
-  fun disposeLoad(holder: RecyclerView.ViewHolder) {
-    //
+//  fun disposeLoad(holder: RecyclerView.ViewHolder) {
 //    val parent = if (holder.itemView is ViewGroup) holder.itemView as ViewGroup else null
 //    if (parent != null) {
 //      for (i in 0 until parent.childCount) {
@@ -162,7 +155,7 @@ abstract class HeaderAdapter<Data, ViewHolder : RecyclerView.ViewHolder> (
 //        }
 //      }
 //    }
-  }
+//  }
 
   companion object {
     //显示模式 1:列表 2:网格

@@ -82,6 +82,10 @@ data class Song(
     return duration
   }
 
+  override fun getKey(): String {
+    return albumId.toString()
+  }
+
   override fun hashCode(): Int {
     var result = id
     result = 31 * result + displayName.hashCode()

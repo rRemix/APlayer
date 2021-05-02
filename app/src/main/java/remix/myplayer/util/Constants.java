@@ -30,4 +30,6 @@ public class Constants {
   public final static int SYSTEM_LOCKSCREEN = 1;
   public final static int CLOSE_LOCKSCREEN = 2;
 
+  public static final int KB = 1024;
+  public static final int MB = 1024 * KB;
 }

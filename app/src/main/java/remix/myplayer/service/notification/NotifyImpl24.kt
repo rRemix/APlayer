@@ -14,13 +14,10 @@ import com.bumptech.glide.request.transition.Transition
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.glide.GlideApp
-import remix.myplayer.request.RemoteUriRequest
-import remix.myplayer.request.RequestConfig
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
 import remix.myplayer.util.DensityUtil
-import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 
 /**
  * Created by Remix on 2017/11/22.
