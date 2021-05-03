@@ -13,16 +13,16 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
+import android.view.View;
+import android.widget.ImageView;
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import android.view.View;
-import android.widget.ImageView;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import com.afollestad.materialdialogs.MaterialDialog;
 import remix.myplayer.App;
 import remix.myplayer.R;
@@ -279,6 +279,17 @@ public class Theme {
 
   public static boolean isWindowBackgroundDark(Context context) {
     return !ColorUtil.isColorLight(resolveColor(context, android.R.attr.windowBackground));
+  }
+
+  public static Drawable resolveDrawable(Context context, @AttrRes int attr){
+    TypedArray ta = context.getTheme().obtainStyledAttributes(new int[]{attr});
+    Drawable drawable;
+    try {
+      drawable = ta.getDrawable(0);
+    } finally {
+      ta.recycle();
+    }
+    return drawable;
   }
 
 }

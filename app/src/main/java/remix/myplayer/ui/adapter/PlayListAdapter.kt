@@ -8,19 +8,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.view.SimpleDraweeView
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.databinding.ItemPlaylistRecycleGridBinding
 import remix.myplayer.databinding.ItemPlaylistRecycleListBinding
 import remix.myplayer.db.room.model.PlayList
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
-import remix.myplayer.request.ImageUriRequest
-import remix.myplayer.request.PlayListUriRequest
-import remix.myplayer.request.RequestConfig
-import remix.myplayer.request.UriRequest
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.libraryBtnColor
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
@@ -28,6 +28,7 @@ import remix.myplayer.ui.adapter.holder.HeaderHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
 import remix.myplayer.util.Constants
+import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
@@ -51,11 +52,6 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
     else PlayListGridHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_playlist_recycle_grid, parent, false))
   }
 
-  override fun onViewRecycled(holder: BaseViewHolder) {
-    super.onViewRecycled(holder)
-    disposeLoad(holder)
-  }
-
   @SuppressLint("RestrictedApi")
   override fun convert(holder: BaseViewHolder, data: PlayList?, position: Int) {
     if (position == 0) {
@@ -72,10 +68,19 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
     holder.tvOther.text = context.getString(R.string.song_count, data.audioIds.size)
 
     //设置专辑封面
-    val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
-    object : PlayListUriRequest(holder.iv,
-        UriRequest(data.id, URL_PLAYLIST, UriRequest.TYPE_NETEASE_SONG),
-        RequestConfig.Builder(imageSize, imageSize).build()) {}.load()
+    val options = RequestOptions()
+        .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+        .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+
+    if (mode == GRID_MODE) {
+      options.transform(MultiTransformation(CenterCrop(), RoundedCorners(DensityUtil.dip2px(2f))))
+    }
+
+    GlideApp.with(holder.itemView)
+        .load(data)
+        .apply(options)
+        .into(holder.iv)
+
     holder.container.setOnClickListener { v: View? ->
       if (position - 1 < 0) {
         ToastUtil.show(context, R.string.illegal_arg)
@@ -103,7 +108,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
       val popupMenu = PopupMenu(context, holder.btn)
       popupMenu.menuInflater.inflate(R.menu.menu_playlist_item, popupMenu.menu)
       popupMenu.setOnMenuItemClickListener(
-          LibraryListener(context, data.id.toString() + "", Constants.PLAYLIST, data.name))
+          LibraryListener(context, data, Constants.PLAYLIST, data.name))
       popupMenu.show()
     }
 
@@ -116,10 +121,10 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
     if (position in 1..dataList.size) {
       val data = dataList[position - 1]
       val key = when (SPUtil.getValue(
-        App.context,
-        SETTING_KEY.NAME,
-        SETTING_KEY.PLAYLIST_SORT_ORDER,
-        SortOrder.PLAYLIST_A_Z
+          App.context,
+          SETTING_KEY.NAME,
+          SETTING_KEY.PLAYLIST_SORT_ORDER,
+          SortOrder.PLAYLIST_A_Z
       )) {
         SortOrder.PLAYLIST_A_Z, SortOrder.PLAYLIST_Z_A -> data.name
         else -> ""
@@ -133,7 +138,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
   internal open class PlayListHolder(itemView: View) : BaseViewHolder(itemView) {
     lateinit var tvName: TextView
     lateinit var tvOther: TextView
-    lateinit var iv: SimpleDraweeView
+    lateinit var iv: ImageView
     lateinit var btn: ImageView
     lateinit var container: ViewGroup
   }
@@ -143,7 +148,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
       val binding = ItemPlaylistRecycleListBinding.bind(itemView)
       tvName = binding.itemText1
       tvOther = binding.itemText2
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       btn = binding.itemButton
       container = binding.itemContainer
     }
@@ -154,7 +159,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
       val binding = ItemPlaylistRecycleGridBinding.bind(itemView)
       tvName = binding.itemText1
       tvOther = binding.itemText2
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       btn = binding.itemButton
       container = binding.itemContainer
     }

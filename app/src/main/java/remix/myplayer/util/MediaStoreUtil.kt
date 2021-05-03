@@ -14,7 +14,6 @@ import android.provider.MediaStore.Audio
 import android.provider.MediaStore.Audio.AudioColumns
 import android.provider.Settings
 import androidx.annotation.WorkerThread
-import com.facebook.common.util.ByteConstants
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.audio.exceptions.CannotReadException
 import org.jaudiotagger.audio.exceptions.CannotWriteException
@@ -32,6 +31,7 @@ import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
 import remix.myplayer.db.room.DatabaseRepository.Companion.getInstance
 import remix.myplayer.helper.MusicServiceRemote.deleteFromService
 import remix.myplayer.helper.SortOrder
+import remix.myplayer.util.Constants.MB
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import timber.log.Timber
 import java.io.File
@@ -79,10 +79,10 @@ object MediaStoreUtil {
     val artistMaps: MutableMap<Long, MutableList<Artist>> = LinkedHashMap()
     val artists: MutableList<Artist> = ArrayList()
     val sortOrder = SPUtil.getValue(
-      context,
-      SETTING_KEY.NAME,
-      SETTING_KEY.ARTIST_SORT_ORDER,
-      SortOrder.ARTIST_A_Z
+        context,
+        SETTING_KEY.NAME,
+        SETTING_KEY.ARTIST_SORT_ORDER,
+        SortOrder.ARTIST_A_Z
     )
     try {
       context.contentResolver
@@ -131,10 +131,10 @@ object MediaStoreUtil {
     val albumMaps: MutableMap<Long, MutableList<Album>> = LinkedHashMap()
     val albums: MutableList<Album> = ArrayList()
     val sortOrder = SPUtil.getValue(
-      context,
-      SETTING_KEY.NAME,
-      SETTING_KEY.ALBUM_SORT_ORDER,
-      SortOrder.ALBUM_A_Z
+        context,
+        SETTING_KEY.NAME,
+        SETTING_KEY.ALBUM_SORT_ORDER,
+        SortOrder.ALBUM_A_Z
     )
     try {
       context.contentResolver
@@ -717,7 +717,6 @@ object MediaStoreUtil {
 
   init {
     SCAN_SIZE = SPUtil
-        .getValue(App.context, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE,
-            ByteConstants.MB)
+        .getValue(App.context, SETTING_KEY.NAME, SETTING_KEY.SCAN_SIZE, MB)
   }
 }

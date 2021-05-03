@@ -1,11 +1,12 @@
 package remix.myplayer.misc.cache;
 
+import static remix.myplayer.util.Constants.MB;
+
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.text.TextUtils;
-import com.facebook.common.util.ByteConstants;
 import java.io.File;
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class DiskCache {
       if (!lrcCacheDir.exists()) {
         lrcCacheDir.mkdir();
       }
-      mLrcCache = DiskLruCache.open(lrcCacheDir, getAppVersion(context), 1, 10 * ByteConstants.MB);
+      mLrcCache = DiskLruCache.open(lrcCacheDir, getAppVersion(context), 1, 10 * MB);
     } catch (IOException e) {
       e.printStackTrace();
     }

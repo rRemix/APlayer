@@ -20,16 +20,16 @@ class PurchaseAdapter(layoutId: Int) : BaseAdapter<Purchase, PurchaseAdapter.Pur
     }
     holder.binding.itemTitle.text = purchase.title.replace("(APlayer)", "")
     if (App.IS_GOOGLEPLAY) {
-      holder.binding.itemLogo.setActualImageResource(LOGOS_OTHERS[position])
+      holder.binding.iv.setImageResource(LOGOS_OTHERS[position])
       holder.binding.itemPrice.text = purchase.price
     } else {
       when (position) {
         0, 1, 2 -> {
-          holder.binding.itemLogo.setActualImageResource(LOGOS_DONATE[position])
+          holder.binding.iv.setImageResource(LOGOS_DONATE[position])
           holder.binding.itemPrice.text = ""
         }
         3, 4, 5, 6, 7 -> {
-          holder.binding.itemLogo.setActualImageResource(LOGOS_OTHERS[position - 3])
+          holder.binding.iv.setImageResource(LOGOS_OTHERS[position - 3])
           holder.binding.itemPrice.text = purchase.price
         }
       }

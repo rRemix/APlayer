@@ -8,7 +8,7 @@
   android:orientation="vertical"
   android:gravity="center_horizontal">
 
-  <com.facebook.drawee.view.SimpleDraweeView
+  <ImageView
     android:id="@+id/iv_header"
     android:layout_marginTop="@dimen/d20_size"
     android:layout_width="108dp"
@@ -17,11 +17,21 @@
     android:paddingLeft="@dimen/d4_size"
     android:paddingRight="@dimen/d4_size"
     android:paddingBottom="@dimen/d6_size"
-    android:scaleType="centerCrop"
-    fresco:actualImageScaleType="centerCrop"
-    fresco:placeholderImageScaleType="centerCrop"
-    fresco:placeholderImage="?attr/default_album"
     android:background="@color/transparent"/>
+<!--  <com.facebook.drawee.view.SimpleDraweeView-->
+<!--    android:id="@+id/iv_header"-->
+<!--    android:layout_marginTop="@dimen/d20_size"-->
+<!--    android:layout_width="108dp"-->
+<!--    android:layout_height="108dp"-->
+<!--    android:paddingTop="@dimen/d2_size"-->
+<!--    android:paddingLeft="@dimen/d4_size"-->
+<!--    android:paddingRight="@dimen/d4_size"-->
+<!--    android:paddingBottom="@dimen/d6_size"-->
+<!--    android:scaleType="centerCrop"-->
+<!--    fresco:actualImageScaleType="centerCrop"-->
+<!--    fresco:placeholderImageScaleType="centerCrop"-->
+<!--    fresco:placeholderImage="?attr/default_album"-->
+<!--    android:background="@color/transparent"/>-->
 
   <TextView
     android:id="@+id/tv_header"

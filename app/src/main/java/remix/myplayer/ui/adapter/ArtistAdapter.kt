@@ -6,18 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
-import com.facebook.drawee.view.SimpleDraweeView
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.databinding.ItemArtistRecycleGridBinding
 import remix.myplayer.databinding.ItemArtistRecycleListBinding
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
-import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.libraryBtnColor
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
@@ -25,11 +29,8 @@ import remix.myplayer.ui.adapter.holder.HeaderHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
-import remix.myplayer.util.Constants
-import remix.myplayer.util.ImageUriUtil
-import remix.myplayer.util.SPUtil
+import remix.myplayer.util.*
 import remix.myplayer.util.SPUtil.SETTING_KEY
-import remix.myplayer.util.ToastUtil
 import java.util.*
 
 /**
@@ -50,11 +51,6 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
     else ArtistGridHolder(ItemArtistRecycleGridBinding.inflate(LayoutInflater.from(parent.context), parent, false))
   }
 
-  override fun onViewRecycled(holder: BaseViewHolder) {
-    super.onViewRecycled(holder)
-    disposeLoad(holder)
-  }
-
   @SuppressLint("RestrictedApi", "CheckResult")
   override fun convert(holder: BaseViewHolder, artist: Artist?, position: Int) {
     if (position == 0) {
@@ -69,7 +65,6 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
     val context = holder.itemView.context
     //设置歌手名
     holder.tv1.text = artist.artist
-    val artistId = artist.artistID
     if (holder is ArtistListHolder) {
       if (artist.count > 0) {
         holder.tv2.text = context.getString(R.string.song_count_1, artist.count)
@@ -78,8 +73,19 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
       }
     }
     //设置封面
-    val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
-    holder.iv.tag = setImage(holder.iv, ImageUriUtil.getSearchRequest(artist), imageSize, position)
+    val options = RequestOptions()
+        .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_artist))
+        .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_artist))
+
+    if (mode == GRID_MODE) {
+      options.transform(MultiTransformation(CenterCrop(), RoundedCorners(DensityUtil.dip2px(2f))))
+    }
+
+    GlideApp.with(holder.itemView)
+        .load(artist)
+        .apply(options)
+        .into(holder.iv)
+
     holder.container.setOnClickListener { v: View? ->
       if (holder.adapterPosition - 1 < 0) {
         ToastUtil.show(context, R.string.illegal_arg)
@@ -106,7 +112,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
       }
       val popupMenu = PopupMenu(context, holder.btn)
       popupMenu.menuInflater.inflate(R.menu.menu_artist_item, popupMenu.menu)
-      popupMenu.setOnMenuItemClickListener(LibraryListener(context, artistId.toString() + "",
+      popupMenu.setOnMenuItemClickListener(LibraryListener(context, artist,
           Constants.ARTIST,
           artist.artist))
       popupMenu.gravity = Gravity.END
@@ -141,7 +147,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
   internal open class ArtistHolder(v: View) : BaseViewHolder(v) {
     lateinit var tv1: TextView
     lateinit var tv2: TextView
-    lateinit var iv: SimpleDraweeView
+    lateinit var iv: ImageView
     lateinit var btn: ImageButton
     lateinit var container: ViewGroup
   }
@@ -150,7 +156,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
     init {
       tv1 = binding.itemText1
       tv2 = binding.itemText2
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       btn = binding.itemButton
       container = binding.itemContainer
     }
@@ -159,7 +165,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
   internal class ArtistGridHolder(binding: ItemArtistRecycleGridBinding) : ArtistHolder(binding.root) {
     init {
       tv1 = binding.itemText1
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       btn = binding.itemButton
       container = binding.itemContainer
     }

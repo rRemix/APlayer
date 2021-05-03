@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:id="@+id/item_root"
@@ -16,25 +15,17 @@
     android:layout_marginBottom="8dp"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintLeft_toLeftOf="parent"
-    app:layout_constraintTop_toTopOf="parent"/>
+    app:layout_constraintTop_toTopOf="parent" />
 
-  <com.facebook.drawee.view.SimpleDraweeView
-    android:id="@+id/song_head_image"
+  <remix.myplayer.ui.widget.CircleImageView
+    android:id="@+id/iv"
     android:layout_width="@dimen/d40_size"
     android:layout_height="@dimen/d40_size"
-    android:layout_marginStart="16dp"
-    android:visibility="visible"
-    app:actualImageScaleType="centerCrop"
-    app:fadeDuration="@integer/FadeDuration"
-    app:failureImage="?attr/default_album"
-    app:failureImageScaleType="centerCrop"
+    android:layout_marginStart="@dimen/d16_size"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintRight_toLeftOf="@id/song_title"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    app:placeholderImage="?attr/default_album"
-    app:placeholderImageScaleType="centerCrop"
-    app:roundAsCircle="true"/>
+    app:layout_constraintTop_toTopOf="parent" />
 
   <ImageButton
     android:id="@+id/song_button"
@@ -43,7 +34,7 @@
     android:background="?attr/background_oval_ripple"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="parent"/>
+    app:layout_constraintTop_toTopOf="parent" />
 
   <View
     android:id="@+id/divider"
@@ -52,15 +43,15 @@
     android:layout_marginStart="16dp"
     android:background="?attr/divider_color"
     app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintStart_toStartOf="parent"/>
+    app:layout_constraintStart_toStartOf="parent" />
 
   <TextView
     android:id="@+id/song_title"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="2dp"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="8dp"
+    android:layout_marginBottom="2dp"
     android:ellipsize="end"
     android:gravity="start|center_vertical"
     android:lines="1"
@@ -69,10 +60,10 @@
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintBottom_toTopOf="@id/song_other"
     app:layout_constraintEnd_toStartOf="@+id/song_button"
-    app:layout_constraintStart_toEndOf="@+id/song_head_image"
+    app:layout_constraintStart_toEndOf="@+id/iv"
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintVertical_chainStyle="packed"
-    tools:text="七里香七里香七里香七里香七里香七里香"/>
+    tools:text="七里香七里香七里香七里香七里香七里香" />
 
   <TextView
     android:id="@+id/song_other"
@@ -88,7 +79,7 @@
     app:layout_constraintEnd_toEndOf="@id/song_title"
     app:layout_constraintStart_toStartOf="@id/song_title"
     app:layout_constraintTop_toBottomOf="@+id/song_title"
-    tools:text="周杰伦"/>
+    tools:text="周杰伦" />
 
   <ImageView
     android:id="@+id/sq"
@@ -100,6 +91,6 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     app:srcCompat="@drawable/icon_sq"
-    tools:visibility="visible"/>
+    tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

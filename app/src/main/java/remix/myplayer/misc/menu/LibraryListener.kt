@@ -14,10 +14,10 @@ import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
+import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
-import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.theme.Theme
@@ -29,6 +29,7 @@ import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.MediaStoreUtil.getSongIds
 import remix.myplayer.util.MediaStoreUtil.getSongsByParentPath
 import remix.myplayer.util.MusicUtil.makeCmdIntent
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 
@@ -36,7 +37,7 @@ import remix.myplayer.util.ToastUtil
  * Created by taeja on 16-1-25.
  */
 class LibraryListener(private val context: Context,
-                      private val key: String,
+                      private val model: APlayerModel,
                       private val type: Int,
                       private val extra: String) : PopupMenu.OnMenuItemClickListener {
 
@@ -44,15 +45,15 @@ class LibraryListener(private val context: Context,
     return Single.fromCallable {
       when (type) {
         //专辑或者艺术家
-        Constants.ALBUM, Constants.ARTIST -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + key, null)
+        Constants.ALBUM, Constants.ARTIST -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + model.getKey(), null)
         //播放列表
-        Constants.PLAYLIST -> DatabaseRepository.getInstance().getPlayList(key.toLong())
+        Constants.PLAYLIST -> DatabaseRepository.getInstance().getPlayList(model.getKey().toLong())
             .map {
               it.audioIds.toList()
             }
             .blockingGet()
         //文件夹
-        Constants.FOLDER -> getSongsByParentPath(key).map { it.id }
+        Constants.FOLDER -> getSongsByParentPath(model.getKey()).map { it.id }
         else -> emptyList()
       }
     }
@@ -122,7 +123,7 @@ class LibraryListener(private val context: Context,
                   .checkBoxPromptRes(R.string.delete_source, check[0]) { buttonView, isChecked -> check[0] = isChecked }
                   .onAny { dialog, which ->
                     if (which == POSITIVE) {
-                      DeleteHelper.deleteSongs(ids, check[0], if (type == Constants.PLAYLIST) key.toLong() else -1, type == Constants.PLAYLIST)
+                      DeleteHelper.deleteSongs(ids, check[0], if (type == Constants.PLAYLIST) model.getKey().toLong() else -1, type == Constants.PLAYLIST)
                           .compose(applySingleScheduler())
                           .subscribe({
                             ToastUtil.show(context, if (it) R.string.delete_success else R.string.delete_error)
@@ -135,9 +136,9 @@ class LibraryListener(private val context: Context,
             }
             //设置封面
             R.id.menu_album_thumb -> {
-              val customCover = CustomCover(key.toLong(), type, extra)
+              val customCover = CustomCover(model, type)
               val thumbIntent = (context as Activity).intent
-              thumbIntent.putExtra("thumb", customCover)
+              thumbIntent.putExtra(EXTRA_COVER, customCover)
               context.intent = thumbIntent
               Crop.pickImage(context, Crop.REQUEST_PICK)
             }
@@ -152,7 +153,7 @@ class LibraryListener(private val context: Context,
                   .title(R.string.rename)
                   .input("", "", false) { dialog, input ->
                     DatabaseRepository.getInstance()
-                        .getPlayList(key.toLong())
+                        .getPlayList(model.getKey().toLong())
                         .flatMap {
                           DatabaseRepository.getInstance()
                               .updatePlayList(it.copy(name = input.toString()))
@@ -176,6 +177,10 @@ class LibraryListener(private val context: Context,
 
 
     return true
+  }
+
+  companion object{
+    const val EXTRA_COVER = "cover"
   }
 
 }

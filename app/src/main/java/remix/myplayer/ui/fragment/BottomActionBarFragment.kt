@@ -9,18 +9,16 @@ import android.view.GestureDetector.SimpleOnGestureListener
 import kotlinx.android.synthetic.main.bottom_actionbar.*
 import remix.myplayer.App
 import remix.myplayer.R
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.isPlaying
 import remix.myplayer.misc.menu.CtrlButtonListener
-import remix.myplayer.request.LibraryUriRequest
-import remix.myplayer.request.RequestConfig
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.fragment.base.BaseMusicFragment
 import remix.myplayer.util.DensityUtil
-import remix.myplayer.util.ImageUriUtil
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -100,17 +98,13 @@ class BottomActionBarFragment : BaseMusicFragment() {
     bottom_title.text = song.title
     bottom_artist.text = song.artist
     //封面
-    object : LibraryUriRequest(bottom_action_bar_cover,
-        ImageUriUtil.getSearchRequestWithAlbumType(song),
-        RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()) {
-      override fun onSuccess(result: String?) {
-        super.onSuccess(result)
-      }
-
-      override fun onError(throwable: Throwable?) {
-        super.onError(throwable)
-      }
-    }.load()
+    GlideApp.with(this)
+        .load(song)
+        .centerCrop()
+        .placeholder(Theme.resolveDrawable(requireContext(), R.attr.default_album))
+        .error(Theme.resolveDrawable(requireContext(), R.attr.default_album))
+        .dontAnimate()
+        .into(iv)
   }
 
   fun startPlayerActivity() {

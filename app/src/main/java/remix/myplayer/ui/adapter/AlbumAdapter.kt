@@ -10,16 +10,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.view.SimpleDraweeView
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.databinding.ItemAlbumRecycleGridBinding
 import remix.myplayer.databinding.ItemAlbumRecycleListBinding
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
-import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.getBackgroundColorMain
 import remix.myplayer.theme.ThemeStore.libraryBtnColor
@@ -28,11 +31,12 @@ import remix.myplayer.ui.adapter.holder.HeaderHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
 import remix.myplayer.util.Constants
-import remix.myplayer.util.ImageUriUtil
+import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
 import java.util.*
+
 
 /**
  * Created by Remix on 2015/12/20.
@@ -52,10 +56,6 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     else AlbumGridHolder(ItemAlbumRecycleGridBinding.inflate(LayoutInflater.from(parent.context), parent, false))
   }
 
-  override fun onViewRecycled(holder: BaseViewHolder) {
-    super.onViewRecycled(holder)
-    disposeLoad(holder)
-  }
 
   @SuppressLint("RestrictedApi")
   override fun convert(holder: BaseViewHolder, album: Album?, position: Int) {
@@ -71,9 +71,19 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     holder.tv1.text = album.album
 
     //设置封面
-    val albumId = album.albumID
-    val imageSize = if (mode == LIST_MODE) ImageUriRequest.SMALL_IMAGE_SIZE else ImageUriRequest.BIG_IMAGE_SIZE
-    holder.iv.tag = setImage(holder.iv, ImageUriUtil.getSearchRequest(album), imageSize, position)
+    val options = RequestOptions()
+        .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+        .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+
+    if (mode == GRID_MODE) {
+      options.transform(MultiTransformation(CenterCrop(), RoundedCorners(DensityUtil.dip2px(2f))))
+    }
+
+    GlideApp.with(holder.itemView)
+        .load(album)
+        .apply(options)
+        .into(holder.iv)
+
     if (holder is AlbumListHolder) {
       holder.tv2.text = App.context.getString(R.string.song_count_2, album.artist, album.count)
     } else {
@@ -106,7 +116,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
       val popupMenu = PopupMenu(context, holder.btn, Gravity.END)
       popupMenu.menuInflater.inflate(R.menu.menu_album_item, popupMenu.menu)
       popupMenu.setOnMenuItemClickListener(LibraryListener(
-          context, albumId.toString() + "",
+          context, album,
           Constants.ALBUM,
           album.album))
       popupMenu.show()
@@ -127,10 +137,10 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     if (position in 1..dataList.size) {
       val data = dataList[position - 1]
       val key = when (SPUtil.getValue(
-        App.context,
-        SETTING_KEY.NAME,
-        SETTING_KEY.ALBUM_SORT_ORDER,
-        SortOrder.ALBUM_A_Z
+          App.context,
+          SETTING_KEY.NAME,
+          SETTING_KEY.ALBUM_SORT_ORDER,
+          SortOrder.ALBUM_A_Z
       )) {
         SortOrder.ALBUM_A_Z, SortOrder.ALBUM_Z_A -> data.album
         SortOrder.ARTIST_A_Z, SortOrder.ARTIST_Z_A -> data.artist
@@ -147,7 +157,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     lateinit var tv1: TextView
     lateinit var tv2: TextView
     lateinit var btn: ImageButton
-    lateinit var iv: SimpleDraweeView
+    lateinit var iv: ImageView
     lateinit var container: ViewGroup
   }
 
@@ -157,7 +167,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
       tv1 = binding.itemText1
       tv2 = binding.itemText2
       btn = binding.itemButton
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       container = binding.itemContainer
     }
   }
@@ -167,7 +177,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
       tv1 = binding.itemText1
       tv2 = binding.itemText2
       btn = binding.itemButton
-      iv = binding.itemSimpleiview
+      iv = binding.iv
       container = binding.itemContainer
     }
   }

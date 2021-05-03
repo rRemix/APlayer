@@ -4,16 +4,11 @@ import android.app.Activity
 import android.app.Application.ActivityLifecycleCallbacks
 import android.content.Context
 import android.content.res.Configuration
-import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication
-import com.facebook.common.util.ByteConstants
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.imagepipeline.cache.MemoryCacheParams
-import com.facebook.imagepipeline.core.ImagePipelineConfig
 import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy
 import io.reactivex.Completable
@@ -98,26 +93,15 @@ class App : MultiDexApplication(), ActivityLifecycleCallbacks {
     CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG, strategy)
     CrashReport.setIsDevelopmentDevice(this, BuildConfig.DEBUG)
 
-    // fresco
-    val cacheSize = (Runtime.getRuntime().maxMemory() / 8).toInt()
-    val config = ImagePipelineConfig.newBuilder(this)
-        .setBitmapMemoryCacheParamsSupplier {
-          MemoryCacheParams(cacheSize, Int.MAX_VALUE, cacheSize, Int.MAX_VALUE,
-              2 * ByteConstants.MB)
-        }
-        .setBitmapsConfig(Bitmap.Config.RGB_565)
-        .setDownsampleEnabled(true)
-        .build()
-    Fresco.initialize(this, config)
   }
 
   override fun onLowMemory() {
     super.onLowMemory()
     Timber.v("onLowMemory")
-    Completable
-        .fromAction { Fresco.getImagePipeline().clearMemoryCaches() }
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .subscribe()
+//    Completable
+//        .fromAction { Fresco.getImagePipeline().clearMemoryCaches() }
+//        .subscribeOn(AndroidSchedulers.mainThread())
+//        .subscribe()
   }
 
   override fun onTrimMemory(level: Int) {
@@ -128,12 +112,9 @@ class App : MultiDexApplication(), ActivityLifecycleCallbacks {
           when (level) {
             TRIM_MEMORY_UI_HIDDEN -> {
             }
-            TRIM_MEMORY_RUNNING_MODERATE, TRIM_MEMORY_RUNNING_LOW, TRIM_MEMORY_RUNNING_CRITICAL ->               // 释放不需要资源
-              Fresco.getImagePipeline().clearMemoryCaches()
+            TRIM_MEMORY_RUNNING_MODERATE, TRIM_MEMORY_RUNNING_LOW, TRIM_MEMORY_RUNNING_CRITICAL -> {
+            }
             TRIM_MEMORY_BACKGROUND, TRIM_MEMORY_MODERATE, TRIM_MEMORY_COMPLETE -> {
-              // 尽可能释放资源
-              Timber.v("")
-              Fresco.getImagePipeline().clearMemoryCaches()
             }
             else -> {
             }

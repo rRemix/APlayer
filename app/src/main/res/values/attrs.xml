@@ -1,73 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <declare-styleable name="CircleImageView">
-    <attr format="dimension" name="border_width"/>
-    <attr format="color" name="border_color"/>
+    <attr name="civ_border_width" format="dimension" />
+    <attr name="civ_border_color" format="color" />
+    <attr name="civ_border_overlay" format="boolean" />
+    <attr name="civ_circle_background_color" format="color" />
   </declare-styleable>
 
   <declare-styleable name="CircleSeekBar">
-    <attr format="integer|reference" name="progress_max" />
-    <attr format="dimension|reference" name="thumb_radius" />
-    <attr format="dimension|reference" name="track_width" />
+    <attr name="progress_max" format="integer|reference" />
+    <attr name="thumb_radius" format="dimension|reference" />
+    <attr name="track_width" format="dimension|reference" />
   </declare-styleable>
 
   <!--<declare-styleable name="ColumnView">-->
-    <!--<attr format="color" name="columncolor"/>-->
-    <!--<attr format="dimension|integer|reference" name="columnwidth"/>-->
-    <!--<attr format="integer" name="columnnum"/>-->
+  <!--<attr format="color" name="columncolor"/>-->
+  <!--<attr format="dimension|integer|reference" name="columnwidth"/>-->
+  <!--<attr format="integer" name="columnnum"/>-->
   <!--</declare-styleable>-->
 
   <declare-styleable name="FilterSizeSeekBar">
-    <attr format="dimension|reference" name="trackheight"/>
-    <attr format="color|reference" name="trackcolor"/>
-    <attr format="color|reference" name="progresscolor"/>
-    <attr format="integer" name="dotnum"/>
-    <attr format="dimension|reference" name="dotwidth"/>
-    <attr format="reference" name="thumb"/>
-    <attr format="reference" name="thumbpress"/>
-    <attr format="color|reference" name="dotcolor"/>
-    <attr format="color|reference" name="tiptextcolor"/>
+    <attr name="trackheight" format="dimension|reference" />
+    <attr name="trackcolor" format="color|reference" />
+    <attr name="progresscolor" format="color|reference" />
+    <attr name="dotnum" format="integer" />
+    <attr name="dotwidth" format="dimension|reference" />
+    <attr name="thumb" format="reference" />
+    <attr name="thumbpress" format="reference" />
+    <attr name="dotcolor" format="color|reference" />
+    <attr name="tiptextcolor" format="color|reference" />
   </declare-styleable>
 
   <declare-styleable name="EQSeekBar">
-    <attr format="dimension|reference" name="eqtrackwidth"/>
-    <attr format="color|reference" name="eqenabletrackcolor"/>
-    <attr format="color|reference" name="eqenableprogresscolor"/>
-    <attr format="color|reference" name="eqtrackcolor"/>
-    <attr format="color|reference" name="eqprogresscolor"/>
-    <attr format="integer" name="eqdotnum"/>
-    <attr format="reference" name="eqthumb"/>
-    <attr format="color|reference" name="eqenabletextcolor"/>
-    <attr format="color|reference" name="eqtextcolor"/>
+    <attr name="eqtrackwidth" format="dimension|reference" />
+    <attr name="eqenabletrackcolor" format="color|reference" />
+    <attr name="eqenableprogresscolor" format="color|reference" />
+    <attr name="eqtrackcolor" format="color|reference" />
+    <attr name="eqprogresscolor" format="color|reference" />
+    <attr name="eqdotnum" format="integer" />
+    <attr name="eqthumb" format="reference" />
+    <attr name="eqenabletextcolor" format="color|reference" />
+    <attr name="eqtextcolor" format="color|reference" />
   </declare-styleable>
 
   <declare-styleable name="FastScrollRecyclerView">
-    <attr format="boolean" name="hideScrollbar"/>
-    <attr format="boolean" name="showTrack"/>
-    <attr format="color|reference" name="trackColor"/>
-    <attr format="color|reference" name="handleColor"/>
-    <attr format="color|reference" name="bubbleColor"/>
-    <attr format="color|reference" name="bubbleTextColor"/>
+    <attr name="hideScrollbar" format="boolean" />
+    <attr name="showTrack" format="boolean" />
+    <attr name="trackColor" format="color|reference" />
+    <attr name="handleColor" format="color|reference" />
+    <attr name="bubbleColor" format="color|reference" />
+    <attr name="bubbleTextColor" format="color|reference" />
   </declare-styleable>
 
-  <attr format="color|reference" name="text_color_primary"/>
-  <attr format="color|reference" name="text_color_secondary"/>
-  <attr format="color|reference" name="background_color_main"/>
-  <attr format="color|reference" name="background_color_dialog"/>
-  <attr format="color|reference" name="background_library_color"/>
+  <attr name="text_color_primary" format="color|reference" />
+  <attr name="text_color_secondary" format="color|reference" />
+  <attr name="background_color_main" format="color|reference" />
+  <attr name="background_color_dialog" format="color|reference" />
+  <attr name="background_library_color" format="color|reference" />
   <!--点击效果-->
-  <attr format="reference" name="background_grid"/>
-  <attr format="reference" name="background_list"/>
-  <attr format="reference" name="background_rect_ripple"/>
-  <attr format="reference" name="background_oval_ripple"/>
+  <attr name="background_grid" format="reference" />
+  <attr name="background_list" format="reference" />
+  <attr name="background_rect_ripple" format="reference" />
+  <attr name="background_oval_ripple" format="reference" />
 
   <!--默认专辑和艺术家封面-->
-  <attr format="reference" name="default_album"/>
-  <attr format="reference" name="default_artist"/>
+  <attr name="default_album" format="reference" />
+  <attr name="default_artist" format="reference" />
   <!--波纹颜色-->
-  <attr format="reference|color" name="ripple_color"/>
+  <attr name="ripple_color" format="reference|color" />
   <!--分割线-->
-  <attr format="color|reference" name="divider_color"/>
+  <attr name="divider_color" format="color|reference" />
   <!--&lt;!&ndash;光标&ndash;&gt;-->
   <!--<attr name="textCursor" format="reference"/>-->
   <!--<attr name="tab" format="reference"/>-->

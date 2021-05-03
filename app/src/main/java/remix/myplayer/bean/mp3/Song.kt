@@ -1,7 +1,6 @@
 package remix.myplayer.bean.mp3
 
 import android.content.ContentUris
-import android.content.ContentValues
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Parcelable
@@ -33,10 +32,13 @@ data class Song(
     val size: Long,
     val year: String?,
     val titleKey: String?,
-    val addTime: Long) : Parcelable {
+    val addTime: Long) : Parcelable, APlayerModel {
 
   val contentUri: Uri
     get() = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toLong())
+
+  val artUri: Uri
+    get() = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId)
 
   val showName: String
     get() = if (!SHOW_DISPLAYNAME) title else displayName
@@ -80,6 +82,10 @@ data class Song(
     return duration
   }
 
+  override fun getKey(): String {
+    return albumId.toString()
+  }
+
   override fun hashCode(): Int {
     var result = id
     result = 31 * result + displayName.hashCode()
@@ -119,7 +125,6 @@ data class Song(
 
     return true
   }
-
 
   companion object {
     @JvmStatic

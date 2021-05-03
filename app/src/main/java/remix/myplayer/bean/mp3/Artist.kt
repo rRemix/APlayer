@@ -1,24 +1,18 @@
 package remix.myplayer.bean.mp3
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
 /**
  * Created by Remix on 2017/10/22.
  */
 
+@Parcelize
 data class Artist(val artistID: Long,
                   val artist: String,
-                  var count: Int) {
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
+                  var count: Int) : Parcelable, APlayerModel {
 
-    other as Artist
-
-    if (artistID != other.artistID) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    return artistID.hashCode()
+  override fun getKey(): String {
+    return artistID.toString()
   }
 }

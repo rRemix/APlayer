@@ -42,9 +42,9 @@ class RoundCoverFragment : CoverFragment() {
       }
 
       override fun onSpringAtRest(spring: Spring) {
-        if (cover_image.tag != requestId) {
-          cover_image.setImageURI("", null)
-        }
+//        if (cover_image.tag != requestId) {
+//          cover_image.setImageURI("", null)
+//        }
         cover_container.translationX = startValue.toFloat()
         val endVal = 1f
         inAnim = SpringSystem.create().createSpring()

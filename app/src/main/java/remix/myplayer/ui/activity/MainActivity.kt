@@ -16,7 +16,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
 import com.facebook.rebound.SpringSystem
@@ -34,12 +33,15 @@ import remix.myplayer.bean.misc.Library
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
+import remix.myplayer.glide.GlideApp
+import remix.myplayer.glide.UriFetcher
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
 import remix.myplayer.misc.interfaces.OnItemClickListener
+import remix.myplayer.misc.menu.LibraryListener.Companion.EXTRA_COVER
 import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.misc.update.DownloadService
 import remix.myplayer.misc.update.DownloadService.Companion.ACTION_DISMISS_DIALOG
@@ -47,10 +49,6 @@ import remix.myplayer.misc.update.DownloadService.Companion.ACTION_DOWNLOAD_COMP
 import remix.myplayer.misc.update.DownloadService.Companion.ACTION_SHOW_DIALOG
 import remix.myplayer.misc.update.UpdateAgent
 import remix.myplayer.misc.update.UpdateListener
-import remix.myplayer.request.ImageUriRequest
-import remix.myplayer.request.LibraryUriRequest
-import remix.myplayer.request.RequestConfig
-import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
@@ -60,7 +58,7 @@ import remix.myplayer.ui.fragment.*
 import remix.myplayer.ui.misc.DoubleClickListener
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.util.*
-import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.Util.*
 import timber.log.Timber
 import java.io.File
@@ -465,7 +463,9 @@ class MainActivity : MenuActivity(), View.OnClickListener {
         if (data.getBooleanExtra(EXTRA_RECREATE, false)) { //设置后需要重启activity
           handler.sendEmptyMessage(MSG_RECREATE_ACTIVITY)
         } else if (data.getBooleanExtra(EXTRA_REFRESH_ADAPTER, false)) { //刷新adapter
-          ImageUriRequest.clearUriCache()
+          //TODO clear glide activeResource
+          UriFetcher.clearAllCache()
+          GlideApp.get(this).clearMemory()
           handler.sendEmptyMessage(MSG_UPDATE_ADAPTER)
         } else if (data.getBooleanExtra(EXTRA_REFRESH_LIBRARY, false)) { //刷新Library
           val libraries = data.getSerializableExtra(EXTRA_LIBRARY) as List<Library>?
@@ -496,14 +496,14 @@ class MainActivity : MenuActivity(), View.OnClickListener {
       Crop.REQUEST_CROP, Crop.REQUEST_PICK -> {
         val intent = intent
 
-        val customCover = intent.getParcelableExtra<CustomCover>("thumb") ?: return
+        val customCover = intent.getParcelableExtra<CustomCover>(EXTRA_COVER) ?: return
         val errorTxt = getString(
             when (customCover.type) {
               Constants.ALBUM -> R.string.set_album_cover_error
               Constants.ARTIST -> R.string.set_artist_cover_error
               else -> R.string.set_playlist_cover_error
             })
-        val id = customCover.id //专辑、艺术家、播放列表封面
+        val id = customCover.model.getKey().toLong() //专辑、艺术家、播放列表封面
 
         if (resultCode != Activity.RESULT_OK) {
           ToastUtil.show(this, errorTxt)
@@ -513,9 +513,9 @@ class MainActivity : MenuActivity(), View.OnClickListener {
         if (requestCode == Crop.REQUEST_PICK) {
           //选择图片
           val cacheDir = DiskCache.getDiskCacheDir(this,
-              "thumbnail/" + when {
-                customCover.type == Constants.ALBUM -> "album"
-                customCover.type == Constants.ARTIST -> "artist"
+              "thumbnail/" + when (customCover.type) {
+                Constants.ALBUM -> "album"
+                Constants.ARTIST -> "artist"
                 else -> "playlist"
               })
           if (!cacheDir.exists() && !cacheDir.mkdirs()) {
@@ -541,9 +541,11 @@ class MainActivity : MenuActivity(), View.OnClickListener {
           }
 
           Handler(Looper.getMainLooper()).postDelayed({
-            Fresco.getImagePipeline().clearCaches()
-            ImageUriRequest.clearUriCache()
+            //TODO clear glide activeResource
+            UriFetcher.clearAllCache()
+            GlideApp.get(this).clearMemory()
             onMediaStoreChanged()
+            handler.sendEmptyMessage(MSG_UPDATE_ADAPTER)
           }, 500)
         }
       }
@@ -580,9 +582,12 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     val currentSong = MusicServiceRemote.getCurrentSong()
     if (currentSong != Song.EMPTY_SONG) {
       tv_header.text = getString(R.string.play_now, currentSong.title)
-      LibraryUriRequest(iv_header,
-          getSearchRequestWithAlbumType(currentSong),
-          RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load()
+      GlideApp.with(this)
+          .load(currentSong)
+          .centerCrop()
+          .placeholder(Theme.resolveDrawable(this, R.attr.default_album))
+          .error(Theme.resolveDrawable(this, R.attr.default_album))
+          .into(iv_header)
     }
   }
 

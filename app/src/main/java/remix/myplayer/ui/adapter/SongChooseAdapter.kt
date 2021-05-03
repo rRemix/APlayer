@@ -1,20 +1,18 @@
 package remix.myplayer.ui.adapter
 
-import android.net.Uri
 import android.view.View
 import android.widget.CompoundButton
+import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemSongChooseBinding
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.misc.interfaces.OnSongChooseListener
-import remix.myplayer.request.ImageUriRequest
-import remix.myplayer.request.LibraryUriRequest
-import remix.myplayer.request.RequestConfig
+import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.accentColor
 import remix.myplayer.theme.ThemeStore.isLightTheme
 import remix.myplayer.theme.TintHelper
 import remix.myplayer.ui.adapter.SongChooseAdapter.SongChooseHolder
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
-import remix.myplayer.util.ImageUriUtil
 import java.util.*
 
 /**
@@ -37,10 +35,13 @@ class SongChooseAdapter(layoutID: Int, private val checkListener: OnSongChooseLi
     //艺术家
     holder.binding.itemArtist.text = song.artist
     //封面
-    holder.binding.itemImg.setImageURI(Uri.EMPTY)
-    LibraryUriRequest(holder.binding.itemImg,
-        ImageUriUtil.getSearchRequestWithAlbumType(song),
-        RequestConfig.Builder(ImageUriRequest.SMALL_IMAGE_SIZE, ImageUriRequest.SMALL_IMAGE_SIZE).build()).load()
+    GlideApp.with(holder.itemView)
+        .load(song)
+        .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+        .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+        .centerCrop()
+        .into(holder.binding.iv)
+
     //选中歌曲
     holder.binding.root.setOnClickListener { v: View? ->
       holder.binding.checkbox.isChecked = !holder.binding.checkbox.isChecked

@@ -1,37 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:fresco="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  xmlns:tools="http://schemas.android.com/tools"
   android:background="@color/white">
 
   <ImageView
+    android:id="@+id/lockscreen_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/lockscreen_background"
-    android:visibility="visible"
-    android:scaleType="centerCrop"/>
+    android:scaleType="centerCrop"
+    android:visibility="visible" />
 
   <RelativeLayout
     android:id="@+id/lockscreen_imgage_container"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/white"
-    android:layout_centerHorizontal="true"
     android:layout_alignParentTop="true"
+    android:layout_centerHorizontal="true"
     android:layout_marginTop="@dimen/d60_size"
+    android:background="@color/white"
     android:padding="1.5dp">
-    <com.facebook.drawee.view.SimpleDraweeView
+    <!--    <com.facebook.drawee.view.SimpleDraweeView-->
+    <!--      android:layout_width="@dimen/d210_size"-->
+    <!--      android:layout_height="@dimen/d210_size"-->
+    <!--      android:id="@+id/lockscreen_image"-->
+    <!--      fresco:placeholderImageScaleType="centerCrop"-->
+    <!--      fresco:placeholderImage="@drawable/album_empty_bg_night"-->
+    <!--      fresco:actualImageScaleType="centerCrop"-->
+    <!--      android:scaleType="centerCrop"-->
+    <!--      android:layout_centerInParent="true"/>-->
+    <ImageView
+      android:id="@+id/iv"
       android:layout_width="@dimen/d210_size"
       android:layout_height="@dimen/d210_size"
-      android:id="@+id/lockscreen_image"
-      fresco:placeholderImageScaleType="centerCrop"
-      fresco:placeholderImage="@drawable/album_empty_bg_night"
-      fresco:actualImageScaleType="centerCrop"
-      android:scaleType="centerCrop"
-      android:layout_centerInParent="true"/>
+      android:layout_centerInParent="true" />
   </RelativeLayout>
 
 
@@ -39,131 +42,143 @@
     android:id="@+id/lockscreen_detail_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_below="@id/lockscreen_imgage_container"
     android:layout_marginTop="@dimen/d28_size"
     android:gravity="center"
-    android:layout_below="@id/lockscreen_imgage_container">
+    android:orientation="vertical">
+
     <TextView
       android:id="@+id/lockscreen_song"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:layout_marginLeft="@dimen/d10_size"
+      android:layout_marginTop="@dimen/d12_size"
+      android:layout_marginRight="@dimen/d10_size"
+      android:ellipsize="end"
       android:gravity="center"
       android:maxLines="1"
-      android:ellipsize="end"
-      android:layout_marginTop="@dimen/d12_size"
-      android:textSize="@dimen/s20_size"
-      android:layout_marginLeft="@dimen/d10_size"
-      android:layout_marginRight="@dimen/d10_size"/>
+      android:textSize="@dimen/s20_size" />
+
     <TextView
       android:id="@+id/lockscreen_artist"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:layout_marginLeft="@dimen/d10_size"
+      android:layout_marginTop="@dimen/d12_size"
+      android:layout_marginRight="@dimen/d10_size"
+      android:ellipsize="end"
       android:gravity="center"
       android:maxLines="1"
-      android:ellipsize="end"
-      android:layout_marginTop="@dimen/d12_size"
-      android:textSize="@dimen/s14_size"
-      android:layout_marginLeft="@dimen/d10_size"
-      android:layout_marginRight="@dimen/d10_size"/>
+      android:textSize="@dimen/s14_size" />
   </LinearLayout>
 
   <RelativeLayout
     android:id="@+id/lockscreen_button_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:layout_below="@id/lockscreen_detail_container"
     android:layout_marginTop="@dimen/d30_size"
-    android:layout_below="@id/lockscreen_detail_container">
+    android:orientation="horizontal">
+
     <ImageButton
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
       android:id="@+id/lockscreen_play"
-      android:src="@drawable/lock_btn_play"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
       android:layout_centerInParent="true"
-      android:background="@color/transparent"
       android:layout_marginLeft="@dimen/d30_size"
-      android:layout_marginRight="@dimen/d30_size"/>
+      android:layout_marginRight="@dimen/d30_size"
+      android:background="@color/transparent"
+      android:src="@drawable/lock_btn_play" />
+
     <ImageButton
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:padding="@dimen/d8_size"
       android:id="@+id/lockscreen_prev"
-      android:src="@drawable/lock_btn_prev"
-      android:background="@color/transparent"
-      android:layout_toLeftOf="@id/lockscreen_play"
-      android:layout_centerVertical="true"/>
-    <ImageButton
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:padding="@dimen/d8_size"
-      android:id="@+id/lockscreen_next"
-      android:src="@drawable/lock_btn_next"
+      android:layout_centerVertical="true"
+      android:layout_toLeftOf="@id/lockscreen_play"
       android:background="@color/transparent"
+      android:padding="@dimen/d8_size"
+      android:src="@drawable/lock_btn_prev" />
+
+    <ImageButton
+      android:id="@+id/lockscreen_next"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerVertical="true"
       android:layout_toRightOf="@id/lockscreen_play"
-      android:layout_centerVertical="true"/>
+      android:background="@color/transparent"
+      android:padding="@dimen/d8_size"
+      android:src="@drawable/lock_btn_next" />
   </RelativeLayout>
 
   <remix.myplayer.ui.widget.VerticalScrollTextView
+    android:id="@+id/lockscreen_lyric"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textSize="@dimen/s16_size"
-    android:maxLines="2"
-    android:ellipsize="end"
-    android:id="@+id/lockscreen_lyric"
-    android:gravity="center"
-    android:layout_marginTop="@dimen/d40_size"
-    android:paddingStart="@dimen/d12_size"
-    android:paddingEnd="@dimen/d12_size"
-    android:paddingTop="@dimen/d12_size"
-    android:paddingBottom="@dimen/d12_size"
-    android:layout_centerHorizontal="true"
-    android:lineSpacingExtra="@dimen/d8_size"
     android:layout_below="@id/lockscreen_button_container"
-    tools:text="歌词"/>
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="@dimen/d40_size"
+    android:ellipsize="end"
+    android:gravity="center"
+    android:lineSpacingExtra="@dimen/d8_size"
+    android:maxLines="2"
+    android:paddingStart="@dimen/d12_size"
+    android:paddingTop="@dimen/d12_size"
+    android:paddingEnd="@dimen/d12_size"
+    android:paddingBottom="@dimen/d12_size"
+    android:textSize="@dimen/s16_size"
+    tools:text="歌词" />
 
   <LinearLayout
     android:id="@+id/lockscreen_arrow_container"
-    android:orientation="horizontal"
-    android:gravity="center"
-    android:layout_centerHorizontal="true"
-    android:layout_alignParentBottom="true"
-    android:layout_marginBottom="20dp"
     android:layout_width="wrap_content"
-    android:layout_height="@dimen/d12_size">
+    android:layout_height="@dimen/d12_size"
+    android:layout_alignParentBottom="true"
+    android:layout_centerHorizontal="true"
+    android:layout_marginBottom="20dp"
+    android:gravity="center"
+    android:orientation="horizontal">
+
     <ImageView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:src="@drawable/icon_lockscreen_arrow"
-      android:background="@color/transparent"/>
+      android:background="@color/transparent"
+      android:src="@drawable/icon_lockscreen_arrow" />
+
     <ImageView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:src="@drawable/icon_lockscreen_arrow"
-      android:background="@color/transparent"/>
+      android:background="@color/transparent"
+      android:src="@drawable/icon_lockscreen_arrow" />
+
     <ImageView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:src="@drawable/icon_lockscreen_arrow"
-      android:background="@color/transparent"/>
+      android:background="@color/transparent"
+      android:src="@drawable/icon_lockscreen_arrow" />
+
     <ImageView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:src="@drawable/icon_lockscreen_arrow"
-      android:background="@color/transparent"/>
+      android:background="@color/transparent"
+      android:src="@drawable/icon_lockscreen_arrow" />
+
     <ImageView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:src="@drawable/icon_lockscreen_arrow"
-      android:background="@color/transparent"/>
+      android:background="@color/transparent"
+      android:src="@drawable/icon_lockscreen_arrow" />
+
     <ImageView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:src="@drawable/icon_lockscreen_arrow"
-      android:background="@color/transparent"/>
+      android:background="@color/transparent"
+      android:src="@drawable/icon_lockscreen_arrow" />
+
     <ImageView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:src="@drawable/icon_lockscreen_arrow"
-      android:background="@color/transparent"/>
+      android:background="@color/transparent"
+      android:src="@drawable/icon_lockscreen_arrow" />
   </LinearLayout>
 </RelativeLayout>

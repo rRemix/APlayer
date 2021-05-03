@@ -1,65 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:fresco="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/reslist_item"
   android:layout_width="match_parent"
   android:layout_height="@dimen/item_height"
-  android:id="@+id/reslist_item"
   android:background="?attr/background_rect_ripple">
-  <com.facebook.drawee.view.SimpleDraweeView
-    android:layout_alignParentLeft="true"
-    android:id="@+id/search_image"
-    android:layout_centerVertical="true"
-    android:layout_marginLeft="@dimen/d16_size"
-    android:layout_marginRight="@dimen/d16_size"
+  <!--  <com.facebook.drawee.view.SimpleDraweeView-->
+  <!--    android:layout_alignParentStart="true"-->
+  <!--    android:id="@+id/search_image"-->
+  <!--    android:layout_centerVertical="true"-->
+  <!--    android:layout_marginLeft="@dimen/d16_size"-->
+  <!--    android:layout_marginRight="@dimen/d16_size"-->
+  <!--    android:layout_width="@dimen/d45_size"-->
+  <!--    android:layout_height="@dimen/d45_size"-->
+  <!--    fresco:actualImageScaleType="centerCrop"-->
+  <!--    fresco:placeholderImageScaleType="centerCrop"-->
+  <!--    fresco:placeholderImage="?attr/default_album"-->
+  <!--    fresco:failureImage="?attr/default_album"-->
+  <!--    fresco:failureImageScaleType="centerCrop"-->
+  <!--    fresco:roundAsCircle="true"/>-->
+  <remix.myplayer.ui.widget.CircleImageView
+    android:id="@+id/iv"
     android:layout_width="@dimen/d45_size"
     android:layout_height="@dimen/d45_size"
-    fresco:actualImageScaleType="centerCrop"
-    fresco:placeholderImageScaleType="centerCrop"
-    fresco:placeholderImage="?attr/default_album"
-    fresco:failureImage="?attr/default_album"
-    fresco:failureImageScaleType="centerCrop"
-    fresco:roundAsCircle="true"/>
+    android:layout_alignParentStart="true"
+    android:layout_centerVertical="true"
+    android:layout_marginHorizontal="@dimen/d16_size" />
+
   <!--歌曲名、歌手、专辑-->
   <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="@dimen/item_height"
     android:layout_gravity="center_vertical"
+    android:layout_toEndOf="@id/iv"
     android:gravity="center_vertical"
-    android:orientation="vertical"
-    android:layout_toRightOf="@id/search_image">
+    android:orientation="vertical">
+
     <TextView
+      android:id="@+id/search_name"
       android:layout_width="@dimen/d200_size"
       android:layout_height="wrap_content"
-      android:id="@+id/search_name"
-      android:textColor="?attr/text_color_primary"
-      android:textSize="@dimen/s14_size"
       android:layout_marginBottom="@dimen/d5_szie"
+      android:ellipsize="end"
       android:lines="1"
-      android:ellipsize="end"/>
+      android:textColor="?attr/text_color_primary"
+      android:textSize="@dimen/s14_size" />
+
     <TextView
       android:id="@+id/search_detail"
       android:layout_width="@dimen/d200_size"
       android:layout_height="wrap_content"
-      android:textColor="?attr/text_color_secondary"
-      android:textSize="@dimen/s12_size"
+      android:ellipsize="end"
       android:lines="1"
-      android:ellipsize="end"/>
+      android:textColor="?attr/text_color_secondary"
+      android:textSize="@dimen/s12_size" />
   </LinearLayout>
 
   <!--结尾处按钮-->
   <ImageButton
-    android:layout_alignParentRight="true"
     android:id="@+id/search_button"
     android:layout_width="@dimen/item_list_btn_size"
     android:layout_height="@dimen/item_list_btn_size"
+    android:layout_alignParentEnd="true"
     android:layout_centerVertical="true"
-    android:background="?attr/background_oval_ripple"/>
+    android:background="?attr/background_oval_ripple" />
 
   <View
     android:layout_width="match_parent"
     android:layout_height="@dimen/d1_size"
-    android:background="?attr/divider_color"
     android:layout_alignParentBottom="true"
-    android:layout_marginLeft="@dimen/d16_size"/>
+    android:layout_marginStart="@dimen/d16_size"
+    android:background="?attr/divider_color" />
 </RelativeLayout>

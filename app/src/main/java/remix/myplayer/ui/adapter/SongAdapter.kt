@@ -14,11 +14,11 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemSongRecycleBinding
 import remix.myplayer.databinding.LayoutHeader1Binding
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.SongPopupListener
-import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.service.Command
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.accentColor
@@ -28,7 +28,6 @@ import remix.myplayer.theme.ThemeStore.textColorPrimary
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
-import remix.myplayer.util.ImageUriUtil
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
@@ -48,11 +47,6 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return if (viewType == TYPE_HEADER) HeaderHolder(LayoutInflater.from(parent.context).inflate(R.layout.layout_header_1, parent, false))
     else SongViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_song_recycle, parent, false))
-  }
-
-  override fun onViewRecycled(holder: BaseViewHolder) {
-    super.onViewRecycled(holder)
-    disposeLoad(holder)
   }
 
   @SuppressLint("RestrictedApi")
@@ -87,7 +81,12 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
     }
 
     //封面
-    holder.binding.songHeadImage.tag = setImage(holder.binding.songHeadImage, ImageUriUtil.getSearchRequestWithAlbumType(song), ImageUriRequest.SMALL_IMAGE_SIZE, position)
+    GlideApp.with(holder.itemView)
+        .load(song)
+        .centerCrop()
+        .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+        .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+        .into(holder.binding.iv)
 
 //        //是否为无损
 //        if(!TextUtils.isEmpty(song.getDisplayName())){
@@ -147,10 +146,10 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
     if (position in 1..dataList.size) {
       val data = dataList[position - 1]
       val key = when (SPUtil.getValue(
-        App.context,
-        SPUtil.SETTING_KEY.NAME,
-        SPUtil.SETTING_KEY.SONG_SORT_ORDER,
-        SortOrder.SONG_A_Z
+          App.context,
+          SPUtil.SETTING_KEY.NAME,
+          SPUtil.SETTING_KEY.SONG_SORT_ORDER,
+          SortOrder.SONG_A_Z
       )) {
         SortOrder.SONG_A_Z, SortOrder.SONG_Z_A -> data.title
         SortOrder.ARTIST_A_Z, SortOrder.ARTIST_Z_A -> data.artist

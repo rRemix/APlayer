@@ -3,22 +3,20 @@ package remix.myplayer.service.notification
 import android.app.Notification
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Build
-import androidx.core.app.NotificationCompat
 import android.view.View
 import android.widget.RemoteViews
+import androidx.core.app.NotificationCompat
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import remix.myplayer.R
-import remix.myplayer.request.RemoteUriRequest
-import remix.myplayer.request.RequestConfig
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.DensityUtil
-import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 import remix.myplayer.util.SPUtil
-import timber.log.Timber
 
 
 /**
@@ -94,40 +92,43 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     //设置封面
     val size = DensityUtil.dip2px(service, 128f)
 
-    disposable?.dispose()
-    disposable = object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
-      override fun onStart() {
-        Timber.v("onStart")
-        remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-        remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-        pushNotify(notification)
-      }
+    GlideApp.with(service)
+        .asBitmap()
+        .load(song)
+        .override(size, size)
+        .centerCrop()
+        .into(object : CustomTarget<Bitmap>() {
+          override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+            if (!resource.isRecycled) {
+              remoteBigView.setImageViewBitmap(R.id.notify_image, resource)
+              remoteView.setImageViewBitmap(R.id.notify_image, resource)
+            } else {
+              remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+              remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+            }
 
-      override fun onError(throwable: Throwable) {
-        Timber.v("onError")
-        remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-        remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-        pushNotify(notification)
-      }
+            pushNotify(notification)
+          }
 
-      override fun onSuccess(result: Bitmap?) {
-        Timber.v("onSuccess")
-        try {
-          if (result != null && !result.isRecycled) {
-            remoteBigView.setImageViewBitmap(R.id.notify_image, result)
-            remoteView.setImageViewBitmap(R.id.notify_image, result)
-          } else {
+          override fun onLoadCleared(placeholder: Drawable?) {
             remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+            pushNotify(notification)
           }
-        } catch (e: Exception) {
-          Timber.v(e)
-        } finally {
-          pushNotify(notification)
-        }
-      }
 
-    }.load()
+          override fun onLoadFailed(errorDrawable: Drawable?) {
+            remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+            remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+            pushNotify(notification)
+          }
+
+          override fun onLoadStarted(placeholder: Drawable?) {
+            remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+            remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+            pushNotify(notification)
+          }
+
+        })
   }
 
   private fun buildNotification(context: Context, remoteView: RemoteViews, remoteBigView: RemoteViews): Notification {
@@ -177,12 +178,12 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     val song = service.currentSong
     val builder = NotificationCompat.Builder(service, PLAYING_NOTIFICATION_CHANNEL_ID)
     builder.setContentText(song.title)
-            .setContentTitle(song.title)
-            .setShowWhen(false)
-            .setTicker(lrc)
-            .setOngoing(service.isPlaying)
-            .setContentIntent(contentIntent)
-            .setSmallIcon(R.drawable.icon_notifbar)
+        .setContentTitle(song.title)
+        .setShowWhen(false)
+        .setTicker(lrc)
+        .setOngoing(service.isPlaying)
+        .setContentIntent(contentIntent)
+        .setSmallIcon(R.drawable.icon_notifbar)
     val notification = builder.build()
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

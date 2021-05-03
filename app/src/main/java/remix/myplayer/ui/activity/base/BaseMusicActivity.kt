@@ -9,7 +9,6 @@ import kotlinx.coroutines.cancel
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.helper.MusicServiceRemote
-import remix.myplayer.request.ImageUriRequest
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Util
 import remix.myplayer.util.Util.registerLocalReceiver
@@ -112,7 +111,6 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
 
   override fun onMediaStoreChanged() {
     Timber.tag(TAG).v("onMediaStoreChanged")
-    ImageUriRequest.clearUriCache()
     for (listener in serviceEventListeners) {
       listener.onMediaStoreChanged()
     }

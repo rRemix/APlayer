@@ -6,20 +6,15 @@
   android:layout_width="match_parent"
   android:layout_height="@dimen/d64_size"
   android:background="?attr/background_list">
-  <com.facebook.drawee.view.SimpleDraweeView
-    android:id="@+id/item_simpleiview"
+
+  <ImageView
+    android:id="@+id/iv"
+    android:layout_marginStart="@dimen/d8_size"
     android:layout_width="@dimen/d42_size"
     android:layout_height="@dimen/d42_size"
-    android:layout_marginStart="@dimen/d8_size"
-    app:actualImageScaleType="centerCrop"
-    app:fadeDuration="@integer/FadeDuration"
-    app:failureImage="?attr/default_album"
-    app:failureImageScaleType="centerCrop"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintLeft_toLeftOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    app:placeholderImage="?attr/default_album"
-    app:placeholderImageScaleType="centerCrop"/>
+    app:layout_constraintTop_toTopOf="parent"/>
 
 
   <TextView
@@ -36,7 +31,7 @@
     android:textSize="@dimen/s14_size"
     app:layout_constraintBottom_toTopOf="@id/item_text2"
     app:layout_constraintEnd_toStartOf="@id/item_button"
-    app:layout_constraintStart_toEndOf="@id/item_simpleiview"
+    app:layout_constraintStart_toEndOf="@id/iv"
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintVertical_chainStyle="packed"/>
 

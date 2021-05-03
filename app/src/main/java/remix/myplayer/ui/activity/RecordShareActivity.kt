@@ -16,11 +16,10 @@ import remix.myplayer.App.Companion.context
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivityRecordshareBinding
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
-import remix.myplayer.request.LibraryUriRequest
-import remix.myplayer.request.RequestConfig
 import remix.myplayer.theme.GradientDrawableMaker
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.activity.base.BaseMusicActivity
@@ -81,9 +80,15 @@ class RecordShareActivity : BaseMusicActivity() {
     //当前正在播放的歌曲
     val song: Song = intent.extras!!.getParcelable(EXTRA_SONG)
         ?: return
-    LibraryUriRequest(binding.recordshareImage,
-        ImageUriUtil.getSearchRequestWithAlbumType(song),
-        RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load()
+//    LibraryUriRequest(binding.recordshareImage,
+//        ImageUriUtil.getSearchRequestWithAlbumType(song),
+//        RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load()
+    GlideApp.with(this)
+        .load(song)
+        .centerCrop()
+        .placeholder(Theme.resolveDrawable(this, R.attr.default_album))
+        .error(Theme.resolveDrawable(this, R.attr.default_album))
+        .into(binding.iv)
 
     //设置歌曲名与分享内容
     val content = intent.extras!!.getString(EXTRA_CONTENT)

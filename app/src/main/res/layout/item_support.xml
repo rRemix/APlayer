@@ -31,13 +31,12 @@
         android:textColor="?attr/text_color_primary"
         android:textSize="@dimen/s14_size"/>
 
-      <com.facebook.drawee.view.SimpleDraweeView
+      <ImageView
+        android:id="@+id/iv"
+        android:scaleType="centerCrop"
+        android:layout_marginVertical="@dimen/d4_size"
         android:layout_width="@dimen/d32_size"
-        android:layout_height="@dimen/d32_size"
-        android:id="@+id/item_logo"
-        android:layout_marginTop="@dimen/d4_size"
-        android:layout_marginBottom="@dimen/d4_size"
-        fresco:actualImageScaleType="centerCrop"/>
+        android:layout_height="@dimen/d32_size"/>
 
       <TextView
         android:id="@+id/item_title"

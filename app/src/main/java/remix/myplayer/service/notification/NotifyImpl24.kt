@@ -5,50 +5,56 @@ import android.app.Notification
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.request.RemoteUriRequest
-import remix.myplayer.request.RequestConfig
+import remix.myplayer.glide.GlideApp
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
 import remix.myplayer.util.DensityUtil
-import remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType
 
 /**
  * Created by Remix on 2017/11/22.
  */
 @TargetApi(Build.VERSION_CODES.O)
 class NotifyImpl24(context: MusicService) : Notify(context) {
+  private val defaultBitmap = BitmapFactory.decodeResource(service.resources, R.drawable.album_empty_bg_night)
+
   override fun updateForPlaying() {
     val song = service.currentSong
 
     //设置封面
     val size = DensityUtil.dip2px(service, 128f)
-    disposable?.dispose()
-    disposable = object : RemoteUriRequest(getSearchRequestWithAlbumType(song), RequestConfig.Builder(size, size).build()) {
-      override fun onStart() {
-        val result = BitmapFactory.decodeResource(service.resources, R.drawable.album_empty_bg_night)
-        updateWithBitmap(result, song)
-      }
-      override fun onError(throwable: Throwable) {
-        val result = BitmapFactory.decodeResource(service.resources, R.drawable.album_empty_bg_night)
-        updateWithBitmap(result, song)
-      }
 
-      override fun onSuccess(bitmap: Bitmap?) {
-        var result = bitmap
-        //                Bitmap result = copy(bitmap);
-        if (result == null) {
-          result = BitmapFactory.decodeResource(service.resources, R.drawable.album_empty_bg_night)
-        }
-        updateWithBitmap(result, song)
-      }
+    GlideApp.with(service)
+        .asBitmap()
+        .load(song)
+        .centerCrop()
+        .override(size, size)
+        .into(object : CustomTarget<Bitmap>() {
+          override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+            updateWithBitmap(resource, song)
+          }
 
-    }.load()
+          override fun onStart() {
+            updateWithBitmap(null, song)
+          }
+
+          override fun onLoadFailed(errorDrawable: Drawable?) {
+            updateWithBitmap(defaultBitmap, song)
+          }
+
+          override fun onLoadCleared(placeholder: Drawable?) {
+            updateWithBitmap(defaultBitmap, song)
+          }
+
+        })
   }
 
   private fun updateWithBitmap(bitmap: Bitmap?, song: Song) {
@@ -76,7 +82,7 @@ class NotifyImpl24(context: MusicService) : Notify(context) {
         .setDeleteIntent(buildPendingIntent(service, Command.CLOSE_NOTIFY))
         .setContentIntent(contentIntent)
         .setContentTitle(song.title)
-        .setLargeIcon(bitmap)
+        .setLargeIcon(bitmap ?: defaultBitmap)
         .setShowWhen(false)
         .setOngoing(service.isPlaying)
         .setPriority(PRIORITY_MAX)
@@ -93,12 +99,12 @@ class NotifyImpl24(context: MusicService) : Notify(context) {
     val song = service.currentSong
     val builder = NotificationCompat.Builder(service, PLAYING_NOTIFICATION_CHANNEL_ID)
     builder.setContentText(song.artist + " - " + song.album)
-            .setContentTitle(song.title)
-            .setShowWhen(false)
-            .setTicker(lrc)
-            .setOngoing(service.isPlaying)
-            .setContentIntent(contentIntent)
-            .setSmallIcon(R.drawable.icon_notifbar)
+        .setContentTitle(song.title)
+        .setShowWhen(false)
+        .setTicker(lrc)
+        .setOngoing(service.isPlaying)
+        .setContentIntent(contentIntent)
+        .setSmallIcon(R.drawable.icon_notifbar)
     val notification = builder.build()
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

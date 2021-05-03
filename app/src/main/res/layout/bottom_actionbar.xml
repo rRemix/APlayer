@@ -1,79 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:fresco="http://schemas.android.com/apk/res-auto"
-  android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/bottom_actionbar_root"
   android:layout_width="match_parent"
   android:layout_height="@dimen/item_height"
   android:background="@drawable/commom_playercontrols_bg"
-  android:id="@+id/bottom_actionbar_root">
+  android:orientation="vertical">
+
   <ImageView
     android:layout_width="match_parent"
     android:layout_height="1px"
-    android:background="?attr/divider_color"/>
+    android:background="?attr/divider_color" />
   <!-- 底部自定义actionbar -->
   <RelativeLayout
     android:id="@+id/bottom_action_bar"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <!-- 封面 -->
-    <com.facebook.drawee.view.SimpleDraweeView
-      android:layout_marginLeft="@dimen/d12_size"
+    <!--    <com.facebook.drawee.view.SimpleDraweeView-->
+    <!--      android:layout_marginStart="@dimen/d12_size"-->
+    <!--      android:layout_width="@dimen/d48_size"-->
+    <!--      android:layout_height="@dimen/d48_size"-->
+    <!--      android:id="@+id/bottom_action_bar_cover"-->
+    <!--      fresco:actualImageScaleType="centerCrop"-->
+    <!--      fresco:placeholderImageScaleType="centerCrop"-->
+    <!--      fresco:placeholderImage="?attr/default_album"-->
+    <!--      fresco:fadeDuration="0"-->
+    <!--      android:layout_centerVertical="true"/>-->
+    <ImageView
+      android:id="@+id/iv"
       android:layout_width="@dimen/d48_size"
       android:layout_height="@dimen/d48_size"
-      android:id="@+id/bottom_action_bar_cover"
-      fresco:actualImageScaleType="centerCrop"
-      fresco:placeholderImageScaleType="centerCrop"
-      fresco:placeholderImage="?attr/default_album"
-      fresco:fadeDuration="0"
-      android:layout_centerVertical="true"/>
+      android:layout_centerVertical="true"
+      android:layout_marginStart="@dimen/d12_size" />
 
     <ImageView
       android:id="@+id/playbar_next"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:src="@drawable/bf_btn_next"
+      android:layout_alignParentEnd="true"
       android:layout_centerVertical="true"
-      android:layout_alignParentRight="true"
-      android:layout_marginRight="@dimen/d16_size"/>
+      android:layout_marginEnd="@dimen/d16_size"
+      android:src="@drawable/bf_btn_next" />
 
     <!-- 播放按钮 -->
     <ImageView
-      android:layout_centerVertical="true"
-      android:layout_toLeftOf="@id/playbar_next"
       android:id="@+id/playbar_play"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:layout_centerVertical="true"
+      android:layout_marginEnd="@dimen/d16_size"
+      android:layout_toStartOf="@id/playbar_next"
       android:background="@color/transparent"
-      android:src="@drawable/bf_btn_play"
-      android:layout_marginRight="@dimen/d16_size"/>
+      android:src="@drawable/bf_btn_play" />
 
     <!-- 歌曲名与歌手 -->
     <LinearLayout
-      android:layout_toRightOf="@id/bottom_action_bar_cover"
-      android:layout_toLeftOf="@id/playbar_play"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:orientation="vertical"
-      android:gravity="center_vertical"
       android:layout_marginLeft="@dimen/d8_size"
-      android:layout_marginRight="@dimen/d8_size">
+      android:layout_marginRight="@dimen/d8_size"
+      android:layout_toStartOf="@id/playbar_play"
+      android:layout_toEndOf="@id/iv"
+      android:gravity="center_vertical"
+      android:orientation="vertical">
+
       <TextView
-        android:layout_height="wrap_content"
+        android:id="@+id/bottom_title"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="?attr/text_color_primary"
-        android:textSize="@dimen/s16_size"
-        android:id="@+id/bottom_title"/>
+        android:textSize="@dimen/s16_size" />
+
       <TextView
-        android:layout_height="wrap_content"
+        android:id="@+id/bottom_artist"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        android:id="@+id/bottom_artist"
-        android:textSize="@dimen/s14_size"
-        android:textColor="?attr/text_color_secondary"/>
+        android:textColor="?attr/text_color_secondary"
+        android:textSize="@dimen/s14_size" />
     </LinearLayout>
   </RelativeLayout>
 </LinearLayout>
