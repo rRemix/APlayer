@@ -6,7 +6,6 @@ import android.text.TextUtils
 import android.util.LruCache
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
-import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Song
@@ -28,6 +27,10 @@ object UriFetcher {
       Uri.parse("https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png"),
       Uri.parse("http://p1.music.126.net/l8KRlRa-YLNW0GOBeN6fIA==/17914342951434926.jpg"),
       Uri.parse("http://p1.music.126.net/RCIIvR7ull5iQWN-awJ-Aw==/109951165555852156.jpg"))
+
+  var albumVersion = 0
+  var artistVersion = 0
+  var playListVersion = 0
 
   const val TYPE_ALBUM = 10
   const val TYPE_ARTIST = 100
@@ -78,6 +81,24 @@ object UriFetcher {
     SPUtil.putValue(context, SPUtil.COVER_KEY.NAME, key.toString(), uri.toString())
 
     return uri
+  }
+
+  fun updateAllVersion(){
+    updateAlbumVersion()
+    updateArtistVersion()
+    updatePlayListVersion()
+  }
+
+  fun updateAlbumVersion(){
+    albumVersion++
+  }
+
+  fun updateArtistVersion(){
+    artistVersion++
+  }
+
+  fun updatePlayListVersion(){
+    playListVersion++
   }
 
   fun clearAllCache() {

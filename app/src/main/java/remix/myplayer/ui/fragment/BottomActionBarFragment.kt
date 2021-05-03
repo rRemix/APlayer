@@ -6,10 +6,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
+import com.bumptech.glide.signature.ObjectKey
 import kotlinx.android.synthetic.main.bottom_actionbar.*
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.glide.GlideApp
+import remix.myplayer.glide.UriFetcher
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.isPlaying
 import remix.myplayer.misc.menu.CtrlButtonListener
@@ -103,6 +105,7 @@ class BottomActionBarFragment : BaseMusicFragment() {
         .centerCrop()
         .placeholder(Theme.resolveDrawable(requireContext(), R.attr.default_album))
         .error(Theme.resolveDrawable(requireContext(), R.attr.default_album))
+        .signature(ObjectKey(UriFetcher.albumVersion))
         .dontAnimate()
         .into(iv)
   }

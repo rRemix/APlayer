@@ -6,19 +6,16 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.PixelFormat
-import android.graphics.drawable.Drawable
 import android.os.Build
-import android.os.Bundle
 import android.widget.RemoteViews
 import com.bumptech.glide.request.target.AppWidgetTarget
+import com.bumptech.glide.signature.ObjectKey
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.appwidgets.big.AppWidgetBig
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.glide.GlideApp
+import remix.myplayer.glide.UriFetcher
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
@@ -75,6 +72,7 @@ abstract class BaseAppwidget
         .asBitmap()
         .load(song)
         .centerCrop()
+        .signature(ObjectKey(UriFetcher.albumVersion))
         .override(size, size)
         .into(AppWidgetTarget(service, size, size, R.id.appwidget_image, remoteViews, ComponentName(service, javaClass)))
   }

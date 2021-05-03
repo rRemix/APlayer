@@ -12,6 +12,7 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.signature.ObjectKey
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
 import remix.myplayer.R
@@ -19,6 +20,7 @@ import remix.myplayer.databinding.ItemPlaylistRecycleGridBinding
 import remix.myplayer.databinding.ItemPlaylistRecycleListBinding
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.glide.GlideApp
+import remix.myplayer.glide.UriFetcher
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
 import remix.myplayer.theme.Theme
@@ -79,6 +81,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
     GlideApp.with(holder.itemView)
         .load(data)
         .apply(options)
+        .signature(ObjectKey(UriFetcher.playListVersion))
         .into(holder.iv)
 
     holder.container.setOnClickListener { v: View? ->

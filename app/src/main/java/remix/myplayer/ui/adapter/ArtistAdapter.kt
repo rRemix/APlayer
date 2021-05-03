@@ -13,6 +13,7 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.signature.ObjectKey
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
 import remix.myplayer.R
@@ -20,6 +21,7 @@ import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.databinding.ItemArtistRecycleGridBinding
 import remix.myplayer.databinding.ItemArtistRecycleListBinding
 import remix.myplayer.glide.GlideApp
+import remix.myplayer.glide.UriFetcher
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
 import remix.myplayer.theme.Theme
@@ -84,6 +86,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
     GlideApp.with(holder.itemView)
         .load(artist)
         .apply(options)
+        .signature(ObjectKey(UriFetcher.artistVersion))
         .into(holder.iv)
 
     holder.container.setOnClickListener { v: View? ->

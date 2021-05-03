@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.signature.ObjectKey
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
 import remix.myplayer.R
@@ -15,6 +16,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemSongRecycleBinding
 import remix.myplayer.databinding.LayoutHeader1Binding
 import remix.myplayer.glide.GlideApp
+import remix.myplayer.glide.UriFetcher.albumVersion
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.helper.SortOrder
@@ -86,6 +88,7 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
         .centerCrop()
         .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
         .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
+        .signature(ObjectKey(albumVersion))
         .into(holder.binding.iv)
 
 //        //是否为无损

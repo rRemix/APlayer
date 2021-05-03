@@ -11,9 +11,11 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.bumptech.glide.signature.ObjectKey
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.glide.GlideApp
+import remix.myplayer.glide.UriFetcher
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
@@ -23,19 +25,21 @@ import remix.myplayer.util.DensityUtil
  * Created by Remix on 2017/11/22.
  */
 @TargetApi(Build.VERSION_CODES.O)
-class NotifyImpl24(context: MusicService) : Notify(context) {
+class
+NotifyImpl24(context: MusicService) : Notify(context) {
   private val defaultBitmap = BitmapFactory.decodeResource(service.resources, R.drawable.album_empty_bg_night)
+  private val size = DensityUtil.dip2px(service, 128f)
 
   override fun updateForPlaying() {
     val song = service.currentSong
 
     //设置封面
-    val size = DensityUtil.dip2px(service, 128f)
 
     GlideApp.with(service)
         .asBitmap()
         .load(song)
         .centerCrop()
+        .signature(ObjectKey(UriFetcher.albumVersion))
         .override(size, size)
         .into(object : CustomTarget<Bitmap>() {
           override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {

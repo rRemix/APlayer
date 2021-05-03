@@ -16,6 +16,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.materialdialogs.MaterialDialog
+import com.bumptech.glide.signature.ObjectKey
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
 import com.facebook.rebound.SpringSystem
@@ -463,7 +464,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
         if (data.getBooleanExtra(EXTRA_RECREATE, false)) { //设置后需要重启activity
           handler.sendEmptyMessage(MSG_RECREATE_ACTIVITY)
         } else if (data.getBooleanExtra(EXTRA_REFRESH_ADAPTER, false)) { //刷新adapter
-          //TODO clear glide activeResource
+          UriFetcher.updateAllVersion()
           UriFetcher.clearAllCache()
           GlideApp.get(this).clearMemory()
           handler.sendEmptyMessage(MSG_UPDATE_ADAPTER)
@@ -541,7 +542,11 @@ class MainActivity : MenuActivity(), View.OnClickListener {
           }
 
           Handler(Looper.getMainLooper()).postDelayed({
-            //TODO clear glide activeResource
+            when (customCover.type) {
+              Constants.ALBUM -> UriFetcher.updateAlbumVersion()
+              Constants.ARTIST -> UriFetcher.updateArtistVersion()
+              else -> UriFetcher.updatePlayListVersion()
+            }
             UriFetcher.clearAllCache()
             GlideApp.get(this).clearMemory()
             onMediaStoreChanged()
@@ -585,6 +590,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
       GlideApp.with(this)
           .load(currentSong)
           .centerCrop()
+          .signature(ObjectKey(UriFetcher.albumVersion))
           .placeholder(Theme.resolveDrawable(this, R.attr.default_album))
           .error(Theme.resolveDrawable(this, R.attr.default_album))
           .into(iv_header)
