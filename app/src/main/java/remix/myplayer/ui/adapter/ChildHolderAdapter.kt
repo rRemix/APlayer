@@ -24,6 +24,7 @@ import remix.myplayer.theme.ThemeStore.accentColor
 import remix.myplayer.theme.ThemeStore.highLightTextColor
 import remix.myplayer.theme.ThemeStore.libraryBtnColor
 import remix.myplayer.theme.ThemeStore.textColorPrimary
+import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
@@ -123,7 +124,7 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
         val popupMenu = PopupMenu(context, holder.binding.songButton, Gravity.END)
         popupMenu.menuInflater.inflate(R.menu.menu_song_item, popupMenu.menu)
         popupMenu.setOnMenuItemClickListener(
-            SongPopupListener((context as AppCompatActivity), data, type == Constants.PLAYLIST,
+            SongPopupListener((context as BaseActivity), data, type == Constants.PLAYLIST,
                 arg))
         popupMenu.show()
       }
@@ -182,7 +183,7 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
 
   fun updatePlayingSong() {
     val currentSong = getCurrentSong()
-    if (currentSong.id == -1 || currentSong.id == lastPlaySong.id) {
+    if (currentSong == Song.EMPTY_SONG || currentSong.id == lastPlaySong.id) {
       return
     }
     if (dataList.contains(currentSong)) {

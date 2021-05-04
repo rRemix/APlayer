@@ -45,7 +45,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
   private var popup: MultiPopupWindow? = null
   var extra: Long = 0
 
-  private fun getSongsSingle(ids: List<Int>): Single<List<Song>> {
+  private fun getSongsSingle(ids: List<Long>): Single<List<Song>> {
     return Single.fromCallable {
       val songs = ArrayList<Song>()
       ids.forEach {
@@ -55,9 +55,9 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
     }
   }
 
-  private fun getSongIdSingle(): Single<List<Int>> {
+  private fun getSongIdSingle(): Single<List<Long>> {
     return Single.fromCallable {
-      val ids = ArrayList<Int>()
+      val ids = ArrayList<Long>()
       if (checkParam.isEmpty()) {
         return@fromCallable ids
       }
@@ -94,10 +94,10 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
     }
   }
 
-  private fun getSongIds(): List<Int> {
+  private fun getSongIds(): List<Long> {
     if (checkParam.isEmpty())
       return emptyList()
-    val ids = ArrayList<Int>()
+    val ids = ArrayList<Long>()
     when (type) {
       Constants.SONG, Constants.PLAYLISTSONG -> {
         checkParam.forEach {

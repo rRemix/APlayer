@@ -28,7 +28,7 @@ interface HistoryDao {
     SELECT * FROM History
     WHERE audio_id = :audioId
   """)
-  fun selectByAudioId(audioId: Int): History?
+  fun selectByAudioId(audioId: Long): History?
 
   @Update
   fun update(history: History): Int

@@ -21,15 +21,15 @@ import java.util.zip.ZipOutputStream
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-fun Album.getSongIds(): List<Int> {
+fun Album.getSongIds(): List<Long> {
   return MediaStoreUtil.getSongIds(MediaStore.Audio.Media.ALBUM_ID + "=?", arrayOf((albumID.toString())))
 }
 
-fun Artist.getSongIds(): List<Int> {
+fun Artist.getSongIds(): List<Long> {
   return MediaStoreUtil.getSongIds(MediaStore.Audio.Media.ARTIST_ID + "=?", arrayOf(artistID.toString()))
 }
 
-fun Folder.getSongIds(): List<Int> {
+fun Folder.getSongIds(): List<Long> {
   return MediaStoreUtil.getSongsByParentPath(path).map { it.id }
 }
 

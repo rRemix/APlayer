@@ -54,10 +54,10 @@ object M3UHelper {
           }
         }
         .map {
-          val audioIds = ArrayList<Int>()
+          val audioIds = ArrayList<Long>()
           file.readLines().forEachWithIndex { i: Int, path: String ->
             if (i != 0 && !path.startsWith(ENTRY)) {
-              val id: Int
+              val id: Long
               // 先直接判断本地文件是否存在
               val song = File(path)
               id = if (song.exists() && song.isFile) {
@@ -93,7 +93,7 @@ object M3UHelper {
   }
 
   @JvmStatic
-  fun importLocalPlayList(context: Context, playlistLocal: Map<String, List<Int>>, select: Array<CharSequence>): Disposable {
+  fun importLocalPlayList(context: Context, playlistLocal: Map<String, List<Long>>, select: Array<CharSequence>): Disposable {
     val singles = playlistLocal.entries
         .filter {
           select.contains(it.key)
@@ -139,7 +139,7 @@ object M3UHelper {
             bw.write(HEADER)
             for (song in songs) {
               bw.newLine()
-              bw.write(ENTRY + song.getDuration() + DURATION_SEPARATOR + song.artist + " - " + song.title)
+              bw.write(ENTRY + song.duration + DURATION_SEPARATOR + song.artist + " - " + song.title)
               bw.newLine()
               bw.write(song.data)
             }

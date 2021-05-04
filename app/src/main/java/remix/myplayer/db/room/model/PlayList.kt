@@ -18,19 +18,19 @@ data class PlayList(
     val id: Long,
     val name: String,
 //    val count: Int,
-    val audioIds: LinkedHashSet<Int>,
+    val audioIds: LinkedHashSet<Long>,
     val date: Long
 ) : Parcelable, APlayerModel {
 
   class Converter {
     @TypeConverter
-    fun toStrList(listStr: String?): LinkedHashSet<Int>? {
+    fun toStrList(listStr: String?): LinkedHashSet<Long>? {
       val gson = Gson()
       return gson.fromJson(listStr, object : TypeToken<LinkedHashSet<Int>>() {}.type)
     }
 
     @TypeConverter
-    fun toListStr(list: LinkedHashSet<Int>?): String? {
+    fun toListStr(list: LinkedHashSet<Long>?): String? {
       return Gson().toJson(list)
     }
   }

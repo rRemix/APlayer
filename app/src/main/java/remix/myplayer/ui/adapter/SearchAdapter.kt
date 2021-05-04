@@ -3,7 +3,6 @@ package remix.myplayer.ui.adapter
 import android.annotation.SuppressLint
 import android.view.Gravity
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
@@ -12,6 +11,7 @@ import remix.myplayer.glide.GlideApp
 import remix.myplayer.misc.menu.SongPopupListener
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.libraryBtnColor
+import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.adapter.SearchAdapter.SearchResHolder
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
 
@@ -45,7 +45,7 @@ class SearchAdapter(layoutId: Int) : BaseAdapter<Song, SearchResHolder>(layoutId
       val popupMenu = PopupMenu(holder.itemView.context, holder.binding.searchButton, Gravity.END)
       popupMenu.menuInflater.inflate(R.menu.menu_song_item, popupMenu.menu)
       popupMenu.setOnMenuItemClickListener(
-          SongPopupListener((holder.itemView.context as AppCompatActivity), song, false, ""))
+          SongPopupListener((holder.itemView.context as BaseActivity), song, false, ""))
       popupMenu.show()
     }
     if (onItemClickListener != null) {

@@ -2,6 +2,7 @@ package remix.myplayer.ui.activity.base
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -10,6 +11,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.tbruyelle.rxpermissions2.RxPermissions
 import remix.myplayer.BuildConfig
+import remix.myplayer.R
 import remix.myplayer.helper.LanguageHelper.setLocal
 import remix.myplayer.misc.manager.ActivityManager
 import remix.myplayer.service.MusicService
@@ -18,8 +20,10 @@ import remix.myplayer.theme.ThemeStore.navigationBarColor
 import remix.myplayer.theme.ThemeStore.sColoredNavigation
 import remix.myplayer.theme.ThemeStore.statusBarColor
 import remix.myplayer.theme.ThemeStore.themeRes
+import remix.myplayer.ui.misc.AudioTag
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.StatusBarUtil
+import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 
 /**
@@ -32,6 +36,8 @@ open class BaseActivity : AppCompatActivity() {
 
   @JvmField
   protected var hasPermission = false
+
+  var audioTag: AudioTag? = null
 
   /**
    * 设置主题
@@ -133,6 +139,17 @@ open class BaseActivity : AppCompatActivity() {
   override fun onPause() {
     super.onPause()
     isForeground = false
+  }
+
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    if (requestCode == AudioTag.REQUEST_GRANT_WRITE_ACCESS) {
+      if (resultCode == Activity.RESULT_OK) {
+        audioTag?.saveTag()
+      } else {
+        ToastUtil.show(this, R.string.grant_write_access_tip)
+      }
+    }
   }
 
   override fun attachBaseContext(newBase: Context) {

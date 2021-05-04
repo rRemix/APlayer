@@ -192,6 +192,7 @@
   <string name="submit">提交</string>
   <string name="add_local_list">添加到本地歌单</string>
   <string name="new_list">新建歌单...</string>
+
   <string name="song_path">歌曲路径:</string>
   <string name="song_name">歌曲名:</string>
   <string name="file_size">文件大小:</string>
@@ -204,6 +205,8 @@
   <string name="please_input_artist">请输入艺术家</string>
   <string name="please_input_year">请输入年代</string>
   <string name="please_input_genre">请输入流派</string>
+  <string name="grant_write_access_tip">请授予修改音乐文件的权限</string>
+
   <string name="write_something">每当想起这首歌的时候</string>
   <string name="song_sheet">歌单</string>
   <string name="play_failed">播放失败:</string>
@@ -396,7 +399,7 @@
   <string name="md_presets_label">预设</string>
 
   <string name="not_found_email">未找到邮箱</string>
-  <string name="init_failed">初始化失败</string>
+  <string name="init_failed">初始化失败：%s</string>
   <string name="select_language">选择软件语言</string>
   <string name="select_language_tips">将强制设置软件的语言</string>
 

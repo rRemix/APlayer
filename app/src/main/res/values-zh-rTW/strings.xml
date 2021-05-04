@@ -192,6 +192,7 @@
   <string name="submit">提交</string>
   <string name="add_local_list">新增至本地播放清單</string>
   <string name="new_list">新增播放清單...</string>
+
   <string name="song_path">曲目路徑:</string>
   <string name="song_name">曲目名:</string>
   <string name="file_size">檔案大小:</string>
@@ -204,6 +205,8 @@
   <string name="please_input_artist">請輸入演出者</string>
   <string name="please_input_year">請輸入年代</string>
   <string name="please_input_genre">請輸入流派</string>
+  <string name="grant_write_access_tip">請授予修改音樂檔案的權限</string>
+
   <string name="write_something">每當想起這首歌的時候</string>
   <string name="song_sheet">播放清單</string>
   <string name="play_failed">播放失敗:</string>
@@ -396,7 +399,7 @@
   <string name="md_presets_label">預設</string>
 
   <string name="not_found_email">未找到電子郵件</string>
-  <string name="init_failed">初始化失敗</string>
+  <string name="init_failed">初始化失敗：%s</string>
   <string name="select_language">選擇軟體語言</string>
   <string name="select_language_tips">將強制設定軟體的語言</string>
 

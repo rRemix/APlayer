@@ -23,7 +23,7 @@ import java.util.*
  */
 class SongChooseAdapter(layoutID: Int, private val checkListener: OnSongChooseListener) : BaseAdapter<Song, SongChooseHolder>(layoutID) {
 
-  val checkedSong: ArrayList<Int> = ArrayList()
+  val checkedSong: ArrayList<Long> = ArrayList()
 
   override fun convert(holder: SongChooseHolder, song: Song?, position: Int) {
     if (song == null) {
@@ -55,7 +55,7 @@ class SongChooseAdapter(layoutID: Int, private val checkListener: OnSongChooseLi
       if (isChecked && !checkedSong.contains(audioId)) {
         checkedSong.add(audioId)
       } else if (!isChecked) {
-        checkedSong.remove(Integer.valueOf(audioId))
+        checkedSong.remove(audioId)
       }
       checkListener.OnSongChoose(checkedSong.size > 0)
     }

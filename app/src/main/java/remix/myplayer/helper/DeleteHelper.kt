@@ -10,7 +10,7 @@ object DeleteHelper {
    * 在曲库列表删除歌曲
    */
   @JvmStatic
-  fun deleteSongs(songIds: List<Int>, deleteSource: Boolean, playlistId: Long = -1, deletePlaylist: Boolean = false):
+  fun deleteSongs(songIds: List<Long>, deleteSource: Boolean, playlistId: Long = -1, deletePlaylist: Boolean = false):
       Single<Boolean> {
     return Single
         .fromCallable {
@@ -36,7 +36,7 @@ object DeleteHelper {
    * 在列表内(如专辑、艺术家列表内删除歌曲)
    */
   @JvmStatic
-  fun deleteSong(songId: Int, deleteSource: Boolean, deleteFromPlayList: Boolean = false, playListName: String = ""):
+  fun deleteSong(songId: Long, deleteSource: Boolean, deleteFromPlayList: Boolean = false, playListName: String = ""):
       Single<Boolean> {
     return Single
         .fromCallable {

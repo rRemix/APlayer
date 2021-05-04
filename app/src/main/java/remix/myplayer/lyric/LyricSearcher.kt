@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.reactivex.Observable
 import io.reactivex.functions.Function
+import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.App
 import remix.myplayer.bean.kugou.KLrcResponse
@@ -19,7 +20,6 @@ import remix.myplayer.bean.qq.QLrcResponse
 import remix.myplayer.bean.qq.QSearchResponse
 import remix.myplayer.lyric.bean.LrcRow
 import remix.myplayer.misc.cache.DiskCache
-import remix.myplayer.misc.tageditor.TagEditor
 import remix.myplayer.request.network.HttpClient
 import remix.myplayer.util.*
 import timber.log.Timber
@@ -161,9 +161,13 @@ class LyricSearcher {
    * @return
    */
   private fun getEmbeddedObservable(): Observable<List<LrcRow>> {
-    val tagEditor = TagEditor(song.data)
     return Observable.create { e ->
-      val lyric = tagEditor.getFieldValueSingle(FieldKey.LYRICS).blockingGet()
+      val audioFile = AudioFileIO.read(File(song.data))
+      val lyric = try {
+        audioFile.tag.getFirst(FieldKey.LYRICS)
+      } catch (e: Exception) {
+        ""
+      }
       if (!lyric.isNullOrEmpty()) {
         e.onNext(lrcParser.getLrcRows(getBufferReader(lyric.toByteArray(UTF_8)),
             true, cacheKey, searchKey))
@@ -329,7 +333,7 @@ class LyricSearcher {
    */
   private fun getKuGouObservable(): Observable<List<LrcRow>> {
     //酷狗歌词
-    return HttpClient.getInstance().getKuGouSearch(searchKey, song.getDuration(), "")
+    return HttpClient.getInstance().getKuGouSearch(searchKey, song.duration, "")
         .flatMap { body ->
           val searchResponse = Gson().fromJson(body.string(), KSearchResponse::class.java)
           if (searchResponse.candidates.isNotEmpty() && song.title.equals(searchResponse.candidates[0].song, true)) {

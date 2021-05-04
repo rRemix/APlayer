@@ -19,7 +19,7 @@ import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.ui.dialog.FileChooserDialog
 import remix.myplayer.ui.dialog.TimerDialog
-import remix.myplayer.ui.misc.Tag
+import remix.myplayer.ui.misc.AudioTag
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
@@ -35,7 +35,7 @@ import java.lang.ref.WeakReference
  */
 class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private val song: Song) : ContextWrapper(activity), PopupMenu.OnMenuItemClickListener
     where ActivityCallback : PlayerActivity, ActivityCallback : FileChooserDialog.FileCallback {
-  private val tag: Tag = Tag(activity, song)
+  private val audioTag: AudioTag = AudioTag(activity, song)
   private val ref = WeakReference(activity)
 
   override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -96,10 +96,10 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
             .show()
       }
       R.id.menu_edit -> {
-        tag.edit()
+        audioTag.edit()
       }
       R.id.menu_detail -> {
-        tag.detail()
+        audioTag.detail()
       }
       R.id.menu_timer -> {
         val fm = activity.supportFragmentManager ?: return true

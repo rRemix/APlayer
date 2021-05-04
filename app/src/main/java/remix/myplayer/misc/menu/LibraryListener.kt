@@ -41,7 +41,7 @@ class LibraryListener(private val context: Context,
                       private val type: Int,
                       private val extra: String) : PopupMenu.OnMenuItemClickListener {
 
-  private fun getSongIdSingle(): Single<List<Int>> {
+  private fun getSongIdSingle(): Single<List<Long>> {
     return Single.fromCallable {
       when (type) {
         //专辑或者艺术家

@@ -192,6 +192,7 @@
   <string name="submit">Submit</string>
   <string name="add_local_list">Add to playlist</string>
   <string name="new_list">New Playlist...</string>
+
   <string name="song_path">File path:</string>
   <string name="song_name">File name:</string>
   <string name="file_size">Size:</string>
@@ -204,6 +205,8 @@
   <string name="please_input_artist">Please input artist</string>
   <string name="please_input_year">Please input year</string>
   <string name="please_input_genre">Please input genre</string>
+  <string name="grant_write_access_tip">Please grant write access to the media file</string>
+
   <string name="write_something">Every time i think of this song,i ...</string>
   <string name="song_sheet">Playlist</string>
   <string name="play_failed">unable to play:</string>
@@ -396,7 +399,7 @@
   <string name="md_presets_label">Presets</string>
 
   <string name="not_found_email">Not found email</string>
-  <string name="init_failed">init failed</string>
+  <string name="init_failed">Init failed: %s</string>
   <string name="select_language">Select APlayer language</string>
   <string name="select_language_tips">Will change APlayer language by force</string>
 

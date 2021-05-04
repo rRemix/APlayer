@@ -5,7 +5,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.github.promeg.pinyinhelper.Pinyin
@@ -25,6 +24,7 @@ import remix.myplayer.theme.ThemeStore.accentColor
 import remix.myplayer.theme.ThemeStore.highLightTextColor
 import remix.myplayer.theme.ThemeStore.libraryBtnColor
 import remix.myplayer.theme.ThemeStore.textColorPrimary
+import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
@@ -121,7 +121,7 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
       val popupMenu = PopupMenu(context, holder.binding.songButton, Gravity.END)
       popupMenu.menuInflater.inflate(R.menu.menu_song_item, popupMenu.menu)
       popupMenu.setOnMenuItemClickListener(
-          SongPopupListener((context as AppCompatActivity), song, false, ""))
+          SongPopupListener((context as BaseActivity), song, false, ""))
       popupMenu.show()
     }
     holder.binding.itemRoot.setOnClickListener { v: View? ->
@@ -168,7 +168,7 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
    */
   fun updatePlayingSong() {
     val currentSong = getCurrentSong()
-    if (currentSong.id == -1 || currentSong.id == lastPlaySong.id) {
+    if (currentSong == Song.EMPTY_SONG || currentSong.id == lastPlaySong.id) {
       return
     }
     if (dataList.contains(currentSong)) {

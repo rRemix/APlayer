@@ -1368,7 +1368,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentSong.album)
         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentSong.artist)
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentSong.artist)
-        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.getDuration())
+        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.duration)
         .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (playQueue.position + 1).toLong())
         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.title)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1598,7 +1598,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 获得电源锁
    */
   private fun acquireWakeLock() {
-    wakeLock.acquire(if (playQueue.song != EMPTY_SONG) playQueue.song.getDuration() else 30000L)
+    wakeLock.acquire(if (playQueue.song != EMPTY_SONG) playQueue.song.duration else 30000L)
   }
 
   /**

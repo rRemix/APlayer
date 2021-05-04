@@ -11,7 +11,7 @@ import androidx.room.PrimaryKey
 data class PlayQueue(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
-    val audio_id: Int
+    val audio_id: Long
 ) {
 
   companion object {

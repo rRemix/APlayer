@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
   android:orientation="vertical"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
@@ -85,6 +84,7 @@
       android:id="@+id/song_detail_mime"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:text="@string/loading"
       android:textSize="@dimen/s16_size"
       android:textColor="@color/detail_text_color"
       android:textIsSelectable="true"/>
@@ -127,6 +127,7 @@
       android:id="@+id/song_detail_bit_rate"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:text="@string/loading"
       android:textSize="@dimen/s16_size"
       android:textColor="@color/detail_text_color"
       android:textIsSelectable="true"/>
@@ -149,6 +150,7 @@
       android:id="@+id/song_detail_sample_rate"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:text="@string/loading"
       android:textSize="@dimen/s16_size"
       android:textColor="@color/detail_text_color"
       android:textIsSelectable="true"/>

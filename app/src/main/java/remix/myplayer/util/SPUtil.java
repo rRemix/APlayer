@@ -48,6 +48,12 @@ public class SPUtil {
     editor.putInt(key, value).apply();
   }
 
+  public static void putValue(Context context, String name, String key, long value) {
+    SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE)
+        .edit();
+    editor.putLong(key, value).apply();
+  }
+
   public static void putValue(Context context, String name, String key, String value) {
     SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE)
         .edit();
@@ -67,6 +73,10 @@ public class SPUtil {
 
   public static int getValue(Context context, String name, Object key, int dft) {
     return context.getSharedPreferences(name, Context.MODE_PRIVATE).getInt(key.toString(), dft);
+  }
+
+  public static long getValue(Context context, String name, Object key, long dft) {
+    return context.getSharedPreferences(name, Context.MODE_PRIVATE).getLong(key.toString(), dft);
   }
 
   public static String getValue(Context context, String name, Object key, String dft) {
