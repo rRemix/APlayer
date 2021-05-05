@@ -231,6 +231,7 @@
   <string name="plz_give_float_permission">请在设置中授予悬浮窗权限</string>
   <string name="jump_alipay_error">跳转失败\n已复制支付宝账户(*博睿)</string>
   <string name="plz_give_access_external_storage_permission">请授予读写存储空间的权限</string>
+  <string name="manual_scan_permission_tip">从 Android 11 起，手动扫描需要「所有文件访问权限」</string>
   <string name="show_recently">显示近一周导入的歌曲</string>
   <string name="no_audio_ID">请在播放歌曲后再次尝试此操作</string>
   <string name="need_earphone">使用此功能需要插入耳机</string>

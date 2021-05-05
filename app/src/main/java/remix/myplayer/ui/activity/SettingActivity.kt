@@ -433,21 +433,39 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
                 !binding.settingScreenSwitch.isChecked
             //手动扫描
             R.id.setting_scan_container -> {
-              val initialFile = File(
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                !Environment.isExternalStorageManager()
+              ) {
+                getBaseDialog(this@SettingActivity)
+                  .content(R.string.manual_scan_permission_tip)
+                  .positiveText(R.string.confirm)
+                  .negativeText(R.string.cancel)
+                  .onPositive { _, _ ->
+                    startActivity(
+                      Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).setData(
+                        Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                      )
+                    )
+                  }
+                  .build()
+                  .show()
+              } else {
+                val initialFile = File(
                   SPUtil.getValue(
-                      this@SettingActivity,
-                      SETTING_KEY.NAME,
-                      SETTING_KEY.MANUAL_SCAN_FOLDER,
-                      ""
+                    this@SettingActivity,
+                    SETTING_KEY.NAME,
+                    SETTING_KEY.MANUAL_SCAN_FOLDER,
+                    ""
                   )
-              )
-              val builder =
+                )
+                val builder =
                   Builder(this@SettingActivity).chooseButton(R.string.choose_folder)
-                      .tag("Scan").allowNewFolder(false, R.string.new_folder)
-              if (initialFile.exists() && initialFile.isDirectory && initialFile.list() != null) {
-                builder.initialPath(initialFile.absolutePath)
+                    .tag("Scan").allowNewFolder(false, R.string.new_folder)
+                if (initialFile.exists() && initialFile.isDirectory && initialFile.list() != null) {
+                  builder.initialPath(initialFile.absolutePath)
+                }
+                builder.show()
               }
-              builder.show()
             }
             //锁屏显示
             R.id.setting_lockscreen_container -> configLockScreen()
@@ -455,26 +473,26 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             R.id.setting_navigation_container -> {
               if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 ToastUtil.show(
-                    this@SettingActivity, getString(R.string.only_lollopop)
+                  this@SettingActivity, getString(R.string.only_lollopop)
                 )
                 return
               }
               binding.settingNavaigationSwitch.isChecked =
-                  !binding.settingNavaigationSwitch.isChecked
+                !binding.settingNavaigationSwitch.isChecked
             }
             //摇一摇
             R.id.setting_shake_container -> binding.settingShakeSwitch.isChecked =
-                !binding.settingShakeSwitch.isChecked
+              !binding.settingShakeSwitch.isChecked
             //选择主色调
             R.id.setting_primary_color_container -> ColorChooserDialog.Builder(
-                this@SettingActivity, R.string.primary_color
+              this@SettingActivity, R.string.primary_color
             ).accentMode(false).preselect(ThemeStore.materialPrimaryColor)
-                .allowUserColorInput(true).allowUserColorInputAlpha(false).show()
+              .allowUserColorInput(true).allowUserColorInputAlpha(false).show()
             //选择强调色
             R.id.setting_accent_color_container -> ColorChooserDialog.Builder(
-                this@SettingActivity, R.string.accent_color
+              this@SettingActivity, R.string.accent_color
             ).accentMode(true).preselect(ThemeStore.accentColor)
-                .allowUserColorInput(true).allowUserColorInputAlpha(false).show()
+              .allowUserColorInput(true).allowUserColorInputAlpha(false).show()
             //通知栏底色
             R.id.setting_notify_color_container -> configNotifyBackgroundColor()
             //音效设置
@@ -483,9 +501,9 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             R.id.setting_feedback_container -> gotoEmail()
             //关于我们
             R.id.setting_about_container -> startActivity(
-                Intent(
-                    this@SettingActivity, AboutActivity::class.java
-                )
+              Intent(
+                this@SettingActivity, AboutActivity::class.java
+              )
             )
             //检查更新
             R.id.setting_update_container -> {
@@ -497,44 +515,44 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             R.id.setting_clear_container -> clearCache()
             //通知栏样式
             R.id.setting_classic_notify_container -> binding.settingNotifySwitch.isChecked =
-                !binding.settingNotifySwitch.isChecked
+              !binding.settingNotifySwitch.isChecked
             //专辑与艺术家封面自动下载
             R.id.setting_album_cover_container -> configCoverDownload()
             //封面下载源
             R.id.setting_cover_source_container -> configCoverDownloadSource()
             //沉浸式状态栏
             R.id.setting_immersive_container -> binding.settingImmersiveSwitch.isChecked =
-                !binding.settingImmersiveSwitch.isChecked
+              !binding.settingImmersiveSwitch.isChecked
             //歌单导入
             R.id.setting_import_playlist_container -> importPlayList()
             //歌单导出
             R.id.setting_export_playlist_container -> exportPlayList()
             //断点播放
             R.id.setting_breakpoint_container -> binding.settingBreakpointSwitch.isChecked =
-                !binding.settingBreakpointSwitch.isChecked
+              !binding.settingBreakpointSwitch.isChecked
             //忽略内嵌封面
             R.id.setting_ignore_mediastore_container -> binding.settingIgnoreMediastoreSwitch.isChecked =
-                !binding.settingIgnoreMediastoreSwitch.isChecked
+              !binding.settingIgnoreMediastoreSwitch.isChecked
             //播放界面底部
             R.id.setting_player_bottom_container -> changeBottomOfPlayingScreen()
             //恢复移除的歌曲
             R.id.setting_restore_delete_container -> restoreDeleteSong()
             //文件名
             R.id.setting_displayname_container -> binding.settingDisplaynameSwitch.isChecked =
-                !binding.settingDisplaynameSwitch.isChecked
+              !binding.settingDisplaynameSwitch.isChecked
             //强制排序
             R.id.setting_force_sort_container -> binding.settingForceSortSwitch.isChecked =
-                !binding.settingForceSortSwitch.isChecked
+              !binding.settingForceSortSwitch.isChecked
             //深色主题
             R.id.setting_dark_theme_container -> configDarkTheme()
             //黑色主题
             R.id.setting_black_theme_container -> binding.settingBlackThemeSwitch.isChecked =
-                !binding.settingBlackThemeSwitch.isChecked
+              !binding.settingBlackThemeSwitch.isChecked
             //语言
             R.id.setting_language_container -> changeLanguage()
             //音频焦点
             R.id.setting_audio_focus_container -> binding.settingAudioFocusSwitch.isChecked =
-                !binding.settingAudioFocusSwitch.isChecked
+              !binding.settingAudioFocusSwitch.isChecked
             //自动播放
             R.id.setting_auto_play_headset_container -> configAutoPlay()
             //自定义播放界面背景
