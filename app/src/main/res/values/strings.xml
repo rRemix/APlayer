@@ -205,7 +205,7 @@
   <string name="please_input_artist">Please input artist</string>
   <string name="please_input_year">Please input year</string>
   <string name="please_input_genre">Please input genre</string>
-  <string name="grant_write_access_tip">Please grant write access to the media file</string>
+  <string name="grant_write_permission_tip">Please grant permission to write the media file</string>
 
   <string name="write_something">Every time i think of this song,i ...</string>
   <string name="song_sheet">Playlist</string>
@@ -438,4 +438,7 @@
   <string name="now_playing_screen_custom">Custom</string>
 
   <string name="song_list_select_title_format">%1$,d selected</string>
+
+  <string name="grant_delete_permission_tip">Please grant permission to delete the media file</string>
+  <string name="delete_source_fail_tip">Fail to delete source file: %s</string>
 </resources>

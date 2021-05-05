@@ -123,7 +123,7 @@ class LibraryListener(private val context: Context,
                   .checkBoxPromptRes(R.string.delete_source, check[0]) { buttonView, isChecked -> check[0] = isChecked }
                   .onAny { dialog, which ->
                     if (which == POSITIVE) {
-                      DeleteHelper.deleteSongs(ids, check[0], if (type == Constants.PLAYLIST) model.getKey().toLong() else -1, type == Constants.PLAYLIST)
+                      DeleteHelper.deleteSongs(context as BaseActivity, ids, check[0], if (type == Constants.PLAYLIST) model.getKey().toLong() else -1, type == Constants.PLAYLIST)
                           .compose(applySingleScheduler())
                           .subscribe({
                             ToastUtil.show(context, if (it) R.string.delete_success else R.string.delete_error)

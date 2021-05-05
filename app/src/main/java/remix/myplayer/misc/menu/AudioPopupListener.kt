@@ -130,7 +130,7 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
             .checkBoxPromptRes(R.string.delete_source, checked[0], CompoundButton.OnCheckedChangeListener { buttonView, isChecked -> checked[0] = isChecked })
             .onAny { dialog, which ->
               if (which == POSITIVE) {
-                DeleteHelper.deleteSong(song.id, checked[0], false, "")
+                DeleteHelper.deleteSong(activity, song.id, checked[0], false, "")
                     .compose<Boolean>(applySingleScheduler<Boolean>())
                     .subscribe({ success ->
                       if (success) {

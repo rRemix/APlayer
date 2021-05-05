@@ -69,7 +69,7 @@ data class Song(
     }
 
   val contentUri: Uri
-    get() = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toLong())
+    get() = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
   val artUri: Uri
     get() = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId)

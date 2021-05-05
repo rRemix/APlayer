@@ -205,7 +205,7 @@
   <string name="please_input_artist">请输入艺术家</string>
   <string name="please_input_year">请输入年代</string>
   <string name="please_input_genre">请输入流派</string>
-  <string name="grant_write_access_tip">请授予修改音乐文件的权限</string>
+  <string name="grant_write_permission_tip">请授予修改音乐文件的权限</string>
 
   <string name="write_something">每当想起这首歌的时候</string>
   <string name="song_sheet">歌单</string>
@@ -438,4 +438,7 @@
   <string name="now_playing_screen_custom">自定义</string>
 
   <string name="song_list_select_title_format">已选择 %1$,d</string>
+
+  <string name="grant_delete_permission_tip">请授予删除音频文件的权限</string>
+  <string name="delete_source_fail_tip">删除源文件失败：%s</string>
 </resources>

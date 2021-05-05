@@ -92,7 +92,7 @@ class SongPopupListener(activity: BaseActivity,
             .onAny { dialog, which ->
               if (which == POSITIVE) {
                 DeleteHelper
-                    .deleteSong(song.id, check[0], isDeletePlayList, playListName)
+                    .deleteSong(activity, song.id, check[0], isDeletePlayList, playListName)
                     .subscribe({ success -> ToastUtil.show(activity, if (success) R.string.delete_success else R.string.delete_error) }, { ToastUtil.show(activity, R.string.delete_error) })
               }
             }

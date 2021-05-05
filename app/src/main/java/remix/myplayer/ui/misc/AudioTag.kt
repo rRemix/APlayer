@@ -207,7 +207,7 @@ class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activit
             startIntentSenderForResult(
               activity,
               securityException.userAction.actionIntent.intentSender,
-              REQUEST_GRANT_WRITE_ACCESS,
+              REQUEST_WRITE_PERMISSION,
               null,
               0,
               0,
@@ -217,6 +217,8 @@ class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activit
             return
           }
           throw securityException
+        } catch (e: Exception) {
+          throw e
         } finally {
           tmpFile.delete()
         }
@@ -235,8 +237,8 @@ class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activit
   }
 
   companion object {
-    const val CACHE_DIR_NAME = "tag"
-    const val REQUEST_GRANT_WRITE_ACCESS = 0x100
+    private const val CACHE_DIR_NAME = "tag"
+    const val REQUEST_WRITE_PERMISSION = 0x100
   }
 }
 

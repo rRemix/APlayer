@@ -22,6 +22,7 @@ import remix.myplayer.misc.getSongIds
 import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
+import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.adapter.*
 import remix.myplayer.ui.widget.MultiPopupWindow
 import remix.myplayer.util.*
@@ -177,7 +178,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
           when (type) {
             Constants.PLAYLIST -> { //删除播放列表
               if (deleteSource) {
-                MediaStoreUtil.delete(songs, true)
+                MediaStoreUtil.delete(activityRef.get() as BaseActivity, songs, true)
               }
 
               checkParam.forEach {
@@ -191,13 +192,13 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
             }
             Constants.PLAYLISTSONG -> { //删除播放列表内歌曲
               if (deleteSource) {
-                MediaStoreUtil.delete(songs, true)
+                MediaStoreUtil.delete(activityRef.get() as BaseActivity, songs, true)
               } else {
                 databaseRepository.deleteFromPlayList(songs.map { it.id }, extra).blockingGet()
               }
             }
             else -> {
-              MediaStoreUtil.delete(songs, deleteSource)
+              MediaStoreUtil.delete(activityRef.get() as BaseActivity, songs, deleteSource)
             }
           }
         }
