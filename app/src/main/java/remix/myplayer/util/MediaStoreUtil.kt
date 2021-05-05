@@ -1,5 +1,6 @@
 package remix.myplayer.util
 
+import android.app.RecoverableSecurityException
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
@@ -8,19 +9,11 @@ import android.database.Cursor
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
-import android.provider.BaseColumns
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio
 import android.provider.MediaStore.Audio.AudioColumns
 import android.provider.Settings
 import androidx.annotation.WorkerThread
-import org.jaudiotagger.audio.AudioFileIO
-import org.jaudiotagger.audio.exceptions.CannotReadException
-import org.jaudiotagger.audio.exceptions.CannotWriteException
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException
-import org.jaudiotagger.tag.TagException
-import org.jaudiotagger.tag.images.ArtworkFactory
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Album
@@ -31,12 +24,13 @@ import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
 import remix.myplayer.db.room.DatabaseRepository.Companion.getInstance
 import remix.myplayer.helper.MusicServiceRemote.deleteFromService
 import remix.myplayer.helper.SortOrder
+import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.util.Constants.MB
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by taeja on 16-2-17.
@@ -47,6 +41,8 @@ import java.util.*
 object MediaStoreUtil {
   private const val TAG = "MediaStoreUtil"
 
+  const val REQUEST_DELETE_PERMISSION = 0x101
+
   private val context: Context
     get() = App.context
 
@@ -56,14 +52,17 @@ object MediaStoreUtil {
   //扫描文件默认大小设置
   var SCAN_SIZE = 0
   private val BASE_PROJECTION = arrayOf(
-      BaseColumns._ID,
+      AudioColumns._ID,
       AudioColumns.TITLE,
       AudioColumns.TITLE_KEY,
       AudioColumns.DISPLAY_NAME,
       AudioColumns.TRACK,
       AudioColumns.SIZE,
       AudioColumns.YEAR,
+      AudioColumns.GENRE,
+      AudioColumns.TRACK,
       AudioColumns.DURATION,
+      AudioColumns.DATE_MODIFIED,
       AudioColumns.DATE_ADDED,
       AudioColumns.DATA,
       AudioColumns.ALBUM_ID,
@@ -200,7 +199,7 @@ object MediaStoreUtil {
   /**
    * 获得所有歌曲id
    */
-  val allSongsId: List<Int>
+  val allSongsId: List<Long>
     get() = getSongIds(
         null,
         null,
@@ -275,28 +274,34 @@ object MediaStoreUtil {
     if (cursor == null || cursor.columnCount <= 0) {
       return EMPTY_SONG
     }
-    val duration = cursor.getLong(cursor.getColumnIndex(Audio.Media.DURATION))
-    val data = cursor.getString(cursor.getColumnIndex(Audio.Media.DATA))
-    val id = cursor.getInt(cursor.getColumnIndex(Audio.Media._ID))
     return Song(
-        id,
-        Util.processInfo(cursor.getString(cursor.getColumnIndex(Audio.Media.DISPLAY_NAME)),
-            Util.TYPE_DISPLAYNAME),
-        Util.processInfo(cursor.getString(cursor.getColumnIndex(Audio.Media.TITLE)),
-            Util.TYPE_SONG),
-        Util.processInfo(cursor.getString(cursor.getColumnIndex(Audio.Media.ALBUM)),
-            Util.TYPE_ALBUM),
-        cursor.getLong(cursor.getColumnIndex(Audio.Media.ALBUM_ID)),
-        Util.processInfo(cursor.getString(cursor.getColumnIndex(Audio.Media.ARTIST)),
-            Util.TYPE_ARTIST),
-        cursor.getLong(cursor.getColumnIndex(Audio.Media.ARTIST_ID)),
-        duration,
-        Util.getTime(duration),
-        data,
-        cursor.getLong(cursor.getColumnIndex(Audio.Media.SIZE)),
-        cursor.getString(cursor.getColumnIndex(Audio.Media.YEAR)),
-        cursor.getString(cursor.getColumnIndex(Audio.Media.TITLE_KEY)),
-        cursor.getLong(cursor.getColumnIndex(Audio.Media.DATE_ADDED)))
+      id = cursor.getLong(cursor.getColumnIndex(Audio.Media._ID)),
+      displayName = Util.processInfo(
+        cursor.getString(cursor.getColumnIndex(AudioColumns.DISPLAY_NAME)),
+        Util.TYPE_DISPLAYNAME
+      ),
+      title = Util.processInfo(
+        cursor.getString(cursor.getColumnIndex(AudioColumns.TITLE)),
+        Util.TYPE_SONG
+      ),
+      album = Util.processInfo(
+        cursor.getString(cursor.getColumnIndex(AudioColumns.ALBUM)),
+        Util.TYPE_ALBUM
+      ),
+      albumId = cursor.getLong(cursor.getColumnIndex(AudioColumns.ALBUM_ID)),
+      artist = Util.processInfo(
+        cursor.getString(cursor.getColumnIndex(AudioColumns.ARTIST)),
+        Util.TYPE_ARTIST
+      ),
+      artistId = cursor.getLong(cursor.getColumnIndex(AudioColumns.ARTIST_ID)),
+      _duration = cursor.getLong(cursor.getColumnIndex(Audio.Media.DURATION)),
+      data = cursor.getString(cursor.getColumnIndex(Audio.Media.DATA)),
+      size = cursor.getLong(cursor.getColumnIndex(AudioColumns.SIZE)),
+      year = cursor.getLong(cursor.getColumnIndex(AudioColumns.YEAR)).toString(),
+      _genre = cursor.getString(cursor.getColumnIndex(AudioColumns.GENRE)),
+      track = cursor.getLong(cursor.getColumnIndex(AudioColumns.TRACK)).toString(),
+      dateModified = cursor.getLong(cursor.getColumnIndex(AudioColumns.DATE_MODIFIED))
+    )
   }
 
   fun getSongIdsByParentId(parentId: Long): List<Int> {
@@ -357,11 +362,11 @@ object MediaStoreUtil {
    * @return 对应歌曲信息
    */
   @JvmStatic
-  fun getSongById(id: Int): Song {
+  fun getSongById(id: Long): Song {
     return getSong(Audio.Media._ID + "=?", arrayOf(id.toString() + ""))
   }
 
-  fun getSongsByIds(ids: List<Int?>?): List<Song> {
+  fun getSongsByIds(ids: List<Long>?): List<Song> {
     val songs: List<Song> = ArrayList()
     if (ids == null || ids.isEmpty()) {
       return songs
@@ -374,82 +379,11 @@ object MediaStoreUtil {
     return getSongs(selection.toString(), null)
   }
 
-  private fun insertAlbumArt(context: Context, albumId: Long, path: String) {
-    val contentResolver = context.contentResolver
-    val artworkUri = Uri.parse("content://media/external/audio/albumart")
-    contentResolver.delete(ContentUris.withAppendedId(artworkUri, albumId), null, null)
-    val values = ContentValues()
-    values.put("album_id", albumId)
-    values.put("_data", path)
-    contentResolver.insert(artworkUri, values)
-  }
-
-  private fun deleteAlbumArt(context: Context, albumId: Int) {
-    val contentResolver = context.contentResolver
-    val localUri = Uri.parse("content://media/external/audio/albumart")
-    contentResolver.delete(ContentUris.withAppendedId(localUri, albumId.toLong()), null, null)
-  }
-
-  @WorkerThread
-  @Throws(TagException::class, ReadOnlyFileException::class, CannotReadException::class, InvalidAudioFrameException::class, IOException::class, CannotWriteException::class)
-  fun saveArtwork(context: Context, albumId: Long, artFile: File) {
-    val song = getSongByAlbumId(albumId)
-    val audioFile = AudioFileIO.read(File(song.data))
-    val tag = audioFile.tagOrCreateAndSetDefault
-    val artwork = ArtworkFactory.createArtworkFromFile(artFile)
-    tag.deleteArtworkField()
-    tag.setField(artwork)
-    audioFile.commit()
-    insertAlbumArt(context, albumId, artFile.absolutePath)
-  }
-
-  /**
-   * 删除歌曲
-   *
-   * @param data 删除参数 包括歌曲id、专辑id、艺术家id、播放列表id、parentId
-   * @param type 删除类型 包括单个歌曲、专辑、艺术家、文件夹、播放列表
-   * @return 是否歌曲数量
-   */
-  @Deprecated("")
-  fun delete(data: Int, type: Int, deleteSource: Boolean): Int {
-    var where: String? = null
-    var arg: Array<String?>? = null
-    when (type) {
-      Constants.SONG -> {
-        where = Audio.Media._ID + "=?"
-        arg = arrayOf(data.toString() + "")
-      }
-      Constants.ALBUM, Constants.ARTIST -> if (type == Constants.ALBUM) {
-        where = Audio.Media.ALBUM_ID + "=?"
-        arg = arrayOf(data.toString() + "")
-      } else {
-        where = Audio.Media.ARTIST_ID + "=?"
-        arg = arrayOf(data.toString() + "")
-      }
-      Constants.FOLDER -> {
-        val ids = getSongIdsByParentId(data.toLong())
-        val selection = StringBuilder(127)
-        //                for(int i = 0 ; i < ids.size();i++){
-//                    selection.append(MediaStore.Audio.Media._ID).append(" = ").append(ids.get(i)).append(i != ids.size() - 1 ? " or " : " ");
-//                }
-        selection.append(Audio.Media._ID + " in (")
-        var i = 0
-        while (i < ids.size) {
-          selection.append(ids[i]).append(if (i == ids.size - 1) ") " else ",")
-          i++
-        }
-        where = selection.toString()
-        arg = null
-      }
-    }
-    return delete(getSongs(where, arg), deleteSource)
-  }
-
   /**
    * 删除指定歌曲
    */
   @WorkerThread
-  fun delete(songs: List<Song>?, deleteSource: Boolean): Int {
+  fun delete(activity: BaseActivity, songs: List<Song>?, deleteSource: Boolean): Int {
     //保存是否删除源文件
     SPUtil.putValue(App.context, SETTING_KEY.NAME, SETTING_KEY.DELETE_SOURCE,
         deleteSource)
@@ -472,7 +406,7 @@ object MediaStoreUtil {
 
     //删除源文件
     if (deleteSource) {
-      deleteSource(songs)
+      deleteSource(activity, songs)
     }
 
     //刷新界面
@@ -481,16 +415,62 @@ object MediaStoreUtil {
   }
 
   /**
-   * 删除源文件
+   * 删除单个源文件
    */
-  fun deleteSource(songs: List<Song>?) {
+  fun deleteSource(activity: BaseActivity, song: Song) {
+    try {
+      try {
+        context.contentResolver.delete(
+          song.contentUri,
+          "${AudioColumns._ID} = ?",
+          arrayOf(song.id.toString())
+        )
+      } catch (securityException: SecurityException) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+          securityException is RecoverableSecurityException
+        ) {
+          activity.startIntentSenderForResult(
+            securityException.userAction.actionIntent.intentSender,
+            REQUEST_DELETE_PERMISSION,
+            null,
+            0,
+            0,
+            0,
+            null
+          )
+          return
+        }
+        throw securityException
+      }
+    } catch (e: Exception) {
+      Timber.e("Fail to delete source")
+      e.printStackTrace()
+      ToastUtil.show(activity, R.string.delete_source_fail_tip, e)
+    }
+  }
+
+  /**
+   * 删除多个源文件
+   */
+  private fun deleteSource(activity: BaseActivity, songs: List<Song>?) {
     if (songs == null || songs.isEmpty()) {
       return
     }
+    val toDeleteSongs: ArrayList<Song> = ArrayList()
     for (song in songs) {
-      context.contentResolver.delete(Audio.Media.EXTERNAL_CONTENT_URI,
-          Audio.Media._ID + "=?", arrayOf(song.toString() + ""))
-      Util.deleteFileSafely(File(song.data))
+      if (Util.deleteFileSafely(File(song.data))) {
+        context.contentResolver.delete(
+          Audio.Media.EXTERNAL_CONTENT_URI,
+          "${AudioColumns._ID} = ?",
+          arrayOf(song.id.toString())
+        )
+      } else {
+        toDeleteSongs.add(song)
+      }
+    }
+    if (toDeleteSongs.isNotEmpty()) {
+      activity.toDeleteSongs = toDeleteSongs
+      deleteSource(activity, toDeleteSongs[0])
     }
   }
 
@@ -550,7 +530,7 @@ object MediaStoreUtil {
   /**
    * 根据路径获得歌曲id
    */
-  fun getSongIdByUrl(url: String?): Int {
+  fun getSongIdByUrl(url: String?): Long {
     return getSongId(Audio.Media.DATA + " = ?", arrayOf(url))
   }
 
@@ -563,7 +543,7 @@ object MediaStoreUtil {
    * 设置铃声
    */
   @JvmStatic
-  fun setRing(context: Context?, audioId: Int) {
+  fun setRing(context: Context?, audioId: Long) {
     try {
       val cv = ContentValues()
       cv.put(Audio.Media.IS_RINGTONE, true)
@@ -628,28 +608,28 @@ object MediaStoreUtil {
   }
 
   @JvmStatic
-  fun getSongId(selection: String?, selectionValues: Array<String?>?): Int {
+  fun getSongId(selection: String?, selectionValues: Array<String?>?): Long {
     val songs = getSongs(selection, selectionValues, null)
     return if (songs.isNotEmpty()) songs[0].id else -1
   }
 
   @JvmStatic
-  fun getSongIds(selection: String?, selectionValues: Array<String?>?): List<Int> {
+  fun getSongIds(selection: String?, selectionValues: Array<String?>?): List<Long> {
     return getSongIds(selection, selectionValues, null)
   }
 
   @JvmStatic
   fun getSongIds(selection: String?, selectionValues: Array<String?>?,
-                 sortOrder: String?): List<Int> {
+                 sortOrder: String?): List<Long> {
     if (!Util.hasStoragePermissions()) {
       return ArrayList()
     }
-    val ids: MutableList<Int> = ArrayList()
+    val ids: MutableList<Long> = ArrayList()
     try {
       makeSongCursor(selection, selectionValues, sortOrder).use { cursor ->
         if (cursor != null && cursor.count > 0) {
           while (cursor.moveToNext()) {
-            ids.add(cursor.getInt(cursor.getColumnIndex(Audio.Media._ID)))
+            ids.add(cursor.getLong(cursor.getColumnIndex(Audio.Media._ID)))
           }
         }
       }

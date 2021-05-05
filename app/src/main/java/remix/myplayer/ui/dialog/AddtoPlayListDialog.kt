@@ -37,7 +37,7 @@ class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<Lis
   private val adapter: AddToPlayListAdapter by lazy {
     AddToPlayListAdapter(R.layout.item_playlist_addto)
   }
-  private var songIds: List<Int>? = null
+  private var songIds: List<Long>? = null
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val rootView = requireActivity().layoutInflater.inflate(R.layout.dialog_addto_playlist, null)
@@ -45,7 +45,7 @@ class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<Lis
         .customView(rootView, false)
         .build()
 
-    songIds = arguments?.getSerializable(EXTRA_SONG_LIST) as List<Int>?
+    songIds = arguments?.getSerializable(EXTRA_SONG_LIST) as List<Long>?
     if (songIds == null) {
       ToastUtil.show(context, R.string.add_song_playlist_error)
       dismiss()
@@ -145,7 +145,7 @@ class AddtoPlayListDialog : BaseMusicDialog(), LoaderManager.LoaderCallbacks<Lis
 
   companion object {
     const val EXTRA_SONG_LIST = "list"
-    fun newInstance(ids: List<Int>): AddtoPlayListDialog {
+    fun newInstance(ids: List<Long>): AddtoPlayListDialog {
       val dialog = AddtoPlayListDialog()
       val arg = Bundle()
       arg.putSerializable(EXTRA_SONG_LIST, ArrayList<Any?>(ids))

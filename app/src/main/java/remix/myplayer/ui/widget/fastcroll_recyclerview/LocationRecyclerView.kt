@@ -47,7 +47,7 @@ class LocationRecyclerView @JvmOverloads constructor(
    *
    * @param data
    */
-  private fun smoothScrollTo(data: List<Song>, currentId: Int) {
+  private fun smoothScrollTo(data: List<Song>, currentId: Long) {
     for (i in data.indices) {
       if (data[i].id == currentId) {
         pos = i

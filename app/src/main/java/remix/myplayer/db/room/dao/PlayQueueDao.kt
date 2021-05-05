@@ -26,7 +26,7 @@ interface PlayQueueDao {
     DELETE FROM PlayQueue
     WHERE audio_id IN (:audioIds)
   """)
-  fun deleteSongs(audioIds: List<Int>): Int
+  fun deleteSongs(audioIds: List<Long>): Int
 
 
   @Query("""

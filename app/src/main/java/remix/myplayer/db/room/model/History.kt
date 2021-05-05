@@ -10,8 +10,7 @@ import androidx.room.PrimaryKey
 data class History(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
-    val audio_id: Int,
+    val audio_id: Long,
     val play_count: Int,
     val last_play: Long
-) {
-}
+)

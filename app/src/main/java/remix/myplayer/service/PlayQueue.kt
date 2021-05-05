@@ -121,13 +121,13 @@ class PlayQueue(service: MusicService) {
     }
     //读取上次退出时正在播放的歌曲的id
     val service = service.get() ?: return
-    val lastId = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1)
+    val lastId = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1L)
     //上次退出时正在播放的歌曲是否还存在
     var isLastSongExist = false
     //上次退出时正在播放的歌曲的pos
     var pos = 0
     //查找上次退出时的歌曲是否还存在
-    if (lastId != -1) {
+    if (lastId != -1L) {
       for (i in _originalQueue.indices) {
         if (lastId == _originalQueue[i].id) {
           isLastSongExist = true

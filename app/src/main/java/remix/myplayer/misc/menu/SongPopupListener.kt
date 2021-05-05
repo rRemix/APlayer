@@ -2,7 +2,6 @@ package remix.myplayer.misc.menu
 
 import android.content.Intent
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.soundcloud.android.crop.Crop
@@ -16,8 +15,9 @@ import remix.myplayer.misc.menu.LibraryListener.Companion.EXTRA_COVER
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.theme.Theme
+import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
-import remix.myplayer.ui.misc.Tag
+import remix.myplayer.ui.misc.AudioTag
 import remix.myplayer.util.*
 import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.SPUtil.SETTING_KEY
@@ -27,11 +27,11 @@ import java.lang.ref.WeakReference
  * Created by Remix on 2018/3/5.
  */
 
-class SongPopupListener(activity: AppCompatActivity,
+class SongPopupListener(activity: BaseActivity,
                         private val song: Song,
                         private val isDeletePlayList: Boolean,
                         private val playListName: String) : PopupMenu.OnMenuItemClickListener {
-  private val tag = Tag(activity, song)
+  private val tag = AudioTag(activity, song)
   private val ref = WeakReference(activity)
 
   override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -92,7 +92,7 @@ class SongPopupListener(activity: AppCompatActivity,
             .onAny { dialog, which ->
               if (which == POSITIVE) {
                 DeleteHelper
-                    .deleteSong(song.id, check[0], isDeletePlayList, playListName)
+                    .deleteSong(activity, song.id, check[0], isDeletePlayList, playListName)
                     .subscribe({ success -> ToastUtil.show(activity, if (success) R.string.delete_success else R.string.delete_error) }, { ToastUtil.show(activity, R.string.delete_error) })
               }
             }

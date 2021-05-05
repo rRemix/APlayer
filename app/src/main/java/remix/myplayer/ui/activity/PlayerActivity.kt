@@ -35,7 +35,6 @@ import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_player.*
@@ -432,7 +431,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
   private fun setUpSeekBar() {
 
     //初始化已播放时间与剩余时间
-    duration = song.getDuration().toInt()
+    duration = song.duration.toInt()
     val temp = getProgress()
     currentTime = if (temp in 1 until duration) temp else 0
     if (duration > 0 && duration - currentTime > 0) {
@@ -687,7 +686,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
       //更新进度条
       val temp = getProgress()
       currentTime = if (temp in 1 until duration) temp else 0
-      duration = song.getDuration().toInt()
+      duration = song.duration.toInt()
       seekbar.max = duration
       //更新下一首歌曲
       next_song.text = getString(R.string.next_song, getNextSong().title)

@@ -192,6 +192,7 @@
   <string name="submit">提交</string>
   <string name="add_local_list">新增至本地播放清單</string>
   <string name="new_list">新增播放清單...</string>
+
   <string name="song_path">曲目路徑:</string>
   <string name="song_name">曲目名:</string>
   <string name="file_size">檔案大小:</string>
@@ -199,11 +200,14 @@
   <string name="length">長度:</string>
   <string name="bitrate">位元率:</string>
   <string name="sample_rate">採樣頻率:</string>
-  <string name="please_input_song_name">請輸入曲目名</string>
-  <string name="please_input_album">請曲目專輯</string>
-  <string name="please_input_artist">請輸入演出者</string>
-  <string name="please_input_year">請輸入年代</string>
-  <string name="please_input_genre">請輸入流派</string>
+  <string name="song_name_input_hint">曲目名</string>
+  <string name="album_input_hint">專輯</string>
+  <string name="artist_input_hint">演出者</string>
+  <string name="year_input_hint">年代</string>
+  <string name="track_number_input_hint">音軌號</string>
+  <string name="genre_input_hint">流派</string>
+  <string name="grant_write_permission_tip">請授予修改音樂檔案的權限</string>
+
   <string name="write_something">每當想起這首歌的時候</string>
   <string name="song_sheet">播放清單</string>
   <string name="play_failed">播放失敗:</string>
@@ -228,6 +232,7 @@
   <string name="plz_give_float_permission">請在設定中授予顯示在其他應用程式上層權限</string>
   <string name="jump_alipay_error">跳轉失敗\n已複製支付寶賬戶(*博睿)</string>
   <string name="plz_give_access_external_storage_permission">請授予訪問儲存空間的權限</string>
+  <string name="manual_scan_permission_tip">從 Android 11 起，手動掃描需要「所有檔案存取權」</string>
   <string name="show_recently">顯示近一週匯入的曲目</string>
   <string name="no_audio_ID">請在播放曲目後再次嘗試此操作</string>
   <string name="need_earphone">使用此功能需要插入耳機</string>
@@ -315,7 +320,6 @@
   <string name="save_wechat_qrcode_success">已儲存 WeChat QR碼,請打開 WeChat 識別該QR碼</string>
   <string name="play_breakpoint">接續播放</string>
   <string name="play_breakpoint_tip">再次打開應用程式時將從斷點處開始播放</string>
-  <string name="please_input_track_number">請輸入音軌號</string>
   <string name="will_stop_at_x">將在%d分鐘後關閉</string>
   <string name="saveing">儲存中</string>
   <string name="ignore_mediastore_artwork">忽略系統暫存中的媒體封面</string>
@@ -396,7 +400,7 @@
   <string name="md_presets_label">預設</string>
 
   <string name="not_found_email">未找到電子郵件</string>
-  <string name="init_failed">初始化失敗</string>
+  <string name="init_failed">初始化失敗：%s</string>
   <string name="select_language">選擇軟體語言</string>
   <string name="select_language_tips">將強制設定軟體的語言</string>
 
@@ -435,4 +439,7 @@
   <string name="now_playing_screen_custom">自訂</string>
 
   <string name="song_list_select_title_format">已選取 %1$,d</string>
+
+  <string name="grant_delete_permission_tip">請授予刪除音樂檔案的權限</string>
+  <string name="delete_source_fail_tip">刪除原始檔案失敗：%s</string>
 </resources>

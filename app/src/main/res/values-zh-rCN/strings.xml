@@ -192,6 +192,7 @@
   <string name="submit">提交</string>
   <string name="add_local_list">添加到本地歌单</string>
   <string name="new_list">新建歌单...</string>
+
   <string name="song_path">歌曲路径:</string>
   <string name="song_name">歌曲名:</string>
   <string name="file_size">文件大小:</string>
@@ -199,11 +200,14 @@
   <string name="length">长度:</string>
   <string name="bitrate">比特率:</string>
   <string name="sample_rate">采样率:</string>
-  <string name="please_input_song_name">请输入歌曲名</string>
-  <string name="please_input_album">请输入专辑</string>
-  <string name="please_input_artist">请输入艺术家</string>
-  <string name="please_input_year">请输入年代</string>
-  <string name="please_input_genre">请输入流派</string>
+  <string name="song_name_input_hint">歌曲名</string>
+  <string name="album_input_hint">专辑</string>
+  <string name="artist_input_hint">艺术家</string>
+  <string name="year_input_hint">年代</string>
+  <string name="track_number_input_hint">音轨号</string>
+  <string name="genre_input_hint">流派</string>
+  <string name="grant_write_permission_tip">请授予修改音乐文件的权限</string>
+
   <string name="write_something">每当想起这首歌的时候</string>
   <string name="song_sheet">歌单</string>
   <string name="play_failed">播放失败:</string>
@@ -228,6 +232,7 @@
   <string name="plz_give_float_permission">请在设置中授予悬浮窗权限</string>
   <string name="jump_alipay_error">跳转失败\n已复制支付宝账户(*博睿)</string>
   <string name="plz_give_access_external_storage_permission">请授予读写存储空间的权限</string>
+  <string name="manual_scan_permission_tip">从 Android 11 起，手动扫描需要「所有文件访问权限」</string>
   <string name="show_recently">显示近一周导入的歌曲</string>
   <string name="no_audio_ID">请在播放歌曲后再次尝试此操作</string>
   <string name="need_earphone">使用此功能需要插入耳机</string>
@@ -315,7 +320,6 @@
   <string name="save_wechat_qrcode_success">已保存微信二维码,请打开微信识别该二维码</string>
   <string name="play_breakpoint">断点播放</string>
   <string name="play_breakpoint_tip">再次打开软件时将从断点处开始播放</string>
-  <string name="please_input_track_number">请输入音轨号</string>
   <string name="will_stop_at_x">将在%d分钟后关闭</string>
   <string name="saveing">保存中</string>
   <string name="ignore_mediastore_artwork">忽略系统缓存中的媒体封面</string>
@@ -396,7 +400,7 @@
   <string name="md_presets_label">预设</string>
 
   <string name="not_found_email">未找到邮箱</string>
-  <string name="init_failed">初始化失败</string>
+  <string name="init_failed">初始化失败：%s</string>
   <string name="select_language">选择软件语言</string>
   <string name="select_language_tips">将强制设置软件的语言</string>
 
@@ -435,4 +439,7 @@
   <string name="now_playing_screen_custom">自定义</string>
 
   <string name="song_list_select_title_format">已选择 %1$,d</string>
+
+  <string name="grant_delete_permission_tip">请授予删除音频文件的权限</string>
+  <string name="delete_source_fail_tip">删除源文件失败：%s</string>
 </resources>

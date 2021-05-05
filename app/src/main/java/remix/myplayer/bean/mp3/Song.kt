@@ -19,23 +19,57 @@ import timber.log.Timber
  */
 @Parcelize
 data class Song(
-    val id: Int,
+    val id: Long,
     val displayName: String,
     val title: String,
     val album: String,
     val albumId: Long,
     val artist: String,
     val artistId: Long,
-    private var duration: Long,
-    val realTime: String,
+    private var _duration: Long,
     val data: String,
     val size: Long,
-    val year: String?,
-    val titleKey: String?,
-    val addTime: Long) : Parcelable, APlayerModel {
+    val year: String,
+    private var _genre: String?,
+    val track: String?,
+    val dateModified: Long) : Parcelable, APlayerModel {
+
+  val duration: Long
+    get() {
+      if (_duration <= 0 && id > 0 && data.isNotEmpty()) {
+        val metadataRetriever = MediaMetadataRetriever()
+        try {
+          metadataRetriever.setDataSource(data)
+          _duration =
+            metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!
+              .toLong()
+        } catch (e: Exception) {
+          Timber.v("Fail to get duration: $e")
+        } finally {
+          metadataRetriever.release()
+        }
+      }
+      return _duration
+    }
+
+  val genre: String
+    get() {
+      if (_genre.isNullOrEmpty() && id > 0 && data.isNotEmpty()) {
+        val metadataRetriever = MediaMetadataRetriever()
+        try {
+          metadataRetriever.setDataSource(data)
+          _genre = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)!!
+        } catch (e: Exception) {
+          Timber.v("Fail to get genre: $e")
+        } finally {
+          metadataRetriever.release()
+        }
+      }
+      return _genre ?: ""
+    }
 
   val contentUri: Uri
-    get() = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toLong())
+    get() = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
   val artUri: Uri
     get() = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId)
@@ -43,92 +77,13 @@ data class Song(
   val showName: String
     get() = if (!SHOW_DISPLAYNAME) title else displayName
 
-  override fun toString(): String {
-    return "Song{" +
-        "id=" + id +
-        ", title='" + title + '\''.toString() +
-        ", displayName='" + displayName + '\''.toString() +
-        ", album='" + album + '\''.toString() +
-        ", albumId=" + albumId +
-        ", artist='" + artist + '\''.toString() +
-        ", duration=" + duration +
-        ", realTime='" + realTime + '\''.toString() +
-        ", url='" + data + '\''.toString() +
-        ", size=" + size +
-        ", year=" + year +
-        '}'.toString()
-  }
-
-
-  fun getDuration(): Long {
-    if (duration <= 0 && id > 0 && data.isNotEmpty()) {
-      val metadataRetriever = MediaMetadataRetriever()
-      try {
-        metadataRetriever.setDataSource(data)
-        duration = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong()
-//        if (duration > 0) {
-//          val contentValues = ContentValues()
-//          contentValues.put(MediaStore.Audio.Media.DURATION, duration)
-//          val updateCount = App.getContext().contentResolver.update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-//              contentValues, MediaStore.Audio.Media._ID + "=?", arrayOf(id.toString() + ""))
-//          Timber.tag("Song").v("updateDuration, dur: $duration  count: $updateCount")
-//        }
-      } catch (e: Exception) {
-        Timber.tag("Song").v("updateDuration failed: $e")
-      } finally {
-        metadataRetriever.release()
-      }
-    }
-    return duration
-  }
-
   override fun getKey(): String {
     return albumId.toString()
   }
 
-  override fun hashCode(): Int {
-    var result = id
-    result = 31 * result + displayName.hashCode()
-    result = 31 * result + title.hashCode()
-    result = 31 * result + album.hashCode()
-    result = 31 * result + albumId.hashCode()
-    result = 31 * result + artist.hashCode()
-    result = 31 * result + artistId.hashCode()
-    result = 31 * result + duration.hashCode()
-    result = 31 * result + realTime.hashCode()
-    result = 31 * result + data.hashCode()
-    result = 31 * result + size.hashCode()
-    result = 31 * result + year.hashCode()
-    result = 31 * result + titleKey.hashCode()
-    result = 31 * result + addTime.hashCode()
-    return result
-  }
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is Song) return false
-
-    if (id != other.id) return false
-    if (displayName != other.displayName) return false
-    if (title != other.title) return false
-    if (album != other.album) return false
-    if (albumId != other.albumId) return false
-    if (artist != other.artist) return false
-    if (artistId != other.artistId) return false
-    if (duration != other.duration) return false
-    if (realTime != other.realTime) return false
-    if (data != other.data) return false
-    if (size != other.size) return false
-    if (year != other.year) return false
-    if (titleKey != other.titleKey) return false
-    if (addTime != other.addTime) return false
-
-    return true
-  }
-
   companion object {
     @JvmStatic
-    val EMPTY_SONG = Song(-1, "", "", "", -1, "", -1, -1, "", "", -1, "", "", -1)
+    val EMPTY_SONG = Song(-1, "", "", "", -1, "", -1, -1, "", -1, "", "", "", -1)
 
     //所有列表是否显示文件名
     @JvmStatic

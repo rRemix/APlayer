@@ -51,7 +51,7 @@ class DatabaseRepository private constructor() {
   /**
    * 插入多首歌曲到播放队列
    */
-  fun insertToPlayQueue(audioIds: List<Int>): Single<Int> {
+  fun insertToPlayQueue(audioIds: List<Long>): Single<Int> {
     val actual = audioIds.toMutableList()
     return getPlayQueue()
         .map {
@@ -67,7 +67,7 @@ class DatabaseRepository private constructor() {
   /**
    * 从播放队列移除
    */
-  fun deleteFromPlayQueue(audioIds: List<Int>): Single<Int> {
+  fun deleteFromPlayQueue(audioIds: List<Long>): Single<Int> {
     return Single
         .fromCallable {
           deleteFromPlayQueueInternal(audioIds)
@@ -75,7 +75,7 @@ class DatabaseRepository private constructor() {
   }
 
 
-  private fun deleteFromPlayQueueInternal(audioIds: List<Int>): Int {
+  private fun deleteFromPlayQueueInternal(audioIds: List<Long>): Int {
     if (audioIds.isEmpty()) {
       return 0
     }
@@ -99,7 +99,7 @@ class DatabaseRepository private constructor() {
   /**
    * 插入多首歌曲到播放列表
    */
-  fun insertToPlayList(audioIds: List<Int>, playlistId: Long = -1): Single<Int> {
+  fun insertToPlayList(audioIds: List<Long>, playlistId: Long = -1): Single<Int> {
     return Single
         .fromCallable {
           db.playListDao().selectById(playlistId)
@@ -118,7 +118,7 @@ class DatabaseRepository private constructor() {
   /**
    * 插入多首歌曲到播放列表
    */
-  fun insertToPlayList(audioIds: List<Int>, name: String): Single<Int> {
+  fun insertToPlayList(audioIds: List<Long>, name: String): Single<Int> {
     return Single
         .fromCallable {
           db.playListDao().selectByName(name) ?: throw IllegalArgumentException("No Playlist Found")
@@ -137,7 +137,7 @@ class DatabaseRepository private constructor() {
   /**
    * 从播放列表移除
    */
-  fun deleteFromPlayList(audioIds: List<Int>, name: String): Single<Int> {
+  fun deleteFromPlayList(audioIds: List<Long>, name: String): Single<Int> {
     return Single
         .fromCallable {
           db.playListDao().selectByName(name)
@@ -156,7 +156,7 @@ class DatabaseRepository private constructor() {
   /**
    * 从播放列表移除
    */
-  fun deleteFromPlayList(audioIds: List<Int>, playlistId: Long): Single<Int> {
+  fun deleteFromPlayList(audioIds: List<Long>, playlistId: Long): Single<Int> {
     return Single
         .fromCallable {
           db.playListDao().selectById(playlistId) ?: throw IllegalArgumentException()
@@ -202,7 +202,7 @@ class DatabaseRepository private constructor() {
   /**
    * 获取我的收藏播放列表
    */
-  fun getMyLoveList(): Single<List<Int>> {
+  fun getMyLoveList(): Single<List<Long>> {
     return Single
         .fromCallable {
           db.playListDao().selectById(myLoveId)
@@ -269,7 +269,7 @@ class DatabaseRepository private constructor() {
   /**
    * 更新列表内的歌曲id
    */
-  fun updatePlayListAudios(playlistId: Long, audioIds: List<Int>): Single<Int> {
+  fun updatePlayListAudios(playlistId: Long, audioIds: List<Long>): Single<Int> {
     return Single
         .fromCallable {
           db.playListDao().updateAudioIDs(playlistId, Gson().toJson(audioIds))
@@ -279,7 +279,7 @@ class DatabaseRepository private constructor() {
   /**
    * 是否是收藏的歌曲
    */
-  fun isMyLove(audioId: Int): Single<Boolean> {
+  fun isMyLove(audioId: Long): Single<Boolean> {
     return getPlayList(myLoveId)
         .map { playList ->
           playList.audioIds.contains(audioId)
@@ -289,7 +289,7 @@ class DatabaseRepository private constructor() {
   /**
    * 添加或者删除收藏
    */
-  fun toggleMyLove(audioId: Int): Single<Boolean> {
+  fun toggleMyLove(audioId: Long): Single<Boolean> {
     return isMyLove(audioId)
         .flatMap {
           if (it) {
@@ -308,7 +308,7 @@ class DatabaseRepository private constructor() {
   /**
    * 获取播放队列
    */
-  fun getPlayQueue(): Single<List<Int>> {
+  fun getPlayQueue(): Single<List<Long>> {
     return Single
         .fromCallable {
           db.playQueueDao().selectAll()
@@ -322,7 +322,7 @@ class DatabaseRepository private constructor() {
    * 获得播放队列对应的歌曲
    */
   fun getPlayQueueSongs(): Single<List<Song>> {
-    val idsInQueue = ArrayList<Int>()
+    val idsInQueue = ArrayList<Long>()
     return Single
         .fromCallable {
           db.playQueueDao().selectAll()
@@ -340,7 +340,7 @@ class DatabaseRepository private constructor() {
           //删除不存在的歌曲
           if (songs.size < idsInQueue.size) {
             Timber.v("删除播放队列中不存在的歌曲")
-            val deleteIds = ArrayList<Int>()
+            val deleteIds = ArrayList<Long>()
             val existIds = songs.map { it.id }
 
             for (audioId in idsInQueue) {
@@ -367,7 +367,7 @@ class DatabaseRepository private constructor() {
   }
 
 
-  private fun convertAudioIdsToPlayQueues(audioIds: List<Int>): List<PlayQueue> {
+  private fun convertAudioIdsToPlayQueues(audioIds: List<Long>): List<PlayQueue> {
     val playQueues = ArrayList<PlayQueue>()
     for (audioId in audioIds) {
       playQueues.add(PlayQueue(0, audioId))
@@ -408,7 +408,7 @@ class DatabaseRepository private constructor() {
           //移除不存在的歌曲
           if (songs.size < playList.audioIds.size) {
             Timber.v("删除播放列表中不存在的歌曲")
-            val deleteIds = ArrayList<Int>()
+            val deleteIds = ArrayList<Long>()
             val existIds = songs.map { it.id }
 
             for (audioId in playList.audioIds) {
@@ -425,7 +425,7 @@ class DatabaseRepository private constructor() {
   }
 
 
-  private fun getSongsWithSort(sort: String, ids: List<Int>): Single<List<Song>> {
+  private fun getSongsWithSort(sort: String, ids: List<Long>): Single<List<Song>> {
     return Single
         .fromCallable {
           if (ids.isEmpty()) {
@@ -447,7 +447,7 @@ class DatabaseRepository private constructor() {
         }
   }
 
-  private fun makeInStr(audioIds: List<Int>): String {
+  private fun makeInStr(audioIds: List<Long>): String {
     val inStrBuilder = StringBuilder(127)
 
     for (i in audioIds.indices) {
@@ -495,9 +495,9 @@ class DatabaseRepository private constructor() {
   /**
    * 获取本机的播放列表 播放列表名字-歌曲ID列表
    */
-  val playlistFromMediaStore: Map<String, List<Int>>
+  val playlistFromMediaStore: Map<String, List<Long>>
     get() {
-      val map = HashMap<String, List<Int>>()
+      val map = HashMap<String, List<Long>>()
       var playlistCursor: Cursor? = null
       var songCursor: Cursor? = null
       try {
@@ -507,14 +507,14 @@ class DatabaseRepository private constructor() {
           return map
         }
         while (playlistCursor.moveToNext()) {
-          val helperList = java.util.ArrayList<Int>()
+          val helperList = ArrayList<Long>()
           songCursor = App.context.contentResolver.query(MediaStore.Audio.Playlists.Members
               .getContentUri("external", playlistCursor
                   .getInt(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists.Members._ID)).toLong()), null, null, null, null)
           if (songCursor != null) {
             while (songCursor.moveToNext()) {
               helperList.add(songCursor
-                  .getInt(songCursor.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID)))
+                  .getLong(songCursor.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID)))
             }
           }
           map[playlistCursor
