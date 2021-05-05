@@ -200,11 +200,12 @@
   <string name="length">長度:</string>
   <string name="bitrate">位元率:</string>
   <string name="sample_rate">採樣頻率:</string>
-  <string name="please_input_song_name">請輸入曲目名</string>
-  <string name="please_input_album">請曲目專輯</string>
-  <string name="please_input_artist">請輸入演出者</string>
-  <string name="please_input_year">請輸入年代</string>
-  <string name="please_input_genre">請輸入流派</string>
+  <string name="song_name_input_hint">曲目名</string>
+  <string name="album_input_hint">專輯</string>
+  <string name="artist_input_hint">演出者</string>
+  <string name="year_input_hint">年代</string>
+  <string name="track_number_input_hint">音軌號</string>
+  <string name="genre_input_hint">流派</string>
   <string name="grant_write_permission_tip">請授予修改音樂檔案的權限</string>
 
   <string name="write_something">每當想起這首歌的時候</string>
@@ -319,7 +320,6 @@
   <string name="save_wechat_qrcode_success">已儲存 WeChat QR碼,請打開 WeChat 識別該QR碼</string>
   <string name="play_breakpoint">接續播放</string>
   <string name="play_breakpoint_tip">再次打開應用程式時將從斷點處開始播放</string>
-  <string name="please_input_track_number">請輸入音軌號</string>
   <string name="will_stop_at_x">將在%d分鐘後關閉</string>
   <string name="saveing">儲存中</string>
   <string name="ignore_mediastore_artwork">忽略系統暫存中的媒體封面</string>
