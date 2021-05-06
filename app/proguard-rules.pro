@@ -135,13 +135,6 @@ public static final int *;
 #kotlin
 -dontwarn kotlin.**
 
-#jaudiotagger
--keep class org.jaudiotagger.** { *; }
--dontwarn org.jaudiotagger.**
-
-#ijkplayer
--keep class tv.danmaku.ijk.media.player.** { *; }
-
 #bugly
 -dontwarn com.tencent.bugly.**
 -keep public class com.tencent.bugly.**{*;}

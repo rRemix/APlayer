@@ -42,6 +42,7 @@
 - [Material-dialogs](https://github.com/afollestad/material-dialogs)
 - [Android-crop](https://github.com/jdamcd/android-crop)
 - [TinyPinyin](https://github.com/promeG/TinyPinyin)
+- [Jaudiotagger for Android](https://github.com/hexise/jaudiotagger-android)
 
 ## Finally 
 - Pull request is welcome
