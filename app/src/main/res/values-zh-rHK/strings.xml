@@ -59,7 +59,7 @@
 
   <string name="load_playlist_error">載入播放清單失敗</string>
 
-  <string name="confirm_delete_from_playlist_or_library">確定從%s移除?</string>
+  <string name="confirm_delete_from_playlist_or_library">確定從%s移除？</string>
   <string name="delete_success">移除成功</string>
   <string name="delete_error">移除失敗</string>
   <string name="set_ringtone_success">設定鈴聲成功</string>
@@ -102,7 +102,7 @@
   <string name="default_lrc_path">預設掃描所有歌詞檔案</string>
   <string name="lrc_tip">%s</string>
   <string name="cache_size">%1$2.2f MB</string>
-  <string name="confirm_clear_cache">確定清除暫存?</string>
+  <string name="confirm_clear_cache">確定清除暫存？</string>
   <string name="mylove_cant_edit">我的最愛清單不可編輯</string>
   <string name="error">錯誤</string>
   <string name="share_to">分享到</string>
@@ -161,17 +161,17 @@
   <string name="donate_tip">您的支持，是我們進步的動力。</string>
   <string name="jump_alipay_account">跳轉支付寶</string>
   <string name="already_copy">已複製到剪貼簿</string>
-  <string name="confirm_delete_playlist">是否移除所選播放清單?</string>
-  <string name="confirm_delete_from_playlist">是否從播放清單移除?</string>
-  <string name="confirm_delete_from_library">是否從曲庫移除?</string>
+  <string name="confirm_delete_playlist">是否移除所選播放清單？</string>
+  <string name="confirm_delete_from_playlist">是否從播放清單移除？</string>
+  <string name="confirm_delete_from_library">是否從曲庫移除？</string>
   <string name="sleep_timer">睡眠定時</string>
   <string name="eq">等化器</string>
   <string name="collect">收藏</string>
   <string name="only_lollopop">僅支援 Android 5.0 及以上</string>
   <string name="aplayer_lockscreen">APlayer 螢幕保護程式</string>
   <string name="system_lockscreen">系統鎖定螢幕</string>
-  <string name="aplayer_lockscreen_tip">鎖定螢幕會顯示當前曲目的封面,樣式取決於 APlayer</string>
-  <string name="system_lockscreen_tip">鎖定螢幕會顯示當前曲目的封面,樣式取決於你的系統</string>
+  <string name="aplayer_lockscreen_tip">鎖定螢幕會顯示當前曲目的封面，樣式取決於 APlayer</string>
+  <string name="system_lockscreen_tip">鎖定螢幕會顯示當前曲目的封面，樣式取決於你的系統</string>
   <string name="lockscreen_off_tip">鎖定螢幕將不會顯示曲目封面</string>
 
   <string name="choose_or_close_lockscreen">選擇螢幕保護程式或者關閉此功能</string>
@@ -215,15 +215,15 @@
   <string name="float_lrc">浮動歌詞</string>
   <string name="closed_desktop_lrc">已關閉浮動歌詞</string>
   <string name="opened_desktop_lrc">已開啟浮動歌詞</string>
-  <string name="confirm_ignore_lrc">確認忽略歌詞?</string>
-  <string name="confirm_cancel_ignore_lrc">確認取消忽略歌詞?</string>
+  <string name="confirm_ignore_lrc">確認忽略歌詞？</string>
+  <string name="confirm_cancel_ignore_lrc">確認取消忽略歌詞？</string>
   <string name="ignore_lrc">忽略歌詞</string>
   <string name="cancel_ignore_lrc">取消忽略歌詞</string>
   <string name="select_lrc">手動選擇</string>
   <string name="path_empty">播放路徑為空</string>
   <string name="file_not_exist">音樂檔案不存在</string>
   <string name="desktop_lyric_lock">浮動歌詞已鎖定</string>
-  <string name="desktop_lyric__lock_ticker">浮動歌詞已鎖定,可在通知列解鎖</string>
+  <string name="desktop_lyric__lock_ticker">浮動歌詞已鎖定，可在通知列解鎖</string>
   <string name="desktop_lyric__unlock">浮動歌詞已解除鎖定</string>
   <string name="mediaplayer_error">MediaPlayer{what:%1$d,extra:%2$d}\n正在重新初始化</string>
   <string name="screen_always_on_title">歌詞頁面螢幕保持開啟</string>
@@ -316,7 +316,7 @@
   <string name="import_count">匯入%s首曲目</string>
   <string name="alipay">支付寶</string>
   <string name="cant_share_song">無法分享曲目</string>
-  <string name="save_wechat_qrcode_success">已儲存 WeChat QR碼,請打開 WeChat 識別該QR碼</string>
+  <string name="save_wechat_qrcode_success">已儲存 WeChat QR碼，請打開 WeChat 識別該QR碼</string>
   <string name="play_breakpoint">接續播放</string>
   <string name="play_breakpoint_tip">再次打開應用程式時將從斷點處開始播放</string>
   <string name="will_stop_at_x">將在%d分鐘後關閉</string>
@@ -349,13 +349,13 @@
   <string name="update_notification_description">更新通知用於展示下載進度</string>
   <string name="downloading">下載中</string>
   <string name="download_complete">下載完成</string>
-  <string name="download_complete_to_do">下載完成,點擊安裝</string>
+  <string name="download_complete_to_do">下載完成，點擊安裝</string>
   <string name="plz_give_install_permission">請授予安裝未知來源應用程式的權限</string>
   <string name="update">更新</string>
   <string name="new_version_found">發現新版本</string>
   <string name="ignore_this_version">忽略該版本</string>
   <string name="ignore_check_update_forever">不再檢查更新</string>
-  <string name="empty_path_report_to_developer">安裝路徑為空,請回報問題給開發者</string>
+  <string name="empty_path_report_to_developer">安裝路徑為空，請回報問題給開發者</string>
   <string name="rename">重新命名</string>
   <string name="no_equalizer">沒有找到等化器</string>
   <string name="clear_download_cover">是否清除已經下載的封面</string>
@@ -371,7 +371,7 @@
   <string name="lyric_advance_x_second">提前%1$s秒</string>
   <string name="lyric_delay_x_second">延後%1$s秒</string>
   <string name="speed">播放倍速</string>
-  <string name="whether_change_theme">當前為夜間模式，是否切換主題顏色?</string>
+  <string name="whether_change_theme">當前為夜間模式，是否切換主題顏色？</string>
   <string name="embedded_lyric">內嵌</string>
   <string name="default_lyric_priority">預設</string>
   <string name="local">本地</string>
@@ -421,14 +421,14 @@
   <string name="auto_play_none">從不</string>
   <string name="deleting">刪除中</string>
   <string name="adding">新增中</string>
-  <string name="send_log">是否同時發送日誌?</string>
+  <string name="send_log">是否同時發送日誌？</string>
   <string name="clear">清除</string>
   <string name="add">添加</string>
   <string name="clear_blacklist_title">清除黑名單</string>
-  <string name="clear_blacklist_content">确定清除黑名單嗎?</string>
+  <string name="clear_blacklist_content">确定清除黑名單嗎？</string>
   <string name="blacklist">黑名單</string>
   <string name="remove_from_blacklist">從黑名单移除</string>
-  <string name="do_you_want_remove_from_blacklist">你想從黑名單移除%s嗎?</string>
+  <string name="do_you_want_remove_from_blacklist">你想從黑名單移除%s嗎？</string>
   <string name="blacklist_tip">這些文件夾中的內容將會從您的媒體庫中隱藏</string>
   <string name="yes">是</string>
   <string name="no">否</string>
