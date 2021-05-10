@@ -37,7 +37,7 @@ object UpdateAgent {
           }
         }
         .flatMap {
-          HttpClient.getInstance().getLatestRelease("rRemix", "APlayer")
+          HttpClient.getInstance().fetchLatestRelease("rRemix", "APlayer")
         }
         .compose(RxUtil.applySingleScheduler())
         .doFinally {

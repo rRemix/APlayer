@@ -1,14 +1,17 @@
 package remix.myplayer.request.network
 
-import io.reactivex.Observable
 import io.reactivex.Single
-import okhttp3.ResponseBody
 import remix.myplayer.bean.github.Release
+import remix.myplayer.bean.kugou.KLrcResponse
+import remix.myplayer.bean.kugou.KSearchResponse
 import remix.myplayer.bean.lastfm.LastFmAlbum
 import remix.myplayer.bean.lastfm.LastFmArtist
 import remix.myplayer.bean.netease.NAlbumSearchResponse
 import remix.myplayer.bean.netease.NArtistSearchResponse
+import remix.myplayer.bean.netease.NLrcResponse
 import remix.myplayer.bean.netease.NSongSearchResponse
+import remix.myplayer.bean.qq.QLrcResponse
+import remix.myplayer.bean.qq.QSearchResponse
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -84,40 +87,9 @@ class HttpClient private constructor() {
   //        }
   //        return sOkHttpClient;
   //    }
-  fun getNeteaseSearch(key: String?, offset: Int, limit: Int, type: Int): Observable<ResponseBody> {
-    return neteaseApi.getNeteaseSearch(key, offset, limit, type)
-  }
 
-  fun getNeteaseLyric(song_id: Int): Observable<ResponseBody> {
-    return neteaseApi.getNeteaseLyric("pc", song_id, -1, -1, -1)
-  }
-
-  fun getKuGouSearch(keyword: String?, duration: Long, hash: String?): Observable<ResponseBody> {
-    return kuGouApi.getKuGouSearch(1, "yes", "pc", keyword, duration, "")
-  }
-
-  fun getKuGouLyric(id: Int, accessKey: String?): Observable<ResponseBody> {
-    return kuGouApi.getKuGouLyric(1, "pc", "lrc", "utf8", id, accessKey)
-  }
-
-  fun getQQSearch(key: String?): Observable<ResponseBody> {
-    return qqApi.getQQSearch(1, key, "json")
-  }
-
-  fun getQQLyric(songmid: String?): Observable<ResponseBody> {
-    return qqApi.getQQLyric(songmid, 5381, "json", 1)
-  }
-
-  fun getAlbumInfo(albumName: String?, artistName: String?, lang: String?): Observable<ResponseBody> {
-    return lastfmApi.getAlbumInfo(albumName, artistName, lang)
-  }
-
-  fun getArtistInfo(artistName: String?, lang: String?): Observable<ResponseBody> {
-    return lastfmApi.getArtistInfo(artistName, lang)
-  }
-
-  fun getLatestRelease(owner: String, repo: String): Single<Release> {
-    return githubApi.getLatestRelease(owner, repo)
+  fun fetchLatestRelease(owner: String, repo: String): Single<Release> {
+    return githubApi.fetchLatestRelease(owner, repo)
   }
 
   //New Api
@@ -141,6 +113,25 @@ class HttpClient private constructor() {
     return neteaseApi.searchNeteaseArtist(key, offset, limit, 100)
   }
 
+  fun searchNeteaseLyric(id: Int): Single<NLrcResponse> {
+    return neteaseApi.searchNeteaseLyric("pc", id, -1, -1, -1)
+  }
+
+  fun searchKuGou(keyword: String?, duration: Long): Single<KSearchResponse> {
+    return kuGouApi.searchKuGou(1, "yes", "pc", keyword, duration, "")
+  }
+
+  fun searchKuGouLyric(id: Int, accessKey: String?): Single<KLrcResponse> {
+    return kuGouApi.searchKuGouLyric(1, "pc", "lrc", "utf8", id, accessKey)
+  }
+
+  fun searchQQ(key: String?): Single<QSearchResponse> {
+    return qqApi.searchQQ(1, key, "json")
+  }
+
+  fun searchQQLyric(songmid: String?): Single<QLrcResponse> {
+    return qqApi.searchQQLyric(songmid, 5381, "json", 1)
+  }
 
   private object SingletonHolder {
     val instance = HttpClient()

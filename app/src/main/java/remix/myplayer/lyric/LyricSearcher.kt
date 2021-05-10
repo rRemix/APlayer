@@ -6,18 +6,13 @@ import android.util.Base64
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.functions.Function
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.App
-import remix.myplayer.bean.kugou.KLrcResponse
-import remix.myplayer.bean.kugou.KSearchResponse
 import remix.myplayer.bean.misc.LyricPriority
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.bean.netease.NLrcResponse
-import remix.myplayer.bean.netease.NSongSearchResponse
-import remix.myplayer.bean.qq.QLrcResponse
-import remix.myplayer.bean.qq.QSearchResponse
 import remix.myplayer.lyric.bean.LrcRow
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.request.network.HttpClient
@@ -299,31 +294,33 @@ class LyricSearcher {
    */
   private fun getNeteaseObservable(): Observable<List<LrcRow>> {
     return HttpClient.getInstance()
-        .getNeteaseSearch(searchKey, 0, 1, 1)
+        .searchNeteaseSong(searchKey, 0, 1)
         .flatMap {
-          HttpClient.getInstance()
-              .getNeteaseLyric(Gson().fromJson(it.string(), NSongSearchResponse::class.java)?.result?.songs?.get(0)?.id ?: 0)
-              .map {
-                val lrcResponse = Gson().fromJson(it.string(), NLrcResponse::class.java)
-                val combine = lrcParser.getLrcRows(getBufferReader(lrcResponse.lrc?.lyric?.toByteArray() ?: "".toByteArray()), false, cacheKey, searchKey)
-                if (isCN && lrcResponse.tlyric != null && !lrcResponse.tlyric.lyric.isNullOrEmpty()) {
-                  val translate = lrcParser.getLrcRows(getBufferReader(lrcResponse.tlyric.lyric.toByteArray()), false, cacheKey, searchKey)
-                  if (translate.isNotEmpty()) {
-                    for (i in translate.indices) {
-                      for (j in combine.indices) {
-                        if (translate[i].time == combine[j].time) {
-                          combine[j].translate = translate[i].content
-                          break
-                        }
-                      }
-                    }
+          HttpClient.getInstance().searchNeteaseLyric(it.result?.songs?.get(0)?.id ?: 0)
+        }
+        .map { lrcResponse ->
+          val combine = lrcParser.getLrcRows(getBufferReader(lrcResponse.lrc?.lyric?.toByteArray()
+              ?: "".toByteArray()), false, cacheKey, searchKey)
+          if (isCN && lrcResponse.tlyric != null && !lrcResponse.tlyric.lyric.isNullOrEmpty()) {
+            val translate = lrcParser.getLrcRows(getBufferReader(lrcResponse.tlyric.lyric.toByteArray()), false, cacheKey, searchKey)
+            if (translate.isNotEmpty()) {
+              for (i in translate.indices) {
+                for (j in combine.indices) {
+                  if (translate[i].time == combine[j].time) {
+                    combine[j].translate = translate[i].content
+                    break
                   }
                 }
-                Timber.v("NeteaseLyric")
-                lrcParser.saveLrcRows(combine, cacheKey, searchKey)
-                combine
               }
-        }.onErrorResumeNext(Function {
+            }
+          }
+          Timber.v("NeteaseLyric")
+          lrcParser.saveLrcRows(combine, cacheKey, searchKey)
+          combine
+        }
+        .toObservable()
+        .onErrorResumeNext(Function {
+          Timber.v("search netease lyric failed: ${it.message}")
           Observable.empty()
         })
   }
@@ -333,23 +330,23 @@ class LyricSearcher {
    */
   private fun getKuGouObservable(): Observable<List<LrcRow>> {
     //酷狗歌词
-    return HttpClient.getInstance().getKuGouSearch(searchKey, song.duration, "")
-        .flatMap { body ->
-          val searchResponse = Gson().fromJson(body.string(), KSearchResponse::class.java)
+    return HttpClient.getInstance().searchKuGou(searchKey, song.duration)
+        .flatMap { searchResponse ->
           if (searchResponse.candidates.isNotEmpty() && song.title.equals(searchResponse.candidates[0].song, true)) {
-            HttpClient.getInstance().getKuGouLyric(
+            HttpClient.getInstance().searchKuGouLyric(
                 searchResponse.candidates[0].id,
                 searchResponse.candidates[0].accesskey)
-                .map { lrcBody ->
-                  val lrcResponse = Gson().fromJson(lrcBody.string(), KLrcResponse::class.java)
+                .map { lrcResponse ->
                   Timber.v("KugouLyric")
                   lrcParser.getLrcRows(getBufferReader(Base64.decode(lrcResponse.content, Base64.DEFAULT)), true, cacheKey, searchKey)
                 }
           } else {
-            Observable.empty()
+            Single.error(Throwable("no kugou lyric"))
           }
         }
+        .toObservable()
         .onErrorResumeNext(Function {
+          Timber.v("search kugou lyric failed: ${it.message}")
           Observable.empty()
         })
   }
@@ -358,20 +355,18 @@ class LyricSearcher {
    * QQ歌词
    */
   private fun getQQObservable(): Observable<List<LrcRow>> {
-    return HttpClient.getInstance().getQQSearch(searchKey)
-        .flatMap { body ->
-          val searchResponse = Gson().fromJson(body.string(), QSearchResponse::class.java)
+    return HttpClient.getInstance().searchQQ(searchKey)
+        .flatMap { searchResponse ->
           if (song.title.equals(searchResponse.data.song.list[0].songname, true)) {
-            HttpClient.getInstance().getQQLyric(searchResponse.data.song.list[0].songmid)
-                .map { lrcBody ->
-                  val lrcResponse = Gson().fromJson(lrcBody.string(), QLrcResponse::class.java)
+            HttpClient.getInstance().searchQQLyric(searchResponse.data.song.list[0].songmid)
+                .map { lrcResponse ->
                   val combine = lrcParser.getLrcRows(getBufferReader(lrcResponse.lyric.toByteArray()), false, cacheKey, searchKey)
                   combine.forEach {
                     it.content = Util.htmlToText(it.content)
                   }
                   if (lrcResponse.trans.isNotEmpty()) {
                     val translate = lrcParser.getLrcRows(getBufferReader(lrcResponse.trans.toByteArray()), false, cacheKey, searchKey)
-                    if (isCN && translate.size > 0) {
+                    if (isCN && translate.isNotEmpty()) {
                       translate.forEach {
                         if (it.content.isNotEmpty() && it.content != "//") {
                           for (i in combine.indices) {
@@ -389,10 +384,12 @@ class LyricSearcher {
                   combine
                 }
           } else {
-            Observable.empty()
+            Single.error(Throwable("no qq lyric"))
           }
         }
+        .toObservable()
         .onErrorResumeNext(Function {
+          Timber.v("search qq lyric failed: ${it.message}")
           Observable.empty()
         })
   }
