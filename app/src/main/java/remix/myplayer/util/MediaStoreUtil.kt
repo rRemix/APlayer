@@ -51,24 +51,32 @@ object MediaStoreUtil {
 
   //扫描文件默认大小设置
   var SCAN_SIZE = 0
-  private val BASE_PROJECTION = arrayOf(
-      AudioColumns._ID,
-      AudioColumns.TITLE,
-      AudioColumns.TITLE_KEY,
-      AudioColumns.DISPLAY_NAME,
-      AudioColumns.TRACK,
-      AudioColumns.SIZE,
-      AudioColumns.YEAR,
-      AudioColumns.GENRE,
-      AudioColumns.TRACK,
-      AudioColumns.DURATION,
-      AudioColumns.DATE_MODIFIED,
-      AudioColumns.DATE_ADDED,
-      AudioColumns.DATA,
-      AudioColumns.ALBUM_ID,
-      AudioColumns.ALBUM,
-      AudioColumns.ARTIST_ID,
-      AudioColumns.ARTIST)
+  private val BASE_PROJECTION: Array<String> = {
+    val projection = ArrayList<String>(
+      listOf(
+        AudioColumns._ID,
+        AudioColumns.TITLE,
+        AudioColumns.TITLE_KEY,
+        AudioColumns.DISPLAY_NAME,
+        AudioColumns.TRACK,
+        AudioColumns.SIZE,
+        AudioColumns.YEAR,
+        AudioColumns.TRACK,
+        AudioColumns.DURATION,
+        AudioColumns.DATE_MODIFIED,
+        AudioColumns.DATE_ADDED,
+        AudioColumns.DATA,
+        AudioColumns.ALBUM_ID,
+        AudioColumns.ALBUM,
+        AudioColumns.ARTIST_ID,
+        AudioColumns.ARTIST
+      )
+    )
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      projection.add(AudioColumns.GENRE)
+    }
+    projection.toTypedArray()
+  }()
 
   @JvmStatic
   fun getAllArtist(): List<Artist> {
@@ -275,7 +283,7 @@ object MediaStoreUtil {
       return EMPTY_SONG
     }
     return Song(
-      id = cursor.getLong(cursor.getColumnIndex(Audio.Media._ID)),
+      id = cursor.getLong(cursor.getColumnIndex(AudioColumns._ID)),
       displayName = Util.processInfo(
         cursor.getString(cursor.getColumnIndex(AudioColumns.DISPLAY_NAME)),
         Util.TYPE_DISPLAYNAME
@@ -294,11 +302,17 @@ object MediaStoreUtil {
         Util.TYPE_ARTIST
       ),
       artistId = cursor.getLong(cursor.getColumnIndex(AudioColumns.ARTIST_ID)),
-      _duration = cursor.getLong(cursor.getColumnIndex(Audio.Media.DURATION)),
-      data = cursor.getString(cursor.getColumnIndex(Audio.Media.DATA)),
+      _duration = cursor.getLong(cursor.getColumnIndex(AudioColumns.DURATION)),
+      data = cursor.getString(cursor.getColumnIndex(AudioColumns.DATA)),
       size = cursor.getLong(cursor.getColumnIndex(AudioColumns.SIZE)),
       year = cursor.getLong(cursor.getColumnIndex(AudioColumns.YEAR)).toString(),
-      _genre = cursor.getString(cursor.getColumnIndex(AudioColumns.GENRE)),
+      _genre = cursor.getColumnIndex(AudioColumns.GENRE).let {
+        if (it != -1) {
+          cursor.getString(it)
+        } else {
+          null
+        }
+      },
       track = cursor.getLong(cursor.getColumnIndex(AudioColumns.TRACK)).toString(),
       dateModified = cursor.getLong(cursor.getColumnIndex(AudioColumns.DATE_MODIFIED))
     )
@@ -553,8 +567,7 @@ object MediaStoreUtil {
       // 把需要设为铃声的歌曲更新铃声库
       if (this.context.contentResolver.update(Audio.Media.EXTERNAL_CONTENT_URI, cv,
               MediaStore.MediaColumns._ID + "=?", arrayOf(audioId.toString() + "")) > 0) {
-        val newUri = ContentUris
-            .withAppendedId(Audio.Media.EXTERNAL_CONTENT_URI, audioId.toLong())
+        val newUri = ContentUris.withAppendedId(Audio.Media.EXTERNAL_CONTENT_URI, audioId)
         RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, newUri)
         ToastUtil.show(context, R.string.set_ringtone_success)
       } else {
