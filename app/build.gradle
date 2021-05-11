@@ -147,7 +147,6 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    testImplementation 'junit:junit:4.12'
 
     //support
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
@@ -213,6 +212,10 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.28'
     implementation 'com.github.tony19:logback-android:2.0.0'
 
+}
+
+android.sourceSets.all {
+    java.srcDirs += "src/third-party/jaudiotagger-android/src"
 }
 
 def getProperties(String fileName) {
