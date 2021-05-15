@@ -7,10 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.PorterDuff
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.InsetDrawable
@@ -41,6 +38,7 @@ import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.layout_player_control.*
 import kotlinx.android.synthetic.main.layout_player_topbar.*
 import kotlinx.android.synthetic.main.layout_player_volume.*
+import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivityPlayerBinding
@@ -58,10 +56,8 @@ import remix.myplayer.lyric.LrcView.OnLrcClickListener
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
-import remix.myplayer.misc.interfaces.OnInflateFinishListener
 import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.misc.menu.AudioPopupListener
-import remix.myplayer.util.RxUtil
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
@@ -131,13 +127,21 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     private set
   private lateinit var coverFragment: CoverFragment
 
-  /**
-   * 下拉关闭
-   */
-  private var eventY1 = 0f
-  private var eventY2 = 0f
-  private var eventX1 = 0f
-  private var eventX2 = 0f
+  private var distanceX = 0f
+  private var distanceY = 0f
+  private var lastY = 0f
+  private var lastX = 0f
+
+  private val thresholdX by lazy {
+    DensityUtil.dip2px(App.context, 40f)
+  }
+  private val thresholdY by lazy {
+    if (this.isPortraitOrientation()) {
+      DensityUtil.dip2px(App.context, 100f)
+    } else {
+      DensityUtil.dip2px(App.context, 40f)
+    }
+  }
 
   /**
    * 更新Handler
@@ -250,24 +254,24 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     Util.registerLocalReceiver(receiver, IntentFilter(ACTION_UPDATE_NEXT))
 
     arrayOf(
-      binding.layoutPlayerControl.playbarNext,
-      binding.layoutPlayerControl.playbarPrev,
-      binding.layoutPlayerControl.playbarPlayContainer
+        binding.layoutPlayerControl.playbarNext,
+        binding.layoutPlayerControl.playbarPrev,
+        binding.layoutPlayerControl.playbarPlayContainer
     ).forEach {
       it.setOnClickListener(onCtrlClick)
     }
     arrayOf(
-      binding.layoutPlayerControl.playbarModel,
-      binding.layoutPlayerControl.playbarPlayinglist,
-      binding.topActionbar.topHide,
-      binding.topActionbar.topMore
+        binding.layoutPlayerControl.playbarModel,
+        binding.layoutPlayerControl.playbarPlayinglist,
+        binding.topActionbar.topHide,
+        binding.topActionbar.topMore
     ).forEach {
       it.setOnClickListener(onOtherClick)
     }
     arrayOf(
-      binding.layoutPlayerVolume.volumeDown,
-      binding.layoutPlayerVolume.volumeUp,
-      binding.layoutPlayerVolume.nextSong
+        binding.layoutPlayerVolume.volumeDown,
+        binding.layoutPlayerVolume.volumeUp,
+        binding.layoutPlayerVolume.nextSong
     ).forEach {
       it.setOnClickListener(onVolumeClick)
     }
@@ -581,25 +585,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
       view_pager.adapter = adapter
       view_pager.offscreenPageLimit = adapter.count - 1
       view_pager.currentItem = 0
-      val thresholdY = DensityUtil.dip2px(this, 40f)
-      val thresholdX = DensityUtil.dip2px(this, 60f)
-      //下滑关闭
-      view_pager.setOnTouchListener { v: View?, event: MotionEvent ->
-        if (view_pager.currentItem == 0) {
-          if (event.action == MotionEvent.ACTION_DOWN) {
-            eventX1 = event.x
-            eventY1 = event.y
-          }
-          if (event.action == MotionEvent.ACTION_UP) {
-            eventX2 = event.x
-            eventY2 = event.y
-            if (eventY2 - eventY1 > thresholdY && abs(eventX1 - eventX2) < thresholdX) {
-              onBackPressed()
-            }
-          }
-        }
-        false
-      }
+
       view_pager.addOnPageChangeListener(object : OnPageChangeListener {
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
         override fun onPageSelected(position: Int) {
@@ -630,8 +616,46 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     }
   }
 
+  override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+    when (event.action) {
+      MotionEvent.ACTION_DOWN -> {
+        if (touchOnCoverFragment(event)) {
+          lastX = event.x
+          lastY = event.y
+        }
+      }
+      MotionEvent.ACTION_MOVE -> {
+        if (lastX > 0 && lastY > 0 && touchOnCoverFragment(event)) {
+          distanceX += abs(event.x - lastX)
+          distanceY += (event.y - lastY)
+          if (distanceY > thresholdY && distanceX < thresholdX) {
+            onBackPressed()
+          }
+
+          lastX = event.x
+          lastY = event.y
+        }
+      }
+      else -> {
+        lastX = 0f
+        lastY = 0f
+        distanceY = 0f
+        distanceX = 0f
+      }
+    }
+
+    return super.dispatchTouchEvent(event)
+  }
+
+  private fun touchOnCoverFragment(event: MotionEvent): Boolean {
+    val rect = Rect()
+    return (this.isPortraitOrientation() && view_pager.currentItem == 0) ||
+        (binding.containerCover?.getLocalVisibleRect(rect) == true && rect.contains(event.x.toInt(), event.y.toInt()))
+  }
+
+
   private fun setUpLyricFragment() {
-    lyricFragment.setOnInflateFinishListener(OnInflateFinishListener { view: View? ->
+    lyricFragment.setOnInflateFinishListener { view: View? ->
       lrcView = view as LrcView
       lrcView?.setOnLrcClickListener(object : OnLrcClickListener {
         override fun onClick() {}
@@ -651,7 +675,7 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
       lrcView?.setHighLightColor(ThemeStore.textColorPrimary)
       lrcView?.setOtherColor(ThemeStore.textColorSecondary)
       lrcView?.setTimeLineColor(ThemeStore.textColorSecondary)
-    })
+    }
   }
 
   private fun setUpCoverFragment() {
