@@ -79,12 +79,7 @@ class RecentlyActivity : LibraryActivity<Song, SongAdapter>() {
   @OnHandleMessage
   fun handleMessage(msg: Message) {
     when (msg.what) {
-      MSG_RESET_MULTI -> if (adapter != null) {
-        adapter!!.notifyDataSetChanged()
-      }
-      MSG_UPDATE_ADAPTER -> if (adapter != null) {
-        adapter!!.notifyDataSetChanged()
-      }
+      MSG_RESET_MULTI, MSG_UPDATE_ADAPTER -> adapter?.notifyDataSetChanged()
     }
   }
 
@@ -93,21 +88,16 @@ class RecentlyActivity : LibraryActivity<Song, SongAdapter>() {
     handler.remove()
   }
 
-  override fun onMediaStoreChanged() {
-    super.onMediaStoreChanged()
+  override val loader: Loader<List<Song>> by lazy {
+    AsyncRecentlySongLoader(this)
   }
 
-  override val loader: Loader<List<Song>> = AsyncRecentlySongLoader(this)
-
-  override val loaderId: Int = LoaderIds.ACTIVITY_RECENTLY
+  override val loaderId = LoaderIds.ACTIVITY_RECENTLY
 
   private class AsyncRecentlySongLoader(context: Context) : AppWrappedAsyncTaskLoader<List<Song>>(context) {
     override fun loadInBackground(): List<Song> {
-      return lastAddedSongs
+      return getLastAddedSong()
     }
-
-    private val lastAddedSongs: List<Song>
-      get() = getLastAddedSong()
   }
 
   companion object {
