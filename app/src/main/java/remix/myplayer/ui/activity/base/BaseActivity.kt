@@ -159,8 +159,10 @@ open class BaseActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
           toDeleteSongs?.let {
             MediaStoreUtil.deleteSource(this, it[0])
-            it.remove(it[0])
-            MediaStoreUtil.deleteSource(this, it[0])
+            it.removeAt(0)
+            if (it.isNotEmpty()) {
+              MediaStoreUtil.deleteSource(this, it[0])
+            }
           }
         } else {
           ToastUtil.show(this, R.string.grant_delete_permission_tip)
