@@ -16,14 +16,6 @@ class APlayerGlideModule : AppGlideModule() {
 
   override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
     registry.append(Uri::class.java, InputStream::class.java, EmbeddedLoader.Factory())
-//    registry.append(Song::class.java, InputStream::class.java, object : ModelLoaderFactory<Song, InputStream> {
-//      override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Song, InputStream> {
-//        return APlayerUriLoader(multiFactory.build(Uri::class.java, InputStream::class.java))
-//      }
-//
-//      override fun teardown() {
-//      }
-//    })
     registry.append(APlayerModel::class.java, InputStream::class.java, APlayerUriLoader.Factory())
   }
 

@@ -174,3 +174,6 @@ public static final int *;
   *** rewind();
 }
 
+#jaudiotagger
+-keep class org.jaudiotagger.** { *; }
+-dontwarn org.jaudiotagger.**
