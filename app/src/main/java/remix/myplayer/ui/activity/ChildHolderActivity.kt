@@ -11,6 +11,7 @@ import android.view.View
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import remix.myplayer.R
+import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivityChildHolderBinding
 import remix.myplayer.db.room.DatabaseRepository.Companion.getInstance
@@ -163,7 +164,7 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
           !this.sortOrder.equals(sortOrder, ignoreCase = true)) {
         //选择的是手动排序
         if (sortOrder.equals(SortOrder.PLAYLIST_SONG_CUSTOM, ignoreCase = true)) {
-          CustomSortActivity.start(this, key.toLong(), title, ArrayList(adapter!!.dataList))
+          CustomSortActivity.start(this, intent.getParcelableExtra(EXTRA_MODEL)!!, ArrayList(adapter!!.dataList))
         } else {
           update = true
         }
@@ -296,16 +297,20 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
   }
 
   companion object {
-    val TAG = ChildHolderActivity::class.java.simpleName
     private const val EXTRA_KEY = "key"
     private const val EXTRA_TYPE = "type"
     private const val EXTRA_TITLE = "title"
+    private const val EXTRA_MODEL = "model"
 
-    fun start(context: Context, type: Int, key: String?, title: String?) {
-      context.startActivity(Intent(context, ChildHolderActivity::class.java)
+    fun start(context: Context, type: Int, key: String?, title: String?, model: APlayerModel? = null) {
+      val intent = Intent(context, ChildHolderActivity::class.java)
           .putExtra(EXTRA_KEY, key)
           .putExtra(EXTRA_TYPE, type)
-          .putExtra(EXTRA_TITLE, title))
+          .putExtra(EXTRA_TITLE, title)
+      if (model != null) {
+        intent.putExtra(EXTRA_MODEL, model)
+      }
+      context.startActivity(intent)
     }
   }
 }

@@ -44,13 +44,13 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter>() {
             ToastUtil.show(requireContext(), getStringSafely(R.string.list_is_empty))
             return
           }
-          ChildHolderActivity.start(requireContext(), Constants.PLAYLIST, playList.id.toString(), playList.name)
+          ChildHolderActivity.start(requireContext(), Constants.PLAYLIST, playList.id.toString(), playList.name, playList)
         }
       }
 
       override fun onItemLongClick(view: View, position: Int) {
         if (userVisibleHint) {
-          multiChoice.longClick(position, adapter?.dataList?.get(position))
+          multiChoice.longClick(position, adapter.dataList[position])
         }
       }
     }

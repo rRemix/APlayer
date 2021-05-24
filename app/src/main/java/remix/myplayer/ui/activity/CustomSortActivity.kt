@@ -3,11 +3,11 @@ package remix.myplayer.ui.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.ItemTouchHelper
-import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.activity_custom_sort.*
 import org.jetbrains.anko.doAsync
@@ -16,6 +16,8 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivityCustomSortBinding
 import remix.myplayer.db.room.DatabaseRepository
+import remix.myplayer.db.room.model.PlayList
+import remix.myplayer.glide.UriFetcher
 import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore
@@ -41,25 +43,21 @@ class CustomSortActivity : ToolbarActivity() {
         .progressIndeterminateStyle(false).build()
   }
 
-  private lateinit var songs: ArrayList<Song>
-  private var playlistId = -1L
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = ActivityCustomSortBinding.inflate(layoutInflater)
     setContentView(binding.root)
 
-    playlistId = intent.getLongExtra(EXTRA_ID, -1)
-    val playlistName = intent.getStringExtra(EXTRA_NAME) ?: ""
-
-    if (!intent.hasExtra(EXTRA_LIST)) {
+    if (!intent.hasExtra(EXTRA_LIST) || !intent.hasExtra(EXTRA_PLAYLIST)) {
       ToastUtil.show(this, R.string.illegal_arg)
       finish()
       return
     }
-    songs = intent.getSerializableExtra(EXTRA_LIST) as ArrayList<Song>
 
-    setUpToolbar(playlistName)
+    val songs = intent.getSerializableExtra(EXTRA_LIST) as ArrayList<Song>
+    val playList = intent.getParcelableExtra<PlayList>(EXTRA_PLAYLIST)!!
+
+    setUpToolbar(playList.name)
 
     adapter.setDataList(songs)
     adapter.onItemClickListener = object : OnItemClickListener {
@@ -117,8 +115,11 @@ class CustomSortActivity : ToolbarActivity() {
 
         Thread.sleep(500)
         val result = DatabaseRepository.getInstance()
-          .updatePlayListAudios(playlistId, songs.map { it.id })
-          .blockingGet()
+            .updatePlayListAudios(playList.id, adapter.dataList.map { it.id })
+            .blockingGet()
+
+        UriFetcher.updatePlayListVersion()
+        UriFetcher.clearAllCache()
 
         uiThread {
           ToastUtil.show(this@CustomSortActivity, if (result > 0) R.string.save_success else R.string.save_error)
@@ -131,15 +132,13 @@ class CustomSortActivity : ToolbarActivity() {
 
   companion object {
     @JvmStatic
-    fun start(context: Context, id: Long, name: String, list: List<Song>) {
+    fun start(context: Context, playList: PlayList, list: List<Song>) {
       context.startActivity(Intent(context, CustomSortActivity::class.java)
-          .putExtra(EXTRA_ID, id)
-          .putExtra(EXTRA_NAME, name)
+          .putExtra(EXTRA_PLAYLIST, playList)
           .putExtra(EXTRA_LIST, ArrayList(list)))
     }
 
-    private const val EXTRA_ID = "id"
-    private const val EXTRA_NAME = "name"
+    private const val EXTRA_PLAYLIST = "playlist"
     private const val EXTRA_LIST = "list"
   }
 
