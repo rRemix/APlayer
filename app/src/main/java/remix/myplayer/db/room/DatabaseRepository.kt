@@ -440,18 +440,9 @@ class DatabaseRepository private constructor() {
           val tempArray = Array(ids.size) { Song.EMPTY_SONG }
 
           songs.forEachIndexed { index, song ->
-            tempArray[if (CUSTOMSORT == sort) {
-              //TODO why ids.indexOf return -1??
-              var newIndex = index
-              for (i in ids.indices) {
-                if (ids[i] == song.id) {
-                  newIndex = i
-                  break
-                }
-              }
-              newIndex
-            } else index] = song
+            tempArray[if (CUSTOMSORT == sort) ids.indexOf(song.id) else index] = song
           }
+
           tempArray
               .filter { it.id != Song.EMPTY_SONG.id }
         }

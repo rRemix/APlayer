@@ -26,7 +26,7 @@ data class PlayList(
     @TypeConverter
     fun toStrList(listStr: String?): LinkedHashSet<Long>? {
       val gson = Gson()
-      return gson.fromJson(listStr, object : TypeToken<LinkedHashSet<Int>>() {}.type)
+      return gson.fromJson(listStr, object : TypeToken<LinkedHashSet<Long>>() {}.type)
     }
 
     @TypeConverter
