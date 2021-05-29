@@ -1431,13 +1431,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             return@tryLaunch
           }
 
-          val exist = withContext(Dispatchers.IO) {
-            File(song.data).exists()
-          }
-          if (!exist) {
-            ToastUtil.show(service, getString(R.string.file_not_exist))
-            return@tryLaunch
-          }
+//          val exist = withContext(Dispatchers.IO) {
+//            File(song.data).exists()
+//          }
+//          if (!exist) {
+//            ToastUtil.show(service, getString(R.string.file_not_exist))
+//            return@tryLaunch
+//          }
+
           if (requestFocus) {
             audioFocus = AudioManagerCompat.requestAudioFocus(
                 audioManager,
