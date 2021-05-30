@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
@@ -22,12 +23,12 @@ object PermissionUtil {
 
   fun hasReadAndWriteExternalStorage(): Boolean {
     return has(Manifest.permission.READ_EXTERNAL_STORAGE) &&
-           has(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+           has(Manifest.permission.WRITE_EXTERNAL_STORAGE)
   }
 
   @RequiresApi(Build.VERSION_CODES.R)
   fun hasManageExternalStorage(): Boolean {
-    return has(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+    return Environment.isExternalStorageManager()
   }
 
   @RequiresApi(Build.VERSION_CODES.R)
