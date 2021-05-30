@@ -232,7 +232,6 @@
   <string name="plz_give_float_permission">Grant floating window permissionin settings</string>
   <string name="jump_alipay_error">Jump Error</string>
   <string name="plz_give_access_external_storage_permission">Please give permission to access external storage</string>
-  <string name="manual_scan_permission_tip">To manual scan audio files on Android 11 and above, all files access permission is required</string>
   <string name="show_recently">Shows the songs imported in the last week</string>
   <string name="no_audio_ID">Please try this again after playing the song</string>
   <string name="need_earphone">Use this feature need to plug in your headphones</string>
@@ -442,4 +441,6 @@
 
   <string name="grant_delete_permission_tip">Please grant permission to delete the media file</string>
   <string name="delete_source_fail_tip">Fail to delete source file: %s</string>
+
+  <string name="manage_external_storage_permission_tip">To use this function on Android 11 and above, all files access permission is required</string>
 </resources>

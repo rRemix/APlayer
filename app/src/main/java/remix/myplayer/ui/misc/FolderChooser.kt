@@ -37,7 +37,7 @@ class FolderChooser(val activity: BaseActivity,
         !PermissionUtil.hasManageExternalStorage()) {
       Theme
           .getBaseDialog(activity)
-          .content(R.string.manual_scan_permission_tip)
+          .content(R.string.manage_external_storage_permission_tip)
           .positiveText(R.string.confirm)
           .negativeText(R.string.cancel)
           .onPositive { _, _ -> PermissionUtil.requestManageExternalStorage(activity) }
