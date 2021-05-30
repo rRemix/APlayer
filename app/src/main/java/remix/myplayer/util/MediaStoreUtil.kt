@@ -80,7 +80,7 @@ object MediaStoreUtil {
 
   @JvmStatic
   fun getAllArtist(): List<Artist> {
-    if (!Util.hasStoragePermissions()) {
+    if (!PermissionUtil.hasReadAndWriteExternalStorage()) {
       return ArrayList()
     }
     val artistMaps: MutableMap<Long, MutableList<Artist>> = LinkedHashMap()
@@ -132,7 +132,7 @@ object MediaStoreUtil {
 
   @JvmStatic
   fun getAllAlbum(): List<Album> {
-    if (!Util.hasStoragePermissions()) {
+    if (!PermissionUtil.hasReadAndWriteExternalStorage()) {
       return ArrayList()
     }
     val albumMaps: MutableMap<Long, MutableList<Album>> = LinkedHashMap()
@@ -216,7 +216,7 @@ object MediaStoreUtil {
 
   @JvmStatic
   fun getAllFolder(): List<Folder> {
-    if (!Util.hasStoragePermissions()) {
+    if (!PermissionUtil.hasReadAndWriteExternalStorage()) {
       return Collections.emptyList()
     }
 
@@ -634,7 +634,7 @@ object MediaStoreUtil {
   @JvmStatic
   fun getSongIds(selection: String?, selectionValues: Array<String?>?,
                  sortOrder: String?): List<Long> {
-    if (!Util.hasStoragePermissions()) {
+    if (!PermissionUtil.hasReadAndWriteExternalStorage()) {
       return ArrayList()
     }
     val ids: MutableList<Long> = ArrayList()
@@ -660,7 +660,7 @@ object MediaStoreUtil {
   @JvmStatic
   fun getSongs(selection: String?, selectionValues: Array<String?>?,
                sortOrder: String?): List<Song> {
-    if (!Util.hasStoragePermissions()) {
+    if (!PermissionUtil.hasReadAndWriteExternalStorage()) {
       return ArrayList()
     }
     val songs: MutableList<Song> = ArrayList()

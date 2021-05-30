@@ -431,31 +431,6 @@ public class Util {
   }
 
   /**
-   * 判断是否有权限
-   */
-  public static boolean hasPermissions(String[] permissions) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && permissions != null) {
-      for (String permission : permissions) {
-        if (App.getContext().checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  /**
-   * 是否有读写权限
-   */
-  private static final String[] PERMISSION_STORAGE = new String[]{
-      Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-
-  public static boolean hasStoragePermissions() {
-    return hasPermissions(PERMISSION_STORAGE);
-  }
-
-
-  /**
    * 判断wifi是否打开
    */
   public static boolean isWifi(Context context) {

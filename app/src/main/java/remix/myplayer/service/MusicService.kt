@@ -59,7 +59,6 @@ import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.activity.LockScreenActivity
-import remix.myplayer.ui.activity.base.BaseActivity.Companion.EXTERNAL_STORAGE_PERMISSIONS
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
@@ -67,6 +66,7 @@ import remix.myplayer.ui.widget.desktop.DesktopLyricView
 import remix.myplayer.util.Constants.*
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.MediaStoreUtil
+import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
@@ -440,7 +440,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     stop = false
 
     tryLaunch {
-      hasPermission = hasPermissions(EXTERNAL_STORAGE_PERMISSIONS)
+      hasPermission = PermissionUtil.hasReadAndWriteExternalStorage()
       withContext(Dispatchers.IO) {
         load()
       }
