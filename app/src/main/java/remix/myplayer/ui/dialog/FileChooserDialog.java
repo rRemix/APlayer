@@ -3,7 +3,6 @@ package remix.myplayer.ui.dialog;
 import static remix.myplayer.theme.Theme.getBaseDialog;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -222,12 +221,6 @@ public class FileChooserDialog extends DialogFragment implements MaterialDialog.
     }
   }
 
-  @Override
-  public void onAttach(Activity activity) {
-    super.onAttach(activity);
-    callback = (FileCallback) activity;
-  }
-
   public void show(FragmentActivity context) {
     final String tag = getBuilder().tag;
     Fragment frag = context.getSupportFragmentManager().findFragmentByTag(tag);
@@ -268,8 +261,9 @@ public class FileChooserDialog extends DialogFragment implements MaterialDialog.
     String[] extensions;
     String tag;
     String goUpLabel;
+    FileCallback callback;
 
-    public <ActivityType extends AppCompatActivity & FileCallback> Builder(
+    public <ActivityType extends AppCompatActivity> Builder(
         @NonNull ActivityType context) {
       this.context = context;
       cancelButton = android.R.string.cancel;
@@ -321,11 +315,18 @@ public class FileChooserDialog extends DialogFragment implements MaterialDialog.
     }
 
     @NonNull
+    public Builder callback(@NonNull FileCallback callback) {
+      this.callback = callback;
+      return this;
+    }
+
+    @NonNull
     public FileChooserDialog build() {
       FileChooserDialog dialog = new FileChooserDialog();
       Bundle args = new Bundle();
       args.putSerializable("builder", this);
       dialog.setArguments(args);
+      dialog.callback = callback;
       return dialog;
     }
 

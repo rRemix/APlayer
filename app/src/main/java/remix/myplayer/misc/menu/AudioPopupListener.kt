@@ -17,14 +17,15 @@ import remix.myplayer.service.Command
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
-import remix.myplayer.ui.dialog.FileChooserDialog
 import remix.myplayer.ui.dialog.TimerDialog
 import remix.myplayer.ui.misc.AudioTag
+import remix.myplayer.ui.misc.FileChooser
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import remix.myplayer.util.Util.sendLocalBroadcast
+import java.io.File
 import java.lang.ref.WeakReference
 
 /**
@@ -33,8 +34,8 @@ import java.lang.ref.WeakReference
  * @Author Xiaoborui
  * @Date 2016/8/29 15:33
  */
-class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private val song: Song) : ContextWrapper(activity), PopupMenu.OnMenuItemClickListener
-    where ActivityCallback : PlayerActivity, ActivityCallback : FileChooserDialog.FileCallback {
+class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
+  ContextWrapper(activity), PopupMenu.OnMenuItemClickListener {
   private val audioTag: AudioTag = AudioTag(activity, song)
   private val ref = WeakReference(activity)
 
@@ -64,9 +65,26 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
                   sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
                 }
                 5 -> { //手动选择歌词
-                  FileChooserDialog.Builder(activity)
-                      .extensionsFilter(".lrc")
-                      .show()
+                  FileChooser(
+                      activity,
+                      null,
+                      arrayOf(".lrc"),
+                      null,
+                      null,
+                      object : FileChooser.FileCallback {
+                        override fun onFileSelection(chooser: FileChooser, file: File) {
+                          SPUtil.putValue(
+                              activity,
+                              SPUtil.LYRIC_KEY.NAME,
+                              song.id.toString(),
+                              SPUtil.LYRIC_KEY.LYRIC_MANUAL
+                          )
+                          lyricFragment.updateLrc(file.absolutePath)
+                          sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
+                        }
+
+                        override fun onFileChooserDismissed(chooser: FileChooser) {}
+                      }).show()
                 }
                 6 -> { //忽略或者取消忽略
                   getBaseDialog(activity)
@@ -175,5 +193,4 @@ class AudioPopupListener<ActivityCallback>(activity: ActivityCallback, private v
     }
     return true
   }
-
 }

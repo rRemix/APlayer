@@ -70,9 +70,9 @@ import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_REFRESH_LIBRARY
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_ADAPTIVE_COLOR
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_CUSTOM_IMAGE
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_THEME
-import remix.myplayer.ui.dialog.FileChooserDialog
 import remix.myplayer.ui.dialog.LyricPriorityDialog
 import remix.myplayer.ui.dialog.color.ColorChooserDialog
+import remix.myplayer.ui.misc.FileChooser
 import remix.myplayer.ui.misc.FolderChooser
 import remix.myplayer.util.*
 import remix.myplayer.util.Constants.KB
@@ -92,8 +92,8 @@ import java.io.File
  * @Date 2016/8/23 13:51
  */
 //todo 重构整个界面
-class SettingActivity : ToolbarActivity(), FileChooserDialog.FileCallback,
-    ColorChooserDialog.ColorCallback, SharedPreferences.OnSharedPreferenceChangeListener {
+class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
+  SharedPreferences.OnSharedPreferenceChangeListener {
   private lateinit var binding: ActivitySettingBinding
 
   private lateinit var checkedChangedListener: OnCheckedChangeListener
@@ -571,67 +571,6 @@ class SettingActivity : ToolbarActivity(), FileChooserDialog.FileCallback,
     onBackPressed()
   }
 
-  override fun onFileSelection(dialog: FileChooserDialog, file: File) {
-    when (dialog.tag) {
-      "Import" -> {
-        val newPlaylistName = file.name.substring(0, file.name.lastIndexOf("."))
-
-        // 记录下导入的父目录
-        val parent = file.parentFile
-        if (parent.exists() && parent.isDirectory && parent.list() != null) {
-          SPUtil.putValue(
-              this,
-              SETTING_KEY.NAME,
-              SETTING_KEY.IMPORT_PLAYLIST_FOLDER,
-              parent.absolutePath
-          )
-        }
-
-        DatabaseRepository.getInstance().getAllPlaylist()
-            .map<List<String>> { playLists ->
-              val allPlayListsName = ArrayList<String>()
-              //判断是否存在
-              var alreadyExist = false
-              for ((_, name) in playLists) {
-                allPlayListsName.add(name)
-                if (name.equals(newPlaylistName, ignoreCase = true)) {
-                  alreadyExist = true
-                }
-              }
-              //不存在则提示新建
-              if (!alreadyExist) {
-                allPlayListsName.add(
-                    0, newPlaylistName + "(" + getString(R.string.new_create) + ")"
-                )
-              }
-
-              allPlayListsName
-            }.compose(applySingleScheduler()).subscribe { allPlayListsName ->
-              getBaseDialog(this).title(R.string.import_playlist_to)
-                  .items(allPlayListsName)
-                  .itemsCallback { dialog1, itemView, position, text ->
-                    val chooseNew = position == 0 && text.toString().endsWith(
-                        "(" + getString(R.string.new_create) + ")"
-                    )
-                    disposables.add(
-                        importM3UFile(
-                            this@SettingActivity,
-                            file,
-                            if (chooseNew) newPlaylistName else text.toString(),
-                            chooseNew
-                        )
-                    )
-                  }.show()
-            }
-      }
-    }
-
-  }
-
-  override fun onFileChooserDismissed(dialog: FileChooserDialog) {
-
-  }
-
 
   override fun onColorSelection(dialog: ColorChooserDialog, selectedColor: Int) {
     when (dialog.title) {
@@ -913,22 +852,59 @@ class SettingActivity : ToolbarActivity(), FileChooserDialog.FileCallback,
             getString(R.string.import_from_external_storage),
             getString(R.string.import_from_others)
         )
-        .itemsCallback { dialog, itemView, select, text ->
+        .itemsCallback { _, _, select, _ ->
           if (select == 0) {
-            val initialFile = File(
-                SPUtil.getValue(
-                    this, SETTING_KEY.NAME, SETTING_KEY.IMPORT_PLAYLIST_FOLDER, ""
-                )
-            )
-            val builder = FileChooserDialog.Builder(
-                this@SettingActivity
-            )
-                .tag("Import")
-                .extensionsFilter(".m3u")
-            if (initialFile.exists() && initialFile.isDirectory && initialFile.list() != null) {
-              builder.initialPath(initialFile.absolutePath)
-            }
-            builder.show()
+            FileChooser(
+                this@SettingActivity,
+                TAG_IMPORT_PLAYLIST,
+                arrayOf(".m3u"),
+                SETTING_KEY.NAME,
+                SETTING_KEY.IMPORT_PLAYLIST_FOLDER,
+                object : FileChooser.FileCallback {
+                  override fun onFileSelection(chooser: FileChooser, file: File) {
+                    val newPlaylistName = file.name.substring(0, file.name.lastIndexOf("."))
+
+                    DatabaseRepository.getInstance().getAllPlaylist()
+                        .map<List<String>> { playLists ->
+                          val allPlayListsName = ArrayList<String>()
+                          //判断是否存在
+                          var alreadyExist = false
+                          for ((_, name) in playLists) {
+                            allPlayListsName.add(name)
+                            if (name.equals(newPlaylistName, ignoreCase = true)) {
+                              alreadyExist = true
+                            }
+                          }
+                          //不存在则提示新建
+                          if (!alreadyExist) {
+                            allPlayListsName.add(
+                                0,
+                                newPlaylistName + "(" + getString(R.string.new_create) + ")"
+                            )
+                          }
+
+                          allPlayListsName
+                        }.compose(applySingleScheduler()).subscribe { allPlayListsName ->
+                          getBaseDialog(this@SettingActivity).title(R.string.import_playlist_to)
+                              .items(allPlayListsName)
+                              .itemsCallback { dialog1, itemView, position, text ->
+                                val chooseNew = position == 0 && text.toString().endsWith(
+                                    "(" + getString(R.string.new_create) + ")"
+                                )
+                                disposables.add(
+                                    importM3UFile(
+                                        this@SettingActivity,
+                                        file,
+                                        if (chooseNew) newPlaylistName else text.toString(),
+                                        chooseNew
+                                    )
+                                )
+                              }.show()
+                        }
+                  }
+
+                  override fun onFileChooserDismissed(chooser: FileChooser) {}
+                }).show()
           } else {
             Single
                 .fromCallable { DatabaseRepository.getInstance().playlistFromMediaStore }
@@ -1417,6 +1393,7 @@ class SettingActivity : ToolbarActivity(), FileChooserDialog.FileCallback,
     private const val REQUEST_THEME_COLOR = 0x10
 
     private const val TAG_SCAN = "Scan"
+    private const val TAG_IMPORT_PLAYLIST = "ImportPlaylist"
     private const val TAG_EXPORT_PLAYLIST = "ExportPlaylist"
     private const val TAG_BLACKLIST = "Blacklist"
   }

@@ -8,21 +8,22 @@ import com.google.gson.GsonBuilder
 import remix.myplayer.R
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.activity.base.BaseActivity
-import remix.myplayer.ui.dialog.FolderChooserDialog
+import remix.myplayer.ui.dialog.FileChooserDialog
 import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.SPUtil
 import java.io.File
 
-class FolderChooser(val activity: BaseActivity,
-                    val tag: String?,
-                    private val newFolderLabel: Int?,
-                    private val preferenceName: String?,
-                    private val preferenceKey: String?,
-                    val callback: FolderCallback?
-) : FolderChooserDialog.FolderCallback {
+class FileChooser(val activity: BaseActivity,
+                  val tag: String?,
+                  private val extensionsFilter: Array<String>,
+                  private val preferenceName: String?,
+                  private val preferenceKey: String?,
+                  val callback: FileCallback?
+) : FileChooserDialog.FileCallback {
 
-  interface FolderCallback {
-    fun onFolderSelection(chooser: FolderChooser, folder: File)
+  interface FileCallback {
+    fun onFileSelection(chooser: FileChooser, file: File)
+    fun onFileChooserDismissed(chooser: FileChooser)
   }
 
   private data class Choice(
@@ -45,11 +46,10 @@ class FolderChooser(val activity: BaseActivity,
       return
     }
 
-    val builder = FolderChooserDialog
+    val builder = FileChooserDialog
         .Builder(activity)
-        .chooseButton(R.string.choose_folder)
-        .allowNewFolder(newFolderLabel != null, newFolderLabel ?: 0)
         .tag(tag)
+        .extensionsFilter(*extensionsFilter)
         .callback(this)
 
     var lastChoice: Choice? = null
@@ -105,11 +105,11 @@ class FolderChooser(val activity: BaseActivity,
     }
   }
 
-  override fun onFolderSelection(dialog: FolderChooserDialog, folder: File) {
+  override fun onFileSelection(dialog: FileChooserDialog, file: File) {
     preferenceName?.let { preferenceName ->
       preferenceKey?.let { preferenceKey ->
         SPUtil.deleteValue(activity, preferenceName, preferenceKey)
-        if (folder.isDirectory && folder.startsWith(selectedVolume ?: folder.absolutePath)) {
+        if (file.isFile && file.startsWith(selectedVolume ?: file.absolutePath)) {
           SPUtil.putValue(
               activity,
               preferenceName,
@@ -117,12 +117,16 @@ class FolderChooser(val activity: BaseActivity,
               GsonBuilder()
                   .serializeNulls()
                   .create()
-                  .toJson(Choice(selectedVolume, folder.absolutePath))
+                  .toJson(Choice(selectedVolume, file.parent ?: return))
           )
         }
       }
     }
 
-    callback?.onFolderSelection(this, folder)
+    callback?.onFileSelection(this, file)
+  }
+
+  override fun onFileChooserDismissed(dialog: FileChooserDialog) {
+    callback?.onFileChooserDismissed(this)
   }
 }

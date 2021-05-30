@@ -216,7 +216,7 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
     @StringRes
     protected int mNewFolderButton;
 
-    public <ActivityType extends AppCompatActivity & FolderCallback> Builder(
+    public <ActivityType extends AppCompatActivity> Builder(
         @NonNull ActivityType context) {
       mContext = context;
       mChooseButton = R.string.choose_folder;
