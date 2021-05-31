@@ -5,8 +5,7 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import remix.myplayer.App
-import remix.myplayer.ui.activity.base.BaseActivity
-import remix.myplayer.util.Util
+import remix.myplayer.util.PermissionUtil
 
 /**
  * @ClassName
@@ -25,7 +24,7 @@ abstract class BaseFragment : Fragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    hasPermission = Util.hasPermissions(BaseActivity.EXTERNAL_STORAGE_PERMISSIONS)
+    hasPermission = PermissionUtil.hasReadAndWriteExternalStorage()
   }
 
   override fun onDestroyView() {

@@ -232,7 +232,6 @@
   <string name="plz_give_float_permission">請在設定中授予顯示在其他應用程式上層權限</string>
   <string name="jump_alipay_error">跳轉失敗\n已複製支付寶賬戶(*博睿)</string>
   <string name="plz_give_access_external_storage_permission">請授予訪問儲存空間的權限</string>
-  <string name="manual_scan_permission_tip">從 Android 11 起，手動掃描需要「所有檔案存取權」</string>
   <string name="show_recently">顯示近一週匯入的曲目</string>
   <string name="no_audio_ID">請在播放曲目後再次嘗試此操作</string>
   <string name="need_earphone">使用此功能需要插入耳機</string>
@@ -442,4 +441,6 @@
 
   <string name="grant_delete_permission_tip">請授予刪除音樂檔案的權限</string>
   <string name="delete_source_fail_tip">刪除原始檔案失敗：%s</string>
+
+  <string name="manage_external_storage_permission_tip">從 Android 11 起，此功能需要「所有檔案存取權」</string>
 </resources>

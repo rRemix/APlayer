@@ -24,6 +24,7 @@ import remix.myplayer.theme.ThemeStore.themeRes
 import remix.myplayer.ui.misc.AudioTag
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.MediaStoreUtil
+import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.StatusBarUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
@@ -51,7 +52,7 @@ open class BaseActivity : AppCompatActivity() {
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    hasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS)
+    hasPermission = PermissionUtil.hasReadAndWriteExternalStorage()
     //严格模式
     if (BuildConfig.DEBUG) {
 //      StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()

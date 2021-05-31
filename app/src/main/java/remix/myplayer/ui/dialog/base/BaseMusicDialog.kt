@@ -6,9 +6,8 @@ import android.view.View
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.service.MusicService
-import remix.myplayer.ui.activity.base.BaseActivity.Companion.EXTERNAL_STORAGE_PERMISSIONS
 import remix.myplayer.ui.activity.base.BaseMusicActivity
-import remix.myplayer.util.Util
+import remix.myplayer.util.PermissionUtil
 
 /**
  * Created by remix on 2019/1/31
@@ -33,7 +32,7 @@ open class BaseMusicDialog : BaseDialog(), MusicEventCallback {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    hasPermission = Util.hasPermissions(EXTERNAL_STORAGE_PERMISSIONS)
+    hasPermission = PermissionUtil.hasReadAndWriteExternalStorage()
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -68,8 +68,6 @@ import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.adapter.PagerAdapter
 import remix.myplayer.ui.blur.StackBlurManager
-import remix.myplayer.ui.dialog.FileChooserDialog
-import remix.myplayer.ui.dialog.FileChooserDialog.FileCallback
 import remix.myplayer.ui.dialog.PlayQueueDialog
 import remix.myplayer.ui.dialog.PlayQueueDialog.Companion.newInstance
 import remix.myplayer.ui.fragment.LyricFragment
@@ -88,7 +86,7 @@ import kotlin.math.abs
 /**
  * 播放界面
  */
-class PlayerActivity : BaseMusicActivity(), FileCallback {
+class PlayerActivity : BaseMusicActivity() {
   private lateinit var binding: ActivityPlayerBinding
 
   private var valueAnimator: ValueAnimator? = null
@@ -967,28 +965,6 @@ class PlayerActivity : BaseMusicActivity(), FileCallback {
     handler.remove()
     Util.unregisterLocalReceiver(receiver)
   }
-
-  /**
-   * 选择歌词文件
-   */
-  override fun onFileSelection(dialog: FileChooserDialog, file: File) {
-//        //如果之前忽略过该歌曲的歌词，取消忽略
-//        Set<String> ignoreLrcId = new HashSet<>(SPUtil.getStringSet(this,SPUtil.SETTING_KEY.NAME,"IgnoreLrcID"));
-//        if(ignoreLrcId.size() > 0){
-//            for (String id : ignoreLrcId){
-//                if((mInfo.getID() + "").equals(id)){
-//                    ignoreLrcId.remove(mInfo.getID() + "");
-//                    SPUtil.putStringSet(context,SPUtil.SETTING_KEY.NAME,"IgnoreLrcID",ignoreLrcId);
-//                }
-//            }
-//        }
-    SPUtil.putValue(this, SPUtil.LYRIC_KEY.NAME, song.id.toString() + "",
-        SPUtil.LYRIC_KEY.LYRIC_MANUAL)
-    lyricFragment.updateLrc(file.absolutePath)
-    Util.sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
-  }
-
-  override fun onFileChooserDismissed(dialog: FileChooserDialog) {}
 
   private fun updateProgressText(current: Int) {
     if (current > 0 && duration - current > 0) {

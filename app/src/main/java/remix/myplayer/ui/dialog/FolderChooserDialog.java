@@ -7,7 +7,6 @@ package remix.myplayer.ui.dialog;
 import static remix.myplayer.theme.Theme.getBaseDialog;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -146,7 +145,7 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
   }
 
   private void createNewFolder() {
-    new MaterialDialog.Builder(getActivity())
+    getBaseDialog(getActivity())
         .title(getBuilder().mNewFolderButton)
         .input(0, 0, false, new MaterialDialog.InputCallback() {
           @Override
@@ -191,12 +190,6 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
     dialog.setItems(getContentsArray());
   }
 
-  @Override
-  public void onAttach(Activity activity) {
-    super.onAttach(activity);
-    mCallback = (FolderCallback) activity;
-  }
-
   public void show(FragmentActivity context) {
     final String tag = getBuilder().mTag;
     Fragment frag = context.getSupportFragmentManager().findFragmentByTag(tag);
@@ -218,11 +211,12 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
     protected int mCancelButton;
     protected String mInitialPath;
     protected String mTag;
+    protected FolderCallback mCallback;
     protected boolean mAllowNewFolder;
     @StringRes
     protected int mNewFolderButton;
 
-    public <ActivityType extends AppCompatActivity & FolderCallback> Builder(
+    public <ActivityType extends AppCompatActivity> Builder(
         @NonNull ActivityType context) {
       mContext = context;
       mChooseButton = R.string.choose_folder;
@@ -278,11 +272,18 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
     }
 
     @NonNull
+    public Builder callback(@NonNull FolderCallback callback) {
+      mCallback = callback;
+      return this;
+    }
+
+    @NonNull
     public FolderChooserDialog build() {
       FolderChooserDialog dialog = new FolderChooserDialog();
       Bundle args = new Bundle();
       args.putSerializable("builder", this);
       dialog.setArguments(args);
+      dialog.mCallback = mCallback;
       return dialog;
     }
 

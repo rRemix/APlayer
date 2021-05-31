@@ -13,7 +13,6 @@ import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
 import android.provider.Settings
-import android.text.TextUtils
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
@@ -71,11 +70,10 @@ import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_REFRESH_LIBRARY
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_ADAPTIVE_COLOR
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_CUSTOM_IMAGE
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_THEME
-import remix.myplayer.ui.dialog.FileChooserDialog
-import remix.myplayer.ui.dialog.FolderChooserDialog
-import remix.myplayer.ui.dialog.FolderChooserDialog.Builder
 import remix.myplayer.ui.dialog.LyricPriorityDialog
 import remix.myplayer.ui.dialog.color.ColorChooserDialog
+import remix.myplayer.ui.misc.FileChooser
+import remix.myplayer.ui.misc.FolderChooser
 import remix.myplayer.util.*
 import remix.myplayer.util.Constants.KB
 import remix.myplayer.util.Constants.MB
@@ -94,8 +92,8 @@ import java.io.File
  * @Date 2016/8/23 13:51
  */
 //todo 重构整个界面
-class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, FileChooserDialog.FileCallback,
-    ColorChooserDialog.ColorCallback, SharedPreferences.OnSharedPreferenceChangeListener {
+class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
+  SharedPreferences.OnSharedPreferenceChangeListener {
   private lateinit var binding: ActivitySettingBinding
 
   private lateinit var checkedChangedListener: OnCheckedChangeListener
@@ -432,41 +430,19 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             R.id.setting_screen_container -> binding.settingScreenSwitch.isChecked =
                 !binding.settingScreenSwitch.isChecked
             //手动扫描
-            R.id.setting_scan_container -> {
-              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-                !Environment.isExternalStorageManager()
-              ) {
-                getBaseDialog(this@SettingActivity)
-                  .content(R.string.manual_scan_permission_tip)
-                  .positiveText(R.string.confirm)
-                  .negativeText(R.string.cancel)
-                  .onPositive { _, _ ->
-                    startActivity(
-                      Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).setData(
-                        Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                      )
-                    )
-                  }
-                  .build()
-                  .show()
-              } else {
-                val initialFile = File(
-                  SPUtil.getValue(
-                    this@SettingActivity,
-                    SETTING_KEY.NAME,
-                    SETTING_KEY.MANUAL_SCAN_FOLDER,
-                    ""
-                  )
-                )
-                val builder =
-                  Builder(this@SettingActivity).chooseButton(R.string.choose_folder)
-                    .tag("Scan").allowNewFolder(false, R.string.new_folder)
-                if (initialFile.exists() && initialFile.isDirectory && initialFile.list() != null) {
-                  builder.initialPath(initialFile.absolutePath)
-                }
-                builder.show()
-              }
-            }
+            R.id.setting_scan_container ->
+              FolderChooser(
+                  this@SettingActivity,
+                  TAG_SCAN,
+                  null,
+                  SETTING_KEY.NAME,
+                  SETTING_KEY.MANUAL_SCAN_FOLDER,
+                  object : FolderChooser.FolderCallback {
+                    override fun onFolderSelection(chooser: FolderChooser, folder: File) {
+                      MediaScanner(this@SettingActivity).scanFiles(folder)
+                      needRefreshAdapter = true
+                    }
+                  }).show()
             //锁屏显示
             R.id.setting_lockscreen_container -> configLockScreen()
             //导航栏变色
@@ -593,136 +569,6 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
 
   override fun onClickNavigation() {
     onBackPressed()
-  }
-
-  override fun onFolderSelection(dialog: FolderChooserDialog, folder: File) {
-    var tag = dialog.tag ?: return
-
-    var playListName = ""
-    try {
-      if (tag.contains("ExportPlayList")) {
-        val tagAndName = tag.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        tag = tagAndName[0]
-        playListName = tagAndName[1]
-      }
-    } catch (e: Exception) {
-      e.printStackTrace()
-    }
-
-    when (tag) {
-      "Scan" -> {
-        if (folder.exists() && folder.isDirectory && folder.list() != null) {
-          SPUtil.putValue(
-              this,
-              SETTING_KEY.NAME,
-              SETTING_KEY.MANUAL_SCAN_FOLDER,
-              folder.absolutePath
-          )
-        }
-
-        MediaScanner(this).scanFiles(folder)
-        needRefreshAdapter = true
-      }
-      "ExportPlayList" -> {
-        if (TextUtils.isEmpty(playListName)) {
-          ToastUtil.show(this, R.string.export_fail)
-          return
-        }
-        if (folder.exists() && folder.isDirectory && folder.list() != null) {
-          SPUtil.putValue(
-              this,
-              SETTING_KEY.NAME,
-              SETTING_KEY.EXPORT_PLAYLIST_FOLDER,
-              folder.absolutePath
-          )
-        }
-        disposables.add(
-            exportPlayListToFile(
-                this, playListName, File(
-                folder, "$playListName.m3u"
-            )
-            )
-        )
-      }
-      "BlackList" -> {
-        val blackList = LinkedHashSet(
-            SPUtil.getStringSet(
-                this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST
-            )
-        )
-        if (folder.exists() && folder.isDirectory) {
-          blackList.add(folder.absolutePath)
-          SPUtil.putStringSet(
-              this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST, blackList
-          )
-          contentResolver.notifyChange(
-              MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null
-          )
-        }
-        configBlackList(blackList)
-      }
-    }
-  }
-
-  override fun onFileSelection(dialog: FileChooserDialog, file: File) {
-    when (dialog.tag) {
-      "Import" -> {
-        val newPlaylistName = file.name.substring(0, file.name.lastIndexOf("."))
-
-        // 记录下导入的父目录
-        val parent = file.parentFile
-        if (parent.exists() && parent.isDirectory && parent.list() != null) {
-          SPUtil.putValue(
-              this,
-              SETTING_KEY.NAME,
-              SETTING_KEY.IMPORT_PLAYLIST_FOLDER,
-              parent.absolutePath
-          )
-        }
-
-        DatabaseRepository.getInstance().getAllPlaylist()
-            .map<List<String>> { playLists ->
-              val allPlayListsName = ArrayList<String>()
-              //判断是否存在
-              var alreadyExist = false
-              for ((_, name) in playLists) {
-                allPlayListsName.add(name)
-                if (name.equals(newPlaylistName, ignoreCase = true)) {
-                  alreadyExist = true
-                }
-              }
-              //不存在则提示新建
-              if (!alreadyExist) {
-                allPlayListsName.add(
-                    0, newPlaylistName + "(" + getString(R.string.new_create) + ")"
-                )
-              }
-
-              allPlayListsName
-            }.compose(applySingleScheduler()).subscribe { allPlayListsName ->
-              getBaseDialog(this).title(R.string.import_playlist_to)
-                  .items(allPlayListsName)
-                  .itemsCallback { dialog1, itemView, position, text ->
-                    val chooseNew = position == 0 && text.toString().endsWith(
-                        "(" + getString(R.string.new_create) + ")"
-                    )
-                    disposables.add(
-                        importM3UFile(
-                            this@SettingActivity,
-                            file,
-                            if (chooseNew) newPlaylistName else text.toString(),
-                            chooseNew
-                        )
-                    )
-                  }.show()
-            }
-      }
-    }
-
-  }
-
-  override fun onFileChooserDismissed(dialog: FileChooserDialog) {
-
   }
 
 
@@ -970,23 +816,28 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
         }.compose(applySingleScheduler()).subscribe { allPlayListNames ->
           getBaseDialog(this).title(R.string.choose_playlist_to_export)
               .negativeText(R.string.cancel).items(allPlayListNames)
-              .itemsCallback { dialog, itemView, position, text ->
-                val initialFile = File(
-                    SPUtil.getValue(
-                        this,
-                        SETTING_KEY.NAME,
-                        SETTING_KEY.EXPORT_PLAYLIST_FOLDER,
-                        ""
-                    )
-                )
-                val builder =
-                    Builder(this@SettingActivity).chooseButton(R.string.choose_folder)
-                        .tag("ExportPlayList-$text")
-                        .allowNewFolder(true, R.string.new_folder)
-                if (initialFile.exists() && initialFile.isDirectory && initialFile.list() != null) {
-                  builder.initialPath(initialFile.absolutePath)
-                }
-                builder.show()
+              .itemsCallback { _, _, _, text ->
+                FolderChooser(
+                    this,
+                    TAG_EXPORT_PLAYLIST,
+                    R.string.new_folder,
+                    SETTING_KEY.NAME,
+                    SETTING_KEY.EXPORT_PLAYLIST_FOLDER,
+                    object : FolderChooser.FolderCallback {
+                      override fun onFolderSelection(chooser: FolderChooser, folder: File) {
+                        if (text.isEmpty()) {
+                          ToastUtil.show(this@SettingActivity, R.string.export_fail)
+                          return
+                        }
+                        disposables.add(
+                            exportPlayListToFile(
+                                this@SettingActivity,
+                                text.toString(),
+                                File(folder, "$text.m3u")
+                            )
+                        )
+                      }
+                    }).show()
               }.show()
         })
   }
@@ -1001,22 +852,59 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             getString(R.string.import_from_external_storage),
             getString(R.string.import_from_others)
         )
-        .itemsCallback { dialog, itemView, select, text ->
+        .itemsCallback { _, _, select, _ ->
           if (select == 0) {
-            val initialFile = File(
-                SPUtil.getValue(
-                    this, SETTING_KEY.NAME, SETTING_KEY.IMPORT_PLAYLIST_FOLDER, ""
-                )
-            )
-            val builder = FileChooserDialog.Builder(
-                this@SettingActivity
-            )
-                .tag("Import")
-                .extensionsFilter(".m3u")
-            if (initialFile.exists() && initialFile.isDirectory && initialFile.list() != null) {
-              builder.initialPath(initialFile.absolutePath)
-            }
-            builder.show()
+            FileChooser(
+                this@SettingActivity,
+                TAG_IMPORT_PLAYLIST,
+                arrayOf(".m3u"),
+                SETTING_KEY.NAME,
+                SETTING_KEY.IMPORT_PLAYLIST_FOLDER,
+                object : FileChooser.FileCallback {
+                  override fun onFileSelection(chooser: FileChooser, file: File) {
+                    val newPlaylistName = file.name.substring(0, file.name.lastIndexOf("."))
+
+                    DatabaseRepository.getInstance().getAllPlaylist()
+                        .map<List<String>> { playLists ->
+                          val allPlayListsName = ArrayList<String>()
+                          //判断是否存在
+                          var alreadyExist = false
+                          for ((_, name) in playLists) {
+                            allPlayListsName.add(name)
+                            if (name.equals(newPlaylistName, ignoreCase = true)) {
+                              alreadyExist = true
+                            }
+                          }
+                          //不存在则提示新建
+                          if (!alreadyExist) {
+                            allPlayListsName.add(
+                                0,
+                                newPlaylistName + "(" + getString(R.string.new_create) + ")"
+                            )
+                          }
+
+                          allPlayListsName
+                        }.compose(applySingleScheduler()).subscribe { allPlayListsName ->
+                          getBaseDialog(this@SettingActivity).title(R.string.import_playlist_to)
+                              .items(allPlayListsName)
+                              .itemsCallback { dialog1, itemView, position, text ->
+                                val chooseNew = position == 0 && text.toString().endsWith(
+                                    "(" + getString(R.string.new_create) + ")"
+                                )
+                                disposables.add(
+                                    importM3UFile(
+                                        this@SettingActivity,
+                                        file,
+                                        if (chooseNew) newPlaylistName else text.toString(),
+                                        chooseNew
+                                    )
+                                )
+                              }.show()
+                        }
+                  }
+
+                  override fun onFileChooserDismissed(chooser: FileChooser) {}
+                }).show()
           } else {
             Single
                 .fromCallable { DatabaseRepository.getInstance().playlistFromMediaStore }
@@ -1297,11 +1185,8 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
   /**
    * 设置黑名单
    */
-  private fun configBlackList(
-      blackList: Set<String> = SPUtil.getStringSet(
-          this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST
-      )
-  ) {
+  private fun configBlackList() {
+    val blackList: Set<String> = SPUtil.getStringSet(this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST)
     val items = ArrayList<String>(blackList)
     items.sortWith(Comparator { left, right ->
       File(left).name.compareTo(
@@ -1362,9 +1247,31 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
             }
             DialogAction.POSITIVE -> {
               //add
-              val builder = Builder(this).chooseButton(R.string.choose_folder)
-                  .tag("BlackList")
-              builder.show()
+              FolderChooser(
+                  this,
+                  TAG_BLACKLIST,
+                  null,
+                  null,
+                  null,
+                  object : FolderChooser.FolderCallback {
+                    override fun onFolderSelection(chooser: FolderChooser, folder: File) {
+                      if (folder.isDirectory) {
+                        val newBlacklist = LinkedHashSet<String>(blackList)
+                        newBlacklist.add(folder.absolutePath)
+                        SPUtil.putStringSet(
+                            this@SettingActivity,
+                            SETTING_KEY.NAME,
+                            SETTING_KEY.BLACKLIST,
+                            newBlacklist
+                        )
+                        contentResolver.notifyChange(
+                            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                            null
+                        )
+                      }
+                      configBlackList()
+                    }
+                  }).show()
             }
           }
         }
@@ -1484,6 +1391,11 @@ class SettingActivity : ToolbarActivity(), FolderChooserDialog.FolderCallback, F
     private const val CACHE_SIZE = 101
     private const val CLEAR_FINISH = 102
     private const val REQUEST_THEME_COLOR = 0x10
+
+    private const val TAG_SCAN = "Scan"
+    private const val TAG_IMPORT_PLAYLIST = "ImportPlaylist"
+    private const val TAG_EXPORT_PLAYLIST = "ExportPlaylist"
+    private const val TAG_BLACKLIST = "Blacklist"
   }
 
 }
