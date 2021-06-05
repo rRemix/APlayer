@@ -88,9 +88,8 @@ class RecentlyActivity : LibraryActivity<Song, SongAdapter>() {
     handler.remove()
   }
 
-  override val loader: Loader<List<Song>> by lazy {
-    AsyncRecentlySongLoader(this)
-  }
+  override val loader: Loader<List<Song>>
+    get() = AsyncRecentlySongLoader(this)
 
   override val loaderId = LoaderIds.ACTIVITY_RECENTLY
 
