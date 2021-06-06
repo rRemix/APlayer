@@ -1,8 +1,10 @@
 package remix.myplayer.misc.menu
 
 import android.content.ContextWrapper
+import android.content.Intent
 import androidx.appcompat.widget.PopupMenu
 import android.view.MenuItem
+import android.webkit.MimeTypeMap
 import android.widget.CompoundButton
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.afollestad.materialdialogs.MaterialDialog
@@ -19,13 +21,11 @@ import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.ui.dialog.TimerDialog
 import remix.myplayer.ui.misc.AudioTag
-import remix.myplayer.ui.misc.FileChooser
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import remix.myplayer.util.Util.sendLocalBroadcast
-import java.io.File
 import java.lang.ref.WeakReference
 
 /**
@@ -65,26 +65,13 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
                   sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
                 }
                 5 -> { //手动选择歌词
-                  FileChooser(
-                      activity,
-                      null,
-                      arrayOf(".lrc"),
-                      null,
-                      null,
-                      object : FileChooser.FileCallback {
-                        override fun onFileSelection(chooser: FileChooser, file: File) {
-                          SPUtil.putValue(
-                              activity,
-                              SPUtil.LYRIC_KEY.NAME,
-                              song.id.toString(),
-                              SPUtil.LYRIC_KEY.LYRIC_MANUAL
-                          )
-                          lyricFragment.updateLrc(file.absolutePath)
-                          sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
-                        }
-
-                        override fun onFileChooserDismissed(chooser: FileChooser) {}
-                      }).show()
+                  activity.startActivityForResult(
+                      Intent(Intent.ACTION_GET_CONTENT).apply {
+                        type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("lrc")
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                      },
+                      PlayerActivity.REQUEST_SELECT_LYRIC
+                  )
                 }
                 6 -> { //忽略或者取消忽略
                   getBaseDialog(activity)

@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -966,6 +967,22 @@ class PlayerActivity : BaseMusicActivity() {
     Util.unregisterLocalReceiver(receiver)
   }
 
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    if (requestCode == REQUEST_SELECT_LYRIC && resultCode == Activity.RESULT_OK) {
+      data?.data?.let { uri ->
+        SPUtil.putValue(
+            this,
+            SPUtil.LYRIC_KEY.NAME,
+            song.id.toString(),
+            SPUtil.LYRIC_KEY.LYRIC_MANUAL
+        )
+        lyricFragment.updateLrc(uri)
+        Util.sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
+      }
+    }
+  }
+
   private fun updateProgressText(current: Int) {
     if (current > 0 && duration - current > 0) {
       text_hasplay.text = Util.getTime(current.toLong())
@@ -1031,5 +1048,7 @@ class PlayerActivity : BaseMusicActivity() {
     private const val DELAY_SHOW_NEXT_SONG = 3000
 
     const val ACTION_UPDATE_NEXT = "remix.myplayer.update.next_song"
+
+    const val REQUEST_SELECT_LYRIC = 0x104
   }
 }

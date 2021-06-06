@@ -14,6 +14,7 @@ import android.os.Message
 import android.provider.MediaStore
 import android.provider.Settings
 import android.view.View
+import android.webkit.MimeTypeMap
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.core.content.FileProvider
@@ -72,7 +73,6 @@ import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_CUSTOM_IMA
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_THEME
 import remix.myplayer.ui.dialog.LyricPriorityDialog
 import remix.myplayer.ui.dialog.color.ColorChooserDialog
-import remix.myplayer.ui.misc.FileChooser
 import remix.myplayer.ui.misc.FolderChooser
 import remix.myplayer.util.*
 import remix.myplayer.util.Constants.KB
@@ -854,57 +854,13 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
         )
         .itemsCallback { _, _, select, _ ->
           if (select == 0) {
-            FileChooser(
-                this@SettingActivity,
-                TAG_IMPORT_PLAYLIST,
-                arrayOf(".m3u"),
-                SETTING_KEY.NAME,
-                SETTING_KEY.IMPORT_PLAYLIST_FOLDER,
-                object : FileChooser.FileCallback {
-                  override fun onFileSelection(chooser: FileChooser, file: File) {
-                    val newPlaylistName = file.name.substring(0, file.name.lastIndexOf("."))
-
-                    DatabaseRepository.getInstance().getAllPlaylist()
-                        .map<List<String>> { playLists ->
-                          val allPlayListsName = ArrayList<String>()
-                          //判断是否存在
-                          var alreadyExist = false
-                          for ((_, name) in playLists) {
-                            allPlayListsName.add(name)
-                            if (name.equals(newPlaylistName, ignoreCase = true)) {
-                              alreadyExist = true
-                            }
-                          }
-                          //不存在则提示新建
-                          if (!alreadyExist) {
-                            allPlayListsName.add(
-                                0,
-                                newPlaylistName + "(" + getString(R.string.new_create) + ")"
-                            )
-                          }
-
-                          allPlayListsName
-                        }.compose(applySingleScheduler()).subscribe { allPlayListsName ->
-                          getBaseDialog(this@SettingActivity).title(R.string.import_playlist_to)
-                              .items(allPlayListsName)
-                              .itemsCallback { dialog1, itemView, position, text ->
-                                val chooseNew = position == 0 && text.toString().endsWith(
-                                    "(" + getString(R.string.new_create) + ")"
-                                )
-                                disposables.add(
-                                    importM3UFile(
-                                        this@SettingActivity,
-                                        file,
-                                        if (chooseNew) newPlaylistName else text.toString(),
-                                        chooseNew
-                                    )
-                                )
-                              }.show()
-                        }
-                  }
-
-                  override fun onFileChooserDismissed(chooser: FileChooser) {}
-                }).show()
+            startActivityForResult(
+                Intent(Intent.ACTION_GET_CONTENT).apply {
+                  type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("m3u")
+                  addCategory(Intent.CATEGORY_OPENABLE)
+                },
+                REQUEST_IMPORT_PLAYLIST
+            )
           } else {
             Single
                 .fromCallable { DatabaseRepository.getInstance().playlistFromMediaStore }
@@ -1351,38 +1307,75 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
       requestCode: Int, resultCode: Int, data: Intent?
   ) {
     super.onActivityResult(requestCode, resultCode, data)
-    if (requestCode == REQUEST_THEME_COLOR) {
-      if (data != null) {
-        needRecreate = data.getBooleanExtra(EXTRA_RECREATE, false)
-        if (needRecreate) {
-          handler.sendEmptyMessage(RECREATE)
+    when (requestCode) {
+      REQUEST_THEME_COLOR ->
+        if (data != null) {
+          needRecreate = data.getBooleanExtra(EXTRA_RECREATE, false)
+          if (needRecreate) {
+            handler.sendEmptyMessage(RECREATE)
+          }
+        }
+      REQUEST_IMPORT_PLAYLIST -> {
+        if (resultCode == Activity.RESULT_OK) {
+          data?.data?.let { uri ->
+            DatabaseRepository
+                .getInstance()
+                .getAllPlaylist()
+                .compose(applySingleScheduler())
+                .subscribe { playlists ->
+                  getBaseDialog(this)
+                      .title(R.string.add_to_playlist)
+                      .items(playlists.map { it.name })
+                      .itemsCallback { _, _, _, text ->
+                        disposables.add(importM3UFile(this, uri, text.toString(), false))
+                      }
+                      .neutralText(R.string.create_playlist)
+                      .onNeutral { _, _ ->
+                        getBaseDialog(this)
+                            .title(R.string.new_playlist)
+                            .positiveText(R.string.create)
+                            .negativeText(R.string.cancel)
+                            .content(R.string.input_playlist_name)
+                            .input(null, null) { _, input ->
+                              if (playlists.map { it.name }.contains(input.toString())) {
+                                ToastUtil.show(this, R.string.playlist_already_exist)
+                              } else {
+                                disposables.add(importM3UFile(this, uri, input.toString(), true))
+                              }
+                            }
+                            .show()
+                      }
+                      .show()
+                }
+          }
         }
       }
-    } else if (requestCode == Crop.REQUEST_PICK) {
-      //选择图片
-      val cacheDir = DiskCache.getDiskCacheDir(
-          this, "thumbnail/player"
-      )
-      if (data == null || !cacheDir.exists() && !cacheDir.mkdirs()) {
-        ToastUtil.show(this, R.string.setting_error)
-        return
-      }
+      Crop.REQUEST_PICK -> {
+        //选择图片
+        val cacheDir = DiskCache.getDiskCacheDir(
+            this, "thumbnail/player"
+        )
+        if (data == null || !cacheDir.exists() && !cacheDir.mkdirs()) {
+          ToastUtil.show(this, R.string.setting_error)
+          return
+        }
 
-      val oldFile = File(cacheDir, "player.jpg")
-      if (oldFile.exists()) {
-        oldFile.delete()
+        val oldFile = File(cacheDir, "player.jpg")
+        if (oldFile.exists()) {
+          oldFile.delete()
+        }
+        val destination = Uri.fromFile(oldFile)
+        Crop.of(data.data, destination).withAspect(
+            resources.displayMetrics.widthPixels,
+            resources.displayMetrics.heightPixels
+        )
+            .start(this)
       }
-      val destination = Uri.fromFile(oldFile)
-      Crop.of(data.data, destination).withAspect(
-          resources.displayMetrics.widthPixels,
-          resources.displayMetrics.heightPixels
-      )
-          .start(this)
-    } else if (requestCode == Crop.REQUEST_CROP) {
-      if (data == null || Crop.getOutput(data) == null) {
-        ToastUtil.show(this, R.string.setting_error)
-        return
-      }
+      Crop.REQUEST_CROP ->
+        if (data == null || Crop.getOutput(data) == null) {
+          ToastUtil.show(this, R.string.setting_error)
+          return
+        }
     }
   }
 
@@ -1391,6 +1384,8 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     private const val CACHE_SIZE = 101
     private const val CLEAR_FINISH = 102
     private const val REQUEST_THEME_COLOR = 0x10
+    private const val REQUEST_IMPORT_PLAYLIST = 0x102
+    private const val REQUEST_EXPORT_PLAYLIST = 0x103
 
     private const val TAG_SCAN = "Scan"
     private const val TAG_IMPORT_PLAYLIST = "ImportPlaylist"

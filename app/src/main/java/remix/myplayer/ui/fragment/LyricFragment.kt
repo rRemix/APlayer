@@ -1,6 +1,7 @@
 package remix.myplayer.ui.fragment
 
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.os.Message
 import android.view.LayoutInflater
@@ -82,14 +83,14 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
   @JvmOverloads
   fun updateLrc(song: Song, clearCache: Boolean = false) {
     this.song = song
-    getLrc("", clearCache)
+    getLrc(Uri.EMPTY, clearCache)
   }
 
-  fun updateLrc(lrcPath: String) {
-    getLrc(lrcPath, true)
+  fun updateLrc(uri: Uri) {
+    getLrc(uri, true)
   }
 
-  private fun getLrc(manualPath: String, clearCache: Boolean) {
+  private fun getLrc(uri: Uri, clearCache: Boolean) {
     if (!isVisible)
       return
     if (song == null) {
@@ -107,7 +108,7 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
     Timber.v("setSearching")
     lrcView.setText(getStringSafely(R.string.searching))
     disposable = lyricSearcher.setSong(song ?: return)
-        .getLyricObservable(manualPath, clearCache)
+        .getLyricObservable(uri, clearCache)
         .subscribe(Consumer {
           Timber.v("setLrcRows")
           if (id == song?.id) {

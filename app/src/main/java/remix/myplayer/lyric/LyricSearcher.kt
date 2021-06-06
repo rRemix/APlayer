@@ -1,5 +1,6 @@
 package remix.myplayer.lyric
 
+import android.net.Uri
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Base64
@@ -64,7 +65,7 @@ class LyricSearcher {
    *
    * @return 歌词
    */
-  fun getLyricObservable(manualPath: String, clearCache: Boolean): Observable<List<LrcRow>> {
+  fun getLyricObservable(uri: Uri, clearCache: Boolean): Observable<List<LrcRow>> {
     if (song == Song.EMPTY_SONG) {
       return Observable.error(Throwable("empty song"))
     }
@@ -92,7 +93,7 @@ class LyricSearcher {
         getQQObservable()
       }
       SPUtil.LYRIC_KEY.LYRIC_MANUAL -> {
-        getManualObservable(manualPath)
+        getManualObservable(uri)
       }
       SPUtil.LYRIC_KEY.LYRIC_DEFAULT -> {
         //默认优先级排序 酷狗-网易-QQ-本地-内嵌-忽略
@@ -147,7 +148,7 @@ class LyricSearcher {
    * @return 歌词
    */
   fun getLyricObservable(): Observable<List<LrcRow>> {
-    return getLyricObservable("", false)
+    return getLyricObservable(Uri.EMPTY, false)
   }
 
   /**
@@ -259,13 +260,21 @@ class LyricSearcher {
   /**
    * 手动设置歌词
    */
-  private fun getManualObservable(manualPath: String): Observable<List<LrcRow>> {
+  private fun getManualObservable(uri: Uri): Observable<List<LrcRow>> {
     return Observable.create { e ->
       //手动设置的歌词
-      if (!TextUtils.isEmpty(manualPath)) {
-        Timber.v("ManualLyric")
-        e.onNext(lrcParser.getLrcRows(getBufferReader(manualPath), true, cacheKey, searchKey))
-      }
+      Timber.v("ManualLyric")
+      e.onNext(
+          lrcParser.getLrcRows(
+              BufferedReader(
+                  InputStreamReader(
+                      App.context.contentResolver.openInputStream(
+                          uri
+                      )
+                  )
+              ), true, cacheKey, searchKey
+          )
+      )
       e.onComplete()
     }
   }
