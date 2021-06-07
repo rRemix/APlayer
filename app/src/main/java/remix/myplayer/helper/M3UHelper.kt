@@ -17,8 +17,8 @@ import remix.myplayer.util.ToastUtil
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
-import java.io.FileWriter
 import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 object M3UHelper {
   private val databaseRepository = DatabaseRepository.getInstance()
@@ -125,8 +125,7 @@ object M3UHelper {
 
   }
 
-  @JvmStatic
-  fun exportPlayListToFile(context: Context, playlistName: String, file: File): Disposable {
+  fun exportPlayListToFile(context: Context, playlistName: String, uri: Uri): Disposable {
     return databaseRepository
         .getPlayList(playlistName)
         .flatMap {
@@ -134,7 +133,8 @@ object M3UHelper {
         }
         .flatMapCompletable { songs ->
           CompletableSource {
-            val bw = BufferedWriter(FileWriter(file))
+            val bw =
+              BufferedWriter(OutputStreamWriter(context.contentResolver.openOutputStream(uri)))
             bw.write(HEADER)
             for (song in songs) {
               bw.newLine()

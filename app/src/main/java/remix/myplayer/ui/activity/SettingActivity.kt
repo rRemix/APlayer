@@ -121,6 +121,8 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
 
   private val disposables = ArrayList<Disposable>()
 
+  private var pendingExportPlaylist: String? = null
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -817,27 +819,15 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
           getBaseDialog(this).title(R.string.choose_playlist_to_export)
               .negativeText(R.string.cancel).items(allPlayListNames)
               .itemsCallback { _, _, _, text ->
-                FolderChooser(
-                    this,
-                    TAG_EXPORT_PLAYLIST,
-                    R.string.new_folder,
-                    SETTING_KEY.NAME,
-                    SETTING_KEY.EXPORT_PLAYLIST_FOLDER,
-                    object : FolderChooser.FolderCallback {
-                      override fun onFolderSelection(chooser: FolderChooser, folder: File) {
-                        if (text.isEmpty()) {
-                          ToastUtil.show(this@SettingActivity, R.string.export_fail)
-                          return
-                        }
-                        disposables.add(
-                            exportPlayListToFile(
-                                this@SettingActivity,
-                                text.toString(),
-                                File(folder, "$text.m3u")
-                            )
-                        )
-                      }
-                    }).show()
+                pendingExportPlaylist = text.toString()
+                startActivityForResult(
+                    Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                      type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("m3u")
+                      addCategory(Intent.CATEGORY_OPENABLE)
+                      putExtra(Intent.EXTRA_TITLE, "$text.m3u")
+                    },
+                    REQUEST_EXPORT_PLAYLIST
+                )
               }.show()
         })
   }
@@ -1348,6 +1338,16 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
                       .show()
                 }
           }
+        }
+      }
+      REQUEST_EXPORT_PLAYLIST -> {
+        if (resultCode == Activity.RESULT_OK) {
+          pendingExportPlaylist?.let { pendingExportPlaylist ->
+            data?.data?.let { uri ->
+              disposables.add(exportPlayListToFile(this, pendingExportPlaylist, uri))
+            }
+          }
+          pendingExportPlaylist = null
         }
       }
       Crop.REQUEST_PICK -> {

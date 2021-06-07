@@ -252,10 +252,6 @@ public class SPUtil {
     String AUTO_PLAY = "auto_play_headset_plug_in";
     //手动扫描目录
     String MANUAL_SCAN_FOLDER = "manual_scan_folder";
-    //导入m3u目录
-    String IMPORT_PLAYLIST_FOLDER = "import_playlist_folder";
-    //导出m3u目录
-    String EXPORT_PLAYLIST_FOLDER = "export_playlist_folder";
     //自定义播放背景
     String PLAYER_BACKGROUND = "player_background";
     // 深色主题
