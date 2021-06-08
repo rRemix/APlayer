@@ -1,23 +1,24 @@
 package remix.myplayer.helper
 
 import android.content.Context
+import android.net.Uri
 import android.provider.MediaStore
 import io.reactivex.CompletableSource
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import org.jetbrains.anko.collections.forEachWithIndex
-import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.theme.Theme
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.ToastUtil
+import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
-import java.io.FileWriter
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 object M3UHelper {
   private val databaseRepository = DatabaseRepository.getInstance()
@@ -30,8 +31,7 @@ object M3UHelper {
   /**
    * 导入歌单
    */
-  @JvmStatic
-  fun importM3UFile(context: Context, file: File, playlistName: String, newCreate: Boolean): Disposable {
+  fun importM3UFile(context: Context, uri: Uri, playlistName: String, newCreate: Boolean): Disposable {
     val dialog = Theme.getBaseDialog(context)
         .title(R.string.saveing)
         .content(R.string.please_wait)
@@ -41,10 +41,7 @@ object M3UHelper {
     dialog.show()
 
     return Single
-        .just(file)
-        .filter {
-          it.isFile && it.canRead()
-        }
+        .just(Any())
         .doOnSubscribe {
           if (newCreate) {
             val newId = databaseRepository.insertPlayList(playlistName).blockingGet()
@@ -55,7 +52,9 @@ object M3UHelper {
         }
         .map {
           val audioIds = ArrayList<Long>()
-          file.readLines().forEachWithIndex { i: Int, path: String ->
+          val stream = context.contentResolver.openInputStream(uri)
+          val reader = BufferedReader(InputStreamReader(stream))
+          reader.readLines().forEachIndexed { i: Int, path: String ->
             if (i != 0 && !path.startsWith(ENTRY)) {
               val id: Long
               // 先直接判断本地文件是否存在
@@ -64,8 +63,10 @@ object M3UHelper {
                 MediaStoreUtil.getSongIdByUrl(path)
               } else {
                 // 再根据歌曲名去查找
-                MediaStoreUtil.getSongId(MediaStore.Audio.Media.DATA + " like ?",
-                    arrayOf("%" + path.replace("\\", "/")))
+                MediaStoreUtil.getSongId(
+                    MediaStore.Audio.Media.DATA + " like ?",
+                    arrayOf("%" + path.replace("\\", "/"))
+                )
               }
               if (id > 0) {
                 audioIds.add(id)
@@ -77,19 +78,17 @@ object M3UHelper {
                 audioId > 0
               }
         }
-        .flatMapSingle {
+        .flatMap {
           databaseRepository.insertToPlayList(it, playlistName)
         }
         .compose(applySingleScheduler())
-        .subscribe(
-            {
-              dialog.dismiss()
-              ToastUtil.show(context, App.context.getString(R.string.import_playlist_to_count, playlistName, it))
-            },
-            {
-              dialog.dismiss()
-              ToastUtil.show(context, R.string.import_fail, it.toString())
-            })
+        .subscribe({
+          dialog.dismiss()
+          ToastUtil.show(context, R.string.import_playlist_to_count, playlistName, it)
+        }, {
+          dialog.dismiss()
+          ToastUtil.show(context, R.string.import_fail, it.toString())
+        })
   }
 
   @JvmStatic
@@ -126,8 +125,7 @@ object M3UHelper {
 
   }
 
-  @JvmStatic
-  fun exportPlayListToFile(context: Context, playlistName: String, file: File): Disposable {
+  fun exportPlayListToFile(context: Context, playlistName: String, uri: Uri): Disposable {
     return databaseRepository
         .getPlayList(playlistName)
         .flatMap {
@@ -135,7 +133,8 @@ object M3UHelper {
         }
         .flatMapCompletable { songs ->
           CompletableSource {
-            val bw = BufferedWriter(FileWriter(file))
+            val bw =
+              BufferedWriter(OutputStreamWriter(context.contentResolver.openOutputStream(uri)))
             bw.write(HEADER)
             for (song in songs) {
               bw.newLine()
