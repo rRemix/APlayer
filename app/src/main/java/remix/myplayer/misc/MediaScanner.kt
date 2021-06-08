@@ -9,7 +9,6 @@ import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.reactivestreams.Subscription
-import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.theme.Theme
 import remix.myplayer.util.MediaStoreUtil
@@ -23,31 +22,6 @@ import java.io.File
  */
 
 class MediaScanner(private val context: Context) {
-
-  fun scanFilesSimply(folder: File) {
-    val toScanFiles = ArrayList<File>()
-
-    val dispose = Completable
-        .fromAction {
-          getScanFiles(folder, toScanFiles)
-          if (toScanFiles.isNotEmpty()) {
-            MediaScannerConnection.scanFile(
-                context,
-                toScanFiles.map { it.absolutePath }.toTypedArray(),
-                toScanFiles.map { "audio/*" }.toTypedArray()
-            ) { path, uri ->
-//              Timber.tag(TAG).v("scanCompleted, path: $path uri: $uri")
-            }
-          }
-        }
-        .subscribeOn(Schedulers.io())
-        .subscribe({
-          Timber.tag(TAG).v("scanAll completed")
-        }, {
-          Timber.tag(TAG).w("scan err: $it")
-        })
-
-  }
 
   fun scanFiles(folder: File) {
     var subscription: Subscription? = null
@@ -66,7 +40,7 @@ class MediaScanner(private val context: Context) {
     connection = MediaScannerConnection(context, object : MediaScannerConnection.MediaScannerConnectionClient {
       override fun onMediaScannerConnected() {
         Flowable.create(FlowableOnSubscribe<File> { emitter ->
-          getScanFiles(folder, toScanFiles, force = true)
+          getScanFiles(folder, toScanFiles)
           for (file in toScanFiles) {
             emitter.onNext(file)
           }
@@ -94,7 +68,7 @@ class MediaScanner(private val context: Context) {
               override fun onComplete() {
                 loadingDialog.dismiss()
                 ToastUtil.show(context, context.getString(R.string.scanned_finish))
-                App.context.contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
+                context.contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
               }
             })
       }
@@ -108,31 +82,13 @@ class MediaScanner(private val context: Context) {
     connection.connect()
   }
 
-  private fun getScanFiles(file: File, toScanFiles: ArrayList<File>, force: Boolean = false) {
-    if (force) {
-      if (file.isFile && file.length() >= MediaStoreUtil.SCAN_SIZE) {
-        if (isAudioFile(file))
-          toScanFiles.add(file)
-      } else {
-        val files = file.listFiles() ?: return
-        for (temp in files) {
-          getScanFiles(temp, toScanFiles, force = true)
-        }
-      }
-    } else {
-      val baseSelection = MediaStoreUtil.baseSelection
-      val selection = "$baseSelection and media_type = 2"
-      val selectionArgs = MediaStoreUtil.baseSelectionArgs
-
-      context.contentResolver.query(MediaStore.Files.getContentUri("external"),
-        arrayOf(MediaStore.Files.FileColumns.DATA),
-        selection, selectionArgs, null)?.use {
-        while (it.moveToNext()) {
-          val path = it.getString(0)
-          if (path.startsWith(file.absolutePath)) {
-            toScanFiles.add(File(path))
-          }
-        }
+  private fun getScanFiles(file: File, toScanFiles: ArrayList<File>) {
+    if (file.isFile) {
+      if (file.length() >= MediaStoreUtil.SCAN_SIZE && isAudioFile(file))
+        toScanFiles.add(file)
+    } else if (file.isDirectory) {
+      file.listFiles()?.forEach {
+        getScanFiles(it, toScanFiles)
       }
     }
   }
