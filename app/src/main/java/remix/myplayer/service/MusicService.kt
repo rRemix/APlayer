@@ -44,7 +44,6 @@ import remix.myplayer.helper.*
 import remix.myplayer.lyric.LyricFetcher
 import remix.myplayer.lyric.LyricFetcher.Companion.LYRIC_FIND_INTERVAL
 import remix.myplayer.lyric.bean.LyricRowWrapper
-import remix.myplayer.misc.MediaScanner
 import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.misc.log.LogObserver
 import remix.myplayer.misc.observer.MediaStoreObserver
@@ -73,7 +72,6 @@ import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util.*
 import timber.log.Timber
-import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
@@ -1569,15 +1567,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     prepare(playQueue.song, false)
 
     load = LOAD_SUCCESS
-    uiHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
-
-    //打开软件扫描
-    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-        ?.apply {
-          if (exists() && isDirectory) {
-            MediaScanner(this@MusicService).scanFilesSimply(this)
-          }
-        }
   }
 
   fun deleteSongFromService(deleteSongs: List<Song>?) {
