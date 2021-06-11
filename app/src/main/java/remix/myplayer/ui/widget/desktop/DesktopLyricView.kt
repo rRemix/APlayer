@@ -28,12 +28,9 @@ import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRIC
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.adapter.DesktopLyricColorAdapter
 import remix.myplayer.ui.adapter.DesktopLyricColorAdapter.Companion.COLORS
-import remix.myplayer.util.ColorUtil
+import remix.myplayer.util.*
 import remix.myplayer.util.MusicUtil.makeCmdIntent
-import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
-import remix.myplayer.util.ToastUtil
-import remix.myplayer.util.Util
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
 import kotlin.math.abs
@@ -60,11 +57,11 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
 
   private var textSizeType = MEDIUM
   private val hideRunnable = Runnable {
-    widget_pannel.visibility = View.GONE
+    widget_panel.visibility = View.GONE
     widget_lrc_container.visibility = View.GONE
   }
 
-  private val mOnSeekBarChangeListener = object : OnSeekBarChangeListener {
+  private val onSeekBarChangeListener = object : OnSeekBarChangeListener {
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
       val temp = Color.rgb(widget_seekbar_r.progress, widget_seekbar_g.progress, widget_seekbar_b.progress)
       val color = if (ColorUtil.isColorCloseToWhite(temp)) Color.parseColor("#F9F9F9") else temp
@@ -141,9 +138,9 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
     widget_text_r.setTextColor(color)
     widget_text_g.setTextColor(color)
     widget_text_b.setTextColor(color)
-    widget_seekbar_r.setOnSeekBarChangeListener(mOnSeekBarChangeListener)
-    widget_seekbar_g.setOnSeekBarChangeListener(mOnSeekBarChangeListener)
-    widget_seekbar_b.setOnSeekBarChangeListener(mOnSeekBarChangeListener)
+    widget_seekbar_r.setOnSeekBarChangeListener(onSeekBarChangeListener)
+    widget_seekbar_g.setOnSeekBarChangeListener(onSeekBarChangeListener)
+    widget_seekbar_b.setOnSeekBarChangeListener(onSeekBarChangeListener)
     MDTintHelper.setTint(widget_seekbar_r, color)
     MDTintHelper.setTint(widget_seekbar_g, color)
     MDTintHelper.setTint(widget_seekbar_b, color)
@@ -236,15 +233,15 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
       MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> if (!isLocked) {
         if (!isDragging) {
           //点击后隐藏或者显示操作栏
-          if (widget_pannel.isShown) {
-            widget_pannel.visibility = View.INVISIBLE
+          if (widget_panel.isShown) {
+            widget_panel.visibility = View.INVISIBLE
           } else {
-            widget_pannel.visibility = View.VISIBLE
+            widget_panel.visibility = View.VISIBLE
             handler.postDelayed(hideRunnable, DISMISS_THRESHOLD.toLong())
           }
         } else {
           //滑动
-          if (widget_pannel.isShown) {
+          if (widget_panel.isShown) {
             handler.postDelayed(hideRunnable, DISMISS_THRESHOLD.toLong())
           }
           isDragging = false
@@ -412,15 +409,15 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
     private const val HUGE = 4
 
     //第一行歌词字体大小
-    private const val FIRST_LINE_HUGE = 20
-    private const val FIRST_LINE_BIG = 19
+    private const val FIRST_LINE_HUGE = 23
+    private const val FIRST_LINE_BIG = 20
     private const val FIRST_LINE_MEDIUM = 18
     private const val FIRST_LINE_SMALL = 17
     private const val FIRST_LINE_TINY = 16
 
     //第二行歌词字体大小
-    private const val SECOND_LINE_HUGE = 18
-    private const val SECOND_LINE_BIG = 17
+    private const val SECOND_LINE_HUGE = 20
+    private const val SECOND_LINE_BIG = 18
     private const val SECOND_LINE_MEDIUM = 16
     private const val SECOND_LINE_SMALL = 15
     private const val SECOND_LINE_TINY = 14
@@ -430,7 +427,7 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
 
     private const val DISTANCE_THRESHOLD = 10
     private const val DISMISS_THRESHOLD = 4500
-    private const val LONGCLICK_THRESHOLD = 1000
+    private const val LONG_CLICK_THRESHOLD = 1000
 
 
     private const val MESSAGE_SAVE_COLOR = 1
