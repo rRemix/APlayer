@@ -2,7 +2,6 @@ package remix.myplayer.ui.activity
 
 import android.content.Context
 import android.content.Loader
-import android.database.Cursor
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.MediaStore
@@ -13,7 +12,6 @@ import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivitySearchBinding
@@ -24,8 +22,6 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.adapter.SearchAdapter
 import remix.myplayer.util.*
-import remix.myplayer.util.MediaStoreUtil.baseSelection
-import remix.myplayer.util.MediaStoreUtil.getSongInfo
 import java.util.*
 
 /**
@@ -152,32 +148,10 @@ class SearchActivity : LibraryActivity<Song, SearchAdapter>(), SearchView.OnQuer
       if (TextUtils.isEmpty(key)) {
         return ArrayList()
       }
-      var cursor: Cursor? = null
-      val songs: MutableList<Song> = ArrayList()
-      try {
-        val selection = (MediaStore.Audio.Media.TITLE + " like ? " + "or " + MediaStore.Audio.Media.ARTIST
-            + " like ? "
-            + "or " + MediaStore.Audio.Media.ALBUM + " like ? and " + baseSelection)
-        cursor = context.contentResolver
-            .query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                null,
-                selection, arrayOf("%$key%", "%$key%", "%$key%"), null)
-        if (cursor != null && cursor.count > 0) {
-          val blackList = SPUtil.getStringSet(App.context, SPUtil.SETTING_KEY.NAME,
-              SPUtil.SETTING_KEY.BLACKLIST_SONG)
-          while (cursor.moveToNext()) {
-            if (!blackList
-                    .contains(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)))) {
-              songs.add(getSongInfo(cursor))
-            }
-          }
-        }
-      } finally {
-        if (cursor != null && !cursor.isClosed) {
-          cursor.close()
-        }
-      }
-      return songs
+
+      return MediaStoreUtil.getSongs(MediaStore.Audio.Media.TITLE + " like ? or " +
+          MediaStore.Audio.ArtistColumns.ARTIST + " like ? or " +
+          MediaStore.Audio.AlbumColumns.ALBUM + " like ?", arrayOf("'%$key%'", "'%$key%'", "'%$key%'"))
     }
   }
 

@@ -504,7 +504,7 @@ object MediaStoreUtil {
       }
       val builder = StringBuilder(baseSelection)
       var i = 0
-      if (!deleteIds.isEmpty()) {
+      if (deleteIds.isNotEmpty()) {
         builder.append(" AND ")
         for (id in deleteIds) {
           if (i == 0) {
@@ -515,7 +515,7 @@ object MediaStoreUtil {
           i++
         }
       }
-      if (!blacklist.isEmpty()) {
+      if (blacklist.isNotEmpty()) {
         builder.append(" AND ")
         i = 0
         for (path in blacklist) {
@@ -596,7 +596,7 @@ object MediaStoreUtil {
     var selection = selection
     var selectionValues = selectionValues
     selection = if (selection != null && selection.trim { it <= ' ' } != "") {
-      "$selection AND $baseSelection"
+      "$selection AND ($baseSelection)"
     } else {
       baseSelection
     }
