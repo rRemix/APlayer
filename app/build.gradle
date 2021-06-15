@@ -25,8 +25,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 30
 
-        versionCode 15762
-        versionName "1.5.7.6"
+        versionCode 15770
+        versionName "1.5.7.7"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true

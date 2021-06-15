@@ -1567,6 +1567,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     prepare(playQueue.song, false)
 
     load = LOAD_SUCCESS
+
+    uiHandler.postDelayed({ sendLocalBroadcast(Intent(META_CHANGE)) }, 400)
   }
 
   fun deleteSongFromService(deleteSongs: List<Song>?) {

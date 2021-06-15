@@ -33,17 +33,17 @@ class FolderChooser(val activity: BaseActivity,
   private var selectedVolume: String? = null
 
   fun show() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-        !PermissionUtil.hasManageExternalStorage()) {
-      Theme
-          .getBaseDialog(activity)
-          .content(R.string.manage_external_storage_permission_tip)
-          .positiveText(R.string.confirm)
-          .negativeText(R.string.cancel)
-          .onPositive { _, _ -> PermissionUtil.requestManageExternalStorage(activity) }
-          .show()
-      return
-    }
+//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+//        !PermissionUtil.hasManageExternalStorage()) {
+//      Theme
+//          .getBaseDialog(activity)
+//          .content(R.string.manage_external_storage_permission_tip)
+//          .positiveText(R.string.confirm)
+//          .negativeText(R.string.cancel)
+//          .onPositive { _, _ -> PermissionUtil.requestManageExternalStorage(activity) }
+//          .show()
+//      return
+//    }
 
     val builder = FolderChooserDialog
         .Builder(activity)
