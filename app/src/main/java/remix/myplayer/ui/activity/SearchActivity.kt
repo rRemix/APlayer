@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Loader
 import android.graphics.drawable.Drawable
@@ -12,6 +13,9 @@ import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivitySearchBinding
@@ -23,6 +27,7 @@ import remix.myplayer.service.MusicService
 import remix.myplayer.ui.adapter.SearchAdapter
 import remix.myplayer.util.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by taeja on 16-1-22.
@@ -31,15 +36,18 @@ import java.util.*
  * 搜索界面，根据关键字，搜索歌曲名，艺术家，专辑中的记录
  */
 class SearchActivity : LibraryActivity<Song, SearchAdapter>(), SearchView.OnQueryTextListener {
+  private val allSongs: MutableList<Song> = ArrayList()
   lateinit var binding: ActivitySearchBinding
 
   //搜索的关键字
-  private var mkey: String = ""
+  private var key: String = ""
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = ActivitySearchBinding.inflate(layoutInflater)
     setContentView(binding.root)
     setUpToolbar("")
+
+    loadSongs()
     adapter = SearchAdapter(R.layout.item_search_reulst)
     adapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
@@ -89,7 +97,7 @@ class SearchActivity : LibraryActivity<Song, SearchAdapter>(), SearchView.OnQuer
         return false
       }
     })
-    searchView.setQuery(mkey, false)
+    searchView.setQuery(key, false)
     searchView.post { searchView.setOnQueryTextListener(this@SearchActivity) }
     return true
   }
@@ -114,44 +122,72 @@ class SearchActivity : LibraryActivity<Song, SearchAdapter>(), SearchView.OnQuer
   }
 
   override val loader: Loader<List<Song>>
-    get() = AsyncSearchLoader(this, mkey)
+    get() = AsyncSearchLoader(this, key, allSongs)
   override val loaderId: Int = LoaderIds.ACTIVITY_SEARCH
 
   /**
    * 搜索歌曲名，专辑，艺术家中包含该关键的记录
    *
-   * @param key 搜索关键字
+   * @param newKey 搜索关键字
    */
-  private fun search(key: String) {
-    mkey = key
+  private fun search(newKey: String) {
+    this.key = newKey
     loaderManager.restartLoader(LoaderIds.ACTIVITY_SEARCH, null, this)
   }
 
-  override fun onQueryTextSubmit(key: String): Boolean {
-    if (key != mkey) {
-      search(key)
+  override fun onQueryTextSubmit(newKey: String): Boolean {
+    if (newKey != key) {
+      search(newKey)
       return true
     }
     return false
   }
 
-  override fun onQueryTextChange(key: String): Boolean {
-    if (key != mkey) {
-      search(key)
+  override fun onQueryTextChange(newKey: String): Boolean {
+    if (newKey != key) {
+      search(newKey)
       return true
     }
     return false
   }
 
-  private class AsyncSearchLoader(context: Context, private val key: String) : AppWrappedAsyncTaskLoader<List<Song>>(context) {
+  override fun onMediaStoreChanged() {
+    super.onMediaStoreChanged()
+    loadSongs()
+  }
+
+  override fun onResume() {
+    super.onResume()
+    loadSongs()
+  }
+
+  @SuppressLint("CheckResult")
+  private fun loadSongs() {
+    Completable
+        .fromAction {
+          allSongs.clear()
+          allSongs.addAll(MediaStoreUtil.getAllSong())
+        }
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe {
+          search(key)
+        }
+  }
+
+  private class AsyncSearchLoader(context: Context, private val key: String, private val allSongs: List<Song>) : AppWrappedAsyncTaskLoader<List<Song>>(context) {
     override fun loadInBackground(): List<Song> {
-      if (TextUtils.isEmpty(key)) {
+      if (TextUtils.isEmpty(key) || allSongs.isEmpty()) {
         return ArrayList()
       }
 
-      return MediaStoreUtil.getSongs(MediaStore.Audio.Media.TITLE + " like ? or " +
-          MediaStore.Audio.ArtistColumns.ARTIST + " like ? or " +
-          MediaStore.Audio.AlbumColumns.ALBUM + " like ?", arrayOf("'%$key%'", "'%$key%'", "'%$key%'"))
+      val songs = MediaStoreUtil.getSongs(MediaStore.Audio.Media.TITLE + " LIKE ? OR " +
+          MediaStore.Audio.ArtistColumns.ARTIST + " LIKE ? OR " +
+          MediaStore.Audio.AlbumColumns.ALBUM + " LIKE ?", arrayOf("%$key%", "%$key%", "%$key%"))
+
+      return songs.filter {
+        allSongs.contains(it)
+      }
     }
   }
 
