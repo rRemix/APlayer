@@ -846,13 +846,18 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
         )
         .itemsCallback { _, _, select, _ ->
           if (select == 0) {
-            startActivityForResult(
-                Intent(Intent.ACTION_GET_CONTENT).apply {
-                  type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("m3u")
-                  addCategory(Intent.CATEGORY_OPENABLE)
-                },
-                REQUEST_IMPORT_PLAYLIST
-            )
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+              type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("m3u")
+              addCategory(Intent.CATEGORY_OPENABLE)
+            }
+            if (Util.isIntentAvailable(this, intent)) {
+              startActivityForResult(
+                  intent,
+                  REQUEST_IMPORT_PLAYLIST
+              )
+            } else{
+              ToastUtil.show(this,R.string.func_not_available)
+            }
           } else {
             Single
                 .fromCallable { DatabaseRepository.getInstance().playlistFromMediaStore }

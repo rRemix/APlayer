@@ -2,10 +2,10 @@ package remix.myplayer.misc.menu
 
 import android.content.ContextWrapper
 import android.content.Intent
-import androidx.appcompat.widget.PopupMenu
 import android.view.MenuItem
 import android.webkit.MimeTypeMap
 import android.widget.CompoundButton
+import androidx.appcompat.widget.PopupMenu
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.afollestad.materialdialogs.MaterialDialog
 import remix.myplayer.R
@@ -14,7 +14,6 @@ import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
-import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.service.Command
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.ui.activity.PlayerActivity
@@ -22,6 +21,7 @@ import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.ui.dialog.TimerDialog
 import remix.myplayer.ui.misc.AudioTag
 import remix.myplayer.util.MusicUtil
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
@@ -35,7 +35,7 @@ import java.lang.ref.WeakReference
  * @Date 2016/8/29 15:33
  */
 class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
-  ContextWrapper(activity), PopupMenu.OnMenuItemClickListener {
+    ContextWrapper(activity), PopupMenu.OnMenuItemClickListener {
   private val audioTag: AudioTag = AudioTag(activity, song)
   private val ref = WeakReference(activity)
 
@@ -65,13 +65,18 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
                   sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
                 }
                 5 -> { //手动选择歌词
-                  activity.startActivityForResult(
-                      Intent(Intent.ACTION_GET_CONTENT).apply {
-                        type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("lrc")
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                      },
-                      PlayerActivity.REQUEST_SELECT_LYRIC
-                  )
+                  val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("lrc")
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                  }
+                  if (Util.isIntentAvailable(activity, intent)) {
+                    activity.startActivityForResult(
+                        intent,
+                        PlayerActivity.REQUEST_SELECT_LYRIC
+                    )
+                  } else {
+                    ToastUtil.show(this, R.string.func_not_available)
+                  }
                 }
                 6 -> { //忽略或者取消忽略
                   getBaseDialog(activity)

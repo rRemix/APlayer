@@ -442,4 +442,5 @@
   <string name="delete_source_fail_tip">刪除原始檔案失敗：%s</string>
 
   <string name="manage_external_storage_permission_tip">從 Android 11 起，此功能需要「所有檔案存取權」</string>
+  <string name="func_not_available">功能不可用</string>
 </resources>
