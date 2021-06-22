@@ -443,4 +443,5 @@
   <string name="delete_source_fail_tip">Fail to delete source file: %s</string>
 
   <string name="manage_external_storage_permission_tip">To use this function on Android 11 and above, all files access permission is required</string>
+  <string name="func_not_available">function is not available</string>
 </resources>

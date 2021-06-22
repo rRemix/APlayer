@@ -19,13 +19,13 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.misc.getSongIds
-import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.adapter.*
 import remix.myplayer.ui.widget.MultiPopupWindow
 import remix.myplayer.util.*
+import remix.myplayer.util.RxUtil.applySingleScheduler
 import java.lang.ref.WeakReference
 
 class MultipleChoice<T>(activity: Activity, val type: Int) {
@@ -361,7 +361,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
   private fun updateTitle() {
     val activity = activityRef.get() ?: return
     popup?.binding?.multiTitle?.text =
-      activity.getString(R.string.song_list_select_title_format, checkPos.size)
+        activity.getString(R.string.song_list_select_title_format, checkPos.size)
   }
 
   private fun clearCheck() {
@@ -397,7 +397,9 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
           }
           true
         }
-        show()
+        if (!activity.isFinishing && !activity.isDestroyed) {
+          show()
+        }
       }
     }
     popup!!.show(View(activity))
