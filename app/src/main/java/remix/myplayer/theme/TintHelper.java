@@ -7,15 +7,6 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
-import androidx.annotation.CheckResult;
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.SwitchCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -26,6 +17,17 @@ import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import androidx.annotation.CheckResult;
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.TintableBackgroundView;
+import androidx.core.view.ViewCompat;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.lang.reflect.Field;
 import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
@@ -284,25 +286,43 @@ public final class TintHelper {
     }
   }
 
-  public static void setTint(@NonNull EditText editText, @ColorInt int color, boolean useDarker) {
-    final ColorStateList editTextColorStateList = new ColorStateList(new int[][]{
-        new int[]{-android.R.attr.state_enabled},
-        new int[]{android.R.attr.state_enabled, -android.R.attr.state_pressed,
-            -android.R.attr.state_focused},
-        new int[]{}
-    }, new int[]{
-        ContextCompat.getColor(editText.getContext(),
-            useDarker ? R.color.ate_text_disabled_dark : R.color.ate_text_disabled_light),
-        ContextCompat.getColor(editText.getContext(),
-            useDarker ? R.color.ate_control_normal_dark : R.color.ate_control_normal_light),
-        color
-    });
-    if (editText instanceof AppCompatEditText) {
-      ((AppCompatEditText) editText).setSupportBackgroundTintList(editTextColorStateList);
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      editText.setBackgroundTintList(editTextColorStateList);
+  public static void setTint(@NonNull TextView view, @ColorInt int color, boolean isDark) {
+    final ColorStateList colorStateList = new ColorStateList(
+        new int[][]{
+            new int[]{-android.R.attr.state_enabled},
+            new int[]{
+                android.R.attr.state_enabled,
+                -android.R.attr.state_pressed,
+                -android.R.attr.state_focused
+            },
+            new int[]{}
+        },
+        new int[]{
+            ContextCompat.getColor(view.getContext(),
+                isDark ? R.color.ate_text_disabled_dark : R.color.ate_text_disabled_light),
+            ContextCompat.getColor(view.getContext(),
+                isDark ? R.color.ate_control_normal_dark : R.color.ate_control_normal_light),
+            color
+        }
+    );
+    ViewCompat.setBackgroundTintList(view, colorStateList);
+    if (view instanceof TintableBackgroundView) {
+      // Why is it necessary?
+      ((TintableBackgroundView)view).setSupportBackgroundTintList(colorStateList);
     }
-    setCursorTint(editText, color);
+    view.setHighlightColor(ColorUtils.setAlphaComponent(color, 0x66));
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      Drawable cursorDrawable = view.getTextCursorDrawable();
+      Drawable handleDrawable = view.getTextSelectHandle();
+      Drawable handleLeftDrawable = view.getTextSelectHandleLeft();
+      Drawable handleRightDrawable = view.getTextSelectHandleRight();
+      view.setTextCursorDrawable(createTintedDrawable(cursorDrawable, color));
+      view.setTextSelectHandle(createTintedDrawable(handleDrawable, color));
+      view.setTextSelectHandleLeft(createTintedDrawable(handleLeftDrawable, color));
+      view.setTextSelectHandleRight(createTintedDrawable(handleRightDrawable, color));
+    } else {
+      setCursorTint(view, color);
+    }
   }
 
   public static void setTint(@NonNull CheckBox box, @ColorInt int color, boolean useDarker) {
@@ -425,21 +445,21 @@ public final class TintHelper {
     return drawable;
   }
 
-  public static void setCursorTint(@NonNull EditText editText, @ColorInt int color) {
+  public static void setCursorTint(@NonNull TextView view, @ColorInt int color) {
     try {
       Field fCursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
       fCursorDrawableRes.setAccessible(true);
-      int mCursorDrawableRes = fCursorDrawableRes.getInt(editText);
+      int mCursorDrawableRes = fCursorDrawableRes.getInt(view);
       Field fEditor = TextView.class.getDeclaredField("mEditor");
       fEditor.setAccessible(true);
-      Object editor = fEditor.get(editText);
+      Object editor = fEditor.get(view);
       Class<?> clazz = editor.getClass();
       Field fCursorDrawable = clazz.getDeclaredField("mCursorDrawable");
       fCursorDrawable.setAccessible(true);
       Drawable[] drawables = new Drawable[2];
-      drawables[0] = ContextCompat.getDrawable(editText.getContext(), mCursorDrawableRes);
+      drawables[0] = ContextCompat.getDrawable(view.getContext(), mCursorDrawableRes);
       drawables[0] = createTintedDrawable(drawables[0], color);
-      drawables[1] = ContextCompat.getDrawable(editText.getContext(), mCursorDrawableRes);
+      drawables[1] = ContextCompat.getDrawable(view.getContext(), mCursorDrawableRes);
       drawables[1] = createTintedDrawable(drawables[1], color);
       fCursorDrawable.set(editor, drawables);
     } catch (Exception e) {
