@@ -6,13 +6,9 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.misc.log.LogObserver
-import remix.myplayer.util.RxUtil
 import remix.myplayer.ui.activity.PlayerActivity
+import remix.myplayer.util.*
 import remix.myplayer.util.Constants.MODE_SHUFFLE
-import remix.myplayer.util.MediaStoreUtil
-import remix.myplayer.util.SPUtil
-import remix.myplayer.util.ToastUtil
-import remix.myplayer.util.Util
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -121,7 +117,11 @@ class PlayQueue(service: MusicService) {
     }
     //读取上次退出时正在播放的歌曲的id
     val service = service.get() ?: return
-    val lastId = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1L)
+    val lastId = try {
+      SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1L)
+    } catch (e: Exception) {
+      SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1)
+    }
     //上次退出时正在播放的歌曲是否还存在
     var isLastSongExist = false
     //上次退出时正在播放的歌曲的pos
@@ -271,11 +271,11 @@ class PlayQueue(service: MusicService) {
 
   private fun saveQueue() {
     repository.clearPlayQueue()
-        .flatMap {
-          repository.insertToPlayQueue(_originalQueue.map { it.id })
-        }
-        .compose(RxUtil.applySingleScheduler())
-        .subscribe(LogObserver())
+      .flatMap {
+        repository.insertToPlayQueue(_originalQueue.map { it.id })
+      }
+      .compose(RxUtil.applySingleScheduler())
+      .subscribe(LogObserver())
   }
 
   fun updateNextSong() {

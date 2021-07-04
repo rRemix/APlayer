@@ -21,6 +21,8 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -107,12 +109,11 @@ public class Theme {
   public static void tintDrawable(View view, @DrawableRes int res, @ColorInt int color) {
     if (view instanceof ImageView) {
       ((ImageView) view)
-          .setImageDrawable(tintDrawable(App.getContext().getResources().getDrawable(res), color));
+          .setImageDrawable(tintDrawable(AppCompatResources.getDrawable(App.getContext(),res), color));
     } else {
-      view.setBackground(tintDrawable(App.getContext().getResources().getDrawable(res), color));
+      view.setBackground(tintDrawable(AppCompatResources.getDrawable(App.getContext(),res), color));
     }
   }
-
 
   /**
    * 修改edittext光标与下划线颜色
