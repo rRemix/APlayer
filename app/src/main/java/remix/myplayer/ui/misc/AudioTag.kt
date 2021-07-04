@@ -14,13 +14,13 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.dialog_song_detail.view.*
 import kotlinx.android.synthetic.main.dialog_song_edit.view.*
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.audio.exceptions.CannotWriteException
 import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.databinding.DialogSongDetailBinding
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.theme.TextInputLayoutUtil
@@ -58,30 +58,35 @@ class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activit
         .onPositive { _, _ -> disposable?.dispose() }
         .build()
 
-    val view = detailDialog.customView!!
+    val binding = DialogSongDetailBinding.bind(detailDialog.customView!!)
 
-    //歌曲路径
-    view.song_detail_path.text = song.data
-    //歌曲名称
-    view.song_detail_name.text = song.showName
-    //歌曲大小
-    view.song_detail_size.text = getString(R.string.cache_size, 1.0f * song.size / MB)
-    //歌曲时长
-    view.song_detail_duration.text = Util.getTime(song.duration)
+    binding.songDetailPath.text = song.data
+    binding.songDetailName.text = song.showName
+    binding.songDetailSize.text = getString(R.string.cache_size, 1.0f * song.size / MB)
+    binding.songDetailDuration.text = Util.getTime(song.duration)
+
+    arrayOf(
+        binding.songDetailPath,
+        binding.songDetailName,
+        binding.songDetailSize,
+        binding.songDetailMime,
+        binding.songDetailDuration,
+        binding.songDetailBitRate,
+        binding.songDetailSampleRate
+    ).forEach {
+      TintHelper.setTint(it, ThemeStore.accentColor, false)
+    }
 
     disposable = Single.fromCallable { AudioFileIO.read(File(song.data)).audioHeader }
       .observeOn(AndroidSchedulers.mainThread())
       .subscribeOn(Schedulers.io())
       .subscribe(
         { audioHeader ->
-          //歌曲格式
-          view.song_detail_mime.text = audioHeader.format
-          //歌曲码率
+          binding.songDetailMime.text = audioHeader.format
           @SuppressLint("SetTextI18n")
-          view.song_detail_bit_rate.text = "${audioHeader.bitRate} kb/s"
-          //歌曲采样率
+          binding.songDetailBitRate.text = "${audioHeader.bitRate} kb/s"
           @SuppressLint("SetTextI18n")
-          view.song_detail_sample_rate.text = "${audioHeader.sampleRate} Hz"
+          binding.songDetailSampleRate.text = "${audioHeader.sampleRate} Hz"
         }, {
           ToastUtil.show(this, getString(R.string.init_failed, it))
         })

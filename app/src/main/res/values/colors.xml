@@ -65,8 +65,6 @@
   <color name="light_normal_tab_text_color">#99ffffff</color>
   <color name="dark_normal_tab_text_color">@color/dark_text_color_secondary</color>
 
-  <color name="detail_text_color">#737373</color>
-
   <color name="default_accent_color">#555393</color>
   <color name="player_top_detail_text_color">#7e7e7e</color>
   <color name="player_time_text_color">#6b6b6b</color>
