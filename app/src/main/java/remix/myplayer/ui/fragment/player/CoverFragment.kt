@@ -1,5 +1,6 @@
 package remix.myplayer.ui.fragment.player
 
+import android.app.Activity
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -45,8 +46,7 @@ abstract class CoverFragment : BaseMusicFragment() {
   }
 
   fun setImage(song: Song, playAnim: Boolean, updateBackground: Boolean) {
-    if (!isAdded) {
-      Timber.v("view: $view")
+    if (!isAdded || (context as Activity).isFinishing) {
       reRunnable = Runnable {
         setImage(song, playAnim, updateBackground)
       }
@@ -77,6 +77,13 @@ abstract class CoverFragment : BaseMusicFragment() {
     if (playAnim) {
       playAnimation(song)
     }
+  }
+
+  fun clearAnim() {
+    outAnim?.destroy()
+    outAnim = null
+    inAnim?.destroy()
+    inAnim = null
   }
 
   abstract fun playAnimation(song: Song)

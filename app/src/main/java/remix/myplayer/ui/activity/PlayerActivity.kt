@@ -298,6 +298,7 @@ class PlayerActivity : BaseMusicActivity() {
 
   override fun finish() {
     super.finish()
+    coverFragment.clearAnim()
     overridePendingTransition(0, R.anim.audio_out)
   }
 

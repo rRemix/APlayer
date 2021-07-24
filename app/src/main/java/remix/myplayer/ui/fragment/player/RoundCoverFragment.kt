@@ -1,5 +1,6 @@
 package remix.myplayer.ui.fragment.player
 
+import android.app.Activity
 import android.os.Bundle
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
@@ -26,7 +27,7 @@ class RoundCoverFragment : CoverFragment() {
    * 操作为上一首歌曲时，显示往左侧消失的动画 下一首歌曲时，显示往右侧消失的动画
    */
   override fun playAnimation(song: Song) {
-    if (!isAdded) {
+    if (!isAdded || (context as Activity).isFinishing) {
       return
     }
     val operation = getOperation()
