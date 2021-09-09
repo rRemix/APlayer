@@ -211,7 +211,7 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
     protected int mCancelButton;
     protected String mInitialPath;
     protected String mTag;
-    protected FolderCallback mCallback;
+    protected transient FolderCallback mCallback;
     protected boolean mAllowNewFolder;
     @StringRes
     protected int mNewFolderButton;
