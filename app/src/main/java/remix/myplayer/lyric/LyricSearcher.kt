@@ -112,6 +112,9 @@ class LyricSearcher {
             LyricPriority.QQ.priority -> observables.add(getQQObservable())
             LyricPriority.LOCAL.priority -> observables.add(getLocalObservable())
             LyricPriority.EMBEDED.priority -> observables.add(getEmbeddedObservable())
+            LyricPriority.IGNORE.priority -> observables.add(Observable.create { emitter ->
+              emitter.onError(Throwable("ignore lyric"))
+            })
           }
         }
         Observable.concat(observables).firstOrError().toObservable()
@@ -302,10 +305,9 @@ class LyricSearcher {
    * 网易歌词
    */
   private fun getNeteaseObservable(): Observable<List<LrcRow>> {
-    return HttpClient.getInstance()
-        .searchNeteaseSong(searchKey, 0, 1)
+    return HttpClient.searchNeteaseSong(searchKey, 0, 1)
         .flatMap {
-          HttpClient.getInstance().searchNeteaseLyric(it.result?.songs?.get(0)?.id ?: 0)
+          HttpClient.searchNeteaseLyric(it.result?.songs?.get(0)?.id ?: 0)
         }
         .map { lrcResponse ->
           val combine = lrcParser.getLrcRows(getBufferReader(lrcResponse.lrc?.lyric?.toByteArray()
@@ -329,7 +331,7 @@ class LyricSearcher {
         }
         .toObservable()
         .onErrorResumeNext(Function {
-          Timber.v("search netease lyric failed: ${it.message}")
+          Timber.w("search netease lyric failed: ${it.message}")
           Observable.empty()
         })
   }
@@ -339,10 +341,10 @@ class LyricSearcher {
    */
   private fun getKuGouObservable(): Observable<List<LrcRow>> {
     //酷狗歌词
-    return HttpClient.getInstance().searchKuGou(searchKey, song.duration)
+    return HttpClient.searchKuGou(searchKey, song.duration)
         .flatMap { searchResponse ->
           if (searchResponse.candidates.isNotEmpty() && song.title.equals(searchResponse.candidates[0].song, true)) {
-            HttpClient.getInstance().searchKuGouLyric(
+            HttpClient.searchKuGouLyric(
                 searchResponse.candidates[0].id,
                 searchResponse.candidates[0].accesskey)
                 .map { lrcResponse ->
@@ -355,7 +357,7 @@ class LyricSearcher {
         }
         .toObservable()
         .onErrorResumeNext(Function {
-          Timber.v("search kugou lyric failed: ${it.message}")
+          Timber.w("search kugou lyric failed: ${it.message}")
           Observable.empty()
         })
   }
@@ -364,10 +366,10 @@ class LyricSearcher {
    * QQ歌词
    */
   private fun getQQObservable(): Observable<List<LrcRow>> {
-    return HttpClient.getInstance().searchQQ(searchKey)
+    return HttpClient.searchQQ(searchKey)
         .flatMap { searchResponse ->
           if (song.title.equals(searchResponse.data.song.list[0].songname, true)) {
-            HttpClient.getInstance().searchQQLyric(searchResponse.data.song.list[0].songmid)
+            HttpClient.searchQQLyric(searchResponse.data.song.list[0].songmid)
                 .map { lrcResponse ->
                   val combine = lrcParser.getLrcRows(getBufferReader(lrcResponse.lyric.toByteArray()), false, cacheKey, searchKey)
                   combine.forEach {
@@ -398,7 +400,7 @@ class LyricSearcher {
         }
         .toObservable()
         .onErrorResumeNext(Function {
-          Timber.v("search qq lyric failed: ${it.message}")
+          Timber.w("search qq lyric failed: ${it.message}")
           Observable.empty()
         })
   }

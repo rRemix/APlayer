@@ -160,13 +160,13 @@ object UriFetcher {
     if (canDownloadCover()) {
       try {
         if (downloadFromLastFM()) {
-          val lastFMAlbum = HttpClient.getInstance().searchLastFMAlbum(song.album, song.artist, null).blockingGet()
+          val lastFMAlbum = HttpClient.searchLastFMAlbum(song.album, song.artist, null).blockingGet()
           val lastFMUri = ImageUriUtil.getLargestAlbumImageUrl(lastFMAlbum.album?.image)
           if (!TextUtils.isEmpty(lastFMUri)) {
             return Uri.parse(lastFMUri)
           }
         } else {
-          val neteaseResponse = HttpClient.getInstance().searchNeteaseSong(ImageUriUtil.getNeteaseSearchKey(song), 0, 1).blockingGet()
+          val neteaseResponse = HttpClient.searchNeteaseSong(ImageUriUtil.getNeteaseSearchKey(song), 0, 1).blockingGet()
           val neteaseUri = neteaseResponse?.result?.songs?.get(0)?.album?.picUrl
           if (!TextUtils.isEmpty(neteaseUri)) {
             return Uri.parse(neteaseUri)
@@ -201,13 +201,13 @@ object UriFetcher {
     if (canDownloadCover()) {
       try {
         if (downloadFromLastFM()) {
-          val lastFMAlbum = HttpClient.getInstance().searchLastFMAlbum(album.album, album.artist, null).blockingGet()
+          val lastFMAlbum = HttpClient.searchLastFMAlbum(album.album, album.artist, null).blockingGet()
           val lastFMUri = ImageUriUtil.getLargestAlbumImageUrl(lastFMAlbum.album?.image)
           if (!TextUtils.isEmpty(lastFMUri)) {
             return Uri.parse(lastFMUri)
           }
         } else {
-          val neteaseResponse = HttpClient.getInstance().searchNeteaseAlbum(ImageUriUtil.getNeteaseSearchKey(album), 0, 1).blockingGet()
+          val neteaseResponse = HttpClient.searchNeteaseAlbum(ImageUriUtil.getNeteaseSearchKey(album), 0, 1).blockingGet()
           val neteaseUri = neteaseResponse?.result?.albums?.get(0)?.picUrl
           if (!TextUtils.isEmpty(neteaseUri)) {
             return Uri.parse(neteaseUri)
@@ -238,13 +238,13 @@ object UriFetcher {
     if (canDownloadCover()) {
       try {
         if (downloadFromLastFM()) {
-          val lastFMArtist = HttpClient.getInstance().searchLastFMArtist(artist.artist, null).blockingGet()
+          val lastFMArtist = HttpClient.searchLastFMArtist(artist.artist, null).blockingGet()
           val lastFMUri = ImageUriUtil.getLargestArtistImageUrl(lastFMArtist.artist?.image)
           if (!TextUtils.isEmpty(lastFMUri)) {
             return Uri.parse(lastFMUri)
           }
         } else {
-          val neteaseResponse = HttpClient.getInstance().searchNeteaseArtist(ImageUriUtil.getNeteaseSearchKey(artist), 0, 1).blockingGet()
+          val neteaseResponse = HttpClient.searchNeteaseArtist(ImageUriUtil.getNeteaseSearchKey(artist), 0, 1).blockingGet()
           //      imageUrl = response.getResult().getArtists().get(0).getPicUrl();
           val neteaseUri = neteaseResponse?.result?.artists?.get(0)?.picUrl
           if (!TextUtils.isEmpty(neteaseUri)) {

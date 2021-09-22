@@ -19,7 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 /**
  * Created by Remix on 2017/11/20.
  */
-class HttpClient private constructor() {
+object HttpClient {
   private val neteaseApi: ApiService
   private val kuGouApi: ApiService
   private val qqApi: ApiService
@@ -93,7 +93,11 @@ class HttpClient private constructor() {
   }
 
   //New Api
-  fun searchLastFMAlbum(albumName: String?, artistName: String?, lang: String?): Single<LastFmAlbum> {
+  fun searchLastFMAlbum(
+    albumName: String?,
+    artistName: String?,
+    lang: String?
+  ): Single<LastFmAlbum> {
     return lastfmApi.searchLastFMAlbum(albumName, artistName, lang)
   }
 
@@ -133,53 +137,45 @@ class HttpClient private constructor() {
     return qqApi.searchQQLyric(songmid, 5381, "json", 1)
   }
 
-  private object SingletonHolder {
-    val instance = HttpClient()
-  }
 
-  companion object {
-    @JvmStatic
-    fun getInstance(): HttpClient = SingletonHolder.instance
-
-    private const val NETEASE_BASE_URL = "http://music.163.com/api/"
-    private const val KUGOU_BASE_URL = "http://lyrics.kugou.com/"
-    private const val QQ_BASE_URL = "https://c.y.qq.com/"
-    private const val LASTFM_BASE_URL = "http://ws.audioscrobbler.com/2.0/"
-    private const val GITHUB_BASE_URL = "https://api.github.com/"
-  }
+  private const val NETEASE_BASE_URL = "http://music.163.com/api/"
+  private const val KUGOU_BASE_URL = "http://lyrics.kugou.com/"
+  private const val QQ_BASE_URL = "https://c.y.qq.com/"
+  private const val LASTFM_BASE_URL = "http://ws.audioscrobbler.com/2.0/"
+  private const val GITHUB_BASE_URL = "https://api.github.com/"
 
   init {
     val retrofitBuilder = Retrofit.Builder()
     val okHttpClient = OkHttpHelper.okHttpClient
     neteaseApi = retrofitBuilder
-        .baseUrl(NETEASE_BASE_URL)
-        .client(okHttpClient)
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .addConverterFactory(GsonConverterFactory.create())
-        .build().create(ApiService::class.java)
+      .baseUrl(NETEASE_BASE_URL)
+      .client(okHttpClient)
+      .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+      .addConverterFactory(GsonConverterFactory.create())
+      .build().create(ApiService::class.java)
     kuGouApi = retrofitBuilder
-        .baseUrl(KUGOU_BASE_URL)
-        .client(okHttpClient)
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .addConverterFactory(GsonConverterFactory.create())
-        .build().create(ApiService::class.java)
+      .baseUrl(KUGOU_BASE_URL)
+      .client(okHttpClient)
+      .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+      .addConverterFactory(GsonConverterFactory.create())
+      .build().create(ApiService::class.java)
     qqApi = retrofitBuilder
-        .baseUrl(QQ_BASE_URL)
-        .client(okHttpClient)
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .addConverterFactory(GsonConverterFactory.create())
-        .build().create(ApiService::class.java)
+      .baseUrl(QQ_BASE_URL)
+      .client(okHttpClient)
+      .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+      .addConverterFactory(GsonConverterFactory.create())
+      .build().create(ApiService::class.java)
     lastfmApi = retrofitBuilder
-        .baseUrl(LASTFM_BASE_URL)
-        .client(okHttpClient)
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .addConverterFactory(GsonConverterFactory.create())
-        .build().create(ApiService::class.java)
+      .baseUrl(LASTFM_BASE_URL)
+      .client(okHttpClient)
+      .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+      .addConverterFactory(GsonConverterFactory.create())
+      .build().create(ApiService::class.java)
     githubApi = retrofitBuilder
-        .baseUrl(GITHUB_BASE_URL)
-        .client(okHttpClient)
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .addConverterFactory(GsonConverterFactory.create())
-        .build().create(ApiService::class.java)
+      .baseUrl(GITHUB_BASE_URL)
+      .client(okHttpClient)
+      .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+      .addConverterFactory(GsonConverterFactory.create())
+      .build().create(ApiService::class.java)
   }
 }
