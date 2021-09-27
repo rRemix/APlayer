@@ -41,9 +41,6 @@ class App : MultiDexApplication(), ActivityLifecycleCallbacks {
   override fun onCreate() {
     super.onCreate()
     context = this
-    if (!BuildConfig.DEBUG) {
-      IS_GOOGLEPLAY = "google".equals(Util.getAppMetaData("BUGLY_APP_CHANNEL"), ignoreCase = true)
-    }
     setUp()
 
     // AppShortcut
@@ -147,6 +144,7 @@ class App : MultiDexApplication(), ActivityLifecycleCallbacks {
       private set
 
     //是否是googlePlay版本
-    var IS_GOOGLEPLAY = false
+    const val IS_GOOGLEPLAY =
+        !BuildConfig.DEBUG && BuildConfig.FLAVOR == "google"
   }
 }

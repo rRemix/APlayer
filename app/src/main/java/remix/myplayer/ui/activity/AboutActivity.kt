@@ -14,7 +14,10 @@ class AboutActivity : ToolbarActivity() {
     super.onCreate(savedInstanceState)
     binding = ActivityAboutBinding.inflate(layoutInflater)
     setContentView(binding.root)
-    binding.aboutText.text = "v" + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")"
+    binding.aboutText.text =
+        "v${BuildConfig.VERSION_NAME}" +
+            " (${BuildConfig.VERSION_CODE})" +
+            " (${BuildConfig.FLAVOR})"
     setUpToolbar(getString(R.string.about))
   }
 }

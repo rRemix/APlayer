@@ -19,6 +19,7 @@ repositories {
 
 android {
     compileSdkVersion 30
+    ndkVersion "23.0.7599858"
 
     defaultConfig {
         applicationId "remix.myplayer"
@@ -72,7 +73,7 @@ android {
             versionNameSuffix '-DEBUG'
 
             ndk {
-                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
             }
         }
         release {
@@ -107,13 +108,9 @@ android {
     }
 
     productFlavors {
-        assistant91 {}
-        baidu {}
-        anzhuomarket {}
-        xiaomi {}
-        kuan {}
         google {}
-        productFlavors.all {flavor ->
+        nongoogle {}
+        productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }
     }
