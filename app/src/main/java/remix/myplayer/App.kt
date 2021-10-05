@@ -144,7 +144,7 @@ class App : MultiDexApplication(), ActivityLifecycleCallbacks {
       private set
 
     //是否是googlePlay版本
-    const val IS_GOOGLEPLAY =
+    val IS_GOOGLEPLAY =
         !BuildConfig.DEBUG && BuildConfig.FLAVOR == "google"
   }
 }

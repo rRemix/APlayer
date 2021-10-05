@@ -14,6 +14,7 @@ import remix.myplayer.theme.ThemeStore.libraryBtnColor
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.adapter.SearchAdapter.SearchResHolder
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
+import remix.myplayer.ui.misc.MultipleChoice
 
 /**
  * Created by Remix on 2016/1/23.
@@ -21,7 +22,7 @@ import remix.myplayer.ui.adapter.holder.BaseViewHolder
 /**
  * 搜索结果的适配器
  */
-class SearchAdapter(layoutId: Int) : BaseAdapter<Song, SearchResHolder>(layoutId) {
+class SearchAdapter(private val multiChoice: MultipleChoice<Song>, layoutId: Int) : BaseAdapter<Song, SearchResHolder>(layoutId) {
 
   @SuppressLint("RestrictedApi")
   override fun convert(holder: SearchResHolder, song: Song?, position: Int) {
@@ -42,6 +43,9 @@ class SearchAdapter(layoutId: Int) : BaseAdapter<Song, SearchResHolder>(layoutId
     val tintColor = libraryBtnColor
     Theme.tintDrawable(holder.binding.searchButton, R.drawable.icon_player_more, tintColor)
     holder.binding.searchButton.setOnClickListener { v: View? ->
+      if (multiChoice.isActive) {
+        return@setOnClickListener
+      }
       val popupMenu = PopupMenu(holder.itemView.context, holder.binding.searchButton, Gravity.END)
       popupMenu.menuInflater.inflate(R.menu.menu_song_item, popupMenu.menu)
       popupMenu.setOnMenuItemClickListener(
@@ -49,8 +53,14 @@ class SearchAdapter(layoutId: Int) : BaseAdapter<Song, SearchResHolder>(layoutId
       popupMenu.show()
     }
     if (onItemClickListener != null) {
-      holder.binding.reslistItem.setOnClickListener { v: View? -> onItemClickListener?.onItemClick(v, holder.adapterPosition) }
+      holder.binding.root.setOnClickListener { v: View? -> onItemClickListener?.onItemClick(v, holder.adapterPosition) }
+      holder.binding.root.setOnLongClickListener { v: View? ->
+        onItemClickListener?.onItemLongClick(v, holder.adapterPosition)
+        true
+      }
     }
+
+    holder.binding.root.isSelected = multiChoice.isPositionCheck(position)
   }
 
   class SearchResHolder(itemView: View) : BaseViewHolder(itemView) {

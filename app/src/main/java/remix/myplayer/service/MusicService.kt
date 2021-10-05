@@ -62,15 +62,15 @@ import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
 import remix.myplayer.ui.widget.desktop.DesktopLyricView
+import remix.myplayer.util.*
 import remix.myplayer.util.Constants.*
-import remix.myplayer.util.DensityUtil
-import remix.myplayer.util.MediaStoreUtil
-import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.RxUtil.applySingleScheduler
-import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
-import remix.myplayer.util.ToastUtil
-import remix.myplayer.util.Util.*
+import remix.myplayer.util.Util.isAppOnForeground
+import remix.myplayer.util.Util.isIntentAvailable
+import remix.myplayer.util.Util.registerLocalReceiver
+import remix.myplayer.util.Util.sendLocalBroadcast
+import remix.myplayer.util.Util.unregisterLocalReceiver
 import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.util.*
@@ -730,8 +730,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     unregisterLocalReceiver(controlReceiver)
     unregisterLocalReceiver(musicEventReceiver)
     unregisterLocalReceiver(widgetReceiver)
-    unregisterReceiver(this, headSetReceiver)
-    unregisterReceiver(this, screenReceiver)
+    Util.unregisterReceiver(this, headSetReceiver)
+    Util.unregisterReceiver(this, screenReceiver)
 
     getSharedPreferences(SETTING_KEY.NAME, Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this)
 
@@ -1648,7 +1648,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     private val tag: String = WidgetTask::class.java.simpleName
 
     override fun run() {
-      val isAppOnForeground = isAppOnForeground()
+      val isAppOnForeground = isAppOnForeground
       // app在前台不用更新
       if (!isAppOnForeground) {
         appWidgets.forEach {
@@ -1695,7 +1695,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       // 桌面歌词
       val wrapper = lyricFetcher.findCurrentLyric()
       Timber.tag(TAG_DESKTOP_LYRIC).v("findCurrentLyric: $wrapper")
-      if (!showDesktopLyric || !screenOn || checkNoPermission() || isAppOnForeground()) {
+      if (!showDesktopLyric || !screenOn || checkNoPermission() || isAppOnForeground) {
         if (isDesktopLyricShowing) {
           Timber.tag(TAG_DESKTOP_LYRIC).v("remove desktop lyric")
           uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)

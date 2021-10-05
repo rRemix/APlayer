@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.fragment_record.*
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivitySearchBinding
@@ -48,21 +49,29 @@ class SearchActivity : LibraryActivity<Song, SearchAdapter>(), SearchView.OnQuer
     setUpToolbar("")
 
     loadSongs()
-    adapter = SearchAdapter(R.layout.item_search_reulst)
+    adapter = SearchAdapter(choice, R.layout.item_search_reulst)
+    choice.adapter = adapter
     adapter?.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
         adapter?.let { adapter ->
           if (position >= 0 && position < adapter.getDataList().size) {
-            Util.sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.PLAY_TEMP)
-                .putExtra(MusicService.EXTRA_SONG, adapter.getDataList()[position]))
+            val song = adapter.getDataList()[position]
+            if (!choice.click(position, song)) {
+              Util.sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.PLAY_TEMP)
+                  .putExtra(MusicService.EXTRA_SONG, adapter.getDataList()[position]))
+            }
           } else {
             ToastUtil.show(this@SearchActivity, R.string.illegal_arg)
           }
         }
-
       }
 
-      override fun onItemLongClick(view: View, position: Int) {}
+      override fun onItemLongClick(view: View, position: Int) {
+        val song = adapter?.dataList?.get(position) ?: return
+        if (choice.longClick(position, song)) {
+          Util.hideKeyboard(window.decorView)
+        }
+      }
     }
     binding.searchResultNative.adapter = adapter
     binding.searchResultNative.layoutManager = LinearLayoutManager(this)

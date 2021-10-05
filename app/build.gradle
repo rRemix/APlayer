@@ -19,7 +19,7 @@ repositories {
 
 android {
     compileSdkVersion 30
-    ndkVersion "23.0.7599858"
+//    ndkVersion "23.0.7599858"
 
     defaultConfig {
         applicationId "remix.myplayer"
@@ -90,7 +90,7 @@ android {
             }
         }
 
-        android.applicationVariants.all {variant ->
+        android.applicationVariants.all { variant ->
             variant.outputs.all {
                 outputFileName = "APlayer_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${new Date().format("yyyy-MM-dd HH-mm")}.apk"
             }
@@ -219,7 +219,7 @@ def getProperties(String fileName) {
     final Properties properties = new Properties()
     def file = file(fileName)
     if (file.exists()) {
-        file.withInputStream {stream -> properties.load(stream)}
+        file.withInputStream { stream -> properties.load(stream) }
     }
     return properties
 }

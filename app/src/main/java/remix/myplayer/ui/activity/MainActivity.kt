@@ -60,7 +60,10 @@ import remix.myplayer.ui.misc.DoubleClickListener
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.util.*
 import remix.myplayer.util.RxUtil.applySingleScheduler
-import remix.myplayer.util.Util.*
+import remix.myplayer.util.Util.hashKeyForDisk
+import remix.myplayer.util.Util.installApk
+import remix.myplayer.util.Util.registerLocalReceiver
+import remix.myplayer.util.Util.unregisterLocalReceiver
 import timber.log.Timber
 import java.io.File
 import java.lang.ref.WeakReference

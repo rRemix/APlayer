@@ -10,7 +10,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.service.MusicService
-import remix.myplayer.util.Util
+import remix.myplayer.util.Util.isAppOnForeground
 import remix.myplayer.util.Util.registerLocalReceiver
 import remix.myplayer.util.Util.unregisterLocalReceiver
 import timber.log.Timber
@@ -79,7 +79,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
   }
 
   private fun bindToService() {
-    if (!Util.isAppOnForeground()) {
+    if (!isAppOnForeground) {
       Timber.tag(TAG).v("bindToService(),app isn't on foreground")
       pendingBindService = true
       return
