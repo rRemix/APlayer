@@ -747,11 +747,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
               Uri.parse(if (!IS_GOOGLEPLAY) "mailto:568920427@qq.com" else "mailto:rRemix.me@gmail.com")
         }
 
-        if (Util.isIntentAvailable(this, emailIntent)) {
-          startActivity(emailIntent)
-        } else {
-          ToastUtil.show(this, R.string.not_found_email)
-        }
+        Util.startActivitySafely(this, emailIntent)
       })
     }
     getBaseDialog(this)
@@ -822,14 +818,12 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
               .negativeText(R.string.cancel).items(allPlayListNames)
               .itemsCallback { _, _, _, text ->
                 pendingExportPlaylist = text.toString()
-                startActivityForResult(
-                    Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                      type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("m3u")
-                      addCategory(Intent.CATEGORY_OPENABLE)
-                      putExtra(Intent.EXTRA_TITLE, "$text.m3u")
-                    },
-                    REQUEST_EXPORT_PLAYLIST
-                )
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                  type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("m3u")
+                  addCategory(Intent.CATEGORY_OPENABLE)
+                  putExtra(Intent.EXTRA_TITLE, "$text.m3u")
+                }
+                Util.startActivityForResultSafely(this, intent, REQUEST_EXPORT_PLAYLIST)
               }.show()
         })
   }
@@ -850,14 +844,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
               type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("m3u")
               addCategory(Intent.CATEGORY_OPENABLE)
             }
-            if (Util.isIntentAvailable(this, intent)) {
-              startActivityForResult(
-                  intent,
-                  REQUEST_IMPORT_PLAYLIST
-              )
-            } else{
-              ToastUtil.show(this,R.string.func_not_available)
-            }
+            Util.startActivityForResultSafely(this, intent, REQUEST_IMPORT_PLAYLIST)
           } else {
             Single
                 .fromCallable { DatabaseRepository.getInstance().playlistFromMediaStore }

@@ -1,8 +1,10 @@
 package remix.myplayer.util
 
+import android.app.Activity
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
 import android.app.Service
+import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -244,11 +246,25 @@ object Util {
   }
 
   /**
-   * 安全的启动activity
+   * 启动 Activity，失败时 toast
    */
-  fun startActivitySafely(context: Context, intent: Intent?) {
-    if (isIntentAvailable(context, intent)) {
+  fun startActivitySafely(context: Context, intent: Intent) {
+    try {
       context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+      ToastUtil.show(context, R.string.activity_not_found_tip)
+    }
+  }
+
+  fun startActivityForResultSafely(
+      activity: Activity,
+      intent: Intent,
+      requestCode: Int
+  ) {
+    try {
+      activity.startActivityForResult(intent, requestCode)
+    } catch (e: ActivityNotFoundException) {
+      ToastUtil.show(activity, R.string.activity_not_found_tip)
     }
   }
 

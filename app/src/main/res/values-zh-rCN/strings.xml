@@ -398,7 +398,6 @@
   <string name="md_custom_label">自定义</string>
   <string name="md_presets_label">预设</string>
 
-  <string name="not_found_email">未找到邮箱</string>
   <string name="init_failed">初始化失败：%s</string>
   <string name="select_language">选择软件语言</string>
   <string name="select_language_tips">将强制设置软件的语言</string>
@@ -442,6 +441,5 @@
   <string name="grant_delete_permission_tip">请授予删除音频文件的权限</string>
   <string name="delete_source_fail_tip">删除源文件失败：%s</string>
 
-  <string name="manage_external_storage_permission_tip">从 Android 11 起，此功能需要「所有文件访问权限」</string>
-  <string name="func_not_available">功能不可用</string>
+  <string name="activity_not_found_tip">找不到对应 Activity</string>
 </resources>
