@@ -69,14 +69,11 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
                     type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("lrc")
                     addCategory(Intent.CATEGORY_OPENABLE)
                   }
-                  if (Util.isIntentAvailable(activity, intent)) {
-                    activity.startActivityForResult(
-                        intent,
-                        PlayerActivity.REQUEST_SELECT_LYRIC
-                    )
-                  } else {
-                    ToastUtil.show(this, R.string.func_not_available)
-                  }
+                  Util.startActivityForResultSafely(
+                      activity,
+                      intent,
+                      PlayerActivity.REQUEST_SELECT_LYRIC
+                  )
                 }
                 6 -> { //忽略或者取消忽略
                   getBaseDialog(activity)

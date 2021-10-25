@@ -67,7 +67,6 @@ import remix.myplayer.util.Constants.*
 import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.Util.isAppOnForeground
-import remix.myplayer.util.Util.isIntentAvailable
 import remix.myplayer.util.Util.registerLocalReceiver
 import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.Util.unregisterLocalReceiver
@@ -1261,9 +1260,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             val permissionIntent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
             permissionIntent.data = Uri.parse("package:$packageName")
             permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            if (isIntentAvailable(service, permissionIntent)) {
-              startActivity(permissionIntent)
-            }
+            Util.startActivitySafely(service, permissionIntent)
           }
           ToastUtil.show(service, R.string.plz_give_float_permission)
           return

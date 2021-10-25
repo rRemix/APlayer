@@ -398,7 +398,6 @@
   <string name="md_custom_label">Custom</string>
   <string name="md_presets_label">Presets</string>
 
-  <string name="not_found_email">Not found email</string>
   <string name="init_failed">Init failed: %s</string>
   <string name="select_language">Select APlayer language</string>
   <string name="select_language_tips">Will change APlayer language by force</string>
@@ -442,6 +441,5 @@
   <string name="grant_delete_permission_tip">Please grant permission to delete the media file</string>
   <string name="delete_source_fail_tip">Fail to delete source file: %s</string>
 
-  <string name="manage_external_storage_permission_tip">To use this function on Android 11 and above, all files access permission is required</string>
-  <string name="func_not_available">function is not available</string>
+  <string name="activity_not_found_tip">Activity not found</string>
 </resources>

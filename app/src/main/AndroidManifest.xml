@@ -19,6 +19,11 @@
 
   <queries>
     <intent>
+      <!-- 系统均衡器 -->
+      <action android:name="android.media.action.DISPLAY_AUDIO_EFFECT_CONTROL_PANEL" />
+    </intent>
+    <intent>
+      <!-- 长按文本的弹出菜单 -->
       <action android:name="android.intent.action.PROCESS_TEXT" />
       <data android:mimeType="text/plain" />
     </intent>

@@ -398,7 +398,6 @@
   <string name="md_custom_label">自訂</string>
   <string name="md_presets_label">預設</string>
 
-  <string name="not_found_email">未找到電子郵件</string>
   <string name="init_failed">初始化失敗：%s</string>
   <string name="select_language">選擇軟體語言</string>
   <string name="select_language_tips">將強制設定軟體的語言</string>
@@ -442,6 +441,5 @@
   <string name="grant_delete_permission_tip">請授予刪除音樂檔案的權限</string>
   <string name="delete_source_fail_tip">刪除原始檔案失敗：%s</string>
 
-  <string name="manage_external_storage_permission_tip">從 Android 11 起，此功能需要「所有檔案存取權」</string>
-  <string name="func_not_available">功能不可用</string>
+  <string name="activity_not_found_tip">找不到對應 Activity</string>
 </resources>
