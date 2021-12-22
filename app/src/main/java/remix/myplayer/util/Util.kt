@@ -527,7 +527,7 @@ object Util {
    * 判断是否支持状态栏歌词
    */
   fun isSupportStatusBarLyric(context: Context): Boolean {
-    return RomUtils.checkIsMeizuRom() || Settings.System.getInt(context.contentResolver, "status_bar_show_lyric", 0) != 0
+    return RomUtils.checkIsMeizuRom() || Settings.System.getInt(context.contentResolver, "status_bar_show_lyric", 0) != 0 || RomUtils.checkIsbaolong24Rom() || RomUtils.checkIsexTHmUIRom()
   }
 
   /**

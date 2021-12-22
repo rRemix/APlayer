@@ -103,4 +103,20 @@ public class RomUtils {
     return Build.MANUFACTURER.contains("QiKU")
         || Build.MANUFACTURER.contains("360");
   }
+
+  public static boolean checkIsexTHmUIRom() {
+    String exTHmUIFlag = getSystemProperty("ro.exthm.device");
+    if (TextUtils.isEmpty(exTHmUIFlag))
+      return false;
+    else
+      return true;
+  }
+
+  public static boolean checkIsbaolong24Rom() {
+    String baolong24Flag = getSystemProperty("org.baolong24.device");
+    if (TextUtils.isEmpty(baolong24Flag))
+      return false;
+    else
+      return true;
+  }
 }
