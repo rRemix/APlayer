@@ -32,17 +32,17 @@ interface ApiService {
   fun searchLastFMArtist(@Query("artist") artistName: String?,
                          @Query("lang") language: String?): Single<LastFmArtist>
 
-  @POST("search/pc")
+  @GET("search/get")
   @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
   fun searchNeteaseSong(@Query("s") key: String?, @Query("offset") offset: Int,
                         @Query("limit") limit: Int, @Query("type") type: Int): Single<NSongSearchResponse>
 
-  @POST("search/pc")
+  @GET("search/get")
   @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
   fun searchNeteaseAlbum(@Query("s") key: String?, @Query("offset") offset: Int,
                          @Query("limit") limit: Int, @Query("type") type: Int): Single<NAlbumSearchResponse>
 
-  @POST("search/pc")
+  @GET("search/get")
   @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
   fun searchNeteaseArtist(@Query("s") key: String?, @Query("offset") offset: Int,
                           @Query("limit") limit: Int, @Query("type") type: Int): Single<NArtistSearchResponse>
