@@ -127,6 +127,9 @@ class LyricSearcher {
     return if (isTypeAvailable(type)) Observable.concat(getCacheObservable(), observable)
         .firstOrError()
         .toObservable()
+        .doOnError {
+          Timber.w(it)
+        }
         .doOnSubscribe {
           cacheKey = Util.hashKeyForDisk(song.id.toString() + "-" +
               (if (!TextUtils.isEmpty(song.artist)) song.artist else "") + "-" +

@@ -361,7 +361,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     object : Thread() {
       override fun run() {
         cacheSize = 0
-        cacheSize += Util.getFolderSize(externalCacheDir)
+//        cacheSize += Util.getFolderSize(externalCacheDir)
         cacheSize += Util.getFolderSize(cacheDir)
         handler.sendEmptyMessage(CACHE_SIZE)
       }
@@ -1004,7 +1004,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
                 //清除歌词，封面等缓存
                 //清除配置文件、数据库等缓存
                 Util.deleteFilesByDirectory(cacheDir)
-                Util.deleteFilesByDirectory(externalCacheDir)
+//                Util.deleteFilesByDirectory(externalCacheDir)
                 DiskCache.init(this@SettingActivity, "lyric")
                 //清除glide缓存
                 GlideApp.get(this@SettingActivity).clearDiskCache()

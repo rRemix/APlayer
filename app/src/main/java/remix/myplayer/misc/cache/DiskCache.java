@@ -23,7 +23,7 @@ public class DiskCache {
       if (!lrcCacheDir.exists()) {
         lrcCacheDir.mkdir();
       }
-      mLrcCache = DiskLruCache.open(lrcCacheDir, getAppVersion(context), 1, 10 * MB);
+      mLrcCache = DiskLruCache.open(lrcCacheDir, getAppVersion(context), 1, 200 * MB);
     } catch (IOException e) {
       e.printStackTrace();
     }
