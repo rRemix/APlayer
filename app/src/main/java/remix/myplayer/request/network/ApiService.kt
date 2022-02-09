@@ -11,6 +11,7 @@ import remix.myplayer.bean.netease.NAlbumSearchResponse
 import remix.myplayer.bean.netease.NArtistSearchResponse
 import remix.myplayer.bean.netease.NLrcResponse
 import remix.myplayer.bean.netease.NSongSearchResponse
+import remix.myplayer.bean.netease.NDetailResponse
 import remix.myplayer.bean.qq.QLrcResponse
 import remix.myplayer.bean.qq.QSearchResponse
 import retrofit2.http.*
@@ -51,6 +52,10 @@ interface ApiService {
   @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
   fun searchNeteaseLyric(@Query("os") os: String?, @Query("id") id: Int,
                          @Query("lv") lv: Int, @Query("kv") kv: Int, @Query("tv") tv: Int): Single<NLrcResponse>
+
+  @GET("song/detail")
+  @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
+  fun searchNeteaseDetail( @Query("id") id: Int, @Query("ids") ids: String?): Single<NDetailResponse>
 
   @GET("search")
   fun searchKuGou(@Query("ver") ver: Int, @Query("man") man: String?,
