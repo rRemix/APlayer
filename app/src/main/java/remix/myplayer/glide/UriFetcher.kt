@@ -167,7 +167,10 @@ object UriFetcher {
           }
         } else {
           val neteaseResponse = HttpClient.searchNeteaseSong(ImageUriUtil.getNeteaseSearchKey(song), 0, 1).blockingGet()
-          val neteaseUri = neteaseResponse?.result?.songs?.get(0)?.album?.picUrl
+          val song_id = neteaseResponse?.result?.songs?.get(0)?.id
+          val neteaseDetailResponse = HttpClient.searchNeteaseDetail(song_id.toString().toInt(), "[$song_id]").blockingGet()
+          val neteaseUri = neteaseDetailResponse?.songs?.get(0)?.album?.picUrl
+          //val neteaseUri = neteaseResponse?.result?.songs?.get(0)?.album?.picUrl
           if (!TextUtils.isEmpty(neteaseUri)) {
             return Uri.parse(neteaseUri)
           }

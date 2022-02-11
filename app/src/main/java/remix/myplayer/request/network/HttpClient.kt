@@ -10,6 +10,7 @@ import remix.myplayer.bean.netease.NAlbumSearchResponse
 import remix.myplayer.bean.netease.NArtistSearchResponse
 import remix.myplayer.bean.netease.NLrcResponse
 import remix.myplayer.bean.netease.NSongSearchResponse
+import remix.myplayer.bean.netease.NDetailResponse
 import remix.myplayer.bean.qq.QLrcResponse
 import remix.myplayer.bean.qq.QSearchResponse
 import retrofit2.Retrofit
@@ -119,6 +120,10 @@ object HttpClient {
 
   fun searchNeteaseLyric(id: Int): Single<NLrcResponse> {
     return neteaseApi.searchNeteaseLyric("pc", id, -1, -1, -1)
+  }
+
+  fun searchNeteaseDetail(id: Int, ids: String?): Single<NDetailResponse> {
+    return neteaseApi.searchNeteaseDetail(id,"[$id]" )
   }
 
   fun searchKuGou(keyword: String?, duration: Long): Single<KSearchResponse> {
