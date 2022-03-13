@@ -18,7 +18,7 @@ repositories {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 //    ndkVersion "23.0.7599858"
 
     defaultConfig {
