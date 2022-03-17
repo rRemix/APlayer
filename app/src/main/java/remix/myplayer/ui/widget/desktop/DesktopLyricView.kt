@@ -1,10 +1,11 @@
 package remix.myplayer.ui.widget.desktop
 
+import android.app.Service
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PointF
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
+import android.hardware.input.InputManager
+import android.os.Build
 import android.os.Message
 import android.text.TextUtils
 import android.view.MotionEvent
@@ -224,7 +225,7 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
         if (abs(event.rawY - lastPoint.y) > DISTANCE_THRESHOLD) {
           params.y += (event.rawY - lastPoint.y).toInt()
           isDragging = true
-          if (VERSION.SDK_INT >= VERSION_CODES.KITKAT && isAttachedToWindow) {
+          if (isAttachedToWindow) {
             windowManager.updateViewLayout(this, params)
           }
         }
@@ -348,11 +349,15 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
         params.flags = (WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
             or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
             or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+          val inputManager = context.getSystemService(Service.INPUT_SERVICE) as InputManager
+          params.alpha = inputManager.maximumObscuringOpacityForTouch
+        }
       } else {
         //        mNotify.cancel();
         params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
       }
-      if (VERSION.SDK_INT >= VERSION_CODES.KITKAT && isAttachedToWindow) {
+      if (isAttachedToWindow) {
         windowManager.updateViewLayout(this, params)
       }
     }
