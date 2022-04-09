@@ -672,11 +672,16 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     mediaPlayer.setOnErrorListener { mp, what, extra ->
       try {
-        prepared = false
-        mediaPlayer.release()
-        setUpPlayer()
-        ToastUtil.show(service, R.string.mediaplayer_error, what, extra)
-        return@setOnErrorListener true
+        if(what == 100){
+          service.updatePlaybackState();
+          ToastUtil.show(service, R.string.mediaplayer_error_ignore, what, extra)
+        }else {
+          prepared = false
+          mediaPlayer.release()
+          setUpPlayer()
+          ToastUtil.show(service, R.string.mediaplayer_error, what, extra)
+          return@setOnErrorListener true
+        }
       } catch (ignored: Exception) {
 
       }
