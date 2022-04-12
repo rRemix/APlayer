@@ -73,7 +73,6 @@ import remix.myplayer.util.Util.unregisterLocalReceiver
 import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Created by Remix on 2015/12/1.
@@ -672,10 +671,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     mediaPlayer.setOnErrorListener { mp, what, extra ->
       try {
-        if(what == 100){
-          service.updatePlaybackState();
+        if (what == 100) {
+          service.updatePlaybackState()
           ToastUtil.show(service, R.string.mediaplayer_error_ignore, what, extra)
-        }else {
+        } else {
           prepared = false
           mediaPlayer.release()
           setUpPlayer()

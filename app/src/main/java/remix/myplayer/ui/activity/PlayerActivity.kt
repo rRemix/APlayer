@@ -950,12 +950,14 @@ class PlayerActivity : BaseMusicActivity() {
   private fun startBGColorAnimation(swatch: Swatch) {
     valueAnimator?.cancel()
 
-    valueAnimator = ValueAnimator.ofObject(ArgbEvaluator(), Theme.resolveColor(this, R.attr.colorSurface), swatch.rgb)
+    val surfaceColor = Theme.resolveColor(this, R.attr.colorSurface, if (ThemeStore.isLightTheme) Color.WHITE else Color.BLACK)
+    valueAnimator = ValueAnimator.ofObject(ArgbEvaluator(), surfaceColor, swatch.rgb)
 
     valueAnimator?.addUpdateListener { animation ->
       val drawable = DrawableGradient(GradientDrawable.Orientation.TOP_BOTTOM,
           intArrayOf(animation.animatedValue as Int,
-              Theme.resolveColor(this, R.attr.colorSurface)), 0)
+              surfaceColor
+          ), 0)
       player_container.background = drawable
     }
     valueAnimator?.setDuration(1000)?.start()

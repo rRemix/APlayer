@@ -27,7 +27,8 @@ class RoundCoverFragment : CoverFragment() {
    * 操作为上一首歌曲时，显示往左侧消失的动画 下一首歌曲时，显示往右侧消失的动画
    */
   override fun playAnimation(song: Song) {
-    if (!isAdded || (context as Activity).isFinishing) {
+    val coverContainer = cover_container
+    if (!isAdded || (context as Activity).isFinishing || coverContainer == null) {
       return
     }
     val operation = getOperation()
@@ -39,14 +40,14 @@ class RoundCoverFragment : CoverFragment() {
     outAnim = SpringSystem.create().createSpring()
     outAnim?.addListener(object : SimpleSpringListener() {
       override fun onSpringUpdate(spring: Spring) {
-        cover_container.translationX = spring.currentValue.toFloat()
+        coverContainer.translationX = spring.currentValue.toFloat()
       }
 
       override fun onSpringAtRest(spring: Spring) {
 //        if (cover_image.tag != requestId) {
 //          cover_image.setImageURI("", null)
 //        }
-        cover_container.translationX = startValue.toFloat()
+        coverContainer.translationX = startValue.toFloat()
         val endVal = 1f
         inAnim = SpringSystem.create().createSpring()
         inAnim?.addListener(object : SimpleSpringListener() {
@@ -54,8 +55,8 @@ class RoundCoverFragment : CoverFragment() {
             if (cover_image == null) {
               return
             }
-            cover_container.scaleX = spring.currentValue.toFloat()
-            cover_container.scaleY = spring.currentValue.toFloat()
+            coverContainer.scaleX = spring.currentValue.toFloat()
+            coverContainer.scaleY = spring.currentValue.toFloat()
           }
 
           override fun onSpringActivate(spring: Spring) {}

@@ -383,6 +383,9 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
 
   fun open() {
     val activity = activityRef.get() ?: return
+    if (activity.isDestroyed || activity.isFinishing) {
+      return
+    }
     popup = MultiPopupWindow(activity)
     popup!!.binding.multiClose.setOnClickListener { close() }
     popup!!.binding.multiPlaylist.setOnClickListener { addToPlayList() }
