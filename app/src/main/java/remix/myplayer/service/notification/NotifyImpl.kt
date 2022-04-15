@@ -93,6 +93,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
 
     //设置封面
     val size = DensityUtil.dip2px(service, 128f)
+    pushNotify(notification)
 
     GlideApp.with(service)
         .asBitmap()
@@ -114,9 +115,6 @@ class NotifyImpl(context: MusicService) : Notify(context) {
           }
 
           override fun onLoadCleared(placeholder: Drawable?) {
-            remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            pushNotify(notification)
           }
 
           override fun onLoadFailed(errorDrawable: Drawable?) {
@@ -124,13 +122,6 @@ class NotifyImpl(context: MusicService) : Notify(context) {
             remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             pushNotify(notification)
           }
-
-          override fun onLoadStarted(placeholder: Drawable?) {
-            remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            pushNotify(notification)
-          }
-
         })
   }
 

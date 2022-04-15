@@ -10,7 +10,6 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.TaskStackBuilder
-import io.reactivex.disposables.Disposable
 import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService

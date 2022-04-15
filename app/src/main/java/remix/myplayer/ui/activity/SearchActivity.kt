@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_record.*
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivitySearchBinding
@@ -26,9 +25,10 @@ import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.adapter.SearchAdapter
-import remix.myplayer.util.*
-import java.util.*
-import kotlin.collections.ArrayList
+import remix.myplayer.util.MediaStoreUtil
+import remix.myplayer.util.MusicUtil
+import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 
 /**
  * Created by taeja on 16-1-22.
@@ -194,6 +194,7 @@ class SearchActivity : LibraryActivity<Song, SearchAdapter>(), SearchView.OnQuer
           MediaStore.Audio.ArtistColumns.ARTIST + " LIKE ? OR " +
           MediaStore.Audio.AlbumColumns.ALBUM + " LIKE ?", arrayOf("%$key%", "%$key%", "%$key%"))
 
+      val allSongs = ArrayList(allSongs)
       return songs.filter {
         allSongs.contains(it)
       }
