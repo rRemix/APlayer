@@ -383,7 +383,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
 
   fun open() {
     val activity = activityRef.get() ?: return
-    if (activity.isDestroyed || activity.isFinishing) {
+    if (activity.isDestroyed || activity.isFinishing || !activity.hasWindowFocus()) {
       return
     }
     popup = MultiPopupWindow(activity)
@@ -400,7 +400,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
           }
           true
         }
-        if (!activity.isFinishing && !activity.isDestroyed) {
+        if (!activity.isFinishing && !activity.isDestroyed && activity.hasWindowFocus()) {
           show()
         }
       }

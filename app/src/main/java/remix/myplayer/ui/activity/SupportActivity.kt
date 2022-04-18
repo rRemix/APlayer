@@ -16,15 +16,12 @@ import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.anjlab.android.iab.v3.BillingProcessor
-import com.anjlab.android.iab.v3.TransactionDetails
+import com.anjlab.android.iab.v3.PurchaseInfo
+import com.anjlab.android.iab.v3.SkuDetails
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
-import io.reactivex.observers.DisposableSingleObserver
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_support_develop.*
 import remix.myplayer.App
 import remix.myplayer.BuildConfig
@@ -33,16 +30,15 @@ import remix.myplayer.bean.misc.Purchase
 import remix.myplayer.databinding.ActivitySupportDevelopBinding
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.interfaces.OnItemClickListener
-import remix.myplayer.util.RxUtil
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.adapter.PurchaseAdapter
 import remix.myplayer.util.AlipayUtil
+import remix.myplayer.util.RxUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
 import java.io.File
 import java.io.OutputStream
-import java.lang.ref.WeakReference
 import java.util.*
 
 class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
@@ -54,10 +50,10 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
 
   val SKU_IDS = arrayListOf("price_3", "price_8", "price_15", "price_25", "price_40")
 
-  private var mBillingProcessor: BillingProcessor? = null
-  private var mDisposable: Disposable? = null
+  private var billingProcessor: BillingProcessor? = null
+  private var disposable: Disposable? = null
 
-  private lateinit var mLoading: MaterialDialog
+  private lateinit var loading: MaterialDialog
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -79,14 +75,14 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
 
       override fun onItemClick(view: View?, position: Int) {
         if (App.IS_GOOGLEPLAY) {
-          mBillingProcessor?.purchase(this@SupportActivity, SKU_IDS[position])
+          billingProcessor?.purchase(this@SupportActivity, SKU_IDS[position])
         } else {
           when (position) {
             0 -> {
               var outputStream: OutputStream? = null
               //保存微信图片
               Observable.just(BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode))
-                  .flatMap(Function<Bitmap, ObservableSource<File>> {
+                  .flatMap(Function {
                     return@Function ObservableSource<File> {
                       val weChatBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode)
                       if (weChatBitmap == null || weChatBitmap.isRecycled) {
@@ -167,7 +163,7 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
               Util.startActivitySafely(this@SupportActivity, intent)
             }
             else -> {
-              mBillingProcessor?.purchase(this@SupportActivity, SKU_IDS[position - 3])
+              billingProcessor?.purchase(this@SupportActivity, SKU_IDS[position - 3])
             }
           }
         }
@@ -178,48 +174,45 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
     recyclerView.layoutManager = GridLayoutManager(this, 2)
     recyclerView.adapter = adapter
 
-    mLoading = Theme.getBaseDialog(this)
+    loading = Theme.getBaseDialog(this)
         .title(R.string.loading)
         .content(R.string.please_wait)
         .canceledOnTouchOutside(false)
         .progress(true, 0)
         .progressIndeterminateStyle(false).build()
 
-    mBillingProcessor = BillingProcessor(this, BuildConfig.GOOGLE_PLAY_LICENSE_KEY, BillingHandler(this))
+    billingProcessor = BillingProcessor(this, BuildConfig.GOOGLE_PLAY_LICENSE_KEY, this)
   }
 
   private fun loadSkuDetails() {
     if (adapter.dataList.size > 3)
       return
-    mDisposable = Single.fromCallable { mBillingProcessor?.getPurchaseListingDetails(SKU_IDS) }
-        .map {
-          val beans = ArrayList<Purchase>()
-          it.sortedWith(kotlin.Comparator { o1, o2 ->
-            o1.priceValue.compareTo(o2.priceValue)
-          }).forEach {
-            beans.add(Purchase(it.productId, "", it.title, it.priceText))
-          }
-          beans
+    if (hasWindowFocus()) {
+      loading.show()
+    }
+
+    billingProcessor?.getPurchaseListingDetailsAsync(SKU_IDS, object : BillingProcessor.ISkuDetailsResponseListener {
+      override fun onSkuDetailsResponse(products: MutableList<SkuDetails>?) {
+        loading.dismiss()
+        if (products.isNullOrEmpty()) {
+          return
         }
-        .doFinally { mLoading.dismiss() }
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribeWith(object : DisposableSingleObserver<List<Purchase>>() {
-          override fun onSuccess(datas: List<Purchase>) {
-            adapter.dataList.addAll(datas)
-            adapter.notifyDataSetChanged()
-          }
+        val beans = ArrayList<Purchase>()
+        products.sortWith { o1, o2 ->
+          o1.priceValue.compareTo(o2.priceValue)
+        }
+        products.forEach {
+          beans.add(Purchase(it.productId, "", it.title, it.priceText))
+        }
+        adapter.dataList.addAll(beans)
+        adapter.notifyDataSetChanged()
+      }
 
-          override fun onError(e: Throwable) {
-            ToastUtil.show(this@SupportActivity, R.string.error_occur, e)
-          }
-
-          override fun onStart() {
-            if (hasWindowFocus()) {
-              mLoading.show()
-            }
-          }
-        })
+      override fun onSkuDetailsError(error: String?) {
+        ToastUtil.show(this@SupportActivity, R.string.error_occur, error)
+        loading.dismiss()
+      }
+    })
   }
 
   override fun onBillingInitialized() {
@@ -233,24 +226,18 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
   }
 
   @SuppressLint("CheckResult")
-  override fun onProductPurchased(productId: String, details: TransactionDetails?) {
+  override fun onProductPurchased(productId: String, details: PurchaseInfo?) {
     Timber.v("onProductPurchased")
-    Single
-        .fromCallable {
-          mBillingProcessor?.consumePurchase(productId)
-        }.subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe({
-          if (it == true) {
-            Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show()
-          } else {
-            Toast.makeText(this, R.string.payment_failure, Toast.LENGTH_SHORT).show()
-          }
-        }, {
-          Timber.w(it)
-          Toast.makeText(this, R.string.payment_failure, Toast.LENGTH_SHORT).show()
-        })
+    billingProcessor?.consumePurchaseAsync(productId,object : BillingProcessor.IPurchasesResponseListener{
+      override fun onPurchasesSuccess() {
+        Toast.makeText(this@SupportActivity, R.string.thank_you, Toast.LENGTH_SHORT).show()
+      }
 
+      override fun onPurchasesError() {
+        Toast.makeText(this@SupportActivity, R.string.payment_failure, Toast.LENGTH_SHORT).show()
+      }
+
+    })
   }
 
   override fun onBillingError(errorCode: Int, error: Throwable?) {
@@ -258,38 +245,11 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
     ToastUtil.show(this, R.string.error_occur, "code = $errorCode err =  $error")
   }
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    mBillingProcessor?.let {
-      if (!it.handleActivityResult(requestCode, resultCode, data))
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-  }
-
   override fun onDestroy() {
     super.onDestroy()
-    mBillingProcessor?.release()
-    mDisposable?.dispose()
-    if (mLoading.isShowing)
-      mLoading.dismiss()
-  }
-
-  private class BillingHandler(handler: BillingProcessor.IBillingHandler) : BillingProcessor.IBillingHandler {
-    private val ref = WeakReference<BillingProcessor.IBillingHandler>(handler)
-    override fun onBillingInitialized() {
-      ref.get()?.onBillingInitialized()
-    }
-
-    override fun onPurchaseHistoryRestored() {
-      ref.get()?.onPurchaseHistoryRestored()
-    }
-
-    override fun onProductPurchased(productId: String, details: TransactionDetails?) {
-      ref.get()?.onProductPurchased(productId, details)
-    }
-
-    override fun onBillingError(errorCode: Int, error: Throwable?) {
-      ref.get()?.onBillingError(errorCode, error)
-    }
-
+    billingProcessor?.release()
+    disposable?.dispose()
+    if (loading.isShowing)
+      loading.dismiss()
   }
 }
