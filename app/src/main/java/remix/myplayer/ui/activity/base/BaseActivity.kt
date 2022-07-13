@@ -76,8 +76,6 @@ open class BaseActivity : AppCompatActivity() {
 //    } else{
 //      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 //    }
-    //将该activity添加到ActivityManager,用于退出程序时关闭
-    ActivityManager.AddActivity(this)
     setNavigationBarColor()
   }
 
@@ -118,7 +116,6 @@ open class BaseActivity : AppCompatActivity() {
 
   override fun onDestroy() {
     super.onDestroy()
-    ActivityManager.RemoveActivity(this)
     isDestroyed = true
   }
 
