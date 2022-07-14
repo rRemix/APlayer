@@ -11,7 +11,9 @@ import android.os.*
 import android.provider.Settings
 import android.text.TextUtils
 import android.view.Menu
+import android.view.MotionEvent
 import android.view.View
+import android.widget.TextView
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager.widget.ViewPager
@@ -226,7 +228,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     }
 
     pagerAdapter.list = libraries
-    menuLayoutId = parseMenuId(pagerAdapter.list[0].mTag)
+    menuLayoutId = parseMenuId(pagerAdapter.list[0].tag)
     //有且仅有一个tab
     if (libraries.size == 1) {
       if (libraries[0].isPlayList()) {
@@ -247,7 +249,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
         val library = pagerAdapter.list[position]
         showViewWithAnim(btn_add, library.isPlayList())
 
-        menuLayoutId = parseMenuId(pagerAdapter.list[position].mTag)
+        menuLayoutId = parseMenuId(pagerAdapter.list[position].tag)
         currentFragment = pagerAdapter.getFragment(position) as LibraryFragment<*, *>
 
         invalidateOptionsMenu()
@@ -342,10 +344,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
   private fun setUpTab() {
     //添加tab选项卡
     val isPrimaryColorCloseToWhite = ThemeStore.isMDColorCloseToWhite
-    //        tabs = new TabLayout(new ContextThemeWrapper(this, !ColorUtil.isColorLight(ThemeStore.getMaterialPrimaryColor()) ? R.style.Custotabs_Light : R.style.Custotabs_Dark));
-    //        tabs = new TabLayout(new ContextThemeWrapper(this,R.style.Custotabs_Light));
-    //        tabs.setLayoutParams(new AppBarLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,DensityUtil.dip2px(this,48)));
-    //        tabs = new TabLayout(this);
+
     tabs.setBackgroundColor(ThemeStore.materialPrimaryColor)
     tabs.addTab(tabs.newTab().setText(R.string.tab_song))
     tabs.addTab(tabs.newTab().setText(R.string.tab_album))
@@ -365,6 +364,15 @@ class MainActivity : MenuActivity(), View.OnClickListener {
         ColorUtil.getColor(if (isPrimaryColorCloseToWhite) R.color.black else R.color.white))
 
     setTabClickListener()
+    tabs.post {
+      for (i in 0..tabs.tabCount) {
+        ((tabs.getTabAt(i)?.view?.getChildAt(1)) as TextView?)?.apply {
+          if (layout.lineCount > 1) {
+            maxLines = 1
+          }
+        }
+      }
+    }
   }
 
   private fun setTabClickListener() {
@@ -477,7 +485,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
             pagerAdapter.list = libraries
             pagerAdapter.notifyDataSetChanged()
             view_pager.offscreenPageLimit = libraries.size - 1
-            menuLayoutId = parseMenuId(pagerAdapter.list[view_pager.currentItem].mTag)
+            menuLayoutId = parseMenuId(pagerAdapter.list[view_pager.currentItem].tag)
             currentFragment = pagerAdapter.getFragment(view_pager.currentItem) as LibraryFragment<*, *>
             invalidateOptionsMenu()
             //如果只有一个Library,隐藏标签栏

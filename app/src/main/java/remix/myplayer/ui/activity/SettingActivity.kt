@@ -1096,7 +1096,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     }
     val selected = ArrayList<Int>()
     for (temp in oldLibraries) {
-      selected.add(temp.mOrder)
+      selected.add(temp.order)
     }
 
     val allLibraryStrings = getAllLibraryString(this)

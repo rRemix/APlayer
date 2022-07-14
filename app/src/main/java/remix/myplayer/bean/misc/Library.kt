@@ -11,11 +11,11 @@ import remix.myplayer.ui.fragment.*
 @Parcelize
 data class Library(
     @SerializedName("mTag")
-    val mTag: Int,
+    val tag: Int,
     @SerializedName("mOrder")
-    val mOrder: Int = mTag,
+    val order: Int = tag,
     @SerializedName("mClassName")
-    val mClassName: String = when (mTag) {
+    val className: String = when (tag) {
       TAG_SONG -> SongFragment::class.java.name
       TAG_ALBUM -> AlbumFragment::class.java.name
       TAG_ARTIST -> ArtistFragment::class.java.name
@@ -24,12 +24,12 @@ data class Library(
     }) : Parcelable {
 
   fun isPlayList(): Boolean {
-    return mClassName == PlayListFragment::class.java.name
+    return className == PlayListFragment::class.java.name
   }
 
   fun getTitle(): String {
     return App.context.getString(
-        when (mTag) {
+        when (tag) {
           TAG_SONG -> R.string.tab_song
           TAG_ALBUM -> R.string.tab_album
           TAG_ARTIST -> R.string.tab_artist
