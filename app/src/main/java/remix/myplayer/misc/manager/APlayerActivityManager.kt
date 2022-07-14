@@ -14,48 +14,50 @@ import java.util.*
  * on:           2022/7/13 13:36
  * Email:        yaocf@189.cn
  */
-open class ActivityManager :Application.ActivityLifecycleCallbacks{
+open class APlayerActivityManager :Application.ActivityLifecycleCallbacks{
 
     companion object {
-        private lateinit var currentAc : WeakReference<Activity?>;
+        private lateinit var currentAc : WeakReference<Activity?>
         //不需要使用atomReference，这边的所有方法
-        private var activitys : LinkedList<Activity> = LinkedList();
+        private var activitys : LinkedList<Activity> = LinkedList()
         fun finishAll(){
-            val toFinish = LinkedList(activitys);
+            val toFinish = LinkedList(activitys)
             for (ac : Activity in toFinish){
                 if (!ac.isFinishing) {
-                    ac.finish();
+                    ac.finish()
                 }
             }
         }
+
+        private var foregroundActivityCount = 0
+        val isAppForeground: Boolean
+            get() = foregroundActivityCount > 0
     }
 
     override fun onActivityCreated(p0: Activity, p1: Bundle?) {
-        activitys.add(p0);
+        activitys.add(p0)
     }
 
     override fun onActivityStarted(p0: Activity) {
-        TODO("Not yet implemented")
+        foregroundActivityCount++
     }
 
     override fun onActivityResumed(p0: Activity) {
-        currentAc = WeakReference(p0);
+        currentAc = WeakReference(p0)
     }
 
     override fun onActivityPaused(p0: Activity) {
-        TODO("Not yet implemented")
     }
 
     override fun onActivityStopped(p0: Activity) {
-        TODO("Not yet implemented")
+        foregroundActivityCount--
     }
 
     override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {
-        TODO("Not yet implemented")
     }
 
     override fun onActivityDestroyed(p0: Activity) {
-        activitys.remove(p0);
+        activitys.remove(p0)
     }
 
 }

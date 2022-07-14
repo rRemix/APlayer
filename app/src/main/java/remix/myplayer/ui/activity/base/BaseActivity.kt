@@ -14,7 +14,6 @@ import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.LanguageHelper.setLocal
-import remix.myplayer.misc.manager.ActivityManager
 import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.navigationBarColor

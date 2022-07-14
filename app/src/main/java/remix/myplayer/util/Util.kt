@@ -4,11 +4,7 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
 import android.app.Service
-import android.content.ActivityNotFoundException
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.media.MediaFormat
@@ -30,6 +26,7 @@ import remix.myplayer.App.Companion.context
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.misc.floatpermission.rom.RomUtils
+import remix.myplayer.misc.manager.APlayerActivityManager
 import timber.log.Timber
 import java.io.*
 import java.security.MessageDigest
@@ -82,19 +79,20 @@ object Util {
     get() {
       try {
         val activityManager = context
-            .getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager? ?: return false
+          .getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager? ?: return false
         val packageName = context.packageName
         val appProcesses: MutableList<RunningAppProcessInfo> = activityManager.runningAppProcesses
-            ?: return false
+          ?: return false
         for (appProcess in appProcesses) {
           if (appProcess.processName == packageName &&
-              appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+            appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+          ) {
             return true
           }
         }
       } catch (e: Exception) {
         Timber.w("isAppOnForeground(), ex: %s", e.message)
-        return context.isAppForeground
+        return APlayerActivityManager.isAppForeground
       }
       return false
     }
@@ -240,8 +238,10 @@ object Util {
    */
   fun isIntentAvailable(context: Context, intent: Intent?): Boolean {
     val packageManager = context.packageManager
-    val list = packageManager.queryIntentActivities(intent!!,
-        PackageManager.MATCH_DEFAULT_ONLY)
+    val list = packageManager.queryIntentActivities(
+      intent!!,
+      PackageManager.MATCH_DEFAULT_ONLY
+    )
     return list != null && list.size > 0
   }
 
@@ -257,9 +257,9 @@ object Util {
   }
 
   fun startActivityForResultSafely(
-      activity: Activity,
-      intent: Intent,
-      requestCode: Int
+    activity: Activity,
+    intent: Intent,
+    requestCode: Int
   ) {
     try {
       activity.startActivityForResult(intent, requestCode)
@@ -274,7 +274,7 @@ object Util {
   val isNetWorkConnected: Boolean
     get() {
       val connectivityManager = context
-          .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
       if (connectivityManager != null) {
         val netWorkInfo = connectivityManager.activeNetworkInfo
         if (netWorkInfo != null) {
@@ -323,7 +323,7 @@ object Util {
     } else {
       if (origin == null || origin == "") {
         context
-            .getString(if (type == TYPE_ARTIST) R.string.unknown_artist else R.string.unknown_album)
+          .getString(if (type == TYPE_ARTIST) R.string.unknown_artist else R.string.unknown_album)
       } else {
         origin
       }
@@ -393,7 +393,7 @@ object Util {
    */
   fun isWifi(context: Context): Boolean {
     val activeNetInfo = (context
-        .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo
+      .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo
     return activeNetInfo != null && activeNetInfo.type == ConnectivityManager.TYPE_WIFI
   }
 
@@ -410,7 +410,8 @@ object Util {
     try {
       val packageManager = context.packageManager
       if (packageManager != null) {
-        val applicationInfo = packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+        val applicationInfo =
+          packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
         if (applicationInfo != null) {
           if (applicationInfo.metaData != null) {
             channelNumber = applicationInfo.metaData.getString(key)
@@ -425,39 +426,47 @@ object Util {
 
   fun createShareSongFileIntent(song: Song, context: Context): Intent {
     return try {
-      val parcelable: Parcelable = FileProvider.getUriForFile(context,
-          context.packageName + ".fileprovider",
-          File(song.data))
+      val parcelable: Parcelable = FileProvider.getUriForFile(
+        context,
+        context.packageName + ".fileprovider",
+        File(song.data)
+      )
       Intent()
-          .setAction(Intent.ACTION_SEND)
-          .putExtra(Intent.EXTRA_STREAM,
-              parcelable)
-          .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-          .setType("audio/*")
+        .setAction(Intent.ACTION_SEND)
+        .putExtra(
+          Intent.EXTRA_STREAM,
+          parcelable
+        )
+        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        .setType("audio/*")
     } catch (e: IllegalArgumentException) {
       //the path is most likely not like /storage/emulated/0/... but something like /storage/28C7-75B0/...
       e.printStackTrace()
       Toast.makeText(context, context.getString(R.string.cant_share_song), Toast.LENGTH_SHORT)
-          .show()
+        .show()
       Intent()
     }
   }
 
   fun createShareImageFileIntent(file: File, context: Context): Intent {
     return try {
-      val parcelable: Parcelable = FileProvider.getUriForFile(context,
-          context.packageName + ".fileprovider",
-          file)
+      val parcelable: Parcelable = FileProvider.getUriForFile(
+        context,
+        context.packageName + ".fileprovider",
+        file
+      )
       Intent()
-          .setAction(Intent.ACTION_SEND)
-          .putExtra(Intent.EXTRA_STREAM,
-              parcelable)
-          .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-          .setType("image/*")
+        .setAction(Intent.ACTION_SEND)
+        .putExtra(
+          Intent.EXTRA_STREAM,
+          parcelable
+        )
+        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        .setType("image/*")
     } catch (e: IllegalArgumentException) {
       e.printStackTrace()
       Toast.makeText(context, context.getString(R.string.cant_share_song), Toast.LENGTH_SHORT)
-          .show()
+        .show()
       Intent()
     }
   }
@@ -485,8 +494,10 @@ object Util {
     val intent = Intent(Intent.ACTION_VIEW)
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      val apkUri = FileProvider.getUriForFile(context,
-          context.applicationContext.packageName + ".fileprovider", installFile)
+      val apkUri = FileProvider.getUriForFile(
+        context,
+        context.applicationContext.packageName + ".fileprovider", installFile
+      )
       intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
       intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
       context.startActivity(intent)
@@ -527,7 +538,11 @@ object Util {
    * 判断是否支持状态栏歌词
    */
   fun isSupportStatusBarLyric(context: Context): Boolean {
-    return RomUtils.checkIsMeizuRom() || Settings.System.getInt(context.contentResolver, "status_bar_show_lyric", 0) != 0 || RomUtils.checkIsbaolong24Rom() || RomUtils.checkIsexTHmUIRom()
+    return RomUtils.checkIsMeizuRom() || Settings.System.getInt(
+      context.contentResolver,
+      "status_bar_show_lyric",
+      0
+    ) != 0 || RomUtils.checkIsbaolong24Rom() || RomUtils.checkIsexTHmUIRom()
   }
 
   /**

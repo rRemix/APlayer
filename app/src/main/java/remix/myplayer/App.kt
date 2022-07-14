@@ -1,11 +1,8 @@
 package remix.myplayer
 
-import android.app.Activity
-import android.app.Application.ActivityLifecycleCallbacks
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
-import android.os.Bundle
 import android.os.Process
 import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication
@@ -20,6 +17,7 @@ import remix.myplayer.helper.LanguageHelper.saveSystemCurrentLanguage
 import remix.myplayer.helper.LanguageHelper.setApplicationLanguage
 import remix.myplayer.helper.LanguageHelper.setLocal
 import remix.myplayer.misc.cache.DiskCache
+import remix.myplayer.misc.manager.APlayerActivityManager
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
@@ -29,8 +27,7 @@ import timber.log.Timber
 /**
  * Created by Remix on 16-3-16.
  */
-class App : MultiDexApplication(), ActivityLifecycleCallbacks {
-  private var foregroundActivityCount = 0
+class App : MultiDexApplication() {
 
   override fun attachBaseContext(base: Context) {
     saveSystemCurrentLanguage()
@@ -56,7 +53,7 @@ class App : MultiDexApplication(), ActivityLifecycleCallbacks {
       Timber.v(throwable)
       CrashReport.postCatchedException(throwable)
     }
-    registerActivityLifecycleCallbacks(this)
+    registerActivityLifecycleCallbacks(APlayerActivityManager())
   }
 
   private fun setUp() {
@@ -120,23 +117,6 @@ class App : MultiDexApplication(), ActivityLifecycleCallbacks {
         .subscribeOn(AndroidSchedulers.mainThread())
         .subscribe()
   }
-
-  val isAppForeground: Boolean
-    get() = foregroundActivityCount > 0
-
-  override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
-  override fun onActivityStarted(activity: Activity) {
-    foregroundActivityCount++
-  }
-
-  override fun onActivityResumed(activity: Activity) {}
-  override fun onActivityPaused(activity: Activity) {}
-  override fun onActivityStopped(activity: Activity) {
-    foregroundActivityCount--
-  }
-
-  override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
-  override fun onActivityDestroyed(activity: Activity) {}
 
   companion object {
     @JvmStatic
