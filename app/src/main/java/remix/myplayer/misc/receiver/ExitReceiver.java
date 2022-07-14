@@ -29,7 +29,7 @@ public class ExitReceiver extends BroadcastReceiver {
     //停止摇一摇
 //        ShakeDetector.getInstance().stopListen();
     //关闭所有activity
-    ActivityManager.FinishAll();
+    ActivityManager.Companion.finishAll();
     new Handler().postDelayed(() -> {
       Timber.tag(TAG_LIFECYCLE).v("关闭App");
       System.exit(0);
