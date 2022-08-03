@@ -2,19 +2,18 @@ package remix.myplayer.ui.activity
 
 import android.media.audiofx.AudioEffect
 import android.os.Bundle
-import androidx.appcompat.widget.AppCompatSeekBar
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.SeekBar
-import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_eq.*
 import remix.myplayer.R
+import remix.myplayer.databinding.LayoutEqSeekbarBinding
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.theme.TintHelper
 import remix.myplayer.util.ToastUtil
+import java.text.DecimalFormat
 
 /**
  * Created by Remix on 19-5-6.
@@ -62,35 +61,38 @@ class EQActivity : ToolbarActivity() {
     val bandNumber = EQHelper.bandNumber
     val accentColor = ThemeStore.accentColor
 
+    val decimalFormat = DecimalFormat("+#;-#")
+    val minLevelText = decimalFormat.format(EQHelper.minLevel / 100)
+    val maxLevelText = decimalFormat.format(EQHelper.maxLevel / 100)
+
     for (i in 0 until bandNumber) {
-      val eqLayout = LayoutInflater.from(this).inflate(R.layout.layout_eq_seekbar, eq_container, false)
+      val layout = LayoutEqSeekbarBinding.inflate(layoutInflater, eq_container, false)
 
-      eqLayout.findViewById<TextView>(R.id.tv_freq).text = String.format("%d Hz", EQHelper.getCenterFreq(i))
-      eqLayout.findViewById<TextView>(R.id.tv_min).text = (EQHelper.minLevel / 100).toString()
-      eqLayout.findViewById<TextView>(R.id.tv_max).text = (EQHelper.maxLevel / 100).toString()
+      layout.tvFreq.text = String.format("%d mHz", EQHelper.getCenterFreq(i))
+      layout.tvMin.text = minLevelText
+      layout.tvMax.text = maxLevelText
 
-      val seekBarView = eqLayout.findViewById<AppCompatSeekBar>(R.id.eq_seekbar)
-      seekBarView.tag = i
-      seekBarView.max = EQHelper.maxLevel - EQHelper.minLevel
-      seekBarView.progress = EQHelper.getBandLevel(i) - EQHelper.minLevel
-      seekBarView.isEnabled = EQHelper.enable
-
-      TintHelper.setTint(seekBarView, accentColor, false)
-
-      seekBarView.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+      layout.eqSeekbar.tag = i
+      layout.eqSeekbar.max = EQHelper.maxLevel - EQHelper.minLevel
+      layout.eqSeekbar.progress = EQHelper.getBandLevel(i) - EQHelper.minLevel
+      layout.eqSeekbar.isEnabled = EQHelper.enable
+      TintHelper.setTint(layout.eqSeekbar, accentColor, false)
+      layout.eqSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        override fun onProgressChanged(
+            seekBar: SeekBar,
+            progress: Int,
+            fromUser: Boolean
+        ) {
           if (fromUser) {
             EQHelper.setBandLevel(i, progress + EQHelper.minLevel)
           }
         }
 
-        override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        }
-
-        override fun onStopTrackingTouch(seekBar: SeekBar?) {
-        }
+        override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+        override fun onStopTrackingTouch(seekBar: SeekBar?) {}
       })
-      eq_container.addView(eqLayout)
+
+      eq_container.addView(layout.root)
     }
 
     //低音增强
