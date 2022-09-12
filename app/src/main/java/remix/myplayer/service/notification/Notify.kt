@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import remix.myplayer.R
 import remix.myplayer.service.Command
@@ -22,8 +23,8 @@ import remix.myplayer.ui.activity.PlayerActivity
  */
 
 abstract class Notify internal constructor(internal var service: MusicService) {
-  protected val FLAG_ALWAYS_SHOW_TICKER = 0x1000000
-  protected val FLAG_ONLY_UPDATE_TICKER = 0x2000000
+  private val FLAG_ALWAYS_SHOW_TICKER = 0x1000000
+  private val FLAG_ONLY_UPDATE_TICKER = 0x2000000
 
   private val notificationManager: NotificationManager by lazy {
     service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -66,7 +67,25 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
   abstract fun updateForPlaying()
 
-  abstract fun updateWithLyric(lrc: String)
+  fun updateWithLyric(lrc: String) {
+    if (!service.isPlaying) return
+    val song = service.currentSong
+    val builder = NotificationCompat.Builder(service, PLAYING_NOTIFICATION_CHANNEL_ID)
+    builder.setContentText("${song.artist} - ${song.album}")
+        .setContentTitle(song.title)
+        .setShowWhen(false)
+        .setTicker(lrc)
+        .setOngoing(service.isPlaying)
+        .setContentIntent(contentIntent)
+        .setSmallIcon(R.drawable.icon_notifbar)
+
+    val notification = builder.build()
+    notification.extras.putInt("ticker_icon", R.drawable.icon_notifibar_lrc)
+    notification.extras.putBoolean("ticker_icon_switch", false)
+    notification.flags = notification.flags.or(FLAG_ALWAYS_SHOW_TICKER)
+    notification.flags = notification.flags.or(FLAG_ONLY_UPDATE_TICKER)
+    notificationManager.notify(STATUS_BAR_LYRIC_NOTIFICATION_ID, notification)
+  }
 
   internal fun pushNotify(notification: Notification) {
     if (service.stop)
@@ -133,5 +152,6 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
     internal const val PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification"
     private const val PLAYING_NOTIFICATION_ID = 1
+    private const val STATUS_BAR_LYRIC_NOTIFICATION_ID = 2
   }
 }

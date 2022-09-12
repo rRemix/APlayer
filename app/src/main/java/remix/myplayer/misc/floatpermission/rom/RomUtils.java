@@ -86,16 +86,7 @@ public class RomUtils {
   }
 
   public static boolean checkIsMeizuRom() {
-    //return Build.MANUFACTURER.contains("Meizu");
-    String meizuFlymeOSFlag = getSystemProperty("ro.build.display.id");
-    if (TextUtils.isEmpty(meizuFlymeOSFlag)) {
-      return false;
-    } else if (meizuFlymeOSFlag.contains("flyme") || meizuFlymeOSFlag.toLowerCase()
-        .contains("flyme")) {
-      return true;
-    } else {
-      return false;
-    }
+    return Build.DISPLAY.toLowerCase().contains("flyme");
   }
 
   public static boolean checkIs360Rom() {
