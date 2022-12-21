@@ -126,6 +126,7 @@ public class SPUtil {
     int LYRIC_EMBEDDED = LyricPriority.EMBEDED.getPriority();
     int LYRIC_MANUAL = LyricPriority.MANUAL.getPriority();
 
+    String LYRIC_FONT_SIZE = "lyric_font_size";
   }
 
   public interface COVER_KEY {

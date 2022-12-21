@@ -16,6 +16,12 @@
   <string-array name="player_background">
     <item>@string/now_playing_screen_theme</item>
     <item>@string/now_playing_screen_cover</item>
-<!--    <item>@string/now_playing_screen_custom</item>-->
+    <!--    <item>@string/now_playing_screen_custom</item>-->
+  </string-array>
+
+  <string-array name="lyric_font_size">
+    <item>@string/lyric_font_size_normal</item>
+    <item>@string/lyric_font_size_big</item>
+    <item>@string/lyric_font_size_huge</item>
   </string-array>
 </resources>

@@ -367,10 +367,11 @@
   <string name="show_next_song_only">Show next song only</string>
   <string name="show_vol_control_only">Show volume controls only</string>
   <string name="tap_to_toggle">Tap to toggle</string>
-  <string name="change_offset">Adjust</string>
+  <string name="change_offset">Adjust Timeline</string>
   <string name="lyric_offset_reset">Back to original</string>
   <string name="lyric_advance_x_second">%1$s s advanced</string>
   <string name="lyric_delay_x_second">%1$s s delayed</string>
+  <string name="lyric_adjust_font_size">Adjust Font Size</string>
   <string name="speed">Play speed</string>
   <string name="whether_change_theme">Currently in night mode, whether to switch theme colors?</string>
   <string name="embedded_lyric">Embedded</string>
@@ -443,4 +444,8 @@
   <string name="delete_source_fail_tip">Fail to delete source file: %s</string>
 
   <string name="activity_not_found_tip">Activity not found</string>
+
+  <string name="lyric_font_size_normal">Normal</string>
+  <string name="lyric_font_size_big">Big</string>
+  <string name="lyric_font_size_huge">Huge</string>
 </resources>

@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Handler
+import android.os.Looper
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
@@ -24,10 +25,11 @@ import remix.myplayer.R
 import remix.myplayer.lyric.bean.LrcRow
 import remix.myplayer.theme.Theme
 import remix.myplayer.util.DensityUtil
+import remix.myplayer.util.SPUtil
 import timber.log.Timber
-import java.lang.Math.max
-import java.lang.Math.min
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Created by Remix on 2018/1/3.
@@ -46,53 +48,40 @@ class LrcView : View, ILrcView {
   /**
    * 画高亮歌词的画笔
    */
-  private val paintForHighLightLrc by lazy {
+  private val highLightPaint by lazy {
     TextPaint()
   }
 
   /**
-   * 高亮歌词当前的字体大小
-   */
-  private var sizeForHighLightLrc = 0f
-
-  /**
    * 高亮歌词当前的字体颜色
    */
-  private var colorForHighLightLrc = DEFAULT_COLOR_FOR_HIGH_LIGHT_LRC
+  private var highLightTextColor = DEFAULT_COLOR_FOR_HIGH_LIGHT_LRC
 
   /**
    * 画其他歌词的画笔
    */
-  private val paintForOtherLrc by lazy {
+  private val normalPaint by lazy {
     TextPaint()
   }
-  /**其他歌词的默认字体大小 */
-  //    private static final float DEFAULT_SIZE_FOR_OTHER_LRC = 45;
-
-  /**
-   * 其他歌词当前的字体大小
-   */
-  private var sizeForOtherLrc = 0f
-
   /**
    * 高亮歌词当前的字体颜色
    */
-  private var colorForOtherLrc = DEFAULT_COLOR_FOR_OTHER_LRC
+  private var normalTextColor = DEFAULT_COLOR_FOR_OTHER_LRC
 
   /**
    * 画时间线的画笔
    */
-  private val paintForTimeLine: TextPaint by lazy {
+  private val timeLinePaint: TextPaint by lazy {
     TextPaint()
   }
 
   /***时间线的颜色 */
-  private var timeLineColor = Color.GRAY
+  private var timeLineTextColor = Color.GRAY
 
   /**
    * 时间文字大小
    */
-  private var sizeForTimeLine = 0f
+  private var timeLineTextSize = 0f
 
   /**
    * 是否画时间线
@@ -109,7 +98,9 @@ class LrcView : View, ILrcView {
   /**
    * 歌词的当前缩放比例
    */
-  var curScalingFactor = DEFAULT_SCALING_FACTOR
+  var scalingFactor =
+    SPUtil.getValue(App.context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.LYRIC_FONT_SIZE, "1f")
+      .toFloat()
     private set
 
   /**
@@ -133,7 +124,7 @@ class LrcView : View, ILrcView {
   /**
    * 错误提示文字
    */
-  private var text = App.context.getString(R.string.no_lrc)
+  private var placeholder = App.context.getString(R.string.no_lrc)
 
   /**
    * 当前纵坐标
@@ -144,16 +135,18 @@ class LrcView : View, ILrcView {
    * 时间线的图标
    */
   private val timelineDrawable = Theme
-      .getDrawable(App.context, R.drawable.icon_lyric_timeline)
+    .getDrawable(App.context, R.drawable.icon_lyric_timeline)
 
   /**
    * 初始状态时间线图标所在的位置
    */
   private val timelineRect by lazy {
-    Rect(-timelineDrawable.intrinsicWidth / 2,
-        height / 2 - timelineDrawable.intrinsicHeight * 2,
-        timelineDrawable.intrinsicWidth * 2,
-        height / 2 + timelineDrawable.intrinsicHeight * 2)
+    Rect(
+      -timelineDrawable.intrinsicWidth / 2,
+      height / 2 - timelineDrawable.intrinsicHeight * 2,
+      timelineDrawable.intrinsicWidth * 2,
+      height / 2 + timelineDrawable.intrinsicHeight * 2
+    )
   }
 
   constructor(context: Context?) : super(context) {
@@ -168,26 +161,26 @@ class LrcView : View, ILrcView {
    * 初始化画笔等
    */
   override fun init() {
-    paintForHighLightLrc.isAntiAlias = true
-    paintForHighLightLrc.color = colorForHighLightLrc
-    val size = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 15f,
-        context.resources.displayMetrics)
+    highLightPaint.isAntiAlias = true
+    highLightPaint.color = highLightTextColor
 
-    sizeForHighLightLrc = size
-    paintForHighLightLrc.textSize = sizeForHighLightLrc
-    paintForHighLightLrc.isFakeBoldText = true
+    highLightPaint.textSize = DEFAULT_TEXT_SIZE * scalingFactor
+    highLightPaint.isFakeBoldText = true
 
-    paintForOtherLrc.isAntiAlias = true
-    paintForOtherLrc.color = colorForOtherLrc
-    sizeForOtherLrc = size
-    paintForOtherLrc.textSize = sizeForOtherLrc
+    normalPaint.isAntiAlias = true
+    normalPaint.color = normalTextColor
+    normalPaint.textSize = DEFAULT_TEXT_SIZE * scalingFactor
 
-    paintForTimeLine.isAntiAlias = true
-    sizeForTimeLine = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 11f,
-        context.resources.displayMetrics)
-    paintForTimeLine.textSize = sizeForTimeLine
-    paintForTimeLine.color = timeLineColor
+    timeLinePaint.isAntiAlias = true
+    timeLineTextSize = TypedValue.applyDimension(
+      TypedValue.COMPLEX_UNIT_SP, 11f,
+      context.resources.displayMetrics
+    )
+    timeLinePaint.textSize = timeLineTextSize
+    timeLinePaint.color = timeLineTextColor
     touchSlop = ViewConfiguration.get(context).scaledTouchSlop
+
+    linePadding = DEFAULT_PADDING * scalingFactor
   }
 
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -200,16 +193,14 @@ class LrcView : View, ILrcView {
 //    }
   }
 
-  private var totalRow = 0
-
   @SuppressLint("DrawAllocation")
   override fun onDraw(canvas: Canvas) {
     if (lrcRows == null || lrcRows?.isEmpty() == true) {
       //画默认的显示文字
-      val textWidth = paintForOtherLrc.measureText(text)
+      val textWidth = normalPaint.measureText(placeholder)
       val textX = (width - textWidth) / 2
-      paintForOtherLrc.alpha = 0xff
-      canvas.drawText(text, textX, (height / 2).toFloat(), paintForOtherLrc)
+      normalPaint.alpha = 0xff
+      canvas.drawText(placeholder, textX, (height / 2).toFloat(), normalPaint)
       return
     }
     val availableWidth = width - (paddingLeft + paddingRight)
@@ -217,9 +208,9 @@ class LrcView : View, ILrcView {
     lrcRows?.let {
       for (i in it.indices) {
         if (i == curRow) {   //画高亮歌词
-          drawLrcRow(canvas, paintForHighLightLrc, availableWidth, it[i])
+          drawLrcRow(canvas, highLightPaint, availableWidth, it[i])
         } else {  //普通歌词
-          drawLrcRow(canvas, paintForOtherLrc, availableWidth, it[i])
+          drawLrcRow(canvas, normalPaint, availableWidth, it[i])
         }
       }
     }
@@ -234,16 +225,26 @@ class LrcView : View, ILrcView {
       val y = height / 2 + scrollY + DEFAULT_SPACING_PADDING
       val lrcRow = lrcRows?.get(curRow)
       if (lrcRow != null) {
-        canvas.drawText(lrcRow.timeStr,
-            width - paintForTimeLine.measureText(lrcRow.timeStr) - 5,
-            y - 10, paintForTimeLine)
+        canvas.drawText(
+          lrcRow.timeStr,
+          width - timeLinePaint.measureText(lrcRow.timeStr) - 5,
+          y - 10, timeLinePaint
+        )
       }
 
-      canvas.drawLine((timelineDrawable.intrinsicWidth + 10).toFloat(), y, width.toFloat(), y, paintForTimeLine)
-      timelineDrawable.setBounds(0,
-          y.toInt() - timelineDrawable.intrinsicHeight / 2,
-          timelineDrawable.intrinsicWidth,
-          y.toInt() + timelineDrawable.intrinsicHeight / 2)
+      canvas.drawLine(
+        (timelineDrawable.intrinsicWidth + 10).toFloat(),
+        y,
+        width.toFloat(),
+        y,
+        timeLinePaint
+      )
+      timelineDrawable.setBounds(
+        0,
+        y.toInt() - timelineDrawable.intrinsicHeight / 2,
+        timelineDrawable.intrinsicWidth,
+        y.toInt() + timelineDrawable.intrinsicHeight / 2
+      )
       timelineDrawable.draw(canvas)
     }
   }
@@ -251,7 +252,12 @@ class LrcView : View, ILrcView {
   /**
    * 分割绘制歌词
    */
-  private fun drawLrcRow(canvas: Canvas, textPaint: TextPaint?, availableWidth: Int, lrcRow: LrcRow) {
+  private fun drawLrcRow(
+    canvas: Canvas,
+    textPaint: TextPaint?,
+    availableWidth: Int,
+    lrcRow: LrcRow
+  ) {
     drawText(canvas, textPaint, availableWidth, lrcRow.content)
     if (lrcRow.hasTranslate()) {
 //            mRowY += DEFAULT_SPACING_PADDING;
@@ -264,9 +270,11 @@ class LrcView : View, ILrcView {
    * 分割绘制歌词
    */
   private fun drawText(canvas: Canvas, textPaint: TextPaint?, availableWidth: Int, text: String) {
-    val staticLayout = StaticLayout(text, textPaint, availableWidth,
-        Layout.Alignment.ALIGN_CENTER,
-        DEFAULT_SPACING_MULTI, 0f, true)
+    val staticLayout = StaticLayout(
+      text, textPaint, availableWidth,
+      Layout.Alignment.ALIGN_CENTER,
+      DEFAULT_SPACING_MULTI, 0f, true
+    )
     val extra = if (staticLayout.lineCount > 1) DensityUtil.dip2px(context, 10f) else 0
     canvas.save()
     canvas.translate(paddingLeft.toFloat(), rowY - staticLayout.height / 2 + extra)
@@ -305,13 +313,13 @@ class LrcView : View, ILrcView {
   }
 
   private val mHandler by lazy {
-    Handler()
+    Handler(Looper.getMainLooper())
   }
 
   private inner class LongPressRunnable : Runnable {
     override fun run() {
-      if (mOnLrcClickListener != null) {
-        mOnLrcClickListener?.onLongClick()
+      if (onLrcClickListener != null) {
+        onLrcClickListener?.onLongClick()
       }
     }
   }
@@ -343,7 +351,8 @@ class LrcView : View, ILrcView {
           if (timeLineWaiting) {
             //点击定位图标
             if (timelineRect.contains(event.x.toInt(), event.y.toInt())
-                && onSeekToListener != null && curRow != -1) {
+              && onSeekToListener != null && curRow != -1
+            ) {
               mHandler.removeCallbacks(timeLineDisableRunnable)
               mHandler.post(timeLineDisableRunnable)
               onSeekToListener?.onSeekTo(lrcRows?.get(curRow)?.time ?: 0)
@@ -357,7 +366,8 @@ class LrcView : View, ILrcView {
       MotionEvent.ACTION_MOVE -> if (hasLrc()) {
         if (!canDrag) {
           if (abs(x = event.rawY - firstY) > touchSlop
-              && abs(x = event.rawY - firstY) > abs(x = event.rawX - lastX)) {
+            && abs(x = event.rawY - firstY) > abs(x = event.rawX - lastX)
+          ) {
             canDrag = true
             isDrawTimeLine = true
             scroller.forceFinished(true)
@@ -383,10 +393,10 @@ class LrcView : View, ILrcView {
           //根据滚动后的距离 查找歌词
 //                        int currentRow = (int) (getScrollY() / (mSizeForOtherLrc + mLinePadding));
           var currentRow = rowByScrollY
-          lrcRows?.let { lrcRows->
+          lrcRows?.let { lrcRows ->
             currentRow = min(currentRow, lrcRows.size - 1)
             currentRow = max(currentRow, 0)
-            seekTo(lrcRows[currentRow].time ?: 0, false, false)
+            seekTo(lrcRows[currentRow].time, false, false)
           }
           return true
         }
@@ -395,8 +405,8 @@ class LrcView : View, ILrcView {
         longPressRunnable?.let { mHandler.removeCallbacks(it) }
       }
       MotionEvent.ACTION_UP -> if (!canDrag) {
-        if (longPressRunnable == null && mOnLrcClickListener != null) {
-          mOnLrcClickListener?.onClick()
+        if (longPressRunnable == null && onLrcClickListener != null) {
+          onLrcClickListener?.onClick()
         }
         longPressRunnable?.let { mHandler.removeCallbacks(it) }
         longPressRunnable = null
@@ -429,7 +439,7 @@ class LrcView : View, ILrcView {
     reset()
 
     this.lrcRows = lrcRows
-    this.lrcRows?.let { lrcRows->
+    this.lrcRows?.let { lrcRows ->
       //计算每一行歌词所占的高度
 //            for(LrcRow lrcRow : mLrcRows){
 //                int height = 0;
@@ -443,25 +453,32 @@ class LrcView : View, ILrcView {
 //                }
 //                lrcRow.setHeight(height);
 //            }
-      for (lrcRow in lrcRows) {
-        lrcRow.contentHeight = getSingleLineHeight(lrcRow.content)
-        if (lrcRow.hasTranslate()) {
-          lrcRow.translateHeight = getSingleLineHeight(lrcRow.translate)
-        }
-        lrcRow.totalHeight = lrcRow.translateHeight + lrcRow.contentHeight
-        totalHeight += lrcRow.totalHeight
-      }
+      calculateLrcRowHeight(lrcRows)
     }
     invalidate()
+  }
+
+  private fun calculateLrcRowHeight(lrcRows: List<LrcRow>) {
+    totalHeight = 0
+    for (lrcRow in lrcRows) {
+      lrcRow.contentHeight = getSingleLineHeight(lrcRow.content)
+      if (lrcRow.hasTranslate()) {
+        lrcRow.translateHeight = getSingleLineHeight(lrcRow.translate)
+      }
+      lrcRow.totalHeight = lrcRow.translateHeight + lrcRow.contentHeight
+      totalHeight += lrcRow.totalHeight
+    }
   }
 
   /**
    * 获得单句歌词的高度，可能有多行
    */
   private fun getSingleLineHeight(text: String): Int {
-    val staticLayout = StaticLayout(text, paintForOtherLrc,
-        width - paddingLeft - paddingRight, Layout.Alignment.ALIGN_CENTER,
-        DEFAULT_SPACING_MULTI, DEFAULT_SPACING_PADDING, true)
+    val staticLayout = StaticLayout(
+      text, normalPaint,
+      width - paddingLeft - paddingRight, Layout.Alignment.ALIGN_CENTER,
+      DEFAULT_SPACING_MULTI, DEFAULT_SPACING_PADDING, true
+    )
     return staticLayout.height
   }
 
@@ -469,11 +486,6 @@ class LrcView : View, ILrcView {
    * 当前高亮歌词的行号
    */
   private var curRow = -1
-
-  /**
-   * 上一次的高亮歌词的行号
-   */
-  private var lastRow = -1
 
   /**
    * 到第n行所滚动过的距离
@@ -500,7 +512,7 @@ class LrcView : View, ILrcView {
    */
   private val rowByScrollY: Int
     get() {
-      lrcRows?.let { lrcRows->
+      lrcRows?.let { lrcRows ->
         var totalY = 0
         var line = 0
         while (line < lrcRows.size) {
@@ -513,7 +525,7 @@ class LrcView : View, ILrcView {
         return line - 1
       }
 
-      return 0;
+      return 0
     }
 
   private var offset = 0
@@ -528,7 +540,7 @@ class LrcView : View, ILrcView {
       progress += offset
     }
 
-    lrcRows?.let { lrcRows->
+    lrcRows?.let { lrcRows ->
       if (lrcRows.isEmpty()) {
         return
       }
@@ -543,7 +555,6 @@ class LrcView : View, ILrcView {
       for (i in lrcRows.indices.reversed()) {
         if (progress >= lrcRows[i].time) {
           if (curRow != i) {
-            lastRow = curRow
             curRow = i
             if (fromSeekBarByUser) {
               if (!scroller.isFinished) {
@@ -575,15 +586,30 @@ class LrcView : View, ILrcView {
   /**
    * 设置歌词的缩放比例
    */
-  override fun setLrcScalingFactor(scalingFactor: Float) {
-    curScalingFactor = scalingFactor
-    sizeForHighLightLrc *= curScalingFactor
-    sizeForOtherLrc *= curScalingFactor
-    linePadding = DEFAULT_PADDING * curScalingFactor
-    totalRow = (height / (sizeForOtherLrc + linePadding)).toInt() + 3
-    scrollTo(scrollX, (curRow * (sizeForOtherLrc + linePadding)).toInt())
+  override fun setLrcScalingFactor(newFactor: Float) {
+    if (scalingFactor == newFactor) {
+      return
+    }
+    SPUtil.putValue(
+      context,
+      SPUtil.LYRIC_KEY.NAME,
+      SPUtil.LYRIC_KEY.LYRIC_FONT_SIZE,
+      newFactor.toString()
+    )
+    scalingFactor = newFactor
+    highLightPaint.textSize = DEFAULT_TEXT_SIZE * scalingFactor
+
+    normalPaint.textSize = DEFAULT_TEXT_SIZE * scalingFactor
+
+    linePadding = DEFAULT_PADDING * scalingFactor
+
+    lrcRows?.let {
+      calculateLrcRowHeight(it)
+      scrollTo(scrollX, getScrollYByRow(curRow))
+      scroller.forceFinished(true)
+    }
+
     invalidate()
-    scroller.forceFinished(true)
   }
 
   /**
@@ -594,7 +620,6 @@ class LrcView : View, ILrcView {
       scroller.forceFinished(true)
     }
     curRow = 0
-    totalRow = 0
     lrcRows = null
     longPressRunnable?.let { mHandler.removeCallbacks(it) }
     mHandler.removeCallbacks(timeLineDisableRunnable)
@@ -634,21 +659,23 @@ class LrcView : View, ILrcView {
   }
 
   fun setText(text: String) {
-    this.text = text
+    this.placeholder = text
     reset()
   }
 
   fun setText(@StringRes res: Int) {
-    setText(resources.getString(res))
+    this.placeholder = resources.getString(res)
+    setText(placeholder)
+    reset()
   }
 
   interface OnSeekToListener {
     fun onSeekTo(progress: Int)
   }
 
-  private var mOnLrcClickListener: OnLrcClickListener? = null
+  private var onLrcClickListener: OnLrcClickListener? = null
   fun setOnLrcClickListener(mOnLrcClickListener: OnLrcClickListener?) {
-    this.mOnLrcClickListener = mOnLrcClickListener
+    this.onLrcClickListener = mOnLrcClickListener
   }
 
   interface OnLrcClickListener {
@@ -664,26 +691,26 @@ class LrcView : View, ILrcView {
    * 设置高亮歌词颜色
    */
   fun setHighLightColor(@ColorInt color: Int) {
-    colorForHighLightLrc = color
-    paintForHighLightLrc.color = colorForHighLightLrc
+    highLightTextColor = color
+    highLightPaint.color = highLightTextColor
   }
 
   /**
    * 设置非高亮歌词颜色
    */
   fun setOtherColor(@ColorInt color: Int) {
-    colorForOtherLrc = color
-    paintForOtherLrc.color = colorForOtherLrc
+    normalTextColor = color
+    normalPaint.color = normalTextColor
   }
 
   /**
    * 设置时间线颜色
    */
   fun setTimeLineColor(@ColorInt color: Int) {
-    if (timeLineColor != color) {
-      timeLineColor = color
+    if (timeLineTextColor != color) {
+      timeLineTextColor = color
       Theme.tintDrawable(timelineDrawable, color)
-      paintForTimeLine.color = color
+      timeLinePaint.color = color
     }
   }
 
@@ -693,7 +720,8 @@ class LrcView : View, ILrcView {
   }
 
   companion object {
-    /**高亮歌词的默认字体大小 */ //    public static final float DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC = 45;
+    val DEFAULT_TEXT_SIZE = DensityUtil.dip2px(App.context, 15f).toFloat()
+
     /**
      * 歌词间默认的行距
      */
@@ -723,21 +751,6 @@ class LrcView : View, ILrcView {
      * 时间线默认大小
      */
     private const val DEFAULT_SIZE_FOR_TIMELINE = 35f
-
-    /**
-     * 歌词的最大缩放比例
-     */
-    const val MAX_SCALING_FACTOR = 1.5f
-
-    /**
-     * 歌词的最小缩放比例
-     */
-    const val MIN_SCALING_FACTOR = 0.5f
-
-    /**
-     * 默认缩放比例
-     */
-    private const val DEFAULT_SCALING_FACTOR = 1.0f
 
     /***移动一句歌词的持续时间 */
     private const val DURATION_FOR_LRC_SCROLL = 800

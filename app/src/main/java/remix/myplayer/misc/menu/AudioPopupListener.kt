@@ -56,6 +56,7 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
                 getString(R.string.embedded_lyric),
                 getString(R.string.select_lrc),
                 getString(if (!alreadyIgnore) R.string.ignore_lrc else R.string.cancel_ignore_lrc),
+                getString(R.string.lyric_adjust_font_size),
                 getString(R.string.change_offset))
             .itemsCallback { dialog, itemView, position, text ->
               when (position) {
@@ -94,7 +95,15 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
                       }
                       .show()
                 }
-                7 -> { //歌词时间轴调整
+                7 -> { //字体大小调整
+                  getBaseDialog(ref.get())
+                    .items(R.array.lyric_font_size)
+                    .itemsCallback { dialog, itemView, position, text ->
+                      lyricFragment.setLyricScalingFactor(position)
+                    }
+                    .show()
+                }
+                8 -> { //歌词时间轴调整
                   activity.showLyricOffsetView()
                 }
               }

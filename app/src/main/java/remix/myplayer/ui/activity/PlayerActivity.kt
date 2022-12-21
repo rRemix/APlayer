@@ -517,9 +517,9 @@ class PlayerActivity : BaseMusicActivity() {
     if (song == null) {
       return
     }
-    val title = song.title ?: ""
-    val artist = song.artist ?: ""
-    val album = song.album ?: ""
+    val title = song.title
+    val artist = song.artist
+    val album = song.album
     if (title == "") {
       top_title.text = getString(R.string.unknown_song)
     } else {

@@ -24,9 +24,9 @@ interface ILrcView {
 
   /***
    * 设置歌词文字的缩放比例
-   * @param scalingFactor
+   * @param newFactor
    */
-  fun setLrcScalingFactor(scalingFactor: Float)
+  fun setLrcScalingFactor(newFactor: Float)
 
   /**
    * 重置

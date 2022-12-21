@@ -51,7 +51,11 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
     pageName = LyricFragment::class.java.simpleName
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
     return inflater.inflate(R.layout.fragment_lrc, container, false)
   }
 
@@ -108,31 +112,39 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
     Timber.v("setSearching")
     lrcView.setText(getStringSafely(R.string.searching))
     disposable = lyricSearcher.setSong(song ?: return)
-        .getLyricObservable(uri, clearCache)
-        .subscribe(Consumer {
-          Timber.v("setLrcRows")
-          if (id == song?.id) {
-            if (it == null || it.isEmpty()) {
-              lrcView.setText(getStringSafely(R.string.no_lrc))
-              return@Consumer
-            }
-            lrcView.setOffset(SPUtil.getValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, song?.id.toString() + "", 0))
-            lrcView.setLrcRows(it)
-          }
-        }, Consumer {
-          Timber.v(it)
-          if (id == song?.id) {
-            lrcView.setLrcRows(null)
+      .getLyricObservable(uri, clearCache)
+      .subscribe(Consumer {
+        Timber.v("setLrcRows")
+        if (id == song?.id) {
+          if (it == null || it.isEmpty()) {
             lrcView.setText(getStringSafely(R.string.no_lrc))
+            return@Consumer
           }
-        })
+          lrcView.setOffset(
+            SPUtil.getValue(
+              requireContext(),
+              SPUtil.LYRIC_OFFSET_KEY.NAME,
+              song?.id.toString() + "",
+              0
+            )
+          )
+          lrcView.setLrcRows(it)
+        }
+      }, Consumer {
+        Timber.v(it)
+        if (id == song?.id) {
+          lrcView.setLrcRows(null)
+          lrcView.setText(getStringSafely(R.string.no_lrc))
+        }
+      })
   }
 
   override fun onClick(view: View) {
     msgHandler.removeMessages(MESSAGE_HIDE)
     msgHandler.sendEmptyMessageDelayed(MESSAGE_HIDE, DELAY_HIDE)
 
-    val originalOffset = SPUtil.getValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, song?.id.toString() + "", 0)
+    val originalOffset =
+      SPUtil.getValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, song?.id.toString() + "", 0)
     var newOffset = originalOffset
     when (view.id) {
       R.id.offsetReset -> {
@@ -143,7 +155,12 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
       R.id.offsetReduce -> newOffset -= 500
     }
     if (originalOffset != newOffset) {
-      SPUtil.putValue(requireContext(), SPUtil.LYRIC_OFFSET_KEY.NAME, song?.id.toString() + "", newOffset)
+      SPUtil.putValue(
+        requireContext(),
+        SPUtil.LYRIC_OFFSET_KEY.NAME,
+        song?.id.toString() + "",
+        newOffset
+      )
       val toastMsg = msgHandler.obtainMessage(MESSAGE_SHOW_TOAST)
       toastMsg.arg1 = newOffset
       msgHandler.removeMessages(MESSAGE_SHOW_TOAST)
@@ -163,6 +180,24 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
     msgHandler.sendEmptyMessageDelayed(MESSAGE_HIDE, DELAY_HIDE)
   }
 
+  fun setLyricScalingFactor(choose: Int) {
+    val factor = when (choose) {
+      0 -> {
+        1f
+      }
+      1 -> {
+        1.5f
+      }
+      2 -> {
+        2f
+      }
+      else -> {
+        1f
+      }
+    }
+    lrcView.setLrcScalingFactor(factor)
+  }
+
   @OnHandleMessage
   fun handleInternal(msg: Message) {
     when (msg.what) {
@@ -172,8 +207,11 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
       MESSAGE_SHOW_TOAST -> {
         val newOffset = msg.arg1
         if (newOffset != 0 && abs(newOffset) <= 60000) {//最大偏移60s
-          ToastUtil.show(requireContext(), if (newOffset > 0) R.string.lyric_advance_x_second else R.string.lyric_delay_x_second,
-              String.format(Locale.getDefault(), "%.1f", newOffset / 1000f))
+          ToastUtil.show(
+            requireContext(),
+            if (newOffset > 0) R.string.lyric_advance_x_second else R.string.lyric_delay_x_second,
+            String.format(Locale.getDefault(), "%.1f", newOffset / 1000f)
+          )
         }
       }
     }

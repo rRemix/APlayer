@@ -367,10 +367,11 @@
   <string name="show_next_song_only">僅顯示下一首</string>
   <string name="show_vol_control_only">僅顯示音量控制</string>
   <string name="tap_to_toggle">點擊切換</string>
-  <string name="change_offset">歌詞調整</string>
+  <string name="change_offset">調整時間線</string>
   <string name="lyric_offset_reset">歌詞已還原</string>
   <string name="lyric_advance_x_second">提前%1$s秒</string>
   <string name="lyric_delay_x_second">延後%1$s秒</string>
+  <string name="lyric_adjust_font_size">調整字體大小</string>
   <string name="speed">播放速度</string>
   <string name="whether_change_theme">當前為夜間模式，是否切換主題顏色？</string>
   <string name="embedded_lyric">曲目內嵌</string>
@@ -443,4 +444,8 @@
   <string name="delete_source_fail_tip">刪除原始檔案失敗：%s</string>
 
   <string name="activity_not_found_tip">找不到對應 Activity</string>
+
+  <string name="lyric_font_size_normal">正常</string>
+  <string name="lyric_font_size_big">大</string>
+  <string name="lyric_font_size_huge">超大</string>
 </resources>
