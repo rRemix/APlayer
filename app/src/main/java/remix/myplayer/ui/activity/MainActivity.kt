@@ -367,7 +367,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     tabs.post {
       for (i in 0..tabs.tabCount) {
         ((tabs.getTabAt(i)?.view?.getChildAt(1)) as TextView?)?.apply {
-          if (layout.lineCount > 1) {
+          if (layout != null && layout.lineCount > 1) {
             maxLines = 1
           }
         }
