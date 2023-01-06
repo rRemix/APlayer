@@ -54,7 +54,6 @@ class App : MultiDexApplication() {
       CrashReport.postCatchedException(throwable)
     }
     registerActivityLifecycleCallbacks(APlayerActivityManager())
-    Timber.v("aaa")
   }
 
   private fun setUp() {

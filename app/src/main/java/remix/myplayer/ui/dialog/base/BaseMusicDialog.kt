@@ -32,7 +32,7 @@ open class BaseMusicDialog : BaseDialog(), MusicEventCallback {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    hasPermission = PermissionUtil.hasReadAndWriteExternalStorage()
+    hasPermission = PermissionUtil.hasNecessaryPermission()
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

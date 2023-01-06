@@ -301,7 +301,7 @@
   <string name="name_desc">名稱降序</string>
   <string name="create_time">建立時間</string>
   <string name="custom">自訂</string>
-  <string name="lyric">歌詞</string>
+  <string name="lyric">歌詞設定</string>
   <string name="track_number">音軌號</string>
   <string name="playlist_import">播放清單匯入</string>
   <string name="playlist_import_tip">將外部或其他播放器的播放清單匯入到現有或新的播放清單中</string>

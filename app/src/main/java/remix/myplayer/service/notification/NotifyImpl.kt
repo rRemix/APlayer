@@ -94,14 +94,16 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     val size = DensityUtil.dip2px(service, 128f)
     pushNotify(notification)
 
-    GlideApp.with(service)
-        .asBitmap()
-        .load(song)
-        .override(size, size)
-        .centerCrop()
-        .signature(ObjectKey(UriFetcher.albumVersion))
-        .into(object : CustomTarget<Bitmap>() {
-          override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+    GlideApp.with(service).clear(target)
+    target = GlideApp.with(service)
+      .asBitmap()
+      .load(song)
+      .override(size, size)
+      .centerCrop()
+      .signature(ObjectKey(UriFetcher.albumVersion))
+      .into(object : CustomTarget<Bitmap>() {
+        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+          if (song.id == service.currentSong.id) {
             if (!resource.isRecycled) {
               remoteBigView.setImageViewBitmap(R.id.notify_image, resource)
               remoteView.setImageViewBitmap(R.id.notify_image, resource)
@@ -112,16 +114,27 @@ class NotifyImpl(context: MusicService) : Notify(context) {
 
             pushNotify(notification)
           }
+        }
 
-          override fun onLoadCleared(placeholder: Drawable?) {
-          }
+        override fun onLoadCleared(placeholder: Drawable?) {
+        }
 
-          override fun onLoadFailed(errorDrawable: Drawable?) {
+        override fun onLoadFailed(errorDrawable: Drawable?) {
+          if (song.id == service.currentSong.id) {
             remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             pushNotify(notification)
           }
-        })
+        }
+
+        override fun onLoadStarted(placeholder: Drawable?) {
+          if (song.id == service.currentSong.id) {
+            remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+            remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+            pushNotify(notification)
+          }
+        }
+      })
   }
 
   private fun buildNotification(context: Context, remoteView: RemoteViews, remoteBigView: RemoteViews): Notification {

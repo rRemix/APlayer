@@ -117,7 +117,7 @@ abstract class MenuActivity : ToolbarActivity() {
   }
 
   protected fun setUpMenuItem(menu: Menu, sortOrder: String) {
-    val subMenu = menu.findItem(R.id.action_sort_order).subMenu
+    val subMenu = menu.findItem(R.id.action_sort_order).subMenu ?: return
     when (sortOrder) {
       SortOrder.SONG_A_Z -> subMenu.findItem(R.id.action_sort_order_title).isChecked = true
       SortOrder.SONG_Z_A -> subMenu.findItem(R.id.action_sort_order_title_desc).isChecked = true

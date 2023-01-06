@@ -51,7 +51,7 @@ open class BaseActivity : AppCompatActivity() {
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    hasPermission = PermissionUtil.hasReadAndWriteExternalStorage()
+    hasPermission = PermissionUtil.hasNecessaryPermission()
     //严格模式
     if (BuildConfig.DEBUG) {
 //      StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -119,7 +119,7 @@ open class BaseActivity : AppCompatActivity() {
   }
 
   override fun isDestroyed(): Boolean {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) super.isDestroyed() else isDestroyed
+    return super.isDestroyed()
   }
 
   @SuppressLint("CheckResult")
@@ -172,7 +172,11 @@ open class BaseActivity : AppCompatActivity() {
   }
 
   companion object {
-    val EXTERNAL_STORAGE_PERMISSIONS = arrayOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    val EXTERNAL_STORAGE_PERMISSIONS =
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        arrayOf(Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_IMAGES)
+      } else {
+        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+      }
   }
 }

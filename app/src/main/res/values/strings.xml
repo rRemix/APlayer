@@ -301,7 +301,7 @@
   <string name="name_desc">Title desc</string>
   <string name="create_time">Create time </string>
   <string name="custom">Custom</string>
-  <string name="lyric">Lyric</string>
+  <string name="lyric">Lyric Settings</string>
   <string name="track_number">Track Number</string>
   <string name="playlist_import">Import Playlist</string>
   <string name="playlist_import_tip">Import playlist from external or other players into existing or new playlist</string>

@@ -51,7 +51,7 @@ class BottomActionBarFragment : BaseMusicFragment() {
 
     //手势检测
     gestureDetector = GestureDetector(requireContext(), GestureListener(this))
-    bottom_action_bar.setOnTouchListener { v: View?, event: MotionEvent? -> gestureDetector.onTouchEvent(event) }
+    bottom_action_bar.setOnTouchListener { v: View?, event: MotionEvent -> gestureDetector.onTouchEvent(event) }
 
     //播放按钮
     val listener = CtrlButtonListener(App.context)

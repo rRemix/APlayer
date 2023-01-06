@@ -21,9 +21,13 @@ object PermissionUtil {
     ) == PackageManager.PERMISSION_GRANTED
   }
 
-  fun hasReadAndWriteExternalStorage(): Boolean {
-    return has(Manifest.permission.READ_EXTERNAL_STORAGE) &&
-           has(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+  fun hasNecessaryPermission(): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      has(Manifest.permission.READ_MEDIA_AUDIO) &&
+          has(Manifest.permission.READ_MEDIA_IMAGES)
+    } else {
+      has(Manifest.permission.READ_EXTERNAL_STORAGE)
+    }
   }
 
   @RequiresApi(Build.VERSION_CODES.R)

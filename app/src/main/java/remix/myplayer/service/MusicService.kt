@@ -438,7 +438,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     stop = false
 
     tryLaunch {
-      hasPermission = PermissionUtil.hasReadAndWriteExternalStorage()
+      hasPermission = PermissionUtil.hasNecessaryPermission()
       withContext(Dispatchers.IO) {
         load()
       }
@@ -579,7 +579,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON)
     mediaButtonIntent.component = mediaButtonReceiverComponentName
 
-    val pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, mediaButtonIntent, 0)
+    val pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, mediaButtonIntent, PendingIntent.FLAG_IMMUTABLE)
 
     mediaSession = MediaSessionCompat(applicationContext, "APlayer", mediaButtonReceiverComponentName, pendingIntent)
     mediaSession.setCallback(object : MediaSessionCompat.Callback() {

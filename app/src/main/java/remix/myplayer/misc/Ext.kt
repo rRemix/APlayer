@@ -1,7 +1,9 @@
 package remix.myplayer.misc
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Looper
 import android.provider.MediaStore
 import kotlinx.coroutines.CoroutineScope
@@ -149,4 +151,7 @@ private fun ZipOutputStream.createEmptyFolder(location: String) {
   closeEntry()
 }
 
+
+fun getPendingIntentFlag() =
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
 

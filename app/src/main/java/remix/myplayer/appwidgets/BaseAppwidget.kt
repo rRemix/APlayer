@@ -16,6 +16,7 @@ import remix.myplayer.appwidgets.big.AppWidgetBig
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.glide.GlideApp
 import remix.myplayer.glide.UriFetcher
+import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
@@ -44,9 +45,9 @@ abstract class BaseAppwidget
     intent.putExtra(EXTRA_CONTROL, cmd)
     intent.component = componentName
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isAllowForForegroundService(cmd)) {
-      PendingIntent.getForegroundService(context, cmd, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+      PendingIntent.getForegroundService(context, cmd, intent, getPendingIntentFlag())
     } else {
-      PendingIntent.getService(context, cmd, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+      PendingIntent.getService(context, cmd, intent, getPendingIntentFlag())
     }
   }
 
@@ -88,7 +89,7 @@ abstract class BaseAppwidget
 
     val action = Intent(context, MainActivity::class.java)
     action.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-    views.setOnClickPendingIntent(R.id.appwidget_clickable, PendingIntent.getActivity(context, 0, action, 0))
+    views.setOnClickPendingIntent(R.id.appwidget_clickable, PendingIntent.getActivity(context, 0, action, getPendingIntentFlag()))
   }
 
   protected fun pushUpdate(context: Context, appWidgetId: IntArray?, remoteViews: RemoteViews) {
