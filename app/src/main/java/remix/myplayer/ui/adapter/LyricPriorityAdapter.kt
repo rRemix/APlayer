@@ -13,14 +13,15 @@ import remix.myplayer.util.SPUtil
 class LyricPriorityAdapter(context: Context?, layoutId: Int) : BaseAdapter<LyricPriority, LyricPriorityAdapter.LyricPriorityHolder>(layoutId) {
 
   init {
-    val temp:ArrayList<LyricPriority> = Gson().fromJson(SPUtil.getValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
+    val temp: ArrayList<LyricPriority> = Gson().fromJson(SPUtil.getValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
         object : TypeToken<List<LyricPriority>>() {}.type)
 
-    val all = listOf(LyricPriority.KUGOU,
+    val all = listOf(
+        LyricPriority.EMBEDDED,
+        LyricPriority.LOCAL,
+        LyricPriority.KUGOU,
         LyricPriority.NETEASE,
         LyricPriority.QQ,
-        LyricPriority.LOCAL,
-        LyricPriority.EMBEDED,
         LyricPriority.IGNORE)
     if (temp.size < all.size) {
       if (!temp.contains(LyricPriority.QQ)) {

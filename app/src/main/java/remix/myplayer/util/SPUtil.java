@@ -108,12 +108,13 @@ public class SPUtil {
     //歌词搜索优先级
     String PRIORITY_LYRIC = "priority_lyric";
     String DEFAULT_PRIORITY = new Gson().toJson(Arrays
-            .asList(LyricPriority.KUGOU,
-                    LyricPriority.NETEASE,
-                    LyricPriority.QQ,
-                    LyricPriority.LOCAL,
-                    LyricPriority.EMBEDED,
-                    LyricPriority.IGNORE),
+            .asList(
+                LyricPriority.EMBEDDED,
+                LyricPriority.LOCAL,
+                LyricPriority.KUGOU,
+                LyricPriority.NETEASE,
+                LyricPriority.QQ,
+                LyricPriority.IGNORE),
         new TypeToken<List<LyricPriority>>() {
         }.getType());
 
@@ -123,10 +124,11 @@ public class SPUtil {
     int LYRIC_KUGOU = LyricPriority.KUGOU.getPriority();
     int LYRIC_QQ = LyricPriority.QQ.getPriority();
     int LYRIC_LOCAL = LyricPriority.LOCAL.getPriority();
-    int LYRIC_EMBEDDED = LyricPriority.EMBEDED.getPriority();
+    int LYRIC_EMBEDDED = LyricPriority.EMBEDDED.getPriority();
     int LYRIC_MANUAL = LyricPriority.MANUAL.getPriority();
 
     String LYRIC_FONT_SIZE = "lyric_font_size";
+    String LYRIC_RESET_ON_16000 = "lyric_reset_on_16000";
   }
 
   public interface COVER_KEY {

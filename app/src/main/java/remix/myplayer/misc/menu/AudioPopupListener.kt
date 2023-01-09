@@ -49,18 +49,19 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
 
         val lyricFragment = ref.get()?.lyricFragment ?: return true
         getBaseDialog(ref.get())
-            .items(getString(R.string.kugou),
+            .items(
+                getString(R.string.embedded_lyric),
+                getString(R.string.local),
+                getString(R.string.kugou),
                 getString(R.string.netease),
                 getString(R.string.qq),
-                getString(R.string.local),
-                getString(R.string.embedded_lyric),
                 getString(R.string.select_lrc),
                 getString(if (!alreadyIgnore) R.string.ignore_lrc else R.string.cancel_ignore_lrc),
                 getString(R.string.lyric_adjust_font_size),
                 getString(R.string.change_offset))
             .itemsCallback { dialog, itemView, position, text ->
               when (position) {
-                0, 1, 2, 3, 4 -> { //0酷狗 1网易 2QQ 3本地 4内嵌
+                0, 1, 2, 3, 4 -> { //0内嵌 1本地 2酷狗 3网易 4qq
                   SPUtil.putValue(ref.get(), SPUtil.LYRIC_KEY.NAME, song.id.toString(), position + 2)
                   lyricFragment.updateLrc(song, true)
                   sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))

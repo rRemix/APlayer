@@ -96,7 +96,7 @@ class LyricSearcher {
         getManualObservable(uri)
       }
       SPUtil.LYRIC_KEY.LYRIC_DEFAULT -> {
-        //默认优先级排序 酷狗-网易-QQ-本地-内嵌-忽略
+        //默认优先级排序 本地-内嵌-酷狗-网易-QQ-忽略
 
         val priority = Gson().fromJson<List<LyricPriority>>(SPUtil.getValue(App.context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY),
             object : TypeToken<List<LyricPriority>>() {}.type)
@@ -111,7 +111,7 @@ class LyricSearcher {
             LyricPriority.NETEASE.priority -> observables.add(getNeteaseObservable())
             LyricPriority.QQ.priority -> observables.add(getQQObservable())
             LyricPriority.LOCAL.priority -> observables.add(getLocalObservable())
-            LyricPriority.EMBEDED.priority -> observables.add(getEmbeddedObservable())
+            LyricPriority.EMBEDDED.priority -> observables.add(getEmbeddedObservable())
             LyricPriority.IGNORE.priority -> observables.add(Observable.create { emitter ->
               emitter.onError(Throwable("ignore lyric"))
             })

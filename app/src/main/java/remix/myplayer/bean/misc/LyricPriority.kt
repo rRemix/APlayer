@@ -7,11 +7,11 @@ import java.util.*
 enum class LyricPriority(val priority: Int, val desc: String) {
   DEF(0, App.context.getString(R.string.default_lyric_priority)),
   IGNORE(1, App.context.getString(R.string.ignore_lrc)),
-  KUGOU(2, App.context.getString(R.string.kugou)),
-  NETEASE(3, App.context.getString(R.string.netease)),
-  QQ(4, App.context.getString(R.string.qq)),
-  LOCAL(5, App.context.getString(R.string.local)),
-  EMBEDED(6, App.context.getString(R.string.embedded_lyric)),
+  EMBEDDED(2, App.context.getString(R.string.embedded_lyric)),
+  LOCAL(3, App.context.getString(R.string.local)),
+  KUGOU(4, App.context.getString(R.string.kugou)),
+  NETEASE(5, App.context.getString(R.string.netease)),
+  QQ(6, App.context.getString(R.string.qq)),
   MANUAL(7, App.context.getString(R.string.select_lrc));
 
   override fun toString(): String {
@@ -37,7 +37,7 @@ enum class LyricPriority(val priority: Int, val desc: String) {
         KUGOU.desc -> KUGOU
         QQ.desc -> QQ
         LOCAL.desc -> LOCAL
-        EMBEDED.desc -> EMBEDED
+        EMBEDDED.desc -> EMBEDDED
         MANUAL.desc -> MANUAL
         else -> DEF
       }

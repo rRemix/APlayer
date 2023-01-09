@@ -38,6 +38,7 @@ class App : MultiDexApplication() {
   override fun onCreate() {
     super.onCreate()
     context = this
+    checkMigration()
     setUp()
 
     // AppShortcut
@@ -54,6 +55,19 @@ class App : MultiDexApplication() {
       CrashReport.postCatchedException(throwable)
     }
     registerActivityLifecycleCallbacks(APlayerActivityManager())
+  }
+
+  private fun checkMigration() {
+    if (!SPUtil.getValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.LYRIC_RESET_ON_16000, false)) {
+      SPUtil.deleteFile(this, SPUtil.LYRIC_KEY.NAME)
+      SPUtil.putValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.LYRIC_RESET_ON_16000, true)
+      SPUtil.putValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY)
+      try {
+        DiskCache.getLrcDiskCache().delete()
+      } catch (e: Exception) {
+        Timber.v(e)
+      }
+    }
   }
 
   private fun setUp() {
