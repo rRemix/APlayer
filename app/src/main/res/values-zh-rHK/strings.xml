@@ -407,6 +407,7 @@
   <string name="zh_simple">簡體中文</string>
   <string name="zh_traditional">繁體中文</string>
   <string name="english">英文</string>
+  <string name="japanese">日文</string>
 
   <string name="bass_boost">低音增強</string>
   <string name="virtualizer">環繞聲</string>
