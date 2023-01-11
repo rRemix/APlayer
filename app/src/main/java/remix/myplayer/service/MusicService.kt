@@ -46,6 +46,7 @@ import remix.myplayer.lyric.LyricFetcher
 import remix.myplayer.lyric.LyricFetcher.Companion.LYRIC_FIND_INTERVAL
 import remix.myplayer.lyric.bean.LyricRowWrapper
 import remix.myplayer.misc.floatpermission.FloatWindowManager
+import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.misc.log.LogObserver
 import remix.myplayer.misc.observer.MediaStoreObserver
 import remix.myplayer.misc.receiver.ExitReceiver
@@ -579,7 +580,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON)
     mediaButtonIntent.component = mediaButtonReceiverComponentName
 
-    val pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, mediaButtonIntent, PendingIntent.FLAG_IMMUTABLE)
+    val pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, mediaButtonIntent, getPendingIntentFlag())
 
     mediaSession = MediaSessionCompat(applicationContext, "APlayer", mediaButtonReceiverComponentName, pendingIntent)
     mediaSession.setCallback(object : MediaSessionCompat.Callback() {
