@@ -13,6 +13,7 @@ object LanguageHelper {
   private const val CHINESE_SIMPLE = 1
   private const val CHINESE_TRADITIONAL = 2
   private const val ENGLISH = 3
+  private const val JAPANESE = 4
   var current = -1
 
   private var sLocal: Locale = Locale.getDefault()
@@ -31,6 +32,7 @@ object LanguageHelper {
       CHINESE_SIMPLE -> Locale.SIMPLIFIED_CHINESE
       ENGLISH -> Locale.ENGLISH
       CHINESE_TRADITIONAL -> Locale.TRADITIONAL_CHINESE
+      JAPANESE -> Locale.JAPANESE
       else -> sLocal
     }
   }

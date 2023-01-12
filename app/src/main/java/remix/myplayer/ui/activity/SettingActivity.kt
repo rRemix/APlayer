@@ -661,10 +661,11 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     val zhSimple = getString(R.string.zh_simple)
     val zhTraditional = getString(R.string.zh_traditional)
     val english = getString(R.string.english)
+    val japanese = getString(R.string.japanese)
     val auto = getString(R.string.auto)
 
     getBaseDialog(this)
-        .items(auto, zhSimple, zhTraditional, english)
+        .items(auto, zhSimple, zhTraditional, english, japanese)
         .itemsCallbackSingleChoice(
             SPUtil.getValue(
                 this, SETTING_KEY.NAME, SETTING_KEY.LANGUAGE, AUTO

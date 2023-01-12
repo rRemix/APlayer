@@ -5,5 +5,5 @@
 /build
 .DS_Store
 *.hprof
-
+/.vscode
 
