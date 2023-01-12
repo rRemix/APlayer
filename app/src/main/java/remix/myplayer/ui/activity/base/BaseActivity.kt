@@ -127,7 +127,7 @@ open class BaseActivity : AppCompatActivity() {
     super.onResume()
     isForeground = true
     RxPermissions(this)
-        .request(*EXTERNAL_STORAGE_PERMISSIONS)
+        .request(*NECESSARY_PERMISSIONS)
         .subscribe { has: Boolean ->
           if (has != hasPermission) {
             val intent = Intent(MusicService.PERMISSION_CHANGE)
@@ -172,9 +172,11 @@ open class BaseActivity : AppCompatActivity() {
   }
 
   companion object {
-    val EXTERNAL_STORAGE_PERMISSIONS =
+    val NECESSARY_PERMISSIONS =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_IMAGES)
+      } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
       } else {
         arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
       }
