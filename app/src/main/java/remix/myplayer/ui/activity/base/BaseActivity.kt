@@ -21,12 +21,8 @@ import remix.myplayer.theme.ThemeStore.sColoredNavigation
 import remix.myplayer.theme.ThemeStore.statusBarColor
 import remix.myplayer.theme.ThemeStore.themeRes
 import remix.myplayer.ui.misc.AudioTag
-import remix.myplayer.util.ColorUtil
-import remix.myplayer.util.MediaStoreUtil
-import remix.myplayer.util.PermissionUtil
-import remix.myplayer.util.StatusBarUtil
-import remix.myplayer.util.ToastUtil
-import remix.myplayer.util.Util
+import remix.myplayer.util.*
+import timber.log.Timber
 
 /**
  * Created by Remix on 2016/3/16.
@@ -127,14 +123,22 @@ open class BaseActivity : AppCompatActivity() {
     super.onResume()
     isForeground = true
     RxPermissions(this)
-        .request(*NECESSARY_PERMISSIONS)
-        .subscribe { has: Boolean ->
-          if (has != hasPermission) {
-            val intent = Intent(MusicService.PERMISSION_CHANGE)
-            intent.putExtra(BaseMusicActivity.EXTRA_PERMISSION, has)
-            Util.sendLocalBroadcast(intent)
-          }
+      .request(*NECESSARY_PERMISSIONS)
+      .subscribe { has: Boolean ->
+        if (has != hasPermission) {
+          val intent = Intent(MusicService.PERMISSION_CHANGE)
+          intent.putExtra(BaseMusicActivity.EXTRA_PERMISSION, has)
+          Util.sendLocalBroadcast(intent)
         }
+      }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      RxPermissions(this)
+        .request(Manifest.permission.POST_NOTIFICATIONS)
+        .subscribe { has ->
+          Timber.v("has: $has")
+        }
+    }
   }
 
   override fun onPause() {
@@ -176,7 +180,10 @@ open class BaseActivity : AppCompatActivity() {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_IMAGES)
       } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        arrayOf(
+          Manifest.permission.READ_EXTERNAL_STORAGE,
+          Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
       } else {
         arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
       }

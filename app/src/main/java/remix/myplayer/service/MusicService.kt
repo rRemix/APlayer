@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.media.PlaybackParams
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
@@ -860,7 +861,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     mediaPlayer.start()
 
     //倍速播放
-    setSpeed(speed)
+//    setSpeed(speed)
 
     //渐变
     if (fadeIn) {
@@ -1408,7 +1409,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
   private fun updatePlaybackState() {
     mediaSession.setPlaybackState(PlaybackStateCompat.Builder()
-        .setActiveQueueItemId(currentSong.id.toLong())
+        .setActiveQueueItemId(currentSong.id)
         .setState(if (isPlay) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED, progress.toLong(), speed)
         .setActions(MEDIA_SESSION_ACTIONS).build())
   }
@@ -1446,24 +1447,26 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             }
           }
 
-//          if (isPlaying) {
-//            pause(true)
-//          }
-
-          prepared = false
-          isLove = withContext(Dispatchers.IO) {
-            repository.isMyLove(playQueue.song.id)
-                .onErrorReturn {
-                  false
-                }
-                .blockingGet()
+          if (isPlaying) {
+            mediaPlayer.pause()
           }
+          prepared = false
           mediaPlayer.reset()
           withContext(Dispatchers.IO) {
             mediaPlayer.setDataSource(this@MusicService, song.contentUri)
           }
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mediaPlayer.playbackParams = PlaybackParams().setSpeed(speed)
+          }
           mediaPlayer.prepareAsync()
           prepared = true
+          isLove = withContext(Dispatchers.IO) {
+            repository.isMyLove(playQueue.song.id)
+              .onErrorReturn {
+                false
+              }
+              .blockingGet()
+          }
           Timber.v("prepare finish: $song")
         },
         catch = {
@@ -1477,7 +1480,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    *
    * @param isNext 是否是播放下一首
    */
+  private var lastSwitchTime = System.currentTimeMillis()
   fun playNextOrPrev(isNext: Boolean) {
+    if (System.currentTimeMillis() - lastSwitchTime <= 800) {
+      return
+    }
+    lastSwitchTime = System.currentTimeMillis()
     if (playQueue.size() == 0) {
       ToastUtil.show(service, getString(R.string.list_is_empty))
       return

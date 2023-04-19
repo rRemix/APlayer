@@ -417,7 +417,7 @@
   <string name="audio_focus_tip">Don\'t pauses music when loss audio focus</string>
 
   <string name="auto_play">Auto play</string>
-  <string name="auto_play_tip">Automatic playback option/string>
+  <string name="auto_play_tip">Automatic playback option string</string>
   <string name="auto_play_headset_plug">Resume on wired headset/speaker connect</string>
   <string name="auto_play_open_software">Start playback when app is started</string>
   <string name="auto_play_none">Never</string>

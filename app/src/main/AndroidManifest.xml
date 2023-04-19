@@ -17,6 +17,7 @@
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
   <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
   <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
   <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false"/>
 
