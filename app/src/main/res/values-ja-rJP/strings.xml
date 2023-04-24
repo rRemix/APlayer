@@ -292,8 +292,8 @@
   <string name="display_title_desc">ファイル名 逆順</string>
   <string name="artist">アーティスト</string>
   <string name="artist_desc">アーティスト 逆順</string>
-  <string name="date">更新日時</string>
-  <string name="date_desc">更新日時 逆順</string>
+  <string name="date_modify">変更日時</string>
+  <string name="date_modify_desc">変更日時 逆順</string>
   <string name="duration">長さ</string>
   <string name="year">年</string>
   <string name="number_of_album">アルバム数</string>

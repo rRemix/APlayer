@@ -292,8 +292,8 @@
   <string name="display_title_desc">File name desc</string>
   <string name="artist">Artist</string>
   <string name="artist_desc">Artist desc</string>
-  <string name="date">Date</string>
-  <string name="date_desc">Date desc</string>
+  <string name="date_modify">Date Modified</string>
+  <string name="date_modify_desc">Date Modified desc</string>
   <string name="duration">Duration</string>
   <string name="year">Year</string>
   <string name="number_of_album">Number of albums</string>

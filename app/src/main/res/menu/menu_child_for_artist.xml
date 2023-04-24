@@ -28,10 +28,10 @@
           android:title="@string/album_desc"
           android:id="@+id/action_sort_order_album_desc"/>
         <item
-          android:title="@string/date"
+          android:title="@string/date_modify"
           android:id="@+id/action_sort_order_date"/>
         <item
-          android:title="@string/date_desc"
+          android:title="@string/date_modify_desc"
           android:id="@+id/action_sort_order_date_desc"/>
         <!--<item android:title="@string/duration" android:id="@+id/action_sort_order_duration"/>-->
         <!--<item android:title="@string/year" android:id="@+id/action_sort_order_year"/>-->
