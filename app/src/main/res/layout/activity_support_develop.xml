@@ -15,10 +15,49 @@
       app:layout_scrollFlags="scroll|enterAlways"/>
   </com.google.android.material.appbar.AppBarLayout>
 
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/d12_size"
+    android:textSize="@dimen/s18_size"
+    android:textColor="?attr/text_color_primary"
+    android:textStyle="bold"
+    android:text="@string/donation"/>
+
   <androidx.recyclerview.widget.RecyclerView
     android:id="@+id/recyclerView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:overScrollMode="never"/>
+
+  <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/d8_size"
+    android:orientation="vertical"
+    android:id="@+id/ad">
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_margin="@dimen/d12_size"
+      android:textSize="@dimen/s18_size"
+      android:textColor="?attr/text_color_primary"
+      android:textStyle="bold"
+      android:text="其他方式"/>
+    <TextView
+      android:id="@+id/ad_content"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textColor="?attr/text_color_secondary"
+      android:layout_marginHorizontal="@dimen/d24_size" />
+
+    <ImageView
+      android:id="@+id/ad_qrcode"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:layout_marginTop="@dimen/d16_size"
+      android:src="@drawable/ad_qrcode"/>
+  </LinearLayout>
 
 </LinearLayout>

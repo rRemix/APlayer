@@ -449,4 +449,6 @@
   <string name="lyric_font_size_normal">標準</string>
   <string name="lyric_font_size_big">大</string>
   <string name="lyric_font_size_huge">特大</string>
+
+  <string name="donation">寄付する</string>
 </resources>

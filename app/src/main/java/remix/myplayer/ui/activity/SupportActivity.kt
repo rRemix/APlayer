@@ -2,15 +2,9 @@ package remix.myplayer.ui.activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ContentValues
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
@@ -18,28 +12,21 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.anjlab.android.iab.v3.BillingProcessor
 import com.anjlab.android.iab.v3.PurchaseInfo
 import com.anjlab.android.iab.v3.SkuDetails
-import io.reactivex.Observable
-import io.reactivex.ObservableSource
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Function
 import kotlinx.android.synthetic.main.activity_support_develop.*
+import kotlinx.coroutines.launch
 import remix.myplayer.App
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Purchase
 import remix.myplayer.databinding.ActivitySupportDevelopBinding
-import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.adapter.PurchaseAdapter
 import remix.myplayer.util.AlipayUtil
-import remix.myplayer.util.RxUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
-import java.io.File
-import java.io.OutputStream
-import java.util.*
 
 class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
   private lateinit var binding: ActivitySupportDevelopBinding
@@ -79,83 +66,19 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
         } else {
           when (position) {
             0 -> {
-              var outputStream: OutputStream? = null
               //保存微信图片
-              Observable.just(BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode))
-                  .flatMap(Function {
-                    return@Function ObservableSource<File> {
-                      val weChatBitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_wechat_qrcode)
-                      if (weChatBitmap == null || weChatBitmap.isRecycled) {
-                        it.onError(Throwable("Invalid Bitmap"))
-                        return@ObservableSource
-                      }
-                      val dir = DiskCache.getDiskCacheDir(this@SupportActivity, "qrCode")
-                      if (!dir.exists())
-                        dir.mkdirs()
-                      val qrCodeFile = File(dir, "qrCode.png")
-
-                      //删除旧文件
-                      contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                          null, MediaStore.Images.Media.DATA + "=?", arrayOf(qrCodeFile.absolutePath), null)
-                          ?.use { cursor ->
-                            if (cursor.count > 0) {
-                              contentResolver.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.DATA + "=?", arrayOf(qrCodeFile.absolutePath))
-                            }
-                            if (qrCodeFile.exists()) {
-                              qrCodeFile.delete()
-                            }
-                            qrCodeFile.createNewFile()
-
-                            // 保存到系统MediaStore
-                            val values = ContentValues()
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                              values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-                            } else {
-                              values.put(MediaStore.MediaColumns.DATA, qrCodeFile.absolutePath)
-                            }
-                            values.put(MediaStore.Images.ImageColumns.TITLE, "qrCode")
-                            values.put(MediaStore.Images.ImageColumns.DISPLAY_NAME, "qrCode")
-                            values.put(MediaStore.Images.ImageColumns.DATE_ADDED, System.currentTimeMillis() / 1000)
-                            values.put(MediaStore.Images.ImageColumns.DATE_MODIFIED, System.currentTimeMillis() / 1000)
-                            values.put(MediaStore.Images.ImageColumns.MIME_TYPE, "image/png")
-                            values.put(MediaStore.Images.ImageColumns.WIDTH, weChatBitmap.width)
-                            values.put(MediaStore.Images.ImageColumns.HEIGHT, weChatBitmap.height)
-                            val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                                values)
-                            if (uri == null) {
-                              it.onError(Throwable("Uri Empty"))
-                              return@ObservableSource
-                            }
-                            outputStream = contentResolver.openOutputStream(uri)
-                            weChatBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                            values.clear()
-                            values.put(MediaStore.Images.ImageColumns.SIZE, qrCodeFile.length())
-                            contentResolver.update(uri, values, null, null)
-                            weChatBitmap.recycle()
-                            it.onNext(qrCodeFile)
-                            it.onComplete()
-                          }
-
-                    }
-                  })
-                  .compose(RxUtil.applyScheduler())
-                  .doFinally {
-                    outputStream?.close()
-                  }
-                  .subscribe({
-                    ToastUtil.show(this@SupportActivity, R.string.save_wechat_qrcode_success, it.absolutePath)
-                  }, {
-                    ToastUtil.show(this@SupportActivity, R.string.save_error)
-                  })
+              launch {
+                Util.saveToAlbum(this@SupportActivity, R.drawable.icon_wechat_qrcode, "wechat_qrCode.png")
+              }
             }
             1 -> {
               Theme.getBaseDialog(this@SupportActivity)
-                  .title(R.string.support_develop)
-                  .positiveText(R.string.jump_alipay_account)
-                  .negativeText(R.string.cancel)
-                  .content(R.string.donate_tip)
-                  .onPositive { _, _ -> AlipayUtil.startAlipayClient(this@SupportActivity as Activity) }
-                  .show()
+                .title(R.string.support_develop)
+                .positiveText(R.string.jump_alipay_account)
+                .negativeText(R.string.cancel)
+                .content(R.string.donate_tip)
+                .onPositive { _, _ -> AlipayUtil.startAlipayClient(this@SupportActivity as Activity) }
+                .show()
             }
             2 -> {
               val intent = Intent("android.intent.action.VIEW")
@@ -175,13 +98,32 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
     recyclerView.adapter = adapter
 
     loading = Theme.getBaseDialog(this)
-        .title(R.string.loading)
-        .content(R.string.please_wait)
-        .canceledOnTouchOutside(false)
-        .progress(true, 0)
-        .progressIndeterminateStyle(false).build()
+      .title(R.string.loading)
+      .content(R.string.please_wait)
+      .canceledOnTouchOutside(false)
+      .progress(true, 0)
+      .progressIndeterminateStyle(false).build()
 
     billingProcessor = BillingProcessor(this, BuildConfig.GOOGLE_PLAY_LICENSE_KEY, this)
+
+    if (!App.IS_GOOGLEPLAY) {
+      ad.visibility = View.VISIBLE
+      ad_content.text = """
+        如果你的手机并未下载过"快手极速版"，并且是新用户，可通过以下步骤支持开发者：
+        一.在安卓应用商店或AppStore下载"快手极速版"
+        二.注册并登陆账号(微信\QQ\手机号码任意一种方式均可)
+        三.点左上角"三"或者放大镜扫描下方二维码(可长按保存)
+        四.半小时之内观看至少一分钟的视频即可帮助开发者获得奖励。另外，如果用户在第二天和连续七天观看一分钟的视频，开发者都可以获得奖励
+      """.trimIndent()
+      ad_qrcode.setOnLongClickListener {
+        launch {
+          Util.saveToAlbum(this@SupportActivity, R.drawable.ad_qrcode, "a_ad_qrCode.png")
+        }
+        return@setOnLongClickListener true
+      }
+    } else {
+      ad.visibility = View.GONE
+    }
   }
 
   private fun loadSkuDetails() {
@@ -191,28 +133,30 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
       loading.show()
     }
 
-    billingProcessor?.getPurchaseListingDetailsAsync(SKU_IDS, object : BillingProcessor.ISkuDetailsResponseListener {
-      override fun onSkuDetailsResponse(products: MutableList<SkuDetails>?) {
-        loading.dismiss()
-        if (products.isNullOrEmpty()) {
-          return
+    billingProcessor?.getPurchaseListingDetailsAsync(
+      SKU_IDS,
+      object : BillingProcessor.ISkuDetailsResponseListener {
+        override fun onSkuDetailsResponse(products: MutableList<SkuDetails>?) {
+          loading.dismiss()
+          if (products.isNullOrEmpty()) {
+            return
+          }
+          val beans = ArrayList<Purchase>()
+          products.sortWith { o1, o2 ->
+            o1.priceValue.compareTo(o2.priceValue)
+          }
+          products.forEach {
+            beans.add(Purchase(it.productId, "", it.title, it.priceText))
+          }
+          adapter.dataList.addAll(beans)
+          adapter.notifyDataSetChanged()
         }
-        val beans = ArrayList<Purchase>()
-        products.sortWith { o1, o2 ->
-          o1.priceValue.compareTo(o2.priceValue)
-        }
-        products.forEach {
-          beans.add(Purchase(it.productId, "", it.title, it.priceText))
-        }
-        adapter.dataList.addAll(beans)
-        adapter.notifyDataSetChanged()
-      }
 
-      override fun onSkuDetailsError(error: String?) {
-        ToastUtil.show(this@SupportActivity, R.string.error_occur, error)
-        loading.dismiss()
-      }
-    })
+        override fun onSkuDetailsError(error: String?) {
+          ToastUtil.show(this@SupportActivity, R.string.error_occur, error)
+          loading.dismiss()
+        }
+      })
   }
 
   override fun onBillingInitialized() {
@@ -228,16 +172,17 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
   @SuppressLint("CheckResult")
   override fun onProductPurchased(productId: String, details: PurchaseInfo?) {
     Timber.v("onProductPurchased")
-    billingProcessor?.consumePurchaseAsync(productId,object : BillingProcessor.IPurchasesResponseListener{
-      override fun onPurchasesSuccess() {
-        Toast.makeText(this@SupportActivity, R.string.thank_you, Toast.LENGTH_SHORT).show()
-      }
+    billingProcessor?.consumePurchaseAsync(productId,
+      object : BillingProcessor.IPurchasesResponseListener {
+        override fun onPurchasesSuccess() {
+          Toast.makeText(this@SupportActivity, R.string.thank_you, Toast.LENGTH_SHORT).show()
+        }
 
-      override fun onPurchasesError() {
-        Toast.makeText(this@SupportActivity, R.string.payment_failure, Toast.LENGTH_SHORT).show()
-      }
+        override fun onPurchasesError() {
+          Toast.makeText(this@SupportActivity, R.string.payment_failure, Toast.LENGTH_SHORT).show()
+        }
 
-    })
+      })
   }
 
   override fun onBillingError(errorCode: Int, error: Throwable?) {

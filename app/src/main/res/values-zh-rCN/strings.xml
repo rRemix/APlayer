@@ -449,4 +449,6 @@
   <string name="lyric_font_size_normal">正常</string>
   <string name="lyric_font_size_big">大</string>
   <string name="lyric_font_size_huge">超大</string>
+
+  <string name="donation">捐赠</string>
 </resources>

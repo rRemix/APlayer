@@ -449,4 +449,6 @@
   <string name="lyric_font_size_normal">Normal</string>
   <string name="lyric_font_size_big">Big</string>
   <string name="lyric_font_size_huge">Huge</string>
+
+  <string name="donation">Donation</string>
 </resources>

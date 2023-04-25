@@ -7,12 +7,16 @@ import android.app.Service
 import android.content.*
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.MediaFormat
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.Parcelable
 import android.os.Vibrator
+import android.provider.MediaStore
 import android.provider.Settings
 import android.text.TextUtils
 import android.view.View
@@ -21,6 +25,8 @@ import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import remix.myplayer.App
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
@@ -567,5 +573,44 @@ object Util {
       e.printStackTrace()
     }
     return false
+  }
+
+  suspend fun saveToAlbum(context: Context, resId: Int, fileName: String) {
+    val bitmap = BitmapFactory.decodeResource(context.resources, resId)
+    val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), fileName)
+
+    withContext(Dispatchers.IO) {
+      if (file.exists()) {
+        file.delete()
+      }
+
+      file.createNewFile()
+      file.outputStream().use {
+        bitmap.compress(Bitmap.CompressFormat.PNG, 90, it)
+      }
+    }
+
+    val values = ContentValues()
+    val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      values.put(
+        MediaStore.MediaColumns.RELATIVE_PATH,
+        Environment.DIRECTORY_PICTURES
+      )
+      MediaStore.Images.Media.getContentUri(
+        MediaStore.VOLUME_EXTERNAL_PRIMARY
+      )
+    } else {
+      values.put(MediaStore.MediaColumns.DATA, file.absolutePath)
+      MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    }
+    values.put(MediaStore.Images.ImageColumns.TITLE, fileName)
+    values.put(MediaStore.Images.ImageColumns.DISPLAY_NAME, fileName)
+    values.put(MediaStore.Images.ImageColumns.MIME_TYPE, "image/png")
+    values.put(MediaStore.Images.ImageColumns.WIDTH, bitmap.width)
+    values.put(MediaStore.Images.ImageColumns.HEIGHT, bitmap.height)
+
+    val insertUri = context.contentResolver.insert(uri, values)
+    Timber.v("insertUri: $insertUri")
+    ToastUtil.show(context, R.string.save_success)
   }
 }
