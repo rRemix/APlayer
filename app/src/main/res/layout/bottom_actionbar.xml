@@ -15,18 +15,7 @@
     android:id="@+id/bottom_action_bar"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!-- 封面 -->
-    <!--    <com.facebook.drawee.view.SimpleDraweeView-->
-    <!--      android:layout_marginStart="@dimen/d12_size"-->
-    <!--      android:layout_width="@dimen/d48_size"-->
-    <!--      android:layout_height="@dimen/d48_size"-->
-    <!--      android:id="@+id/bottom_action_bar_cover"-->
-    <!--      fresco:actualImageScaleType="centerCrop"-->
-    <!--      fresco:placeholderImageScaleType="centerCrop"-->
-    <!--      fresco:placeholderImage="?attr/default_album"-->
-    <!--      fresco:fadeDuration="0"-->
-    <!--      android:layout_centerVertical="true"/>-->
-    <ImageView
+    <remix.myplayer.ui.widget.CircleImageView
       android:id="@+id/iv"
       android:layout_width="@dimen/d48_size"
       android:layout_height="@dimen/d48_size"
