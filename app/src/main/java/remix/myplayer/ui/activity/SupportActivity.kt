@@ -39,8 +39,9 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
 
   private var billingProcessor: BillingProcessor? = null
   private var disposable: Disposable? = null
+  private val googlePlay = App.IS_GOOGLEPLAY
 
-  private lateinit var loading: MaterialDialog
+//  private lateinit var loading: MaterialDialog
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -49,7 +50,7 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
     setUpToolbar(getString(R.string.support_develop))
 
     val beans = ArrayList<Purchase>()
-    if (!App.IS_GOOGLEPLAY) {
+    if (!googlePlay) {
       beans.add(Purchase("wechat", "icon_wechat_donate", getString(R.string.wechat), ""))
       beans.add(Purchase("alipay", "icon_alipay_donate", getString(R.string.alipay), ""))
       beans.add(Purchase("paypal", "icon_paypal_donate", getString(R.string.paypal), ""))
@@ -61,14 +62,18 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
       }
 
       override fun onItemClick(view: View?, position: Int) {
-        if (App.IS_GOOGLEPLAY) {
+        if (googlePlay) {
           billingProcessor?.purchase(this@SupportActivity, SKU_IDS[position])
         } else {
           when (position) {
             0 -> {
               //保存微信图片
               launch {
-                Util.saveToAlbum(this@SupportActivity, R.drawable.icon_wechat_qrcode, "wechat_qrCode.png")
+                Util.saveToAlbum(
+                  this@SupportActivity,
+                  R.drawable.icon_wechat_qrcode,
+                  "wechat_qrCode.png"
+                )
               }
             }
             1 -> {
@@ -97,21 +102,21 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
     recyclerView.layoutManager = GridLayoutManager(this, 2)
     recyclerView.adapter = adapter
 
-    loading = Theme.getBaseDialog(this)
-      .title(R.string.loading)
-      .content(R.string.please_wait)
-      .canceledOnTouchOutside(false)
-      .progress(true, 0)
-      .progressIndeterminateStyle(false).build()
+//    loading = Theme.getBaseDialog(this)
+//      .title(R.string.loading)
+//      .content(R.string.please_wait)
+//      .canceledOnTouchOutside(false)
+//      .progress(true, 0)
+//      .progressIndeterminateStyle(false).build()
 
     billingProcessor = BillingProcessor(this, BuildConfig.GOOGLE_PLAY_LICENSE_KEY, this)
 
-    if (!App.IS_GOOGLEPLAY) {
+    if (!googlePlay) {
       ad.visibility = View.VISIBLE
       ad_content.text = """
         如果你的手机并未下载过"快手极速版"，并且是新用户，可通过以下步骤支持开发者：
         一.在安卓应用商店或AppStore下载"快手极速版"
-        二.注册并登陆账号(微信\QQ\手机号码任意一种方式均可)
+        二.注册并登陆账号(未登录过的微信\QQ\手机号码任意一种方式均可)
         三.点左上角"三"或者放大镜扫描下方二维码(可长按保存)
         四.半小时之内观看至少一分钟的视频即可帮助开发者获得奖励。另外，如果用户在第二天和连续七天观看一分钟的视频，开发者都可以获得奖励
       """.trimIndent()
@@ -129,15 +134,15 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
   private fun loadSkuDetails() {
     if (adapter.dataList.size > 3)
       return
-    if (hasWindowFocus()) {
-      loading.show()
-    }
+//    if (hasWindowFocus()) {
+//      loading.show()
+//    }
 
     billingProcessor?.getPurchaseListingDetailsAsync(
       SKU_IDS,
       object : BillingProcessor.ISkuDetailsResponseListener {
         override fun onSkuDetailsResponse(products: MutableList<SkuDetails>?) {
-          loading.dismiss()
+//          loading.dismiss()
           if (products.isNullOrEmpty()) {
             return
           }
@@ -153,8 +158,10 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
         }
 
         override fun onSkuDetailsError(error: String?) {
-          ToastUtil.show(this@SupportActivity, R.string.error_occur, error)
-          loading.dismiss()
+          if (googlePlay) {
+            ToastUtil.show(this@SupportActivity, R.string.error_occur, error)
+          }
+//          loading.dismiss()
         }
       })
   }
@@ -166,7 +173,7 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
 
   override fun onPurchaseHistoryRestored() {
     Timber.v("onPurchaseHistoryRestored")
-    Toast.makeText(this, R.string.restored_previous_purchases, Toast.LENGTH_SHORT).show()
+//    Toast.makeText(this, R.string.restored_previous_purchases, Toast.LENGTH_SHORT).show()
   }
 
   @SuppressLint("CheckResult")
@@ -187,14 +194,16 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
 
   override fun onBillingError(errorCode: Int, error: Throwable?) {
     Timber.v("onBillingError")
-    ToastUtil.show(this, R.string.error_occur, "code = $errorCode err =  $error")
+    if (googlePlay) {
+      ToastUtil.show(this, R.string.error_occur, "code = $errorCode err =  $error")
+    }
   }
 
   override fun onDestroy() {
     super.onDestroy()
     billingProcessor?.release()
     disposable?.dispose()
-    if (loading.isShowing)
-      loading.dismiss()
+//    if (loading.isShowing)
+//      loading.dismiss()
   }
 }

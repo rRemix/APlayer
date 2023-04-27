@@ -11,7 +11,6 @@ import android.os.*
 import android.provider.Settings
 import android.text.TextUtils
 import android.view.Menu
-import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.drawerlayout.widget.DrawerLayout
@@ -70,6 +69,7 @@ import timber.log.Timber
 import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -141,19 +141,49 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     intentFilter.addAction(ACTION_DISMISS_DIALOG)
     registerLocalReceiver(receiver, intentFilter)
 
-    //初始化控件
+    // 初始化控件
     setUpToolbar()
     setUpPager()
     setUpTab()
     btn_add.setOnClickListener(this)
-    //初始化测滑菜单
+    // 初始化测滑菜单
     setUpDrawerLayout()
     setUpViewColor()
-    //handler
+    // 检查更新
     handler.postDelayed({ this.checkUpdate() }, 500)
 
-    //清除多选显示状态
+    // 清除多选显示状态
     MultipleChoice.isActiveSomeWhere = false
+
+    // 捐赠
+    checkDonation()
+  }
+
+  private fun checkDonation(){
+    if (!SPUtil.getValue(this, SPUtil.OTHER_KEY.NAME, SPUtil.OTHER_KEY.SUPPORT_NO_MORE_PROMPT, false) &&
+        !SPUtil.getValue(this, SPUtil.OTHER_KEY.NAME, SPUtil.OTHER_KEY.WAS_SUPPORT, false)) {
+
+      val lastOpenTime = SPUtil.getValue(this, SPUtil.OTHER_KEY.NAME, SPUtil.OTHER_KEY.LAST_OPEN_TIME, System.currentTimeMillis())
+      SPUtil.putValue(this, SPUtil.OTHER_KEY.NAME, SPUtil.OTHER_KEY.LAST_OPEN_TIME, System.currentTimeMillis())
+      if (System.currentTimeMillis() - lastOpenTime >= TimeUnit.DAYS.toMillis(2)) {
+        handler.postDelayed({
+          Theme.getBaseDialog(this)
+            .title(R.string.support_developer)
+            .positiveText(R.string.go)
+            .negativeText(R.string.cancel)
+            .neutralText(R.string.no_more_prompt)
+            .content(R.string.donate_tip)
+            .onPositive { _, _ ->
+              SPUtil.putValue(this, SPUtil.OTHER_KEY.NAME, SPUtil.OTHER_KEY.WAS_SUPPORT, true)
+              startActivity(Intent(this, SupportActivity::class.java))
+            }
+            .onNeutral { _, _ ->
+              SPUtil.putValue(this, SPUtil.OTHER_KEY.NAME, SPUtil.OTHER_KEY.SUPPORT_NO_MORE_PROMPT, true)
+            }
+            .show()
+        }, 1500)
+      }
+    }
   }
 
   override fun setStatusBarColor() {

@@ -451,4 +451,7 @@
   <string name="lyric_font_size_huge">特大</string>
 
   <string name="donation">寄付する</string>
+  <string name="support_developer">開発者のサポート</string>
+  <string name="no_more_prompt">再プロンプト</string>
+  <string name="go">行く</string>
 </resources>

@@ -267,4 +267,12 @@ public class SPUtil {
 
     String NAME = "LyricOffset";
   }
+
+  public interface OTHER_KEY {
+    String NAME = "Other";
+
+    String LAST_OPEN_TIME = "last_open_time";
+    String WAS_SUPPORT = "was_support";
+    String SUPPORT_NO_MORE_PROMPT = "support_no_more_prompt";
+  }
 }
