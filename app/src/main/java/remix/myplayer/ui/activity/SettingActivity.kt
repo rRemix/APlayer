@@ -128,7 +128,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
 
   private var pendingExportPlaylist: String? = null
 
-  private lateinit var blackList: LinkedHashSet<String>
+  private var blackList: Set<String> = emptySet()
         
   //尝试从uri获取文件夹absolutePath
   fun getFolderPath(documentFile: DocumentFile?): String? {
@@ -1180,7 +1180,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
    * 设置黑名单
    */
   private fun configBlackList() {
-    val blackList: Set<String> = SPUtil.getStringSet(this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST)
+    blackList = SPUtil.getStringSet(this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST)
     val items = ArrayList<String>(blackList)
     items.sortWith(Comparator { left, right ->
       File(left).name.compareTo(
@@ -1383,6 +1383,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
           data?.data?.let { uri ->
             val folder = DocumentFile.fromTreeUri(this, uri)
             if (folder?.isDirectory == true) {
+              val newBlacklist = LinkedHashSet(blackList)
               val folderPath = getFolderPath(folder) //只有文件夹
               val encodedUri = folder.uri.toString() //content uri
               var dncodedUri = Uri.decode(folder.uri.toString()) 
@@ -1392,12 +1393,12 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
               //val fullPath = stroagePath + folderPath
               val fullPath = "$rootPath/$folderPath"
               if (folderPath != null) {
-                blackList.add(fullPath)
+                newBlacklist.add(fullPath)
                 SPUtil.putStringSet(
                         this@SettingActivity,
                         SETTING_KEY.NAME,
                         SETTING_KEY.BLACKLIST,
-                        blackList
+                        newBlacklist
                 )
                 contentResolver.notifyChange(
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
