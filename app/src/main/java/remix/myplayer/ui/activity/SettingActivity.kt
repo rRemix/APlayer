@@ -19,6 +19,7 @@ import android.webkit.MimeTypeMap
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.core.content.FileProvider
+import androidx.documentfile.provider.DocumentFile
 import com.afollestad.materialdialogs.DialogAction
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -127,8 +128,36 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
 
   private var pendingExportPlaylist: String? = null
 
+  private lateinit var blackList: LinkedHashSet<String>
+        
+  //尝试从uri获取文件夹absolutePath
+  fun getFolderPath(documentFile: DocumentFile?): String? {
+    if (documentFile == null) {
+      return null
+    }
+
+    val name = documentFile.name ?: return null
+    val parent = documentFile.parentFile ?: return name
+
+    val parentPath = getFolderPath(parent)
+    return if (parentPath != null) {
+      "$parentPath/$name"
+    } else {
+      name
+    }
+  }
+
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    // 加载之前保存的黑名单列表
+    val set = SPUtil.getStringSet(
+            this,
+            SETTING_KEY.NAME,
+            SETTING_KEY.BLACKLIST
+    )
+    blackList = if (set != null) LinkedHashSet(set) else LinkedHashSet()
 
     binding = ActivitySettingBinding.inflate(layoutInflater)
     setContentView(binding.root)
@@ -1212,31 +1241,11 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
             }
             DialogAction.POSITIVE -> {
               //add
-              FolderChooser(
-                  this,
-                  TAG_BLACKLIST,
-                  null,
-                  null,
-                  null,
-                  object : FolderChooser.FolderCallback {
-                    override fun onFolderSelection(chooser: FolderChooser, folder: File) {
-                      if (folder.isDirectory) {
-                        val newBlacklist = LinkedHashSet<String>(blackList)
-                        newBlacklist.add(folder.absolutePath)
-                        SPUtil.putStringSet(
-                            this@SettingActivity,
-                            SETTING_KEY.NAME,
-                            SETTING_KEY.BLACKLIST,
-                            newBlacklist
-                        )
-                        contentResolver.notifyChange(
-                            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                            null
-                        )
-                      }
-                      configBlackList()
-                    }
-                  }).show()
+              // 启动获取目录的Intent
+              val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                addCategory(Intent.CATEGORY_DEFAULT)
+              }
+              startActivityForResult(intent, REQUEST_CODE_ADD_BLACKLIST)
             }
           }
         }
@@ -1369,7 +1378,38 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
           pendingExportPlaylist = null
         }
       }
-      Crop.REQUEST_PICK -> {
+      REQUEST_CODE_ADD_BLACKLIST ->{
+        if (requestCode == REQUEST_CODE_ADD_BLACKLIST && resultCode == Activity.RESULT_OK) {
+          data?.data?.let { uri ->
+            val folder = DocumentFile.fromTreeUri(this, uri)
+            if (folder?.isDirectory == true) {
+              val folderPath = getFolderPath(folder) //只有文件夹
+              val encodedUri = folder.uri.toString() //content uri
+              var dncodedUri = Uri.decode(folder.uri.toString()) 
+              val folderPath_test = folder?.uri?.path //getFolderPath()去掉content提供者信息后面的路径
+              val stroagePath = "/storage/emulated/0/"
+              val rootPath = Environment.getExternalStorageDirectory()
+              //val fullPath = stroagePath + folderPath
+              val fullPath = "$rootPath/$folderPath"
+              if (folderPath != null) {
+                blackList.add(fullPath)
+                SPUtil.putStringSet(
+                        this@SettingActivity,
+                        SETTING_KEY.NAME,
+                        SETTING_KEY.BLACKLIST,
+                        blackList
+                )
+                contentResolver.notifyChange(
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        null
+                )
+              }
+            }
+            configBlackList()
+          }
+        }
+      }
+        Crop.REQUEST_PICK -> {
         //选择图片
         val cacheDir = DiskCache.getDiskCacheDir(
             this, "thumbnail/player"
@@ -1405,6 +1445,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     private const val REQUEST_THEME_COLOR = 0x10
     private const val REQUEST_IMPORT_PLAYLIST = 0x102
     private const val REQUEST_EXPORT_PLAYLIST = 0x103
+    private const val REQUEST_CODE_ADD_BLACKLIST = 0x104
 
     private const val TAG_SCAN = "Scan"
     private const val TAG_IMPORT_PLAYLIST = "ImportPlaylist"
