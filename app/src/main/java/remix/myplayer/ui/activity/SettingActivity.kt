@@ -151,14 +151,6 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    // 加载之前保存的黑名单列表
-    val set = SPUtil.getStringSet(
-            this,
-            SETTING_KEY.NAME,
-            SETTING_KEY.BLACKLIST
-    )
-    blackList = if (set != null) LinkedHashSet(set) else LinkedHashSet()
-
     binding = ActivitySettingBinding.inflate(layoutInflater)
     setContentView(binding.root)
     setUpToolbar(getString(R.string.setting))
