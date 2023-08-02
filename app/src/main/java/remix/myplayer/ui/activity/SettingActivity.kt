@@ -131,21 +131,21 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
   private var blackList: Set<String> = emptySet()
         
   //尝试从uri获取文件夹absolutePath
-  fun getFolderPath(documentFile: DocumentFile?): String? {
-    if (documentFile == null) {
-      return null
-    }
-
-    val name = documentFile.name ?: return null
-    val parent = documentFile.parentFile ?: return name
-
-    val parentPath = getFolderPath(parent)
-    return if (parentPath != null) {
-      "$parentPath/$name"
-    } else {
-      name
-    }
-  }
+  //fun getFolderPath(documentFile: DocumentFile?): String? {
+  //  if (documentFile == null) {
+  //    return null
+  //  }
+//
+  //  val name = documentFile.name ?: return null
+  //  val parent = documentFile.parentFile ?: return name
+//
+  //  val parentPath = getFolderPath(parent)
+  //  return if (parentPath != null) {
+  //    "$parentPath/$name"
+  //  } else {
+  //    name
+  //  }
+  //}
 
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -1376,11 +1376,19 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
             val folder = DocumentFile.fromTreeUri(this, uri)
             if (folder?.isDirectory == true) {
               val newBlacklist = LinkedHashSet(blackList)
-              val folderPath = getFolderPath(folder) //只有文件夹
-              val encodedUri = folder.uri.toString() //content uri
-              var dncodedUri = Uri.decode(folder.uri.toString()) 
-              val folderPath_test = folder?.uri?.path //getFolderPath()去掉content提供者信息后面的路径
-              val stroagePath = "/storage/emulated/0/"
+              var folderPath:String?
+              if (decodedUri.lastIndexOf("document/primary:") !== -1) {
+                folderPath = decodedUri.split("document/primary:")[1]
+              } else  if (decodedUri.lastIndexOf("document/home:") !== -1) {
+                folderPath = "Documents/" + decodedUri.split("document/home:")[1]
+              } else {
+                folderPath = null
+              }
+              //val folderPath = getFolderPath(folder) //只有文件夹
+              //val encodedUri = folder.uri.toString() //content uri
+              //var dncodedUri = Uri.decode(folder.uri.toString()) 
+              //val folderPath_test = folder?.uri?.path //getFolderPath()去掉content提供者信息后面的路径
+              //val stroagePath = "/storage/emulated/0/"
               val rootPath = Environment.getExternalStorageDirectory()
               //val fullPath = stroagePath + folderPath
               val fullPath = "$rootPath/$folderPath"
