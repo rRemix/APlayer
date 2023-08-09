@@ -585,23 +585,16 @@ object Util {
       }
 
       file.createNewFile()
-      file.outputStream().use {
-        bitmap.compress(Bitmap.CompressFormat.PNG, 90, it)
-      }
     }
 
     val values = ContentValues()
-    val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       values.put(
         MediaStore.MediaColumns.RELATIVE_PATH,
         Environment.DIRECTORY_PICTURES
       )
-      MediaStore.Images.Media.getContentUri(
-        MediaStore.VOLUME_EXTERNAL_PRIMARY
-      )
     } else {
       values.put(MediaStore.MediaColumns.DATA, file.absolutePath)
-      MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     }
     values.put(MediaStore.Images.ImageColumns.TITLE, fileName)
     values.put(MediaStore.Images.ImageColumns.DISPLAY_NAME, fileName)
@@ -609,7 +602,15 @@ object Util {
     values.put(MediaStore.Images.ImageColumns.WIDTH, bitmap.width)
     values.put(MediaStore.Images.ImageColumns.HEIGHT, bitmap.height)
 
-    val insertUri = context.contentResolver.insert(uri, values)
+    val insertUri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values) ?: return
+
+    context.contentResolver.openOutputStream(insertUri)?.use {
+      ByteArrayOutputStream().use { bos ->
+        bitmap.compress(Bitmap.CompressFormat.PNG, 90, bos)
+        it.write(bos.toByteArray())
+      }
+    }
+
     Timber.v("insertUri: $insertUri")
     ToastUtil.show(context, R.string.save_success)
   }
