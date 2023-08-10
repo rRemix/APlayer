@@ -129,7 +129,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
   private var pendingExportPlaylist: String? = null
 
   private var blackList: Set<String> = emptySet()
-        
+
   //尝试从uri获取文件夹absolutePath
   //fun getFolderPath(documentFile: DocumentFile?): String? {
   //  if (documentFile == null) {
@@ -1233,11 +1233,39 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
             }
             DialogAction.POSITIVE -> {
               //add
-              // 启动获取目录的Intent
-              val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-                addCategory(Intent.CATEGORY_DEFAULT)
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // 启动获取目录的Intent
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                  addCategory(Intent.CATEGORY_DEFAULT)
+                }
+                startActivityForResult(intent, REQUEST_CODE_ADD_BLACKLIST)
+              } else {
+                FolderChooser(
+                  this,
+                  TAG_BLACKLIST,
+                  null,
+                  null,
+                  null,
+                  object : FolderChooser.FolderCallback {
+                    override fun onFolderSelection(chooser: FolderChooser, folder: File) {
+                      if (folder.isDirectory) {
+                        val newBlacklist = LinkedHashSet<String>(blackList)
+                        newBlacklist.add(folder.absolutePath)
+                        SPUtil.putStringSet(
+                          this@SettingActivity,
+                          SETTING_KEY.NAME,
+                          SETTING_KEY.BLACKLIST,
+                          newBlacklist
+                        )
+                        contentResolver.notifyChange(
+                          MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                          null
+                        )
+                      }
+                      configBlackList()
+                    }
+                  }).show()
               }
-              startActivityForResult(intent, REQUEST_CODE_ADD_BLACKLIST)
             }
           }
         }
@@ -1371,29 +1399,21 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
         }
       }
       REQUEST_CODE_ADD_BLACKLIST ->{
-        if (requestCode == REQUEST_CODE_ADD_BLACKLIST && resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
           data?.data?.let { uri ->
             val folder = DocumentFile.fromTreeUri(this, uri)
             if (folder?.isDirectory == true) {
               val newBlacklist = LinkedHashSet(blackList)
-              var folderPath:String?
-              if (decodedUri.lastIndexOf("document/primary:") !== -1) {
-                folderPath = decodedUri.split("document/primary:")[1]
-              } else  if (decodedUri.lastIndexOf("document/home:") !== -1) {
-                folderPath = "Documents/" + decodedUri.split("document/home:")[1]
+              val decodedUri = Uri.decode(folder.uri.toString())
+              val folderPath = if (decodedUri.lastIndexOf("document/primary:") != -1) {
+                decodedUri.split("document/primary:")[1]
+              } else if (decodedUri.lastIndexOf("document/home:") != -1) {
+                "Documents/" + decodedUri.split("document/home:")[1]
               } else {
-                folderPath = null
+                null
               }
-              //val folderPath = getFolderPath(folder) //只有文件夹
-              //val encodedUri = folder.uri.toString() //content uri
-              //var dncodedUri = Uri.decode(folder.uri.toString()) 
-              //val folderPath_test = folder?.uri?.path //getFolderPath()去掉content提供者信息后面的路径
-              //val stroagePath = "/storage/emulated/0/"
-              val rootPath = Environment.getExternalStorageDirectory()
-              //val fullPath = stroagePath + folderPath
-              val fullPath = "$rootPath/$folderPath"
               if (folderPath != null) {
-                newBlacklist.add(fullPath)
+                newBlacklist.add("${Environment.getExternalStorageDirectory()}/$folderPath")
                 SPUtil.putStringSet(
                         this@SettingActivity,
                         SETTING_KEY.NAME,
