@@ -352,7 +352,11 @@ class LyricSearcher {
                 searchResponse.candidates[0].accesskey)
                 .map { lrcResponse ->
                   Timber.v("KugouLyric")
-                  lrcParser.getLrcRows(getBufferReader(Base64.decode(lrcResponse.content, Base64.DEFAULT)), true, cacheKey, searchKey)
+                  val rows = lrcParser.getLrcRows(getBufferReader(Base64.decode(lrcResponse.content, Base64.DEFAULT)), true, cacheKey, searchKey)
+                  rows.forEach {
+                    it.content = Util.htmlToText(it.content)
+                  }
+                  rows
                 }
           } else {
             Single.error(Throwable("no kugou lyric"))
