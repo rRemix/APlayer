@@ -16,6 +16,7 @@ import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.ui.activity.ChildHolderActivity
 import remix.myplayer.ui.adapter.FolderAdapter
 import remix.myplayer.util.Constants
+import remix.myplayer.util.ItemsSorter
 import remix.myplayer.util.MediaStoreUtil.getAllFolder
 
 /**
@@ -69,7 +70,7 @@ class FolderFragment : LibraryFragment<Folder, FolderAdapter>() {
 
   private class AsyncFolderLoader(context: Context?) : WrappedAsyncTaskLoader<List<Folder>>(context) {
     override fun loadInBackground(): List<Folder> {
-      return getAllFolder()
+      return getAllFolder().sortedBy { it.name }
     }
   }
 
