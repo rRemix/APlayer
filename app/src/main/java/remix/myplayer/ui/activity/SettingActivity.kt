@@ -1175,11 +1175,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     blackList = SPUtil.getStringSet(this, SETTING_KEY.NAME, SETTING_KEY.BLACKLIST)
     val items = ArrayList<String>(blackList)
     items.sortWith(Comparator { left, right ->
-      File(left).name.compareTo(
-          File(
-              right
-          ).name
-      )
+      File(left).name.compareTo(File(right).name)
     })
 
     getBaseDialog(this).items(items)
@@ -1369,15 +1365,16 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
                       }
                       .neutralText(R.string.create_playlist)
                       .onNeutral { _, _ ->
+                        val m3uFile = DocumentFile.fromSingleUri(this, uri)
                         getBaseDialog(this)
                             .title(R.string.new_playlist)
                             .positiveText(R.string.create)
                             .negativeText(R.string.cancel)
                             .content(R.string.input_playlist_name)
-                            .input(null, null) { _, input ->
+                            .input(null, m3uFile?.name?.removeSuffix(".m3u")) { _, input ->
                               if (playlists.map { it.name }.contains(input.toString())) {
                                 ToastUtil.show(this, R.string.playlist_already_exist)
-                              } else {
+                              } else if (!input.isNullOrBlank()){
                                 disposables.add(importM3UFile(this, uri, input.toString(), true))
                               }
                             }
@@ -1403,15 +1400,8 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
           data?.data?.let { uri ->
             val folder = DocumentFile.fromTreeUri(this, uri)
             if (folder?.isDirectory == true) {
+              val folderPath = parseDocument(folder)
               val newBlacklist = LinkedHashSet(blackList)
-              val decodedUri = Uri.decode(folder.uri.toString())
-              val folderPath = if (decodedUri.lastIndexOf("document/primary:") != -1) {
-                decodedUri.split("document/primary:")[1]
-              } else if (decodedUri.lastIndexOf("document/home:") != -1) {
-                "Documents/" + decodedUri.split("document/home:")[1]
-              } else {
-                null
-              }
               if (folderPath != null) {
                 newBlacklist.add("${Environment.getExternalStorageDirectory()}/$folderPath")
                 SPUtil.putStringSet(
@@ -1457,6 +1447,18 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
           return
         }
     }
+  }
+
+  private fun parseDocument(folder: DocumentFile): String? {
+    val decodedUri = Uri.decode(folder.uri.toString())
+    val folderPath = if (decodedUri.lastIndexOf("document/primary:") != -1) {
+      decodedUri.split("document/primary:")[1]
+    } else if (decodedUri.lastIndexOf("document/home:") != -1) {
+      "Documents/" + decodedUri.split("document/home:")[1]
+    } else {
+      null
+    }
+    return folderPath
   }
 
   companion object {
