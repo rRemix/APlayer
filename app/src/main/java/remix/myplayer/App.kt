@@ -68,6 +68,14 @@ class App : MultiDexApplication() {
         Timber.v(e)
       }
     }
+
+    val oldVersion = SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.VERSION, 1)
+    if (oldVersion < SETTING_KEY.NEWEST_VERSION) {
+      if (oldVersion == 1) {
+        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.LIBRARY, "")
+      }
+      SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.VERSION, SETTING_KEY.NEWEST_VERSION)
+    }
   }
 
   private fun setUp() {

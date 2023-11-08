@@ -7,6 +7,7 @@
     <string name="tab_artist">アーティスト</string>
     <string name="tab_playlist">プレイリスト</string>
     <string name="tab_folder">フォルダ</string>
+    <string name="tab_genre">流派</string>
 
     <string name="drawer_song">ライブラリ</string>
     <string name="drawer_recently_add">最近の追加</string>
@@ -292,6 +293,8 @@
   <string name="display_title_desc">ファイル名 逆順</string>
   <string name="artist">アーティスト</string>
   <string name="artist_desc">アーティスト 逆順</string>
+  <string name="genre">流派</string>
+  <string name="genre_desc">流派 逆順</string>
   <string name="date_modify">変更日時</string>
   <string name="date_modify_desc">変更日時 逆順</string>
   <string name="duration">長さ</string>

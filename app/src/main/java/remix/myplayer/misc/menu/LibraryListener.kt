@@ -15,9 +15,11 @@ import io.reactivex.schedulers.Schedulers
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.mp3.APlayerModel
+import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
+import remix.myplayer.misc.getSongIds
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.theme.Theme
@@ -54,6 +56,8 @@ class LibraryListener(private val context: Context,
             .blockingGet()
         //文件夹
         Constants.FOLDER -> getSongsByParentPath(model.getKey()).map { it.id }
+        //流派
+        Constants.GENRE -> (model as Genre).getSongIds()
         else -> emptyList()
       }
     }
@@ -61,16 +65,6 @@ class LibraryListener(private val context: Context,
 
   @SuppressLint("CheckResult")
   override fun onMenuItemClick(item: MenuItem): Boolean {
-//        val ids = when (type) {
-//            Constants.ALBUM, Constants.ARTIST //专辑或者艺术家
-//            -> getSongIds((if (type == Constants.ALBUM) MediaStore.Audio.Media.ALBUM_ID else MediaStore.Audio.Media.ARTIST_ID) + "=" + id, null)
-//            Constants.PLAYLIST //播放列表
-//            -> PlayListUtil.getSongIds(id)
-//            Constants.FOLDER //文件夹
-//            -> getSongIdsByParentId(id)
-//            else -> emptyList<Int>()
-//        }
-
     getSongIdSingle()
         .map {
           MediaStoreUtil.getSongsByIds(it)

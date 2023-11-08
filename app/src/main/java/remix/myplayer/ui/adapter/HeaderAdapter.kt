@@ -17,6 +17,7 @@ import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.SPUtil
+import java.lang.IllegalStateException
 
 /**
  * @ClassName
@@ -105,8 +106,7 @@ abstract class HeaderAdapter<Data, ViewHolder : RecyclerView.ViewHolder>(
   }
 
   private fun saveMode(context: Context) {
-    val key = if (this is AlbumAdapter) SPUtil.SETTING_KEY.MODE_FOR_ALBUM else if (this is ArtistAdapter) SPUtil.SETTING_KEY.MODE_FOR_ARTIST else SPUtil.SETTING_KEY.MODE_FOR_PLAYLIST
-    SPUtil.putValue(context, SPUtil.SETTING_KEY.NAME, key, mode)
+    SPUtil.putValue(context, SPUtil.SETTING_KEY.NAME, key ?: return, mode)
   }
 
   fun setMarginForGridLayout(holder: BaseViewHolder, position: Int) {
@@ -169,8 +169,31 @@ abstract class HeaderAdapter<Data, ViewHolder : RecyclerView.ViewHolder>(
     const val TYPE_NORMAL = 1
   }
 
+  val key by lazy {
+    when (this) {
+      is AlbumAdapter -> {
+        SPUtil.SETTING_KEY.MODE_FOR_ALBUM
+      }
+
+      is ArtistAdapter -> {
+        SPUtil.SETTING_KEY.MODE_FOR_ARTIST
+      }
+
+      is GenreAdapter -> {
+        SPUtil.SETTING_KEY.MODE_FOR_GENRE
+      }
+
+      is PlayListAdapter -> {
+        SPUtil.SETTING_KEY.MODE_FOR_PLAYLIST
+      }
+
+      else -> {
+        null
+      }
+    }
+  }
+
   init {
-    val key = if (this is AlbumAdapter) SPUtil.SETTING_KEY.MODE_FOR_ALBUM else if (this is ArtistAdapter) SPUtil.SETTING_KEY.MODE_FOR_ARTIST else if (this is PlayListAdapter) SPUtil.SETTING_KEY.MODE_FOR_PLAYLIST else null
     //其他的列表都是List模式
     mode = if (key != null) SPUtil
         .getValue(recyclerView.context, SPUtil.SETTING_KEY.NAME, key, GRID_MODE) else LIST_MODE

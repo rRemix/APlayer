@@ -10,17 +10,16 @@ import remix.myplayer.ui.fragment.*
 
 @Parcelize
 data class Library(
-    @SerializedName("mTag")
     val tag: Int,
-    @SerializedName("mOrder")
     val order: Int = tag,
-    @SerializedName("mClassName")
     val className: String = when (tag) {
       TAG_SONG -> SongFragment::class.java.name
       TAG_ALBUM -> AlbumFragment::class.java.name
       TAG_ARTIST -> ArtistFragment::class.java.name
       TAG_PLAYLIST -> PlayListFragment::class.java.name
-      else -> FolderFragment::class.java.name
+      TAG_GENRE -> GenreFragment::class.java.name
+      TAG_FOLDER -> FolderFragment::class.java.name
+      else -> throw IllegalArgumentException("unknown tag: $tag")
     }) : Parcelable {
 
   fun isPlayList(): Boolean {
@@ -34,7 +33,9 @@ data class Library(
           TAG_ALBUM -> R.string.tab_album
           TAG_ARTIST -> R.string.tab_artist
           TAG_PLAYLIST -> R.string.tab_playlist
-          else -> R.string.tab_folder
+          TAG_GENRE -> R.string.tab_genre
+          TAG_FOLDER -> R.string.tab_folder
+          else -> throw IllegalArgumentException("unknown tag: $tag")
         })
   }
 
@@ -43,14 +44,16 @@ data class Library(
     const val TAG_SONG = 0
     const val TAG_ALBUM = 1
     const val TAG_ARTIST = 2
-    const val TAG_PLAYLIST = 3
-    const val TAG_FOLDER = 4
+    const val TAG_GENRE = 3
+    const val TAG_PLAYLIST = 4
+    const val TAG_FOLDER = 5
 
     fun getDefaultLibrary(): List<Library> {
       return listOf(
           Library(TAG_SONG),
           Library(TAG_ALBUM),
           Library(TAG_ARTIST),
+          Library(TAG_GENRE),
           Library(TAG_PLAYLIST),
           Library(TAG_FOLDER))
     }
@@ -59,6 +62,7 @@ data class Library(
       return listOf(context.resources.getString(R.string.tab_song),
           context.resources.getString(R.string.tab_album),
           context.resources.getString(R.string.tab_artist),
+          context.resources.getString(R.string.tab_genre),
           context.resources.getString(R.string.tab_playlist),
           context.resources.getString(R.string.tab_folder))
     }

@@ -15,6 +15,7 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Folder
+import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
@@ -89,7 +90,11 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
             ids.addAll((it as Folder).getSongIds())
           }
         }
-
+        Constants.GENRE -> {
+          checkParam.forEach {
+            ids.addAll((it as Genre).getSongIds())
+          }
+        }
       }
       ids
     }
@@ -125,7 +130,11 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
           ids.addAll((it as Folder).getSongIds())
         }
       }
-
+      Constants.GENRE -> {
+        checkParam.forEach {
+          ids.addAll((it as Genre).getSongIds())
+        }
+      }
     }
     return ids
   }
@@ -348,7 +357,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
   }
 
   private fun isLibraryAdapter(): Boolean {
-    return (adapter is SongAdapter || adapter is AlbumAdapter || adapter is ArtistAdapter
+    return (adapter is SongAdapter || adapter is AlbumAdapter || adapter is ArtistAdapter || adapter is GenreAdapter
         || adapter is PlayListAdapter || adapter is ChildHolderAdapter)
   }
 
@@ -390,6 +399,9 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
     popup!!.binding.multiClose.setOnClickListener { close() }
     popup!!.binding.multiPlaylist.setOnClickListener { addToPlayList() }
     popup!!.binding.multiQueue.setOnClickListener { addToPlayQueue() }
+    if (type == Constants.GENRE) {
+      popup!!.binding.multiDelete.visibility = View.GONE
+    }
     popup!!.binding.multiDelete.setOnClickListener { delete() }
     popup!!.binding.multiMore.setOnClickListener {
       PopupMenu(activity, popup!!.binding.multiMore).run {

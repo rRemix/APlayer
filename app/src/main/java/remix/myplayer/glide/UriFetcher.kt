@@ -8,11 +8,13 @@ import remix.myplayer.App.Companion.context
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
+import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.request.network.HttpClient
 import remix.myplayer.util.ImageUriUtil
+import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.MediaStoreUtil.getSongs
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.Util
@@ -65,6 +67,9 @@ object UriFetcher {
         fetch(model)
       }
       is PlayList -> {
+        fetch(model)
+      }
+      is Genre -> {
         fetch(model)
       }
       else -> {
@@ -276,6 +281,20 @@ object UriFetcher {
               .getPlayListSongs(context, it, true)
         }
         .blockingGet()
+
+    var uri: Uri
+    for (song in songs) {
+      uri = fetch(song)
+      if (uri != Uri.EMPTY) {
+        return uri
+      }
+    }
+
+    return Uri.EMPTY
+  }
+
+  private fun fetch(genre: Genre): Uri {
+    val songs = MediaStoreUtil.getSongsByGenreId(genre.id)
 
     var uri: Uri
     for (song in songs) {

@@ -18,12 +18,13 @@ import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.Constants
 import remix.myplayer.util.DensityUtil
-import java.util.*
+import java.util.Collections
 
 /**
  * Created by Remix on 2016/12/23.
  */
-abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>> : BaseMusicFragment(), MusicEventCallback, LoaderManager.LoaderCallbacks<List<Data>> {
+abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>> : BaseMusicFragment(),
+  MusicEventCallback, LoaderManager.LoaderCallbacks<List<Data>> {
   lateinit var adapter: A
   lateinit var multiChoice: MultipleChoice<Data>
     private set
@@ -31,7 +32,31 @@ abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>> : BaseMusicFragme
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val type = if (this is SongFragment) Constants.SONG else if (this is AlbumFragment) Constants.ALBUM else if (this is ArtistFragment) Constants.ARTIST else if (this is PlayListFragment) Constants.PLAYLIST else Constants.FOLDER
+    val type = when (this) {
+      is SongFragment -> {
+        Constants.SONG
+      }
+
+      is AlbumFragment -> {
+        Constants.ALBUM
+      }
+
+      is ArtistFragment -> {
+        Constants.ARTIST
+      }
+
+      is PlayListFragment -> {
+        Constants.PLAYLIST
+      }
+
+      is GenreFragment -> {
+        Constants.GENRE
+      }
+
+      else -> {
+        Constants.FOLDER
+      }
+    }
     multiChoice = MultipleChoice(requireActivity(), type)
     initAdapter()
     initView()
@@ -52,8 +77,10 @@ abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>> : BaseMusicFragme
     }
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                            savedInstanceState: Bundle?): View? {
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
     return inflater.inflate(layoutID, container, false)
   }
 

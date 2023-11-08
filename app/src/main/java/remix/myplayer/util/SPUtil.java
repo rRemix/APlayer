@@ -183,6 +183,8 @@ public class SPUtil {
     String ARTIST_SORT_ORDER = "artist_sort_order";
     //播放列表排序顺序
     String PLAYLIST_SORT_ORDER = "playlist_sort_order";
+    //流派排序
+    String GENRE_SORT_ORDER = "genre_sort_order";
     //文件夹内歌曲排序顺序
     String CHILD_FOLDER_SONG_SORT_ORDER = "child_folder_song_sort_order";
     //艺术家内歌曲排序顺序
@@ -191,6 +193,8 @@ public class SPUtil {
     String CHILD_ALBUM_SONG_SORT_ORDER = "child_album_song_sort_order";
     //播放列表内歌曲排序顺序
     String CHILD_PLAYLIST_SONG_SORT_ORDER = "child_playlist_song_sort_order";
+    //流派内歌曲排序顺序
+    String CHILD_GENRE_SONG_SORT_ORDER = "child_genre_song_sort_order";
     //移除歌曲
     String BLACKLIST_SONG = "black_list_song";
     //黑名单
@@ -235,6 +239,8 @@ public class SPUtil {
     String MODE_FOR_ALBUM = "mode_for_album";
     //艺术家列表的显示模式
     String MODE_FOR_ARTIST = "mode_for_artist";
+    //流派列表的显示模式
+    String MODE_FOR_GENRE = "mode_for_genre";
     //播放列表的显示模式
     String MODE_FOR_PLAYLIST = "mode_for_playlist";
     //语言
@@ -261,6 +267,8 @@ public class SPUtil {
     String DARK_THEME = "dark_theme";
     // 黑色主题
     String BLACK_THEME = "black_theme";
+    String VERSION = "version";
+    int NEWEST_VERSION = 2;
   }
 
   public interface LYRIC_OFFSET_KEY {

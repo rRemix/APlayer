@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import remix.myplayer.bean.misc.Library
 import remix.myplayer.ui.fragment.*
+import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 
 /**
@@ -70,8 +71,18 @@ class MainPagerAdapter(private val fm: FragmentManager) : FragmentPagerAdapter(f
       return weakReference.get()!!
     }
     val (tag) = libraries[position]
-    val fragment: Fragment = if (tag == Library.TAG_SONG) SongFragment() else if (tag == Library.TAG_ALBUM) AlbumFragment() else if (tag == Library.TAG_ARTIST) ArtistFragment() else if (tag == Library.TAG_PLAYLIST) PlayListFragment() else FolderFragment()
-    val newWeakReference = WeakReference(fragment)
+
+    val fragment = when(tag) {
+      Library.TAG_SONG -> SongFragment()
+      Library.TAG_ALBUM -> AlbumFragment()
+      Library.TAG_ARTIST -> ArtistFragment()
+      Library.TAG_GENRE -> GenreFragment()
+      Library.TAG_PLAYLIST -> PlayListFragment()
+      Library.TAG_FOLDER -> FolderFragment()
+      else -> throw IllegalArgumentException("unknown library: ${libraries[position]}")
+    }
+//    val fragment: Fragment = if (tag == Library.TAG_SONG) SongFragment() else if (tag == Library.TAG_ALBUM) AlbumFragment() else if (tag == Library.TAG_ARTIST) ArtistFragment() else if (tag == Library.TAG_PLAYLIST) PlayListFragment() else FolderFragment()
+    val newWeakReference = WeakReference(fragment as Fragment)
     fragmentMap[position] = newWeakReference
     return fragment
   }

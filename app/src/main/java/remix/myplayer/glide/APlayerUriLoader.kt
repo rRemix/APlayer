@@ -18,7 +18,7 @@ class APlayerUriLoader(private val concreteLoader: ModelLoader<Uri, InputStream>
   }
 
   override fun handles(model: APlayerModel): Boolean {
-    return model is Song || model is Album || model is Artist || model is PlayList
+    return model is Song || model is Album || model is Artist || model is PlayList || model is Genre
   }
 
   class Factory : ModelLoaderFactory<APlayerModel, InputStream> {

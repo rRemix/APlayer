@@ -17,6 +17,7 @@ import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.db.room.model.PlayQueue
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
+import remix.myplayer.util.SPUtil
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
 
@@ -49,13 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
     private fun buildDatabase(context: Context): AppDatabase {
-      val migration1to3 = object : Migration(1, 3) {
-        override fun migrate(database: SupportSQLiteDatabase) {
-        }
-
-      }
       val database = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "aplayer.db")
-          .addMigrations(migration1to3)
           .build()
       database.invalidationTracker.addObserver(object : InvalidationTracker.Observer(PlayList.TABLE_NAME, PlayQueue.TABLE_NAME) {
         override fun onInvalidated(tables: MutableSet<String>) {

@@ -16,6 +16,7 @@ public class Constants {
   public final static int FOLDER = 3;
   public final static int PLAYLIST = 4;
   public final static int PLAYLISTSONG = 5;
+  public final static int GENRE = 6;
 
   public final static String ACTION_EXIT = "remix.music.EXIT";
 

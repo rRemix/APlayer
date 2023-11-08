@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/item_container"
+  android:layout_width="match_parent"
+  android:layout_height="@dimen/d64_size"
+  android:background="?attr/background_list">
+
+  <ImageView
+    android:id="@+id/iv"
+    android:layout_width="@dimen/d42_size"
+    android:layout_height="@dimen/d42_size"
+    android:layout_marginStart="@dimen/d8_size"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintTop_toTopOf="parent"/>
+
+  <TextView
+    android:id="@+id/item_text1"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp"
+    android:layout_marginStart="@dimen/d8_size"
+    android:layout_marginEnd="@dimen/d8_size"
+    android:ellipsize="end"
+    android:gravity="start|center_vertical"
+    android:lines="1"
+    android:textColor="?attr/text_color_primary"
+    android:textSize="@dimen/s14_size"
+    app:layout_constraintBottom_toTopOf="@id/item_text2"
+    app:layout_constraintEnd_toStartOf="@id/item_button"
+    app:layout_constraintStart_toEndOf="@id/iv"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_chainStyle="packed"/>
+
+  <TextView
+    android:id="@+id/item_text2"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/d4_size"
+    android:ellipsize="end"
+    android:gravity="start|center_vertical"
+    android:lines="1"
+    android:textColor="?attr/text_color_secondary"
+    android:textSize="@dimen/s12_size"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="@id/item_text1"
+    app:layout_constraintRight_toRightOf="@id/item_text1"
+    app:layout_constraintTop_toBottomOf="@id/item_text1"/>
+
+  <ImageButton
+    android:id="@+id/item_button"
+    android:layout_width="@dimen/item_list_btn_size"
+    android:layout_height="@dimen/item_list_btn_size"
+    android:layout_marginEnd="@dimen/d8_size"
+    android:background="?attr/background_oval_ripple"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toTopOf="parent"/>
+
+  <View
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/d1_size"
+    android:layout_marginStart="@dimen/d8_size"
+    android:background="?attr/divider_color"
+    app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

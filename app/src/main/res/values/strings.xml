@@ -7,6 +7,7 @@
   <string name="tab_artist">Artists</string>
   <string name="tab_playlist">Playlists</string>
   <string name="tab_folder">Folders</string>
+  <string name="tab_genre">Genres</string>
 
   <string name="drawer_song">Song Library</string>
   <string name="drawer_recently_add">Recently Added</string>
@@ -292,6 +293,8 @@
   <string name="display_title_desc">File name desc</string>
   <string name="artist">Artist</string>
   <string name="artist_desc">Artist desc</string>
+  <string name="genre">Genre</string>
+  <string name="genre_desc">Genre desc</string>
   <string name="date_modify">Date Modified</string>
   <string name="date_modify_desc">Date Modified desc</string>
   <string name="duration">Duration</string>

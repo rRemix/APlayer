@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Folder
+import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.util.MediaStoreUtil
 import timber.log.Timber
 import java.io.File
@@ -33,6 +34,10 @@ fun Artist.getSongIds(): List<Long> {
 
 fun Folder.getSongIds(): List<Long> {
   return MediaStoreUtil.getSongsByParentPath(path).map { it.id }
+}
+
+fun Genre.getSongIds(): List<Long> {
+  return MediaStoreUtil.getSongsByGenreId(id).map { it.id }
 }
 
 fun Context.isPortraitOrientation(): Boolean {

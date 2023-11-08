@@ -33,6 +33,7 @@ import remix.myplayer.ui.fragment.BottomActionBarFragment
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.util.*
 import remix.myplayer.util.MediaStoreUtil.getSongsByArtistIdOrAlbumId
+import remix.myplayer.util.MediaStoreUtil.getSongsByGenreId
 import remix.myplayer.util.MediaStoreUtil.getSongsByParentPath
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import java.lang.ref.WeakReference
@@ -185,6 +186,9 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
       Constants.ARTIST -> {
         SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, sortOrder)
       }
+      Constants.GENRE -> {
+        SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_GENRE_SONG_SORT_ORDER, sortOrder)
+      }
       else -> {
         SPUtil.putValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, sortOrder)
       }
@@ -247,6 +251,7 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
       when (type) {
         Constants.ALBUM -> return getSongsByArtistIdOrAlbumId(key.toLong(), Constants.ALBUM)
         Constants.ARTIST -> return getSongsByArtistIdOrAlbumId(key.toLong(), Constants.ARTIST)
+        Constants.GENRE -> return getSongsByGenreId(key.toLong(), SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.CHILD_GENRE_SONG_SORT_ORDER, SortOrder.SONG_A_Z))
         Constants.FOLDER -> return getSongsByParentPath(key)
         Constants.PLAYLIST -> return getInstance()
             .getPlayList(key.toLong())
