@@ -297,6 +297,8 @@
   <string name="genre_desc">Genre desc</string>
   <string name="date_modify">Date Modified</string>
   <string name="date_modify_desc">Date Modified desc</string>
+  <string name="count">Play count</string>
+  <string name="count_desc">Play count desc</string>
   <string name="duration">Duration</string>
   <string name="year">Year</string>
   <string name="number_of_album">Number of albums</string>

@@ -109,6 +109,14 @@ abstract class MenuActivity : ToolbarActivity() {
           sortOrder = SortOrder.TRACK_NUMBER
           item.isChecked = true
         }
+        R.id.action_sort_order_play_count -> {
+          sortOrder = SortOrder.PLAY_COUNT
+          item.isChecked = true
+        }
+        R.id.action_sort_order_play_count_desc -> {
+          sortOrder = SortOrder.PLAY_COUNT_DESC
+          item.isChecked = true
+        }
       }
       if (!TextUtils.isEmpty(sortOrder))
         saveSortOrder(sortOrder)
@@ -150,6 +158,8 @@ abstract class MenuActivity : ToolbarActivity() {
       SortOrder.PLAYLIST_DATE -> subMenu.findItem(R.id.action_sort_order_playlist_date).isChecked = true
       SortOrder.TRACK_NUMBER -> subMenu.findItem(R.id.action_sort_order_track_number).isChecked = true
       SortOrder.PLAYLIST_SONG_CUSTOM -> subMenu.findItem(R.id.action_sort_order_custom).isChecked = true
+      SortOrder.PLAY_COUNT -> subMenu.findItem(R.id.action_sort_order_play_count).isChecked = true
+      SortOrder.PLAY_COUNT_DESC -> subMenu.findItem(R.id.action_sort_order_play_count_desc).isChecked = true
     }
   }
 

@@ -13,7 +13,7 @@
   <string name="drawer_recently_add">最近新增</string>
   <string name="drawer_folder">資料夾</string>
   <string name="drawer_setting">設定</string>
-  <string name="drawer_history">最近播放</string>
+  <string name="drawer_history">播放歷史</string>
 
   <string name="from_aplayer">來自 APlayer 播放器</string>
   <string name="about">關於 APlayer</string>
@@ -297,6 +297,8 @@
   <string name="genre_desc">流派降序</string>
   <string name="date_modify">修改時間</string>
   <string name="date_modify_desc">修改時間降序</string>
+  <string name="count">播放次數</string>
+  <string name="count_desc">播放次數降序</string>
   <string name="duration">時長</string>
   <string name="year">年份</string>
   <string name="number_of_album">專輯數量</string>

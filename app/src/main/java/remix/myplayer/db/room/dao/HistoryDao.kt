@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import remix.myplayer.db.room.model.History
 
 
@@ -20,9 +21,11 @@ interface HistoryDao {
   fun insertHistory(history: History): Long
 
   @Query("""
-    SELECT * FROM History ORDER BY last_play DESC LIMIT 30
+    SELECT * FROM History ORDER BY
+    CASE WHEN :asc = 1 THEN play_count END ASC,
+    CASE WHEN :asc = 0 THEN play_count END DESC
   """)
-  fun selectAll(): List<History>
+  fun selectAll(asc: Boolean): Flow<List<History>>
 
   @Query("""
     SELECT * FROM History

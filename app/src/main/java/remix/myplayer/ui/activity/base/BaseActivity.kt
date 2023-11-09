@@ -10,6 +10,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.tbruyelle.rxpermissions2.RxPermissions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
@@ -28,7 +30,7 @@ import timber.log.Timber
  * Created by Remix on 2016/3/16.
  */
 @SuppressLint("Registered")
-open class BaseActivity : AppCompatActivity() {
+open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
   private var isDestroyed = false
   protected var isForeground = false
 

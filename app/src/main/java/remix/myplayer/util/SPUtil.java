@@ -195,6 +195,8 @@ public class SPUtil {
     String CHILD_PLAYLIST_SONG_SORT_ORDER = "child_playlist_song_sort_order";
     //流派内歌曲排序顺序
     String CHILD_GENRE_SONG_SORT_ORDER = "child_genre_song_sort_order";
+    //播放次数排序
+    String HISTORY_SORT_ORDER = "history_sort_order";
     //移除歌曲
     String BLACKLIST_SONG = "black_list_song";
     //黑名单

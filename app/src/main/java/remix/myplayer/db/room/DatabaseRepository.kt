@@ -476,22 +476,28 @@ class DatabaseRepository private constructor() {
 
   }
 
-  fun getHistorySongs(): Single<List<Song>> {
-    return Single
-        .fromCallable {
-          db.historyDao().selectAll()
-        }
-        .map {
-          val songs = ArrayList<Song>()
-          for (history in it) {
-            val song = MediaStoreUtil.getSongById(history.audio_id)
-            if (song != Song.EMPTY_SONG) {
-              songs.add(song)
-            }
-          }
-          songs
-        }
-  }
+//  fun getHistorySongs(): Single<List<Song>> {
+//    return Single
+//        .fromCallable {
+//          val sortOrder = SPUtil.getValue(
+//            App.context,
+//            SPUtil.SETTING_KEY.NAME,
+//            SPUtil.SETTING_KEY.HISTORY_SORT_ORDER,
+//            SortOrder.PLAY_COUNT
+//          )
+//          db.historyDao().selectAll(sortOrder)
+//        }
+//        .map {
+//          val songs = ArrayList<Song>()
+//          for (history in it) {
+//            val song = MediaStoreUtil.getSongById(history.audio_id)
+//            if (song != Song.EMPTY_SONG) {
+//              songs.add(song)
+//            }
+//          }
+//          songs
+//        }
+//  }
 
   /**
    * 获取本机的播放列表 播放列表名字-歌曲ID列表

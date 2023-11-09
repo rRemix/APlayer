@@ -297,6 +297,8 @@
   <string name="genre_desc">流派 逆順</string>
   <string name="date_modify">変更日時</string>
   <string name="date_modify_desc">変更日時 逆順</string>
+  <string name="count">再生回数</string>
+  <string name="count_desc">再生回数 逆順</string>
   <string name="duration">長さ</string>
   <string name="year">年</string>
   <string name="number_of_album">アルバム数</string>
