@@ -26,8 +26,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 33
 
-        versionCode 16200
-        versionName "1.6.2.0"
+        versionCode 16102
+        versionName "1.6.1.0"
 
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
@@ -210,6 +210,8 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.28'
     implementation 'com.github.tony19:logback-android:2.0.0'
 
+    //webdav
+    implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
 }
 
 android.sourceSets.all {

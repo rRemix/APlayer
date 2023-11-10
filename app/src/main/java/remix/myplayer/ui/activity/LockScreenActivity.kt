@@ -275,7 +275,7 @@ class LockScreenActivity : BaseMusicActivity() {
 
     private val ref: WeakReference<LockScreenActivity> = WeakReference(activity)
     private val lyricFetcher: LyricFetcher = LyricFetcher(service)
-    private var songInThread = Song.EMPTY_SONG
+    private var songInThread: Song = Song.EMPTY_SONG
 
     override fun interrupt() {
       super.interrupt()

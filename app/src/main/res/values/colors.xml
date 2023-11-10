@@ -32,6 +32,7 @@
   <color name="light_ripple_color">#1f000000</color>
   <color name="light_select_color">#1f000000</color>
   <color name="light_library_color">#f1f1f1</color>
+  <color name="light_icon_color">#000000</color>
   <!--Divider-->
   <color name="dark_background_color_main">#242428</color>
   <color name="dark_background_color_dialog">#1d1a1d</color>
@@ -42,6 +43,7 @@
   <!--<color name="night_ripple_color">#353538</color>-->
   <color name="dark_select_color">#33ffffff</color>
   <color name="dark_library_color">#171719</color>
+  <color name="dark_icon_color">#ffffff</color>
   <!--Divider-->
   <color name="black_background_color_main">#000000</color>
   <color name="black_library_color">#000000</color>

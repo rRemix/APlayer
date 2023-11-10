@@ -2,10 +2,10 @@ package remix.myplayer.bean.misc
 
 import android.content.Context
 import android.os.Parcelable
-import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 import remix.myplayer.App
 import remix.myplayer.R
+import remix.myplayer.ui.activity.RemoteFragment
 import remix.myplayer.ui.fragment.*
 
 @Parcelize
@@ -19,6 +19,7 @@ data class Library(
       TAG_PLAYLIST -> PlayListFragment::class.java.name
       TAG_GENRE -> GenreFragment::class.java.name
       TAG_FOLDER -> FolderFragment::class.java.name
+      TAG_CLOUD -> RemoteFragment::class.java.name
       else -> throw IllegalArgumentException("unknown tag: $tag")
     }) : Parcelable {
 
@@ -35,6 +36,7 @@ data class Library(
           TAG_PLAYLIST -> R.string.tab_playlist
           TAG_GENRE -> R.string.tab_genre
           TAG_FOLDER -> R.string.tab_folder
+          TAG_CLOUD -> R.string.tab_remote
           else -> throw IllegalArgumentException("unknown tag: $tag")
         })
   }
@@ -47,6 +49,7 @@ data class Library(
     const val TAG_GENRE = 3
     const val TAG_PLAYLIST = 4
     const val TAG_FOLDER = 5
+    const val TAG_CLOUD = 6
 
     fun getDefaultLibrary(): List<Library> {
       return listOf(
@@ -55,7 +58,9 @@ data class Library(
           Library(TAG_ARTIST),
           Library(TAG_GENRE),
           Library(TAG_PLAYLIST),
-          Library(TAG_FOLDER))
+          Library(TAG_FOLDER),
+          Library(TAG_CLOUD)
+      )
     }
 
     fun getAllLibraryString(context: Context): List<String> {
@@ -64,7 +69,8 @@ data class Library(
           context.resources.getString(R.string.tab_artist),
           context.resources.getString(R.string.tab_genre),
           context.resources.getString(R.string.tab_playlist),
-          context.resources.getString(R.string.tab_folder))
+          context.resources.getString(R.string.tab_folder),
+          context.resources.getString(R.string.tab_remote),)
     }
   }
 

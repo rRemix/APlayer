@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+  <group android:enabled="true">
+    <item
+      android:title="连接"
+      android:id="@+id/menu_connect"/>
+    <item
+      android:title="编辑"
+      android:id="@+id/menu_edit"/>
+    <item
+      android:title="@string/delete"
+      android:id="@+id/menu_delete"/>
+  </group>
+</menu>

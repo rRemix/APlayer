@@ -167,6 +167,11 @@
     <!-- 图片裁剪 -->
     <activity android:name="com.soundcloud.android.crop.CropImageActivity"/>
 
+    <activity android:name=".ui.activity.WebDavActivity"
+      android:theme="@style/ActivityStyle"/>
+
+    <activity android:name=".ui.activity.WebDavDetailActivity"
+      android:theme="@style/ActivityStyle"/>
 
     <!-- 线控 -->
     <receiver android:name=".misc.receiver.MediaButtonReceiver"

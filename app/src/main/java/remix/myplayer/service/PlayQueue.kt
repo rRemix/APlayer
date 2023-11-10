@@ -41,10 +41,10 @@ class PlayQueue(service: MusicService) {
     private set
 
   // 当前正在播放的歌曲
-  var song = Song.EMPTY_SONG
+  var song: Song = Song.EMPTY_SONG
 
   // 下一首歌曲
-  var nextSong = Song.EMPTY_SONG
+  var nextSong: Song = Song.EMPTY_SONG
 
   fun makeList() {
     val service = service.get() ?: return
@@ -120,14 +120,14 @@ class PlayQueue(service: MusicService) {
     val lastId = try {
       SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1L)
     } catch (e: Exception) {
-      SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1)
+      SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1L)
     }
     //上次退出时正在播放的歌曲是否还存在
     var isLastSongExist = false
     //上次退出时正在播放的歌曲的pos
     var pos = 0
     //查找上次退出时的歌曲是否还存在
-    if (lastId != -1L) {
+    if (lastId > 0) {
       for (i in _originalQueue.indices) {
         if (lastId == _originalQueue[i].id) {
           isLastSongExist = true

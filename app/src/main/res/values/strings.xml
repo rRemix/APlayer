@@ -8,6 +8,7 @@
   <string name="tab_playlist">Playlists</string>
   <string name="tab_folder">Folders</string>
   <string name="tab_genre">Genres</string>
+  <string name="tab_remote">Remote</string>
 
   <string name="drawer_song">Song Library</string>
   <string name="drawer_recently_add">Recently Added</string>
@@ -459,4 +460,14 @@
   <string name="support_developer">Support Developer</string>
   <string name="no_more_prompt">No more prompt</string>
   <string name="go">go</string>
+
+  <string name="webdav">WebDav</string>
+  <string name="dlna">DLNA</string>
+
+  <string name="alias">Alias</string>
+  <string name="account">Account</string>
+  <string name="pwd">Password</string>
+  <string name="webdav_hint_server">Server</string>
+  <string name="webdav_hint_path">Path(optional)</string>
+  <string name="can_t_be_empty">%s can\'t be empty</string>
 </resources>

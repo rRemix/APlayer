@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity.base
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -40,6 +41,15 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
   var audioTag: AudioTag? = null
 
   var toDeleteSongs: ArrayList<Song>? = null
+
+  private val loadingDialog by lazy {
+    Theme.getBaseDialog(this)
+      .title(R.string.loading)
+      .content(R.string.please_wait)
+      .canceledOnTouchOutside(false)
+      .progress(true, 0)
+      .progressIndeterminateStyle(false).build()
+  }
 
   /**
    * 设置主题
@@ -158,6 +168,7 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         } else {
           ToastUtil.show(this, R.string.grant_write_permission_tip)
         }
+
       MediaStoreUtil.REQUEST_DELETE_PERMISSION ->
         if (resultCode == Activity.RESULT_OK) {
           toDeleteSongs?.let {
@@ -175,6 +186,20 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
   override fun attachBaseContext(newBase: Context) {
     super.attachBaseContext(setLocal(newBase))
+  }
+
+  protected fun showLoading(): Dialog {
+    if (loadingDialog.isShowing) {
+      return loadingDialog
+    }
+    loadingDialog.show()
+    return loadingDialog
+  }
+
+  protected fun dismissLoading() {
+    if (loadingDialog.isShowing) {
+      loadingDialog.dismiss()
+    }
   }
 
   companion object {

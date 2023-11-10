@@ -165,7 +165,7 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
           !this.sortOrder.equals(sortOrder, ignoreCase = true)) {
         //选择的是手动排序
         if (sortOrder.equals(SortOrder.PLAYLIST_SONG_CUSTOM, ignoreCase = true)) {
-          CustomSortActivity.start(this, intent.getParcelableExtra(EXTRA_MODEL)!!, ArrayList(adapter!!.dataList))
+          CustomSortActivity.start(this, intent.getSerializableExtra(EXTRA_MODEL) as PlayList, ArrayList(adapter!!.dataList))
         } else {
           update = true
         }

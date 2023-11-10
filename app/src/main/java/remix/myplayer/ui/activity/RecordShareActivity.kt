@@ -39,9 +39,6 @@ import java.util.*
 class RecordShareActivity : BaseMusicActivity() {
   lateinit var binding: ActivityRecordshareBinding
 
-  //处理图片的进度条
-  private var progressDialog: MaterialDialog? = null
-
   //截屏文件
   private var file: File? = null
 
@@ -54,12 +51,15 @@ class RecordShareActivity : BaseMusicActivity() {
   fun handleMessage(msg: Message) {
     when (msg.what) {
       START -> showLoading()
-      STOP -> dismissLoading("")
+      STOP -> dismissLoading()
       COMPLETE -> if (file != null) {
         ToastUtil.show(this, R.string.screenshot_save_at, file!!.absoluteFile,
             Toast.LENGTH_LONG)
       }
-      ERROR -> dismissLoading(getString(R.string.share_error) + ":" + msg.obj)
+      ERROR -> {
+        ToastUtil.show(this, getString(R.string.share_error) + ":" + msg.obj)
+        dismissLoading()
+      }
     }
   }
 
@@ -110,11 +110,6 @@ class RecordShareActivity : BaseMusicActivity() {
         .strokeSize(DensityUtil.dip2px(1f))
         .strokeColor(Color.parseColor("#f6f6f5"))
         .make()
-    progressDialog = Theme.getBaseDialog(this)
-        .title(R.string.please_wait)
-        .content(R.string.processing_picture)
-        .progress(true, 0)
-        .progressIndeterminateStyle(false).build()
     binding.recordshareCancel.setOnClickListener { v: View? -> finish() }
     binding.recordshareShare.setOnClickListener { v: View? -> ProcessThread().start() }
   }
@@ -188,19 +183,6 @@ class RecordShareActivity : BaseMusicActivity() {
         }
       }
     }
-  }
-
-  private fun showLoading() {
-    if (progressDialog != null && progressDialog?.isShowing == false) {
-      progressDialog?.show()
-    }
-  }
-
-  private fun dismissLoading(error: String) {
-    if (!TextUtils.isEmpty(error)) {
-      ToastUtil.show(this, error)
-    }
-    progressDialog?.dismiss()
   }
 
   public override fun onPause() {

@@ -9,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
 import android.media.AudioManager
+import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.PlaybackParams
 import android.net.Uri
@@ -86,7 +87,8 @@ import java.util.*
  */
 @SuppressLint("CheckResult")
 class MusicService : BaseService(), Playback, MusicEventCallback,
-    MediaPlayer.OnErrorListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener,
+    MediaPlayer.OnErrorListener, MediaPlayer.OnPreparedListener,
+    MediaPlayer.OnCompletionListener, MediaPlayer.OnBufferingUpdateListener,
     SharedPreferences.OnSharedPreferenceChangeListener, CoroutineScope by MainScope() {
   // 播放队列
   private val playQueue = PlayQueue(this)
@@ -638,6 +640,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     mediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK)
     mediaPlayer.setOnCompletionListener(this)
     mediaPlayer.setOnPreparedListener(this)
+    mediaPlayer.setOnBufferingUpdateListener(this)
     mediaPlayer.setOnErrorListener(this)
 
     EQHelper.init(this, mediaPlayer.audioSessionId)
@@ -658,6 +661,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
     operation = Command.NEXT
     acquireWakeLock()
+  }
+
+  override fun onBufferingUpdate(mp: MediaPlayer?, percent: Int) {
+    Timber.v("onBufferingUpdate, percent: $percent")
   }
 
   override fun onPrepared(mp: MediaPlayer?) {
@@ -780,7 +787,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   fun setPlayQueue(newQueue: List<Song>?) {
     Timber.v("setPlayQueue")
-    if (newQueue == null || newQueue.isEmpty()) {
+    if (newQueue.isNullOrEmpty()) {
       return
     }
     if (newQueue == playQueue.originalQueue) {
@@ -798,7 +805,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     Timber.v("setPlayQueue")
     //如果是随机播放，需要更新randomList
     val shuffle = intent.getBooleanExtra(EXTRA_SHUFFLE, false)
-    if (newQueue == null || newQueue.isEmpty()) {
+    if (newQueue.isNullOrEmpty()) {
       return
     }
 
@@ -1111,8 +1118,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       PERMISSION_CHANGE -> onPermissionChanged(intent.getBooleanExtra(EXTRA_PERMISSION, false))
       PLAYLIST_CHANGE -> onPlayListChanged(intent.getStringExtra(EXTRA_PLAYLIST) ?: "")
       TAG_CHANGE -> {
-        val newSong = intent.getParcelableExtra<Song?>(BaseMusicActivity.EXTRA_NEW_SONG)
-        val oldSong = intent.getParcelableExtra<Song?>(BaseMusicActivity.EXTRA_OLD_SONG)
+        val newSong = intent.getSerializableExtra(BaseMusicActivity.EXTRA_NEW_SONG) as Song?
+        val oldSong = intent.getSerializableExtra(BaseMusicActivity.EXTRA_OLD_SONG) as Song?
         if (newSong != null && oldSong != null) {
           onTagChanged(oldSong, newSong)
         }
@@ -1280,9 +1287,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       //临时播放一首歌曲
       Command.PLAY_TEMP -> {
-        intent.getParcelableExtra<Song>(EXTRA_SONG)?.let {
+        intent.getSerializableExtra(EXTRA_SONG)?.let {
           operation = Command.PLAY_TEMP
-          playQueue.song = it
+          playQueue.song = it as Song.Local
           prepare(playQueue.song)
         }
       }
@@ -1303,7 +1310,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       //某一首歌曲添加至下一首播放
       Command.ADD_TO_NEXT_SONG -> {
-        val nextSong = intent.getParcelableExtra<Song>(EXTRA_SONG) ?: return
+        val nextSong = intent.getSerializableExtra(EXTRA_SONG) as Song? ?: return
         //添加到播放队列
         playQueue.addNextSong(nextSong)
         ToastUtil.show(service, R.string.already_add_to_next_song)
@@ -1428,14 +1435,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             return@tryLaunch
           }
 
-//          val exist = withContext(Dispatchers.IO) {
-//            File(song.data).exists()
-//          }
-//          if (!exist) {
-//            ToastUtil.show(service, getString(R.string.file_not_exist))
-//            return@tryLaunch
-//          }
-
           if (requestFocus) {
             audioFocus = AudioManagerCompat.requestAudioFocus(
                 audioManager,
@@ -1452,9 +1451,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           }
           prepared = false
           mediaPlayer.reset()
-          withContext(Dispatchers.IO) {
-            mediaPlayer.setDataSource(this@MusicService, song.contentUri)
-          }
+          setDataSource(song)
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             mediaPlayer.playbackParams = PlaybackParams().setSpeed(speed)
           }
@@ -1473,6 +1470,56 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           ToastUtil.show(service, getString(R.string.play_failed) + it.toString())
           prepared = false
         })
+  }
+
+  private suspend fun setDataSource(song: Song) = withContext(Dispatchers.IO) {
+    if (song.isLocal()) {
+      mediaPlayer.setDataSource(this@MusicService, song.contentUri)
+    } else if (song is Song.Remote) {
+      val metadataRetriever = MediaMetadataRetriever()
+      try {
+        metadataRetriever.setDataSource(song.data, song.allHeaders())
+        val title =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+            ?: song.title
+        val album =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) ?: ""
+        val artist =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: ""
+        val duration =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            ?.toLong() ?: 0L
+        val year =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR) ?: ""
+        val genre =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE) ?: ""
+        val track =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS) ?: ""
+        val dateModified = if (song.dateModified > 0) {
+          song.dateModified
+        } else {
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
+            ?.toLongOrNull() ?: 0
+        }
+
+        playQueue.song.updateMetaData(
+          title,
+          album,
+          artist,
+          duration,
+          year,
+          genre,
+          track,
+          dateModified
+        )
+      } catch (e: Exception) {
+        Timber.v("fail to retrieve: $e")
+      } finally {
+        metadataRetriever.release()
+      }
+
+      mediaPlayer.setDataSource(this@MusicService, song.contentUri, song.allHeaders())
+    }
   }
 
   /**

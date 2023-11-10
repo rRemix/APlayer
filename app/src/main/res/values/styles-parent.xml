@@ -29,6 +29,7 @@
 
     <item name="popupMenuStyle">@style/Widget.AppCompat.Light.PopupMenu.Overflow</item>
 
+    <item name="icon_color">@color/light_icon_color</item>
   </style>
 
   <style name="Theme.APlayer.Base.Dark" parent="Theme.AppCompat.NoActionBar">
@@ -59,6 +60,7 @@
 
     <item name="popupMenuStyle">@style/Widget.AppCompat.PopupMenu.Overflow</item>
 
+    <item name="icon_color">@color/dark_icon_color</item>
   </style>
 
   <style name="Theme.APlayer.Base.Black" parent="@style/Theme.APlayer.Base.Dark">

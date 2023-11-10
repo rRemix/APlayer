@@ -55,7 +55,7 @@ class CustomSortActivity : ToolbarActivity() {
     }
 
     val songs = intent.getSerializableExtra(EXTRA_LIST) as ArrayList<Song>
-    val playList = intent.getParcelableExtra<PlayList>(EXTRA_PLAYLIST)!!
+    val playList = intent.getSerializableExtra(EXTRA_PLAYLIST) as PlayList
 
     setUpToolbar(playList.name)
 

@@ -248,7 +248,7 @@ class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activit
 }
 
 
-private class TextInputEditWatcher internal constructor(private val mInputLayout: TextInputLayout, private val mError: String) : TextWatcher {
+class TextInputEditWatcher(private val inputLayout: TextInputLayout, private val error: String) : TextWatcher {
 
   override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
@@ -256,9 +256,9 @@ private class TextInputEditWatcher internal constructor(private val mInputLayout
 
   override fun afterTextChanged(s: Editable?) {
     if (s == null || TextUtils.isEmpty(s.toString())) {
-      mInputLayout.error = mError
+      inputLayout.error = error
     } else {
-      mInputLayout.error = ""
+      inputLayout.error = ""
     }
   }
 }

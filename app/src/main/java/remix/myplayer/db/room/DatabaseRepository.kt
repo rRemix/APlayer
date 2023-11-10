@@ -437,7 +437,7 @@ class DatabaseRepository private constructor() {
               MediaStore.Audio.Media._ID + " in(" + inStr + ")",
               null,
               if (customSort) null else sort)
-          val tempArray = Array(ids.size) { Song.EMPTY_SONG }
+          val tempArray: Array<Song> = Array(ids.size) { Song.EMPTY_SONG }
 
           songs.forEachIndexed { index, song ->
             tempArray[if (CUSTOMSORT == sort) ids.indexOf(song.id) else index] = song

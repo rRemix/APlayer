@@ -57,6 +57,7 @@
   <attr name="background_color_main" format="color|reference" />
   <attr name="background_color_dialog" format="color|reference" />
   <attr name="background_library_color" format="color|reference" />
+  <attr name="icon_color" format="color|reference"/>
   <!--点击效果-->
   <attr name="background_grid" format="reference" />
   <attr name="background_list" format="reference" />

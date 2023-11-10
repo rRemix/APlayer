@@ -69,7 +69,7 @@ class OkHttpHelper {
                 return arrayOf()
               }
             }
-            builder.sslSocketFactory(sSLSocketFactory, trustAllCert)
+            builder.sslSocketFactory(sSLSocketFactory!!, trustAllCert)
           } catch (e: Exception) {
             throw RuntimeException(e)
           }

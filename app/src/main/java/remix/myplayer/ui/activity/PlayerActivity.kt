@@ -241,7 +241,7 @@ class PlayerActivity : BaseMusicActivity() {
 
     song = getCurrentSong()
     if (song == Song.EMPTY_SONG && intent.hasExtra(EXTRA_SONG)) {
-      song = intent.getParcelableExtra(EXTRA_SONG)!!
+      song = intent.getSerializableExtra(EXTRA_SONG) as Song
     }
 
     setUpBottom()

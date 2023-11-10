@@ -75,8 +75,8 @@ object MusicServiceRemote {
   }
 
   @JvmStatic
-  fun setPlayQueue(newQueueIdList: List<Song>?, intent: Intent) {
-    service?.setPlayQueue(newQueueIdList, intent)
+  fun setPlayQueue(newQueues: List<Song>?, intent: Intent) {
+    service?.setPlayQueue(newQueues, intent)
   }
 
 //  @JvmStatic

@@ -37,9 +37,6 @@ class FolderAdapter(layoutId: Int, private val multiChoice: MultipleChoice<Folde
     holder.binding.folderPath.text = folder.path
     holder.binding.folderNum.text = String.format("%d首", folder.count)
     //根据主题模式 设置图片
-    holder.binding.folderImage.setImageDrawable(Theme
-        .tintDrawable(context.resources.getDrawable(R.drawable.icon_folder),
-            if (isLightTheme) Color.BLACK else Color.WHITE))
     val tintColor = libraryBtnColor
     Theme.tintDrawable(holder.binding.folderButton, R.drawable.icon_player_more, tintColor)
     holder.binding.folderButton.setOnClickListener { v: View? ->

@@ -42,7 +42,7 @@ class RecordFragment : BaseMusicFragment() {
       val intent = Intent(requireContext(), RecordShareActivity::class.java)
       val arg = Bundle()
       arg.putString(RecordShareActivity.EXTRA_CONTENT, edit_record.text.toString())
-      arg.putParcelable(RecordShareActivity.EXTRA_SONG, MusicServiceRemote.getCurrentSong())
+      arg.putSerializable(RecordShareActivity.EXTRA_SONG, MusicServiceRemote.getCurrentSong())
       intent.putExtras(arg)
       startActivityForResult(intent, REQUEST_SHARE)
     }

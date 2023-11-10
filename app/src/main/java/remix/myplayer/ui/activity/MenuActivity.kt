@@ -30,6 +30,8 @@ abstract class MenuActivity : ToolbarActivity() {
       TimerDialog.newInstance()
           .show(supportFragmentManager, TimerDialog::class.java.simpleName)
       return true
+    } else if (item.itemId == R.id.action_close) {
+      finish()
     } else {
       var sortOrder = ""
       when (item.itemId) {

@@ -209,8 +209,8 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScop
             activity.onPlayStateChange()
           }
           MusicService.TAG_CHANGE -> {
-            val newSong = msg.data.getParcelable<Song?>(EXTRA_NEW_SONG)
-            val oldSong = msg.data.getParcelable<Song?>(EXTRA_OLD_SONG)
+            val newSong = msg.data.getSerializable(EXTRA_NEW_SONG) as Song?
+            val oldSong = msg.data.getSerializable(EXTRA_OLD_SONG) as Song?
 
             if (newSong != null && oldSong != null) {
               activity.onTagChanged(oldSong, newSong)

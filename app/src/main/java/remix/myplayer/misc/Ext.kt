@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Looper
 import android.provider.MediaStore
+import com.thegrizzlylabs.sardineandroid.DavResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
@@ -156,7 +157,16 @@ private fun ZipOutputStream.createEmptyFolder(location: String) {
   closeEntry()
 }
 
-
 fun getPendingIntentFlag() =
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
 
+
+private val musicExt = setOf("wav","aif","au","mp3","ram","wma","mmf","amr","aac","flac")
+fun DavResource.isAudio(): Boolean {
+  if (isDirectory || path.isNullOrEmpty() || !contentType.startsWith("audio")) {
+    return false
+  }
+
+  val ext = path.substringAfterLast(".")
+  return musicExt.contains(ext.toLowerCase())
+}

@@ -8,6 +8,7 @@
   <string name="tab_playlist">列表</string>
   <string name="tab_folder">文件夹</string>
   <string name="tab_genre">流派</string>
+  <string name="tab_remote">远程</string>
 
   <string name="drawer_song">歌曲库</string>
   <string name="drawer_recently_add">最近添加</string>
@@ -459,4 +460,14 @@
   <string name="support_developer">支持开发者</string>
   <string name="no_more_prompt">不再提示</string>
   <string name="go">前往</string>
+
+  <string name="webdav">WebDav</string>
+  <string name="dlna">DLNA</string>
+
+  <string name="alias">别名</string>
+  <string name="account">账户</string>
+  <string name="pwd">密码</string>
+  <string name="webdav_hint_server">服务器</string>
+  <string name="webdav_hint_path">路径(可选)</string>
+  <string name="can_t_be_empty">%s不能为空</string>
 </resources>

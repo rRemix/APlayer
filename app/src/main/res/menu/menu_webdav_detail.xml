@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+  <item
+    android:id="@+id/action_timer"
+    android:icon="@drawable/ic_timer_white_24dp"
+    android:title="@string/timer_close"
+    android:orderInCategory="80"
+    app:showAsAction="ifRoom"/>
+  <item
+    android:id="@+id/action_close"
+    android:icon="@drawable/ic_close_white_24dp"
+    android:title="@string/close"
+    android:orderInCategory="90"
+    app:showAsAction="ifRoom"/>
+</menu>

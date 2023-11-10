@@ -324,7 +324,7 @@ object MediaStoreUtil {
     if (cursor == null || cursor.columnCount <= 0) {
       return EMPTY_SONG
     }
-    return Song(
+    return Song.Local(
       id = cursor.getLong(cursor.getColumnIndex(AudioColumns._ID)),
       displayName = Util.processInfo(
         cursor.getString(cursor.getColumnIndex(AudioColumns.DISPLAY_NAME)),

@@ -18,6 +18,10 @@ import remix.myplayer.ui.activity.base.BaseMusicActivity
 open class ToolbarActivity : BaseMusicActivity() {
   protected var toolbar: Toolbar? = null
 
+  protected fun setToolbarTitle(title: String) {
+    toolbar?.title = title
+  }
+
   protected fun setUpToolbar(title: String?, @DrawableRes iconRes: Int) {
     if (toolbar == null) {
       toolbar = findViewById(R.id.toolbar)

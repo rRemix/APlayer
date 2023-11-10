@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/item_container"
+  android:layout_width="match_parent"
+  android:layout_height="@dimen/d56_size"
+  android:background="?attr/background_list">
+
+  <androidx.appcompat.widget.AppCompatImageView
+    android:id="@+id/iv"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/d12_size"
+    android:src="@drawable/icon_webdav"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:tint="?attr/icon_color" />
+
+  <TextView
+    android:id="@+id/tv_alisa"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/d12_size"
+    android:layout_marginEnd="@dimen/d12_size"
+    android:layout_marginBottom="2dp"
+    android:ellipsize="end"
+    android:gravity="start|center_vertical"
+    android:lines="1"
+    android:textColor="?attr/text_color_primary"
+    android:textSize="@dimen/s14_size"
+    app:layout_constraintBottom_toTopOf="@id/tv_server"
+    app:layout_constraintEnd_toStartOf="@id/item_button"
+    app:layout_constraintStart_toEndOf="@id/iv"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_chainStyle="packed" />
+
+  <TextView
+    android:id="@+id/tv_server"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/d4_size"
+    android:ellipsize="end"
+    android:gravity="start|center_vertical"
+    android:lines="1"
+    android:textColor="?attr/text_color_secondary"
+    android:textSize="@dimen/s12_size"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="@id/tv_alisa"
+    app:layout_constraintRight_toRightOf="@id/tv_alisa"
+    app:layout_constraintTop_toBottomOf="@id/tv_alisa" />
+
+  <ImageButton
+    android:id="@+id/item_button"
+    android:layout_width="@dimen/d48_size"
+    android:layout_height="@dimen/d48_size"
+    android:layout_marginEnd="@dimen/d4_size"
+    android:background="?attr/background_oval_ripple"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+
+  <View
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/d1_size"
+    android:layout_marginStart="@dimen/d8_size"
+    android:background="?attr/divider_color"
+    app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
