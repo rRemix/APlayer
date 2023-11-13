@@ -117,20 +117,20 @@ class PlayQueue(service: MusicService) {
     }
     //读取上次退出时正在播放的歌曲的id
     val service = service.get() ?: return
-    val lastId = try {
-      SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1L)
+    val lastSong = try {
+      SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG, "")
     } catch (e: Exception) {
-      SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG_ID, -1L)
+      ""
     }
     //上次退出时正在播放的歌曲是否还存在
-    var isLastSongExist = false
+    var exist = false
     //上次退出时正在播放的歌曲的pos
     var pos = 0
     //查找上次退出时的歌曲是否还存在
-    if (lastId > 0) {
+    if (lastSong.isNotEmpty()) {
       for (i in _originalQueue.indices) {
-        if (lastId == _originalQueue[i].id) {
-          isLastSongExist = true
+        if (lastSong == _originalQueue[i].id.toString() || lastSong == _originalQueue[i].data) {
+          exist = true
           pos = i
           break
         }
@@ -138,7 +138,7 @@ class PlayQueue(service: MusicService) {
     }
 
     //上次退出时保存的正在播放的歌曲未失效
-    if (isLastSongExist) {
+    if (exist) {
       setUpDataSource(_originalQueue[pos], pos)
     } else {
       //重新找到一个歌曲id
@@ -272,7 +272,7 @@ class PlayQueue(service: MusicService) {
   private fun saveQueue() {
     repository.clearPlayQueue()
       .flatMap {
-        repository.insertToPlayQueue(_originalQueue.map { it.id })
+        repository.insertSongsToPlayQueue(_originalQueue)
       }
       .compose(RxUtil.applySingleScheduler())
       .subscribe(LogObserver())

@@ -36,10 +36,11 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.*
+import java.util.function.Consumer
 
 
 class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activity) {
-  private val song: Song = song ?: getCurrentSong()
+  var song: Song = song ?: getCurrentSong()
 
   private var title: String = ""
   private var album: String = ""
@@ -49,6 +50,7 @@ class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activit
   private var track: String = ""
 
   fun detail() {
+    val song = song
     var disposable: Disposable? = null
 
     val detailDialog = Theme.getBaseDialog(this)
@@ -77,19 +79,28 @@ class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activit
       TintHelper.setTint(it, ThemeStore.accentColor, false)
     }
 
-    disposable = Single.fromCallable { AudioFileIO.read(File(song.data)).audioHeader }
-      .observeOn(AndroidSchedulers.mainThread())
-      .subscribeOn(Schedulers.io())
-      .subscribe(
-        { audioHeader ->
-          binding.songDetailMime.text = audioHeader.format
-          @SuppressLint("SetTextI18n")
-          binding.songDetailBitRate.text = "${audioHeader.bitRate} kb/s"
-          @SuppressLint("SetTextI18n")
-          binding.songDetailSampleRate.text = "${audioHeader.sampleRate} Hz"
-        }, {
-          ToastUtil.show(this, getString(R.string.init_failed, it))
-        })
+    if (song.isLocal()) {
+      disposable = Single.fromCallable { AudioFileIO.read(File(song.data)).audioHeader }
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeOn(Schedulers.io())
+        .subscribe(
+          { audioHeader ->
+            binding.songDetailMime.text = audioHeader.format
+            @SuppressLint("SetTextI18n")
+            binding.songDetailBitRate.text = "${audioHeader.bitRate} kb/s"
+            @SuppressLint("SetTextI18n")
+            binding.songDetailSampleRate.text = "${audioHeader.sampleRate} Hz"
+          }, {
+            ToastUtil.show(this, getString(R.string.init_failed, it))
+          })
+    } else if (song is Song.Remote){
+      binding.songDetailMime.text = song.data.substring(song.data.lastIndexOf('.') + 1)
+      @SuppressLint("SetTextI18n")
+      binding.songDetailBitRate.text = "${song.bitRate} kb/s"
+      @SuppressLint("SetTextI18n")
+      binding.songDetailSampleRate.text = "${song.sampleRate} Hz"
+    }
+
 
     detailDialog.show()
   }

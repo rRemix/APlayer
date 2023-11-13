@@ -9,10 +9,18 @@ import androidx.room.PrimaryKey
  */
 @Entity(indices = [Index(value = ["audio_id"], unique = true)])
 data class PlayQueue(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
-    val audio_id: Long
+    val audio_id: Long,
+    val title: String,
+    val data: String
 ) {
+  constructor(audio_id: Long): this(audio_id, "", "")
+
+  @PrimaryKey(autoGenerate = true)
+  var id: Int = 0
+
+  var account: String? = null
+  var pwd: String? = null
+
 
   companion object {
     const val TABLE_NAME = "PlayQueue"

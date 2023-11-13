@@ -47,18 +47,52 @@ class DatabaseRepository private constructor() {
     }
   }
 
+  fun insertToPlayQueue(audioIds: List<Long>): Single<Int> {
+    val actual = audioIds.toMutableList()
+    return getPlayQueue()
+      .map { playQueue ->
+        playQueue.map { item ->
+          item.audio_id
+        }
+      }
+      .map {
+        //不重复添加
+        actual.removeAll(it.toSet())
+
+        db.playQueueDao().insertPlayQueue(
+          actual.map { id -> PlayQueue(id) })
+
+        actual.size
+      }
+  }
 
   /**
    * 插入多首歌曲到播放队列
    */
-  fun insertToPlayQueue(audioIds: List<Long>): Single<Int> {
-    val actual = audioIds.toMutableList()
+  fun insertSongsToPlayQueue(songs: List<Song>): Single<Int> {
+    val actual = songs.toMutableList()
     return getPlayQueue()
-        .map {
+        .map { queue ->
+          val keys = queue.map {
+            if (it.audio_id > 0) it.audio_id.toString() else it.data
+          }
           //不重复添加
-          actual.removeAll(it)
+          actual.removeAll {
+            (it.isLocal() && keys.contains(it.id.toString())) || (it.isRemote() && keys.contains(it.data))
+          }
 
-          db.playQueueDao().insertPlayQueue(convertAudioIdsToPlayQueues(actual))
+          db.playQueueDao().insertPlayQueue(actual.map { song ->
+            if (song.isLocal()) {
+              PlayQueue(song.id, song.title, song.data)
+            } else {
+              PlayQueue(song.hashCode().toLong(), song.title, song.data).apply {
+                if (song is Song.Remote) {
+                  account = song.account
+                  pwd = song.pwd
+                }
+              }
+            }
+          })
 
           actual.size
         }
@@ -308,13 +342,10 @@ class DatabaseRepository private constructor() {
   /**
    * 获取播放队列
    */
-  fun getPlayQueue(): Single<List<Long>> {
+  fun getPlayQueue(): Single<List<PlayQueue>> {
     return Single
         .fromCallable {
           db.playQueueDao().selectAll()
-              .map {
-                it.audio_id
-              }
         }
   }
 
@@ -322,30 +353,27 @@ class DatabaseRepository private constructor() {
    * 获得播放队列对应的歌曲
    */
   fun getPlayQueueSongs(): Single<List<Song>> {
-    val idsInQueue = ArrayList<Long>()
+    val queues = ArrayList<PlayQueue>()
     return Single
         .fromCallable {
           db.playQueueDao().selectAll()
-              .map {
-                it.audio_id
-              }
         }
         .doOnSuccess {
-          idsInQueue.addAll(it)
+          queues.addAll(it)
         }
         .flatMap {
-          getSongsWithSort(CUSTOMSORT, it)
+          getSongsInQueue(CUSTOMSORT, it)
         }
         .doOnSuccess { songs ->
           //删除不存在的歌曲
-          if (songs.size < idsInQueue.size) {
+          if (songs.size < queues.size) {
             Timber.v("删除播放队列中不存在的歌曲")
             val deleteIds = ArrayList<Long>()
             val existIds = songs.map { it.id }
 
-            for (audioId in idsInQueue) {
-              if (!existIds.contains(audioId)) {
-                deleteIds.add(audioId)
+            for (item in queues) {
+              if (!existIds.contains(item.audio_id)) {
+                deleteIds.add(item.audio_id)
               }
             }
 
@@ -364,15 +392,6 @@ class DatabaseRepository private constructor() {
         .fromCallable {
           db.playQueueDao().clear()
         }
-  }
-
-
-  private fun convertAudioIdsToPlayQueues(audioIds: List<Long>): List<PlayQueue> {
-    val playQueues = ArrayList<PlayQueue>()
-    for (audioId in audioIds) {
-      playQueues.add(PlayQueue(0, audioId))
-    }
-    return playQueues
   }
 
   /**
@@ -424,6 +443,41 @@ class DatabaseRepository private constructor() {
         }
   }
 
+  private fun getSongsInQueue(sort: String, queues: List<PlayQueue>): Single<List<Song>> {
+    if (queues.isEmpty()) {
+      return Single.just(Collections.emptyList())
+    }
+    val isLocal = queues.all {
+      it.audio_id > 0
+    }
+    if (isLocal) {
+      val ids = queues.map { it.audio_id }
+      return Single
+        .fromCallable {
+          val customSort = sort == CUSTOMSORT
+          val inStr = makeInStr(ids)
+          val songs = MediaStoreUtil.getSongs(
+            MediaStore.Audio.Media._ID + " in(" + inStr + ")",
+            null,
+            if (customSort) null else sort)
+          val tempArray: Array<Song> = Array(ids.size) { Song.EMPTY_SONG }
+
+          songs.forEachIndexed { index, song ->
+            tempArray[if (CUSTOMSORT == sort) ids.indexOf(song.id) else index] = song
+          }
+
+          tempArray
+            .filter { it.id != Song.EMPTY_SONG.id }
+        }
+    } else {
+      return Single
+        .fromCallable {
+          queues.map {
+            Song.Remote(it.title, it.data, it.account ?: "", it.pwd ?: "")
+          }
+        }
+    }
+  }
 
   private fun getSongsWithSort(sort: String, ids: List<Long>): Single<List<Song>> {
     return Single

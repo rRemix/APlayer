@@ -164,9 +164,9 @@ class LyricSearcher {
    */
   private fun getEmbeddedObservable(): Observable<List<LrcRow>> {
     return Observable.create { e ->
-      val audioFile = AudioFileIO.read(File(song.data))
+      val audioFile = if (song.isLocal()) AudioFileIO.read(File(song.data)) else null
       val lyric = try {
-        audioFile.tag.getFirst(FieldKey.LYRICS)
+        audioFile?.tag?.getFirst(FieldKey.LYRICS)
       } catch (e: Exception) {
         ""
       }

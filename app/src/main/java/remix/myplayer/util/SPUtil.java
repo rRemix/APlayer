@@ -206,9 +206,11 @@ public class SPUtil {
     //退出时播放时间
     String LAST_PLAY_PROGRESS = "last_play_progress";
     //退出时播放的歌曲
+    @Deprecated
     String LAST_SONG_ID = "last_song_id";
+    //退出时播放的歌曲
+    String LAST_SONG = "last_song";
     //退出时下一首歌曲
-    String NEXT_SONG_ID = "next_song_id";
     //播放模式
     String PLAY_MODEL = "play_model";
     //经典通知栏背景是否是系统背景色

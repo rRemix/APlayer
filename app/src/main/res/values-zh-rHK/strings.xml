@@ -469,4 +469,6 @@
   <string name="webdav_hint_server">伺服器</string>
   <string name="webdav_hint_path">路徑(可選)</string>
   <string name="can_t_be_empty">%s不能為空</string>
+  <string name="connect">連接</string>
+  <string name="edit">編輯</string>
 </resources>

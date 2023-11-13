@@ -39,6 +39,13 @@ android {
         }
         multiDexEnabled true
 
+        // room
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+
         buildConfigField("String", "LASTFM_API_KEY", "\"${getProperty(properties, 'LASTFM_API_KEY')}\"")
         buildConfigField("String", "GOOGLE_PLAY_LICENSE_KEY", "\"${getProperty(properties, 'GOOGLE_PLAY_LICENSE_KEY')}\"")
         buildConfigField("String", "BUGLY_APPID", "\"${getProperty(properties, 'BUGLY_APPID')}\"")

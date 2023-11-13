@@ -11,7 +11,7 @@ import remix.myplayer.db.room.model.PlayQueue
  */
 @Dao
 interface PlayQueueDao {
-  @Insert(onConflict = OnConflictStrategy.FAIL)
+  @Insert(onConflict = OnConflictStrategy.ABORT)
   fun insertPlayQueue(playQueue: List<PlayQueue>): LongArray
 
   @Insert(onConflict = OnConflictStrategy.FAIL)

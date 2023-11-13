@@ -470,4 +470,6 @@
   <string name="webdav_hint_server">服务器</string>
   <string name="webdav_hint_path">路径(可选)</string>
   <string name="can_t_be_empty">%s不能为空</string>
+  <string name="connect">连接</string>
+  <string name="edit">编辑</string>
 </resources>

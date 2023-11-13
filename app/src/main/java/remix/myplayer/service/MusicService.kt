@@ -323,7 +323,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 数据库
    */
-  val repository = DatabaseRepository.getInstance()
+  private val repository = DatabaseRepository.getInstance()
 
   /**
    * 监听Mediastore变化
@@ -702,9 +702,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 更新播放历史
    */
   private fun updatePlayHistory() {
-    repository.updateHistory(playQueue.song)
+    if (playQueue.song.isLocal()) {
+      repository.updateHistory(playQueue.song)
         .compose(applySingleScheduler())
         .subscribe(LogObserver())
+    }
   }
 
   private fun unInit() {
@@ -770,7 +772,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
                   .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, song.id.toString())
                   .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.title)
                   .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.artist)
-                  .build().description, song.id.toLong())
+                  .build().description, song.id
+              )
             }
         Timber.v("updateQueueItem, queue: ${queue.size}")
         mediaSession.setQueueTitle(playQueue.song.title)
@@ -880,7 +883,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     //保存当前播放和下一首播放的歌曲的id
     launch {
       withContext(Dispatchers.IO) {
-        SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_SONG_ID, playQueue.song.id)
+        val song = playQueue.song
+        SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_SONG, if (song.isLocal()) song.id.toString() else song.data)
       }
     }
   }
@@ -1476,49 +1480,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     if (song.isLocal()) {
       mediaPlayer.setDataSource(this@MusicService, song.contentUri)
     } else if (song is Song.Remote) {
-      val metadataRetriever = MediaMetadataRetriever()
-      try {
-        metadataRetriever.setDataSource(song.data, song.allHeaders())
-        val title =
-          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
-            ?: song.title
-        val album =
-          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) ?: ""
-        val artist =
-          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: ""
-        val duration =
-          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            ?.toLong() ?: 0L
-        val year =
-          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR) ?: ""
-        val genre =
-          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE) ?: ""
-        val track =
-          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS) ?: ""
-        val dateModified = if (song.dateModified > 0) {
-          song.dateModified
-        } else {
-          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
-            ?.toLongOrNull() ?: 0
-        }
+      retrieveRemoteSong(song, playQueue.song as Song.Remote)
 
-        playQueue.song.updateMetaData(
-          title,
-          album,
-          artist,
-          duration,
-          year,
-          genre,
-          track,
-          dateModified
-        )
-      } catch (e: Exception) {
-        Timber.v("fail to retrieve: $e")
-      } finally {
-        metadataRetriever.release()
-      }
-
-      mediaPlayer.setDataSource(this@MusicService, song.contentUri, song.allHeaders())
+      mediaPlayer.setDataSource(this@MusicService, song.contentUri, song.headers)
     }
   }
 
@@ -2077,6 +2041,57 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         null
       }
 
+    }
+
+    fun retrieveRemoteSong(song: Song.Remote, targetSong: Song.Remote) {
+      val metadataRetriever = MediaMetadataRetriever()
+      try {
+        metadataRetriever.setDataSource(song.data, song.headers)
+        val title =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+            ?: song.title
+        val album =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) ?: ""
+        val artist =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: ""
+        val duration =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            ?.toLong() ?: 0L
+        val year =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR) ?: ""
+        val genre =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE) ?: ""
+        val track =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS) ?: ""
+        val dateModified = if (song.dateModified > 0) {
+          song.dateModified
+        } else {
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
+            ?.toLongOrNull() ?: 0
+        }
+        targetSong.bitRate =
+          metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE) ?: ""
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+          targetSong.sampleRate =
+            metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITS_PER_SAMPLE)
+              ?: ""
+        }
+
+        targetSong.updateMetaData(
+          title,
+          album,
+          artist,
+          duration,
+          year,
+          genre,
+          track,
+          dateModified
+        )
+      } catch (e: Exception) {
+        Timber.v("fail to retrieve: $e")
+      } finally {
+        metadataRetriever.release()
+      }
     }
   }
 }

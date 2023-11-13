@@ -3,12 +3,6 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
   <group android:enabled="true">
     <item
-      android:title="@string/connect"
-      android:id="@+id/menu_connect"/>
-    <item
-      android:title="@string/edit"
-      android:id="@+id/menu_edit"/>
-    <item
       android:title="@string/delete"
       android:id="@+id/menu_delete"/>
   </group>

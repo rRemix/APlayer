@@ -470,4 +470,6 @@
   <string name="webdav_hint_server">サーバー</string>
   <string name="webdav_hint_path">パス(オプション)</string>
   <string name="can_t_be_empty">%s空にすることはできません</string>
+  <string name="connect">せつぞく</string>
+  <string name="edit">編集</string>
 </resources>

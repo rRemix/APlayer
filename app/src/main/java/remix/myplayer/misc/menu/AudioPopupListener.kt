@@ -113,31 +113,43 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
             .show()
       }
       R.id.menu_edit -> {
+        if (!song.isLocal()) {
+          return true
+        }
         audioTag.edit()
       }
       R.id.menu_detail -> {
         audioTag.detail()
       }
       R.id.menu_timer -> {
-        val fm = activity.supportFragmentManager ?: return true
+        val fm = activity.supportFragmentManager
         TimerDialog.newInstance().show(fm, TimerDialog::class.java.simpleName)
       }
       R.id.menu_eq -> {
         EQHelper.startEqualizer(activity)
       }
       R.id.menu_collect -> {
+        if (!song.isLocal()) {
+          return true
+        }
         DatabaseRepository.getInstance()
             .insertToPlayList(listOf(song.id), getString(R.string.my_favorite))
-            .compose<Int>(applySingleScheduler<Int>())
+            .compose(applySingleScheduler())
             .subscribe(
                 { count -> ToastUtil.show(activity, getString(R.string.add_song_playlist_success, 1, getString(R.string.my_favorite))) },
                 { throwable -> ToastUtil.show(activity, R.string.add_song_playlist_error) })
       }
       R.id.menu_add_to_playlist -> {
+        if (!song.isLocal()) {
+          return true
+        }
         AddtoPlayListDialog.newInstance(listOf(song.id))
             .show(activity.supportFragmentManager, AddtoPlayListDialog::class.java.simpleName)
       }
       R.id.menu_delete -> {
+        if (!song.isLocal()) {
+          return true
+        }
         val checked = arrayOf(SPUtil.getValue(activity, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.DELETE_SOURCE, false))
 
         getBaseDialog(activity)

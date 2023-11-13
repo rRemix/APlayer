@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
+import okhttp3.Credentials
 import remix.myplayer.App
 import remix.myplayer.util.SPUtil
 import timber.log.Timber
@@ -36,7 +37,7 @@ sealed class Song(
     return this is Local
   }
 
-  fun isWebDav(): Boolean {
+  fun isRemote(): Boolean {
     return this is Remote
   }
 
@@ -136,10 +137,7 @@ sealed class Song(
       }
 
       is Remote -> {
-        val remote =
-          Remote(title, album, artist, duration, data, size, year, genre, track, dateModified)
-        remote.addHeaders(allHeaders())
-        remote
+        Remote(title, album, artist, duration, data, size, year, genre, track, dateModified, account, pwd)
       }
 
     }
@@ -206,27 +204,23 @@ sealed class Song(
     year: String,
     genre: String,
     track: String?,
-    dateModified: Long
+    dateModified: Long,
+    val account: String,
+    val pwd: String
   ) : Song(
-    0L, title, title, album, 0L, artist, 0L, duration, data, size, year, genre, track, dateModified
+    data.hashCode().toLong(), title, title, album, 0L, artist, 0L, duration, data, size, year, genre, track, dateModified
   ) {
-    private val headers by lazy {
-      HashMap<String, String>()
+    val headers by lazy {
+      mapOf(
+        "Authorization" to Credentials.basic(account, pwd)
+      )
     }
+    var bitRate: String = ""
+    var sampleRate: String = ""
 
-    fun addHeader(k: String, v: String) {
-      headers[k] = v
-    }
+    constructor(title: String, data: String, account: String, pwd: String): this(title, data, 0L, 0L, account, pwd)
 
-    fun addHeaders(map: Map<String, String>) {
-      headers.putAll(map)
-    }
-
-    fun allHeaders(): Map<String, String> {
-      return HashMap(headers)
-    }
-
-    constructor(title: String, data: String, size: Long, dateModified: Long) : this(
+    constructor(title: String, data: String, size: Long, dateModified: Long, account: String, pwd: String) : this(
       title,
       "",
       "",
@@ -236,7 +230,9 @@ sealed class Song(
       "",
       "",
       "",
-      dateModified
+      dateModified,
+      account,
+      pwd
     )
 
     override fun equals(other: Any?): Boolean {

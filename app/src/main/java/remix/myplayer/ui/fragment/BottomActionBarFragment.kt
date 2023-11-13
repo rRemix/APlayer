@@ -111,7 +111,7 @@ class BottomActionBarFragment : BaseMusicFragment() {
   }
 
   fun startPlayerActivity() {
-    if (getCurrentSong().id < 0) {
+    if (getCurrentSong().id == 0L) {
       return
     }
     val intent = Intent(requireContext(), PlayerActivity::class.java)

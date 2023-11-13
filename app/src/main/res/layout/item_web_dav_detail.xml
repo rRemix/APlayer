@@ -10,8 +10,8 @@
     android:layout_width="@dimen/d40_size"
     android:layout_height="@dimen/d40_size"
     android:layout_margin="@dimen/d15_size"
-    android:src="@drawable/icon_folder"
     android:scaleType="center"
+    android:src="@drawable/icon_folder"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
@@ -56,6 +56,7 @@
     android:layout_height="@dimen/d48_size"
     android:layout_marginEnd="@dimen/d4_size"
     android:background="?attr/background_oval_ripple"
+    android:src="@drawable/icon_player_more"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintRight_toRightOf="parent"
     app:layout_constraintTop_toTopOf="parent" />

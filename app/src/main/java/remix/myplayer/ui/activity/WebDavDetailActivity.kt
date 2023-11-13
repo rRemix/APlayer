@@ -9,7 +9,6 @@ import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Credentials.basic
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivityWebdavDetailBinding
@@ -35,11 +34,11 @@ class WebDavDetailActivity : MenuActivity() {
   }
   private var currentUrl: String = ""
   private val adapter by lazy {
-    WebDavDetailAdapter().apply {
+    WebDavDetailAdapter(webdav).apply {
       onItemClickListener = object : OnItemClickListener<DavResource> {
-        override fun onItemClick(view: View, data: DavResource, position: Int) {
-          if (data.isDirectory) {
-            reload(data.path)
+        override fun onItemClick(view: View, resource: DavResource, position: Int) {
+          if (resource.isDirectory) {
+            reload(resource.path)
           } else {
             val resources = getWebDavResources()
             if (resources.isEmpty()) {
@@ -49,19 +48,15 @@ class WebDavDetailActivity : MenuActivity() {
             val remotes = resources
               .filter { it.isAudio() }
               .map {
-                val start = it.path.lastIndexOf('/') + 1
-                var end = it.path.lastIndexOf('.')
-                if (end <= 0 || end <= start) {
-                  end = it.path.length
-                }
                 val remote = Song.Remote(
-                  it.path.substring(start, end),
-                  webdav.server.plus(it.path),
-                  it.contentLength,
-                  it.creation?.time ?: 0
+                  title = it.name.substringBeforeLast('.'),
+                  data = webdav.server.plus(it.path),
+                  size = it.contentLength,
+                  dateModified = it.creation?.time ?: 0,
+                  account = webdav.account ?: "",
+                  pwd = webdav.pwd ?: ""
                 )
-                remote.addHeader("Authorization", basic(webdav.account ?: "", webdav.pwd ?: ""))
-                if (it == data) {
+                if (it == resource) {
                   select = remote
                 }
                 remote
