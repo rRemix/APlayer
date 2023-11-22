@@ -1480,9 +1480,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     if (song.isLocal()) {
       mediaPlayer.setDataSource(this@MusicService, song.contentUri)
     } else if (song is Song.Remote) {
-      retrieveRemoteSong(song, playQueue.song as Song.Remote)
-
       mediaPlayer.setDataSource(this@MusicService, song.contentUri, song.headers)
+      retrieveRemoteSong(song, playQueue.song as Song.Remote)
     }
   }
 

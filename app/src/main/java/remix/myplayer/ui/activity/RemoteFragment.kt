@@ -1,11 +1,7 @@
 package remix.myplayer.ui.activity
 
-import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
-import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -15,24 +11,19 @@ import androidx.recyclerview.widget.RecyclerView
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.databinding.ItemCloudBinding
-import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.fragment.base.BaseFragment
-import timber.log.Timber
 
 class RemoteFragment : BaseFragment() {
   private val items = listOf(
-    Cloud(R.drawable.icon_webdav, App.context.getString(R.string.webdav), OnClickListener {
-      startActivity(Intent(requireContext(), WebDavActivity::class.java))
-    }),
-    Cloud(R.drawable.icon_dlna, App.context.getString(R.string.dlna), OnClickListener {
-      Timber.v("to DLNAActivity")
-    })
+      Cloud(R.drawable.icon_webdav, App.context.getString(R.string.webdav), OnClickListener {
+        startActivity(Intent(requireContext(), WebDavActivity::class.java))
+      }),
   )
 
   override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
   ): View {
     return RecyclerView(requireContext()).apply {
       layoutManager = GridLayoutManager(context, 3)
@@ -55,7 +46,7 @@ class RemoteFragment : BaseFragment() {
   }
 
   private inner class CloudHolder(private val binding: ItemCloudBinding) :
-    RecyclerView.ViewHolder(binding.root) {
+      RecyclerView.ViewHolder(binding.root) {
 
     fun bind(cloud: Cloud) {
       binding.ivIcon.setImageResource(cloud.icon)

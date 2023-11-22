@@ -63,7 +63,7 @@ sealed class Song(
 
   val duration: Long
     get() {
-      if (_duration <= 0 && id > 0 && data.isNotEmpty()) {
+      if (_duration <= 0 && data.isNotEmpty() && this !is Remote) {
         val metadataRetriever = MediaMetadataRetriever()
         try {
           metadataRetriever.setDataSource(data)

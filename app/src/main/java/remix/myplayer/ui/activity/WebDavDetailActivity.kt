@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.thegrizzlylabs.sardineandroid.DavResource
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine
 import kotlinx.coroutines.Dispatchers
@@ -18,12 +19,13 @@ import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.misc.isAudio
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.adapter.OnItemClickListener
 import remix.myplayer.ui.adapter.WebDavDetailAdapter
 import remix.myplayer.util.MusicUtil
 import timber.log.Timber
 
-class WebDavDetailActivity : MenuActivity() {
+class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListener {
   private val webdav by lazy {
     intent.getSerializableExtra(EXTRA_WEBDAV) as WebDav
   }
@@ -46,27 +48,27 @@ class WebDavDetailActivity : MenuActivity() {
             }
             var select: Song.Remote? = null
             val remotes = resources
-              .filter { it.isAudio() }
-              .map {
-                val remote = Song.Remote(
-                  title = it.name.substringBeforeLast('.'),
-                  data = webdav.server.plus(it.path),
-                  size = it.contentLength,
-                  dateModified = it.creation?.time ?: 0,
-                  account = webdav.account ?: "",
-                  pwd = webdav.pwd ?: ""
-                )
-                if (it == resource) {
-                  select = remote
+                .filter { it.isAudio() }
+                .map {
+                  val remote = Song.Remote(
+                      title = it.name.substringBeforeLast('.'),
+                      data = webdav.server.plus(it.path),
+                      size = it.contentLength,
+                      dateModified = it.creation?.time ?: 0,
+                      account = webdav.account ?: "",
+                      pwd = webdav.pwd ?: ""
+                  )
+                  if (it == resource) {
+                    select = remote
+                  }
+                  remote
                 }
-                remote
-              }
             MusicServiceRemote.setPlayQueue(
-              remotes,
-              MusicUtil.makeCmdIntent(Command.PLAYSELECTEDSONG)
-                .putExtra(MusicService.EXTRA_POSITION, remotes.indexOfFirst {
-                  it.data == select?.data
-                })
+                remotes,
+                MusicUtil.makeCmdIntent(Command.PLAYSELECTEDSONG)
+                    .putExtra(MusicService.EXTRA_POSITION, remotes.indexOfFirst {
+                      it.data == select?.data
+                    })
             )
           }
         }
@@ -87,9 +89,16 @@ class WebDavDetailActivity : MenuActivity() {
 
     setUpToolbar(webdav.alias)
 
+    binding.refresh.setColorSchemeColors(ThemeStore.materialPrimaryColor)
+    binding.refresh.setOnRefreshListener(this)
     binding.rv.adapter = adapter
 
     fetchWebDav(webdav.last())
+  }
+
+  override fun onRefresh() {
+    reload(webdav.lastPath ?: return)
+    binding.refresh.isRefreshing = false
   }
 
   override fun getMenuLayoutId(): Int {
@@ -112,18 +121,20 @@ class WebDavDetailActivity : MenuActivity() {
     onClickNavigation()
   }
 
-  private fun reload(path: String) {
-    fetchWebDav(webdav.server.plus(path))
+  private fun reload(path: String, showLoading: Boolean = true) {
+    fetchWebDav(webdav.server.plus(path), showLoading)
     webdav.lastPath = path
     launch {
       AppDatabase.getInstance(applicationContext).webDavDao().insertOrReplace(webdav)
     }
   }
 
-  private fun fetchWebDav(url: String) {
+  private fun fetchWebDav(url: String, showLoading: Boolean = true) {
     currentUrl = url
 
-    showLoading()
+    if (showLoading) {
+      showLoading()
+    }
     launch {
       try {
         val davResources = withContext(Dispatchers.IO) {
@@ -136,7 +147,9 @@ class WebDavDetailActivity : MenuActivity() {
       } catch (e: Exception) {
         Timber.e(e)
       } finally {
-        dismissLoading()
+        if (showLoading) {
+          dismissLoading()
+        }
       }
     }
   }
@@ -145,8 +158,8 @@ class WebDavDetailActivity : MenuActivity() {
     private const val EXTRA_WEBDAV = "extra_webdav"
     fun start(context: Context, webDav: WebDav) {
       context.startActivity(
-        Intent(context, WebDavDetailActivity::class.java)
-          .putExtra(EXTRA_WEBDAV, webDav)
+          Intent(context, WebDavDetailActivity::class.java)
+              .putExtra(EXTRA_WEBDAV, webDav)
       )
     }
   }
