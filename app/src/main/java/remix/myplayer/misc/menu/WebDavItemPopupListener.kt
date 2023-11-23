@@ -32,7 +32,7 @@ class WebDavItemPopupListener(
   private val song: Song.Remote by lazy {
     Song.Remote(
       title = davResource.name.substringBeforeLast('.'),
-      data = webDav.server.plus(davResource.path),
+      data = webDav.base().plus(davResource.path),
       size = davResource.contentLength,
       dateModified = davResource.creation?.time ?: 0,
       account = webDav.account ?: "",
@@ -90,7 +90,7 @@ class WebDavItemPopupListener(
         sardine.setCredentials(webDav.account, webDav.pwd)
         activity.launch {
           withContext(Dispatchers.IO) {
-            sardine.delete(webDav.server.plus(davResource.path))
+            sardine.delete(webDav.base().plus(davResource.path))
           }
           loading.dismiss()
           callback?.onDavResourceRemove(davResource)

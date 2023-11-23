@@ -4,12 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.databinding.ActivityWebdavBinding
 import remix.myplayer.databinding.DialogCreateWebdavBinding
@@ -121,7 +117,8 @@ class WebDavActivity : ToolbarActivity(), CoroutineScope by MainScope() {
 
       TextInputLayoutUtil.setAccent(binding.serverLayout, textInputTintColor)
       TintHelper.setTintAuto(binding.serverLayout.editText!!, editTintColor, false)
-      binding.serverLayout.hint = activity.getString(R.string.webdav_hint_server) + " eg: https://dav.example.com"
+      binding.serverLayout.hint =
+        activity.getString(R.string.webdav_hint_server) + " eg: https://dav.example.com"
       binding.serverLayout.editText?.setText(webDav?.server)
       binding.serverLayout.editText?.setOnEditorActionListener { v, actionId, event ->
         if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -133,21 +130,24 @@ class WebDavActivity : ToolbarActivity(), CoroutineScope by MainScope() {
       binding.serverLayout.editText?.addTextChangedListener(
         TextInputEditWatcher(
           binding.serverLayout,
-          activity.getString(R.string.can_t_be_empty, activity.getString(R.string.webdav_hint_server))
+          activity.getString(
+            R.string.can_t_be_empty,
+            activity.getString(R.string.webdav_hint_server)
+          )
         )
       )
 
-      TextInputLayoutUtil.setAccent(binding.pathLayout, textInputTintColor)
-      TintHelper.setTintAuto(binding.pathLayout.editText!!, editTintColor, false)
-      binding.pathLayout.hint = activity.getString(R.string.webdav_hint_path) + " eg: /path1/path2"
-      binding.pathLayout.editText?.setText(webDav?.initialPath)
-      binding.pathLayout.editText?.setOnEditorActionListener { v, actionId, event ->
-        if (actionId == EditorInfo.IME_ACTION_DONE) {
-          submit(activity, binding, webDav)
-          return@setOnEditorActionListener true
-        }
-        false
-      }
+//      TextInputLayoutUtil.setAccent(binding.pathLayout, textInputTintColor)
+//      TintHelper.setTintAuto(binding.pathLayout.editText!!, editTintColor, false)
+//      binding.pathLayout.hint = activity.getString(R.string.webdav_hint_path) + " eg: /path1/path2"
+//      binding.pathLayout.editText?.setText(webDav?.initialPath)
+//      binding.pathLayout.editText?.setOnEditorActionListener { v, actionId, event ->
+//        if (actionId == EditorInfo.IME_ACTION_DONE) {
+//          submit(activity, binding, webDav)
+//          return@setOnEditorActionListener true
+//        }
+//        false
+//      }
 
       dialog.show()
     }
@@ -164,7 +164,11 @@ class WebDavActivity : ToolbarActivity(), CoroutineScope by MainScope() {
       }
       val server = binding.serverLayout.editText?.text?.toString()?.removeSuffix("/")
       if (server.isNullOrEmpty()) {
-        ToastUtil.show(activity, R.string.can_t_be_empty, activity.getString(R.string.webdav_hint_server))
+        ToastUtil.show(
+          activity,
+          R.string.can_t_be_empty,
+          activity.getString(R.string.webdav_hint_server)
+        )
         return
       }
       val account = binding.accountLayout.editText?.text?.toString()
@@ -178,16 +182,15 @@ class WebDavActivity : ToolbarActivity(), CoroutineScope by MainScope() {
         return
       }
 
-      val path = binding.pathLayout.editText?.text?.toString() ?: "/"
+//      val initialPath = binding.pathLayout.editText?.text?.toString() ?: "/"
       if (webDav == null) {
-        insertOrReplaceWebDav(activity, WebDav(alias, account, pwd, server, path))
+        insertOrReplaceWebDav(activity, WebDav(alias, account, pwd, server))
       } else {
         webDav.alias = alias
         webDav.server = server
-        webDav.initialPath = path
+//        webDav.initialPath = initialPath
         webDav.account = account
         webDav.pwd = pwd
-        webDav.initialPath = path
         webDav.lastPath = ""
         insertOrReplaceWebDav(activity, webDav)
       }

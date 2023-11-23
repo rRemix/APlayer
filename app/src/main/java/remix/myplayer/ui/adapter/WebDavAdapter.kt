@@ -61,7 +61,7 @@ class WebDavAdapter : RecyclerView.Adapter<WebDavAdapter.WebDavHolder>() {
 
     fun bind(webDav: WebDav) {
       binding.tvAlisa.text = webDav.alias
-      binding.tvServer.text = webDav.server + if (!webDav.initialPath.isNullOrEmpty()) "/${webDav.initialPath}" else ""
+      binding.tvServer.text = webDav.server
 
       val tintColor = ThemeStore.libraryBtnColor
       Theme.tintDrawable(binding.itemButton, R.drawable.icon_player_more, tintColor)

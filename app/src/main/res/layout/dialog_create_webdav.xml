@@ -60,17 +60,17 @@
       android:textColor="?attr/text_color_primary" />
   </com.google.android.material.textfield.TextInputLayout>
 
-  <com.google.android.material.textfield.TextInputLayout
-    android:id="@+id/path_layout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/d18_size"
-    android:hint="@string/webdav_hint_path">
+<!--  <com.google.android.material.textfield.TextInputLayout-->
+<!--    android:id="@+id/path_layout"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_marginTop="@dimen/d18_size"-->
+<!--    android:hint="@string/webdav_hint_path">-->
 
-    <com.google.android.material.textfield.TextInputEditText
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:imeOptions="actionDone"
-      android:textColor="?attr/text_color_primary" />
-  </com.google.android.material.textfield.TextInputLayout>
+<!--    <com.google.android.material.textfield.TextInputEditText-->
+<!--      android:layout_width="match_parent"-->
+<!--      android:layout_height="wrap_content"-->
+<!--      android:imeOptions="actionDone"-->
+<!--      android:textColor="?attr/text_color_primary" />-->
+<!--  </com.google.android.material.textfield.TextInputLayout>-->
 </LinearLayout>

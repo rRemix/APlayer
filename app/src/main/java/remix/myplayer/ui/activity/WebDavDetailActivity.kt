@@ -48,27 +48,27 @@ class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListene
             }
             var select: Song.Remote? = null
             val remotes = resources
-                .filter { it.isAudio() }
-                .map {
-                  val remote = Song.Remote(
-                      title = it.name.substringBeforeLast('.'),
-                      data = webdav.server.plus(it.path),
-                      size = it.contentLength,
-                      dateModified = it.creation?.time ?: 0,
-                      account = webdav.account ?: "",
-                      pwd = webdav.pwd ?: ""
-                  )
-                  if (it == resource) {
-                    select = remote
-                  }
-                  remote
+              .filter { it.isAudio() }
+              .map {
+                val remote = Song.Remote(
+                  title = it.name.substringBeforeLast('.'),
+                  data = webdav.base().plus(it.path),
+                  size = it.contentLength,
+                  dateModified = it.creation?.time ?: 0,
+                  account = webdav.account ?: "",
+                  pwd = webdav.pwd ?: ""
+                )
+                if (it == resource) {
+                  select = remote
                 }
+                remote
+              }
             MusicServiceRemote.setPlayQueue(
-                remotes,
-                MusicUtil.makeCmdIntent(Command.PLAYSELECTEDSONG)
-                    .putExtra(MusicService.EXTRA_POSITION, remotes.indexOfFirst {
-                      it.data == select?.data
-                    })
+              remotes,
+              MusicUtil.makeCmdIntent(Command.PLAYSELECTEDSONG)
+                .putExtra(MusicService.EXTRA_POSITION, remotes.indexOfFirst {
+                  it.data == select?.data
+                })
             )
           }
         }
@@ -106,7 +106,7 @@ class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListene
   }
 
   override fun onClickNavigation() {
-    if (currentUrl == webdav.root()) {
+    if (webdav.isRoot(currentUrl)) {
       super.onClickNavigation()
       return
     }
@@ -114,7 +114,11 @@ class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListene
     var url = currentUrl.removeSuffix("/")
     url = url.substring(0, url.lastIndexOf('/'))
 
-    reload(url.replace(webdav.root(), ""))
+    if (url == webdav.root()) {
+      reload(webdav.initialPath())
+    } else {
+      reload(url.replace(webdav.root(), ""))
+    }
   }
 
   override fun onBackPressed() {
@@ -122,7 +126,7 @@ class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListene
   }
 
   private fun reload(path: String, showLoading: Boolean = true) {
-    fetchWebDav(webdav.server.plus(path), showLoading)
+    fetchWebDav(webdav.base().plus(path), showLoading)
     webdav.lastPath = path
     launch {
       AppDatabase.getInstance(applicationContext).webDavDao().insertOrReplace(webdav)
@@ -130,7 +134,7 @@ class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListene
   }
 
   private fun fetchWebDav(url: String, showLoading: Boolean = true) {
-    currentUrl = url
+    currentUrl = url.removeSuffix("/")
 
     if (showLoading) {
       showLoading()
@@ -158,8 +162,8 @@ class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListene
     private const val EXTRA_WEBDAV = "extra_webdav"
     fun start(context: Context, webDav: WebDav) {
       context.startActivity(
-          Intent(context, WebDavDetailActivity::class.java)
-              .putExtra(EXTRA_WEBDAV, webDav)
+        Intent(context, WebDavDetailActivity::class.java)
+          .putExtra(EXTRA_WEBDAV, webDav)
       )
     }
   }
