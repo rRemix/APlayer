@@ -6,17 +6,13 @@ package remix.myplayer.ui.dialog;
 
 import static remix.myplayer.theme.Theme.getBaseDialog;
 
-import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -89,17 +85,6 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
   @NonNull
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-        ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
-            !=
-            PackageManager.PERMISSION_GRANTED) {
-      return new MaterialDialog.Builder(getActivity())
-          .title(R.string.error)
-          .content(R.string.need_permission)
-          .positiveText(android.R.string.ok)
-          .build();
-    }
-
     if (getArguments() == null || !getArguments().containsKey("builder")) {
       throw new IllegalStateException("You must create a FolderChooserDialog using the Builder.");
     }
