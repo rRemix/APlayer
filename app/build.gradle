@@ -26,7 +26,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 33
 
-        versionCode 16200
+        versionCode 16201
         versionName "1.6.2.0"
 
         flavorDimensions "default"

@@ -68,13 +68,20 @@ abstract class AppDatabase : RoomDatabase() {
           database.execSQL("ALTER TABLE `PlayQueue` ADD COLUMN `account` TEXT")
           database.execSQL("ALTER TABLE `PlayQueue` ADD COLUMN `pwd` TEXT")
 
-          database.execSQL("CREATE TABLE IF NOT EXISTS `WebDav` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `alias` TEXT NOT NULL, `account` TEXT, `pwd` TEXT, `server` TEXT NOT NULL, `initialPath` TEXT NOT NULL, `lastPath` TEXT, `createAt` INTEGER NOT NULL)")
+          database.execSQL("CREATE TABLE IF NOT EXISTS `WebDav` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `alias` TEXT NOT NULL, `account` TEXT, `pwd` TEXT, `server` TEXT NOT NULL, `lastPath` TEXT, `createAt` INTEGER NOT NULL)")
+        }
+      }
+      val migration4to5 = object : Migration(4, 5) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+          database.execSQL("DROP TABLE `WebDav`")
+          database.execSQL("CREATE TABLE IF NOT EXISTS `WebDav` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `alias` TEXT NOT NULL, `account` TEXT, `pwd` TEXT, `server` TEXT NOT NULL, `lastPath` TEXT, `createAt` INTEGER NOT NULL)")
         }
       }
       val database =
         Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "aplayer.db")
           .addMigrations(migration1to3)
           .addMigrations(migration3to4)
+          .addMigrations(migration4to5)
           .build()
       database.invalidationTracker.addObserver(object :
         InvalidationTracker.Observer(PlayList.TABLE_NAME, PlayQueue.TABLE_NAME) {
