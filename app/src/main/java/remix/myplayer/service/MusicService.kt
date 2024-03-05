@@ -618,6 +618,23 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       override fun onSeekTo(pos: Long) {
         setProgress(pos.toInt())
       }
+
+      override fun onCustomAction(action: String?, extras: Bundle?) {
+        Timber.v("onCustomAction, ac： $action extra: $extras")
+        val intent = Intent(ACTION_CMD)
+        when(action) {
+          ACTION_UNLOCK_DESKTOP_LYRIC -> {
+            intent.putExtra(EXTRA_CONTROL, Command.UNLOCK_DESKTOP_LYRIC)
+          }
+          ACTION_TOGGLE_DESKTOP_LYRIC -> {
+            intent.putExtra(EXTRA_CONTROL, Command.TOGGLE_DESKTOP_LYRIC)
+          }
+        }
+        if (intent.hasExtra(EXTRA_CONTROL)) {
+          handleCommand(intent)
+          updatePlaybackState()
+        }
+      }
     })
 
     mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS or MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS)
@@ -1311,6 +1328,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       Command.LOCK_DESKTOP_LYRIC -> {
         //更新通知栏
         updateNotification()
+        updatePlaybackState()
       }
       //某一首歌曲添加至下一首播放
       Command.ADD_TO_NEXT_SONG -> {
@@ -1419,10 +1437,22 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
 
   private fun updatePlaybackState() {
-    mediaSession.setPlaybackState(PlaybackStateCompat.Builder()
-        .setActiveQueueItemId(currentSong.id)
-        .setState(if (isPlay) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED, progress.toLong(), speed)
-        .setActions(MEDIA_SESSION_ACTIONS).build())
+    val desktopLyricLock = isDesktopLyricLocked
+
+    val builder = PlaybackStateCompat.Builder()
+    builder.setActiveQueueItemId(currentSong.id)
+      .setState(if (isPlay) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED, progress.toLong(), speed)
+      .setActions(MEDIA_SESSION_ACTIONS)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      builder.addCustomAction(
+        PlaybackStateCompat.CustomAction.Builder(
+          if (desktopLyricLock) ACTION_UNLOCK_DESKTOP_LYRIC else ACTION_TOGGLE_DESKTOP_LYRIC,
+          getString(if (desktopLyricLock) R.string.desktop_lyric__unlock else R.string.desktop_lyric_lock),
+          if (desktopLyricLock) R.drawable.ic_lock_open_black_24dp else R.drawable.ic_desktop_lyric_black_24dp
+        ).build()
+      )
+    }
+    mediaSession.setPlaybackState(builder.build())
   }
 
   /**
@@ -2003,6 +2033,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     const val ACTION_CMD = "$APLAYER_PACKAGE_NAME.cmd"
     const val ACTION_WIDGET_UPDATE = "$APLAYER_PACKAGE_NAME.widget_update"
     const val ACTION_TOGGLE_TIMER = "$APLAYER_PACKAGE_NAME.toggle_timer"
+    const val ACTION_UNLOCK_DESKTOP_LYRIC = "$APLAYER_PACKAGE_NAME.unlock.desktop_lyric"
+    const val ACTION_TOGGLE_DESKTOP_LYRIC = "$APLAYER_PACKAGE_NAME.toggle.desktop_lyric"
 
     private const val MEDIA_SESSION_ACTIONS = (PlaybackStateCompat.ACTION_PLAY
         or PlaybackStateCompat.ACTION_PAUSE
