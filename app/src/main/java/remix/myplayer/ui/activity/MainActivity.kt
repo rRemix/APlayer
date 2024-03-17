@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.materialdialogs.MaterialDialog
+import com.bumptech.glide.Glide
 import com.bumptech.glide.signature.ObjectKey
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
@@ -35,7 +36,6 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivityMainBinding
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.helper.SortOrder
@@ -518,7 +518,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
         } else if (data.getBooleanExtra(EXTRA_REFRESH_ADAPTER, false)) { //刷新adapter
           UriFetcher.updateAllVersion()
           UriFetcher.clearAllCache()
-          GlideApp.get(this).clearMemory()
+          Glide.get(this).clearMemory()
           handler.sendEmptyMessage(MSG_UPDATE_ADAPTER)
         } else if (data.getBooleanExtra(EXTRA_REFRESH_LIBRARY, false)) { //刷新Library
           val libraries = data.getSerializableExtra(EXTRA_LIBRARY) as List<Library>?
@@ -600,7 +600,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
               else -> UriFetcher.updatePlayListVersion()
             }
             UriFetcher.clearAllCache()
-            GlideApp.get(this).clearMemory()
+            Glide.get(this).clearMemory()
             onMediaStoreChanged()
             handler.sendEmptyMessage(MSG_UPDATE_ADAPTER)
           }, 500)
@@ -639,7 +639,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     val currentSong = MusicServiceRemote.getCurrentSong()
     if (currentSong != Song.EMPTY_SONG) {
       binding.navigationView.findViewById<TextView>(R.id.tv_header).text = getString(R.string.play_now, currentSong.title)
-      GlideApp.with(this)
+      Glide.with(this)
           .load(currentSong)
           .centerCrop()
           .signature(ObjectKey(UriFetcher.albumVersion))

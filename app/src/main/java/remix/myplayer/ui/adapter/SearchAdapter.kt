@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.view.Gravity
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
+import com.bumptech.glide.Glide
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemSearchReulstBinding
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.misc.menu.SongPopupListener
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.libraryBtnColor
@@ -32,7 +32,7 @@ class SearchAdapter(private val multiChoice: MultipleChoice<Song>, layoutId: Int
     holder.binding.searchName.text = song.title
     holder.binding.searchDetail.text = String.format("%s-%s", song.artist, song.album)
     //封面
-    GlideApp.with(holder.itemView)
+    Glide.with(holder.itemView)
         .load(song)
         .centerCrop()
         .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))

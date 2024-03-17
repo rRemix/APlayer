@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.devtools.ksp'
     id 'kotlin-android'
-    id 'kotlin-kapt'
     id 'kotlin-parcelize'
     id 'bugly'
 }
@@ -20,7 +20,9 @@ repositories {
 }
 
 android {
-    compileSdkVersion 33
+    namespace 'remix.myplayer'
+
+    compileSdk 34
 //    ndkVersion "23.0.7599858"
 
     defaultConfig {
@@ -90,7 +92,6 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled true
             debuggable false
-            zipAlignEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
@@ -126,22 +127,15 @@ android {
         }
     }
 
-    lintOptions {
-        checkReleaseBuilds false
+    lint {
         abortOnError false
-        disable 'MissingTranslation'
-        disable 'InvalidPackage'
+        checkReleaseBuilds false
+        disable 'MissingTranslation', 'InvalidPackage'
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    repositories {
-        flatDir {
-            dirs 'libs'
-        }
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     buildFeatures {
@@ -198,10 +192,11 @@ dependencies {
     implementation 'com.anjlab.android.iab.v3:library:2.0.3'
 
     //room
-    implementation 'androidx.room:room-runtime:2.3.0'
-    implementation 'androidx.room:room-ktx:2.3.0'
-    kapt 'androidx.room:room-compiler:2.3.0' // use kapt for Kotlin
-    implementation 'androidx.room:room-rxjava2:2.3.0'
+    def room_version = '2.6.1'
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-rxjava2:$room_version"
 
     //rxlife
 //    implementation 'com.trello.rxlifecycle3:rxlifecycle:3.0.0'
@@ -212,8 +207,9 @@ dependencies {
     //timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
-    kapt 'com.github.bumptech.glide:compiler:4.12.0'
+    def glide_version = '4.16.0'
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    ksp "com.github.bumptech.glide:ksp:$glide_version"
 
     //other
     implementation 'com.facebook.rebound:rebound:0.3.8'

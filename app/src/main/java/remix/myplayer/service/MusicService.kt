@@ -27,6 +27,7 @@ import androidx.annotation.WorkerThread
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
+import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.*
@@ -42,7 +43,6 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayQueue
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.*
 import remix.myplayer.lyric.LyricFetcher
 import remix.myplayer.lyric.LyricFetcher.Companion.LYRIC_FIND_INTERVAL
@@ -452,7 +452,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     return START_NOT_STICKY
   }
 
-  override fun onSharedPreferenceChanged(sp: SharedPreferences, key: String) {
+  override fun onSharedPreferenceChanged(sp: SharedPreferences?, key: String?) {
 //    Timber.v("onSharedPreferenceChanged, key: $key")
     when (key) {
       //通知栏背景色
@@ -1406,7 +1406,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     if (!updatePlayStateOnly(control)) {
       val placeholder = if (ThemeStore.isLightTheme) R.drawable.album_empty_bg_day else R.drawable.album_empty_bg_night
-      GlideApp.with(this)
+      Glide.with(this)
           .asBitmap()
           .load(currentSong)
           .error(placeholder)

@@ -5,15 +5,14 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemSongRecycleBinding
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.helper.SortOrder
@@ -91,7 +90,7 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
       holder.binding.songButton.visibility = View.VISIBLE
 
       //封面
-      GlideApp.with(holder.itemView)
+      Glide.with(holder.itemView)
           .load(data)
           .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
           .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))

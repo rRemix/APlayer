@@ -11,6 +11,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import androidx.palette.graphics.Palette
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -21,7 +22,6 @@ import io.reactivex.functions.Consumer
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivityLockscreenBinding
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.lyric.LyricFetcher
 import remix.myplayer.lyric.LyricFetcher.Companion.LYRIC_FIND_INTERVAL
@@ -185,7 +185,7 @@ class LockScreenActivity : BaseMusicActivity() {
     //艺术家
     binding.lockscreenArtist.text = song.artist
     //封面
-    GlideApp.with(this)
+    Glide.with(this)
         .asBitmap()
         .load(song)
         .centerCrop()
@@ -193,12 +193,12 @@ class LockScreenActivity : BaseMusicActivity() {
         .placeholder(R.drawable.album_empty_bg_night)
         .error(R.drawable.album_empty_bg_night)
         .addListener(object : RequestListener<Bitmap> {
-          override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Bitmap>?, isFirstResource: Boolean): Boolean {
+          override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Bitmap>, isFirstResource: Boolean): Boolean {
             startProcess(DEFAULT_BITMAP)
             return false
           }
 
-          override fun onResourceReady(resource: Bitmap?, model: Any?, target: Target<Bitmap>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+          override fun onResourceReady(resource: Bitmap, model: Any, target: Target<Bitmap>?, dataSource: DataSource, isFirstResource: Boolean): Boolean {
             startProcess(resource)
             return false
           }

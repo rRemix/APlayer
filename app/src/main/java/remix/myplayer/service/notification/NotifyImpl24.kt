@@ -8,12 +8,12 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
+import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.bumptech.glide.signature.ObjectKey
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -34,8 +34,8 @@ NotifyImpl24(context: MusicService) : Notify(context) {
     val song = service.currentSong
 
     //设置封面
-    GlideApp.with(service).clear(target)
-    target = GlideApp.with(service)
+    Glide.with(service).clear(target)
+    target = Glide.with(service)
       .asBitmap()
       .load(song)
       .centerCrop()

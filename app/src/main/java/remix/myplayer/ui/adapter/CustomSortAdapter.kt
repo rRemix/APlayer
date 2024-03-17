@@ -1,10 +1,10 @@
 package remix.myplayer.ui.adapter
 
 import android.view.View
+import com.bumptech.glide.Glide
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemCustomSortBinding
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
 
@@ -21,7 +21,7 @@ class CustomSortAdapter(layoutId: Int) : BaseAdapter<Song, CustomSortAdapter.Cus
     holder.binding.itemAlbum.text = data.album
 
     //封面
-    GlideApp.with(holder.itemView)
+    Glide.with(holder.itemView)
         .load(data)
         .centerCrop()
         .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))

@@ -11,12 +11,11 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
-import com.afollestad.materialdialogs.MaterialDialog
+import com.bumptech.glide.Glide
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivityRecordshareBinding
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
@@ -83,7 +82,7 @@ class RecordShareActivity : BaseMusicActivity() {
 //    LibraryUriRequest(binding.recordshareImage,
 //        ImageUriUtil.getSearchRequestWithAlbumType(song),
 //        RequestConfig.Builder(IMAGE_SIZE, IMAGE_SIZE).build()).load()
-    GlideApp.with(this)
+    Glide.with(this)
         .load(song)
         .centerCrop()
         .placeholder(Theme.resolveDrawable(this, R.attr.default_album))
@@ -123,8 +122,6 @@ class RecordShareActivity : BaseMusicActivity() {
    * 将图片保存到本地
    */
   private inner class ProcessThread : Thread() {
-    var fileOutputStream: FileOutputStream? = null
-
     @SuppressLint("SimpleDateFormat")
     override fun run() {
       //开始处理,显示进度条
@@ -137,6 +134,7 @@ class RecordShareActivity : BaseMusicActivity() {
       handler.sendEmptyMessage(START)
       bg = binding.recordshareContainer.getDrawingCache(true)
       file = null
+      var fileOutputStream: FileOutputStream? = null
       try {
         //将截屏内容保存到文件
         val shareDir = DiskCache.getDiskCacheDir(this@RecordShareActivity, "share")
@@ -151,9 +149,9 @@ class RecordShareActivity : BaseMusicActivity() {
             file.createNewFile()
           }
           fileOutputStream = FileOutputStream(file)
-          bg?.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream)
-          fileOutputStream?.flush()
-          fileOutputStream?.close()
+          bg?.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream!!)
+          fileOutputStream!!.flush()
+          fileOutputStream!!.close()
           //处理完成
           handler.sendEmptyMessage(COMPLETE)
           handler.sendEmptyMessage(STOP)
@@ -174,12 +172,10 @@ class RecordShareActivity : BaseMusicActivity() {
         errMsg.obj = e.toString()
         handler.sendMessage(errMsg)
       } finally {
-        if (fileOutputStream != null) {
-          try {
-            fileOutputStream!!.close()
-          } catch (e: IOException) {
-            e.printStackTrace()
-          }
+        try {
+          fileOutputStream?.close()
+        } catch (e: IOException) {
+          e.printStackTrace()
         }
       }
     }

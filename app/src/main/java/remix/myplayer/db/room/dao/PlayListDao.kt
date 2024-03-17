@@ -12,7 +12,7 @@ import androidx.room.RawQuery
  */
 @Dao
 interface PlayListDao {
-  @Insert(onConflict = OnConflictStrategy.FAIL)
+  @Insert(onConflict = OnConflictStrategy.ABORT)
   fun insertPlayList(playlist: PlayList): Long
 
   @Query("""

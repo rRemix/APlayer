@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.bumptech.glide.signature.ObjectKey
 import com.github.promeg.pinyinhelper.Pinyin
 import remix.myplayer.App
@@ -14,7 +15,6 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemSongRecycleBinding
 import remix.myplayer.databinding.LayoutHeader1Binding
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.glide.UriFetcher.albumVersion
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
@@ -83,7 +83,7 @@ class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView
     }
 
     //封面
-    GlideApp.with(holder.itemView)
+    Glide.with(holder.itemView)
         .load(song)
         .centerCrop()
         .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))

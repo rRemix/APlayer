@@ -2,10 +2,10 @@ package remix.myplayer.ui.adapter
 
 import android.view.View
 import android.widget.CompoundButton
+import com.bumptech.glide.Glide
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemSongChooseBinding
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.misc.interfaces.OnSongChooseListener
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.ThemeStore.accentColor
@@ -35,7 +35,7 @@ class SongChooseAdapter(layoutID: Int, private val checkListener: OnSongChooseLi
     //艺术家
     holder.binding.itemArtist.text = song.artist
     //封面
-    GlideApp.with(holder.itemView)
+    Glide.with(holder.itemView)
         .load(song)
         .placeholder(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))
         .error(Theme.resolveDrawable(holder.itemView.context, R.attr.default_album))

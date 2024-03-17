@@ -6,11 +6,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
+import com.bumptech.glide.Glide
 import com.bumptech.glide.signature.ObjectKey
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.databinding.BottomActionbarBinding
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.helper.MusicServiceRemote.isPlaying
@@ -94,7 +94,7 @@ class BottomActionBarFragment : BaseMusicFragment<BottomActionbarBinding>() {
     binding.bottomTitle.text = song.title
     binding.bottomArtist.text = song.artist
     //封面
-    GlideApp.with(this)
+    Glide.with(this)
         .load(song)
         .centerCrop()
         .placeholder(Theme.resolveDrawable(requireContext(), R.attr.default_album))
@@ -147,13 +147,13 @@ class BottomActionBarFragment : BaseMusicFragment<BottomActionbarBinding>() {
       return true
     }
 
-    override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+    override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
       return true
     }
 
     override fun onLongPress(e: MotionEvent) {}
-    override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-      if (reference.get() != null && velocityY < 0 && e1.y - e2.y > Y_THRESHOLD) {
+    override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+      if (e1 != null && reference.get() != null && velocityY < 0 && e1.y - e2.y > Y_THRESHOLD) {
         reference.get()?.startPlayerActivity()
       }
       return true
