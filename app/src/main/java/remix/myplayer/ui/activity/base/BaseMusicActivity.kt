@@ -1,6 +1,5 @@
 package remix.myplayer.ui.activity.base
 
-import android.annotation.SuppressLint
 import android.content.*
 import android.os.*
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +16,6 @@ import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.util.*
 
-@SuppressLint("Registered")
 open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScope by MainScope() {
   private var serviceToken: MusicServiceRemote.ServiceToken? = null
   private val serviceEventListeners = ArrayList<MusicEventCallback>()

@@ -52,7 +52,7 @@ class MainPagerAdapter(private val fm: FragmentManager) : FragmentPagerAdapter(f
     }
     val (_, _, className) = libraries[position]
     for (fragment in fm.fragments) {
-      if (fragment is LibraryFragment<*, *> && (fragment.javaClass.name
+      if (fragment is LibraryFragment<*, *, *> && (fragment.javaClass.name
               == className)) {
         return fragment
       }

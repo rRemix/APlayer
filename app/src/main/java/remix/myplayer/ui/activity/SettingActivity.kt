@@ -29,7 +29,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_setting.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import remix.myplayer.App.Companion.IS_GOOGLEPLAY
@@ -349,7 +348,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     val coverSource = SPUtil.getValue(
         this, SETTING_KEY.NAME, SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, 0
     )
-    setting_cover_source_text.text = getString(
+    binding.settingCoverSourceText.setText(
         if (coverSource == 0) R.string.cover_download_from_lastfm else R.string.cover_download_from_netease
     )
 
@@ -590,7 +589,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
         SETTING_KEY.PLAYER_BACKGROUND,
         BACKGROUND_ADAPTIVE_COLOR
     )
-    setting_now_playing_screen_text.setText(
+    binding.settingNowPlayingScreenText.setText(
         when (nowPlayingScreen) {
           BACKGROUND_THEME -> R.string.now_playing_screen_theme
           BACKGROUND_ADAPTIVE_COLOR -> R.string.now_playing_screen_cover
@@ -958,7 +957,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
                 SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,
                 which
             )
-            setting_cover_source_text.text = getString(
+            binding.settingCoverSourceText.setText(
                 if (which == 0) R.string.cover_download_from_lastfm else R.string.cover_download_from_netease
             )
           }
@@ -1329,11 +1328,11 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
       sharedPreferences: SharedPreferences?, key: String
   ) {
     if (key == SETTING_KEY.DESKTOP_LYRIC_SHOW) {
-      setting_lrc_float_switch.setOnCheckedChangeListener(null)
-      setting_lrc_float_switch.isChecked = SPUtil.getValue(
+      binding.settingLrcFloatSwitch.setOnCheckedChangeListener(null)
+      binding.settingLrcFloatSwitch.isChecked = SPUtil.getValue(
           this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false
       )
-      setting_lrc_float_switch.setOnCheckedChangeListener(checkedChangedListener)
+      binding.settingLrcFloatSwitch.setOnCheckedChangeListener(checkedChangedListener)
     }
   }
 

@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
-import kotlinx.android.synthetic.main.activity_custom_sort.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import remix.myplayer.R
@@ -89,18 +88,18 @@ class CustomSortActivity : ToolbarActivity() {
       }
 
 
-    }).attachToRecyclerView(custom_sort_recyclerView)
+    }).attachToRecyclerView(binding.customSortRecyclerView)
 
-    custom_sort_recyclerView.setHasFixedSize(true)
-    custom_sort_recyclerView.layoutManager = LinearLayoutManager(this)
-    custom_sort_recyclerView.itemAnimator = DefaultItemAnimator()
-    custom_sort_recyclerView.adapter = adapter
+    binding.customSortRecyclerView.setHasFixedSize(true)
+    binding.customSortRecyclerView.layoutManager = LinearLayoutManager(this)
+    binding.customSortRecyclerView.itemAnimator = DefaultItemAnimator()
+    binding.customSortRecyclerView.adapter = adapter
 
 
     val accentColor = ThemeStore.accentColor
-    custom_sort_recyclerView.setBubbleColor(accentColor)
-    custom_sort_recyclerView.setHandleColor(accentColor)
-    custom_sort_recyclerView.setBubbleTextColor(resources.getColor(if (isColorLight(accentColor))
+    binding.customSortRecyclerView.setBubbleColor(accentColor)
+    binding.customSortRecyclerView.setHandleColor(accentColor)
+    binding.customSortRecyclerView.setBubbleTextColor(resources.getColor(if (isColorLight(accentColor))
       R.color.light_text_color_primary
     else
       R.color.dark_text_color_primary))

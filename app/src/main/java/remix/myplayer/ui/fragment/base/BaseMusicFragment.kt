@@ -2,14 +2,22 @@ package remix.myplayer.ui.fragment.base
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.viewbinding.ViewBinding
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.helper.MusicEventCallback
 
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 
-open class BaseMusicFragment : BaseFragment(), MusicEventCallback {
+abstract class BaseMusicFragment<VB: ViewBinding> : BaseFragment(), MusicEventCallback {
+  protected abstract val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> VB
+  private var _binding: VB? = null
+  protected val binding
+    get() = _binding!!
+
   private var musicActivity: BaseMusicActivity? = null
 
   override fun onAttach(context: Context) {
@@ -27,6 +35,15 @@ open class BaseMusicFragment : BaseFragment(), MusicEventCallback {
     musicActivity = null
   }
 
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View? {
+    _binding = bindingInflater.invoke(inflater, container, false)
+    return binding.root
+  }
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 //        MusicEventHelper.addCallback(this)
@@ -37,6 +54,7 @@ open class BaseMusicFragment : BaseFragment(), MusicEventCallback {
     super.onDestroyView()
 //        MusicEventHelper.removeCallback(this)
     musicActivity?.removeMusicServiceEventListener(this)
+    _binding = null
   }
 
   override fun onMediaStoreChanged() {

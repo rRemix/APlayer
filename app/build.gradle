@@ -1,8 +1,10 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'bugly'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'kotlin-parcelize'
+    id 'bugly'
+}
 
 def properties = getProperties('../local.properties')
 
@@ -104,14 +106,16 @@ android {
         }
     }
 
+    sourceSets {
+        main {
+            java.srcDir("src/third-party/jaudiotagger-android/src")
+        }
+    }
+
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
         }
-    }
-
-    androidExtensions {
-        experimental = true
     }
 
     productFlavors {
@@ -220,10 +224,6 @@ dependencies {
 
     //webdav
     implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
-}
-
-android.sourceSets.all {
-    java.srcDirs += "src/third-party/jaudiotagger-android/src"
 }
 
 def getProperties(String fileName) {

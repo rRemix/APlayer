@@ -2,14 +2,16 @@ package remix.myplayer.ui.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_artist.*
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Artist
+import remix.myplayer.databinding.FragmentArtistBinding
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader
 import remix.myplayer.misc.interfaces.LoaderIds
 import remix.myplayer.misc.interfaces.OnItemClickListener
@@ -26,17 +28,17 @@ import remix.myplayer.util.SPUtil
 /**
  * 艺术家Fragment
  */
-class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
+class ArtistFragment : LibraryFragment<Artist, ArtistAdapter, FragmentArtistBinding>() {
+  override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentArtistBinding
+    get() = FragmentArtistBinding::inflate
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     pageName = TAG
   }
 
-  override val layoutID: Int = R.layout.fragment_artist
-
   override fun initAdapter() {
-    adapter = ArtistAdapter(R.layout.item_artist_recycle_grid, multiChoice, recyclerView)
+    adapter = ArtistAdapter(R.layout.item_artist_recycle_grid, multiChoice, binding.recyclerView)
     adapter.onItemClickListener = object : OnItemClickListener {
       override fun onItemClick(view: View, position: Int) {
         val artist = adapter.dataList[position]
@@ -55,10 +57,10 @@ class ArtistFragment : LibraryFragment<Artist, ArtistAdapter>() {
 
   override fun initView() {
     val model = SPUtil.getValue(requireContext(), SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.MODE_FOR_ARTIST, HeaderAdapter.GRID_MODE)
-    recyclerView.layoutManager = if (model == HeaderAdapter.LIST_MODE) LinearLayoutManager(requireContext()) else GridLayoutManager(activity, spanCount)
-    recyclerView.itemAnimator = DefaultItemAnimator()
-    recyclerView.adapter = adapter
-    recyclerView.setHasFixedSize(true)
+    binding.recyclerView.layoutManager = if (model == HeaderAdapter.LIST_MODE) LinearLayoutManager(requireContext()) else GridLayoutManager(activity, spanCount)
+    binding.recyclerView.itemAnimator = DefaultItemAnimator()
+    binding.recyclerView.adapter = adapter
+    binding.recyclerView.setHasFixedSize(true)
   }
 
   override fun loader(): Loader<List<Artist>> {

@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_eq.*
 import remix.myplayer.R
+import remix.myplayer.databinding.ActivityEqBinding
 import remix.myplayer.databinding.LayoutEqSeekbarBinding
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.MusicServiceRemote
@@ -19,6 +19,8 @@ import java.text.DecimalFormat
  * Created by Remix on 19-5-6.
  */
 class EQActivity : ToolbarActivity() {
+  private lateinit var binding: ActivityEqBinding
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -36,7 +38,8 @@ class EQActivity : ToolbarActivity() {
       return
     }
 
-    setContentView(R.layout.activity_eq)
+    binding = ActivityEqBinding.inflate(layoutInflater)
+    setContentView(binding.root)
 
     setUpToolbar(getString(R.string.eq))
 
@@ -46,17 +49,17 @@ class EQActivity : ToolbarActivity() {
 
   private fun setUpUI() {
     //初始化开关
-    eq_switch.isEnabled = EQHelper.builtEqualizerInit
-    eq_switch.isChecked = EQHelper.enable
-    eq_switch.setOnCheckedChangeListener { buttonView, isChecked ->
+    binding.eqSwitch.isEnabled = EQHelper.builtEqualizerInit
+    binding.eqSwitch.isChecked = EQHelper.enable
+    binding.eqSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
       updateEnable(isChecked)
-      eq_reset.isEnabled = EQHelper.enable
+      binding.eqReset.isEnabled = EQHelper.enable
     }
-    TintHelper.setTintAuto(eq_switch, ThemeStore.accentColor, false)
+    TintHelper.setTintAuto(binding.eqSwitch, ThemeStore.accentColor, false)
 
     //初始化重置按钮背景
-    TintHelper.setTintAuto(eq_reset, ThemeStore.accentColor, false)
-    eq_reset.isEnabled = EQHelper.enable
+    TintHelper.setTintAuto(binding.eqReset, ThemeStore.accentColor, false)
+    binding.eqReset.isEnabled = EQHelper.enable
 
     val bandNumber = EQHelper.bandNumber
     val accentColor = ThemeStore.accentColor
@@ -66,7 +69,7 @@ class EQActivity : ToolbarActivity() {
     val maxLevelText = decimalFormat.format(EQHelper.maxLevel / 100)
 
     for (i in 0 until bandNumber) {
-      val layout = LayoutEqSeekbarBinding.inflate(layoutInflater, eq_container, false)
+      val layout = LayoutEqSeekbarBinding.inflate(layoutInflater, binding.eqContainer, false)
 
       layout.tvFreq.text = String.format("%d mHz", EQHelper.getCenterFreq(i))
       layout.tvMin.text = minLevelText
@@ -92,11 +95,11 @@ class EQActivity : ToolbarActivity() {
         override fun onStopTrackingTouch(seekBar: SeekBar?) {}
       })
 
-      eq_container.addView(layout.root)
+      binding.eqContainer.addView(layout.root)
     }
 
     //低音增强
-    bass_seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+    binding.bassSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
       override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         EQHelper.bassBoostStrength = progress
       }
@@ -108,9 +111,9 @@ class EQActivity : ToolbarActivity() {
       }
 
     })
-    bass_seekbar.isEnabled = EQHelper.isBassBoostEnabled
-    bass_seekbar.progress = EQHelper.bassBoostStrength
-    TintHelper.setTint(bass_seekbar, accentColor, false)
+    binding.bassSeekbar.isEnabled = EQHelper.isBassBoostEnabled
+    binding.bassSeekbar.progress = EQHelper.bassBoostStrength
+    TintHelper.setTint(binding.bassSeekbar, accentColor, false)
 
     //环绕声
 //    virtualizer_seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -127,20 +130,20 @@ class EQActivity : ToolbarActivity() {
 //    })
 //    virtualizer_seekbar.isEnabled = EQHelper.isVirtualizerEnabled
 //    virtualizer_seekbar.progress = EQHelper.virtualizerStrength
-    TintHelper.setTint(virtualizer_seekbar, accentColor, false)
+    TintHelper.setTint(binding.virtualizerSeekbar, accentColor, false)
   }
 
 
   private fun updateEnable(enable: Boolean) {
     EQHelper.updateEnable(enable)
     for (i in 0 until EQHelper.bandNumber) {
-      val child = eq_container.findViewWithTag<View>(i)
+      val child = binding.eqContainer.findViewWithTag<View>(i)
       if (child is SeekBar) {
         child.isEnabled = enable
       }
     }
 
-    bass_seekbar.isEnabled = EQHelper.isBassBoostEnabled
+    binding.bassSeekbar.isEnabled = EQHelper.isBassBoostEnabled
 //    virtualizer_seekbar.isEnabled = EQHelper.isVirtualizerEnabled
   }
 
@@ -148,13 +151,13 @@ class EQActivity : ToolbarActivity() {
   fun onReset(v: View) {
     EQHelper.reset()
     for (i in 0 until EQHelper.bandNumber) {
-      val child = eq_container.findViewWithTag<View>(i)
+      val child = binding.eqContainer.findViewWithTag<View>(i)
       if (child is SeekBar) {
         child.progress = EQHelper.getBandLevel(i) - EQHelper.minLevel
       }
     }
-    bass_seekbar.progress = 0
-    virtualizer_seekbar.progress = 0
+    binding.bassSeekbar.progress = 0
+    binding.virtualizerSeekbar.progress = 0
   }
 
 }

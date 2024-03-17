@@ -7,9 +7,9 @@ import android.os.Bundle
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import com.bumptech.glide.signature.ObjectKey
-import kotlinx.android.synthetic.main.bottom_actionbar.*
 import remix.myplayer.App
 import remix.myplayer.R
+import remix.myplayer.databinding.BottomActionbarBinding
 import remix.myplayer.glide.GlideApp
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
@@ -30,33 +30,31 @@ import java.lang.ref.WeakReference
 /**
  * 底部控制的Fragment
  */
-class BottomActionBarFragment : BaseMusicFragment() {
+class BottomActionBarFragment : BaseMusicFragment<BottomActionbarBinding>() {
+  override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> BottomActionbarBinding
+    get() = BottomActionbarBinding::inflate
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     pageName = BottomActionBarFragment::class.java.simpleName
   }
 
   @SuppressLint("ClickableViewAccessibility")
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                            savedInstanceState: Bundle?): View? {
-    return inflater.inflate(R.layout.bottom_actionbar, container, false)
-  }
-
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
     //设置整个背景着色
     Theme.tintDrawable(view, R.drawable.commom_playercontrols_bg, ThemeStore.getBackgroundColorDialog(requireContext()))
-    Theme.tintDrawable(playbar_next, R.drawable.bf_btn_next, ThemeStore.bottomBarBtnColor)
+    Theme.tintDrawable(binding.playbarNext, R.drawable.bf_btn_next, ThemeStore.bottomBarBtnColor)
 
     //手势检测
     gestureDetector = GestureDetector(requireContext(), GestureListener(this))
-    bottom_action_bar.setOnTouchListener { v: View?, event: MotionEvent -> gestureDetector.onTouchEvent(event) }
+    binding.bottomActionBar.setOnTouchListener { v: View?, event: MotionEvent -> gestureDetector.onTouchEvent(event) }
 
     //播放按钮
     val listener = CtrlButtonListener(App.context)
-    playbar_play.setOnClickListener(listener)
-    playbar_next.setOnClickListener(listener)
+    binding.playbarPlay.setOnClickListener(listener)
+    binding.playbarNext.setOnClickListener(listener)
   }
 
   override fun onMetaChanged() {
@@ -81,15 +79,11 @@ class BottomActionBarFragment : BaseMusicFragment() {
   }
 
   private fun updatePlayStatus() {
-    if (isPlaying()) {
-      Theme.tintDrawable(playbar_play,
-          R.drawable.bf_btn_stop,
-          ThemeStore.bottomBarBtnColor)
-    } else {
-      Theme.tintDrawable(playbar_play,
-          R.drawable.bf_btn_play,
-          ThemeStore.bottomBarBtnColor)
-    }
+    Theme.tintDrawable(
+        binding.playbarPlay,
+        if (isPlaying()) R.drawable.bf_btn_stop else R.drawable.bf_btn_play,
+        ThemeStore.bottomBarBtnColor
+    )
   }
 
   //更新界面
@@ -97,8 +91,8 @@ class BottomActionBarFragment : BaseMusicFragment() {
     val song = getCurrentSong()
     Timber.v("updateSong()")
     //歌曲名 艺术家
-    bottom_title.text = song.title
-    bottom_artist.text = song.artist
+    binding.bottomTitle.text = song.title
+    binding.bottomArtist.text = song.artist
     //封面
     GlideApp.with(this)
         .load(song)
@@ -107,7 +101,7 @@ class BottomActionBarFragment : BaseMusicFragment() {
         .error(Theme.resolveDrawable(requireContext(), R.attr.default_album))
         .signature(ObjectKey(UriFetcher.albumVersion))
         .dontAnimate()
-        .into(iv)
+        .into(binding.iv)
   }
 
   fun startPlayerActivity() {

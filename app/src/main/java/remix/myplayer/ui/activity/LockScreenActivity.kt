@@ -18,9 +18,9 @@ import com.bumptech.glide.request.target.Target
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.activity_lockscreen.*
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.databinding.ActivityLockscreenBinding
 import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.lyric.LyricFetcher
@@ -47,6 +47,8 @@ import java.lang.ref.WeakReference
  */
 
 class LockScreenActivity : BaseMusicActivity() {
+  private lateinit var binding: ActivityLockscreenBinding
+
   //高斯模糊后的bitmap
   private var blurBitMap: Bitmap? = null
 
@@ -79,9 +81,10 @@ class LockScreenActivity : BaseMusicActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_lockscreen)
+    binding = ActivityLockscreenBinding.inflate(layoutInflater)
+    setContentView(binding.root)
     try {
-      requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+      requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     } catch (e: Exception) {
       Timber.v(e)
     }
@@ -97,12 +100,12 @@ class LockScreenActivity : BaseMusicActivity() {
 
     //初始化按钮
     val listener = CtrlButtonListener(applicationContext)
-    lockscreen_prev.setOnClickListener(listener)
-    lockscreen_next.setOnClickListener(listener)
-    lockscreen_play.setOnClickListener(listener)
+    binding.lockscreenPrev.setOnClickListener(listener)
+    binding.lockscreenNext.setOnClickListener(listener)
+    binding.lockscreenPlay.setOnClickListener(listener)
 
     //初始化控件
-    lockscreen_background.alpha = 0.75f
+    binding.lockscreenBackground.alpha = 0.75f
     window.decorView.setBackgroundColor(Color.TRANSPARENT)
 
     findViewById<View>(R.id.lockscreen_arrow_container)
@@ -148,10 +151,6 @@ class LockScreenActivity : BaseMusicActivity() {
     overridePendingTransition(0, R.anim.cover_right_out)
   }
 
-  override fun onResume() {
-    super.onResume()
-  }
-
   override fun onDestroy() {
     super.onDestroy()
     if (updateLyricThread != null) {
@@ -182,9 +181,9 @@ class LockScreenActivity : BaseMusicActivity() {
     }
 
     //标题
-    lockscreen_song.text = song.title
+    binding.lockscreenSong.text = song.title
     //艺术家
-    lockscreen_artist.text = song.artist
+    binding.lockscreenArtist.text = song.artist
     //封面
     GlideApp.with(this)
         .asBitmap()
@@ -205,14 +204,14 @@ class LockScreenActivity : BaseMusicActivity() {
           }
 
         })
-        .into(iv)
+        .into(binding.iv)
   }
 
   override fun onPlayStateChange() {
     super.onPlayStateChange()
     //更新播放按钮
 
-    lockscreen_play.setImageResource(
+    binding.lockscreenPlay.setImageResource(
         if (MusicServiceRemote.isPlaying()) R.drawable.lock_btn_pause else R.drawable.lock_btn_play)
   }
 
@@ -220,12 +219,12 @@ class LockScreenActivity : BaseMusicActivity() {
     if (result == null) {
       return
     }
-    lockscreen_background.setImageBitmap(blurBitMap)
+    binding.lockscreenBackground.setImageBitmap(blurBitMap)
 
     val swatch = ColorUtil.getSwatch(result)
-    lockscreen_song.setTextColor(swatch.bodyTextColor)
-    lockscreen_artist.setTextColor(swatch.titleTextColor)
-    lockscreen_lyric.setTextColor(swatch.bodyTextColor)
+    binding.lockscreenSong.setTextColor(swatch.bodyTextColor)
+    binding.lockscreenArtist.setTextColor(swatch.titleTextColor)
+    binding.lockscreenLyric.setTextColor(swatch.bodyTextColor)
   }
 
   private fun startProcess(resource: Bitmap?) {
@@ -259,11 +258,11 @@ class LockScreenActivity : BaseMusicActivity() {
     runOnUiThread {
       curLyric = wrapper
       if (curLyric == null || curLyric === LYRIC_WRAPPER_NO) {
-        lockscreen_lyric.setTextWithAnimation(R.string.no_lrc)
+        binding.lockscreenLyric.setTextWithAnimation(R.string.no_lrc)
       } else if (curLyric === LYRIC_WRAPPER_SEARCHING) {
-        lockscreen_lyric.text = ""
+        binding.lockscreenLyric.text = ""
       } else {
-        lockscreen_lyric.setTextWithAnimation(
+        binding.lockscreenLyric.setTextWithAnimation(
             String.format("%s\n%s", curLyric?.lineOne?.content,
                 curLyric?.lineTwo?.content))
       }

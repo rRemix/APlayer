@@ -8,6 +8,7 @@ import android.hardware.input.InputManager
 import android.os.Build
 import android.os.Message
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
@@ -17,8 +18,8 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.internal.MDTintHelper
-import kotlinx.android.synthetic.main.layout_desktop_lyric.view.*
 import remix.myplayer.R
+import remix.myplayer.databinding.LayoutDesktopLyricBinding
 import remix.myplayer.lyric.bean.LrcRow
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
@@ -45,6 +46,9 @@ import kotlin.math.abs
  */
 
 class DesktopLyricView(private val service: MusicService) : RelativeLayout(service), View.OnClickListener {
+  private val binding: LayoutDesktopLyricBinding =
+    LayoutDesktopLyricBinding.inflate(LayoutInflater.from(service), this, true)
+
   private val windowManager: WindowManager by lazy {
     service.getSystemService(Context.WINDOW_SERVICE) as WindowManager
   }
@@ -53,26 +57,34 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
     private set
   private val handler = MsgHandler(this)
   private val colorAdapter: DesktopLyricColorAdapter by lazy {
-    DesktopLyricColorAdapter(service, R.layout.item_float_lrc_color, widget_color_recyclerview.measuredWidth)
+    DesktopLyricColorAdapter(
+        service,
+        R.layout.item_float_lrc_color,
+        binding.widgetColorRecyclerview.measuredWidth
+    )
   }
 
   private var textSizeType = MEDIUM
   private val hideRunnable = Runnable {
-    widget_panel.visibility = View.GONE
-    widget_lrc_container.visibility = View.GONE
+    binding.widgetPanel.visibility = View.GONE
+    binding.widgetLrcContainer.visibility = View.GONE
   }
 
   private val onSeekBarChangeListener = object : OnSeekBarChangeListener {
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-      val temp = Color.rgb(widget_seekbar_r.progress, widget_seekbar_g.progress, widget_seekbar_b.progress)
+      val temp = Color.rgb(
+          binding.widgetSeekbarR.progress,
+          binding.widgetSeekbarG.progress,
+          binding.widgetSeekbarB.progress
+      )
       val color = if (ColorUtil.isColorCloseToWhite(temp)) Color.parseColor("#F9F9F9") else temp
-      widget_line1.setTextColor(color)
-      MDTintHelper.setTint(widget_seekbar_r, color)
-      MDTintHelper.setTint(widget_seekbar_g, color)
-      MDTintHelper.setTint(widget_seekbar_b, color)
-      widget_text_r.setTextColor(color)
-      widget_text_g.setTextColor(color)
-      widget_text_b.setTextColor(color)
+      binding.widgetLine1.setTextColor(color)
+      MDTintHelper.setTint(binding.widgetSeekbarR, color)
+      MDTintHelper.setTint(binding.widgetSeekbarG, color)
+      MDTintHelper.setTint(binding.widgetSeekbarB, color)
+      binding.widgetTextR.setTextColor(color)
+      binding.widgetTextG.setTextColor(color)
+      binding.widgetTextB.setTextColor(color)
       resetHide()
 
       handler.removeMessages(MESSAGE_SAVE_COLOR)
@@ -94,19 +106,18 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
   private var isDragging = false
 
   init {
-    View.inflate(service, R.layout.layout_desktop_lyric, this)
     setUpView()
   }
 
   private fun setUpColor() {
-    widget_color_recyclerview.viewTreeObserver
+    binding.widgetColorRecyclerview.viewTreeObserver
         .addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
           override fun onPreDraw(): Boolean {
-            widget_color_recyclerview.viewTreeObserver.removeOnPreDrawListener(this)
+            binding.widgetColorRecyclerview.viewTreeObserver.removeOnPreDrawListener(this)
             colorAdapter.onItemClickListener = object : OnItemClickListener {
               override fun onItemClick(view: View, position: Int) {
                 val color = ColorUtil.getColor(COLORS[position])
-                widget_line1.setTextColor(color)
+                binding.widgetLine1.setTextColor(color)
                 colorAdapter.setCurrentColor(color)
                 colorAdapter.notifyDataSetChanged()
                 resetHide()
@@ -116,9 +127,13 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
 
               }
             }
-            widget_color_recyclerview.layoutManager = LinearLayoutManager(service, LinearLayoutManager.HORIZONTAL, false)
-            widget_color_recyclerview.overScrollMode = View.OVER_SCROLL_NEVER
-            widget_color_recyclerview.adapter = colorAdapter
+            binding.widgetColorRecyclerview.layoutManager = LinearLayoutManager(
+                service,
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
+            binding.widgetColorRecyclerview.overScrollMode = View.OVER_SCROLL_NEVER
+            binding.widgetColorRecyclerview.adapter = colorAdapter
             return true
           }
         })
@@ -130,26 +145,26 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
     val red = color and 0xff0000 shr 16
     val green = color and 0x00ff00 shr 8
     val blue = color and 0x0000ff
-    widget_seekbar_r.max = 255
-    widget_seekbar_r.progress = red
-    widget_seekbar_g.max = 255
-    widget_seekbar_g.progress = green
-    widget_seekbar_b.max = 255
-    widget_seekbar_b.progress = blue
-    widget_text_r.setTextColor(color)
-    widget_text_g.setTextColor(color)
-    widget_text_b.setTextColor(color)
-    widget_seekbar_r.setOnSeekBarChangeListener(onSeekBarChangeListener)
-    widget_seekbar_g.setOnSeekBarChangeListener(onSeekBarChangeListener)
-    widget_seekbar_b.setOnSeekBarChangeListener(onSeekBarChangeListener)
-    MDTintHelper.setTint(widget_seekbar_r, color)
-    MDTintHelper.setTint(widget_seekbar_g, color)
-    MDTintHelper.setTint(widget_seekbar_b, color)
+    binding.widgetSeekbarR.max = 255
+    binding.widgetSeekbarR.progress = red
+    binding.widgetSeekbarG.max = 255
+    binding.widgetSeekbarG.progress = green
+    binding.widgetSeekbarB.max = 255
+    binding.widgetSeekbarB.progress = blue
+    binding.widgetTextR.setTextColor(color)
+    binding.widgetTextG.setTextColor(color)
+    binding.widgetTextB.setTextColor(color)
+    binding.widgetSeekbarR.setOnSeekBarChangeListener(onSeekBarChangeListener)
+    binding.widgetSeekbarG.setOnSeekBarChangeListener(onSeekBarChangeListener)
+    binding.widgetSeekbarB.setOnSeekBarChangeListener(onSeekBarChangeListener)
+    MDTintHelper.setTint(binding.widgetSeekbarR, color)
+    MDTintHelper.setTint(binding.widgetSeekbarG, color)
+    MDTintHelper.setTint(binding.widgetSeekbarB, color)
 
     textSizeType = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_TEXT_SIZE, MEDIUM)
-    widget_line1.setTextColor(color)
-    widget_line1.textSize = getTextSize(TYPE_TEXT_SIZE_FIRST_LINE)
-    widget_line2.textSize = getTextSize(TYPE_TEXT_SIZE_SECOND_LINE)
+    binding.widgetLine1.setTextColor(color)
+    binding.widgetLine1.textSize = getTextSize(TYPE_TEXT_SIZE_FIRST_LINE)
+    binding.widgetLine2.textSize = getTextSize(TYPE_TEXT_SIZE_SECOND_LINE)
     isLocked = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
 
     setPlayIcon(service.isPlaying)
@@ -162,10 +177,18 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
       }
     })
 
-    listOf<View>(widget_close, widget_lock, widget_next, widget_play, widget_prev, widget_lrc_bigger, widget_lrc_smaller, widget_setting)
-        .forEach {
-          it.setOnClickListener(this)
-        }
+    arrayOf(
+        binding.widgetClose,
+        binding.widgetLock,
+        binding.widgetNext,
+        binding.widgetPlay,
+        binding.widgetPrev,
+        binding.widgetLrcBigger,
+        binding.widgetLrcSmaller,
+        binding.widgetSetting
+    ).forEach {
+      it.setOnClickListener(this)
+    }
   }
 
   /**
@@ -200,13 +223,13 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
       if (TextUtils.isEmpty(lrc1.content)) {
         lrc1.content = "......"
       }
-      widget_line1.setLrcRow(lrc1)
+      binding.widgetLine1.setLrcRow(lrc1)
     }
     if (lrc2 != null) {
       if (TextUtils.isEmpty(lrc2.content)) {
         lrc2.content = "....."
       }
-      widget_line2.text = lrc2.content
+      binding.widgetLine2.text = lrc2.content
     }
   }
 
@@ -234,15 +257,15 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
       MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> if (!isLocked) {
         if (!isDragging) {
           //点击后隐藏或者显示操作栏
-          if (widget_panel.isShown) {
-            widget_panel.visibility = View.INVISIBLE
+          if (binding.widgetPanel.isShown) {
+            binding.widgetPanel.visibility = View.INVISIBLE
           } else {
-            widget_panel.visibility = View.VISIBLE
+            binding.widgetPanel.visibility = View.VISIBLE
             handler.postDelayed(hideRunnable, DISMISS_THRESHOLD.toLong())
           }
         } else {
           //滑动
-          if (widget_panel.isShown) {
+          if (binding.widgetPanel.isShown) {
             handler.postDelayed(hideRunnable, DISMISS_THRESHOLD.toLong())
           }
           isDragging = false
@@ -258,12 +281,10 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
   }
 
   fun setPlayIcon(play: Boolean) {
-    widget_play.setImageResource(
-        if (play) R.drawable.widget_btn_stop_normal else R.drawable.widget_btn_play_normal)
-  }
-
-  fun stopAnimation() {
-    widget_line1.stopAnimation()
+    binding.widgetPlay.setImageResource(
+        if (play) R.drawable.widget_btn_stop_normal
+        else R.drawable.widget_btn_play_normal
+    )
   }
 
 
@@ -284,19 +305,21 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
       }
       //歌词字体、大小设置
       R.id.widget_setting -> {
-        widget_lrc_container.visibility = if (widget_lrc_container.isShown) View.GONE else View.VISIBLE
+        binding.widgetLrcContainer.visibility = if (binding.widgetLrcContainer.isShown) View.GONE else View.VISIBLE
         setUpColor()
         //操作后重置消息的时间
         resetHide()
       }
       R.id.widget_next, R.id.widget_play, R.id.widget_prev -> {
-        sendLocalBroadcast(makeCmdIntent(when {
-          view.id == R.id.widget_next -> Command.NEXT
-          view.id == R.id.widget_prev -> Command.PREV
-          else -> Command.TOGGLE
-        }))
+        sendLocalBroadcast(makeCmdIntent(
+            when (view.id) {
+              R.id.widget_next -> Command.NEXT
+              R.id.widget_prev -> Command.PREV
+              else -> Command.TOGGLE
+            }
+        ))
         handler.postDelayed({
-          widget_play.setImageResource(
+          binding.widgetPlay.setImageResource(
               if (service.isPlaying)
                 R.drawable.widget_btn_stop_normal
               else
@@ -325,8 +348,8 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
           needRefresh = true
         }
         if (needRefresh) {
-          widget_line1.textSize = getTextSize(TYPE_TEXT_SIZE_FIRST_LINE)
-          widget_line2.textSize = getTextSize(TYPE_TEXT_SIZE_SECOND_LINE)
+          binding.widgetLine1.textSize = getTextSize(TYPE_TEXT_SIZE_FIRST_LINE)
+          binding.widgetLine2.textSize = getTextSize(TYPE_TEXT_SIZE_SECOND_LINE)
           SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_TEXT_SIZE, textSizeType)
           //操作后重置消息的时间
           resetHide()
@@ -384,9 +407,9 @@ class DesktopLyricView(private val service: MusicService) : RelativeLayout(servi
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
     handler.removeCallbacksAndMessages(null)
-    widget_seekbar_r.setOnSeekBarChangeListener(null)
-    widget_seekbar_g.setOnSeekBarChangeListener(null)
-    widget_seekbar_b.setOnSeekBarChangeListener(null)
+    binding.widgetSeekbarR.setOnSeekBarChangeListener(null)
+    binding.widgetSeekbarG.setOnSeekBarChangeListener(null)
+    binding.widgetSeekbarB.setOnSeekBarChangeListener(null)
     Timber.v("onDetachedFromWindow")
   }
 

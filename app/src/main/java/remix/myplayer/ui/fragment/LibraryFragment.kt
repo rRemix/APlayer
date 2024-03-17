@@ -1,12 +1,11 @@
 package remix.myplayer.ui.fragment
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import remix.myplayer.R
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.misc.isPortraitOrientation
@@ -23,8 +22,11 @@ import java.util.Collections
 /**
  * Created by Remix on 2016/12/23.
  */
-abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>> : BaseMusicFragment(),
-  MusicEventCallback, LoaderManager.LoaderCallbacks<List<Data>> {
+abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>, VB: ViewBinding> :
+  BaseMusicFragment<VB>(),
+  MusicEventCallback,
+  LoaderManager.LoaderCallbacks<List<Data>>
+{
   lateinit var adapter: A
   lateinit var multiChoice: MultipleChoice<Data>
     private set
@@ -33,29 +35,12 @@ abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>> : BaseMusicFragme
     super.onViewCreated(view, savedInstanceState)
 
     val type = when (this) {
-      is SongFragment -> {
-        Constants.SONG
-      }
-
-      is AlbumFragment -> {
-        Constants.ALBUM
-      }
-
-      is ArtistFragment -> {
-        Constants.ARTIST
-      }
-
-      is PlayListFragment -> {
-        Constants.PLAYLIST
-      }
-
-      is GenreFragment -> {
-        Constants.GENRE
-      }
-
-      else -> {
-        Constants.FOLDER
-      }
+      is SongFragment -> Constants.SONG
+      is AlbumFragment -> Constants.ALBUM
+      is ArtistFragment -> Constants.ARTIST
+      is PlayListFragment -> Constants.PLAYLIST
+      is GenreFragment -> Constants.GENRE
+      else -> Constants.FOLDER
     }
     multiChoice = MultipleChoice(requireActivity(), type)
     initAdapter()
@@ -77,14 +62,6 @@ abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>> : BaseMusicFragme
     }
   }
 
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(layoutID, container, false)
-  }
-
-  protected abstract val layoutID: Int
   protected abstract fun initAdapter()
   protected abstract fun initView()
   override fun onDestroy() {

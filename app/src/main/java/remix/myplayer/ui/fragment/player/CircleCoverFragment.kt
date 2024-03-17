@@ -1,23 +1,25 @@
 package remix.myplayer.ui.fragment.player
 
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
 import com.facebook.rebound.SpringSystem
-import kotlinx.android.synthetic.main.fragment_cover_circle.*
-import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.databinding.FragmentCoverCircleBinding
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.service.Command
 
-class CircleCoverFragment : CoverFragment() {
-  override val layoutId = R.layout.fragment_cover_circle
+class CircleCoverFragment : CoverFragment<FragmentCoverCircleBinding>() {
+  override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentCoverCircleBinding
+    get() = FragmentCoverCircleBinding::inflate
 
   override fun playAnimation(song: Song) {
     if (!isAdded) {
       return
     }
     val operation = MusicServiceRemote.getOperation()
-    val offsetX = width + cover_image.width shr 1
+    val offsetX = width + binding.coverImage.width shr 1
     val startValue = 0.0
     val endValue = if (operation == Command.PREV) offsetX.toDouble() else -offsetX.toDouble()
 
@@ -25,23 +27,22 @@ class CircleCoverFragment : CoverFragment() {
     outAnim = SpringSystem.create().createSpring()
     outAnim?.addListener(object : SimpleSpringListener() {
       override fun onSpringUpdate(spring: Spring) {
-        cover_image.translationX = spring.currentValue.toFloat()
+        binding.coverImage.translationX = spring.currentValue.toFloat()
       }
 
       override fun onSpringAtRest(spring: Spring) {
 //        if (cover_image.tag != requestId) {
 //          cover_image.setImageURI("", null)
 //        }
-        cover_image.translationX = startValue.toFloat()
+        binding.coverImage.translationX = startValue.toFloat()
         val endVal = 1f
         inAnim = SpringSystem.create().createSpring()
         inAnim?.addListener(object : SimpleSpringListener() {
           override fun onSpringUpdate(spring: Spring) {
-            if (cover_image == null) {
-              return
+            binding.coverImage.run {
+              scaleX = spring.currentValue.toFloat()
+              scaleY = spring.currentValue.toFloat()
             }
-            cover_image.scaleX = spring.currentValue.toFloat()
-            cover_image.scaleY = spring.currentValue.toFloat()
           }
 
           override fun onSpringActivate(spring: Spring) {}

@@ -1,6 +1,5 @@
 package remix.myplayer.ui.activity
 
-
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.*
@@ -12,6 +11,7 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.view.Menu
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -26,15 +26,13 @@ import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.soundcloud.android.crop.Crop
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.dialog_timer.view.*
-import kotlinx.android.synthetic.main.navigation_header.*
 import remix.myplayer.App
 import remix.myplayer.App.Companion.IS_GOOGLEPLAY
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.misc.Library
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.databinding.ActivityMainBinding
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.glide.GlideApp
@@ -77,6 +75,7 @@ import java.util.concurrent.TimeUnit
  *
  */
 class MainActivity : MenuActivity(), View.OnClickListener {
+  private lateinit var binding: ActivityMainBinding
 
   private val drawerAdapter by lazy {
     DrawerAdapter(R.layout.item_drawer)
@@ -134,7 +133,8 @@ class MainActivity : MenuActivity(), View.OnClickListener {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
+    binding = ActivityMainBinding.inflate(layoutInflater)
+    setContentView(binding.root)
 
     val intentFilter = IntentFilter()
     //        intentFilter.addAction(ACTION_LOAD_FINISH);
@@ -147,7 +147,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     setUpToolbar()
     setUpPager()
     setUpTab()
-    btn_add.setOnClickListener(this)
+    binding.btnAdd.setOnClickListener(this)
     // 初始化测滑菜单
     setUpDrawerLayout()
     setUpViewColor()
@@ -200,7 +200,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
   private fun setUpToolbar() {
     super.setUpToolbar("")
     toolbar?.setNavigationIcon(R.drawable.ic_menu_white_24dp)
-    toolbar?.setNavigationOnClickListener { v -> drawer.openDrawer(navigation_view) }
+    toolbar?.setNavigationOnClickListener { v -> binding.drawer.openDrawer(binding.navigationView) }
   }
 
   /**
@@ -264,22 +264,22 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     //有且仅有一个tab
     if (libraries.size == 1) {
       if (libraries[0].isPlayList()) {
-        showViewWithAnim(btn_add, true)
+        showViewWithAnim(binding.btnAdd, true)
       }
-      tabs.visibility = View.GONE
+      binding.tabs.visibility = View.GONE
     } else {
-      tabs.visibility = View.VISIBLE
+      binding.tabs.visibility = View.VISIBLE
     }
 
-    view_pager.adapter = pagerAdapter
-    view_pager.offscreenPageLimit = pagerAdapter.count - 1
-    view_pager.currentItem = 0
-    view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+    binding.viewPager.adapter = pagerAdapter
+    binding.viewPager.offscreenPageLimit = pagerAdapter.count - 1
+    binding.viewPager.currentItem = 0
+    binding.viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
       override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
 
       override fun onPageSelected(position: Int) {
         val library = pagerAdapter.list[position]
-        showViewWithAnim(btn_add, library.isPlayList())
+        showViewWithAnim(binding.btnAdd, library.isPlayList())
 
         menuLayoutId = parseMenuId(pagerAdapter.list[position].tag)
         currentFragment = pagerAdapter.getFragment(position)
@@ -354,8 +354,8 @@ class MainActivity : MenuActivity(), View.OnClickListener {
       is GenreFragment -> SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.GENRE_SORT_ORDER,
         sortOrder)
     }
-    if (currentFragment is LibraryFragment<*, *>) {
-      (currentFragment as LibraryFragment<*, *>?)?.onMediaStoreChanged()
+    if (currentFragment is LibraryFragment<*, *, *>) {
+      (currentFragment as LibraryFragment<*, *, *>?)?.onMediaStoreChanged()
     }
   }
 
@@ -385,18 +385,18 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     //添加tab选项卡
     val isPrimaryColorCloseToWhite = ThemeStore.isMDColorCloseToWhite
 
-    tabs.setBackgroundColor(ThemeStore.materialPrimaryColor)
-    tabs.addTab(tabs.newTab().setText(R.string.tab_song))
-    tabs.addTab(tabs.newTab().setText(R.string.tab_album))
-    tabs.addTab(tabs.newTab().setText(R.string.tab_artist))
-    tabs.addTab(tabs.newTab().setText(R.string.tab_playlist))
-    tabs.addTab(tabs.newTab().setText(R.string.tab_folder))
+    binding.tabs.setBackgroundColor(ThemeStore.materialPrimaryColor)
+    binding.tabs.addTab(binding.tabs.newTab().setText(R.string.tab_song))
+    binding.tabs.addTab(binding.tabs.newTab().setText(R.string.tab_album))
+    binding.tabs.addTab(binding.tabs.newTab().setText(R.string.tab_artist))
+    binding.tabs.addTab(binding.tabs.newTab().setText(R.string.tab_playlist))
+    binding.tabs.addTab(binding.tabs.newTab().setText(R.string.tab_folder))
     //viewpager与tablayout关联
-    tabs.setupWithViewPager(view_pager)
-    tabs.setSelectedTabIndicatorColor(if (isPrimaryColorCloseToWhite) Color.BLACK else Color.WHITE)
+    binding.tabs.setupWithViewPager(binding.viewPager)
+    binding.tabs.setSelectedTabIndicatorColor(if (isPrimaryColorCloseToWhite) Color.BLACK else Color.WHITE)
     //        tabs.setSelectedTabIndicatorColor(ColorUtil.getColor(isLightColor ? R.color.black : R.color.white));
-    tabs.setSelectedTabIndicatorHeight(DensityUtil.dip2px(this, 3f))
-    tabs.setTabTextColors(ColorUtil.getColor(
+    binding.tabs.setSelectedTabIndicatorHeight(DensityUtil.dip2px(this, 3f))
+    binding.tabs.setTabTextColors(ColorUtil.getColor(
         if (isPrimaryColorCloseToWhite)
           R.color.dark_normal_tab_text_color
         else
@@ -404,21 +404,21 @@ class MainActivity : MenuActivity(), View.OnClickListener {
         ColorUtil.getColor(if (isPrimaryColorCloseToWhite) R.color.black else R.color.white))
 
     setTabClickListener()
-    tabs.post {
-      for (i in 0..tabs.tabCount) {
-        ((tabs.getTabAt(i)?.view?.getChildAt(1)) as TextView?)?.apply {
+    binding.tabs.post {
+      for (i in 0 until binding.tabs.tabCount) {
+        ((binding.tabs.getTabAt(i)?.view?.getChildAt(1)) as TextView?)?.apply {
           if (layout != null && layout.lineCount > 1) {
             maxLines = 1
           }
         }
       }
     }
-    tabs.tabMode = TabLayout.MODE_AUTO
+    binding.tabs.tabMode = TabLayout.MODE_AUTO
   }
 
   private fun setTabClickListener() {
-    for (i in 0 until tabs.tabCount) {
-      val tab = tabs.getTabAt(i) ?: return
+    for (i in 0 until binding.tabs.tabCount) {
+      val tab = binding.tabs.getTabAt(i) ?: return
       tab.view.setOnClickListener(object : DoubleClickListener() {
         override fun onDoubleClick(v: View) {
           // 只有第一个标签可能是"歌曲"
@@ -441,7 +441,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
       override fun onItemClick(view: View, position: Int) {
         when (position) {
           //歌曲库
-          0 -> drawer.closeDrawer(navigation_view)
+          0 -> binding.drawer.closeDrawer(binding.navigationView)
           1 -> startActivity(Intent(this@MainActivity, HistoryActivity::class.java))
           //最近添加
           2 -> startActivity(Intent(this@MainActivity, RecentlyActivity::class.java))
@@ -461,10 +461,10 @@ class MainActivity : MenuActivity(), View.OnClickListener {
 
       override fun onItemLongClick(view: View, position: Int) {}
     }
-    recyclerview.adapter = drawerAdapter
-    recyclerview.layoutManager = LinearLayoutManager(this)
+    binding.recyclerview.adapter = drawerAdapter
+    binding.recyclerview.layoutManager = LinearLayoutManager(this)
 
-    drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
+    binding.drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
       override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
 
       override fun onDrawerOpened(drawerView: View) {}
@@ -487,16 +487,16 @@ class MainActivity : MenuActivity(), View.OnClickListener {
 
     bg.setColor(ColorUtil.darkenColor(primaryColor))
     bg.cornerRadius = DensityUtil.dip2px(this, 4f).toFloat()
-    tv_header.background = bg
-    tv_header.setTextColor(ThemeStore.materialPrimaryColorReverse)
+    binding.navigationView.findViewById<TextView>(R.id.tv_header).background = bg
+    binding.navigationView.findViewById<TextView>(R.id.tv_header).setTextColor(ThemeStore.materialPrimaryColorReverse)
     //抽屉
-    header.setBackgroundColor(primaryColor)
-    navigation_view.setBackgroundColor(ThemeStore.drawerDefaultColor)
+    binding.header.root.setBackgroundColor(primaryColor)
+    binding.navigationView.setBackgroundColor(ThemeStore.drawerDefaultColor)
 
     //这种图片不知道该怎么着色 暂时先这样处理
-    btn_add.background = Theme.tintDrawable(R.drawable.bg_playlist_add,
+    binding.btnAdd.background = Theme.tintDrawable(R.drawable.bg_playlist_add,
         ThemeStore.accentColor)
-    btn_add.setImageResource(R.drawable.icon_playlist_add)
+    binding.btnAdd.setImageResource(R.drawable.icon_playlist_add)
   }
 
   override fun onMediaStoreChanged() {
@@ -525,15 +525,15 @@ class MainActivity : MenuActivity(), View.OnClickListener {
           if (libraries != null && libraries.isNotEmpty()) {
             pagerAdapter.list = libraries
             pagerAdapter.notifyDataSetChanged()
-            view_pager.offscreenPageLimit = libraries.size - 1
-            menuLayoutId = parseMenuId(pagerAdapter.list[view_pager.currentItem].tag)
-            currentFragment = pagerAdapter.getFragment(view_pager.currentItem)
+            binding.viewPager.offscreenPageLimit = libraries.size - 1
+            menuLayoutId = parseMenuId(pagerAdapter.list[binding.viewPager.currentItem].tag)
+            currentFragment = pagerAdapter.getFragment(binding.viewPager.currentItem)
             invalidateOptionsMenu()
             //如果只有一个Library,隐藏标签栏
             if (libraries.size == 1) {
-              tabs.visibility = View.GONE
+              binding.tabs.visibility = View.GONE
             } else {
-              tabs.visibility = View.VISIBLE
+              binding.tabs.visibility = View.VISIBLE
             }
           }
         }
@@ -610,12 +610,12 @@ class MainActivity : MenuActivity(), View.OnClickListener {
   }
 
   override fun onBackPressed() {
-    if (drawer.isDrawerOpen(navigation_view)) {
-      drawer.closeDrawer(navigation_view)
+    if (binding.drawer.isDrawerOpen(binding.navigationView)) {
+      binding.drawer.closeDrawer(binding.navigationView)
     } else {
       var closed = false
       for (fragment in supportFragmentManager.fragments) {
-        if (fragment is LibraryFragment<*, *>) {
+        if (fragment is LibraryFragment<*, *, *>) {
           val choice = fragment.multiChoice
           if (choice.isActive) {
             closed = true
@@ -638,20 +638,20 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     super.onMetaChanged()
     val currentSong = MusicServiceRemote.getCurrentSong()
     if (currentSong != Song.EMPTY_SONG) {
-      tv_header.text = getString(R.string.play_now, currentSong.title)
+      binding.navigationView.findViewById<TextView>(R.id.tv_header).text = getString(R.string.play_now, currentSong.title)
       GlideApp.with(this)
           .load(currentSong)
           .centerCrop()
           .signature(ObjectKey(UriFetcher.albumVersion))
           .placeholder(Theme.resolveDrawable(this, R.attr.default_album))
           .error(Theme.resolveDrawable(this, R.attr.default_album))
-          .into(iv_header)
+          .into(binding.navigationView.findViewById(R.id.iv_header))
     }
   }
 
   override fun onPlayStateChange() {
     super.onPlayStateChange()
-    iv_header.setBackgroundResource(if (MusicServiceRemote.isPlaying() && ThemeStore.isLightTheme)
+    binding.navigationView.findViewById<ImageView>(R.id.iv_header).setBackgroundResource(if (MusicServiceRemote.isPlaying() && ThemeStore.isLightTheme)
       R.drawable.drawer_bg_album_shadow
     else
       R.color.transparent)
@@ -670,13 +670,13 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     when (msg.what) {
       MSG_RECREATE_ACTIVITY -> recreate()
       MSG_RESET_MULTI -> for (temp in supportFragmentManager.fragments) {
-        if (temp is LibraryFragment<*, *>) {
+        if (temp is LibraryFragment<*, *, *>) {
           temp.adapter.notifyDataSetChanged()
         }
       }
       MSG_UPDATE_ADAPTER -> //刷新适配器
         for (temp in supportFragmentManager.fragments) {
-          if (temp is LibraryFragment<*, *>) {
+          if (temp is LibraryFragment<*, *, *>) {
             temp.adapter.notifyDataSetChanged()
           }
         }
