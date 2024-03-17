@@ -38,10 +38,8 @@ android {
         multiDexEnabled true
 
         // room
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
+        ksp {
+            arg('room.schemaLocation', "$projectDir/schemas")
         }
 
         buildConfigField("String", "LASTFM_API_KEY", "\"${getProperty(properties, 'LASTFM_API_KEY')}\"")
@@ -209,7 +207,7 @@ dependencies {
     implementation 'com.facebook.rebound:rebound:0.3.8'
     implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
     implementation 'io.github.biezhi:TinyPinyin:2.0.3.RELEASE'
-    implementation 'org.slf4j:slf4j-api:1.7.28'
+    implementation 'org.slf4j:slf4j-api:1.7.36'
     implementation 'com.github.tony19:logback-android:2.0.0'
 
     //webdav
