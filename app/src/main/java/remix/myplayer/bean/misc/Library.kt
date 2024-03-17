@@ -2,7 +2,7 @@ package remix.myplayer.bean.misc
 
 import android.content.Context
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.ui.activity.RemoteFragment

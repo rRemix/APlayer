@@ -3,7 +3,7 @@ package remix.myplayer.bean.mp3
 import android.content.ContentUris
 import android.net.Uri
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 /**
  * Created by Remix on 2017/10/22.
