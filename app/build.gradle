@@ -13,12 +13,6 @@ bugly {
     appKey = "04ab39c8-86fc-4ed6-b28b-6fdfee6e19d9"
 }
 
-repositories {
-    maven {
-        url 'https://maven.google.com'
-    }
-}
-
 android {
     namespace 'remix.myplayer'
 
@@ -176,10 +170,9 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.2'
 
     //rxpermission
-    implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
+    implementation 'com.github.tbruyelle:rxpermissions:0.11'
 
     //kotlin
-    implementation 'org.jetbrains.anko:anko-common:0.10.4'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     //leakCanary
@@ -214,7 +207,7 @@ dependencies {
     //other
     implementation 'com.facebook.rebound:rebound:0.3.8'
     implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
-    implementation 'com.github.promeg:tinypinyin:2.0.1'
+    implementation 'io.github.biezhi:TinyPinyin:2.0.3.RELEASE'
     implementation 'org.slf4j:slf4j-api:1.7.28'
     implementation 'com.github.tony19:logback-android:2.0.0'
 
