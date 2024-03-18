@@ -191,7 +191,7 @@ dependencies {
     implementation 'com.tencent.bugly:crashreport:3.3.3'
 
     //gp
-    implementation 'com.anjlab.android.iab.v3:library:2.0.3'
+    implementation 'com.android.billingclient:billing:5.2.1'
 
     //room
     implementation 'androidx.room:room-runtime:2.3.0'
