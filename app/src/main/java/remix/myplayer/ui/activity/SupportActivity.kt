@@ -1,20 +1,16 @@
 package remix.myplayer.ui.activity
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
-import com.anjlab.android.iab.v3.BillingProcessor
-import com.anjlab.android.iab.v3.PurchaseInfo
-import com.anjlab.android.iab.v3.SkuDetails
-import io.reactivex.disposables.Disposable
+import com.android.billingclient.api.*
+import com.android.billingclient.api.BillingClient.ProductType
+import com.android.billingclient.api.QueryProductDetailsParams.Product
 import kotlinx.coroutines.launch
 import remix.myplayer.App
-import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Purchase
 import remix.myplayer.databinding.ActivitySupportDevelopBinding
@@ -26,20 +22,24 @@ import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
 
-class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
+class SupportActivity : ToolbarActivity(), BillingClientStateListener, PurchasesUpdatedListener,
+  ProductDetailsResponseListener {
   private lateinit var binding: ActivitySupportDevelopBinding
 
   private val adapter: PurchaseAdapter by lazy {
     PurchaseAdapter(R.layout.item_support)
   }
 
-  val SKU_IDS = arrayListOf("price_3", "price_8", "price_15", "price_25", "price_40")
+  private val SKU_IDS = arrayListOf("price_3", "price_8", "price_15", "price_25", "price_40")
 
-  private var billingProcessor: BillingProcessor? = null
-  private var disposable: Disposable? = null
+  private val billingClient by lazy {
+    BillingClient.newBuilder(this)
+      .enablePendingPurchases()
+      .setListener(this)
+      .build()
+  }
+  private val productDetails = ArrayList<ProductDetails>()
   private val googlePlay = App.IS_GOOGLEPLAY
-
-//  private lateinit var loading: MaterialDialog
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -61,7 +61,7 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
 
       override fun onItemClick(view: View?, position: Int) {
         if (googlePlay) {
-          billingProcessor?.purchase(this@SupportActivity, SKU_IDS[position])
+          launchBillingFlow(productDetails.getOrNull(position) ?: return)
         } else {
           when (position) {
             0 -> {
@@ -89,7 +89,7 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
               Util.startActivitySafely(this@SupportActivity, intent)
             }
             else -> {
-              billingProcessor?.purchase(this@SupportActivity, SKU_IDS[position - 3])
+              launchBillingFlow(productDetails.getOrNull(position - 3) ?: return)
             }
           }
         }
@@ -107,7 +107,7 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
 //      .progress(true, 0)
 //      .progressIndeterminateStyle(false).build()
 
-    billingProcessor = BillingProcessor(this, BuildConfig.GOOGLE_PLAY_LICENSE_KEY, this)
+    billingClient.startConnection(this)
 
     if (!googlePlay) {
       binding.ad.visibility = View.VISIBLE
@@ -129,79 +129,116 @@ class SupportActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
     }
   }
 
-  private fun loadSkuDetails() {
-    if (adapter.dataList.size > 3)
+  private fun launchBillingFlow(productDetails: ProductDetails) {
+    billingClient.launchBillingFlow(
+      this, BillingFlowParams.newBuilder()
+        .setProductDetailsParamsList(
+          listOf(
+            BillingFlowParams.ProductDetailsParams.newBuilder()
+              .setProductDetails(productDetails)
+              .build()
+          )
+        )
+        .build()
+    )
+  }
+
+  override fun onBillingSetupFinished(billingResult: BillingResult) {
+    Timber.v("onBillingSetupFinished: $billingResult")
+    if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
       return
-//    if (hasWindowFocus()) {
-//      loading.show()
+    }
+
+    // query product details
+    val params = QueryProductDetailsParams.newBuilder()
+      .setProductList(SKU_IDS.map {
+        Product.newBuilder()
+          .setProductId(it)
+          .setProductType(ProductType.INAPP)
+          .build()
+      })
+      .build()
+    billingClient.queryProductDetailsAsync(params, this)
+
+    // query purchases
+//    billingClient.queryPurchasesAsync(
+//      QueryPurchasesParams.newBuilder().build()
+//    ) { billingResult1, purchases ->
+//      if (billingResult1.responseCode == BillingClient.BillingResponseCode.OK && purchases.isNotEmpty()) {
+//        purchases.forEach {
+//          handlePurchase(it)
+//        }
+//      }
 //    }
-
-    billingProcessor?.getPurchaseListingDetailsAsync(
-      SKU_IDS,
-      object : BillingProcessor.ISkuDetailsResponseListener {
-        override fun onSkuDetailsResponse(products: MutableList<SkuDetails>?) {
-//          loading.dismiss()
-          if (products.isNullOrEmpty()) {
-            return
-          }
-          val beans = ArrayList<Purchase>()
-          products.sortWith { o1, o2 ->
-            o1.priceValue.compareTo(o2.priceValue)
-          }
-          products.forEach {
-            beans.add(Purchase(it.productId, "", it.title, it.priceText))
-          }
-          adapter.dataList.addAll(beans)
-          adapter.notifyDataSetChanged()
-        }
-
-        override fun onSkuDetailsError(error: String?) {
-          if (googlePlay) {
-            ToastUtil.show(this@SupportActivity, R.string.error_occur, error)
-          }
-//          loading.dismiss()
-        }
-      })
   }
 
-  override fun onBillingInitialized() {
-    Timber.v("loadSkuDetails")
-    loadSkuDetails()
+  override fun onBillingServiceDisconnected() {
+    Timber.v("onBillingServiceDisconnected")
   }
 
-  override fun onPurchaseHistoryRestored() {
-    Timber.v("onPurchaseHistoryRestored")
-//    Toast.makeText(this, R.string.restored_previous_purchases, Toast.LENGTH_SHORT).show()
-  }
-
-  @SuppressLint("CheckResult")
-  override fun onProductPurchased(productId: String, details: PurchaseInfo?) {
-    Timber.v("onProductPurchased")
-    billingProcessor?.consumePurchaseAsync(productId,
-      object : BillingProcessor.IPurchasesResponseListener {
-        override fun onPurchasesSuccess() {
-          Toast.makeText(this@SupportActivity, R.string.thank_you, Toast.LENGTH_SHORT).show()
-        }
-
-        override fun onPurchasesError() {
-          Toast.makeText(this@SupportActivity, R.string.payment_failure, Toast.LENGTH_SHORT).show()
-        }
-
-      })
-  }
-
-  override fun onBillingError(errorCode: Int, error: Throwable?) {
-    Timber.v("onBillingError")
-    if (googlePlay) {
-      ToastUtil.show(this, R.string.error_occur, "code = $errorCode err =  $error")
+  override fun onProductDetailsResponse(
+    result: BillingResult,
+    details: MutableList<ProductDetails>
+  ) {
+    if (details.isEmpty()) {
+      return
+    }
+    val beans = ArrayList<Purchase>()
+    details.sortWith { o1, o2 ->
+      o1!!.oneTimePurchaseOfferDetails!!.priceAmountMicros.compareTo(o2!!.oneTimePurchaseOfferDetails!!.priceAmountMicros)
+    }
+    productDetails.addAll(details)
+    details.forEach {
+      beans.add(
+        Purchase(
+          it.productId,
+          "",
+          it.title,
+          it.oneTimePurchaseOfferDetails!!.formattedPrice
+        )
+      )
+    }
+    adapter.dataList.addAll(beans)
+    binding.recyclerView.post {
+      adapter.notifyDataSetChanged()
     }
   }
 
-  override fun onDestroy() {
-    super.onDestroy()
-    billingProcessor?.release()
-    disposable?.dispose()
-//    if (loading.isShowing)
-//      loading.dismiss()
+  override fun onPurchasesUpdated(
+    billingResult: BillingResult,
+    purchases: MutableList<com.android.billingclient.api.Purchase>?
+  ) {
+    Timber.v("onPurchasesUpdated: $billingResult")
+    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+      for (purchase in purchases) {
+        handlePurchase(purchase)
+      }
+    } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+      Timber.v("user cancel")
+    } else {
+      Timber.v("other error")
+//      if (googlePlay) {
+//        ToastUtil.show(
+//          this,
+//          R.string.error_occur,
+//          "code = ${billingResult.responseCode} msg = ${billingResult.debugMessage}"
+//        )
+//      }
+    }
+  }
+
+  private fun handlePurchase(purchase: com.android.billingclient.api.Purchase) {
+    billingClient.consumeAsync(
+      ConsumeParams.newBuilder()
+        .setPurchaseToken(purchase.purchaseToken)
+        .build()
+    ) { result, purchaseToken ->
+      Timber.v("handlePurchase, result: $result")
+      if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+        ToastUtil.show(this@SupportActivity, R.string.thank_you)
+      } else {
+        ToastUtil.show(this@SupportActivity, R.string.payment_failure)
+      }
+    }
   }
 }

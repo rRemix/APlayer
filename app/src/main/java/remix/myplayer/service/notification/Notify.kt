@@ -12,6 +12,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import androidx.core.app.TaskStackBuilder
 import com.bumptech.glide.request.target.CustomTarget
 import remix.myplayer.R
@@ -103,8 +104,9 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     }
 
     if (notifyMode != newNotifyMode && newNotifyMode == NOTIFY_MODE_BACKGROUND) {
-      //            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-      service.stopForeground(false)
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+        ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
+      }
     }
     if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
@@ -124,7 +126,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
    * 取消通知栏
    */
   fun cancelPlayingNotify() {
-    service.stopForeground(true)
+    ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
     notificationManager.cancel(PLAYING_NOTIFICATION_ID)
     isNotifyShowing = false
     //        notifyMode = NOTIFY_MODE_NONE;
