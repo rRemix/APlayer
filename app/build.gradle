@@ -211,7 +211,12 @@ dependencies {
     implementation 'com.github.tony19:logback-android:2.0.0'
 
     //webdav
-    implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
+    implementation('com.github.thegrizzlylabs:sardine-android:0.8') {
+        // https://github.com/thegrizzlylabs/sardine-android/issues/70
+        // 上游已经exclude了，但是不知道为什么还是会有
+        // https://github.com/thegrizzlylabs/sardine-android/blob/d0af7ae8e7ee0654a763c4c6f638a5e98b1782e9/build.gradle#L46
+        exclude group: 'xpp3', module: 'xpp3'
+    }
 }
 
 def getProperties(String fileName) {
