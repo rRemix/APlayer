@@ -3,15 +3,9 @@ plugins {
     id 'com.google.devtools.ksp'
     id 'kotlin-android'
     id 'kotlin-parcelize'
-    id 'bugly'
 }
 
 def properties = getProperties('../local.properties')
-
-bugly {
-    appId = "${getProperty(properties, 'BUGLY_APPID')}"
-    appKey = "04ab39c8-86fc-4ed6-b28b-6fdfee6e19d9"
-}
 
 android {
     namespace 'remix.myplayer'
