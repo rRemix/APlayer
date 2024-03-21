@@ -9,6 +9,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -19,7 +20,6 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.databinding.ItemGenreRecycleGridBinding
 import remix.myplayer.databinding.ItemGenreRecycleListBinding
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
 import remix.myplayer.theme.Theme
@@ -92,7 +92,7 @@ class GenreAdapter(
       options.transform(MultiTransformation(CenterCrop(), RoundedCorners(DensityUtil.dip2px(2f))))
     }
 
-    GlideApp.with(holder.itemView)
+    Glide.with(holder.itemView)
       .load(genre)
       .apply(options)
       .into(holder.iv)

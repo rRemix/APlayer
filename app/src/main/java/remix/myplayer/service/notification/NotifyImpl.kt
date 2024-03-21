@@ -7,11 +7,11 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.bumptech.glide.signature.ObjectKey
 import remix.myplayer.R
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -94,8 +94,8 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     val size = DensityUtil.dip2px(service, 128f)
     pushNotify(notification)
 
-    GlideApp.with(service).clear(target)
-    target = GlideApp.with(service)
+    Glide.with(service).clear(target)
+    target = Glide.with(service)
       .asBitmap()
       .load(song)
       .override(size, size)

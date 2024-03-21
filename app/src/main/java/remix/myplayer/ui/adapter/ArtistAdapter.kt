@@ -9,6 +9,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -20,7 +21,6 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.databinding.ItemArtistRecycleGridBinding
 import remix.myplayer.databinding.ItemArtistRecycleListBinding
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
@@ -83,7 +83,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
       options.transform(MultiTransformation(CenterCrop(), RoundedCorners(DensityUtil.dip2px(2f))))
     }
 
-    GlideApp.with(holder.itemView)
+    Glide.with(holder.itemView)
         .load(artist)
         .apply(options)
         .signature(ObjectKey(UriFetcher.artistVersion))

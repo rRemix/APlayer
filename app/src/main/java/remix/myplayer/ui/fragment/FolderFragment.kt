@@ -3,13 +3,15 @@ package remix.myplayer.ui.fragment
 import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_folder.*
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Folder
+import remix.myplayer.databinding.FragmentFolderBinding
 import remix.myplayer.misc.asynctask.WrappedAsyncTaskLoader
 import remix.myplayer.misc.interfaces.LoaderIds
 import remix.myplayer.misc.interfaces.OnItemClickListener
@@ -25,9 +27,9 @@ import remix.myplayer.util.MediaStoreUtil.getAllFolder
 /**
  * 文件夹Fragment
  */
-class FolderFragment : LibraryFragment<Folder, FolderAdapter>() {
-
-  override val layoutID = R.layout.fragment_folder
+class FolderFragment : LibraryFragment<Folder, FolderAdapter, FragmentFolderBinding>() {
+  override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentFolderBinding
+    get() = FragmentFolderBinding::inflate
 
   override fun initAdapter() {
     adapter = FolderAdapter(R.layout.item_folder_recycle, multiChoice)
@@ -51,10 +53,10 @@ class FolderFragment : LibraryFragment<Folder, FolderAdapter>() {
   }
 
   override fun initView() {
-    recyclerView.layoutManager = LinearLayoutManager(context)
-    recyclerView.setHasFixedSize(true)
-    recyclerView.itemAnimator = DefaultItemAnimator()
-    recyclerView.adapter = adapter
+    binding.recyclerView.layoutManager = LinearLayoutManager(context)
+    binding.recyclerView.setHasFixedSize(true)
+    binding.recyclerView.itemAnimator = DefaultItemAnimator()
+    binding.recyclerView.adapter = adapter
   }
 
   override fun loader(): Loader<List<Folder>> {

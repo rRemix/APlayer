@@ -21,6 +21,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.afollestad.materialdialogs.DialogAction
+import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.soundcloud.android.crop.Crop
@@ -29,7 +30,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_setting.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import remix.myplayer.App.Companion.IS_GOOGLEPLAY
@@ -41,7 +41,6 @@ import remix.myplayer.bean.misc.Library.Companion.getAllLibraryString
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivitySettingBinding
 import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.glide.UriFetcher.DOWNLOAD_LASTFM
 import remix.myplayer.helper.EQHelper
@@ -349,7 +348,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     val coverSource = SPUtil.getValue(
         this, SETTING_KEY.NAME, SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, 0
     )
-    setting_cover_source_text.text = getString(
+    binding.settingCoverSourceText.setText(
         if (coverSource == 0) R.string.cover_download_from_lastfm else R.string.cover_download_from_netease
     )
 
@@ -590,7 +589,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
         SETTING_KEY.PLAYER_BACKGROUND,
         BACKGROUND_ADAPTIVE_COLOR
     )
-    setting_now_playing_screen_text.setText(
+    binding.settingNowPlayingScreenText.setText(
         when (nowPlayingScreen) {
           BACKGROUND_THEME -> R.string.now_playing_screen_theme
           BACKGROUND_ADAPTIVE_COLOR -> R.string.now_playing_screen_cover
@@ -958,7 +957,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
                 SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,
                 which
             )
-            setting_cover_source_text.text = getString(
+            binding.settingCoverSourceText.setText(
                 if (which == 0) R.string.cover_download_from_lastfm else R.string.cover_download_from_netease
             )
           }
@@ -1017,10 +1016,10 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
           .onPositive { clearDialog, action ->
             SPUtil.deleteFile(this, SPUtil.COVER_KEY.NAME)
 //            Fresco.getImagePipeline().clearCaches()
-            GlideApp.get(this).clearMemory()
+            Glide.get(this).clearMemory()
             Completable
                 .fromAction {
-                  GlideApp.get(this).clearDiskCache()
+                  Glide.get(this).clearDiskCache()
                 }
                 .subscribeOn(Schedulers.io())
                 .subscribe()
@@ -1038,7 +1037,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
         .positiveText(R.string.confirm)
         .negativeText(R.string.cancel)
         .onPositive { dialog, which ->
-          GlideApp.get(this@SettingActivity).clearMemory()
+          Glide.get(this@SettingActivity).clearMemory()
           Completable
               .fromAction {
                 //清除歌词，封面等缓存
@@ -1047,7 +1046,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
 //                Util.deleteFilesByDirectory(externalCacheDir)
                 DiskCache.init(this@SettingActivity, "lyric")
                 //清除glide缓存
-                GlideApp.get(this@SettingActivity).clearDiskCache()
+                Glide.get(this@SettingActivity).clearDiskCache()
                 UriFetcher.clearAllCache()
                 needRefreshAdapter = true
                 handler.sendEmptyMessage(CLEAR_FINISH)
@@ -1263,6 +1262,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
                   }).show()
               }
             }
+            DialogAction.NEGATIVE -> {}
           }
         }
         .show()
@@ -1326,14 +1326,14 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
   }
 
   override fun onSharedPreferenceChanged(
-      sharedPreferences: SharedPreferences?, key: String
+      sharedPreferences: SharedPreferences?, key: String?
   ) {
     if (key == SETTING_KEY.DESKTOP_LYRIC_SHOW) {
-      setting_lrc_float_switch.setOnCheckedChangeListener(null)
-      setting_lrc_float_switch.isChecked = SPUtil.getValue(
+      binding.settingLrcFloatSwitch.setOnCheckedChangeListener(null)
+      binding.settingLrcFloatSwitch.isChecked = SPUtil.getValue(
           this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false
       )
-      setting_lrc_float_switch.setOnCheckedChangeListener(checkedChangedListener)
+      binding.settingLrcFloatSwitch.setOnCheckedChangeListener(checkedChangedListener)
     }
   }
 

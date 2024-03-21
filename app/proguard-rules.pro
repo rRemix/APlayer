@@ -20,12 +20,8 @@
 -optimizationpasses 5
 #包明不混合大小写
 -dontusemixedcaseclassnames
-#不去忽略非公共的库类
--dontskipnonpubliclibraryclasses
 #优化  不优化输入的类文件
 -dontoptimize
-#预校验
--dontpreverify
 #混淆时是否记录日志
 -verbose
 #混淆时所采用的算法
@@ -57,6 +53,8 @@
     <methods>;
 }
 -keep class * extends remix.myplayer.ui.adapter.holder.BaseViewHolder{*;}
+-keep,allowshrinking,allowoptimization,allowobfuscation class remix.myplayer.ui.adapter.BaseAdapter
+-keep,allowshrinking,allowoptimization,allowobfuscation class * extends remix.myplayer.ui.adapter.BaseAdapter
 
 -keep class **.R$* {*;}
 -keep public class remix.myplayer.R$*{
@@ -98,6 +96,8 @@ public static final int *;
 #retrofit2
 -dontwarn retrofit2.**
 -keep class retrofit2.** { *; }
+-if interface * { @retrofit2.http.* public *** *(...); }
+-keep,allowoptimization,allowshrinking,allowobfuscation class <3>
 
 -keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
  long producerIndex;
@@ -161,19 +161,10 @@ public static final int *;
 -keepattributes *Annotation*
 -dontwarn ch.qos.logback.core.net.*
 
-# glide
--keep public class * implements com.bumptech.glide.module.GlideModule
--keep class * extends com.bumptech.glide.module.AppGlideModule {
- <init>(...);
-}
--keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
-  **[] $VALUES;
-  public *;
-}
--keep class com.bumptech.glide.load.data.ParcelFileDescriptorRewinder$InternalRewinder {
-  *** rewind();
-}
-
 #jaudiotagger
 -keep class org.jaudiotagger.** { *; }
 -dontwarn org.jaudiotagger.**
+
+# Gson
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken

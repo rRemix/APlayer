@@ -9,10 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.fragment_lrc.*
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.databinding.FragmentLrcBinding
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.lyric.LyricSearcher
 import remix.myplayer.misc.handler.MsgHandler
@@ -33,7 +33,10 @@ import kotlin.math.abs
 /**
  * 歌词界面Fragment
  */
-class LyricFragment : BaseMusicFragment(), View.OnClickListener {
+class LyricFragment : BaseMusicFragment<FragmentLrcBinding>(), View.OnClickListener {
+  override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentLrcBinding
+    get() = FragmentLrcBinding::inflate
+
   private var onFindListener: OnInflateFinishListener? = null
   private var song: Song? = null
 
@@ -51,29 +54,21 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
     pageName = LyricFragment::class.java.simpleName
   }
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R.layout.fragment_lrc, container, false)
-  }
-
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    offsetReduce.setOnClickListener(this)
-    offsetAdd.setOnClickListener(this)
-    offsetReset.setOnClickListener(this)
-    onFindListener?.onViewInflateFinish(lrcView)
+    binding.offsetReduce.setOnClickListener(this)
+    binding.offsetAdd.setOnClickListener(this)
+    binding.offsetReset.setOnClickListener(this)
+    onFindListener?.onViewInflateFinish(binding.lrcView)
     //黑色主题着色按钮
     val themeRes = ThemeStore.themeRes
     if (themeRes == R.style.Theme_APlayer_Black || themeRes == R.style.Theme_APlayer_Dark) {
-      iv_offset_reduce_arrow.setColorFilter(Color.WHITE)
-      iv_offset_reduce_second.setColorFilter(Color.WHITE)
-      offsetReset.setColorFilter(Color.WHITE)
-      iv_offset_add_arrow.setColorFilter(Color.WHITE)
-      iv_offset_add_second.setColorFilter(Color.WHITE)
+      binding.ivOffsetReduceArrow.setColorFilter(Color.WHITE)
+      binding.ivOffsetReduceSecond.setColorFilter(Color.WHITE)
+      binding.offsetReset.setColorFilter(Color.WHITE)
+      binding.ivOffsetAddArrow.setColorFilter(Color.WHITE)
+      binding.ivOffsetAddSecond.setColorFilter(Color.WHITE)
     }
   }
 
@@ -98,28 +93,28 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
     if (!isVisible)
       return
     if (song == null) {
-      lrcView.setText(getStringSafely(R.string.no_lrc))
+      binding.lrcView.setText(getStringSafely(R.string.no_lrc))
       return
     }
     if (clearCache) {
       //清除offset
       SPUtil.putValue(App.context, SPUtil.LYRIC_OFFSET_KEY.NAME, song?.id.toString() + "", 0)
-      lrcView.setOffset(0)
+      binding.lrcView.setOffset(0)
     }
     val id = song?.id
 
     disposable?.dispose()
-    lrcView.setText(getStringSafely(R.string.searching))
+    binding.lrcView.setText(getStringSafely(R.string.searching))
     disposable = lyricSearcher.setSong(song ?: return)
       .getLyricObservable(uri, clearCache)
       .subscribe(Consumer {
         Timber.v("setLrcRows")
         if (id == song?.id) {
           if (it == null || it.isEmpty()) {
-            lrcView.setText(getStringSafely(R.string.no_lrc))
+            binding.lrcView.setText(getStringSafely(R.string.no_lrc))
             return@Consumer
           }
-          lrcView.setOffset(
+          binding.lrcView.setOffset(
             SPUtil.getValue(
               requireContext(),
               SPUtil.LYRIC_OFFSET_KEY.NAME,
@@ -127,13 +122,13 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
               0
             )
           )
-          lrcView.setLrcRows(it)
+          binding.lrcView.setLrcRows(it)
         }
       }, Consumer {
         Timber.v(it)
         if (id == song?.id) {
-          lrcView.setLrcRows(null)
-          lrcView.setText(getStringSafely(R.string.no_lrc))
+          binding.lrcView.setLrcRows(null)
+          binding.lrcView.setText(getStringSafely(R.string.no_lrc))
         }
       })
   }
@@ -164,18 +159,18 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
       toastMsg.arg1 = newOffset
       msgHandler.removeMessages(MESSAGE_SHOW_TOAST)
       msgHandler.sendMessageDelayed(toastMsg, DELAY_SHOW_TOAST)
-      lrcView.setOffset(newOffset)
+      binding.lrcView.setOffset(newOffset)
       MusicServiceRemote.setLyricOffset(newOffset)
     }
 
   }
 
   fun showLyricOffsetView() {
-    if (lrcView.getLrcRows() == null || lrcView.getLrcRows()?.isEmpty() == true) {
+    if (binding.lrcView.getLrcRows().isNullOrEmpty()) {
       ToastUtil.show(requireContext(), R.string.no_lrc)
       return
     }
-    offsetContainer.visibility = View.VISIBLE
+    binding.offsetContainer.visibility = View.VISIBLE
     msgHandler.sendEmptyMessageDelayed(MESSAGE_HIDE, DELAY_HIDE)
   }
 
@@ -194,14 +189,14 @@ class LyricFragment : BaseMusicFragment(), View.OnClickListener {
         1f
       }
     }
-    lrcView.setLrcScalingFactor(factor)
+    binding.lrcView.setLrcScalingFactor(factor)
   }
 
   @OnHandleMessage
   fun handleInternal(msg: Message) {
     when (msg.what) {
       MESSAGE_HIDE -> {
-        offsetContainer.visibility = View.GONE
+        binding.offsetContainer.visibility = View.GONE
       }
       MESSAGE_SHOW_TOAST -> {
         val newOffset = msg.arg1

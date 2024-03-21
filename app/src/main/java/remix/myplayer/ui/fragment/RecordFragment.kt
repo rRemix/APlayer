@@ -6,8 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_record.*
-import remix.myplayer.R
+import remix.myplayer.databinding.FragmentRecordBinding
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.ui.activity.RecordShareActivity
 import remix.myplayer.ui.fragment.base.BaseMusicFragment
@@ -18,7 +17,10 @@ import remix.myplayer.ui.fragment.base.BaseMusicFragment
 /**
  * 心情记录的Fragment
  */
-class RecordFragment : BaseMusicFragment() {
+class RecordFragment : BaseMusicFragment<FragmentRecordBinding>() {
+  override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentRecordBinding
+    get() = FragmentRecordBinding::inflate
+
   //  @BindView(R.id.edit_record)
 //  var mEdit: EditText? = null
   private var shareSuccess = false
@@ -28,20 +30,15 @@ class RecordFragment : BaseMusicFragment() {
     pageName = RecordFragment::class.java.simpleName
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                            savedInstanceState: Bundle?): View? {
-    return inflater.inflate(R.layout.fragment_record, container, false)
-  }
-
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    sharebtn.setOnClickListener { v: View? ->
+    binding.sharebtn.setOnClickListener { v: View? ->
 //            if (mEdit.getText().toString().equals("")) {
 //                ToastUtil.show(mContext,R.string.plz_input_sharecontent);
 //                return;
 //            }
       val intent = Intent(requireContext(), RecordShareActivity::class.java)
       val arg = Bundle()
-      arg.putString(RecordShareActivity.EXTRA_CONTENT, edit_record.text.toString())
+      arg.putString(RecordShareActivity.EXTRA_CONTENT, binding.editRecord.text.toString())
       arg.putSerializable(RecordShareActivity.EXTRA_SONG, MusicServiceRemote.getCurrentSong())
       intent.putExtras(arg)
       startActivityForResult(intent, REQUEST_SHARE)

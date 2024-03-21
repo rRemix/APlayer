@@ -14,14 +14,13 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.dialog_song_edit.view.*
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.audio.exceptions.CannotWriteException
 import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.DialogSongDetailBinding
-import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
+import remix.myplayer.databinding.DialogSongEditBinding
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.theme.TextInputLayoutUtil
 import remix.myplayer.theme.Theme
@@ -35,12 +34,10 @@ import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.util.*
-import java.util.function.Consumer
+import java.util.EnumMap
 
 
-class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activity) {
-  var song: Song = song ?: getCurrentSong()
+class AudioTag(private val activity: BaseActivity, private val song: Song) : ContextWrapper(activity) {
 
   private var title: String = ""
   private var album: String = ""
@@ -50,7 +47,6 @@ class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activit
   private var track: String = ""
 
   fun detail() {
-    val song = song
     var disposable: Disposable? = null
 
     val detailDialog = Theme.getBaseDialog(this)
@@ -94,7 +90,7 @@ class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activit
             ToastUtil.show(this, getString(R.string.init_failed, it))
           })
     } else if (song is Song.Remote){
-      binding.songDetailMime.text = song.data.substring(song.data.lastIndexOf('.') + 1)
+      binding.songDetailMime.text = song.data.substringAfterLast('.')
       @SuppressLint("SetTextI18n")
       binding.songDetailBitRate.text = "${song.bitRate} kb/s"
       @SuppressLint("SetTextI18n")
@@ -111,50 +107,42 @@ class AudioTag(val activity: BaseActivity, song: Song?) : ContextWrapper(activit
         .customView(R.layout.dialog_song_edit, true)
         .negativeText(R.string.cancel)
         .positiveText(R.string.confirm)
-        .onPositive { dialog, which ->
-          dialog.customView?.let { root ->
-            title = root.song_layout.editText?.text.toString()
-            artist = root.artist_layout.editText?.text.toString()
-            album = root.album_layout.editText?.text.toString()
-            genre = root.genre_layout.editText?.text.toString()
-            year = root.year_layout.editText?.text.toString()
-            track = root.track_layout.editText?.text.toString()
-            if (TextUtils.isEmpty(title)) {
-              ToastUtil.show(this, R.string.song_not_empty)
-              return@onPositive
-            }
+        .onPositive { dialog, _ ->
+          dialog.customView!!.let { root ->
+            val binding = DialogSongEditBinding.bind(root)
+            title = binding.songLayout.editText!!.text.toString()
+            artist = binding.artistLayout.editText!!.text.toString()
+            album = binding.albumLayout.editText!!.text.toString()
+            genre = binding.genreLayout.editText!!.text.toString()
+            year = binding.yearLayout.editText!!.text.toString()
+            track = binding.trackLayout.editText!!.text.toString()
             saveTag()
           }
         }
         .build()
 
-    editDialog.customView?.let { root ->
+    editDialog.customView!!.let { root ->
+      val binding = DialogSongEditBinding.bind(root)
       val textInputTintColor = ThemeStore.accentColor
       val editTintColor = ThemeStore.accentColor
-      TextInputLayoutUtil.setAccent(root.song_layout, textInputTintColor)
-      TintHelper.setTintAuto(root.song_layout.editText!!, editTintColor, false)
-      root.song_layout.editText?.addTextChangedListener(TextInputEditWatcher(root.song_layout, getString(R.string.song_not_empty)))
-      root.song_layout.editText?.setText(song.title)
-
-      TextInputLayoutUtil.setAccent(root.album_layout, textInputTintColor)
-      TintHelper.setTintAuto(root.album_layout.editText!!, editTintColor, false)
-      root.album_layout.editText?.setText(song.album)
-
-      TextInputLayoutUtil.setAccent(root.artist_layout, textInputTintColor)
-      TintHelper.setTintAuto(root.artist_layout.editText!!, editTintColor, false)
-      root.artist_layout.editText?.setText(song.artist)
-
-      TextInputLayoutUtil.setAccent(root.year_layout, textInputTintColor)
-      TintHelper.setTintAuto(root.year_layout.editText!!, editTintColor, false)
-      root.year_layout.editText?.setText(song.year)
-
-      TextInputLayoutUtil.setAccent(root.track_layout, textInputTintColor)
-      TintHelper.setTintAuto(root.track_layout.editText!!, editTintColor, false)
-      root.track_layout.editText?.setText(song.track)
-
-      TextInputLayoutUtil.setAccent(root.genre_layout, textInputTintColor)
-      TintHelper.setTintAuto(root.genre_layout.editText!!, editTintColor, false)
-      root.genre_layout.editText?.setText(song.genre)
+      for (layout in arrayOf(
+          binding.songLayout,
+          binding.albumLayout,
+          binding.artistLayout,
+          binding.yearLayout,
+          binding.trackLayout,
+          binding.genreLayout
+      )) {
+        TextInputLayoutUtil.setAccent(layout, textInputTintColor)
+        TintHelper.setTintAuto(layout.editText!!, editTintColor, false)
+      }
+      binding.songLayout.editText!!.addTextChangedListener(TextInputEditWatcher(binding.songLayout, getString(R.string.song_not_empty)))
+      binding.songLayout.editText!!.setText(song.title)
+      binding.albumLayout.editText!!.setText(song.album)
+      binding.artistLayout.editText!!.setText(song.artist)
+      binding.yearLayout.editText!!.setText(song.year)
+      binding.trackLayout.editText!!.setText(song.track)
+      binding.genreLayout.editText!!.setText(song.genre)
     }
 
     editDialog.show()

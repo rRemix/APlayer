@@ -8,13 +8,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.widget.RemoteViews
+import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.AppWidgetTarget
 import com.bumptech.glide.signature.ObjectKey
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.appwidgets.big.AppWidgetBig
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
@@ -69,7 +69,7 @@ abstract class BaseAppwidget
     val song = service.currentSong
     val size = if (this.javaClass.simpleName == AppWidgetBig::class.java.simpleName) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
 
-    GlideApp.with(service)
+    Glide.with(service)
         .asBitmap()
         .load(song)
         .centerCrop()

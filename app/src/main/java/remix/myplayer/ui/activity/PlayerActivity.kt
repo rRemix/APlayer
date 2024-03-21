@@ -35,10 +35,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_player.*
-import kotlinx.android.synthetic.main.layout_player_control.*
-import kotlinx.android.synthetic.main.layout_player_topbar.*
-import kotlinx.android.synthetic.main.layout_player_volume.*
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
@@ -124,7 +120,7 @@ class PlayerActivity : BaseMusicActivity() {
   //Fragment
   lateinit var lyricFragment: LyricFragment
     private set
-  private lateinit var coverFragment: CoverFragment
+  private lateinit var coverFragment: RoundCoverFragment
 
   private var distanceX = 0f
   private var distanceY = 0f
@@ -159,8 +155,8 @@ class PlayerActivity : BaseMusicActivity() {
   //底部显示控制
   private var bottomConfig = 0
   private val volumeRunnable = Runnable {
-    next_song.startAnimation(makeAnimation(next_song, true))
-    volume_container.startAnimation(makeAnimation(volume_container, false))
+    makeAndStartAnimation(binding.layoutPlayerVolume.nextSong, true)
+    makeAndStartAnimation(binding.layoutPlayerVolume.volumeContainer, false)
   }
   private val receiver: Receiver = Receiver()
 
@@ -223,7 +219,7 @@ class PlayerActivity : BaseMusicActivity() {
                 return@onErrorReturn BitmapFactory.decodeResource(resources, R.drawable.album_empty_bg_day)
               }
               .subscribe({
-                player_container.background = BitmapDrawable(resources, it)
+                binding.playerContainer.background = BitmapDrawable(resources, it)
                 updateSwatch(it)
               }, {
 
@@ -279,7 +275,7 @@ class PlayerActivity : BaseMusicActivity() {
   public override fun onResume() {
     super.onResume()
     if (this.isPortraitOrientation()) {
-      view_pager.currentItem = 0
+      binding.viewPager.currentItem = 0
     }
     //更新进度条
     ProgressThread().start()
@@ -324,7 +320,7 @@ class PlayerActivity : BaseMusicActivity() {
         var currentModel = getPlayModel()
         currentModel = if (currentModel == Constants.MODE_REPEAT) Constants.MODE_LOOP else ++currentModel
         setPlayModel(currentModel)
-        playbar_model.setImageDrawable(Theme.tintDrawable(when (currentModel) {
+        binding.layoutPlayerControl.playbarModel.setImageDrawable(Theme.tintDrawable(when (currentModel) {
           Constants.MODE_LOOP -> R.drawable.play_btn_loop
           Constants.MODE_SHUFFLE -> R.drawable.play_btn_shuffle
           else -> R.drawable.play_btn_loop_one
@@ -332,7 +328,7 @@ class PlayerActivity : BaseMusicActivity() {
         val msg = if (currentModel == Constants.MODE_LOOP) getString(R.string.model_normal) else if (currentModel == Constants.MODE_SHUFFLE) getString(R.string.model_random) else getString(R.string.model_repeat)
         //刷新下一首
         if (currentModel != Constants.MODE_SHUFFLE) {
-          next_song.text = getString(R.string.next_song, getNextSong().title)
+          binding.layoutPlayerVolume.nextSong.text = getString(R.string.next_song, getNextSong().title)
         }
         ToastUtil.show(this, msg)
       }
@@ -372,8 +368,8 @@ class PlayerActivity : BaseMusicActivity() {
           .subscribeOn(Schedulers.io())
           .subscribe()
       R.id.next_song -> if (bottomConfig == BOTTOM_SHOW_BOTH) {
-        next_song.startAnimation(makeAnimation(next_song, false))
-        volume_container.startAnimation(makeAnimation(volume_container, true))
+        makeAndStartAnimation(binding.layoutPlayerVolume.nextSong, false)
+        makeAndStartAnimation(binding.layoutPlayerVolume.volumeContainer, true)
         handler.removeCallbacks(volumeRunnable)
         handler.postDelayed(volumeRunnable, DELAY_SHOW_NEXT_SONG.toLong())
       }
@@ -384,11 +380,11 @@ class PlayerActivity : BaseMusicActivity() {
           BiFunction { max: Int, current: Int -> longArrayOf(max.toLong(), current.toLong()) })
           .subscribeOn(Schedulers.io())
           .observeOn(AndroidSchedulers.mainThread())
-          .subscribe { longs: LongArray -> volume_seekbar.progress = (longs[1] * 1.0 / longs[0] * 100).toInt() }
+          .subscribe { longs: LongArray -> binding.layoutPlayerVolume.volumeSeekbar.progress = (longs[1] * 1.0 / longs[0] * 100).toInt() }
     }
   }
 
-  private fun makeAnimation(view: View, show: Boolean): AlphaAnimation {
+  private fun makeAndStartAnimation(view: View, show: Boolean) {
     val alphaAnimation = AlphaAnimation(if (show) 0f else 1f, if (show) 1f else 0f)
     alphaAnimation.duration = 300
     alphaAnimation.setAnimationListener(object : AnimationListener {
@@ -402,7 +398,7 @@ class PlayerActivity : BaseMusicActivity() {
 
       override fun onAnimationRepeat(animation: Animation) {}
     })
-    return alphaAnimation
+    view.startAnimation(alphaAnimation)
   }
 
   /**
@@ -439,22 +435,22 @@ class PlayerActivity : BaseMusicActivity() {
     val temp = getProgress()
     currentTime = if (temp in 1 until duration) temp else 0
     if (duration > 0 && duration - currentTime > 0) {
-      text_hasplay.text = Util.getTime(currentTime.toLong())
-      text_remain.text = Util.getTime((duration - currentTime).toLong())
+      binding.textHasplay.text = Util.getTime(currentTime.toLong())
+      binding.textRemain.text = Util.getTime((duration - currentTime).toLong())
     }
 
     //初始化seekbar
     if (duration > 0 && duration < Int.MAX_VALUE) {
-      seekbar.max = duration
+      binding.seekbar.max = duration
     } else {
-      seekbar.max = 1000
+      binding.seekbar.max = 1000
     }
     if (currentTime in 1 until duration) {
-      seekbar.progress = currentTime
+      binding.seekbar.progress = currentTime
     } else {
-      seekbar.progress = 0
+      binding.seekbar.progress = 0
     }
-    seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+    binding.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
       override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         if (fromUser) {
           updateProgressText(progress)
@@ -487,8 +483,8 @@ class PlayerActivity : BaseMusicActivity() {
         .subscribe { ints: IntArray ->
           val current = ints[1]
           val max = ints[0]
-          volume_seekbar.progress = (current * 1.0 / max * 100).toInt()
-          volume_seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+          binding.layoutPlayerVolume.volumeSeekbar.progress = (current * 1.0 / max * 100).toInt()
+          binding.layoutPlayerVolume.volumeSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
               if (bottomConfig == BOTTOM_SHOW_BOTH) {
                 handler.removeCallbacks(volumeRunnable)
@@ -521,19 +517,19 @@ class PlayerActivity : BaseMusicActivity() {
     val artist = song.artist
     val album = song.album
     if (title == "") {
-      top_title.text = getString(R.string.unknown_song)
+      binding.topActionbar.topTitle.text = getString(R.string.unknown_song)
     } else {
-      top_title.text = title
+      binding.topActionbar.topTitle.text = title
     }
     when {
       artist == "" -> {
-        top_detail.text = song.album
+        binding.topActionbar.topDetail.text = song.album
       }
       album == "" -> {
-        top_detail.text = song.artist
+        binding.topActionbar.topDetail.text = song.artist
       }
       else -> {
-        top_detail.text = String.format("%s-%s", song.artist, song.album)
+        binding.topActionbar.topDetail.text = String.format("%s-%s", song.artist, song.album)
       }
     }
   }
@@ -543,7 +539,7 @@ class PlayerActivity : BaseMusicActivity() {
    */
   private fun updatePlayButton(isPlay: Boolean) {
     isPlaying = isPlay
-    playbar_play_pause.updateState(isPlay, true)
+    binding.layoutPlayerControl.playbarPlayPause.updateState(isPlay, true)
   }
 
   /**
@@ -565,7 +561,7 @@ class PlayerActivity : BaseMusicActivity() {
 
     for (fragment in fragments) {
       if (fragment is LyricFragment ||
-          fragment is CoverFragment ||
+          fragment is CoverFragment<*> ||
           fragment is RecordFragment) {
         fragmentManager.beginTransaction().remove(fragment).commitNow()
       }
@@ -582,11 +578,11 @@ class PlayerActivity : BaseMusicActivity() {
       //      adapter.addFragment(mRecordFragment);
       adapter.addFragment(coverFragment)
       adapter.addFragment(lyricFragment)
-      view_pager.adapter = adapter
-      view_pager.offscreenPageLimit = adapter.count - 1
-      view_pager.currentItem = 0
+      binding.viewPager.adapter = adapter
+      binding.viewPager.offscreenPageLimit = adapter.count - 1
+      binding.viewPager.currentItem = 0
 
-      view_pager.addOnPageChangeListener(object : OnPageChangeListener {
+      binding.viewPager.addOnPageChangeListener(object : OnPageChangeListener {
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
         override fun onPageSelected(position: Int) {
           indicators[prevPosition].setImageDrawable(normalIndicator)
@@ -649,7 +645,7 @@ class PlayerActivity : BaseMusicActivity() {
 
   private fun touchOnCoverFragment(event: MotionEvent): Boolean {
     val rect = Rect()
-    return (this.isPortraitOrientation() && view_pager.currentItem == 0) ||
+    return (this.isPortraitOrientation() && binding.viewPager.currentItem == 0) ||
         (binding.containerCover?.getLocalVisibleRect(rect) == true && rect.contains(event.x.toInt(), event.y.toInt()))
   }
 
@@ -711,9 +707,9 @@ class PlayerActivity : BaseMusicActivity() {
       val temp = getProgress()
       currentTime = if (temp in 1 until duration) temp else 0
       duration = song.duration.toInt()
-      seekbar.max = duration
+      binding.seekbar.max = duration
       //更新下一首歌曲
-      next_song.text = getString(R.string.next_song, getNextSong().title)
+      binding.layoutPlayerVolume.nextSong.text = getString(R.string.next_song, getNextSong().title)
       coverFragment.setImage(song,
           operation != Command.TOGGLE && !firstStart,
           operation != Command.TOGGLE)
@@ -736,10 +732,10 @@ class PlayerActivity : BaseMusicActivity() {
       while (isForeground) {
         try {
           //音量
-          if (volume_seekbar.visibility == View.VISIBLE) {
+          if (binding.layoutPlayerVolume.volumeSeekbar.visibility == View.VISIBLE) {
             val max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
             val current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-            runOnUiThread { volume_seekbar.progress = (current * 1.0 / max * 100).toInt() }
+            runOnUiThread { binding.layoutPlayerVolume.volumeSeekbar.progress = (current * 1.0 / max * 100).toInt() }
           }
           if (!isPlaying()) {
             sleep(500)
@@ -771,12 +767,12 @@ class PlayerActivity : BaseMusicActivity() {
     }
     when (bottomConfig) {
       BOTTOM_SHOW_NEXT -> { //仅显示下一首
-        volume_container.visibility = View.GONE
-        next_song.visibility = View.VISIBLE
+        binding.layoutPlayerVolume.volumeContainer.visibility = View.GONE
+        binding.layoutPlayerVolume.nextSong.visibility = View.VISIBLE
       }
       BOTTOM_SHOW_VOLUME -> { //仅显示音量控制
-        volume_container.visibility = View.VISIBLE
-        next_song.visibility = View.GONE
+        binding.layoutPlayerVolume.volumeContainer.visibility = View.VISIBLE
+        binding.layoutPlayerVolume.nextSong.visibility = View.GONE
       }
       BOTTOM_SHOW_NONE -> { //关闭
         val volumeLayout = findViewById<View>(R.id.layout_player_volume)
@@ -807,53 +803,53 @@ class PlayerActivity : BaseMusicActivity() {
 //        }
 
     //修改控制按钮颜色
-    Theme.tintDrawable(playbar_next, R.drawable.play_btn_next, accentColor)
-    Theme.tintDrawable(playbar_prev, R.drawable.play_btn_pre, accentColor)
-    playbar_play_pause.setBackgroundColor(accentColor)
+    Theme.tintDrawable(binding.layoutPlayerControl.playbarNext, R.drawable.play_btn_next, accentColor)
+    Theme.tintDrawable(binding.layoutPlayerControl.playbarPrev, R.drawable.play_btn_pre, accentColor)
+    binding.layoutPlayerControl.playbarPlayPause.setBackgroundColor(accentColor)
 
     //歌曲名颜色
-    top_title.setTextColor(ThemeStore.playerTitleColor)
+    binding.topActionbar.topTitle.setTextColor(ThemeStore.playerTitleColor)
 
     //修改顶部按钮颜色
-    Theme.tintDrawable(top_hide, R.drawable.icon_player_back, tintColor)
-    Theme.tintDrawable(top_more, R.drawable.icon_player_more, tintColor)
+    Theme.tintDrawable(binding.topActionbar.topHide, R.drawable.icon_player_back, tintColor)
+    Theme.tintDrawable(binding.topActionbar.topMore, R.drawable.icon_player_more, tintColor)
     //播放模式与播放队列
     val playMode = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAY_MODEL,
         Constants.MODE_LOOP)
-    Theme.tintDrawable(playbar_model, if (playMode == Constants.MODE_LOOP) R.drawable.play_btn_loop else if (playMode == Constants.MODE_SHUFFLE) R.drawable.play_btn_shuffle else R.drawable.play_btn_loop_one, tintColor)
-    Theme.tintDrawable(playbar_playinglist, R.drawable.play_btn_normal_list, tintColor)
+    Theme.tintDrawable(binding.layoutPlayerControl.playbarModel, if (playMode == Constants.MODE_LOOP) R.drawable.play_btn_loop else if (playMode == Constants.MODE_SHUFFLE) R.drawable.play_btn_shuffle else R.drawable.play_btn_loop_one, tintColor)
+    Theme.tintDrawable(binding.layoutPlayerControl.playbarPlayinglist, R.drawable.play_btn_normal_list, tintColor)
 
     //音量控制
-    volume_down.drawable.setColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP)
-    volume_up.drawable.setColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP)
+    binding.layoutPlayerVolume.volumeDown.drawable.setColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP)
+    binding.layoutPlayerVolume.volumeUp.drawable.setColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP)
     //        Theme.tintDrawable(mVolumeDown,R.drawable.ic_volume_down_black_24dp,tintColor);
 //        Theme.tintDrawable(mVolumeUp,R.drawable.ic_volume_up_black_24dp,tintColor);
     //下一首背景
-    next_song.background = GradientDrawableMaker()
+    binding.layoutPlayerVolume.nextSong.background = GradientDrawableMaker()
         .color(ThemeStore.playerNextSongBgColor)
         .corner(DensityUtil.dip2px(2f).toFloat())
         .width(DensityUtil.dip2px(288f))
         .height(DensityUtil.dip2px(38f))
         .make()
-    next_song.setTextColor(ThemeStore.playerNextSongTextColor)
+    binding.layoutPlayerVolume.nextSong.setTextColor(ThemeStore.playerNextSongTextColor)
   }
 
   private fun updateSeekBarColor(color: Int) {
-    setProgressDrawable(seekbar, color)
-    setProgressDrawable(volume_seekbar, color)
+    setProgressDrawable(binding.seekbar, color)
+    setProgressDrawable(binding.layoutPlayerVolume.volumeSeekbar, color)
 
     //修改thumb
     val inset = DensityUtil.dip2px(this, 6f)
     val width = DensityUtil.dip2px(this, 2f)
     val height = DensityUtil.dip2px(this, 6f)
-    seekbar.thumb = InsetDrawable(
+    binding.seekbar.thumb = InsetDrawable(
         GradientDrawableMaker()
             .width(width)
             .height(height)
             .color(color)
             .make(),
         inset, inset, inset, inset)
-    volume_seekbar.thumb = InsetDrawable(GradientDrawableMaker()
+    binding.layoutPlayerVolume.volumeSeekbar.thumb = InsetDrawable(GradientDrawableMaker()
         .width(width)
         .height(height)
         .color(color)
@@ -924,27 +920,27 @@ class PlayerActivity : BaseMusicActivity() {
   }
 
   private fun updateViewsColorBySwatch(swatch: Swatch) {
-    playbar_next.setColorFilter(swatch.rgb, PorterDuff.Mode.SRC_IN)
-    playbar_prev.setColorFilter(swatch.rgb, PorterDuff.Mode.SRC_IN)
-    playbar_play_pause.setBackgroundColor(swatch.rgb)
+    binding.layoutPlayerControl.playbarNext.setColorFilter(swatch.rgb, PorterDuff.Mode.SRC_IN)
+    binding.layoutPlayerControl.playbarPrev.setColorFilter(swatch.rgb, PorterDuff.Mode.SRC_IN)
+    binding.layoutPlayerControl.playbarPlayPause.setBackgroundColor(swatch.rgb)
 
-    volume_down.setColorFilter(ColorUtil.adjustAlpha(swatch.rgb, 0.5f), PorterDuff.Mode.SRC_IN)
-    volume_up.setColorFilter(ColorUtil.adjustAlpha(swatch.rgb, 0.5f), PorterDuff.Mode.SRC_IN)
+    binding.layoutPlayerVolume.volumeDown.setColorFilter(ColorUtil.adjustAlpha(swatch.rgb, 0.5f), PorterDuff.Mode.SRC_IN)
+    binding.layoutPlayerVolume.volumeUp.setColorFilter(ColorUtil.adjustAlpha(swatch.rgb, 0.5f), PorterDuff.Mode.SRC_IN)
 
-    playbar_model.setColorFilter(ColorUtil.adjustAlpha(swatch.rgb, 0.5f), PorterDuff.Mode.SRC_IN)
-    playbar_playinglist.setColorFilter(ColorUtil.adjustAlpha(swatch.rgb, 0.5f), PorterDuff.Mode.SRC_IN)
+    binding.layoutPlayerControl.playbarModel.setColorFilter(ColorUtil.adjustAlpha(swatch.rgb, 0.5f), PorterDuff.Mode.SRC_IN)
+    binding.layoutPlayerControl.playbarPlayinglist.setColorFilter(ColorUtil.adjustAlpha(swatch.rgb, 0.5f), PorterDuff.Mode.SRC_IN)
 
     normalIndicator.setColor(ColorUtil.adjustAlpha(swatch.rgb, 0.3f))
     highLightIndicator.setColor(swatch.rgb)
 
     updateSeekBarColor(swatch.rgb)
-    next_song.setBackgroundColor(ColorUtil.adjustAlpha(swatch.rgb, 0.1f))
+    binding.layoutPlayerVolume.nextSong.setBackgroundColor(ColorUtil.adjustAlpha(swatch.rgb, 0.1f))
 
-    top_title.setTextColor(swatch.titleTextColor)
-    top_detail.setTextColor(swatch.bodyTextColor)
+    binding.topActionbar.topTitle.setTextColor(swatch.titleTextColor)
+    binding.topActionbar.topDetail.setTextColor(swatch.bodyTextColor)
 
-    top_more.setColorFilter(swatch.titleTextColor, PorterDuff.Mode.SRC_IN)
-    top_hide.setColorFilter(swatch.titleTextColor, PorterDuff.Mode.SRC_IN)
+    binding.topActionbar.topMore.setColorFilter(swatch.titleTextColor, PorterDuff.Mode.SRC_IN)
+    binding.topActionbar.topHide.setColorFilter(swatch.titleTextColor, PorterDuff.Mode.SRC_IN)
   }
 
   private fun startBGColorAnimation(swatch: Swatch) {
@@ -958,7 +954,7 @@ class PlayerActivity : BaseMusicActivity() {
           intArrayOf(animation.animatedValue as Int,
               surfaceColor
           ), 0)
-      player_container.background = drawable
+      binding.playerContainer.background = drawable
     }
     valueAnimator?.setDuration(1000)?.start()
   }
@@ -988,8 +984,8 @@ class PlayerActivity : BaseMusicActivity() {
 
   private fun updateProgressText(current: Int) {
     if (current > 0 && duration - current > 0) {
-      text_hasplay.text = Util.getTime(current.toLong())
-      text_remain.text = Util.getTime((duration - current).toLong())
+      binding.textHasplay.text = Util.getTime(current.toLong())
+      binding.textRemain.text = Util.getTime((duration - current).toLong())
     }
   }
 
@@ -998,7 +994,7 @@ class PlayerActivity : BaseMusicActivity() {
   }
 
   private fun updateSeekBarByHandler() {
-    seekbar.progress = currentTime
+    binding.seekbar.progress = currentTime
   }
 
   @OnHandleMessage
@@ -1019,8 +1015,8 @@ class PlayerActivity : BaseMusicActivity() {
 
   fun showLyricOffsetView() {
     //todo
-    if (view_pager.currentItem != 2) {
-      view_pager.setCurrentItem(2, true)
+    if (binding.viewPager.currentItem != 2) {
+      binding.viewPager.setCurrentItem(2, true)
     }
     lyricFragment.showLyricOffsetView()
   }
@@ -1028,7 +1024,7 @@ class PlayerActivity : BaseMusicActivity() {
   private inner class Receiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
       //更新下一首歌曲
-      next_song.text = getString(R.string.next_song, getNextSong().title)
+      binding.layoutPlayerVolume.nextSong.text = getString(R.string.next_song, getNextSong().title)
     }
   }
 

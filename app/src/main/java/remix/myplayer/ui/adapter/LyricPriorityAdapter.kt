@@ -2,9 +2,10 @@ package remix.myplayer.ui.adapter
 
 import android.content.Context
 import android.view.View
+import android.widget.TextView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.item_lyric_priority.view.*
+import remix.myplayer.R
 import remix.myplayer.bean.misc.LyricPriority
 import remix.myplayer.ui.adapter.holder.BaseViewHolder
 import remix.myplayer.util.SPUtil
@@ -41,7 +42,7 @@ class LyricPriorityAdapter(context: Context?, layoutId: Int) : BaseAdapter<Lyric
       return
     }
 
-    holder.view.item_title?.text = lyricPriority.desc
+    holder.view.findViewById<TextView>(R.id.item_title)?.text = lyricPriority.desc
     holder.view.setOnClickListener {
 
     }

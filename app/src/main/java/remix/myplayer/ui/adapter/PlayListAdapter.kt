@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -19,7 +20,6 @@ import remix.myplayer.R
 import remix.myplayer.databinding.ItemPlaylistRecycleGridBinding
 import remix.myplayer.databinding.ItemPlaylistRecycleListBinding
 import remix.myplayer.db.room.model.PlayList
-import remix.myplayer.glide.GlideApp
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.menu.LibraryListener
@@ -78,7 +78,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
       options.transform(MultiTransformation(CenterCrop(), RoundedCorners(DensityUtil.dip2px(2f))))
     }
 
-    GlideApp.with(holder.itemView)
+    Glide.with(holder.itemView)
         .load(data)
         .apply(options)
         .signature(ObjectKey(UriFetcher.playListVersion))
