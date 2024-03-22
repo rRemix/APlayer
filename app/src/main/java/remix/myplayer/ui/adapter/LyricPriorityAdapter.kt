@@ -1,7 +1,9 @@
 package remix.myplayer.ui.adapter
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -35,6 +37,10 @@ class LyricPriorityAdapter(context: Context?, layoutId: Int) : BaseAdapter<Lyric
     }
 
     setDataList(temp)
+  }
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LyricPriorityHolder {
+    return LyricPriorityHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
   }
 
   override fun convert(holder: LyricPriorityHolder, lyricPriority: LyricPriority?, position: Int) {

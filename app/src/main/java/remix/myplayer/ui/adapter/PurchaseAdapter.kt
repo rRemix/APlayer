@@ -1,7 +1,9 @@
 package remix.myplayer.ui.adapter
 
 import android.annotation.SuppressLint
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Purchase
@@ -12,6 +14,10 @@ class PurchaseAdapter(layoutId: Int) : BaseAdapter<Purchase, PurchaseAdapter.Pur
   private val LOGOS_OTHERS = listOf(R.drawable.icon_cookie, R.drawable.icon_cake, R.drawable.icon_drink,
       R.drawable.icon_movie, R.drawable.icon_gift)
   private val LOGOS_DONATE = listOf(R.drawable.icon_wechat_donate, R.drawable.icon_alipay_donate, R.drawable.icon_paypal_donate)
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PurchaseHolder {
+    return PurchaseHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
+  }
 
   @SuppressLint("SetTextI18n")
   override fun convert(holder: PurchaseHolder, purchase: Purchase?, position: Int) {

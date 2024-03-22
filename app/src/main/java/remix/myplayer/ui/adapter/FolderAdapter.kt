@@ -3,7 +3,9 @@ package remix.myplayer.ui.adapter
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Folder
@@ -21,6 +23,10 @@ import remix.myplayer.util.Constants
  * Created by taeja on 16-6-23.
  */
 class FolderAdapter(layoutId: Int, private val multiChoice: MultipleChoice<Folder>) : BaseAdapter<Folder, FolderHolder>(layoutId) {
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderHolder {
+    return FolderHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
+  }
 
   override fun onBindViewHolder(holder: FolderHolder, position: Int) {
     convert(holder, getItem(position) ?: return, position)

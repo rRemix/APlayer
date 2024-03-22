@@ -2,7 +2,9 @@ package remix.myplayer.ui.adapter
 
 import android.annotation.SuppressLint
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import com.bumptech.glide.Glide
 import remix.myplayer.R
@@ -23,6 +25,10 @@ import remix.myplayer.ui.misc.MultipleChoice
  * 搜索结果的适配器
  */
 class SearchAdapter(private val multiChoice: MultipleChoice<Song>, layoutId: Int) : BaseAdapter<Song, SearchResHolder>(layoutId) {
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResHolder {
+    return SearchResHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
+  }
 
   @SuppressLint("RestrictedApi")
   override fun convert(holder: SearchResHolder, song: Song?, position: Int) {

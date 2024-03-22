@@ -1,6 +1,8 @@
 package remix.myplayer.ui.adapter
 
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import remix.myplayer.R
 import remix.myplayer.databinding.ItemDrawerBinding
 import remix.myplayer.theme.GradientDrawableMaker
@@ -41,6 +43,10 @@ class DrawerAdapter(layoutId: Int) : BaseAdapter<Int, DrawerHolder>(layoutId) {
 
   override fun getItem(position: Int): Int {
     return TITLES[position]
+  }
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DrawerHolder {
+    return DrawerHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
   }
 
   override fun convert(holder: DrawerHolder, titleRes: Int?, position: Int) {

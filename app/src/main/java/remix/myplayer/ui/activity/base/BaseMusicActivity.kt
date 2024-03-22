@@ -16,7 +16,7 @@ import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.util.*
 
-open class BaseMusicActivity : BaseActivity(), MusicEventCallback, CoroutineScope by MainScope() {
+open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
   private var serviceToken: MusicServiceRemote.ServiceToken? = null
   private val serviceEventListeners = ArrayList<MusicEventCallback>()
   private var musicStateReceiver: MusicStateReceiver? = null

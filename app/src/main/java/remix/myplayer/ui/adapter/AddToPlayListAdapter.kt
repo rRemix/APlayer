@@ -1,6 +1,8 @@
 package remix.myplayer.ui.adapter
 
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import remix.myplayer.databinding.ItemPlaylistAddtoBinding
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.ui.adapter.AddToPlayListAdapter.PlayListAddToHolder
@@ -27,5 +29,9 @@ class AddToPlayListAdapter(layoutId: Int) : BaseAdapter<PlayList, PlayListAddToH
 
   class PlayListAddToHolder(itemView: View) : BaseViewHolder(itemView) {
     val binding: ItemPlaylistAddtoBinding = ItemPlaylistAddtoBinding.bind(itemView)
+  }
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayListAddToHolder {
+    return PlayListAddToHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
   }
 }

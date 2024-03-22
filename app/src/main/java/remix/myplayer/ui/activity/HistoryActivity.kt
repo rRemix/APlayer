@@ -3,11 +3,12 @@ package remix.myplayer.ui.activity
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
+import android.view.ViewGroup
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,6 +23,7 @@ import remix.myplayer.misc.interfaces.OnItemClickListener
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.adapter.SongAdapter
+import remix.myplayer.ui.adapter.holder.BaseViewHolder
 import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.util.Constants
 import remix.myplayer.util.MediaStoreUtil
@@ -33,9 +35,9 @@ class HistoryActivity : MenuActivity() {
   private var job: Job? = null
   private lateinit var binding: ActivityHistoryBinding
   private val adapter by lazy {
-    SongAdapter(R.layout.item_song_recycle, choice, binding.recyclerview)
+    HistoryAdapter(R.layout.item_song_recycle, choice, binding.recyclerview)
   }
-
+  private val countMap = HashMap<Long, Int>()
   private val choice by lazy {
     MultipleChoice<Song>(this, Constants.SONG)
   }
@@ -118,6 +120,7 @@ class HistoryActivity : MenuActivity() {
             val song = MediaStoreUtil.getSongById(history.audio_id)
             if (song != Song.EMPTY_SONG) {
               songs.add(song)
+              countMap[song.id] = history.play_count
             }
           }
           songs
@@ -127,6 +130,27 @@ class HistoryActivity : MenuActivity() {
             adapter.setDataList(it)
           }
         }
+    }
+  }
+
+  private inner class HistoryAdapter(
+    layoutId: Int,
+    multiChoice: MultipleChoice<Song>,
+    recyclerView: RecyclerView
+  ) : SongAdapter(layoutId, multiChoice, recyclerView) {
+    init {
+
+    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+      return super.onCreateViewHolder(parent, viewType)
+    }
+    override fun convert(holder: BaseViewHolder, song: Song?, position: Int) {
+      super.convert(holder, song, position)
+      if (holder !is SongViewHolder || song == null) {
+        return
+      }
+      holder.binding.count.visibility = View.VISIBLE
+      holder.binding.count.text = countMap[song.id]?.toString()
     }
   }
 }

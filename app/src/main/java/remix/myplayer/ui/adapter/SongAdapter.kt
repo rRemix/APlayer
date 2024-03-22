@@ -41,7 +41,7 @@ import java.util.*
 /**
  * Created by Remix on 2016/4/11.
  */
-class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView: RecyclerView)
+open class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView: RecyclerView)
   : HeaderAdapter<Song, BaseViewHolder>(layoutId, multiChoice, recyclerView), FastScroller.SectionIndexer {
 
   private var lastPlaySong = getCurrentSong()

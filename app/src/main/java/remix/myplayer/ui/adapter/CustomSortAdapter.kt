@@ -1,6 +1,8 @@
 package remix.myplayer.ui.adapter
 
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
@@ -12,6 +14,9 @@ import remix.myplayer.ui.adapter.holder.BaseViewHolder
  * Created by Remix on 2018/3/15.
  */
 class CustomSortAdapter(layoutId: Int) : BaseAdapter<Song, CustomSortAdapter.CustomSortHolder>(layoutId) {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomSortHolder {
+    return CustomSortHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
+  }
 
   override fun convert(holder: CustomSortHolder, data: Song?, position: Int) {
     if (data == null) {

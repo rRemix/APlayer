@@ -1,6 +1,8 @@
 package remix.myplayer.ui.adapter
 
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ItemPlayqueueBinding
@@ -23,6 +25,10 @@ import remix.myplayer.util.Util
 class PlayQueueAdapter(layoutId: Int) : BaseAdapter<Song, PlayQueueHolder>(layoutId) {
   private val accentColor: Int = ThemeStore.accentColor
   private val textColor: Int = textColorPrimary
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayQueueHolder {
+    return PlayQueueHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
+  }
 
   override fun convert(holder: PlayQueueHolder, song: Song?, position: Int) {
     if (song == null) {

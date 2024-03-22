@@ -1,6 +1,8 @@
 package remix.myplayer.ui.adapter
 
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CompoundButton
 import com.bumptech.glide.Glide
 import remix.myplayer.R
@@ -24,6 +26,10 @@ import java.util.*
 class SongChooseAdapter(layoutID: Int, private val checkListener: OnSongChooseListener) : BaseAdapter<Song, SongChooseHolder>(layoutID) {
 
   val checkedSong: ArrayList<Long> = ArrayList()
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongChooseHolder {
+    return SongChooseHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
+  }
 
   override fun convert(holder: SongChooseHolder, song: Song?, position: Int) {
     if (song == null) {
