@@ -15,7 +15,7 @@ object SortOrder {
   const val DISPLAY_NAME_Z_A = "$DISPLAY_NAME_A_Z DESC"
 //  const val DURATION = Audio.Media.DURATION
 //  const val YEAR = Audio.Media.YEAR
-  const val PLAYLIST_A_Z = "name"
+  const val PLAYLIST_A_Z = "playlist_name"
   const val PLAYLIST_Z_A = "$PLAYLIST_A_Z DESC"
   const val PLAYLIST_DATE = "date"
   const val TRACK_NUMBER = Audio.Media.TRACK

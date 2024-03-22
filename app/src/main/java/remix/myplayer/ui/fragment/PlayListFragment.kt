@@ -81,12 +81,23 @@ class PlayListFragment : LibraryFragment<PlayList, PlayListAdapter, FragmentPlay
 
   class AsyncPlayListLoader(context: Context?) : WrappedAsyncTaskLoader<List<PlayList>>(context) {
     override fun loadInBackground(): List<PlayList> {
-      val sortOrder = SPUtil.getValue(
+      var sortOrder = SPUtil.getValue(
           App.context,
           SETTING_KEY.NAME,
           SETTING_KEY.PLAYLIST_SORT_ORDER,
-          SortOrder.PLAYLIST_A_Z
+          SortOrder.PLAYLIST_DATE
       )
+      sortOrder = when(sortOrder) {
+        SortOrder.PLAYLIST_A_Z -> {
+          "name"
+        }
+        SortOrder.PLAYLIST_Z_A -> {
+          "name DESC"
+        }
+        else -> {
+          sortOrder
+        }
+      }
       val forceSort =
           SPUtil.getValue(App.context, SETTING_KEY.NAME, SETTING_KEY.FORCE_SORT, false)
       return getInstance().getSortPlayList("SELECT * FROM PlayList ORDER BY $sortOrder")

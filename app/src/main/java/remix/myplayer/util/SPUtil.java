@@ -272,7 +272,7 @@ public class SPUtil {
     // 黑色主题
     String BLACK_THEME = "black_theme";
     String VERSION = "version";
-    int NEWEST_VERSION = 2;
+    int NEWEST_VERSION = 3;
   }
 
   public interface LYRIC_OFFSET_KEY {

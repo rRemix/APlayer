@@ -16,6 +16,7 @@ import remix.myplayer.helper.LanguageHelper.onConfigurationChanged
 import remix.myplayer.helper.LanguageHelper.saveSystemCurrentLanguage
 import remix.myplayer.helper.LanguageHelper.setApplicationLanguage
 import remix.myplayer.helper.LanguageHelper.setLocal
+import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.manager.APlayerActivityManager
 import remix.myplayer.theme.ThemeStore
@@ -73,6 +74,10 @@ class App : MultiDexApplication() {
     if (oldVersion < SETTING_KEY.NEWEST_VERSION) {
       if (oldVersion == 1) {
         SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.LIBRARY, "")
+      }
+      if (oldVersion == 2) {
+        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.GENRE_SORT_ORDER, SortOrder.GENRE_A_Z)
+        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.PLAYLIST_SORT_ORDER, SortOrder.PLAYLIST_DATE)
       }
       SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.VERSION, SETTING_KEY.NEWEST_VERSION)
     }

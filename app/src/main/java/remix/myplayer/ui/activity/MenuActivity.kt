@@ -145,7 +145,7 @@ abstract class MenuActivity : ToolbarActivity() {
       SortOrder.ALBUM_Z_A -> subMenu.findItem(R.id.action_sort_order_album_desc).isChecked = true
       SortOrder.ARTIST_A_Z -> subMenu.findItem(R.id.action_sort_order_artist).isChecked = true
       SortOrder.ARTIST_Z_A -> subMenu.findItem(R.id.action_sort_order_artist_desc).isChecked = true
-      SortOrder.GENRE_A_Z -> subMenu.findItem(R.id.action_sort_order_genre_desc).isChecked = true
+      SortOrder.GENRE_A_Z -> subMenu.findItem(R.id.action_sort_order_genre).isChecked = true
       SortOrder.GENRE_Z_A -> subMenu.findItem(R.id.action_sort_order_genre_desc).isChecked = true
       SortOrder.DATE -> subMenu.findItem(R.id.action_sort_order_date).isChecked = true
       SortOrder.DATE_DESC -> subMenu.findItem(R.id.action_sort_order_date_desc).isChecked = true
