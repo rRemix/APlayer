@@ -41,10 +41,6 @@
     android:theme="@style/AppTheme"
     android:networkSecurityConfig="@xml/network_security_config">
 
-    <meta-data
-      android:name="BUGLY_APP_CHANNEL"
-      android:value="${CHANNEL_VALUE}"/>
-
     <!-- 主页面 -->
     <activity
       android:name=".ui.activity.MainActivity"
