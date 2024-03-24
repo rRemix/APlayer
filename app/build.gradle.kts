@@ -80,6 +80,8 @@ android {
                 "x86_64"
             )
         }
+
+        setProperty("archivesBaseName", "APlayer-v${versionName}")
     }
 
     signingConfigs {
@@ -91,7 +93,7 @@ android {
         }
 
         create("releaseConfig") {
-            storeFile = File(properties.getProperty("keystore.storeFile"))
+            storeFile = File(properties.getProperty("keystore.storeFile") ?: "null")
             storePassword = properties.getProperty("keystore.storePassword")
             keyAlias = properties.getProperty("keystore.keyAlias")
             keyPassword = properties.getProperty("keystore.keyPassword")
@@ -142,6 +144,7 @@ android {
     productFlavors {
         create("nongoogle") {
             dimension = "channel"
+            isDefault = true
         }
         create("google") {
             dimension = "channel"
@@ -171,15 +174,6 @@ android {
     dependenciesInfo {
         includeInApk = false
     }
-
-    /*
-    TODO
-    android.applicationVariants.all { variant ->
-        variant.outputs.all {
-            outputFileName = "APlayer_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${new Date().format("yyyy-MM-dd HH-mm")}.apk"
-        }
-    }
-     */
 }
 
 dependencies {
