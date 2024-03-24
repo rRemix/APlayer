@@ -187,7 +187,6 @@ dependencies {
     implementation(libs.palette.ktx)
     implementation(libs.swiperefreshlayout)
 
-    implementation(libs.billingclient)
     implementation(libs.material)
 
     implementation(libs.glide)
@@ -225,4 +224,7 @@ dependencies {
     implementation(libs.tinypinyin)
 
     debugImplementation(libs.leakcanary)
+
+    val googleImplementation by configurations
+    googleImplementation(libs.billingclient)
 }
