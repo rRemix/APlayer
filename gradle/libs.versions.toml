@@ -1,0 +1,65 @@
+[versions]
+agp = "8.3.1"
+kotlin = "1.9.23"
+ksp = "1.9.23-1.0.19"
+
+glide = "4.16.0"
+retrofit = "2.9.0"
+room = "2.6.1"
+
+
+[plugins]
+application = { id = "com.android.application", version.ref = "agp" }
+kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+
+[libraries]
+# kotlin
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.0" }
+
+# androidx
+appcompat = { group = "androidx.appcompat", name = "appcompat", version = "1.6.1" }
+cardview = { group = "androidx.cardview", name = "cardview", version = "1.0.0" }
+constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.1.4" }
+media = { group = "androidx.media", name = "media", version = "1.7.0" }
+multidex = { group = "androidx.multidex", name = "multidex", version = "2.0.1" }
+palette-ktx = { group = "androidx.palette", name = "palette-ktx", version = "1.0.0" }
+swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version = "1.1.0" }
+
+# google
+billingclient = { group = "com.android.billingclient", name = "billing", version = "6.2.0" }
+material = { group = "com.google.android.material", name = "material", version = "1.11.0" }
+
+# glide
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+glide-ksp = { group = "com.github.bumptech.glide", name = "ksp", version.ref = "glide" }
+
+# retrofit
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+retrofit-adapter-rxjava2 = { group = "com.squareup.retrofit2", name = "adapter-rxjava2", version.ref = "retrofit" }
+
+# room
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-rxjava2 = { group = "androidx.room", name = "room-rxjava2", version.ref = "room" }
+
+# other
+android-crop = { group = "com.soundcloud.android", name = "android-crop", version = "1.0.1" }
+bugly = { group = "com.tencent.bugly", name = "crashreport", version = "3.3.3" }
+leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version = "2.13" }
+logback-android = { group = "com.github.tony19", name = "logback-android", version = "2.0.0" }
+material-dialog = { group = "com.afollestad.material-dialogs", name = "core", version = "0.9.6.0" }
+rebound = { group = "com.facebook.rebound", name = "rebound", version = "0.3.8" }
+rxandroid = { group = "io.reactivex.rxjava2", name = "rxandroid", version = "2.1.1" }
+rxjava = { group = "io.reactivex.rxjava2", name = "rxjava", version = "2.2.19" }
+# noinspection GradleDependency
+rxpermissions = { group = "com.github.tbruyelle", name = "rxpermissions", version = "0.11" }
+sardine-android = { group = "com.github.thegrizzlylabs", name = "sardine-android", version = "0.9" }
+slf4j = { group = "org.slf4j", name = "slf4j-api", version = "2.0.4" }
+timber = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
+# noinspection GradleDependency
+tinypinyin = { group = "io.github.biezhi", name = "TinyPinyin", version = "2.0.3.RELEASE" }

@@ -9,7 +9,7 @@
 /*
 !/libs
 !/src
-!build.gradle
+!build.gradle.kts
 !Debug.jks
 !proguard-rules.pro
 !CMakeLists.txt

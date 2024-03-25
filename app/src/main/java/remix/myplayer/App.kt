@@ -110,6 +110,7 @@ class App : MultiDexApplication() {
     val processName = Util.getProcessName(Process.myPid())
     // 设置是否为上报进程
     val strategy = UserStrategy(context)
+    strategy.setAppChannel(BuildConfig.FLAVOR)
     strategy.isUploadProcess = processName == null || processName == packageName
     CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG, strategy)
     CrashReport.setIsDevelopmentDevice(this, BuildConfig.DEBUG)
