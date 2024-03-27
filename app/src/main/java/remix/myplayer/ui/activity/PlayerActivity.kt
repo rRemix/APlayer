@@ -274,9 +274,9 @@ class PlayerActivity : BaseMusicActivity() {
 
   public override fun onResume() {
     super.onResume()
-    if (this.isPortraitOrientation()) {
-      binding.viewPager.currentItem = 0
-    }
+//    if (this.isPortraitOrientation()) {
+//      binding.viewPager.currentItem = 0
+//    }
     //更新进度条
     ProgressThread().start()
   }
