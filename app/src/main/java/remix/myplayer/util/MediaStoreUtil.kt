@@ -260,7 +260,7 @@ object MediaStoreUtil {
         val genreId = cursor.getLong(0)
         if (genreId > 0) {
           val songs = getSongsByGenreId(genreId)
-          genres.add(Genre(genreId, cursor.getString(1), songs.size))
+          genres.add(Genre(genreId, cursor.getString(1) ?: "", songs.size))
         }
       }
     }
