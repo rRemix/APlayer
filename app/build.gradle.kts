@@ -54,7 +54,7 @@ android {
         buildConfigField(
             "String",
             "LASTFM_API_KEY",
-            "\"${properties.getProperty("GOOGLE_PLAY_LICENSE_KEY")}\""
+            "\"${properties.getProperty("LASTFM_API_KEY")}\""
         )
         buildConfigField(
             "String",
