@@ -22,8 +22,7 @@ fun readProperties(file: File): Properties {
     return properties
 }
 
-val properties =
-    readProperties(File(project.rootProject.projectDir, "local.properties"))
+val properties = readProperties(rootProject.file("local.properties"))
 
 kotlin {
     jvmToolchain(17)
@@ -66,6 +65,12 @@ android {
             "BUGLY_APPID",
             "\"${properties.getProperty("BUGLY_APPID")}\""
         )
+        // Only used in CI builds
+        buildConfigField(
+            "String",
+            "GITHUB_SHA",
+            "\"${System.getenv("GITHUB_SHA") ?: ""}\""
+        )
 
         ndk {
             abiFilters += listOf(
@@ -81,14 +86,18 @@ android {
 
     signingConfigs {
         create("debugConfig") {
-            storeFile = File(projectDir, "Debug.jks")
+            storeFile = project.file("Debug.jks")
             storePassword = "123456"
             keyAlias = "Debug"
             keyPassword = "123456"
+
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
         }
 
         create("releaseConfig") {
-            storeFile = File(properties.getProperty("keystore.storeFile") ?: "null")
+            storeFile = File(properties.getProperty("keystore.storeFile") ?: "")
             storePassword = properties.getProperty("keystore.storePassword")
             keyAlias = properties.getProperty("keystore.keyAlias")
             keyPassword = properties.getProperty("keystore.keyPassword")
@@ -120,6 +129,13 @@ android {
                     "proguard-rules.pro"
                 )
             )
+        }
+
+        create("ciRelease") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs["debugConfig"]
+            applicationIdSuffix = ".ci"
+            versionNameSuffix = "-CI"
         }
     }
 
