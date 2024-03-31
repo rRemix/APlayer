@@ -65,11 +65,10 @@ android {
             "BUGLY_APPID",
             "\"${properties.getProperty("BUGLY_APPID")}\""
         )
-        // Only used in CI builds
         buildConfigField(
             "String",
             "GITHUB_SHA",
-            "\"${System.getenv("GITHUB_SHA") ?: ""}\""
+            "\"${System.getenv("GITHUB_SHA")}\""
         )
 
         ndk {
@@ -131,6 +130,7 @@ android {
             )
         }
 
+        // For CI builds only
         create("ciRelease") {
             initWith(getByName("release"))
             signingConfig = signingConfigs["debugConfig"]
