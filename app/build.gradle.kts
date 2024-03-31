@@ -66,11 +66,6 @@ android {
             "BUGLY_APPID",
             "\"${properties.getProperty("BUGLY_APPID")}\""
         )
-        buildConfigField(
-            "String",
-            "GITHUB_SECRET_KEY",
-            "\"${properties.getProperty("GITHUB_SECRET_KEY")}\""
-        )
 
         ndk {
             abiFilters += listOf(
