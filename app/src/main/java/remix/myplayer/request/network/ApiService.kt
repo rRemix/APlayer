@@ -21,7 +21,6 @@ import retrofit2.http.*
  */
 interface ApiService {
   @GET("repos/{owner}/{repo}/releases/latest")
-  @Headers("token: " + BuildConfig.GITHUB_SECRET_KEY)
   fun fetchLatestRelease(@Path("owner") owner: String?, @Path("repo") repo: String?): Single<Release>
 
   //New Api

@@ -35,7 +35,6 @@ import kotlinx.coroutines.withContext
 import remix.myplayer.App.Companion.IS_GOOGLEPLAY
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
-import remix.myplayer.bean.misc.Feedback
 import remix.myplayer.bean.misc.Library
 import remix.myplayer.bean.misc.Library.Companion.getAllLibraryString
 import remix.myplayer.bean.mp3.Song
@@ -50,7 +49,9 @@ import remix.myplayer.helper.M3UHelper.exportPlayListToFile
 import remix.myplayer.helper.M3UHelper.importLocalPlayList
 import remix.myplayer.helper.M3UHelper.importM3UFile
 import remix.myplayer.helper.ShakeDetector
+import remix.myplayer.misc.AppInfo
 import remix.myplayer.misc.MediaScanner
+import remix.myplayer.misc.SystemInfo
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.misc.handler.MsgHandler
@@ -723,24 +724,12 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
 
   private fun gotoEmail() {
     fun send(sendLog: Boolean) {
-      val feedBack = Feedback(
-          BuildConfig.VERSION_NAME,
-          BuildConfig.VERSION_CODE.toString(),
-          Build.DISPLAY,
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Build.SUPPORTED_ABIS.joinToString(", ", "[", "]")
-          } else {
-            @Suppress("DEPRECATION")
-            "[" + Build.CPU_ABI + ", " + Build.CPU_ABI2 + "]"
-          },
-          Build.MANUFACTURER,
-          Build.MODEL,
-          Build.VERSION.RELEASE,
-          Build.VERSION.SDK_INT.toString()
-      )
       val emailIntent = Intent()
       emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback))
-      emailIntent.putExtra(Intent.EXTRA_TEXT, "\n\n\n" + feedBack)
+      emailIntent.putExtra(
+          Intent.EXTRA_TEXT,
+          "\n\n\nApp info:\n${AppInfo.prettyPrinted}\n\nSystem info:\n${SystemInfo.prettyPrinted}"
+      )
 
       tryLaunch(catch = {
         Timber.w(it)
