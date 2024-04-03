@@ -28,7 +28,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.soundcloud.android.crop.Crop
 import remix.myplayer.App
-import remix.myplayer.App.Companion.IS_GOOGLEPLAY
+import remix.myplayer.App.Companion.ENABLE_UPDATER
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.misc.Library
@@ -699,7 +699,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
   }
 
   private fun checkUpdate() {
-    if (!IS_GOOGLEPLAY && !alreadyCheck) {
+    if (ENABLE_UPDATER && !alreadyCheck) {
       UpdateAgent.forceCheck = false
       UpdateAgent.listener = UpdateListener(this)
       alreadyCheck = true
