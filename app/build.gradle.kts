@@ -153,14 +153,14 @@ android {
 
     flavorDimensions += "channel"
     productFlavors {
-        create("nonGoogle") {
+        create("nongoogle") {
             dimension = "channel"
             isDefault = true
         }
         create("google") {
             dimension = "channel"
         }
-        create("noUpdater") {
+        create("noupdater") {
             dimension = "channel"
         }
     }
@@ -242,6 +242,6 @@ dependencies {
     val googleImplementation by configurations
     googleImplementation(libs.billingclient)
 
-    val noUpdaterImplementation by configurations
-    noUpdaterImplementation(libs.billingclient)
+    val noupdaterImplementation by configurations
+    noupdaterImplementation(libs.billingclient)
 }
