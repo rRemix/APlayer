@@ -151,17 +151,24 @@ android {
         }
     }
 
-    flavorDimensions += "channel"
+    flavorDimensions += listOf("channel", "updater")
     productFlavors {
-        create("nongoogle") {
+        create("nonGoogle") {
             dimension = "channel"
             isDefault = true
         }
         create("google") {
             dimension = "channel"
         }
-        create("noupdater") {
-            dimension = "channel"
+
+        create("withUpdater") {
+            dimension = "updater"
+            isDefault = true
+            buildConfigField("boolean", "ENABLE_UPDATER", "true")
+        }
+        create("withoutUpdater") {
+            dimension = "updater"
+            buildConfigField("boolean", "ENABLE_UPDATER", "false")
         }
     }
 
@@ -187,6 +194,14 @@ android {
 
     dependenciesInfo {
         includeInApk = false
+    }
+}
+
+androidComponents {
+    beforeVariants { variantBuilder ->
+        if (variantBuilder.productFlavors.containsAll(listOf("channel" to "google", "updater" to "withUpdater"))) {
+            variantBuilder.enable = false
+        }
     }
 }
 
@@ -241,7 +256,4 @@ dependencies {
 
     val googleImplementation by configurations
     googleImplementation(libs.billingclient)
-
-    val noupdaterImplementation by configurations
-    noupdaterImplementation(libs.billingclient)
 }

@@ -32,7 +32,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import remix.myplayer.App.Companion.ENABLE_UPDATER
 import remix.myplayer.App.Companion.IS_GOOGLEPLAY
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
@@ -407,7 +406,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
       }
     }.start()
 
-    if (!ENABLE_UPDATER) {
+    if (!BuildConfig.ENABLE_UPDATER) {
       binding.settingUpdateContainer.visibility = View.GONE
     }
 
