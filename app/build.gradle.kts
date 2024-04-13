@@ -200,7 +200,13 @@ android {
 
 androidComponents {
     beforeVariants { variantBuilder ->
-        if (variantBuilder.productFlavors.containsAll(listOf("channel" to "google", "updater" to "withUpdater"))) {
+        if (variantBuilder.productFlavors.containsAll(
+                listOf(
+                    "channel" to "google",
+                    "updater" to "withUpdater"
+                )
+            )
+        ) {
             variantBuilder.enable = false
         }
     }
