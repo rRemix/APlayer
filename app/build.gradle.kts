@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 fun readProperties(file: File): Properties {
@@ -45,10 +46,6 @@ android {
 
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled = true
-
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
 
         buildConfigField(
             "String",
@@ -194,6 +191,10 @@ android {
 
     dependenciesInfo {
         includeInApk = false
+    }
+
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }
 
