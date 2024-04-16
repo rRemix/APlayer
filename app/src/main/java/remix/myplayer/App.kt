@@ -154,7 +154,5 @@ class App : MultiDexApplication() {
     //是否是googlePlay版本
     val IS_GOOGLEPLAY =
         !BuildConfig.DEBUG && BuildConfig.FLAVOR == "google"
-
-    val ENABLE_UPDATER = BuildConfig.FLAVOR == "nonGoogle"
   }
 }
