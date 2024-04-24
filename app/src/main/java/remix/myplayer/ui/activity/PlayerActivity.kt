@@ -14,6 +14,7 @@ import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.InsetDrawable
 import android.graphics.drawable.LayerDrawable
 import android.media.AudioManager
+import android.media.AudioManager.STREAM_MUSIC
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -25,16 +26,16 @@ import android.view.animation.Animation.AnimationListener
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.FragmentManager
 import androidx.palette.graphics.Palette
 import androidx.palette.graphics.Palette.Swatch
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
@@ -348,39 +349,28 @@ class PlayerActivity : BaseMusicActivity() {
     }
   }
 
-  @SuppressLint("CheckResult")
   private val onVolumeClick = View.OnClickListener { v ->
     when (v.id) {
-      R.id.volume_down -> Completable
-          .fromAction {
-            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                AudioManager.ADJUST_LOWER,
-                AudioManager.FLAG_PLAY_SOUND)
-          }
-          .subscribeOn(Schedulers.io())
-          .subscribe()
-      R.id.volume_up -> Completable
-          .fromAction {
-            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                AudioManager.ADJUST_RAISE,
-                AudioManager.FLAG_PLAY_SOUND)
-          }
-          .subscribeOn(Schedulers.io())
-          .subscribe()
+      R.id.volume_down, R.id.volume_up -> {
+        launch {
+          audioManager.adjustStreamVolume(
+            STREAM_MUSIC,
+            when (v.id) {
+              R.id.volume_down -> AudioManager.ADJUST_LOWER
+              R.id.volume_up -> AudioManager.ADJUST_RAISE
+              else -> AudioManager.ADJUST_SAME
+            },
+            AudioManager.FLAG_PLAY_SOUND
+          )
+          updateVolumeSeekbar()
+        }
+      }
       R.id.next_song -> if (bottomConfig == BOTTOM_SHOW_BOTH) {
         makeAndStartAnimation(binding.layoutPlayerVolume.nextSong, false)
         makeAndStartAnimation(binding.layoutPlayerVolume.volumeContainer, true)
         handler.removeCallbacks(volumeRunnable)
-        handler.postDelayed(volumeRunnable, DELAY_SHOW_NEXT_SONG.toLong())
+        handler.postDelayed(volumeRunnable, DELAY_SHOW_NEXT_SONG)
       }
-    }
-    if (v.id != R.id.next_song) {
-      Single.zip(Single.fromCallable { audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) },
-          Single.fromCallable { audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) },
-          BiFunction { max: Int, current: Int -> longArrayOf(max.toLong(), current.toLong()) })
-          .subscribeOn(Schedulers.io())
-          .observeOn(AndroidSchedulers.mainThread())
-          .subscribe { longs: LongArray -> binding.layoutPlayerVolume.volumeSeekbar.progress = (longs[1] * 1.0 / longs[0] * 100).toInt() }
     }
   }
 
@@ -474,35 +464,44 @@ class PlayerActivity : BaseMusicActivity() {
       }
     })
 
-    //音量的Seekbar
-    Single.zip(Single.fromCallable { audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) },
-        Single.fromCallable { audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) },
-        BiFunction { max: Int, current: Int -> intArrayOf(max, current) })
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe { ints: IntArray ->
-          val current = ints[1]
-          val max = ints[0]
-          binding.layoutPlayerVolume.volumeSeekbar.progress = (current * 1.0 / max * 100).toInt()
-          binding.layoutPlayerVolume.volumeSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-              if (bottomConfig == BOTTOM_SHOW_BOTH) {
-                handler.removeCallbacks(volumeRunnable)
-                handler.postDelayed(volumeRunnable, DELAY_SHOW_NEXT_SONG.toLong())
-              }
-              if (fromUser) {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-                    (seekBar.progress / 100f * max).toInt(),
-                    AudioManager.FLAG_PLAY_SOUND)
-              }
-            }
+    launch {
+      val volumeSeekbar = binding.layoutPlayerVolume.volumeSeekbar
+      val min = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        audioManager.getStreamMinVolume(STREAM_MUSIC)
+      } else 0
+      val max = audioManager.getStreamMaxVolume(STREAM_MUSIC)
+      val current = audioManager.getStreamVolume(STREAM_MUSIC)
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
-          })
+      runOnUiThread {
+        if (min != 0) {
+          @RequiresApi(Build.VERSION_CODES.O)
+          volumeSeekbar.min = min
         }
+        volumeSeekbar.max = max
+        volumeSeekbar.progress = current
+
+        volumeSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+          override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+            if (bottomConfig == BOTTOM_SHOW_BOTH) {
+              handler.removeCallbacks(volumeRunnable)
+              handler.postDelayed(volumeRunnable, DELAY_SHOW_NEXT_SONG)
+            }
+            if (fromUser) {
+              audioManager.setStreamVolume(
+                STREAM_MUSIC,
+                progress,
+                AudioManager.FLAG_PLAY_SOUND
+              )
+            }
+          }
+
+          override fun onStartTrackingTouch(seekBar: SeekBar) {}
+          override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        })
+      }
+    }
     if (bottomConfig == BOTTOM_SHOW_BOTH) {
-      handler.postDelayed(volumeRunnable, DELAY_SHOW_NEXT_SONG.toLong())
+      handler.postDelayed(volumeRunnable, DELAY_SHOW_NEXT_SONG)
     }
   }
 
@@ -733,9 +732,7 @@ class PlayerActivity : BaseMusicActivity() {
         try {
           //音量
           if (binding.layoutPlayerVolume.volumeSeekbar.visibility == View.VISIBLE) {
-            val max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-            val current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-            runOnUiThread { binding.layoutPlayerVolume.volumeSeekbar.progress = (current * 1.0 / max * 100).toInt() }
+            updateVolumeSeekbar()
           }
           if (!isPlaying()) {
             sleep(500)
@@ -997,6 +994,13 @@ class PlayerActivity : BaseMusicActivity() {
     binding.seekbar.progress = currentTime
   }
 
+  private fun updateVolumeSeekbar() {
+    val volume = audioManager.getStreamVolume(STREAM_MUSIC)
+    runOnUiThread {
+      binding.layoutPlayerVolume.volumeSeekbar.progress = volume
+    }
+  }
+
   @OnHandleMessage
   fun handleInternal(msg: Message) {
 //        if(msg.what == UPDATE_BG){
@@ -1044,7 +1048,7 @@ class PlayerActivity : BaseMusicActivity() {
     const val BACKGROUND_CUSTOM_IMAGE = 2
 
     private const val FRAGMENT_COUNT = 2
-    private const val DELAY_SHOW_NEXT_SONG = 3000
+    private const val DELAY_SHOW_NEXT_SONG: Long = 3000
 
     const val ACTION_UPDATE_NEXT = "remix.myplayer.update.next_song"
 
