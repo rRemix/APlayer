@@ -4,7 +4,7 @@ kotlin = "1.9.23"
 ksp = "1.9.23-1.0.19"
 
 glide = "4.16.0"
-retrofit = "2.9.0"
+retrofit = "2.11.0"
 room = "2.6.1"
 
 
@@ -52,7 +52,7 @@ room-rxjava2 = { group = "androidx.room", name = "room-rxjava2", version.ref = "
 android-crop = { group = "com.soundcloud.android", name = "android-crop", version = "1.0.1" }
 bugly = { group = "com.tencent.bugly", name = "crashreport", version = "3.3.3" }
 leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version = "2.13" }
-logback-android = { group = "com.github.tony19", name = "logback-android", version = "2.0.0" }
+logback-android = { group = "com.github.tony19", name = "logback-android", version = "3.0.0" }
 material-dialog = { group = "com.afollestad.material-dialogs", name = "core", version = "0.9.6.0" }
 rebound = { group = "com.facebook.rebound", name = "rebound", version = "0.3.8" }
 rxandroid = { group = "io.reactivex.rxjava2", name = "rxandroid", version = "2.1.1" }
@@ -60,7 +60,7 @@ rxjava = { group = "io.reactivex.rxjava2", name = "rxjava", version = "2.2.19" }
 # noinspection GradleDependency
 rxpermissions = { group = "com.github.tbruyelle", name = "rxpermissions", version = "0.11" }
 sardine-android = { group = "com.github.thegrizzlylabs", name = "sardine-android", version = "0.9" }
-slf4j = { group = "org.slf4j", name = "slf4j-api", version = "2.0.4" }
+slf4j = { group = "org.slf4j", name = "slf4j-api", version = "2.0.13" }
 timber = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
 # noinspection GradleDependency
 tinypinyin = { group = "io.github.biezhi", name = "TinyPinyin", version = "2.0.3.RELEASE" }
