@@ -19,6 +19,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -163,10 +164,10 @@ fun getPendingIntentFlag() =
 
 private val musicExt = setOf("wav","aif","au","mp3","ram","wma","mmf","amr","aac","flac")
 fun DavResource.isAudio(): Boolean {
-  if (isDirectory || path.isNullOrEmpty() || !contentType.startsWith("audio")) {
+  if (isDirectory || path.isNullOrEmpty()) {
     return false
   }
-
   val ext = path.substringAfterLast(".")
-  return musicExt.contains(ext.toLowerCase())
+  return musicExt.contains(ext.lowercase(Locale.getDefault())) &&
+      (contentType == "application/octet-stream" || contentType.startsWith("audio"))
 }
