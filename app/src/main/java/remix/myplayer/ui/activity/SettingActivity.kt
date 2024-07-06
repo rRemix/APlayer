@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.EXTRA_ALLOW_MULTIPLE
 import android.content.SharedPreferences
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
@@ -869,6 +870,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
         .itemsCallback { _, _, select, _ ->
           if (select == 0) {
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+              putExtra(EXTRA_ALLOW_MULTIPLE, true)
               type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("m3u")
               addCategory(Intent.CATEGORY_OPENABLE)
             }
@@ -1340,37 +1342,50 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
         }
       REQUEST_IMPORT_PLAYLIST -> {
         if (resultCode == Activity.RESULT_OK) {
-          data?.data?.let { uri ->
+          if (data?.data != null) {
+            val uri = data.data ?: return
             DatabaseRepository
-                .getInstance()
-                .getAllPlaylist()
-                .compose(applySingleScheduler())
-                .subscribe { playlists ->
-                  getBaseDialog(this)
-                      .title(R.string.add_to_playlist)
-                      .items(playlists.map { it.name })
-                      .itemsCallback { _, _, _, text ->
-                        disposables.add(importM3UFile(this, uri, text.toString(), false))
-                      }
-                      .neutralText(R.string.create_playlist)
-                      .onNeutral { _, _ ->
-                        val m3uFile = DocumentFile.fromSingleUri(this, uri)
-                        getBaseDialog(this)
-                            .title(R.string.new_playlist)
-                            .positiveText(R.string.create)
-                            .negativeText(R.string.cancel)
-                            .content(R.string.input_playlist_name)
-                            .input(null, m3uFile?.name?.removeSuffix(".m3u")) { _, input ->
-                              if (playlists.map { it.name }.contains(input.toString())) {
-                                ToastUtil.show(this, R.string.playlist_already_exist)
-                              } else if (!input.isNullOrBlank()){
-                                disposables.add(importM3UFile(this, uri, input.toString(), true))
-                              }
-                            }
-                            .show()
+              .getInstance()
+              .getAllPlaylist()
+              .compose(applySingleScheduler())
+              .subscribe { playlists ->
+                getBaseDialog(this)
+                  .title(R.string.add_to_playlist)
+                  .items(playlists.map { it.name })
+                  .itemsCallback { _, _, _, text ->
+                    disposables.add(importM3UFile(this, uri, text.toString(), false))
+                  }
+                  .neutralText(R.string.create_playlist)
+                  .onNeutral { _, _ ->
+                    val m3uFile = DocumentFile.fromSingleUri(this, uri)
+                    getBaseDialog(this)
+                      .title(R.string.new_playlist)
+                      .positiveText(R.string.create)
+                      .negativeText(R.string.cancel)
+                      .content(R.string.input_playlist_name)
+                      .input(null, m3uFile?.name?.removeSuffix(".m3u")) { _, input ->
+                        if (playlists.map { it.name }.contains(input.toString())) {
+                          ToastUtil.show(this, R.string.playlist_already_exist)
+                        } else if (!input.isNullOrBlank()){
+                          disposables.add(importM3UFile(this, uri, input.toString(), true))
+                        }
                       }
                       .show()
-                }
+                  }
+                  .show()
+              }
+          } else {
+            // 多个按顺序直接导入
+            data?.clipData?.let { clipData ->
+              val pairs = ArrayList<Pair<Uri, DocumentFile>>()
+              for (i in 0 until clipData.itemCount) {
+                val uri = clipData.getItemAt(i).uri
+                pairs.add(Pair(uri, DocumentFile.fromSingleUri(this, uri) ?: continue))
+              }
+              pairs.forEach {
+                importM3UFile(this, it.first, it.second.name ?: "unknown", true)
+              }
+            }
           }
         }
       }
