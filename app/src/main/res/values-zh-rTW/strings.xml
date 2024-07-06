@@ -472,4 +472,5 @@
   <string name="can_t_be_empty">%s不能为空</string>
   <string name="connect">連接</string>
   <string name="edit">編輯</string>
+  <string name="speed_at_2x">2x倍速播放中</string>
 </resources>

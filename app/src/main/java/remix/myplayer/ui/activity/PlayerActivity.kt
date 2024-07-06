@@ -172,8 +172,7 @@ class PlayerActivity : BaseMusicActivity() {
 //      setTheme(R.style.AudioHolderStyle_Night);
 //    }
     val superThemeRes = ThemeStore.themeRes
-    val themeRes: Int
-    themeRes = when (superThemeRes) {
+    val themeRes: Int = when (superThemeRes) {
       R.style.Theme_APlayer_Black -> R.style.PlayerActivityStyle_Black
       R.style.Theme_APlayer_Dark -> R.style.PlayerActivityStyle_Dark
       else -> R.style.PlayerActivityStyle

@@ -470,6 +470,7 @@
   <string name="webdav_hint_server">Server</string>
   <string name="webdav_hint_path">Path(optional)</string>
   <string name="can_t_be_empty">%s can\'t be empty</string>
-  <string name="connect">连接</string>
-  <string name="edit">编辑</string>
+  <string name="connect">Connect</string>
+  <string name="edit">Edit</string>
+  <string name="speed_at_2x">Playing at 2x speed</string>
 </resources>

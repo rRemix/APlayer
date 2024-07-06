@@ -336,7 +336,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   private var hasPermission = false
 
   private var alreadyUnInit: Boolean = false
-  private var speed = 1.0f
+  var speed = 1.0f
+    private set
 
 
   /**
@@ -1555,7 +1556,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
   }
 
-  private fun setSpeed(speed: Float) {
+  fun setSpeed(speed: Float) {
     if (prepared && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && mediaPlayer.isPlaying) {
       try {
         mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
