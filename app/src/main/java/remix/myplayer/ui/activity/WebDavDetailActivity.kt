@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +11,7 @@ import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivityWebdavDetailBinding
@@ -24,23 +26,30 @@ import remix.myplayer.ui.adapter.OnItemClickListener
 import remix.myplayer.ui.adapter.WebDavDetailAdapter
 import remix.myplayer.util.MusicUtil
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListener {
   private val webdav by lazy {
     intent.getSerializableExtra(EXTRA_WEBDAV) as WebDav
   }
   private val sardine by lazy {
-    OkHttpSardine().apply {
+    OkHttpSardine(OkHttpClient.Builder()
+      .connectTimeout(20L, TimeUnit.SECONDS)
+      .readTimeout(20L, TimeUnit.SECONDS)
+      .writeTimeout(20L, TimeUnit.SECONDS)
+      .build()).apply {
       setCredentials(webdav.account, webdav.pwd)
     }
   }
-  private var currentUrl: String = ""
+  
+  private lateinit var binding: ActivityWebdavDetailBinding
+  
   private val adapter by lazy {
     WebDavDetailAdapter(webdav).apply {
       onItemClickListener = object : OnItemClickListener<DavResource> {
-        override fun onItemClick(view: View, resource: DavResource, position: Int) {
-          if (resource.isDirectory) {
-            reload(resource.path)
+        override fun onItemClick(view: View, data: DavResource, position: Int) {
+          if (data.isDirectory) {
+            reload(webdav.base().plus(data.path))
           } else {
             val resources = getWebDavResources()
             if (resources.isEmpty()) {
@@ -58,7 +67,7 @@ class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListene
                   account = webdav.account ?: "",
                   pwd = webdav.pwd ?: ""
                 )
-                if (it == resource) {
+                if (it == data) {
                   select = remote
                 }
                 remote
@@ -79,7 +88,6 @@ class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListene
       }
     }
   }
-  private lateinit var binding: ActivityWebdavDetailBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -93,11 +101,11 @@ class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListene
     binding.refresh.setOnRefreshListener(this)
     binding.rv.adapter = adapter
 
-    fetchWebDav(webdav.last())
+    fetchWebDav(webdav.lastUrl)
   }
 
   override fun onRefresh() {
-    reload(webdav.lastPath ?: return)
+    reload(webdav.lastUrl)
     binding.refresh.isRefreshing = false
   }
 
@@ -106,36 +114,32 @@ class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListene
   }
 
   override fun onClickNavigation() {
-    if (webdav.isRoot(currentUrl)) {
+    if (webdav.server == webdav.lastUrl) { // 根路径
       super.onClickNavigation()
       return
     }
 
-    var url = currentUrl.removeSuffix("/")
+    var url = webdav.lastUrl.removeSuffix("/")
     url = url.substring(0, url.lastIndexOf('/'))
-
-    if (url == webdav.root()) {
-      reload(webdav.initialPath())
-    } else {
-      reload(url.replace(webdav.root(), ""))
-    }
+    
+    reload(url)
   }
 
+  @SuppressLint("MissingSuperCall")
   override fun onBackPressed() {
     onClickNavigation()
   }
 
-  private fun reload(path: String, showLoading: Boolean = true) {
-    fetchWebDav(webdav.base().plus(path), showLoading)
-    webdav.lastPath = path
-    launch {
-      AppDatabase.getInstance(applicationContext).webDavDao().insertOrReplace(webdav)
-    }
+  private fun reload(url: String, showLoading: Boolean = true) {
+    fetchWebDav(url, showLoading, onSuccess = {
+      launch {
+        webdav.lastUrl = url
+        AppDatabase.getInstance(applicationContext).webDavDao().insertOrReplace(webdav)
+      }
+    })
   }
 
-  private fun fetchWebDav(url: String, showLoading: Boolean = true) {
-    currentUrl = url.removeSuffix("/")
-
+  private fun fetchWebDav(url: String, showLoading: Boolean = true, onSuccess: (() -> Unit)? = null) {
     if (showLoading) {
       showLoading()
     }
@@ -148,6 +152,7 @@ class WebDavDetailActivity : MenuActivity(), SwipeRefreshLayout.OnRefreshListene
           return@launch
         }
         adapter.setWebDavResources(davResources.takeLast(davResources.size - 1))
+        onSuccess?.invoke()
       } catch (e: Exception) {
         Timber.e(e)
       } finally {

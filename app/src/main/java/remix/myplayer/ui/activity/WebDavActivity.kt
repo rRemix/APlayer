@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import remix.myplayer.R
 import remix.myplayer.databinding.ActivityWebdavBinding
 import remix.myplayer.databinding.DialogCreateWebdavBinding
@@ -181,17 +180,15 @@ class WebDavActivity : ToolbarActivity(), CoroutineScope by MainScope() {
         ToastUtil.show(activity, R.string.can_t_be_empty, activity.getString(R.string.pwd))
         return
       }
-
-//      val initialPath = binding.pathLayout.editText?.text?.toString() ?: "/"
+      
       if (webDav == null) {
-        insertOrReplaceWebDav(activity, WebDav(alias, account, pwd, server))
+        insertOrReplaceWebDav(activity, WebDav(alias, account, pwd, server, server))
       } else {
         webDav.alias = alias
         webDav.server = server
-//        webDav.initialPath = initialPath
         webDav.account = account
         webDav.pwd = pwd
-        webDav.lastPath = ""
+        webDav.lastUrl = server
         insertOrReplaceWebDav(activity, webDav)
       }
     }
@@ -203,7 +200,7 @@ class WebDavActivity : ToolbarActivity(), CoroutineScope by MainScope() {
         sardine.setCredentials(webdav.account, webdav.pwd)
         try {
           val davResources = withContext(Dispatchers.IO) {
-            sardine.list(webdav.root())
+            sardine.list(webdav.server)
           }
           if (davResources.isNotEmpty()) {
             AppDatabase.getInstance(activity.applicationContext).webDavDao().insertOrReplace(webdav)

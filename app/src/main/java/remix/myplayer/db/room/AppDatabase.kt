@@ -8,6 +8,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import remix.myplayer.db.Migrations.migration3to4
+import remix.myplayer.db.Migrations.migration4to5
 import remix.myplayer.db.room.AppDatabase.Companion.VERSION
 import remix.myplayer.db.room.dao.HistoryDao
 import remix.myplayer.db.room.dao.PlayListDao
@@ -44,11 +46,11 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun webDavDao(): WebDavDao
 
   companion object {
-    const val VERSION = 4
-
+    const val VERSION = 5
+    
     @Volatile
     private var INSTANCE: AppDatabase? = null
-
+    
     @JvmStatic
     fun getInstance(context: Context): AppDatabase =
       INSTANCE ?: synchronized(this) {
@@ -57,26 +59,11 @@ abstract class AppDatabase : RoomDatabase() {
 
     private fun buildDatabase(context: Context): AppDatabase {
       val migration1to3 = object : Migration(1, 3) {
-        override fun migrate(database: SupportSQLiteDatabase) {
+        override fun migrate(db: SupportSQLiteDatabase) {
         }
 
       }
-      val migration3to4 = object : Migration(3, 4) {
-        override fun migrate(database: SupportSQLiteDatabase) {
-          database.execSQL("ALTER TABLE `PlayQueue` ADD COLUMN `title` TEXT NOT NULL DEFAULT ''")
-          database.execSQL("ALTER TABLE `PlayQueue` ADD COLUMN `data` TEXT NOT NULL DEFAULT ''")
-          database.execSQL("ALTER TABLE `PlayQueue` ADD COLUMN `account` TEXT")
-          database.execSQL("ALTER TABLE `PlayQueue` ADD COLUMN `pwd` TEXT")
-
-          database.execSQL("CREATE TABLE IF NOT EXISTS `WebDav` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `alias` TEXT NOT NULL, `account` TEXT, `pwd` TEXT, `server` TEXT NOT NULL, `lastPath` TEXT, `createAt` INTEGER NOT NULL)")
-        }
-      }
-      val migration4to5 = object : Migration(4, 5) {
-        override fun migrate(database: SupportSQLiteDatabase) {
-          database.execSQL("DROP TABLE `WebDav`")
-          database.execSQL("CREATE TABLE IF NOT EXISTS `WebDav` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `alias` TEXT NOT NULL, `account` TEXT, `pwd` TEXT, `server` TEXT NOT NULL, `lastPath` TEXT, `createAt` INTEGER NOT NULL)")
-        }
-      }
+      
       val database =
         Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "aplayer.db")
           .addMigrations(migration1to3)

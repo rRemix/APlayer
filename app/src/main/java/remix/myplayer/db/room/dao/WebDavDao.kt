@@ -11,7 +11,7 @@ import remix.myplayer.db.room.model.WebDav
 @Dao
 interface WebDavDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  suspend fun insertOrReplace(WebDav: WebDav): Long
+  suspend fun insertOrReplace(webdav: WebDav): Long
 
   @Query(
     """
