@@ -21,7 +21,6 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
@@ -249,7 +248,7 @@ public class Theme {
 
   }
 
-  public static void setLightNavigationbarAuto(Activity activity, boolean enabled) {
+  public static void setLightNavigationBarAuto(Activity activity, boolean enabled) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       final View decorView = activity.getWindow().getDecorView();
       int systemUiVisibility = decorView.getSystemUiVisibility();

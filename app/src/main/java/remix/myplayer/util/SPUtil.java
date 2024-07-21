@@ -129,6 +129,7 @@ public class SPUtil {
 
     String LYRIC_FONT_SIZE = "lyric_font_size";
     String LYRIC_RESET_ON_16000 = "lyric_reset_on_16000";
+    String LYRIC_LOCAL_TIP_SHOWN = "lyric_local_tip_shown";
   }
 
   public interface COVER_KEY {

@@ -117,7 +117,7 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && sColoredNavigation) {
       val navigationColor = navigationBarColor
       window.navigationBarColor = navigationColor
-      Theme.setLightNavigationbarAuto(this, ColorUtil.isColorLight(navigationColor))
+      Theme.setLightNavigationBarAuto(this, ColorUtil.isColorLight(navigationColor))
     }
   }
 

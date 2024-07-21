@@ -16,6 +16,7 @@ import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.service.Command
 import remix.myplayer.theme.Theme.getBaseDialog
+import remix.myplayer.ui.ViewCommon
 import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.ui.dialog.TimerDialog
@@ -43,74 +44,10 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
     val activity = ref.get() ?: return true
     when (item.itemId) {
       R.id.menu_lyric -> {
-        val alreadyIgnore = (SPUtil
-            .getValue(ref.get(), SPUtil.LYRIC_KEY.NAME, song.id.toString(),
-                SPUtil.LYRIC_KEY.LYRIC_DEFAULT) == SPUtil.LYRIC_KEY.LYRIC_IGNORE)
-
-        val lyricFragment = ref.get()?.lyricFragment ?: return true
-        getBaseDialog(ref.get())
-            .items(
-                getString(R.string.embedded_lyric),
-                getString(R.string.local),
-                getString(R.string.kugou),
-                getString(R.string.netease),
-                getString(R.string.qq),
-                getString(R.string.select_lrc),
-                getString(if (!alreadyIgnore) R.string.ignore_lrc else R.string.cancel_ignore_lrc),
-                getString(R.string.lyric_adjust_font_size),
-                getString(R.string.change_offset))
-            .itemsCallback { dialog, itemView, position, text ->
-              when (position) {
-                0, 1, 2, 3, 4 -> { //0内嵌 1本地 2酷狗 3网易 4qq
-                  SPUtil.putValue(ref.get(), SPUtil.LYRIC_KEY.NAME, song.id.toString(), position + 2)
-                  lyricFragment.updateLrc(song, true)
-                  sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
-                }
-                5 -> { //手动选择歌词
-                  val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                    type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("lrc")
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                  }
-                  Util.startActivityForResultSafely(
-                      activity,
-                      intent,
-                      PlayerActivity.REQUEST_SELECT_LYRIC
-                  )
-                }
-                6 -> { //忽略或者取消忽略
-                  getBaseDialog(activity)
-                      .title(if (!alreadyIgnore) R.string.confirm_ignore_lrc else R.string.confirm_cancel_ignore_lrc)
-                      .negativeText(R.string.cancel)
-                      .positiveText(R.string.confirm)
-                      .onPositive { dialog1, which ->
-                        if (!alreadyIgnore) {//忽略
-                          SPUtil.putValue(activity, SPUtil.LYRIC_KEY.NAME, song.id.toString(),
-                              SPUtil.LYRIC_KEY.LYRIC_IGNORE)
-                          lyricFragment.updateLrc(song)
-                        } else {//取消忽略
-                          SPUtil.putValue(activity, SPUtil.LYRIC_KEY.NAME, song.id.toString(),
-                              SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
-                          lyricFragment.updateLrc(song)
-                        }
-                        sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
-                      }
-                      .show()
-                }
-                7 -> { //字体大小调整
-                  getBaseDialog(ref.get())
-                    .items(R.array.lyric_font_size)
-                    .itemsCallback { dialog, itemView, position, text ->
-                      lyricFragment.setLyricScalingFactor(position)
-                    }
-                    .show()
-                }
-                8 -> { //歌词时间轴调整
-                  activity.showLyricOffsetView()
-                }
-              }
-
-            }
-            .show()
+        ViewCommon.showLocalLyricTip(activity) {
+          onClickLyric(activity)
+        }
+        return true
       }
       R.id.menu_edit -> {
         if (!song.isLocal()) {
@@ -203,5 +140,87 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
       }
     }
     return true
+  }
+  
+  private fun onClickLyric(activity: PlayerActivity) {
+    val alreadyIgnore = (SPUtil
+      .getValue(
+        ref.get(), SPUtil.LYRIC_KEY.NAME, song.id.toString(),
+        SPUtil.LYRIC_KEY.LYRIC_DEFAULT
+      ) == SPUtil.LYRIC_KEY.LYRIC_IGNORE)
+    
+    val lyricFragment = ref.get()?.lyricFragment ?: return
+    getBaseDialog(ref.get())
+      .items(
+        getString(R.string.embedded_lyric),
+        getString(R.string.local),
+        getString(R.string.kugou),
+        getString(R.string.netease),
+        getString(R.string.qq),
+        getString(R.string.select_lrc),
+        getString(if (!alreadyIgnore) R.string.ignore_lrc else R.string.cancel_ignore_lrc),
+        getString(R.string.lyric_adjust_font_size),
+        getString(R.string.change_offset)
+      )
+      .itemsCallback { dialog, itemView, position, text ->
+        when (position) {
+          0, 1, 2, 3, 4 -> { //0内嵌 1本地 2酷狗 3网易 4qq
+            SPUtil.putValue(ref.get(), SPUtil.LYRIC_KEY.NAME, song.id.toString(), position + 2)
+            lyricFragment.updateLrc(song, true)
+            sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
+          }
+          
+          5 -> { //手动选择歌词
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+              type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("lrc")
+              addCategory(Intent.CATEGORY_OPENABLE)
+            }
+            Util.startActivityForResultSafely(
+              activity,
+              intent,
+              PlayerActivity.REQUEST_SELECT_LYRIC
+            )
+          }
+          
+          6 -> { //忽略或者取消忽略
+            getBaseDialog(activity)
+              .title(if (!alreadyIgnore) R.string.confirm_ignore_lrc else R.string.confirm_cancel_ignore_lrc)
+              .negativeText(R.string.cancel)
+              .positiveText(R.string.confirm)
+              .onPositive { dialog1, which ->
+                if (!alreadyIgnore) {//忽略
+                  SPUtil.putValue(
+                    activity, SPUtil.LYRIC_KEY.NAME, song.id.toString(),
+                    SPUtil.LYRIC_KEY.LYRIC_IGNORE
+                  )
+                  lyricFragment.updateLrc(song)
+                } else {//取消忽略
+                  SPUtil.putValue(
+                    activity, SPUtil.LYRIC_KEY.NAME, song.id.toString(),
+                    SPUtil.LYRIC_KEY.LYRIC_DEFAULT
+                  )
+                  lyricFragment.updateLrc(song)
+                }
+                sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
+              }
+              .show()
+          }
+          
+          7 -> { //字体大小调整
+            getBaseDialog(ref.get())
+              .items(R.array.lyric_font_size)
+              .itemsCallback { dialog, itemView, position, text ->
+                lyricFragment.setLyricScalingFactor(position)
+              }
+              .show()
+          }
+          
+          8 -> { //歌词时间轴调整
+            activity.showLyricOffsetView()
+          }
+        }
+        
+      }
+      .show()
   }
 }

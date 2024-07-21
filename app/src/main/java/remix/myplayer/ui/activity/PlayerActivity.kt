@@ -186,7 +186,7 @@ class PlayerActivity : BaseMusicActivity() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && ThemeStore.sColoredNavigation) {
       val navigationColor = ThemeStore.getBackgroundColorMain(this)
       window.navigationBarColor = navigationColor
-      Theme.setLightNavigationbarAuto(this, ColorUtil.isColorLight(navigationColor))
+      Theme.setLightNavigationBarAuto(this, ColorUtil.isColorLight(navigationColor))
     }
   }
 
