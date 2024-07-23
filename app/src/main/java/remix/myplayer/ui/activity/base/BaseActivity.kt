@@ -42,6 +42,8 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
   var toDeleteSongs: ArrayList<Song>? = null
 
+  private var dialog: Dialog? = null
+  
   private val loadingDialog by lazy {
     Theme.getBaseDialog(this)
       .title(R.string.loading)
@@ -124,6 +126,7 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
   override fun onDestroy() {
     super.onDestroy()
     isDestroyed = true
+    dialog?.dismiss()
   }
 
   override fun isDestroyed(): Boolean {
@@ -201,6 +204,15 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
       loadingDialog.dismiss()
     }
   }
+  
+  protected fun showDialog(newDialog: Dialog) {
+    dialog?.dismiss()
+    if (!isFinishing && !isDestroyed && hasWindowFocus()) {
+      dialog = newDialog
+      newDialog.show()
+    }
+  }
+  
 
   companion object {
     val NECESSARY_PERMISSIONS =

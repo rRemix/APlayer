@@ -5,6 +5,7 @@ import android.app.Activity
 import android.text.TextUtils
 import android.view.View
 import android.widget.PopupMenu
+import com.tencent.bugly.crashreport.CrashReport
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -413,7 +414,11 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
           true
         }
         if (!activity.isFinishing && !activity.isDestroyed && activity.hasWindowFocus()) {
-          show()
+          try {
+            show()
+          } catch (e: Exception) {
+            CrashReport.postCatchedException(Exception("ac: $activity", e))
+          }
         }
       }
     }

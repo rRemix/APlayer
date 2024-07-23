@@ -43,6 +43,7 @@ import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
 import remix.myplayer.misc.interfaces.OnItemClickListener
+import remix.myplayer.misc.isValidGlideContext
 import remix.myplayer.misc.menu.LibraryListener.Companion.EXTRA_COVER
 import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.misc.update.DownloadService
@@ -128,6 +129,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
 
   override fun onDestroy() {
     super.onDestroy()
+    handler.removeCallbacksAndMessages(null)
     unregisterLocalReceiver(receiver)
   }
 
@@ -169,7 +171,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
       SPUtil.putValue(this, SPUtil.OTHER_KEY.NAME, SPUtil.OTHER_KEY.LAST_OPEN_TIME, System.currentTimeMillis())
       if (System.currentTimeMillis() - lastOpenTime >= TimeUnit.DAYS.toMillis(2)) {
         handler.postDelayed({
-          Theme.getBaseDialog(this)
+          showDialog(Theme.getBaseDialog(this)
             .title(R.string.support_developer)
             .positiveText(R.string.go)
             .negativeText(R.string.cancel)
@@ -182,7 +184,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
             .onNeutral { _, _ ->
               SPUtil.putValue(this, SPUtil.OTHER_KEY.NAME, SPUtil.OTHER_KEY.SUPPORT_NO_MORE_PROMPT, true)
             }
-            .show()
+            .build())
         }, 1500)
       }
     }
@@ -639,13 +641,16 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     val currentSong = MusicServiceRemote.getCurrentSong()
     if (currentSong != Song.EMPTY_SONG) {
       binding.navigationView.findViewById<TextView>(R.id.tv_header).text = getString(R.string.play_now, currentSong.title)
-      Glide.with(this)
+      if (isValidGlideContext()) {
+        Glide.with(this)
           .load(currentSong)
           .centerCrop()
           .signature(ObjectKey(UriFetcher.albumVersion))
           .placeholder(Theme.resolveDrawable(this, R.attr.default_album))
           .error(Theme.resolveDrawable(this, R.attr.default_album))
           .into(binding.navigationView.findViewById(R.id.iv_header))
+      }
+      
     }
   }
 
