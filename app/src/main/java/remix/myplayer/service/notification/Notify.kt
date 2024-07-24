@@ -109,9 +109,9 @@ abstract class Notify internal constructor(internal var service: MusicService) {
       }
     }
     if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         service.startForeground(PLAYING_NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
-      } else{
+      } else {
         service.startForeground(PLAYING_NOTIFICATION_ID, notification)
       }
     } else {

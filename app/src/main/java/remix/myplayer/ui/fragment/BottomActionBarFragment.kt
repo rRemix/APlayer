@@ -109,15 +109,13 @@ class BottomActionBarFragment : BaseMusicFragment<BottomActionbarBinding>() {
       return
     }
     val intent = Intent(requireContext(), PlayerActivity::class.java)
-    val bundle = Bundle()
-    intent.putExtras(bundle)
     val activity: Activity? = activity
     if (activity != null && !activity.isDestroyed) {
       activity.startActivity(intent)
     }
   }
 
-  lateinit var gestureDetector: GestureDetector
+  private lateinit var gestureDetector: GestureDetector
 
   internal class GestureListener(fragment: BottomActionBarFragment) : SimpleOnGestureListener() {
     private val reference: WeakReference<BottomActionBarFragment> = WeakReference(fragment)

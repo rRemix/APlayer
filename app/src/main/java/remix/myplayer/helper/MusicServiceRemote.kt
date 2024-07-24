@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.*
 import android.media.MediaPlayer
 import android.os.IBinder
+import androidx.core.content.ContextCompat
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -23,12 +24,16 @@ object MusicServiceRemote {
 //    if (!Util.isAppOnForeground()) {
 //      return null
 //    }
-    var realActivity: Activity? = (context as Activity).parent
-    if (realActivity == null)
-      realActivity = context
+    val realActivity = (context as Activity).parent ?: context
     val contextWrapper = ContextWrapper(realActivity)
-    contextWrapper.startService(Intent(contextWrapper, MusicService::class.java))
-
+    val intent = Intent(contextWrapper, MusicService::class.java)
+    
+    try {
+      context.startService(intent)
+    } catch (e: Exception) {
+      ContextCompat.startForegroundService(context, intent)
+    }
+    
     val binder = ServiceBinder(callback)
 
     if (contextWrapper.bindService(Intent().setClass(contextWrapper, MusicService::class.java), binder, Context.BIND_AUTO_CREATE)) {

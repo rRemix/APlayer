@@ -43,8 +43,11 @@ class SongPopupListener(activity: BaseActivity,
             .putExtra(EXTRA_SONG, song))
       }
       R.id.menu_add_to_playlist -> {
-        AddtoPlayListDialog.newInstance(listOf(song.id))
-            .show(activity.supportFragmentManager, AddtoPlayListDialog::class.java.simpleName)
+        val fm = activity.supportFragmentManager
+        if (!fm.isDestroyed && !fm.isStateSaved) {
+          AddtoPlayListDialog.newInstance(listOf(song.id))
+            .show(fm, AddtoPlayListDialog::class.java.simpleName)
+        }
       }
       R.id.menu_add_to_play_queue -> {
         DatabaseRepository.getInstance()

@@ -24,6 +24,7 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.annotation.WorkerThread
+import androidx.core.app.ServiceCompat
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
@@ -613,6 +614,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
 
       override fun onStop() {
+        pause(false)
+        notify.cancelPlayingNotify()
         stopSelf()
       }
 

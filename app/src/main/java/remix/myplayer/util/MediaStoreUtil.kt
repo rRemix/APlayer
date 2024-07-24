@@ -15,6 +15,7 @@ import android.provider.MediaStore.Audio.AudioColumns
 import android.provider.MediaStore.Audio.Genres
 import android.provider.Settings
 import androidx.annotation.WorkerThread
+import com.tencent.bugly.crashreport.CrashReport
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Album
@@ -249,20 +250,24 @@ object MediaStoreUtil {
     }
 
     val genres: MutableList<Genre> = ArrayList()
-    context.contentResolver.query(
-      Genres.EXTERNAL_CONTENT_URI,
-      arrayOf(Genres._ID, Genres.NAME),
-      null,
-      null,
-      SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.GENRE_SORT_ORDER, SortOrder.GENRE_A_Z)
-    )?.use { cursor ->
-      while (cursor.moveToNext()) {
-        val genreId = cursor.getLong(0)
-        if (genreId > 0) {
-          val songs = getSongsByGenreId(genreId)
-          genres.add(Genre(genreId, cursor.getString(1) ?: "", songs.size))
+    try {
+      context.contentResolver.query(
+        Genres.EXTERNAL_CONTENT_URI,
+        arrayOf(Genres._ID, Genres.NAME),
+        null,
+        null,
+        SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.GENRE_SORT_ORDER, SortOrder.GENRE_A_Z)
+      )?.use { cursor ->
+        while (cursor.moveToNext()) {
+          val genreId = cursor.getLong(0)
+          if (genreId > 0) {
+            val songs = getSongsByGenreId(genreId)
+            genres.add(Genre(genreId, cursor.getString(1) ?: "", songs.size))
+          }
         }
       }
+    } catch (e: Exception) {
+      CrashReport.postCatchedException(e)
     }
     return genres
   }
@@ -651,9 +656,15 @@ object MediaStoreUtil {
           newSelectionValues, selectionValues.size,
           newSelectionValues.size - selectionValues.size)
     }
-
+    
+    val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+    } else {
+      Audio.Media.EXTERNAL_CONTENT_URI
+    }
+    
     return try {
-      context.contentResolver.query(Audio.Media.EXTERNAL_CONTENT_URI,
+      context.contentResolver.query(uri,
           BASE_PROJECTION, selection, newSelectionValues, sortOrder)
     } catch (e: SecurityException) {
       null
