@@ -2,10 +2,14 @@ package remix.myplayer.ui.misc
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
 import android.text.TextUtils
+import android.view.Gravity
 import android.view.View
-import android.widget.PopupMenu
-import com.tencent.bugly.crashreport.CrashReport
+import android.widget.PopupWindow
+import androidx.appcompat.widget.AppCompatTextView
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -23,11 +27,23 @@ import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.misc.getSongIds
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
+import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.base.BaseActivity
-import remix.myplayer.ui.adapter.*
+import remix.myplayer.ui.adapter.AlbumAdapter
+import remix.myplayer.ui.adapter.ArtistAdapter
+import remix.myplayer.ui.adapter.BaseAdapter
+import remix.myplayer.ui.adapter.ChildHolderAdapter
+import remix.myplayer.ui.adapter.GenreAdapter
+import remix.myplayer.ui.adapter.PlayListAdapter
+import remix.myplayer.ui.adapter.SongAdapter
 import remix.myplayer.ui.widget.MultiPopupWindow
-import remix.myplayer.util.*
+import remix.myplayer.util.Constants
+import remix.myplayer.util.DensityUtil
+import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.RxUtil.applySingleScheduler
+import remix.myplayer.util.SPUtil
+import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 import java.lang.ref.WeakReference
 
 class MultipleChoice<T>(activity: Activity, val type: Int) {
@@ -46,6 +62,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
   var isActive: Boolean = false
   var adapter: BaseAdapter<T, *>? = null
   private var popup: MultiPopupWindow? = null
+  private var menuPopup: MenuPopup? = null
   var extra: Long = 0
 
   private fun getSongsSingle(ids: List<Long>): Single<List<Song>> {
@@ -71,26 +88,31 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
             ids.add((it as Song).id)
           }
         }
+
         Constants.ALBUM -> {
           checkParam.forEach {
             ids.addAll((it as Album).getSongIds())
           }
         }
+
         Constants.ARTIST -> {
           checkParam.forEach {
             ids.addAll((it as Artist).getSongIds())
           }
         }
+
         Constants.PLAYLIST -> {
           checkParam.forEach {
             ids.addAll((it as PlayList).audioIds)
           }
         }
+
         Constants.FOLDER -> {
           checkParam.forEach {
             ids.addAll((it as Folder).getSongIds())
           }
         }
+
         Constants.GENRE -> {
           checkParam.forEach {
             ids.addAll((it as Genre).getSongIds())
@@ -111,26 +133,31 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
           ids.add((it as Song).id)
         }
       }
+
       Constants.ALBUM -> {
         checkParam.forEach {
           ids.addAll((it as Album).getSongIds())
         }
       }
+
       Constants.ARTIST -> {
         checkParam.forEach {
           ids.addAll((it as Artist).getSongIds())
         }
       }
+
       Constants.PLAYLIST -> {
         checkParam.forEach {
           ids.addAll((it as PlayList).audioIds.toList())
         }
       }
+
       Constants.FOLDER -> {
         checkParam.forEach {
           ids.addAll((it as Folder).getSongIds())
         }
       }
+
       Constants.GENRE -> {
         checkParam.forEach {
           ids.addAll((it as Genre).getSongIds())
@@ -200,6 +227,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
 
               songs.size
             }
+
             Constants.PLAYLISTSONG -> { //删除播放列表内歌曲
               if (deleteSource) {
                 MediaStoreUtil.delete(activityRef.get() as BaseActivity, songs, true)
@@ -207,6 +235,7 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
                 databaseRepository.deleteFromPlayList(songs.map { it.id }, extra).blockingGet()
               }
             }
+
             else -> {
               MediaStoreUtil.delete(activityRef.get() as BaseActivity, songs, deleteSource)
             }
@@ -396,6 +425,8 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
     if (activity.isDestroyed || activity.isFinishing || !activity.hasWindowFocus()) {
       return
     }
+    val anchor = View(activity)
+
     popup = MultiPopupWindow(activity)
     popup!!.binding.multiClose.setOnClickListener { close() }
     popup!!.binding.multiPlaylist.setOnClickListener { addToPlayList() }
@@ -405,27 +436,26 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
     }
     popup!!.binding.multiDelete.setOnClickListener { delete() }
     popup!!.binding.multiMore.setOnClickListener {
-      PopupMenu(activity, popup!!.binding.multiMore).run {
-        inflate(R.menu.menu_multi_select_more)
-        setOnMenuItemClickListener {
-          when (it.itemId) {
-            R.id.select_all -> selectAll()
-          }
-          true
+      menuPopup?.dismiss()
+      menuPopup = MenuPopup(activity).apply {
+        contentView?.setOnClickListener {
+          selectAll()
+          dismiss()
         }
-        if (!activity.isFinishing && !activity.isDestroyed && activity.hasWindowFocus()) {
-          try {
-            show()
-          } catch (e: Exception) {
-            CrashReport.postCatchedException(Exception("ac: $activity", e))
-          }
-        }
+        contentView.measure(0, 0)
+        showAsDropDown(anchor, activity.window.decorView.measuredWidth - contentView.measuredWidth, popup!!.contentView.measuredHeight - DensityUtil.dip2px(8f))
       }
     }
-    popup!!.show(View(activity))
+    popup!!.show(anchor)
   }
 
   fun close() {
+    if (menuPopup?.isShowing == true) {
+      menuPopup?.dismiss()
+      menuPopup = null
+      return
+    }
+
     disposableContainer.clear()
     isActive = false
     isActiveSomeWhere = false
@@ -440,6 +470,35 @@ class MultipleChoice<T>(activity: Activity, val type: Int) {
 
   override fun toString(): String {
     return "MultipleChoice(activity=${activityRef.get()}, type=$type, checkPos=$checkPos, checkParam=$checkParam, isActive=$isActive, adapter=$adapter, popup=$popup, extra=$extra)"
+  }
+
+  private class MenuPopup(activity: Activity) : PopupWindow(activity) {
+
+    init {
+      val textView = AppCompatTextView(activity)
+      textView.setText(R.string.select_all)
+      textView.setPadding(DensityUtil.dip2px(16f),
+          DensityUtil.dip2px(16f),
+          DensityUtil.dip2px(128f),
+          DensityUtil.dip2px(16f))
+      textView.textSize = 16f
+      textView.gravity = Gravity.CENTER_VERTICAL or Gravity.START
+      textView.setTextColor(if (ThemeStore.isLightTheme) Color.BLACK else Color.WHITE)
+      textView.setBackgroundDrawable(GradientDrawable().apply {
+        setColor(ThemeStore.getBackgroundColorMain(activity))
+        val corner = DensityUtil.dip2px(2f).toFloat()
+        cornerRadii = floatArrayOf(
+            corner, corner,
+            0f, 0f,
+            0f, 0f,
+            corner, corner
+        )
+      })
+
+      setContentView(textView)
+
+      setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }
   }
 
 
