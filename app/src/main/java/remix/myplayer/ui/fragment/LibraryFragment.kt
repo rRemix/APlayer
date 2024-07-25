@@ -69,6 +69,11 @@ abstract class LibraryFragment<Data, A : BaseAdapter<Data, *>, VB: ViewBinding> 
     adapter.setDataList(Collections.emptyList())
   }
 
+  override fun onDestroyView() {
+    super.onDestroyView()
+    view?.findViewById<RecyclerView>(R.id.recyclerView)?.adapter = null
+  }
+
   override fun onMediaStoreChanged() {
     if (hasPermission) {
       loaderManager.restartLoader(loaderId, null, this)

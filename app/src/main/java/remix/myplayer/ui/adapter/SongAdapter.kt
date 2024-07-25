@@ -33,6 +33,7 @@ import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
+import java.lang.ref.WeakReference
 import java.util.*
 
 /**
@@ -42,7 +43,7 @@ import java.util.*
  * Created by Remix on 2016/4/11.
  */
 open class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recyclerView: RecyclerView)
-  : HeaderAdapter<Song, BaseViewHolder>(layoutId, multiChoice, recyclerView), FastScroller.SectionIndexer {
+  : HeaderAdapter<Song, BaseViewHolder>(layoutId, multiChoice, WeakReference(recyclerView)), FastScroller.SectionIndexer {
 
   private var lastPlaySong = getCurrentSong()
 
@@ -179,12 +180,12 @@ open class SongAdapter(layoutId: Int, multiChoice: MultipleChoice<Song>, recycle
       val index = dataList.indexOf(currentSong) + 1
       val lastIndex = dataList.indexOf(lastPlaySong) + 1
       var newHolder: SongViewHolder? = null
-      if (recyclerView.findViewHolderForAdapterPosition(index) is SongViewHolder) {
-        newHolder = recyclerView.findViewHolderForAdapterPosition(index) as SongViewHolder?
+      if (rvRef.get()?.findViewHolderForAdapterPosition(index) is SongViewHolder) {
+        newHolder = rvRef.get()?.findViewHolderForAdapterPosition(index) as SongViewHolder?
       }
       var oldHolder: SongViewHolder? = null
-      if (recyclerView.findViewHolderForAdapterPosition(lastIndex) is SongViewHolder) {
-        oldHolder = recyclerView.findViewHolderForAdapterPosition(lastIndex) as SongViewHolder?
+      if (rvRef.get()?.findViewHolderForAdapterPosition(lastIndex) is SongViewHolder) {
+        oldHolder = rvRef.get()?.findViewHolderForAdapterPosition(lastIndex) as SongViewHolder?
       }
       if (newHolder != null) {
         newHolder.binding.songTitle.setTextColor(highLightTextColor)

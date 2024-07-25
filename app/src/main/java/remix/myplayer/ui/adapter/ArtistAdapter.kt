@@ -33,6 +33,7 @@ import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScrollRecyclerView
 import remix.myplayer.ui.widget.fastcroll_recyclerview.FastScroller
 import remix.myplayer.util.*
 import remix.myplayer.util.SPUtil.SETTING_KEY
+import java.lang.ref.WeakReference
 import java.util.*
 
 /**
@@ -42,7 +43,7 @@ import java.util.*
  * 艺术家界面的适配器
  */
 class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recyclerView: FastScrollRecyclerView)
-  : HeaderAdapter<Artist, BaseViewHolder>(layoutId, multiChoice, recyclerView), FastScroller.SectionIndexer {
+  : HeaderAdapter<Artist, BaseViewHolder>(layoutId, multiChoice, WeakReference(recyclerView)), FastScroller.SectionIndexer {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     if (viewType == TYPE_HEADER) {

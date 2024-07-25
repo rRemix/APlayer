@@ -33,13 +33,14 @@ import remix.myplayer.util.Constants
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
+import java.lang.ref.WeakReference
 import java.util.Locale
 
 class GenreAdapter(
   layoutId: Int,
   multiChoice: MultipleChoice<Genre>,
   recyclerView: FastScrollRecyclerView
-) : HeaderAdapter<Genre, BaseViewHolder>(layoutId, multiChoice, recyclerView),
+) : HeaderAdapter<Genre, BaseViewHolder>(layoutId, multiChoice, WeakReference(recyclerView)),
   FastScroller.SectionIndexer {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {

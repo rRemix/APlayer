@@ -37,6 +37,7 @@ import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
+import java.lang.ref.WeakReference
 import java.util.*
 
 
@@ -47,7 +48,7 @@ import java.util.*
  * 专辑界面的适配器
  */
 class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
-                   recyclerView: RecyclerView) : HeaderAdapter<Album, BaseViewHolder>(layoutId, multipleChoice, recyclerView), FastScroller.SectionIndexer {
+                   recyclerView: RecyclerView) : HeaderAdapter<Album, BaseViewHolder>(layoutId, multipleChoice, WeakReference(recyclerView)), FastScroller.SectionIndexer {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     if (viewType == TYPE_HEADER) {

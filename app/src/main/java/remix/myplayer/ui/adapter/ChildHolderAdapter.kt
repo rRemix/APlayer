@@ -32,6 +32,7 @@ import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
+import java.lang.ref.WeakReference
 import java.util.*
 
 /**
@@ -39,7 +40,7 @@ import java.util.*
  */
 @SuppressLint("RestrictedApi")
 open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val arg: String, multiChoice: MultipleChoice<Song>, recyclerView: RecyclerView)
-  : HeaderAdapter<Song, BaseViewHolder>(layoutId, multiChoice, recyclerView), FastScroller.SectionIndexer {
+  : HeaderAdapter<Song, BaseViewHolder>(layoutId, multiChoice, WeakReference(recyclerView)), FastScroller.SectionIndexer {
 
   private var lastPlaySong = getCurrentSong()
 
@@ -190,14 +191,12 @@ open class ChildHolderAdapter(layoutId: Int, private val type: Int, private val 
       val index = dataList.indexOf(currentSong) + 1
       val lastIndex = dataList.indexOf(lastPlaySong) + 1
       var newHolder: ChildHolderViewHolder? = null
-      if (recyclerView.findViewHolderForAdapterPosition(index) is ChildHolderViewHolder) {
-        newHolder = recyclerView.findViewHolderForAdapterPosition(index) as ChildHolderViewHolder?
+      if (rvRef.get()?.findViewHolderForAdapterPosition(index) is ChildHolderViewHolder) {
+        newHolder = rvRef.get()?.findViewHolderForAdapterPosition(index) as ChildHolderViewHolder?
       }
       var oldHolder: ChildHolderViewHolder? = null
-      if (recyclerView
-              .findViewHolderForAdapterPosition(lastIndex) is ChildHolderViewHolder) {
-        oldHolder = recyclerView
-            .findViewHolderForAdapterPosition(lastIndex) as ChildHolderViewHolder?
+      if (rvRef.get()?.findViewHolderForAdapterPosition(lastIndex) is ChildHolderViewHolder) {
+        oldHolder = rvRef.get()?.findViewHolderForAdapterPosition(lastIndex) as ChildHolderViewHolder?
       }
       if (newHolder != null) {
         newHolder.binding.songTitle.setTextColor(highLightTextColor)

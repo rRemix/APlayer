@@ -34,6 +34,7 @@ import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
+import java.lang.ref.WeakReference
 import java.util.*
 
 /**
@@ -43,7 +44,7 @@ import java.util.*
  * 播放列表的适配器
  */
 class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recyclerView: RecyclerView)
-  : HeaderAdapter<PlayList, BaseViewHolder>(layoutId, multiChoice, recyclerView), FastScroller.SectionIndexer {
+  : HeaderAdapter<PlayList, BaseViewHolder>(layoutId, multiChoice, WeakReference(recyclerView)), FastScroller.SectionIndexer {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     if (viewType == TYPE_HEADER) {

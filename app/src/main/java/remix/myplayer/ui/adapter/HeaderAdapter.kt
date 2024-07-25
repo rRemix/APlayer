@@ -17,7 +17,7 @@ import remix.myplayer.ui.misc.MultipleChoice
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.SPUtil
-import java.lang.IllegalStateException
+import java.lang.ref.WeakReference
 
 /**
  * @ClassName
@@ -28,7 +28,7 @@ import java.lang.IllegalStateException
 abstract class HeaderAdapter<Data, ViewHolder : RecyclerView.ViewHolder>(
     layoutId: Int,
     var choice: MultipleChoice<Data>,
-    var recyclerView: RecyclerView) : BaseAdapter<Data, BaseViewHolder>(layoutId) {
+    var rvRef: WeakReference<RecyclerView>) : BaseAdapter<Data, BaseViewHolder>(layoutId) {
 
   //当前列表模式 1:列表 2:网格
   @JvmField
@@ -87,8 +87,8 @@ abstract class HeaderAdapter<Data, ViewHolder : RecyclerView.ViewHolder>(
     mode = newModel
     setUpModeButton(headerHolder)
     //重新设置LayoutManager和adapter并刷新列表
-    recyclerView.layoutManager = if (mode == LIST_MODE) LinearLayoutManager(headerHolder.itemView.context) else GridLayoutManager(headerHolder.itemView.context, 2)
-    recyclerView.adapter = this
+    rvRef.get()?.layoutManager = if (mode == LIST_MODE) LinearLayoutManager(headerHolder.itemView.context) else GridLayoutManager(headerHolder.itemView.context, 2)
+    rvRef.get()?.adapter = this
     //保存当前模式
     saveMode(headerHolder.itemView.context)
   }
@@ -196,6 +196,6 @@ abstract class HeaderAdapter<Data, ViewHolder : RecyclerView.ViewHolder>(
   init {
     //其他的列表都是List模式
     mode = if (key != null) SPUtil
-        .getValue(recyclerView.context, SPUtil.SETTING_KEY.NAME, key, GRID_MODE) else LIST_MODE
+        .getValue(rvRef.get()?.context, SPUtil.SETTING_KEY.NAME, key, GRID_MODE) else LIST_MODE
   }
 }
