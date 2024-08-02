@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.net.Uri
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.io.Serial
 
 /**
  * Created by Remix on 2017/10/22.
@@ -20,5 +21,10 @@ data class Album(val albumID: Long,
 
   override fun getKey(): String {
     return albumID.toString()
+  }
+
+  companion object {
+    @Serial
+    private const val serialVersionUID: Long = 1214925651243602701L
   }
 }

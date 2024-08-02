@@ -2,6 +2,7 @@ package remix.myplayer.bean.mp3
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.io.Serial
 
 /**
  * Created by Remix on 2018/1/9.
@@ -17,9 +18,7 @@ data class Folder(val name: String?,
 
     other as Folder
 
-    if (path != other.path) return false
-
-    return true
+    return path == other.path
   }
 
   override fun hashCode(): Int {
@@ -28,5 +27,10 @@ data class Folder(val name: String?,
 
   override fun getKey(): String {
     return path
+  }
+
+  companion object {
+    @Serial
+    private const val serialVersionUID: Long = -7333769143033322264L
   }
 }

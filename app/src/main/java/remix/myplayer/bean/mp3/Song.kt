@@ -8,6 +8,7 @@ import okhttp3.Credentials
 import remix.myplayer.App
 import remix.myplayer.util.SPUtil
 import timber.log.Timber
+import java.io.Serial
 
 /**
  * Created by Remix on 2015/11/30.
@@ -180,9 +181,7 @@ sealed class Song(
 
       other as Song
 
-      if (id != other.id) return false
-
-      return true
+      return id == other.id
     }
 
     override fun hashCode(): Int {
@@ -191,6 +190,11 @@ sealed class Song(
 
     override fun toString(): String {
       return "LocalSong(id='$id', data='$data')"
+    }
+
+    companion object {
+      @Serial
+      private val serialVersionUID: Long = -6482253600425978196
     }
   }
 
@@ -241,9 +245,7 @@ sealed class Song(
 
       other as Song
 
-      if (data != other.data) return false
-
-      return true
+      return data == other.data
     }
 
     override fun hashCode(): Int {
@@ -253,9 +255,17 @@ sealed class Song(
     override fun toString(): String {
       return "RemoteSong(data='$data')"
     }
+
+    companion object {
+      @Serial
+      private const val serialVersionUID: Long = 13111653236476560L
+    }
   }
 
   companion object {
+    @Serial
+    private const val serialVersionUID: Long = 6842734564265523984
+
     @JvmStatic
     val EMPTY_SONG = Local(-1, "", "", "", -1, "", -1, -1, "", -1, "", "", "", -1)
 

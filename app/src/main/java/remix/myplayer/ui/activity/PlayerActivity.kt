@@ -237,7 +237,12 @@ class PlayerActivity : BaseMusicActivity() {
 
     song = getCurrentSong()
     if (song == Song.EMPTY_SONG && intent.hasExtra(EXTRA_SONG)) {
-      song = intent.getSerializableExtra(EXTRA_SONG) as Song
+      song = try {
+        intent.getSerializableExtra(EXTRA_SONG) as Song
+      } catch (e: Exception) {
+        Timber.w("failed to load song: $e")
+        Song.EMPTY_SONG
+      }
     }
 
     setUpBottom()
