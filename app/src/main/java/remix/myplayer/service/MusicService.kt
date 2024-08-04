@@ -141,11 +141,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
 
   /**
-   * 当前是否正在播放
-   */
-  private var isPlay: Boolean = false
-
-  /**
    * 当前播放的歌曲是否收藏
    */
   var isLove: Boolean = false
@@ -342,10 +337,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
 
   /**
-   * 获得是否正在播放
+   * 当前是否正在播放
    */
-  val isPlaying: Boolean
-    get() = isPlay
+  var isPlaying: Boolean = false
+    private set(value) {
+      field = value
+      uiHandler.sendEmptyMessage(UPDATE_PLAY_STATE)
+    }
 
   /**
    * 获得当前播放进度
@@ -850,12 +848,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     updateQueueItem()
   }
 
-  private fun setPlay(isPlay: Boolean) {
-    this.isPlay = isPlay
-    uiHandler.sendEmptyMessage(UPDATE_PLAY_STATE)
-    //        sendLocalBroadcast(new Intent(PLAY_STATE_CHANGE));
-  }
-
   /**
    * 播放下一首
    */
@@ -883,7 +875,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       return
     }
 
-    setPlay(true)
+    isPlaying = true
 
     //更新所有界面
     uiHandler.sendEmptyMessage(UPDATE_META_DATA)
@@ -934,7 +926,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       if (!isPlaying) { //如果当前已经暂停了 就不重复操作了 避免已经关闭了通知栏又再次显示
         return
       }
-      setPlay(false)
+      isPlaying = false
       uiHandler.sendEmptyMessage(UPDATE_META_DATA)
       volumeController.fadeOut()
     }
@@ -1445,7 +1437,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     val builder = PlaybackStateCompat.Builder()
     builder.setActiveQueueItemId(currentSong.id)
-      .setState(if (isPlay) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED, progress.toLong(), speed)
+      .setState(if (isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED, progress.toLong(), speed)
       .setActions(MEDIA_SESSION_ACTIONS)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       builder.addCustomAction(
@@ -1545,7 +1537,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       ToastUtil.show(service, R.string.song_lose_effect)
       return
     }
-    setPlay(true)
+    isPlaying = true
     prepare(playQueue.song)
   }
 
@@ -1881,8 +1873,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         }
         //短暂暂停
         AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-          needContinue = isPlay
-          if (isPlay && prepared) {
+          needContinue = isPlaying
+          if (isPlaying && prepared) {
             operation = Command.TOGGLE
             pause(false)
           }
@@ -1899,7 +1891,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             return
           }
           audioFocus = false
-          if (isPlay && prepared) {
+          if (isPlaying && prepared) {
             operation = Command.TOGGLE
             pause(false)
           }
@@ -1958,7 +1950,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       if (Intent.ACTION_SCREEN_ON == action) {
         screenOn = true
         //显示锁屏
-        if (isPlay && SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == APLAYER_LOCKSCREEN) {
+        if (isPlaying && SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.LOCKSCREEN, APLAYER_LOCKSCREEN) == APLAYER_LOCKSCREEN) {
           try {
             context.startActivity(Intent(context, LockScreenActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
