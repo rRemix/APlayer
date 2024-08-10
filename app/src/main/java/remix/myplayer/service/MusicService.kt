@@ -689,6 +689,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   override fun onPrepared(mp: MediaPlayer?) {
     Timber.v("准备完成:%s", firstPrepared)
 
+    prepared = true
+
     if (firstPrepared) {
       firstPrepared = false
       if (lastProgress > 0) {
@@ -867,6 +869,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   override fun play(fadeIn: Boolean) {
     Timber.v("play: $fadeIn")
+    if (!prepared) {
+      ToastUtil.show(this, getString(R.string.buffering_wait))
+      return
+    }
     audioFocus = AudioManagerCompat.requestAudioFocus(
         audioManager,
         focusRequest
@@ -1459,7 +1465,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   private fun prepare(song: Song, requestFocus: Boolean = true) {
     tryLaunch(
         block = {
-          Timber.v("准备播放: %s", song)
+          Timber.v("prepare start: %s", song)
           if (TextUtils.isEmpty(song.data)) {
             ToastUtil.show(service, getString(R.string.path_empty))
             return@tryLaunch
@@ -1486,8 +1492,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             mediaPlayer.playbackParams = PlaybackParams().setSpeed(speed)
           }
           mediaPlayer.prepareAsync()
-          prepared = true
-          isLove = withContext(Dispatchers.IO) {
+          isLove = song.isLocal() && withContext(Dispatchers.IO) {
             repository.isMyLove(playQueue.song.id)
               .onErrorReturn {
                 false
@@ -1503,11 +1508,18 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
   private suspend fun setDataSource(song: Song) = withContext(Dispatchers.IO) {
+    Timber.v("setDataSource: ${song.data}")
     if (song.isLocal()) {
       mediaPlayer.setDataSource(this@MusicService, song.contentUri)
     } else if (song is Song.Remote) {
+      val start = System.currentTimeMillis()
       mediaPlayer.setDataSource(this@MusicService, song.contentUri, song.headers)
-      retrieveRemoteSong(song, playQueue.song as Song.Remote)
+      Timber.v("setDataSource spend: ${System.currentTimeMillis() - start}")
+
+      // 可能会特别耗时
+      launch(Dispatchers.IO) {
+        retrieveRemoteSong(song, playQueue.song as Song.Remote)
+      }
     }
   }
 
@@ -1537,7 +1549,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       ToastUtil.show(service, R.string.song_lose_effect)
       return
     }
-    isPlaying = true
+    // 不能在这里设置playing，因为远程的歌曲可能需要缓冲，并且这里需要提前刷新下界面
+    if (playQueue.song.isRemote()) {
+      uiHandler.sendEmptyMessage(UPDATE_META_DATA)
+    }
+
     prepare(playQueue.song)
   }
 
@@ -2057,10 +2073,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       if (bitmap == null || bitmap.isRecycled) {
         return null
       }
-      var config: Bitmap.Config? = bitmap.config
-      if (config == null) {
-        config = Bitmap.Config.RGB_565
-      }
+      val config: Bitmap.Config = bitmap.config
       return try {
         bitmap.copy(config, false)
       } catch (e: OutOfMemoryError) {
@@ -2071,6 +2084,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
 
     fun retrieveRemoteSong(song: Song.Remote, targetSong: Song.Remote) {
+      Timber.v("retrieveRemoteSong: ${song.data}")
+      val start = System.currentTimeMillis()
       val metadataRetriever = MediaMetadataRetriever()
       try {
         metadataRetriever.setDataSource(song.data, song.headers)
@@ -2115,8 +2130,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           dateModified
         )
       } catch (e: Exception) {
-        Timber.v("fail to retrieve: $e")
+        Timber.v("fail to retrieveRemoteSong data: ${song.data} detail: $e")
       } finally {
+        Timber.v("retrieveRemoteSong spend:${System.currentTimeMillis() - start} ${song.data}")
         metadataRetriever.release()
       }
     }

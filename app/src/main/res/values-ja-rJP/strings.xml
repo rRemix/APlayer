@@ -472,4 +472,5 @@
   <string name="can_t_be_empty">%s空にすることはできません</string>
   <string name="connect">せつぞく</string>
   <string name="edit">編集</string>
+  <string name="buffering_wait">バッファリングです,ちょっと待ってください</string>
 </resources>

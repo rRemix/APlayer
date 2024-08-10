@@ -474,4 +474,5 @@
   <string name="edit">Edit</string>
   <string name="speed_at_2x">Playing at 2x speed</string>
   <string name="local_lyric_tip">If your Android version is 11 or above, please make sure the local lyrics files are placed in the public directory (such as Downloads, Music, etc. directories)</string>
+  <string name="buffering_wait">Buffering, please wait</string>
 </resources>

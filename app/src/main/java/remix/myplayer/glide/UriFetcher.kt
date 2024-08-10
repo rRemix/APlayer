@@ -145,20 +145,22 @@ object UriFetcher {
   }
 
   private fun fetch(song: Song): Uri {
-    // 自定义封面
-    val customArtFile = ImageUriUtil.getCustomThumbIfExist(song.albumId, TYPE_ALBUM)
-    if (customArtFile != null && customArtFile.exists()) {
-      return Uri.fromFile(customArtFile)
-    }
-
-    // 内置
-    if (ignoreMediaStore()) {
-      val songs = getSongs(Audio.Media._ID + "=" + song.id, null)
-      if (songs.isNotEmpty()) {
-        return Uri.parse(PREFIX_EMBEDDED + songs[0].data)
+    if (song.isLocal()) { // 仅本地歌曲
+      // 自定义封面
+      val customArtFile = ImageUriUtil.getCustomThumbIfExist(song.albumId, TYPE_ALBUM)
+      if (customArtFile != null && customArtFile.exists()) {
+        return Uri.fromFile(customArtFile)
       }
-    } else if (ImageUriUtil.isAlbumThumbExistInMediaCache(song.artUri)) {
-      return song.artUri
+
+      // 内置
+      if (ignoreMediaStore()) {
+        val songs = getSongs(Audio.Media._ID + "=" + song.id, null)
+        if (songs.isNotEmpty()) {
+          return Uri.parse(PREFIX_EMBEDDED + songs[0].data)
+        }
+      } else if (ImageUriUtil.isAlbumThumbExistInMediaCache(song.artUri)) {
+        return song.artUri
+      }
     }
 
     // 网络

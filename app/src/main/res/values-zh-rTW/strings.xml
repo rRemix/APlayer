@@ -474,4 +474,5 @@
   <string name="edit">編輯</string>
   <string name="speed_at_2x">2x倍速播放中</string>
   <string name="local_lyric_tip">如果你的Android版本在11以及以上，本地歌詞檔案請確保放在公共目錄中(如Downloads、Music等目錄)</string>
+  <string name="buffering_wait">緩衝中，請稍後</string>
 </resources>

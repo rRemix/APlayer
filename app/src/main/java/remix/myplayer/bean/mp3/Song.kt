@@ -82,7 +82,7 @@ sealed class Song(
 
   val genre: String
     get() {
-      if (_genre.isNullOrEmpty() && id > 0 && data.isNotEmpty()) {
+      if (_genre.isNullOrEmpty() && id > 0 && data.isNotEmpty() && this !is Remote) {
         val metadataRetriever = MediaMetadataRetriever()
         try {
           metadataRetriever.setDataSource(data)
@@ -138,7 +138,7 @@ sealed class Song(
       }
 
       is Remote -> {
-        Remote(title, album, artist, duration, data, size, year, genre, track, dateModified, account, pwd)
+        Remote(title, album, artist, _duration, data, size, year, _genre ?: "", track, dateModified, account, pwd)
       }
 
     }
