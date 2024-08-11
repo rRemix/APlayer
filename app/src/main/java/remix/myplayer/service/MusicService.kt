@@ -1550,9 +1550,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       return
     }
     // 不能在这里设置playing，因为远程的歌曲可能需要缓冲，并且这里需要提前刷新下界面
-    if (playQueue.song.isRemote()) {
-      uiHandler.sendEmptyMessage(UPDATE_META_DATA)
-    }
+//    if (playQueue.song.isRemote()) {
+//      uiHandler.sendEmptyMessage(UPDATE_META_DATA)
+//    }
 
     prepare(playQueue.song)
   }
