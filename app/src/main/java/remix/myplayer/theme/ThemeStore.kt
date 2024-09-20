@@ -20,7 +20,6 @@ object ThemeStore {
   const val FOLLOW_SYSTEM = "follow_system"
   private const val KEY_PRIMARY_COLOR = "primary_color"
   private const val KEY_ACCENT_COLOR = "accent_color"
-  private const val KEY_FLOAT_LYRIC_TEXT_COLOR = "float_lyric_text_color"
   const val STATUS_BAR_ALPHA = 150
 
   @JvmField
@@ -281,23 +280,6 @@ object ThemeStore {
         else -> R.color.drawer_default_light
       }
     )
-
-  @JvmStatic
-  @get:ColorInt
-  var floatLyricTextColor: Int
-    get() {
-      val temp = SPUtil.getValue(
-        App.context, KEY_NAME, KEY_FLOAT_LYRIC_TEXT_COLOR, materialPrimaryColor
-      )
-      return if (ColorUtil.isColorCloseToWhite(temp)) {
-        Color.parseColor("#F9F9F9")
-      } else {
-        temp
-      }
-    }
-    set(value) {
-      SPUtil.putValue(App.context, KEY_NAME, KEY_FLOAT_LYRIC_TEXT_COLOR, value)
-    }
 
   @get:ColorInt
   val colorOnPrimary: Int

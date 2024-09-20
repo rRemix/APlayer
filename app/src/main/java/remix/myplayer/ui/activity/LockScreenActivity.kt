@@ -19,15 +19,11 @@ import com.bumptech.glide.request.target.Target
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import remix.myplayer.R
-import remix.myplayer.bean.mp3.Song
 import remix.myplayer.databinding.ActivityLockscreenBinding
+import remix.myplayer.helper.LyricsHelper
 import remix.myplayer.helper.MusicServiceRemote
-import remix.myplayer.lyric.LyricFetcher
-import remix.myplayer.lyric.LyricFetcher.Companion.LYRIC_FIND_INTERVAL
-import remix.myplayer.lyric.bean.LyricRowWrapper
-import remix.myplayer.lyric.bean.LyricRowWrapper.Companion.LYRIC_WRAPPER_NO
-import remix.myplayer.lyric.bean.LyricRowWrapper.Companion.LYRIC_WRAPPER_SEARCHING
 import remix.myplayer.misc.menu.CtrlButtonListener
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseMusicActivity
@@ -58,8 +54,6 @@ class LockScreenActivity : BaseMusicActivity() {
 
   private var disposable: Disposable? = null
 
-  @Volatile
-  private var curLyric: LyricRowWrapper? = null
   private var updateLyricThread: UpdateLockScreenLyricThread? = null
 
   //前后两次触摸的X
@@ -254,33 +248,16 @@ class LockScreenActivity : BaseMusicActivity() {
     return Palette.from(rawBitMap ?: return null).generate()
   }
 
-  private fun setCurrentLyric(wrapper: LyricRowWrapper) {
+  private fun setLyrics(lyrics: String) {
     runOnUiThread {
-      curLyric = wrapper
-      if (curLyric == null || curLyric === LYRIC_WRAPPER_NO) {
-        binding.lockscreenLyric.setTextWithAnimation(R.string.no_lrc)
-      } else if (curLyric === LYRIC_WRAPPER_SEARCHING) {
-        binding.lockscreenLyric.text = ""
-      } else {
-        binding.lockscreenLyric.setTextWithAnimation(
-            String.format("%s\n%s", curLyric?.lineOne?.content,
-                curLyric?.lineTwo?.content))
-      }
-
+      binding.lockscreenLyric.setTextWithAnimation(lyrics)
     }
   }
 
   private class UpdateLockScreenLyricThread constructor(activity: LockScreenActivity, service: MusicService) : Thread() {
-
     private val ref: WeakReference<LockScreenActivity> = WeakReference(activity)
-    private val lyricFetcher: LyricFetcher = LyricFetcher(service)
-    private var songInThread: Song = Song.EMPTY_SONG
 
-    override fun interrupt() {
-      super.interrupt()
-      lyricFetcher.dispose()
-    }
-
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun run() {
       while (true) {
         try {
@@ -289,17 +266,26 @@ class LockScreenActivity : BaseMusicActivity() {
           return
         }
 
-        val song = MusicServiceRemote.getCurrentSong()
-        if (songInThread !== song) {
-          songInThread = song
-          lyricFetcher.updateLyricRows(songInThread)
-          continue
+        val service = MusicServiceRemote.service ?: continue
+        val activity = ref.get() ?: continue
+        try {
+          val lyrics = service.lyrics.getCompleted()
+          if (lyrics.isEmpty()) {
+            activity.setLyrics(activity.getString(R.string.no_lrc))
+          } else {
+            val content = LyricsHelper.getDesktopLyricsContent(
+              lyrics, service.lyricsOffset, service.progress, service.duration
+            )
+            activity.setLyrics("${content.currentLine?.content ?: ""}\n${content.nextLine ?: ""}")
+          }
+        } catch (_: IllegalStateException) {
+          activity.setLyrics(activity.getString(R.string.searching))
         }
-
-        val activity = ref.get()
-        activity?.setCurrentLyric(lyricFetcher.findCurrentLyric())
       }
     }
   }
 
+  companion object {
+    const val LYRIC_FIND_INTERVAL = 400L
+  }
 }

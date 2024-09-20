@@ -375,8 +375,8 @@
   <string name="tap_to_toggle">點擊切換</string>
   <string name="change_offset">調整時間線</string>
   <string name="lyric_offset_reset">歌詞已還原</string>
-  <string name="lyric_advance_x_second">提前%1$s秒</string>
-  <string name="lyric_delay_x_second">延後%1$s秒</string>
+  <string name="lyric_advance_x_second">提前%.1f秒</string>
+  <string name="lyric_delay_x_second">延後%.1f秒</string>
   <string name="lyric_adjust_font_size">調整字體大小</string>
   <string name="speed">播放速度</string>
   <string name="whether_change_theme">當前為夜間模式，是否切換主題顏色？</string>

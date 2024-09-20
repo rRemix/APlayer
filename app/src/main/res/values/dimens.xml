@@ -105,14 +105,19 @@
 
   <dimen name="cover_margin_top">38dp</dimen>
 
-  <dimen name="desktop_lyric_height">160dp</dimen>
-  <dimen name="desktop_lyric_text_padding">24dp</dimen>
-  <dimen name="desktop_lyric_image_margin">8dp</dimen>
-  <dimen name="desktop_lyric_text_size">18sp</dimen>
-  <dimen name="desktop_lyric_text_small_size">16sp</dimen>
-  <dimen name="desktop_lyric_image_size">24dp</dimen>
-  <dimen name="desktop_lyric_button_size">36dp</dimen>
-  <dimen name="desktop_lyric_container_margin_top">88dp</dimen>
+  <dimen name="desktop_lyrics_divider_thickness">1dp</dimen>
+  <dimen name="desktop_lyrics_control_button_size">48dp</dimen>
+  <dimen name="desktop_lyrics_control_button_padding">12dp</dimen>
+  <dimen name="desktop_lyrics_lines_margin">4dp</dimen>
+  <dimen name="desktop_lyrics_slider_padding">4dp</dimen>
+  <dimen name="desktop_lyrics_slider_icon_size">28dp</dimen>
+  <dimen name="desktop_lyrics_slider_icon_padding">4dp</dimen>
+
+  <dimen name="desktop_lyrics_color_dialog_group_top_margin">8dp</dimen>
+  <dimen name="desktop_lyrics_color_dialog_label_width">24dp</dimen>
+  <dimen name="desktop_lyrics_color_dialog_input_width">48dp</dimen>
+  <dimen name="desktop_lyrics_color_dialog_input_height">48dp</dimen>
+  <dimen name="desktop_lyrics_color_dialog_text_size">16sp</dimen>
 
   <dimen name="player_button_size">56dp</dimen>
   <dimen name="player_volume_button_size">48dp</dimen>
@@ -128,4 +133,10 @@
   <dimen name="md_colorchooser_circlesize">56dp</dimen>
 
   <dimen name="item_list_btn_size">60dp</dimen>
+
+  <dimen name="lrc_fragment_offset_button_size">48dp</dimen>
+  <dimen name="lrc_fragment_offset_text_size">11sp</dimen>
+
+  <dimen name="lyrics_view_lrc_block_vertical_padding">4dp</dimen>
+  <dimen name="lyrics_view_time_indicator_play_button_size">24dp</dimen>
 </resources>

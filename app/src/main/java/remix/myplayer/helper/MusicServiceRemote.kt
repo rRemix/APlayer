@@ -163,9 +163,4 @@ object MusicServiceRemote {
   fun getOperation(): Int {
     return service?.operation ?: Command.NEXT
   }
-
-  @JvmStatic
-  fun setLyricOffset(offset: Int) {
-    service?.setLyricOffset(offset)
-  }
 }

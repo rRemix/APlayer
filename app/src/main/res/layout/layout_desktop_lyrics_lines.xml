@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical">
+
+  <remix.myplayer.ui.widget.SingleLineLyricsView
+    android:id="@+id/first_line"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/desktop_lyrics_lines_margin"
+    android:shadowColor="@color/desktop_lyrics_text_shadow_color"
+    android:shadowDx="1"
+    android:shadowDy="1"
+    android:shadowRadius="2"
+    tools:singleLine="true"
+    tools:text="First Line abcdefghijklmnopqrstuvwxyz1234567890"
+    tools:textColor="#6cf"
+    tools:textSize="18sp" />
+
+  <TextView
+    android:id="@+id/second_line"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/desktop_lyrics_lines_margin"
+    android:ellipsize="marquee"
+    android:gravity="center"
+    android:shadowColor="@color/desktop_lyrics_text_shadow_color"
+    android:shadowDx="1"
+    android:shadowDy="1"
+    android:shadowRadius="2"
+    android:singleLine="true"
+    tools:text="Second Line abcdefghijklmnopqrstuvwxyz12345678901234567890"
+    tools:textColor="#ccc"
+    tools:textSize="16sp" />
+
+</LinearLayout>

@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:orientation="vertical">
+
+    <FrameLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@color/desktop_lyrics_window_background">
+
+      <include layout="@layout/layout_desktop_lyrics_lines" />
+    </FrameLayout>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/desktop_lyrics_color_dialog_group_top_margin"
+      android:text="@string/desktop_lyrics_active_text_color"
+      android:textColor="?attr/colorAccent"
+      android:textSize="@dimen/desktop_lyrics_color_dialog_text_size" />
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center">
+
+      <TextView
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_label_width"
+        android:layout_height="wrap_content"
+        android:text="R"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:ignore="HardcodedText" />
+
+      <com.google.android.material.slider.Slider
+        android:id="@+id/active_text_r_slider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="255" />
+
+      <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/active_text_r_input"
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_input_width"
+        android:layout_height="@dimen/desktop_lyrics_color_dialog_input_height"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:text="255" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center">
+
+      <TextView
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_label_width"
+        android:layout_height="wrap_content"
+        android:text="G"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:ignore="HardcodedText" />
+
+      <com.google.android.material.slider.Slider
+        android:id="@+id/active_text_g_slider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="255" />
+
+      <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/active_text_g_input"
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_input_width"
+        android:layout_height="@dimen/desktop_lyrics_color_dialog_input_height"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:text="255" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center">
+
+      <TextView
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_label_width"
+        android:layout_height="wrap_content"
+        android:text="B"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:ignore="HardcodedText" />
+
+      <com.google.android.material.slider.Slider
+        android:id="@+id/active_text_b_slider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="255" />
+
+      <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/active_text_b_input"
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_input_width"
+        android:layout_height="@dimen/desktop_lyrics_color_dialog_input_height"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:text="255" />
+    </LinearLayout>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/desktop_lyrics_color_dialog_group_top_margin"
+      android:text="@string/desktop_lyrics_inactive_text_color"
+      android:textColor="?attr/colorAccent"
+      android:textSize="@dimen/desktop_lyrics_color_dialog_text_size" />
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center">
+
+      <TextView
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_label_width"
+        android:layout_height="wrap_content"
+        android:text="R"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:ignore="HardcodedText" />
+
+      <com.google.android.material.slider.Slider
+        android:id="@+id/inactive_text_r_slider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="255" />
+
+      <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/inactive_text_r_input"
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_input_width"
+        android:layout_height="@dimen/desktop_lyrics_color_dialog_input_height"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:text="255" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center">
+
+      <TextView
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_label_width"
+        android:layout_height="wrap_content"
+        android:text="G"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:ignore="HardcodedText" />
+
+      <com.google.android.material.slider.Slider
+        android:id="@+id/inactive_text_g_slider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="255" />
+
+      <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/inactive_text_g_input"
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_input_width"
+        android:layout_height="@dimen/desktop_lyrics_color_dialog_input_height"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:text="255" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center">
+
+      <TextView
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_label_width"
+        android:layout_height="wrap_content"
+        android:text="B"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:ignore="HardcodedText" />
+
+      <com.google.android.material.slider.Slider
+        android:id="@+id/inactive_text_b_slider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="255" />
+
+      <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/inactive_text_b_input"
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_input_width"
+        android:layout_height="@dimen/desktop_lyrics_color_dialog_input_height"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:text="255" />
+    </LinearLayout>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/desktop_lyrics_color_dialog_group_top_margin"
+      android:text="@string/desktop_lyrics_translation_text_color"
+      android:textColor="?attr/colorAccent"
+      android:textSize="@dimen/desktop_lyrics_color_dialog_text_size" />
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center">
+
+      <TextView
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_label_width"
+        android:layout_height="wrap_content"
+        android:text="R"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:ignore="HardcodedText" />
+
+      <com.google.android.material.slider.Slider
+        android:id="@+id/translation_text_r_slider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="255" />
+
+      <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/translation_text_r_input"
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_input_width"
+        android:layout_height="@dimen/desktop_lyrics_color_dialog_input_height"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:text="255" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center">
+
+      <TextView
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_label_width"
+        android:layout_height="wrap_content"
+        android:text="G"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:ignore="HardcodedText" />
+
+      <com.google.android.material.slider.Slider
+        android:id="@+id/translation_text_g_slider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="255" />
+
+      <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/translation_text_g_input"
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_input_width"
+        android:layout_height="@dimen/desktop_lyrics_color_dialog_input_height"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:text="255" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center">
+
+      <TextView
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_label_width"
+        android:layout_height="wrap_content"
+        android:text="B"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:ignore="HardcodedText" />
+
+      <com.google.android.material.slider.Slider
+        android:id="@+id/translation_text_b_slider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="255" />
+
+      <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/translation_text_b_input"
+        android:layout_width="@dimen/desktop_lyrics_color_dialog_input_width"
+        android:layout_height="@dimen/desktop_lyrics_color_dialog_input_height"
+        android:textAlignment="center"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/desktop_lyrics_color_dialog_text_size"
+        tools:text="255" />
+    </LinearLayout>
+
+  </LinearLayout>
+</ScrollView>

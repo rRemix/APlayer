@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.application)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
 }
@@ -214,6 +215,7 @@ androidComponents {
 
 dependencies {
     implementation(libs.kotlinx.coroutines)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.appcompat)
     implementation(libs.cardview)

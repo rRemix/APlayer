@@ -66,7 +66,7 @@ import remix.myplayer.misc.zipFrom
 import remix.myplayer.misc.zipOutputStream
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRIC
+import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRICS
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.theme.ThemeStore
@@ -79,7 +79,7 @@ import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_REFRESH_LIBRARY
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_ADAPTIVE_COLOR
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_CUSTOM_IMAGE
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_THEME
-import remix.myplayer.ui.dialog.LyricPriorityDialog
+import remix.myplayer.ui.dialog.LyricsOrderDialog
 import remix.myplayer.ui.dialog.color.ColorChooserDialog
 import remix.myplayer.ui.misc.FolderChooser
 import remix.myplayer.util.*
@@ -221,7 +221,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
               binding.settingLrcFloatTip.setText(if (isChecked) R.string.opened_desktop_lrc else R.string.closed_desktop_lrc)
               val intent = MusicUtil.makeCmdIntent(Command.TOGGLE_DESKTOP_LYRIC)
               intent.putExtra(
-                  EXTRA_DESKTOP_LYRIC, binding.settingLrcFloatSwitch.isChecked
+                  EXTRA_DESKTOP_LYRICS, binding.settingLrcFloatSwitch.isChecked
               )
               sendLocalBroadcast(intent)
             }
@@ -915,9 +915,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
    */
   private fun configLyricPriority() {
     ViewCommon.showLocalLyricTip(this) {
-      LyricPriorityDialog.newInstance().show(
-        supportFragmentManager, "configLyricPriority"
-      )
+      LyricsOrderDialog().show(supportFragmentManager, "configLyricPriority")
     }
   }
 
@@ -1031,7 +1029,6 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
                 //清除配置文件、数据库等缓存
                 Util.deleteFilesByDirectory(cacheDir)
 //                Util.deleteFilesByDirectory(externalCacheDir)
-                DiskCache.init(this@SettingActivity, "lyric")
                 //清除glide缓存
                 Glide.get(this@SettingActivity).clearDiskCache()
                 UriFetcher.clearAllCache()
