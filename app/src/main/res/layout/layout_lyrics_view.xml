@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/time_indicator"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <ImageButton
+      android:id="@+id/play_button"
+      android:layout_width="@dimen/lyrics_view_time_indicator_play_button_size"
+      android:layout_height="@dimen/lyrics_view_time_indicator_play_button_size"
+      android:background="?attr/background_oval_ripple"
+      android:contentDescription="@string/play_from_this_line"
+      android:src="@drawable/ic_play_arrow_black_24dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:tint="?attr/text_color_secondary"
+      tools:ignore="TouchTargetSizeCheck" />
+
+    <View
+      android:id="@+id/line"
+      android:layout_width="0dp"
+      android:layout_height="1dp"
+      android:layout_marginStart="4dp"
+      android:layout_weight="1"
+      android:background="?attr/text_color_secondary"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintLeft_toRightOf="@id/play_button"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+      android:id="@+id/time"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="4dp"
+      android:textColor="?attr/text_color_secondary"
+      android:textSize="12sp"
+      app:layout_constraintBottom_toTopOf="@id/line"
+      app:layout_constraintEnd_toEndOf="parent"
+      tools:text="00:00.00" />
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+  <remix.myplayer.ui.widget.ResponsiveScrollView
+    android:id="@+id/outer_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="SpeakableTextPresentCheck">
+
+    <LinearLayout
+      android:id="@+id/inner_container"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:orientation="vertical" />
+  </remix.myplayer.ui.widget.ResponsiveScrollView>
+
+</FrameLayout>

@@ -2,13 +2,8 @@ package remix.myplayer.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import remix.myplayer.bean.misc.LyricPriority;
 
 /**
  * Created by taeja on 16-1-15.
@@ -54,6 +49,12 @@ public class SPUtil {
     editor.putLong(key, value).apply();
   }
 
+  public static void putValue(Context context, String name, String key, float value) {
+    SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE)
+            .edit();
+    editor.putFloat(key, value).apply();
+  }
+
   public static void putValue(Context context, String name, String key, String value) {
     SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE)
         .edit();
@@ -79,6 +80,10 @@ public class SPUtil {
     return context.getSharedPreferences(name, Context.MODE_PRIVATE).getLong(key.toString(), dft);
   }
 
+  public static float getValue(Context context, String name, Object key, float dft) {
+    return context.getSharedPreferences(name, Context.MODE_PRIVATE).getFloat(key.toString(), dft);
+  }
+
   public static String getValue(Context context, String name, Object key, String dft) {
     return context.getSharedPreferences(name, Context.MODE_PRIVATE).getString(key.toString(), dft);
   }
@@ -102,34 +107,11 @@ public class SPUtil {
     String IGNORE_FOREVER = "ignore_forever";
   }
 
-  public interface LYRIC_KEY {
+  public interface LYRICS_KEY {
+    String NAME = "Lyrics";
 
-    String NAME = "Lyric";
-    //歌词搜索优先级
-    String PRIORITY_LYRIC = "priority_lyric";
-    String DEFAULT_PRIORITY = new Gson().toJson(Arrays
-            .asList(
-                LyricPriority.EMBEDDED,
-                LyricPriority.LOCAL,
-                LyricPriority.KUGOU,
-                LyricPriority.NETEASE,
-                LyricPriority.QQ,
-                LyricPriority.IGNORE),
-        new TypeToken<List<LyricPriority>>() {
-        }.getType());
-
-    int LYRIC_DEFAULT = LyricPriority.DEF.getPriority();
-    int LYRIC_IGNORE = LyricPriority.IGNORE.getPriority();
-    int LYRIC_NETEASE = LyricPriority.NETEASE.getPriority();
-    int LYRIC_KUGOU = LyricPriority.KUGOU.getPriority();
-    int LYRIC_QQ = LyricPriority.QQ.getPriority();
-    int LYRIC_LOCAL = LyricPriority.LOCAL.getPriority();
-    int LYRIC_EMBEDDED = LyricPriority.EMBEDDED.getPriority();
-    int LYRIC_MANUAL = LyricPriority.MANUAL.getPriority();
-
-    String LYRIC_FONT_SIZE = "lyric_font_size";
-    String LYRIC_RESET_ON_16000 = "lyric_reset_on_16000";
-    String LYRIC_LOCAL_TIP_SHOWN = "lyric_local_tip_shown";
+    String ORDER = "order";
+    String OFFSET_PREFIX = "offset_"; // offset_$hashKey
   }
 
   public interface COVER_KEY {
@@ -137,17 +119,23 @@ public class SPUtil {
     String NAME = "Cover";
   }
 
+  public interface DESKTOP_LYRICS_KEY {
+    String NAME = "DesktopLyrics";
+
+    String LOCKED = "locked";
+    String Y_POSITION_PREFIX = "y_position_"; // y_position_$orientation
+    String FIRST_LINE_SIZE = "first_line_size";
+    String SECOND_LINE_SIZE = "second_line_size";
+    String SUNG_COLOR = "sung_color";
+    String UNSUNG_COLOR = "unsung_color";
+    String TRANSLATION_COLOR = "translation_color";
+  }
+
   public interface SETTING_KEY {
 
     String NAME = "Setting";
     //第一次读取数据
     String FIRST_LOAD = "first_load";
-    //桌面歌词是否可移动
-    String DESKTOP_LYRIC_LOCK = "desktop_lyric_lock";
-    //桌面歌词字体大小
-    String DESKTOP_LYRIC_TEXT_SIZE = "desktop_lyric_text_size";
-    //桌面歌词y坐标
-    String DESKTOP_LYRIC_Y = "desktop_lyric_y";
     //是否开启屏幕常亮
     String SCREEN_ALWAYS_ON = "key_screen_always_on";
     //通知栏是否启用经典样式
@@ -164,8 +152,6 @@ public class SPUtil {
     String COLOR_NAVIGATION = "color_Navigation";
     //摇一摇
     String SHAKE = "shake";
-    //优先搜索在线歌词
-    String ONLINE_LYRIC_FIRST = "online_lyric_first";
     //是否开启桌面歌词
     String DESKTOP_LYRIC_SHOW = "desktop_lyric_show";
     //是否开启状态栏歌词
@@ -274,11 +260,6 @@ public class SPUtil {
     String BLACK_THEME = "black_theme";
     String VERSION = "version";
     int NEWEST_VERSION = 3;
-  }
-
-  public interface LYRIC_OFFSET_KEY {
-
-    String NAME = "LyricOffset";
   }
 
   public interface OTHER_KEY {

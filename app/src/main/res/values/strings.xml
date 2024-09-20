@@ -280,6 +280,7 @@
   <string name="immersive">Immersive status bar</string>
   <string name="immersive_tip">Colorize the notification bar as to match background color</string>
   <string name="delete_source">Also delete the source file</string>
+  <string name="default_lyrics">Default</string>
   <string name="kugou">Kugou</string>
   <string name="netease">Netease</string>
   <string name="lastfm">LastFM</string>
@@ -375,8 +376,8 @@
   <string name="tap_to_toggle">Tap to toggle</string>
   <string name="change_offset">Adjust timeline</string>
   <string name="lyric_offset_reset">Back to original</string>
-  <string name="lyric_advance_x_second">%1$s s advanced</string>
-  <string name="lyric_delay_x_second">%1$s s delayed</string>
+  <string name="lyric_advance_x_second">%.1fs advanced</string>
+  <string name="lyric_delay_x_second">%.1fs delayed</string>
   <string name="lyric_adjust_font_size">Adjust Font Size</string>
   <string name="speed">Play speed</string>
   <string name="whether_change_theme">Currently in night mode, confirm to switch theme colors?</string>
@@ -475,4 +476,17 @@
   <string name="speed_at_2x">Playing at 2x speed</string>
   <string name="local_lyric_tip">If your Android version is 11 or above, please make sure the local lyrics files are placed in the public directory (such as Downloads, Music, etc. directories)</string>
   <string name="buffering_wait">Buffering, please wait</string>
+
+  <!-- Desktop lyrics -->
+  <string name="close_desktop_lyrics">Turn off desktop lyrics</string>
+  <string name="lock_desktop_lyrics">Lock desktop lyrics</string>
+  <string name="desktop_lyrics_settings">Show/hide settings of desktop lyric</string>
+  <string name="desktop_lyrics_color">Set colors of desktop lyric</string>
+  <string name="desktop_lyrics_text_example">This is lyric text</string>
+  <string name="desktop_lyrics_translation_example">This is translation</string>
+  <string name="desktop_lyrics_active_text_color">Color of active text</string>
+  <string name="desktop_lyrics_inactive_text_color">Color of inactive text</string>
+  <string name="desktop_lyrics_translation_text_color">Color of translation text</string>
+
+  <string name="play_from_this_line">Play from this line</string>
 </resources>

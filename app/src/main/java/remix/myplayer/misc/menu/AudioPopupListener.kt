@@ -1,7 +1,7 @@
 package remix.myplayer.misc.menu
 
+import android.content.ActivityNotFoundException
 import android.content.ContextWrapper
-import android.content.Intent
 import android.view.MenuItem
 import android.webkit.MimeTypeMap
 import android.widget.CompoundButton
@@ -13,7 +13,11 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.EQHelper
+import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
+import remix.myplayer.lyrics.provider.EmbeddedProvider
+import remix.myplayer.lyrics.provider.IgnoredProvider
+import remix.myplayer.lyrics.provider.StubProvider
 import remix.myplayer.service.Command
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.ui.ViewCommon
@@ -21,12 +25,10 @@ import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.ui.dialog.TimerDialog
 import remix.myplayer.ui.misc.AudioTag
-import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
-import remix.myplayer.util.Util.sendLocalBroadcast
 import java.lang.ref.WeakReference
 
 /**
@@ -141,86 +143,39 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
     }
     return true
   }
-  
+
   private fun onClickLyric(activity: PlayerActivity) {
-    val alreadyIgnore = (SPUtil
-      .getValue(
-        ref.get(), SPUtil.LYRIC_KEY.NAME, song.id.toString(),
-        SPUtil.LYRIC_KEY.LYRIC_DEFAULT
-      ) == SPUtil.LYRIC_KEY.LYRIC_IGNORE)
-    
-    val lyricFragment = ref.get()?.lyricFragment ?: return
-    getBaseDialog(ref.get())
-      .items(
+    getBaseDialog(activity).items(
+        getString(R.string.default_lyrics),
         getString(R.string.embedded_lyric),
         getString(R.string.local),
         getString(R.string.kugou),
         getString(R.string.netease),
         getString(R.string.qq),
         getString(R.string.select_lrc),
-        getString(if (!alreadyIgnore) R.string.ignore_lrc else R.string.cancel_ignore_lrc),
+        getString(R.string.ignore_lrc),
         getString(R.string.lyric_adjust_font_size),
         getString(R.string.change_offset)
-      )
-      .itemsCallback { dialog, itemView, position, text ->
+      ).itemsCallback { _, _, position, _ ->
         when (position) {
-          0, 1, 2, 3, 4 -> { //0内嵌 1本地 2酷狗 3网易 4qq
-            SPUtil.putValue(ref.get(), SPUtil.LYRIC_KEY.NAME, song.id.toString(), position + 2)
-            lyricFragment.updateLrc(song, true)
-            sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
+          0 -> MusicServiceRemote.service?.updateLyrics(StubProvider) // 恢复默认
+          1 -> MusicServiceRemote.service?.updateLyrics(EmbeddedProvider) // 内嵌
+          2, 3, 4, 5 -> TODO() //  本地 酷狗 网易 QQ
+          6 -> try {
+            activity.getContent.launch(lrcMimeType) // 手动选择
+          } catch (e: ActivityNotFoundException) {
+            ToastUtil.show(activity, R.string.activity_not_found_tip)
           }
-          
-          5 -> { //手动选择歌词
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-              type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("lrc")
-              addCategory(Intent.CATEGORY_OPENABLE)
-            }
-            Util.startActivityForResultSafely(
-              activity,
-              intent,
-              PlayerActivity.REQUEST_SELECT_LYRIC
-            )
-          }
-          
-          6 -> { //忽略或者取消忽略
-            getBaseDialog(activity)
-              .title(if (!alreadyIgnore) R.string.confirm_ignore_lrc else R.string.confirm_cancel_ignore_lrc)
-              .negativeText(R.string.cancel)
-              .positiveText(R.string.confirm)
-              .onPositive { dialog1, which ->
-                if (!alreadyIgnore) {//忽略
-                  SPUtil.putValue(
-                    activity, SPUtil.LYRIC_KEY.NAME, song.id.toString(),
-                    SPUtil.LYRIC_KEY.LYRIC_IGNORE
-                  )
-                  lyricFragment.updateLrc(song)
-                } else {//取消忽略
-                  SPUtil.putValue(
-                    activity, SPUtil.LYRIC_KEY.NAME, song.id.toString(),
-                    SPUtil.LYRIC_KEY.LYRIC_DEFAULT
-                  )
-                  lyricFragment.updateLrc(song)
-                }
-                sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
-              }
-              .show()
-          }
-          
-          7 -> { //字体大小调整
-            getBaseDialog(ref.get())
-              .items(R.array.lyric_font_size)
-              .itemsCallback { dialog, itemView, position, text ->
-                lyricFragment.setLyricScalingFactor(position)
-              }
-              .show()
-          }
-          
-          8 -> { //歌词时间轴调整
-            activity.showLyricOffsetView()
-          }
+
+          7 -> MusicServiceRemote.service?.updateLyrics(IgnoredProvider) // 忽略
+          8 -> TODO() // 调整字体大小
+          9 -> activity.showLyricOffsetView()// 调整时间轴
         }
-        
-      }
-      .show()
+      }.show()
+  }
+
+  companion object {
+    private val lrcMimeType: String
+      get() = MimeTypeMap.getSingleton().getMimeTypeFromExtension("lrc") ?: "*/*"
   }
 }

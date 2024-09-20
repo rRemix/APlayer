@@ -24,7 +24,6 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.annotation.WorkerThread
-import androidx.core.app.ServiceCompat
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
@@ -33,6 +32,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.*
 import remix.myplayer.App
+import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.appwidgets.BaseAppwidget
 import remix.myplayer.appwidgets.big.AppWidgetBig
@@ -45,9 +45,9 @@ import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayQueue
 import remix.myplayer.helper.*
-import remix.myplayer.lyric.LyricFetcher
-import remix.myplayer.lyric.LyricFetcher.Companion.LYRIC_FIND_INTERVAL
-import remix.myplayer.lyric.bean.LyricRowWrapper
+import remix.myplayer.lyrics.LyricsLine
+import remix.myplayer.lyrics.LyricsSearcher
+import remix.myplayer.lyrics.provider.ILyricsProvider
 import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.misc.log.LogObserver
@@ -66,10 +66,11 @@ import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
-import remix.myplayer.ui.widget.desktop.DesktopLyricView
+import remix.myplayer.ui.widget.desktop.DesktopLyricsView
 import remix.myplayer.util.*
 import remix.myplayer.util.Constants.*
 import remix.myplayer.util.RxUtil.applySingleScheduler
+import remix.myplayer.util.SPUtil.DESKTOP_LYRICS_KEY
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.Util.isAppOnForeground
 import remix.myplayer.util.Util.registerLocalReceiver
@@ -78,6 +79,7 @@ import remix.myplayer.util.Util.unregisterLocalReceiver
 import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Created by Remix on 2015/12/1.
@@ -257,6 +259,41 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
   /**
+   * 当前歌曲对应的歌词及偏移
+   */
+  var lyrics: Deferred<List<LyricsLine>> = CompletableDeferred(listOf())
+  private var _lyricsOffset: Int? = null
+  var lyricsOffset: Int
+    get() =
+      // 正常情况下只有在歌词加载完后才应该访问 offset，此时 offset 一定不为 null
+      _lyricsOffset ?: if (BuildConfig.DEBUG) {
+        throw IllegalStateException()
+      } else {
+        Timber.e("Trying to get lyricsOffset when _lyricsOffset is null")
+        0
+      }
+    set(value) {
+      if (_lyricsOffset == null) {
+        if (BuildConfig.DEBUG) {
+          throw IllegalStateException()
+        } else {
+          Timber.e("Trying to set lyricsOffset when _lyricsOffset is null")
+          return
+        }
+      }
+      // 仅 LyricsFragment 会修改
+      _lyricsOffset = value
+      launch(Dispatchers.IO) {
+        LyricsSearcher.saveOffset(currentSong, value)
+      }
+    }
+
+  /**
+   * 用于更新桌面歌词和状态栏歌词的 Job
+   */
+  private var updateLyricsJob: Job? = null
+
+  /**
    * 是否显示状态栏歌词
    */
   private var showStatusBarLyric = false
@@ -273,7 +310,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 桌面歌词控件
    */
-  private var desktopLyricView: DesktopLyricView? = null
+  private var desktopLyricView: DesktopLyricsView? = null
 
   /**
    * service是否停止运行
@@ -371,7 +408,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   private var timer: Timer = Timer()
   private var desktopWidgetTask: WidgetTask? = null
-  private var lyricTask: LyricTask? = null
 
   /**
    * 创建桌面歌词悬浮窗
@@ -388,10 +424,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 桌面歌词是否锁定
    */
   val isDesktopLyricLocked: Boolean
-    get() = if (desktopLyricView == null)
-      SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
-    else
-      desktopLyricView?.isLocked == true
+    get() = SPUtil.getValue(service, DESKTOP_LYRICS_KEY.NAME, DESKTOP_LYRICS_KEY.LOCKED, false)
 
   /**
    * 锁屏
@@ -752,7 +785,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     uiHandler.removeCallbacksAndMessages(null)
     showDesktopLyric = false
-    lyricTask?.cancel()
+    uiHandler.sendEmptyMessage(UPDATE_NOTIFICATION)
+    updateLyricsJob?.cancel()
+    updateLyricsJob = null
 
     AudioManagerCompat.abandonAudioFocusRequest(audioManager, focusRequest)
 
@@ -1157,11 +1192,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     updateAppwidget()
     updateNotification()
     updateMediaSession(operation)
-    //桌面歌词与状态栏歌词
-    if (lyricTask == null) {
-      lyricTask = LyricTask()
-      timer.schedule(lyricTask, LYRIC_FIND_INTERVAL, LYRIC_FIND_INTERVAL)
-    }
     // 是否需要保存进度
     if (playAtBreakPoint) {
       startSaveProgress()
@@ -1183,7 +1213,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       return
     }
     //更新桌面歌词播放按钮
-    desktopLyricView?.setPlayIcon(isPlaying)
+    desktopLyricView?.isPlaying = isPlaying
     sendLocalBroadcast(Intent(PLAY_STATE_CHANGE))
   }
 
@@ -1281,8 +1311,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       //桌面歌词
       Command.TOGGLE_DESKTOP_LYRIC -> {
-        val open: Boolean = if (intent.hasExtra(EXTRA_DESKTOP_LYRIC)) {
-          intent.getBooleanExtra(EXTRA_DESKTOP_LYRIC, false)
+        val open: Boolean = if (intent.hasExtra(EXTRA_DESKTOP_LYRICS)) {
+          intent.getBooleanExtra(EXTRA_DESKTOP_LYRICS, false)
         } else {
           !SPUtil.getValue(service,
               SETTING_KEY.NAME,
@@ -1318,11 +1348,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       //解锁桌面歌词
       Command.UNLOCK_DESKTOP_LYRIC -> {
-        if (desktopLyricView != null) {
-          desktopLyricView?.saveLock(false, true)
-        } else {
-          SPUtil.putValue(service, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_LOCK, false)
-        }
+        desktopLyricView?.run {
+          isLocked = false
+        } ?: SPUtil.putValue(service, DESKTOP_LYRICS_KEY.NAME, DESKTOP_LYRICS_KEY.LOCKED, false)
+        ToastUtil.show(service, R.string.desktop_lyric__unlock)
         //更新通知栏
         updateNotification()
       }
@@ -1338,14 +1367,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         //添加到播放队列
         playQueue.addNextSong(nextSong)
         ToastUtil.show(service, R.string.already_add_to_next_song)
-      }
-      //改变歌词源
-      Command.CHANGE_LYRIC -> {
-        lyricTask?.force = true
-//        if (showDesktopLyric) {
-//          updateDesktopLyric(true)
-//        }
-//        updateStatusBarLyric(true)
       }
       //切换定时器
       Command.TOGGLE_TIMER -> {
@@ -1463,6 +1484,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * @param song 播放歌曲的路径
    */
   private fun prepare(song: Song, requestFocus: Boolean = true) {
+    // 需要保证 updateLyrics 在别的地方使用 lyrics 前执行
+    updateLyrics(null)
     tryLaunch(
         block = {
           Timber.v("prepare start: %s", song)
@@ -1723,67 +1746,61 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
   }
 
-  fun setLyricOffset(offset: Int) {
-    lyricTask?.lyricFetcher?.offset = offset
-  }
-
-  private inner class LyricTask : TimerTask() {
-    private var prev: CharSequence = ""
-    val lyricFetcher = LyricFetcher(this@MusicService)
-    var force = false
-
-    override fun run() {
-      if (!showDesktopLyric) {
-        if (isDesktopLyricShowing) {
-          uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
-        }
-        if (!showStatusBarLyric || stop) {
-          return
-        }
-      }
-
-      val currentSong = playQueue.song
-      if (lyricFetcher.song != currentSong || force) {
-        Timber.tag(TAG_DESKTOP_LYRIC).v("重新获取歌词内容, id: ${currentSong.id}")
-        force = false
-        lyricFetcher.updateLyricRows(currentSong)
-        return
-      }
-
-      // 桌面歌词
-      val wrapper = lyricFetcher.findCurrentLyric()
-      Timber.tag(TAG_DESKTOP_LYRIC).v("findCurrentLyric: $wrapper")
-      if (!showDesktopLyric || !screenOn || checkNoPermission() || isAppOnForeground) {
-        if (isDesktopLyricShowing) {
-          Timber.tag(TAG_DESKTOP_LYRIC).v("remove desktop lyric")
-          uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
-        }
-      } else {
-        if (!isDesktopLyricShowing) {
-          Timber.tag(TAG_DESKTOP_LYRIC).v("create desktop lyric")
-          uiHandler.removeMessages(CREATE_DESKTOP_LRC)
-          uiHandler.sendEmptyMessageDelayed(CREATE_DESKTOP_LRC, 50)
-        } else {
-          Timber.tag(TAG_DESKTOP_LYRIC).v("update desktop lyric")
-          uiHandler.obtainMessage(UPDATE_DESKTOP_LRC_CONTENT, wrapper).sendToTarget()
-        }
-      }
-
-      // 状态栏歌词
-      if (showStatusBarLyric) {
-        if (TextUtils.equals(prev, wrapper.lineOne.content)) {
-          return
-        }
-        prev = wrapper.lineOne.content
-        uiHandler.obtainMessage(UPDATE_STATUS_BAR_LRC, wrapper).sendToTarget()
+  fun updateLyrics(provider: ILyricsProvider?) {
+    lyrics.cancel()
+    _lyricsOffset = null
+    lyrics = async(Dispatchers.IO) {
+      LyricsSearcher.getLyricsAndOffset(currentSong, provider).run {
+        ensureActive()
+        _lyricsOffset = second
+        first
       }
     }
+    // TODO: 仅在需要时运行，不需要时（暂停、熄屏？）停止
+    // TODO: 重构
+    updateLyricsJob?.cancel()
+    updateLyricsJob = launch(Dispatchers.IO) {
+      var prev = "" // 最近一次更新的状态栏歌词
+      while (true) {
+        delay(UPDATE_LYRICS_INTERVAL)
 
-    override fun cancel(): Boolean {
-      Timber.tag(TAG_DESKTOP_LYRIC).v("cancel task")
-      lyricFetcher.dispose()
-      uiHandler.sendEmptyMessage(UPDATE_NOTIFICATION)
-      return super.cancel()
+        runCatching {
+          if (!showDesktopLyric) {
+            if (isDesktopLyricShowing) {
+              uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
+            }
+            if (!showStatusBarLyric || stop) {
+              return@runCatching
+            }
+          }
+
+          val lyrics = lyrics.await()
+          val content =
+            LyricsHelper.getDesktopLyricsContent(lyrics, lyricsOffset, progress, duration)
+
+          // 桌面歌词
+          if (!showDesktopLyric || !screenOn || checkNoPermission() || isAppOnForeground) {
+            if (isDesktopLyricShowing) {
+              Timber.tag(TAG_LYRICS_TASK).v("remove desktop lyric")
+              uiHandler.sendEmptyMessage(REMOVE_DESKTOP_LRC)
+            }
+          } else {
+            if (!isDesktopLyricShowing) {
+              Timber.tag(TAG_LYRICS_TASK).v("create desktop lyric")
+              uiHandler.removeMessages(CREATE_DESKTOP_LRC)
+              uiHandler.sendEmptyMessageDelayed(CREATE_DESKTOP_LRC, 50)
+            } else {
+              uiHandler.obtainMessage(UPDATE_DESKTOP_LRC_CONTENT, content).sendToTarget()
+            }
+          }
+
+          // 状态栏歌词
+          if (showStatusBarLyric && !TextUtils.equals(prev, content.currentLine?.content ?: "")) {
+            prev = content.currentLine?.content ?: ""
+            uiHandler.obtainMessage(UPDATE_STATUS_BAR_LRC, prev).sendToTarget()
+          }
+        }
+      }
     }
   }
 
@@ -1805,20 +1822,20 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     param.format = PixelFormat.RGBA_8888
     param.gravity = Gravity.TOP
-    param.width = resources.displayMetrics.widthPixels
+    param.width = ViewGroup.LayoutParams.MATCH_PARENT
     param.height = ViewGroup.LayoutParams.WRAP_CONTENT
     param.x = 0
-    param.y = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_Y, 0)
+    param.y = 0
 
     if (desktopLyricView != null) {
       windowManager.removeView(desktopLyricView)
       desktopLyricView = null
     }
 
-    desktopLyricView = DesktopLyricView(service)
+    desktopLyricView = DesktopLyricsView(service)
     windowManager.addView(desktopLyricView, param)
+    desktopLyricView!!.restoreWindowPosition()
     isDesktopLyricInitializing = false
-    Timber.tag(TAG_DESKTOP_LYRIC).v("创建桌面歌词")
   }
 
   /**
@@ -1826,7 +1843,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    */
   private fun removeDesktopLyric() {
     if (desktopLyricView != null) {
-      Timber.tag(TAG_DESKTOP_LYRIC).v("移除桌面歌词")
+      Timber.v("移除桌面歌词")
       //      desktopLyricView.cancelNotify();
       windowManager.removeView(desktopLyricView)
       desktopLyricView = null
@@ -1848,7 +1865,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       return
     }
     progressTask = ProgressTask()
-    timer.schedule(progressTask, 1000, LYRIC_FIND_INTERVAL)
+    timer.schedule(progressTask, 1000, SAVE_PROGRESS_INTERVAL)
   }
 
   private fun stopSaveProgress() {
@@ -1934,10 +1951,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           musicService.handleMetaChange()
         }
         UPDATE_DESKTOP_LRC_CONTENT -> {
-          if (msg.obj is LyricRowWrapper) {
-            val wrapper = msg.obj as LyricRowWrapper
-            musicService.desktopLyricView?.setText(wrapper.lineOne, wrapper.lineTwo)
-          }
+          musicService.desktopLyricView?.setContent(msg.obj as DesktopLyricsView.Content)
         }
         REMOVE_DESKTOP_LRC -> {
           musicService.removeDesktopLyric()
@@ -1946,10 +1960,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           musicService.createDesktopLyric()
         }
         UPDATE_STATUS_BAR_LRC -> {
-          if (msg.obj is LyricRowWrapper) {
-            val wrapper = msg.obj as LyricRowWrapper
-            musicService.updateNotificationWithLrc(wrapper.lineOne.content);
-          }
+          musicService.updateNotificationWithLrc(msg.obj as String)
         }
         UPDATE_NOTIFICATION -> {
           musicService.updateNotification()
@@ -1985,9 +1996,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
 
   companion object {
-    const val TAG_DESKTOP_LYRIC = "LyricTask"
+    private const val TAG_LYRICS_TASK = "LyricsTask"
     const val TAG_LIFECYCLE = "ServiceLifeCycle"
-    const val EXTRA_DESKTOP_LYRIC = "DesktopLyric"
+    const val EXTRA_DESKTOP_LYRICS = "DesktopLyrics"
     const val EXTRA_SONG = "Song"
     const val EXTRA_POSITION = "Position"
 
@@ -2063,6 +2074,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     private const val APPWIDGET_SMALL_TRANSPARENT = "AppWidgetSmallTransparent"
 
     private const val INTERVAL_APPWIDGET = 1000L
+    private const val SAVE_PROGRESS_INTERVAL = 500L
+    private val UPDATE_LYRICS_INTERVAL = 50.milliseconds // TODO: 是否合适？
 
 
     /**

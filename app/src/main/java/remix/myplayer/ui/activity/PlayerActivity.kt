@@ -3,7 +3,6 @@ package remix.myplayer.ui.activity
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -26,6 +25,7 @@ import android.view.animation.Animation.AnimationListener
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.FragmentManager
@@ -49,8 +49,7 @@ import remix.myplayer.helper.MusicServiceRemote.getPlayModel
 import remix.myplayer.helper.MusicServiceRemote.getProgress
 import remix.myplayer.helper.MusicServiceRemote.isPlaying
 import remix.myplayer.helper.MusicServiceRemote.setPlayModel
-import remix.myplayer.lyric.LrcView
-import remix.myplayer.lyric.LrcView.OnLrcClickListener
+import remix.myplayer.lyrics.provider.UriProvider
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
@@ -68,10 +67,11 @@ import remix.myplayer.ui.adapter.PagerAdapter
 import remix.myplayer.ui.blur.StackBlurManager
 import remix.myplayer.ui.dialog.PlayQueueDialog
 import remix.myplayer.ui.dialog.PlayQueueDialog.Companion.newInstance
-import remix.myplayer.ui.fragment.LyricFragment
+import remix.myplayer.ui.fragment.LyricsFragment
 import remix.myplayer.ui.fragment.RecordFragment
 import remix.myplayer.ui.fragment.player.CoverFragment
 import remix.myplayer.ui.fragment.player.RoundCoverFragment
+import remix.myplayer.ui.widget.LyricsView
 import remix.myplayer.util.*
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import timber.log.Timber
@@ -98,9 +98,6 @@ class PlayerActivity : BaseMusicActivity() {
   //是否正在拖动进度条
   var isDragSeekBarFromUser = false
 
-  //歌词控件
-  private var lrcView: LrcView? = null
-
   //高亮与非高亮指示器
   private lateinit var highLightIndicator: GradientDrawable
   private lateinit var normalIndicator: GradientDrawable
@@ -119,7 +116,7 @@ class PlayerActivity : BaseMusicActivity() {
   private var duration = 0
 
   //Fragment
-  lateinit var lyricFragment: LyricFragment
+  lateinit var lyricsFragment: LyricsFragment
     private set
   private lateinit var coverFragment: RoundCoverFragment
 
@@ -163,6 +160,13 @@ class PlayerActivity : BaseMusicActivity() {
 
   private val background by lazy {
     SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.PLAYER_BACKGROUND, BACKGROUND_ADAPTIVE_COLOR)
+  }
+
+  val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    uri?.let {
+      MusicServiceRemote.service?.updateLyrics(UriProvider(it))
+      lyricsFragment.updateLyrics()
+    }
   }
 
   override fun setUpTheme() {
@@ -448,10 +452,10 @@ class PlayerActivity : BaseMusicActivity() {
       override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         if (fromUser) {
           updateProgressText(progress)
+          lyricsFragment.updateProgress()
         }
         handler.sendEmptyMessage(UPDATE_TIME_ONLY)
         currentTime = progress
-        lrcView?.seekTo(progress, true, fromUser)
       }
 
       override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -477,8 +481,7 @@ class PlayerActivity : BaseMusicActivity() {
       val current = audioManager.getStreamVolume(STREAM_MUSIC)
 
       runOnUiThread {
-        if (min != 0) {
-          @RequiresApi(Build.VERSION_CODES.O)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
           volumeSeekbar.min = min
         }
         volumeSeekbar.max = max
@@ -563,7 +566,7 @@ class PlayerActivity : BaseMusicActivity() {
     val fragments = fragmentManager.fragments
 
     for (fragment in fragments) {
-      if (fragment is LyricFragment ||
+      if (fragment is LyricsFragment ||
           fragment is CoverFragment<*> ||
           fragment is RecordFragment) {
         fragmentManager.beginTransaction().remove(fragment).commitNow()
@@ -571,8 +574,8 @@ class PlayerActivity : BaseMusicActivity() {
     }
     coverFragment = RoundCoverFragment()
     setUpCoverFragment()
-    lyricFragment = LyricFragment()
-    setUpLyricFragment()
+    lyricsFragment = LyricsFragment()
+    setUpLyricsFragment()
 
     if (this.isPortraitOrientation()) {
 
@@ -580,7 +583,7 @@ class PlayerActivity : BaseMusicActivity() {
       val adapter = PagerAdapter(supportFragmentManager)
       //      adapter.addFragment(mRecordFragment);
       adapter.addFragment(coverFragment)
-      adapter.addFragment(lyricFragment)
+      adapter.addFragment(lyricsFragment)
       binding.viewPager.adapter = adapter
       binding.viewPager.offscreenPageLimit = adapter.count - 1
       binding.viewPager.currentItem = 0
@@ -604,7 +607,7 @@ class PlayerActivity : BaseMusicActivity() {
       fragmentManager
           .beginTransaction()
           .replace(R.id.container_cover, coverFragment)
-          .replace(R.id.container_lyric, lyricFragment)
+          .replace(R.id.container_lyric, lyricsFragment)
           .commit()
     }
 
@@ -653,27 +656,13 @@ class PlayerActivity : BaseMusicActivity() {
   }
 
 
-  private fun setUpLyricFragment() {
-    lyricFragment.setOnInflateFinishListener { view: View? ->
-      lrcView = view as LrcView
-      lrcView?.setOnLrcClickListener(object : OnLrcClickListener {
-        override fun onClick() {}
-        override fun onLongClick() {}
-      })
-
-      lrcView?.setOnSeekToListener(object : LrcView.OnSeekToListener {
-        override fun onSeekTo(progress: Int) {
-          if (progress > 0 && progress < getDuration()) {
-            MusicServiceRemote.setProgress(progress)
-            currentTime = progress
-            handler.sendEmptyMessage(UPDATE_TIME_ALL)
-          }
-        }
-
-      })
-      lrcView?.setHighLightColor(ThemeStore.textColorPrimary)
-      lrcView?.setOtherColor(ThemeStore.textColorSecondary)
-      lrcView?.setTimeLineColor(ThemeStore.textColorSecondary)
+  private fun setUpLyricsFragment() {
+    lyricsFragment.onSeekToListener = LyricsView.OnSeekToListener { progress ->
+      if (progress in 0..getDuration()) {
+        MusicServiceRemote.setProgress(progress)
+        currentTime = progress
+        handler.sendEmptyMessage(UPDATE_TIME_ALL)
+      }
     }
   }
 
@@ -691,7 +680,7 @@ class PlayerActivity : BaseMusicActivity() {
     super.onMediaStoreChanged()
     val newSong = getCurrentSong()
     updateTopStatus(newSong)
-    lyricFragment.updateLrc(newSong)
+    lyricsFragment.updateLyrics() // TODO
     song = newSong
     coverFragment.setImage(song, false, true)
   }
@@ -705,7 +694,7 @@ class PlayerActivity : BaseMusicActivity() {
       //更新顶部信息
       updateTopStatus(song)
       //更新歌词
-      handler.postDelayed({ lyricFragment.updateLrc(song) }, 50)
+      lyricsFragment.updateLyrics() // TODO: is it needed?
       //更新进度条
       val temp = getProgress()
       currentTime = if (temp in 1 until duration) temp else 0
@@ -967,22 +956,6 @@ class PlayerActivity : BaseMusicActivity() {
     Util.unregisterLocalReceiver(receiver)
   }
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-    if (requestCode == REQUEST_SELECT_LYRIC && resultCode == Activity.RESULT_OK) {
-      data?.data?.let { uri ->
-        SPUtil.putValue(
-            this,
-            SPUtil.LYRIC_KEY.NAME,
-            song.id.toString(),
-            SPUtil.LYRIC_KEY.LYRIC_MANUAL
-        )
-        lyricFragment.updateLrc(uri)
-        Util.sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.CHANGE_LYRIC))
-      }
-    }
-  }
-
   private fun updateProgressText(current: Int) {
     if (current > 0 && duration - current > 0) {
       binding.textHasplay.text = Util.getTime(current.toLong())
@@ -1026,7 +999,7 @@ class PlayerActivity : BaseMusicActivity() {
     if (binding.viewPager.currentItem != 2) {
       binding.viewPager.setCurrentItem(2, true)
     }
-    lyricFragment.showLyricOffsetView()
+    lyricsFragment.showOffsetPanel()
   }
 
   private inner class Receiver : BroadcastReceiver() {
@@ -1055,7 +1028,5 @@ class PlayerActivity : BaseMusicActivity() {
     private const val DELAY_SHOW_NEXT_SONG: Long = 3000
 
     const val ACTION_UPDATE_NEXT = "remix.myplayer.update.next_song"
-
-    const val REQUEST_SELECT_LYRIC = 0x104
   }
 }
