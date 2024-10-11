@@ -264,3 +264,50 @@ dependencies {
     val googleImplementation by configurations
     googleImplementation(libs.billingclient)
 }
+
+// 上传mapping文件
+if (properties.getProperty("BUGLY_UPLOAD") == "1") {
+    val uploadMapping by tasks.registering(Exec::class) {
+        val jarFile = File(properties.getProperty("BUGLY_JAR") ?: "")
+        if (!jarFile.exists()) {
+            logger.warn("jarFile: ${jarFile.absolutePath} don't exist")
+            return@registering
+        }
+
+        val appId = properties.getProperty("BUGLY_APPID")
+        val appKey = properties.getProperty("BUGLY_APPKEY")
+        if (appId.isNullOrEmpty() || appKey.isNullOrEmpty()) {
+            logger.warn("appId or appKey for bugly is invalid")
+            return@registering
+        }
+
+        val mappingFile =
+            file("${project.layout.buildDirectory.asFile.get()}/outputs/mapping/nonGoogleWithUpdaterRelease/mapping.txt")
+        val args = listOf(
+            "-appid",
+            appId,
+            "-appkey",
+            appKey,
+            "-bundleid",
+            android.defaultConfig.applicationId,
+            "-version",
+            android.defaultConfig.versionName,
+            "-buildNo",
+            android.defaultConfig.versionCode.toString(),
+            "-platform",
+            "Android",
+            "-inputMapping",
+            mappingFile.absolutePath
+        )
+
+        commandLine = listOf("java", "-jar", jarFile.absolutePath) + args
+        standardOutput = System.out
+        errorOutput = System.out
+    }
+
+    tasks.whenTaskAdded {
+        if (name == "assembleNonGoogleWithUpdaterRelease") {
+            finalizedBy(uploadMapping)
+        }
+    }
+}

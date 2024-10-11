@@ -1,6 +1,7 @@
 package remix.myplayer.service
 
 import android.os.CountDownTimer
+import android.os.DeadSystemException
 import android.os.Handler
 import androidx.annotation.FloatRange
 import timber.log.Timber
@@ -45,6 +46,8 @@ class VolumeController(private val service: MusicService) {
         try {
           mediaPlayer.pause()
         } catch (e: IllegalStateException) {
+          Timber.v(e)
+        } catch (e: DeadSystemException) {
           Timber.v(e)
         }
       }
