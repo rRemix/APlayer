@@ -6,6 +6,20 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
+  <ScrollView
+    android:id="@+id/outer_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="SpeakableTextPresentCheck">
+
+    <LinearLayout
+      android:id="@+id/inner_container"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical" />
+  </ScrollView>
+
+  <!-- 必须比 ScrollView 晚定义，不然点击事件会被 ScrollView 拦截 -->
   <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/time_indicator"
     android:layout_width="match_parent"
@@ -50,19 +64,4 @@
       app:layout_constraintEnd_toEndOf="parent"
       tools:text="00:00.00" />
   </androidx.constraintlayout.widget.ConstraintLayout>
-
-  <remix.myplayer.ui.widget.ResponsiveScrollView
-    android:id="@+id/outer_container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:ignore="SpeakableTextPresentCheck">
-
-    <LinearLayout
-      android:id="@+id/inner_container"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:orientation="vertical" />
-  </remix.myplayer.ui.widget.ResponsiveScrollView>
-
 </FrameLayout>

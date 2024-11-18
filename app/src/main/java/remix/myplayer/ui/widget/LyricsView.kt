@@ -2,6 +2,7 @@ package remix.myplayer.ui.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -11,11 +12,13 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.UiThread
-import remix.myplayer.R
+import androidx.core.view.updatePadding
+import remix.myplayer.databinding.LayoutLyricsLineBinding
 import remix.myplayer.databinding.LayoutLyricsViewBinding
 import remix.myplayer.lyrics.LyricsLine
 import remix.myplayer.lyrics.PerWordLyricsLine
 import remix.myplayer.theme.ThemeStore
+import timber.log.Timber
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -23,7 +26,10 @@ class LyricsView @JvmOverloads constructor(
   context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs), View.OnTouchListener {
   companion object {
+    private const val TAG = "LyricsView"
+
     private val DEACTIVATE_DELAY = 5000.milliseconds
+    private val AUTO_SCROLL_DELAY = 200.milliseconds
 
     private val normalTextColor
       @ColorInt get() = ThemeStore.textColorSecondary
@@ -41,40 +47,29 @@ class LyricsView @JvmOverloads constructor(
 
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     super.onSizeChanged(w, h, oldw, oldh)
+    Timber.tag(TAG).v("onSizeChanged, h=$h")
     if (h != oldh) {
       // 给 container 上下加空白，确保第一行和最后一行歌词可以滚动到 view 中间
-      binding.innerContainer.setPadding(0, h / 2, 0, h / 2)
+      val padding = (h + 1) / 2
+      handler.post {
+        binding.innerContainer.setPadding(0, padding, 0, padding)
+      }
     }
   }
 
-  private fun newLayoutForLine(line: LyricsLine): LinearLayout {
-    val params = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    val padding = resources.getDimensionPixelSize(R.dimen.lyrics_view_lrc_block_vertical_padding)
-    val textColor = normalTextColor
-
-    val layout = LinearLayout(context)
-    layout.layoutParams = params
-    layout.setPadding(0, padding, 0, padding)
-    layout.orientation = LinearLayout.VERTICAL
+  private fun addLayoutForLine(line: LyricsLine) {
+    val layout =
+      LayoutLyricsLineBinding.inflate(LayoutInflater.from(context), binding.innerContainer, true)
     if (line.content.isNotBlank()) {
-      val view = TextView(context)
-      view.layoutParams = params
-      view.text = if (line is PerWordLyricsLine) {
-        line.getSpannedString(0f, textColor)
+      layout.content.text = if (line is PerWordLyricsLine) {
+        line.getSpannedString(0f, normalTextColor)
       } else {
         line.content
       }
-      view.setTextColor(textColor)
-      layout.addView(view)
     }
-    if (line.translation?.isNotBlank() == true) {
-      val view = TextView(context)
-      view.layoutParams = params
-      view.text = line.translation
-      view.setTextColor(textColor)
-      layout.addView(view)
+    if (!line.translation.isNullOrBlank()) {
+      layout.translation.text = line.translation
     }
-    return layout
   }
 
   /**
@@ -89,7 +84,7 @@ class LyricsView @JvmOverloads constructor(
       binding.innerContainer.removeAllViews()
       isClickable = lyrics.isNotEmpty()
       value.forEach {
-        binding.innerContainer.addView(newLayoutForLine(it))
+        addLayoutForLine(it)
       }
       rawProgressAndDuration = null
       lastHighlightLine = null
@@ -107,7 +102,7 @@ class LyricsView @JvmOverloads constructor(
       }
       field = value
       if (isActive) {
-        showTimeIndicator()
+        updateTimeIndicator()
       }
       rawProgressAndDuration?.run {
         updateProgress(first, second)
@@ -201,7 +196,8 @@ class LyricsView @JvmOverloads constructor(
     set(value) {
       field = value
       if (value) {
-        showTimeIndicator()
+        updateTimeIndicator()
+        binding.timeIndicator.visibility = View.VISIBLE
         handler.removeCallbacks(deactivateRunnable)
         handler.postDelayed(deactivateRunnable, DEACTIVATE_DELAY.inWholeMilliseconds)
       } else {
@@ -215,34 +211,69 @@ class LyricsView @JvmOverloads constructor(
   private val deactivateRunnable = Runnable {
     isActive = false
   }
+  private val scrollToNearestLineRunnable = Runnable {
+    scrollToLine(getNearestLine())
+  }
 
   @SuppressLint("SetTextI18n")
-  private fun showTimeIndicator() {
+  private fun updateTimeIndicator() {
     (lyrics[getNearestLine()].time - offset).coerceAtLeast(0).let {
       binding.time.text =
         "%02d:%02d.%02d".format(it / 1000 / 60, it / 1000 % 60, (it % 1000 / 10f).roundToInt())
+      // TODO: don't set every time
       binding.playButton.setOnClickListener { _ ->
         onSeekToListener?.onSeekTo(it)
       }
     }
-    binding.timeIndicator.visibility = View.VISIBLE
   }
 
+  private var isTouching: Boolean = false
+
   override fun onTouch(v: View, event: MotionEvent): Boolean {
+    check(v == binding.outerContainer)
+
     isActive = true
+
+    when (event.action) {
+      MotionEvent.ACTION_DOWN -> {
+        isTouching = true
+        handler.removeCallbacks(scrollToNearestLineRunnable)
+      }
+
+      MotionEvent.ACTION_UP -> {
+        isTouching = false
+        handler.postDelayed(scrollToNearestLineRunnable, AUTO_SCROLL_DELAY.inWholeMilliseconds)
+      }
+    }
+
     return false
+  }
+
+  private fun onScrollChange() {
+    updateTimeIndicator()
+
+    handler.removeCallbacks(scrollToNearestLineRunnable)
+    if (!isTouching) {
+      handler.postDelayed(scrollToNearestLineRunnable, AUTO_SCROLL_DELAY.inWholeMilliseconds)
+    }
   }
 
   // 在单独函数以忽略警告
   @SuppressLint("ClickableViewAccessibility")
-  private fun setupOnTouchListener() {
+  private fun init() {
     binding.outerContainer.setOnTouchListener(this)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      binding.outerContainer.setOnScrollChangeListener { _, _, _, _, _ ->
+        onScrollChange()
+      }
+    } else {
+      binding.outerContainer.viewTreeObserver.addOnScrollChangedListener {
+        onScrollChange()
+      }
+    }
   }
 
   init {
-    binding.outerContainer.onFlingEndListener = ResponsiveScrollView.OnFlingEndListener {
-      scrollToLine(getNearestLine())
-    }
-    setupOnTouchListener()
+    init()
   }
 }

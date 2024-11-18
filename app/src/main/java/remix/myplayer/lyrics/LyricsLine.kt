@@ -1,9 +1,11 @@
 package remix.myplayer.lyrics
 
+import kotlinx.serialization.Serializable
 import remix.myplayer.App
 import remix.myplayer.R
 
-abstract class LyricsLine {
+@Serializable
+sealed class LyricsLine {
   /**
    * 这行歌词的开始时间
    */

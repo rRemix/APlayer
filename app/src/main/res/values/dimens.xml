@@ -137,6 +137,5 @@
   <dimen name="lrc_fragment_offset_button_size">48dp</dimen>
   <dimen name="lrc_fragment_offset_text_size">11sp</dimen>
 
-  <dimen name="lyrics_view_lrc_block_vertical_padding">4dp</dimen>
   <dimen name="lyrics_view_time_indicator_play_button_size">24dp</dimen>
 </resources>

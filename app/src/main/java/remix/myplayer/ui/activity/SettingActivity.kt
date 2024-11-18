@@ -47,6 +47,7 @@ import remix.myplayer.glide.UriFetcher.DOWNLOAD_LASTFM
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.LanguageHelper
 import remix.myplayer.helper.LanguageHelper.AUTO
+import remix.myplayer.helper.LyricsHelper
 import remix.myplayer.helper.M3UHelper.exportPlayListToFile
 import remix.myplayer.helper.M3UHelper.importLocalPlayList
 import remix.myplayer.helper.M3UHelper.importM3UFile
@@ -71,7 +72,6 @@ import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.theme.TintHelper
-import remix.myplayer.ui.ViewCommon
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_LIBRARY
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_RECREATE
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_REFRESH_ADAPTER
@@ -914,7 +914,7 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
    * 歌词搜索优先级
    */
   private fun configLyricPriority() {
-    ViewCommon.showLocalLyricTip(this) {
+    LyricsHelper.showLocalLyricsTip(this) {
       LyricsOrderDialog().show(supportFragmentManager, "configLyricPriority")
     }
   }

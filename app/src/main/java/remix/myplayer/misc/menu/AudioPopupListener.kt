@@ -13,6 +13,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.EQHelper
+import remix.myplayer.helper.LyricsHelper
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
 import remix.myplayer.lyrics.provider.EmbeddedProvider
@@ -20,7 +21,6 @@ import remix.myplayer.lyrics.provider.IgnoredProvider
 import remix.myplayer.lyrics.provider.StubProvider
 import remix.myplayer.service.Command
 import remix.myplayer.theme.Theme.getBaseDialog
-import remix.myplayer.ui.ViewCommon
 import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.ui.dialog.AddtoPlayListDialog
 import remix.myplayer.ui.dialog.TimerDialog
@@ -46,7 +46,7 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
     val activity = ref.get() ?: return true
     when (item.itemId) {
       R.id.menu_lyric -> {
-        ViewCommon.showLocalLyricTip(activity) {
+        LyricsHelper.showLocalLyricsTip(activity) {
           onClickLyric(activity)
         }
         return true
@@ -169,9 +169,10 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
 
           7 -> MusicServiceRemote.service?.updateLyrics(IgnoredProvider) // 忽略
           8 -> TODO() // 调整字体大小
-          9 -> activity.showLyricOffsetView()// 调整时间轴
+          9 -> activity.showLyricOffsetView() // 调整时间轴
         }
       }.show()
+    // TODO: update LyricsFragment
   }
 
   companion object {

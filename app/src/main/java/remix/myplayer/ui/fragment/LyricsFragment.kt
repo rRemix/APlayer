@@ -118,13 +118,13 @@ class LyricsFragment : BaseMusicFragment<FragmentLrcBinding>(), View.OnClickList
   override fun onMediaStoreChanged() {
     super.onMediaStoreChanged()
     updateLyrics()
-    TODO("when is it called?")
+//    TODO("when is it called?")
   }
 
   override fun onMetaChanged() {
     super.onMetaChanged()
     updateLyrics()
-    TODO("when is it called?")
+//    TODO("when is it called?")
   }
 
   @UiThread

@@ -474,7 +474,7 @@
   <string name="connect">Connect</string>
   <string name="edit">Edit</string>
   <string name="speed_at_2x">Playing at 2x speed</string>
-  <string name="local_lyric_tip">If your Android version is 11 or above, please make sure the local lyrics files are placed in the public directory (such as Downloads, Music, etc. directories)</string>
+  <string name="local_lyrics_tip">If your Android version is 11 or above, please make sure the local lyrics files are placed in the public directory (such as Downloads, Music, etc. directories)</string>
   <string name="buffering_wait">Buffering, please wait</string>
   <string name="last_play">Last Play TimeAt</string>
   <string name="last_play_desc">Last Play TimeAt Desc</string>

@@ -73,7 +73,6 @@ object LrcParser {
       // [xxx]
       if (it.endsWith(']')) {
         val tag = it.substring(1, it.lastIndex)
-        println(tag)
         // [offset:+/-xxx]
         if (tag.startsWith("offset:")) {
           try {

@@ -87,7 +87,11 @@ object LyricsSearcher {
         when (song) {
           is Song.Local -> "local"
           is Song.Remote -> "remote"
-        }, if (song is Song.Local) song.id else song.data, song.title, song.artist, song.album
+        },
+        if (song is Song.Local) song.id.toString() else song.data,
+        song.title,
+        song.artist,
+        song.album
       )
     )
     // 要作为文件名，安全起见保证输出长度不超过 127 字节，SHA-384 输出 96 字节

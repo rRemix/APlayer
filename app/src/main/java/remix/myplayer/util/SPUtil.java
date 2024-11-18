@@ -110,6 +110,7 @@ public class SPUtil {
   public interface LYRICS_KEY {
     String NAME = "Lyrics";
 
+    String LOCAL_LYRICS_TIP_SHOWN = "local_lyrics_tip_shown";
     String ORDER = "order";
     String OFFSET_PREFIX = "offset_"; // offset_$hashKey
   }
