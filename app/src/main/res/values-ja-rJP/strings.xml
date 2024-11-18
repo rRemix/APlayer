@@ -473,4 +473,5 @@
   <string name="connect">せつぞく</string>
   <string name="edit">編集</string>
   <string name="buffering_wait">バッファリングです,ちょっと待ってください</string>
+    <string name="last_play">最後にプレイした</string>
 </resources>

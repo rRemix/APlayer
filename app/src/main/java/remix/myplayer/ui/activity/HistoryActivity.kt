@@ -38,6 +38,7 @@ class HistoryActivity : MenuActivity() {
     HistoryAdapter(R.layout.item_song_recycle, choice, binding.recyclerview)
   }
   private val countMap = HashMap<Long, Int>()
+  private val last_play_map = HashMap<Long, Long>()
   private val choice by lazy {
     MultipleChoice<Song>(this, Constants.SONG)
   }
@@ -104,15 +105,16 @@ class HistoryActivity : MenuActivity() {
   private fun loadHistory() {
     job?.cancel()
     job = launch(Dispatchers.IO) {
+      val order = SPUtil.getValue(
+        this@HistoryActivity,
+        SPUtil.SETTING_KEY.NAME,
+        SPUtil.SETTING_KEY.HISTORY_SORT_ORDER,
+        SortOrder.PLAY_COUNT_DESC
+      )
       AppDatabase.getInstance(App.context.applicationContext)
         .historyDao()
         .selectAll(
-          SPUtil.getValue(
-            this@HistoryActivity,
-            SPUtil.SETTING_KEY.NAME,
-            SPUtil.SETTING_KEY.HISTORY_SORT_ORDER,
-            SortOrder.PLAY_COUNT_DESC
-          ) != SortOrder.PLAY_COUNT_DESC
+          order
         )
         .map {
           val songs = ArrayList<Song>()
@@ -121,6 +123,7 @@ class HistoryActivity : MenuActivity() {
             if (song != Song.EMPTY_SONG) {
               songs.add(song)
               countMap[song.id] = history.play_count
+              last_play_map[song.id] = history.last_play
             }
           }
           songs

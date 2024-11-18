@@ -22,10 +22,12 @@ interface HistoryDao {
 
   @Query("""
     SELECT * FROM History ORDER BY
-    CASE WHEN :asc = 1 THEN play_count END ASC,
-    CASE WHEN :asc = 0 THEN play_count END DESC
+    CASE :orderBY WHEN 'last_play' THEN last_play  END asc,
+    CASE :orderBY WHEN 'last_play desc' THEN last_play END desc,
+    CASE :orderBY WHEN 'play_count' THEN play_count END asc,
+    CASE :orderBY WHEN 'play_count desc' THEN play_count END desc
   """)
-  fun selectAll(asc: Boolean): Flow<List<History>>
+  fun selectAll(orderBY: String): Flow<List<History>>
 
   @Query("""
     SELECT * FROM History
