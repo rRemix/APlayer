@@ -119,6 +119,14 @@ abstract class MenuActivity : ToolbarActivity() {
           sortOrder = SortOrder.PLAY_COUNT_DESC
           item.isChecked = true
         }
+        R.id.action_sort_order_last_play -> {
+          sortOrder = SortOrder.LASTPLAY
+          item.isChecked = true
+        }
+        R.id.action_sort_order_last_play_desc -> {
+          sortOrder = SortOrder.LASTPLAY_DESC
+          item.isChecked = true
+        }
       }
       if (!TextUtils.isEmpty(sortOrder))
         saveSortOrder(sortOrder)

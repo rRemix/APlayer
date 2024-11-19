@@ -15,6 +15,12 @@
         <item
           android:title="@string/count_desc"
           android:id="@+id/action_sort_order_play_count_desc"/>
+        <item
+            android:title="@string/last_play"
+            android:id="@+id/action_sort_order_last_play"/>
+        <item
+            android:title="@string/last_play_desc"
+            android:id="@+id/action_sort_order_last_play_desc"/>
       </group>
     </menu>
   </item>

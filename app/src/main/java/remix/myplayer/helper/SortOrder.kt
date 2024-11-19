@@ -24,4 +24,6 @@ object SortOrder {
   const val GENRE_Z_A = "${Audio.Genres.DEFAULT_SORT_ORDER} DESC"
   const val PLAY_COUNT = "play_count"
   const val PLAY_COUNT_DESC= "play_count desc"
+  const val LASTPLAY = "last_play"
+  const val LASTPLAY_DESC = "last_play desc"
 }
