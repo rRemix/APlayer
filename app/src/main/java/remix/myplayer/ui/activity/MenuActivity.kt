@@ -170,6 +170,8 @@ abstract class MenuActivity : ToolbarActivity() {
       SortOrder.PLAYLIST_SONG_CUSTOM -> subMenu.findItem(R.id.action_sort_order_custom).isChecked = true
       SortOrder.PLAY_COUNT -> subMenu.findItem(R.id.action_sort_order_play_count).isChecked = true
       SortOrder.PLAY_COUNT_DESC -> subMenu.findItem(R.id.action_sort_order_play_count_desc).isChecked = true
+      SortOrder.LASTPLAY -> subMenu.findItem(R.id.action_sort_order_last_play).isChecked = true
+      SortOrder.LASTPLAY_DESC -> subMenu.findItem(R.id.action_sort_order_last_play_desc).isChecked = true
     }
   }
 
