@@ -1528,7 +1528,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    *
    * @param isNext 是否是播放下一首
    */
-  private var lastSwitchTime = System.currentTimeMillis()
+  private var lastSwitchTime = 0L
   fun playNextOrPrev(isNext: Boolean) {
     if (System.currentTimeMillis() - lastSwitchTime <= 800) {
       return
