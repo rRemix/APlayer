@@ -8,7 +8,8 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.text.TextUtils;
 import java.io.File;
-import java.io.IOException;
+
+import timber.log.Timber;
 
 /**
  * Created by Remix on 2016/6/14.
@@ -24,8 +25,8 @@ public class DiskCache {
         lrcCacheDir.mkdir();
       }
       mLrcCache = DiskLruCache.open(lrcCacheDir, getAppVersion(context), 1, 200 * MB);
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      Timber.e(e);
     }
   }
 

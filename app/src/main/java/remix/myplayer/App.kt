@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Process
 import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication
+import com.hjq.permissions.XXPermissions
 import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy
 import io.reactivex.Completable
@@ -63,11 +64,11 @@ class App : MultiDexApplication() {
       SPUtil.deleteFile(this, SPUtil.LYRIC_KEY.NAME)
       SPUtil.putValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.LYRIC_RESET_ON_16000, true)
       SPUtil.putValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY)
-      try {
-        DiskCache.getLrcDiskCache().delete()
-      } catch (e: Exception) {
-        Timber.v(e)
-      }
+//      try {
+//        DiskCache.getLrcDiskCache().delete()
+//      } catch (e: Exception) {
+//        Timber.v(e)
+//      }
     }
 
     val oldVersion = SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.VERSION, 1)
@@ -84,6 +85,7 @@ class App : MultiDexApplication() {
   }
 
   private fun setUp() {
+    XXPermissions.setCheckMode(false)
     DiskCache.init(this, "lyric")
     setApplicationLanguage(this)
     Completable

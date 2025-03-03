@@ -1,6 +1,5 @@
 package remix.myplayer.ui.activity
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -25,8 +24,10 @@ import com.afollestad.materialdialogs.DialogAction
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.hjq.permissions.OnPermissionCallback
+import com.hjq.permissions.Permission
+import com.hjq.permissions.XXPermissions
 import com.soundcloud.android.crop.Crop
-import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
@@ -256,17 +257,25 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
             //经典通知栏
             R.id.setting_notify_switch -> {
               if (isChecked && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                RxPermissions(this@SettingActivity)
-                  .request(Manifest.permission.POST_NOTIFICATIONS)
-                  .subscribe { has ->
-                    if (!has){
+                XXPermissions.with(this@SettingActivity)
+                  .permission(Permission.POST_NOTIFICATIONS)
+                  .request(object : OnPermissionCallback {
+                    override fun onGranted(p0: MutableList<String>, p1: Boolean) {
+                    }
+
+                    override fun onDenied(
+                      permissions: MutableList<String>,
+                      doNotAskAgain: Boolean
+                    ) {
                       ToastUtil.show(this@SettingActivity, R.string.need_permission)
                       SPUtil.putValue(this@SettingActivity, SETTING_KEY.NAME, keyWord[index], false)
                       buttonView.setOnCheckedChangeListener(null)
                       buttonView.isChecked = false
                       buttonView.setOnCheckedChangeListener(checkedChangedListener)
+
+                      XXPermissions.startPermissionActivity(this@SettingActivity, Permission.POST_NOTIFICATIONS)
                     }
-                  }
+                  })
               }
             }
           }

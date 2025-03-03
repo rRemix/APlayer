@@ -10,7 +10,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.tbruyelle.rxpermissions2.RxPermissions
+import com.hjq.permissions.OnPermissionCallback
+import com.hjq.permissions.Permission
+import com.hjq.permissions.XXPermissions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import remix.myplayer.BuildConfig
@@ -24,7 +26,12 @@ import remix.myplayer.theme.ThemeStore.sColoredNavigation
 import remix.myplayer.theme.ThemeStore.statusBarColor
 import remix.myplayer.theme.ThemeStore.themeRes
 import remix.myplayer.ui.misc.AudioTag
-import remix.myplayer.util.*
+import remix.myplayer.util.ColorUtil
+import remix.myplayer.util.MediaStoreUtil
+import remix.myplayer.util.PermissionUtil
+import remix.myplayer.util.StatusBarUtil
+import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 import timber.log.Timber
 
 /**
@@ -43,7 +50,7 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
   var toDeleteSongs: ArrayList<Song>? = null
 
   private var dialog: Dialog? = null
-  
+
   private val loadingDialog by lazy {
     Theme.getBaseDialog(this)
       .title(R.string.loading)
@@ -86,6 +93,25 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 //      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 //    }
     setNavigationBarColor()
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !XXPermissions.isGranted(
+        this,
+        Manifest.permission.POST_NOTIFICATIONS
+      )
+    ) {
+      XXPermissions.with(this)
+        .permission(Permission.POST_NOTIFICATIONS)
+        .request(object : OnPermissionCallback {
+          override fun onGranted(permissions: MutableList<String>, allGranted: Boolean) {
+            Timber.v("request notification permission onGranted")
+          }
+
+          override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
+            Timber.v("request notification permission onDenied: $doNotAskAgain")
+          }
+        })
+    }
+
   }
 
   override fun setContentView(layoutResID: Int) {
@@ -137,23 +163,19 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
   override fun onResume() {
     super.onResume()
     isForeground = true
-    RxPermissions(this)
-      .request(*NECESSARY_PERMISSIONS)
-      .subscribe { has: Boolean ->
-        if (has != hasPermission) {
-          val intent = Intent(MusicService.PERMISSION_CHANGE)
-          intent.putExtra(BaseMusicActivity.EXTRA_PERMISSION, has)
-          Util.sendLocalBroadcast(intent)
-        }
-      }
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      RxPermissions(this)
-        .request(Manifest.permission.POST_NOTIFICATIONS)
-        .subscribe { has ->
-          Timber.v("has: $has")
+    if (!hasPermission) {
+      XXPermissions.with(this)
+        .permission(*NECESSARY_PERMISSIONS)
+        .request { _, allGranted ->
+          Timber.v("request necessary permission: $allGranted")
+          if (allGranted != hasPermission) {
+            val intent = Intent(MusicService.PERMISSION_CHANGE)
+            intent.putExtra(BaseMusicActivity.EXTRA_PERMISSION, allGranted)
+            Util.sendLocalBroadcast(intent)
+          }
         }
     }
+
   }
 
   override fun onPause() {
@@ -204,7 +226,7 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
       loadingDialog.dismiss()
     }
   }
-  
+
   protected fun showDialog(newDialog: Dialog) {
     dialog?.dismiss()
     if (!isFinishing && !isDestroyed && hasWindowFocus()) {
@@ -212,19 +234,18 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
       newDialog.show()
     }
   }
-  
 
   companion object {
     val NECESSARY_PERMISSIONS =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        arrayOf(Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_IMAGES)
+        arrayOf(Permission.READ_MEDIA_AUDIO, Permission.READ_MEDIA_IMAGES)
       } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
         arrayOf(
-          Manifest.permission.READ_EXTERNAL_STORAGE,
-          Manifest.permission.WRITE_EXTERNAL_STORAGE
+          Permission.READ_EXTERNAL_STORAGE,
+          Permission.WRITE_EXTERNAL_STORAGE
         )
       } else {
-        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        arrayOf(Permission.READ_EXTERNAL_STORAGE)
       }
   }
 }
