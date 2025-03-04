@@ -273,6 +273,8 @@ public class SPUtil {
     // 黑色主题
     String BLACK_THEME = "black_theme";
     String VERSION = "version";
+    // 淡入淡出
+    String CROSS_FADE = "cross_fade";
     int NEWEST_VERSION = 3;
   }
 

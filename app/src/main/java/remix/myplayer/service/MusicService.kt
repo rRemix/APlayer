@@ -396,7 +396,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 锁屏
    */
-  private var lockScreen: Int = CLOSE_LOCKSCREEN
+  private var lockScreen = CLOSE_LOCKSCREEN
+
+  private var crossFade = true
 
   override fun onTaskRemoved(rootIntent: Intent) {
     super.onTaskRemoved(rootIntent)
@@ -492,6 +494,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       SETTING_KEY.SPEED -> {
         speed = java.lang.Float.parseFloat(SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
         setSpeed(speed)
+      }
+      // 淡入淡出
+      SETTING_KEY.CROSS_FADE -> {
+        crossFade = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.CROSS_FADE, true)
       }
     }
   }
@@ -893,7 +899,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 //    setSpeed(speed)
 
     //渐变
-    if (fadeIn) {
+    if (fadeIn && crossFade) {
       volumeController.fadeIn()
     } else {
       volumeController.directTo(1f)
@@ -934,7 +940,11 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       isPlaying = false
       uiHandler.sendEmptyMessage(UPDATE_META_DATA)
-      volumeController.fadeOut()
+      if (crossFade) {
+        volumeController.fadeOut()
+      } else {
+        mediaPlayer.pause()
+      }
     }
   }
 
@@ -1619,6 +1629,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     speed = java.lang.Float.parseFloat(SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.SPEED, "1.0"))
     playAtBreakPoint = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.PLAY_AT_BREAKPOINT, false)
     lastProgress = SPUtil.getValue(service, SETTING_KEY.NAME, SETTING_KEY.LAST_PLAY_PROGRESS, 0)
+    crossFade = SPUtil.getValue(this, SETTING_KEY.NAME, SETTING_KEY.CROSS_FADE, true)
 
     //读取播放列表
     playQueue.restoreIfNecessary()

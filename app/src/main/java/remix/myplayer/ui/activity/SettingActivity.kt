@@ -157,7 +157,8 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
         SETTING_KEY.SHOW_DISPLAYNAME,
         SETTING_KEY.FORCE_SORT,
         SETTING_KEY.BLACK_THEME,
-        SETTING_KEY.AUDIO_FOCUS
+        SETTING_KEY.AUDIO_FOCUS,
+        SETTING_KEY.CROSS_FADE
     )
     arrayOf(
         binding.settingNavaigationSwitch,
@@ -172,7 +173,8 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
         binding.settingDisplaynameSwitch,
         binding.settingForceSortSwitch,
         binding.settingBlackThemeSwitch,
-        binding.settingAudioFocusSwitch
+        binding.settingAudioFocusSwitch,
+        binding.settingCrossfadeSwitch
     ).forEachIndexed { index, view ->
       TintHelper.setTintAuto(view, ThemeStore.accentColor, false)
 

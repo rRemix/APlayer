@@ -109,24 +109,24 @@ class SupportActivity : ToolbarActivity(), BillingClientStateListener, Purchases
 
     billingClient.startConnection(this)
 
-    if (!googlePlay) {
-      binding.ad.visibility = View.VISIBLE
-      binding.adContent.text = """
-        如果你的手机并未下载过"快手极速版"，并且是新用户，可通过以下步骤支持开发者：
-        一.在安卓应用商店或AppStore下载"快手极速版"
-        二.注册并登陆账号(未登录过的微信\QQ\手机号码任意一种方式均可)
-        三.点左上角"三"或者放大镜扫描下方二维码(可长按保存)
-        四.半小时之内观看至少一分钟的视频即可帮助开发者获得奖励。另外，如果用户在第二天和连续七天观看一分钟的视频，开发者都可以获得奖励
-      """.trimIndent()
-      binding.adQrcode.setOnLongClickListener {
-        launch {
-          Util.saveToAlbum(this@SupportActivity, R.drawable.ad_qrcode, "a_ad_qrCode.png")
-        }
-        return@setOnLongClickListener true
-      }
-    } else {
-      binding.ad.visibility = View.GONE
-    }
+//    if (!googlePlay) {
+//      binding.ad.visibility = View.VISIBLE
+//      binding.adContent.text = """
+//        如果你的手机并未下载过"快手极速版"，并且是新用户，可通过以下步骤支持开发者：
+//        一.在安卓应用商店或AppStore下载"快手极速版"
+//        二.注册并登陆账号(未登录过的微信\QQ\手机号码任意一种方式均可)
+//        三.点左上角"三"或者放大镜扫描下方二维码(可长按保存)
+//        四.半小时之内观看至少一分钟的视频即可帮助开发者获得奖励。另外，如果用户在第二天和连续七天观看一分钟的视频，开发者都可以获得奖励
+//      """.trimIndent()
+//      binding.adQrcode.setOnLongClickListener {
+//        launch {
+//          Util.saveToAlbum(this@SupportActivity, R.drawable.ad_qrcode, "a_ad_qrCode.png")
+//        }
+//        return@setOnLongClickListener true
+//      }
+//    } else {
+//      binding.ad.visibility = View.GONE
+//    }
   }
 
   private fun launchBillingFlow(productDetails: ProductDetails) {
