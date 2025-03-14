@@ -502,7 +502,7 @@
               android:layout_centerVertical="true"
               android:layout_marginStart="@dimen/d16_size"
               android:layout_marginEnd="@dimen/d16_size"
-              android:layout_toStartOf="@+id/setting_audio_focus_switch"
+              android:layout_toStartOf="@+id/setting_crossfade_switch"
               android:gravity="center_vertical"
               android:orientation="vertical">
 
@@ -510,14 +510,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/d2_size"
-                android:text="淡入淡出"
+                android:text="@string/play_cross_fade"
                 android:textColor="?attr/text_color_primary"
                 android:textSize="@dimen/s16_size" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="播放、暂停时使用淡入淡出效果"
+                android:text="@string/play_cross_fade_tip"
                 android:textColor="?attr/text_color_secondary"
                 android:textSize="@dimen/s14_size" />
           </LinearLayout>

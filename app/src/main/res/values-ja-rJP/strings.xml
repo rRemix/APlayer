@@ -473,5 +473,7 @@
   <string name="connect">せつぞく</string>
   <string name="edit">編集</string>
   <string name="buffering_wait">バッファリングです,ちょっと待ってください</string>
-    <string name="last_play">最後にプレイした</string>
+  <string name="last_play">最後にプレイした</string>
+  <string name="play_cross_fade">フェードインとフェードアウト</string>
+  <string name="play_cross_fade_tip">再生中および一時停止中にフェード効果を使用する</string>
 </resources>

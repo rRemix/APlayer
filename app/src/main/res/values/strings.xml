@@ -477,4 +477,6 @@
   <string name="buffering_wait">Buffering, please wait</string>
   <string name="last_play">Last Play TimeAt</string>
   <string name="last_play_desc">Last Play TimeAt Desc</string>
+  <string name="play_cross_fade">Fade in and out</string>
+  <string name="play_cross_fade_tip">Use fade-in and fade-out effects when playing and pausing</string>
 </resources>

@@ -445,7 +445,8 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
         binding.settingAudioFocusContainer,
         binding.settingRestoreDeleteContainer,
         binding.settingFilterContainer,
-        binding.settingPlayerBackground
+        binding.settingPlayerBackground,
+        binding.settingCrossfadeContainer
     ).forEach {
       it.setOnClickListener(object : View.OnClickListener {
         override fun onClick(v: View?) {
@@ -568,6 +569,8 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
             R.id.setting_auto_play_headset_container -> configAutoPlay()
             //自定义播放界面背景
             R.id.setting_player_background -> configPlayerBackgroundConfig()
+            //淡入淡出
+            R.id.setting_crossfade_container -> binding.settingCrossfadeSwitch.isChecked = !binding.settingCrossfadeSwitch.isChecked
           }
         }
       })
