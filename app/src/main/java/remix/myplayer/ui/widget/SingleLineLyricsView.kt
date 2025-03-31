@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.annotation.UiThread
 import androidx.appcompat.widget.AppCompatTextView
 import remix.myplayer.lyrics.LyricsLine
 import remix.myplayer.lyrics.PerWordLyricsLine
@@ -28,7 +29,7 @@ class SingleLineLyricsView @JvmOverloads constructor(
 
   @ColorInt
   var sungColor: Int = currentTextColor
-    set(@ColorInt value) {
+    @UiThread set(@ColorInt value) {
       if (value != field) {
         field = value
         invalidate()
@@ -37,7 +38,7 @@ class SingleLineLyricsView @JvmOverloads constructor(
 
   @ColorInt
   var unsungColor: Int = currentTextColor
-    set(@ColorInt value) {
+    @UiThread set(@ColorInt value) {
       if (value != field) {
         field = value
         invalidate()
@@ -49,40 +50,44 @@ class SingleLineLyricsView @JvmOverloads constructor(
    */
   private var content = ""
   var lyricsLine: LyricsLine? = null
-    set(value) {
+    @UiThread set(value) {
       if (value == field) {
         return
       }
       field = value
+      // 不能在这里就把 content 换成省略号，不然后面判断会出问题
       content = lyricsLine?.content ?: ""
       contentDescription = content
-      progress = null
-      invalidate()
+      if (progress != null) {
+        progress = null
+        // 已间接调用 invalidate()
+      } else {
+        invalidate()
+      }
       requestLayout()
     }
 
   /**
    * 当前进度
    *
+   * 取值范围：
    * - `lyricsLine` is `PerWordLyricsLine`：[0, lyricsLine.words.size]
    * - 否则：[0, 1]
    */
-  private var progress: Float? = null
-
-  fun setProgress(time: Int, endTime: Int) {
-    lyricsLine?.let {
-      require(time >= it.time && time <= endTime)
-      val newProgress = if (it is PerWordLyricsLine) {
-        it.getProgress(time, endTime)
-      } else {
-        (time - it.time).toFloat() / (endTime - it.time)
+  var progress: Float? = null
+    @UiThread set(value) {
+      if (value == field) {
+        return
       }
-      if (newProgress != progress) {
-        progress = newProgress
-        invalidate()
+      if (value != null) {
+        lyricsLine.let {
+          check(it != null)
+          require(value in 0.0..(if (it is PerWordLyricsLine) it.words.size.toDouble() else 1.0))
+        }
       }
+      field = value
+      invalidate()
     }
-  }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     val widthMode = MeasureSpec.getMode(widthMeasureSpec)
@@ -126,7 +131,8 @@ class SingleLineLyricsView @JvmOverloads constructor(
           val l =
             paint.measureText(lyricsLine.words.subList(0, index).joinToString("") { it.content })
           val r = paint.measureText(
-            lyricsLine.words.subList(0, index + 1).joinToString("") { it.content })
+            lyricsLine.words.subList(0, index + 1)
+                .joinToString("") { it.content })
           val highlightWidth = l + (r - l) * (offset - index)
           val left = if (width >= textWidth) {
             (width - textWidth) / 2

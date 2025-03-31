@@ -12,7 +12,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.UiThread
-import androidx.core.view.updatePadding
 import remix.myplayer.databinding.LayoutLyricsLineBinding
 import remix.myplayer.databinding.LayoutLyricsViewBinding
 import remix.myplayer.lyrics.LyricsLine
@@ -105,12 +104,11 @@ class LyricsView @JvmOverloads constructor(
         updateTimeIndicator()
       }
       rawProgressAndDuration?.run {
-        updateProgress(first, second)
+        setProgress(first, second)
       }
     }
 
   private fun getTextViewOfLine(index: Int): TextView {
-    check(lyrics[index].content.isNotBlank())
     val layout = binding.innerContainer.getChildAt(index) as LinearLayout
     return layout.getChildAt(0) as TextView
   }
@@ -131,7 +129,7 @@ class LyricsView @JvmOverloads constructor(
   private var lastHighlightLine: Int? = null
 
   @UiThread
-  fun updateProgress(rawProgress: Int, rawDuration: Int) {
+  fun setProgress(rawProgress: Int, rawDuration: Int) {
     check(lyrics.isNotEmpty())
     rawProgressAndDuration = Pair(rawProgress, rawDuration)
     val progress = rawProgress + offset
@@ -203,7 +201,7 @@ class LyricsView @JvmOverloads constructor(
       } else {
         binding.timeIndicator.visibility = View.GONE
         rawProgressAndDuration?.run {
-          updateProgress(first, second)
+          setProgress(first, second)
         }
       }
     }

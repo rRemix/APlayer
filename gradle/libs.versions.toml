@@ -60,10 +60,9 @@ material-dialog = { group = "com.afollestad.material-dialogs", name = "core", ve
 rebound = { group = "com.facebook.rebound", name = "rebound", version = "0.3.8" }
 rxandroid = { group = "io.reactivex.rxjava2", name = "rxandroid", version = "2.1.1" }
 rxjava = { group = "io.reactivex.rxjava2", name = "rxjava", version = "2.2.19" }
-# noinspection GradleDependency
-xxpermissions = { module = "com.github.getActivity:XXPermissions", version.ref = "xxpermissions" }
 sardine-android = { group = "com.github.thegrizzlylabs", name = "sardine-android", version = "0.9" }
 slf4j = { group = "org.slf4j", name = "slf4j-api", version = "2.0.13" }
 timber = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
 # noinspection GradleDependency
 tinypinyin = { group = "io.github.biezhi", name = "TinyPinyin", version = "2.0.3.RELEASE" }
+xxpermissions = { group = "com.github.getActivity", name = "XXPermissions", version.ref = "xxpermissions" }

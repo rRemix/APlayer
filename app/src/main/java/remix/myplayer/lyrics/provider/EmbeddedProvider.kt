@@ -15,7 +15,7 @@ object EmbeddedProvider : ILyricsProvider {
     App.context.getString(R.string.embedded_lyric)
   }
 
-  override fun getLyrics(song: Song): List<LyricsLine> {
+  override suspend fun getLyrics(song: Song): List<LyricsLine> {
     if (song is Song.Local) {
       val lrc = AudioFileIO.read(File(song.data)).tag.getFirst(FieldKey.LYRICS)
       if (lrc.isNullOrEmpty()) {

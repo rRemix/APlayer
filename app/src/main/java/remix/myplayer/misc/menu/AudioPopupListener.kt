@@ -14,8 +14,8 @@ import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.LyricsHelper
-import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.helper.MusicServiceRemote.getCurrentSong
+import remix.myplayer.lyrics.LyricsManager
 import remix.myplayer.lyrics.provider.EmbeddedProvider
 import remix.myplayer.lyrics.provider.IgnoredProvider
 import remix.myplayer.lyrics.provider.StubProvider
@@ -158,8 +158,8 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
         getString(R.string.change_offset)
       ).itemsCallback { _, _, position, _ ->
         when (position) {
-          0 -> MusicServiceRemote.service?.updateLyrics(StubProvider) // 恢复默认
-          1 -> MusicServiceRemote.service?.updateLyrics(EmbeddedProvider) // 内嵌
+          0 -> LyricsManager.updateLyrics(getCurrentSong(), StubProvider) // 恢复默认
+          1 -> LyricsManager.updateLyrics(getCurrentSong(), EmbeddedProvider) // 内嵌
           2, 3, 4, 5 -> TODO() //  本地 酷狗 网易 QQ
           6 -> try {
             activity.getContent.launch(lrcMimeType) // 手动选择
@@ -167,7 +167,7 @@ class AudioPopupListener(activity: PlayerActivity, private val song: Song) :
             ToastUtil.show(activity, R.string.activity_not_found_tip)
           }
 
-          7 -> MusicServiceRemote.service?.updateLyrics(IgnoredProvider) // 忽略
+          7 -> LyricsManager.updateLyrics(getCurrentSong(), IgnoredProvider) // 忽略
           8 -> TODO() // 调整字体大小
           9 -> activity.showLyricOffsetView() // 调整时间轴
         }

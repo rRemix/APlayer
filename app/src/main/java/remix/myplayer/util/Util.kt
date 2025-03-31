@@ -31,7 +31,6 @@ import remix.myplayer.App
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.misc.floatpermission.rom.RomUtils
 import remix.myplayer.misc.manager.APlayerActivityManager
 import timber.log.Timber
 import java.io.*
@@ -543,12 +542,16 @@ object Util {
   /**
    * 判断是否支持状态栏歌词
    */
-  fun isSupportStatusBarLyric(context: Context): Boolean {
-    return RomUtils.checkIsMeizuRom() || Settings.System.getInt(
+  fun isStatusBarLyricsSupported(context: Context): Boolean {
+    return Settings.System.getInt(
       context.contentResolver,
       "status_bar_show_lyric",
       0
-    ) != 0 || RomUtils.checkIsbaolong24Rom() || RomUtils.checkIsexTHmUIRom()
+    ) != 0 || Build.DISPLAY.contains(
+      "flyme",
+      true
+    ) || SystemPropertiesUtil.get("org.baolong24.device")
+        .isNotEmpty() || SystemPropertiesUtil.get("ro.exthm.device").isNotEmpty()
   }
 
   /**

@@ -11,7 +11,7 @@ object IgnoredProvider : ILyricsProvider {
     App.context.getString(R.string.ignore_lrc)
   }
 
-  override fun getLyrics(song: Song): List<LyricsLine> {
+  override suspend fun getLyrics(song: Song): List<LyricsLine> {
     return listOf()
   }
 }

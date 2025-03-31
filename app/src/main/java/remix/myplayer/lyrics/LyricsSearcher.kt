@@ -62,7 +62,7 @@ object LyricsSearcher {
           }
         }
       } catch (t: Throwable) {
-        Timber.tag(TAG).w(t, "Failed to get search order from preference")
+        Timber.tag(TAG).i(t, "Failed to get search order from preference")
       }
       PROVIDERS.forEach {
         if (!providers.contains(it)) {
@@ -168,10 +168,11 @@ object LyricsSearcher {
   }
 
   /**
-   * @param provider 由用户指定的歌词源
+   * @param provider 由用户指定的歌词源（包括恢复默认）或 null
    */
-  fun getLyricsAndOffset(
-    song: Song, provider: ILyricsProvider? = null
+  suspend fun getLyricsAndOffset(
+    song: Song,
+    provider: ILyricsProvider?
   ): Pair<List<LyricsLine>, Int> {
     if (song == Song.EMPTY_SONG) {
       return Pair(listOf(), 0)
@@ -183,7 +184,7 @@ object LyricsSearcher {
       }
     }
     Timber.tag(TAG).v("Searching lyrics for song: $song")
-    listOfNotNull(provider).ifEmpty { order }.forEach {
+    (if (provider != StubProvider && provider != null) listOf(provider) else order).forEach {
       Timber.tag(TAG).v("Trying provider: ${it.id}")
       try {
         return Pair(it.getLyrics(song).let { lyrics ->

@@ -15,6 +15,7 @@ import com.bumptech.glide.signature.ObjectKey
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.glide.UriFetcher
+import remix.myplayer.lyrics.LyricsManager
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
@@ -69,7 +70,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
     val deleteIntent = Intent(MusicService.ACTION_CMD)
     deleteIntent.putExtra(EXTRA_CONTROL, Command.CLOSE_NOTIFY)
 
-    val desktopLyricLock = service.isDesktopLyricLocked
+    val desktopLyricLock = LyricsManager.isDesktopLyricsLocked
 
     val notification = NotificationCompat.Builder(service, PLAYING_NOTIFICATION_CHANNEL_ID)
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

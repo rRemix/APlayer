@@ -18,7 +18,7 @@ class UriProvider(private val uri: Uri) : ILyricsProvider {
   override val displayName: String
     get() = throw RuntimeException()
 
-  override fun getLyrics(song: Song): List<LyricsLine> {
+  override suspend fun getLyrics(song: Song): List<LyricsLine> {
     return try {
       App.context.contentResolver.openInputStream(uri)!!.run {
         try {

@@ -9,10 +9,10 @@ import com.google.android.material.textfield.TextInputEditText
  */
 object MaterialTintHelper {
   fun setTint(slider: Slider) {
-    TODO()
+//    TODO()
   }
 
   fun setTint(editText: TextInputEditText) {
-    TODO()
+//    TODO()
   }
 }

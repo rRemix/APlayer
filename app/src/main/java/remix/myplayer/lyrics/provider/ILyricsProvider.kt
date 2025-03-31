@@ -12,5 +12,5 @@ interface ILyricsProvider {
    *
    * @throws Throwable
    */
-  fun getLyrics(song: Song): List<LyricsLine>
+  suspend fun getLyrics(song: Song): List<LyricsLine>
 }

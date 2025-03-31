@@ -14,20 +14,21 @@ import android.view.ViewConfiguration
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
+import androidx.annotation.UiThread
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.children
 import androidx.core.widget.ImageViewCompat
 import remix.myplayer.R
 import remix.myplayer.databinding.LayoutDesktopLyricsBinding
-import remix.myplayer.lyrics.LyricsLine
+import remix.myplayer.helper.MusicServiceRemote
+import remix.myplayer.lyrics.CurrentNextLyricsLine
+import remix.myplayer.lyrics.LyricsManager
 import remix.myplayer.service.Command
-import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRICS
 import remix.myplayer.theme.MaterialTintHelper
 import remix.myplayer.util.MusicUtil.makeCmdIntent
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SPUtil.DESKTOP_LYRICS_KEY
-import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
@@ -35,6 +36,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
+@UiThread
 class DesktopLyricsView @JvmOverloads constructor(
   context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
@@ -43,7 +45,7 @@ class DesktopLyricsView @JvmOverloads constructor(
 
     private const val ELLIPSIS = Typography.ellipsis.toString()
 
-    private val HIDE_PANEL_DELAY = 5000.milliseconds
+    private val HIDE_PANEL_DELAY = 3000.milliseconds
 
     private const val DEFAULT_FIRST_LINE_SIZE = 18f
     private const val DEFAULT_SECOND_LINE_SIZE = 16f
@@ -57,13 +59,6 @@ class DesktopLyricsView @JvmOverloads constructor(
     @ColorInt
     private const val DEFAULT_TRANSLATION_COLOR = 0xffd4d4d4.toInt()
   }
-
-  data class Content(
-    val currentLine: LyricsLine?,
-    val nextLine: LyricsLine?,
-    val progress: Int,
-    val currentLineEndTime: Int
-  )
 
   private val binding = LayoutDesktopLyricsBinding.inflate(LayoutInflater.from(context), this, true)
 
@@ -159,15 +154,15 @@ class DesktopLyricsView @JvmOverloads constructor(
       }
     }
 
-  fun setContent(content: Content) {
+  fun setLyrics(content: CurrentNextLyricsLine) {
     binding.linesContainer.firstLine.lyricsLine = content.currentLine
+    binding.linesContainer.firstLine.progress = content.currentLineProgress
     if (!content.currentLine?.translation.isNullOrBlank()) {
       setTranslation(content.currentLine?.translation!!)
     } else {
       // 翻译和下一行歌词都没有时显示省略号，统一用显示下一行歌词的颜色
-      setNextLine(content.nextLine?.content?.ifBlank { ELLIPSIS } ?: ELLIPSIS)
+      setNextLine((content.nextLine?.content ?: "").ifBlank { ELLIPSIS })
     }
-    binding.linesContainer.firstLine.setProgress(content.progress, content.currentLineEndTime)
   }
 
   private fun setTranslation(translation: String) {
@@ -211,7 +206,6 @@ class DesktopLyricsView @JvmOverloads constructor(
           // 控制组件由隐藏转为显示时，字体颜色和大小设置默认隐藏
           isSettingsVisible = false
         }
-        restoreWindowPosition()
       }
       if (value) {
         handler.run {
@@ -246,26 +240,34 @@ class DesktopLyricsView @JvmOverloads constructor(
         }
         windowManager.updateViewLayout(this@DesktopLyricsView, this)
       }
-      SPUtil.putValue(context, DESKTOP_LYRICS_KEY.NAME, DESKTOP_LYRICS_KEY.LOCKED, value)
+      if (isLocked != value) {
+        SPUtil.putValue(context, DESKTOP_LYRICS_KEY.NAME, DESKTOP_LYRICS_KEY.LOCKED, value)
+        MusicServiceRemote.service?.run {
+          updateNotification()
+          updatePlaybackState()
+        }
+        ToastUtil.show(
+          context, if (value) R.string.desktop_lyric_lock else R.string.desktop_lyric__unlock
+        )
+      }
     }
 
-  init {
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+
     binding.linesContainer.firstLine.setTextSize(COMPLEX_UNIT_SP, firstLineSize)
     binding.linesContainer.secondLine.setTextSize(COMPLEX_UNIT_SP, secondLineSize)
     binding.linesContainer.firstLine.sungColor = sungColor
     binding.linesContainer.firstLine.unsungColor = unsungColor
 
-    setContent(Content(null, null, 0, 0))
+    setLyrics(CurrentNextLyricsLine(null, null, null))
+
+    isLocked = isLocked
 
     isPanelVisible = false
 
     binding.close.setOnClickListener {
-      SPUtil.putValue(
-        context, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false
-      )
-      sendLocalBroadcast(
-        makeCmdIntent(Command.TOGGLE_DESKTOP_LYRIC).putExtra(EXTRA_DESKTOP_LYRICS, false)
-      )
+      LyricsManager.setDesktopLyricsEnabled(false)
     }
     binding.prev.setOnClickListener {
       sendLocalBroadcast(makeCmdIntent(Command.PREV))
@@ -280,6 +282,7 @@ class DesktopLyricsView @JvmOverloads constructor(
       isPanelVisible = true
     }
     binding.lock.setOnClickListener {
+      isPanelVisible = false
       isLocked = true
       ToastUtil.show(context, R.string.desktop_lyric_lock)
     }
@@ -290,32 +293,27 @@ class DesktopLyricsView @JvmOverloads constructor(
     binding.colorSettings.setOnClickListener {
       handler?.removeCallbacks(hidePanelRunnable)
       // TODO: Set colors
-      isPanelVisible = true
+      isPanelVisible = true // 设置完回来触发自动隐藏？
     }
     MaterialTintHelper.setTint(binding.firstLineSizeSlider)
     MaterialTintHelper.setTint(binding.secondLineSizeSlider)
     binding.firstLineSizeSlider.setLabelFormatter { "${it}sp" }
     binding.secondLineSizeSlider.setLabelFormatter { "${it}sp" }
+    binding.firstLineSizeSlider.value = firstLineSize
+    binding.secondLineSizeSlider.value = secondLineSize
     // TODO: Change on stop? onStopTrackingTouch
-    binding.firstLineSizeSlider.addOnChangeListener { _, value, fromUser ->
-      if (!fromUser) {
-        Timber.tag(TAG).w("firstLineSizeSlider's change is not from user")
-      }
+    binding.firstLineSizeSlider.addOnChangeListener { _, value, _ ->
+      isPanelVisible = true
       firstLineSize = value
     }
-    binding.secondLineSizeSlider.addOnChangeListener { _, value, fromUser ->
-      if (!fromUser) {
-        Timber.tag(TAG).w("secondLineSizeSlider's change is not from user")
-      }
-      secondLineSize = value
-    }
-
-    setOnClickListener {
+    binding.secondLineSizeSlider.addOnChangeListener { _, value, _ ->
       isPanelVisible = true
+      secondLineSize = value
     }
   }
 
   private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
+  private var isTouching = false
   private var isDragging = false
   private var lastPointerY: Float? = null
   private var lastWindowY: Int? = null
@@ -325,14 +323,25 @@ class DesktopLyricsView @JvmOverloads constructor(
       Timber.tag(TAG).w("isLocked is true but received touch event: $event")
       return false
     }
+    if (event.actionMasked != MotionEvent.ACTION_DOWN && !isTouching) {
+      // 会收到全屏幕的点击事件，但只有 ACTION_DOWN 在 View 上的是需要我们处理的
+      return false
+    }
     val params = layoutParams as WindowManager.LayoutParams
-    return when (event.action) {
+    return when (event.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
-        handler?.removeCallbacks(hidePanelRunnable)
-        isDragging = false
-        lastPointerY = event.rawY
-        lastWindowY = params.y
-        true
+        Timber.tag(TAG).v("${event.y} ${top} ${bottom} ${height}")
+        if (event.y < 0 || event.y > height) {
+          isTouching = false
+          false
+        } else {
+          handler?.removeCallbacks(hidePanelRunnable)
+          isTouching = true
+          isDragging = false
+          lastPointerY = event.rawY
+          lastWindowY = params.y
+          true
+        }
       }
 
       MotionEvent.ACTION_MOVE -> {
@@ -347,6 +356,7 @@ class DesktopLyricsView @JvmOverloads constructor(
       }
 
       MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+        isTouching = false
         if (isDragging) {
           params.y = lastWindowY!! + (event.rawY - lastPointerY!!).roundToInt()
           windowManager.updateViewLayout(this, params)
@@ -357,6 +367,7 @@ class DesktopLyricsView @JvmOverloads constructor(
           saveWindowLocation()
         } else {
           if (event.action == MotionEvent.ACTION_UP) {
+            // 避免警告
             performClick()
           }
         }
@@ -368,26 +379,21 @@ class DesktopLyricsView @JvmOverloads constructor(
   }
 
   override fun performClick(): Boolean {
-    super.performClick()
+    if (super.performClick()) {
+      return true
+    }
     isPanelVisible = true
     return true
   }
 
   private fun saveWindowLocation() {
-    val location = IntArray(2)
-    binding.linesContainer.root.getLocationOnScreen(location)
-    yPosition = location[1]
+    yPosition = (layoutParams as WindowManager.LayoutParams).y
   }
 
   fun restoreWindowPosition() {
-    val location = IntArray(2)
-    binding.linesContainer.root.getLocationOnScreen(location)
-
-    if (location[1] != yPosition) {
-      val params = layoutParams as WindowManager.LayoutParams
-      params.y += yPosition - location[1]
-      windowManager.updateViewLayout(this, params)
-    }
+    val params = layoutParams as WindowManager.LayoutParams
+    params.y = yPosition
+    windowManager.updateViewLayout(this, params)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

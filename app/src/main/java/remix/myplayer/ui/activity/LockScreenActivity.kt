@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
+import androidx.annotation.UiThread
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -19,11 +20,11 @@ import com.bumptech.glide.request.target.Target
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import remix.myplayer.R
 import remix.myplayer.databinding.ActivityLockscreenBinding
-import remix.myplayer.helper.LyricsHelper
 import remix.myplayer.helper.MusicServiceRemote
+import remix.myplayer.lyrics.CurrentNextLyricsLine
+import remix.myplayer.lyrics.LyricsManager
 import remix.myplayer.misc.menu.CtrlButtonListener
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseMusicActivity
@@ -32,7 +33,6 @@ import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.RxUtil
 import remix.myplayer.util.StatusBarUtil
 import timber.log.Timber
-import java.lang.ref.WeakReference
 
 /**
  * Created by Remix on 2016/3/9.
@@ -53,8 +53,6 @@ class LockScreenActivity : BaseMusicActivity() {
   private var width: Int = 0
 
   private var disposable: Disposable? = null
-
-  private var updateLyricThread: UpdateLockScreenLyricThread? = null
 
   //前后两次触摸的X
   private var scrollX1: Float = 0f
@@ -105,6 +103,7 @@ class LockScreenActivity : BaseMusicActivity() {
     findViewById<View>(R.id.lockscreen_arrow_container)
         .startAnimation(AnimationUtils.loadAnimation(this, R.anim.arrow_left_to_right))
 
+    LyricsManager.setLockScreenActivity(this)
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -147,10 +146,6 @@ class LockScreenActivity : BaseMusicActivity() {
 
   override fun onDestroy() {
     super.onDestroy()
-    if (updateLyricThread != null) {
-      updateLyricThread?.interrupt()
-      updateLyricThread = null
-    }
     disposable?.dispose()
     disposable = null
   }
@@ -165,14 +160,6 @@ class LockScreenActivity : BaseMusicActivity() {
   override fun onMetaChanged() {
     super.onMetaChanged()
     val song = MusicServiceRemote.getCurrentSong()
-    //歌词
-    if (updateLyricThread == null) {
-      val service = MusicServiceRemote.service
-      if (service != null) {
-        updateLyricThread = UpdateLockScreenLyricThread(this, service)
-        updateLyricThread?.start()
-      }
-    }
 
     //标题
     binding.lockscreenSong.text = song.title
@@ -248,44 +235,8 @@ class LockScreenActivity : BaseMusicActivity() {
     return Palette.from(rawBitMap ?: return null).generate()
   }
 
-  private fun setLyrics(lyrics: String) {
-    runOnUiThread {
-      binding.lockscreenLyric.setTextWithAnimation(lyrics)
-    }
-  }
-
-  private class UpdateLockScreenLyricThread constructor(activity: LockScreenActivity, service: MusicService) : Thread() {
-    private val ref: WeakReference<LockScreenActivity> = WeakReference(activity)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun run() {
-      while (true) {
-        try {
-          sleep(LYRIC_FIND_INTERVAL)
-        } catch (e: InterruptedException) {
-          return
-        }
-
-        val service = MusicServiceRemote.service ?: continue
-        val activity = ref.get() ?: continue
-        try {
-          val lyrics = service.lyrics.getCompleted()
-          if (lyrics.isEmpty()) {
-            activity.setLyrics(activity.getString(R.string.no_lrc))
-          } else {
-            val content = LyricsHelper.getDesktopLyricsContent(
-              lyrics, service.lyricsOffset, service.progress, service.duration
-            )
-            activity.setLyrics("${content.currentLine?.content ?: ""}\n${content.nextLine ?: ""}")
-          }
-        } catch (_: IllegalStateException) {
-          activity.setLyrics(activity.getString(R.string.searching))
-        }
-      }
-    }
-  }
-
-  companion object {
-    const val LYRIC_FIND_INTERVAL = 400L
+  @UiThread
+  fun setLyrics(lyrics: CurrentNextLyricsLine) {
+    binding.lockscreenLyric.setTextWithAnimation("${lyrics.currentLine?.content ?: ""}\n${lyrics.nextLine ?: ""}")
   }
 }

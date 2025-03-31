@@ -108,8 +108,11 @@ public class SPUtil {
   }
 
   public interface LYRICS_KEY {
+
     String NAME = "Lyrics";
 
+    String DESKTOP_LYRICS_ENABLED = "desktop_lyrics_enabled";
+    String STATUS_BAR_LYRICS_ENABLED = "status_bar_lyrics_enabled";
     String LOCAL_LYRICS_TIP_SHOWN = "local_lyrics_tip_shown";
     String ORDER = "order";
     String OFFSET_PREFIX = "offset_"; // offset_$hashKey
@@ -121,7 +124,10 @@ public class SPUtil {
   }
 
   public interface DESKTOP_LYRICS_KEY {
+
     String NAME = "DesktopLyrics";
+
+    // 以下所有设置项一般情况下应在 DesktopLyricsView 内部读/写
 
     String LOCKED = "locked";
     String Y_POSITION_PREFIX = "y_position_"; // y_position_$orientation
@@ -153,10 +159,6 @@ public class SPUtil {
     String COLOR_NAVIGATION = "color_Navigation";
     //摇一摇
     String SHAKE = "shake";
-    //是否开启桌面歌词
-    String DESKTOP_LYRIC_SHOW = "desktop_lyric_show";
-    //是否开启状态栏歌词
-    String STATUSBAR_LYRIC_SHOW = "statusbar_lyric_show";
     //沉浸式状态栏
     String IMMERSIVE_MODE = "immersive_mode";
     //过滤大小

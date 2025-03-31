@@ -250,7 +250,6 @@ dependencies {
     implementation(libs.rebound)
     implementation(libs.rxandroid)
     implementation(libs.rxjava)
-    implementation(libs.xxpermissions)
     implementation(libs.sardine.android) {
         // https://github.com/thegrizzlylabs/sardine-android/issues/70
         // 上游已经exclude了，但是不知道为什么还是会有
@@ -260,6 +259,7 @@ dependencies {
     implementation(libs.slf4j)
     implementation(libs.timber)
     implementation(libs.tinypinyin)
+    implementation(libs.xxpermissions)
 
     debugImplementation(libs.leakcanary)
 

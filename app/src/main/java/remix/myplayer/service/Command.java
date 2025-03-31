@@ -22,6 +22,6 @@ public interface Command {
   int TOGGLE_TIMER = 16;
   int TOGGLE_DESKTOP_LYRIC = 17;
   int HEADSET_CHANGE = 18;
-  int LOCK_DESKTOP_LYRIC = 19;
-  int TOGGLE_STATUS_BAR_LRC = 20;
+//  int LOCK_DESKTOP_LYRIC = 19;
+//  int TOGGLE_STATUS_BAR_LRC = 20;
 }

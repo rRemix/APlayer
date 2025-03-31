@@ -7,6 +7,7 @@ object LrcParser {
   private const val TAG = "LrcParser"
 
   private val WORD_TIME_TAG_REGEX = """<(\d+:){1,2}\d+(\.\d*)?>""".toRegex()
+  private val EMPTY_LINE_WITH_TIME_REGEX = """(\[(\d+:){1,2}\d+(\.\d*)?])*""".toRegex()
 
   /**
    * 一般格式: `mm:ss.xx`, `mm:ss.xxx`
@@ -71,15 +72,17 @@ object LrcParser {
       }
 
       // [xxx]
-      if (it.endsWith(']')) {
+      // 特判空行
+      if (it.endsWith(']') && !EMPTY_LINE_WITH_TIME_REGEX.matches(it)) {
         val tag = it.substring(1, it.lastIndex)
         // [offset:+/-xxx]
         if (tag.startsWith("offset:")) {
           try {
             offset = Integer.parseInt(tag.substring(7).trim())
-            return@forEach
-          } catch (_: Throwable) {
+          } catch (t: Throwable) {
+            Timber.tag(TAG).w("Failed to parse offset: $offset")
           }
+          return@forEach
         }
         Timber.tag(TAG).v("Ignored unknown tag: $tag")
         return@forEach
@@ -115,7 +118,7 @@ object LrcParser {
       val lastLine = combinedLines.lastOrNull()
       combinedLines.add(
         if (lastLine?.time == line.time && lastLine.translation == null) {
-          combinedLines.removeLast()
+          combinedLines.removeAt(combinedLines.lastIndex)
           lastLine.withTranslation(line.content)
         } else {
           line

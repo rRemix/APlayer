@@ -48,6 +48,7 @@ import remix.myplayer.helper.MusicServiceRemote.getPlayModel
 import remix.myplayer.helper.MusicServiceRemote.getProgress
 import remix.myplayer.helper.MusicServiceRemote.isPlaying
 import remix.myplayer.helper.MusicServiceRemote.setPlayModel
+import remix.myplayer.lyrics.LyricsManager
 import remix.myplayer.lyrics.provider.UriProvider
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.handler.MsgHandler
@@ -163,8 +164,7 @@ class PlayerActivity : BaseMusicActivity() {
 
   val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
     uri?.let {
-      MusicServiceRemote.service?.updateLyrics(UriProvider(it))
-      lyricsFragment.updateLyrics()
+      LyricsManager.updateLyrics(getCurrentSong(), UriProvider(it))
     }
   }
 
@@ -451,7 +451,6 @@ class PlayerActivity : BaseMusicActivity() {
       override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         if (fromUser) {
           updateProgressText(progress)
-          lyricsFragment.updateProgress()
         }
         handler.sendEmptyMessage(UPDATE_TIME_ONLY)
         currentTime = progress
@@ -679,7 +678,6 @@ class PlayerActivity : BaseMusicActivity() {
     super.onMediaStoreChanged()
     val newSong = getCurrentSong()
     updateTopStatus(newSong)
-    lyricsFragment.updateLyrics() // TODO
     song = newSong
     coverFragment.setImage(song, false, true)
   }
@@ -692,8 +690,6 @@ class PlayerActivity : BaseMusicActivity() {
     if (operation != Command.TOGGLE || firstStart) {
       //更新顶部信息
       updateTopStatus(song)
-      //更新歌词
-      lyricsFragment.updateLyrics() // TODO: is it needed?
       //更新进度条
       val temp = getProgress()
       currentTime = if (temp in 1 until duration) temp else 0

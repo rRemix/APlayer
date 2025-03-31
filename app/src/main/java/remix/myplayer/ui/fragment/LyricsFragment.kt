@@ -4,17 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.UiThread
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import androidx.core.view.isVisible
 import remix.myplayer.R
 import remix.myplayer.databinding.FragmentLrcBinding
-import remix.myplayer.helper.MusicServiceRemote
+import remix.myplayer.lyrics.LyricsLine
+import remix.myplayer.lyrics.LyricsManager
 import remix.myplayer.ui.fragment.base.BaseMusicFragment
 import remix.myplayer.ui.widget.LyricsView
-import remix.myplayer.util.ToastUtil
+import timber.log.Timber
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -23,9 +22,8 @@ class LyricsFragment : BaseMusicFragment<FragmentLrcBinding>(), View.OnClickList
     get() = FragmentLrcBinding::inflate
 
   companion object {
-    private val TAG = LyricsFragment::class.java.simpleName
+    private const val TAG = "LyricsFragment"
 
-    private val UPDATE_PROGRESS_INTERVAL = 50.milliseconds
     private val HIDE_PANEL_DELAY = 5000.milliseconds
   }
 
@@ -35,71 +33,80 @@ class LyricsFragment : BaseMusicFragment<FragmentLrcBinding>(), View.OnClickList
 
   var onSeekToListener: LyricsView.OnSeekToListener? = null
 
-  private var loadLyricsJob: Job? = null
-  private var updateProgressJob: Job? = null
-
   @UiThread
-  fun updateLyrics() {
-    view ?: return // TODO: Better check?
-
-    loadLyricsJob?.cancel()
-    updateProgressJob?.cancel()
-
+  fun setLyricsSearching() {
+    view ?: return
+    binding.offsetPanel.visibility = View.GONE
     binding.lyrics.visibility = View.GONE
     binding.lyricsNoLrc.visibility = View.GONE
     binding.lyricsSearching.visibility = View.VISIBLE
+  }
 
-    MusicServiceRemote.service?.let { service ->
-      loadLyricsJob = lifecycleScope.launch {
-        val lyrics = service.lyrics.await()
-        binding.lyricsSearching.visibility = View.GONE
-        if (lyrics.isEmpty()) {
-          binding.lyricsNoLrc.visibility = View.VISIBLE
-        } else {
-          binding.lyrics.lyrics = lyrics
-          binding.lyrics.offset = service.lyricsOffset
-          binding.lyrics.visibility = View.VISIBLE
-          updateProgressJob = lifecycleScope.launch {
-            while (true) {
-              updateProgress()
-              delay(UPDATE_PROGRESS_INTERVAL)
-            }
-          }
-        }
-      }
+  @UiThread
+  fun setLyrics(lyrics: List<LyricsLine>) {
+    view ?: return
+    binding.offsetPanel.visibility = View.GONE
+    binding.lyricsSearching.visibility = View.GONE
+    if (lyrics.isEmpty()) {
+      binding.lyrics.visibility = View.GONE
+      binding.lyricsNoLrc.visibility = View.VISIBLE
+    } else {
+      binding.lyricsNoLrc.visibility = View.GONE
+      binding.lyrics.visibility = View.VISIBLE
+      binding.lyrics.lyrics = lyrics
+    }
+  }
+
+  private fun hasLyrics(): Boolean {
+    return binding.lyrics.isVisible
+  }
+
+  @UiThread
+  fun setOffset(offset: Int) {
+    view ?: return
+    if (hasLyrics()) {
+      binding.lyrics.offset = offset
     }
   }
 
   @UiThread
-  fun updateProgress() {
-    MusicServiceRemote.service?.run {
-      binding.lyrics.updateProgress(progress, duration)
+  fun setProgress(progress: Int, duration: Int) {
+    view ?: return
+    if (hasLyrics()) {
+      binding.lyrics.setProgress(progress, duration)
     }
   }
 
   private val hideOffsetPanelRunnable = Runnable {
     binding.offsetPanel.visibility = View.GONE
   }
+  private var toast: Toast? = null
 
   override fun onClick(v: View) {
-    MusicServiceRemote.service?.run {
-      val oldOffset = lyricsOffset
-      when (v.id) {
-        R.id.offset_inc -> lyricsOffset += 500
-        R.id.offset_dec -> lyricsOffset -= 500
-        R.id.offset_reset -> lyricsOffset = 0
-        else -> return@onClick
-      }
-      if (lyricsOffset != oldOffset) {
-        val seconds = lyricsOffset / 1000f
-        when (seconds.sign) {
-          +1f -> ToastUtil.show(context, R.string.lyric_advance_x_second, seconds)
-          -1f -> ToastUtil.show(context, R.string.lyric_delay_x_second, -seconds)
-          0f -> ToastUtil.show(context, R.string.lyric_offset_reset)
-        }
-        binding.lyrics.offset = lyricsOffset
+    if (!hasLyrics()) {
+      Timber.tag(TAG).w("Trying to set offset when no lyrics")
+      return
+    }
+    when (v.id) {
+      R.id.offset_inc -> LyricsManager.offset += 500
+      R.id.offset_dec -> LyricsManager.offset -= 500
+      R.id.offset_reset -> LyricsManager.offset = 0
+      else -> check(false)
+    }
+    val message = when (LyricsManager.offset.sign) {
+      +1 -> resources.getString(R.string.lyric_advance_x_second, LyricsManager.offset / 1000.0)
+      -1 -> resources.getString(R.string.lyric_delay_x_second, LyricsManager.offset / 1000.0)
+      0 -> resources.getString(R.string.lyric_offset_reset)
+      else -> {
+        Timber.tag(TAG).wtf("offset sign??")
+        return
       }
     }
+    // 取消上一次的通知，及时显示最新的
+    // TODO: ToastUtil ?
+    toast?.cancel()
+    toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
+    toast!!.show()
     binding.root.handler.removeCallbacks(hideOffsetPanelRunnable)
     binding.root.handler.postDelayed(hideOffsetPanelRunnable, HIDE_PANEL_DELAY.inWholeMilliseconds)
   }
@@ -113,26 +120,20 @@ class LyricsFragment : BaseMusicFragment<FragmentLrcBinding>(), View.OnClickList
     binding.lyrics.onSeekToListener = LyricsView.OnSeekToListener {
       onSeekToListener?.onSeekTo(it)
     }
-  }
-
-  override fun onMediaStoreChanged() {
-    super.onMediaStoreChanged()
-    updateLyrics()
-//    TODO("when is it called?")
-  }
-
-  override fun onMetaChanged() {
-    super.onMetaChanged()
-    updateLyrics()
-//    TODO("when is it called?")
+    LyricsManager.setLyricsFragment(this)
   }
 
   @UiThread
   fun showOffsetPanel() {
-    binding.offsetPanel.visibility = View.VISIBLE
-    binding.root.handler.run {
-      removeCallbacks(hideOffsetPanelRunnable)
-      postDelayed(hideOffsetPanelRunnable, HIDE_PANEL_DELAY.inWholeMilliseconds)
+    if (hasLyrics()) {
+      binding.offsetPanel.visibility = View.VISIBLE
+      binding.root.handler.run {
+        removeCallbacks(hideOffsetPanelRunnable)
+        postDelayed(hideOffsetPanelRunnable, HIDE_PANEL_DELAY.inWholeMilliseconds)
+      }
+    } else {
+      // 搜索中 / 没有歌词 不应显示偏移设置
+      // TODO: maybe toast?
     }
   }
 }
