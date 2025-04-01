@@ -330,8 +330,8 @@ class DesktopLyricsView @JvmOverloads constructor(
     val params = layoutParams as WindowManager.LayoutParams
     return when (event.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
-        Timber.tag(TAG).v("${event.y} ${top} ${bottom} ${height}")
-        if (event.y < 0 || event.y > height) {
+//        Timber.tag(TAG).d("onTouchEvent ACTION_DOWN ${event.y} $top $bottom $height")
+        if (event.y < top || event.y > bottom) {
           isTouching = false
           false
         } else {

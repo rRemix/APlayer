@@ -1128,8 +1128,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     if (playQueue.song == EMPTY_SONG) {
       return
     }
-    //更新桌面歌词播放按钮
-    LyricsManager.onPlayStateChanged(isPlaying)
+    LyricsManager.isPlaying = isPlaying
     sendLocalBroadcast(Intent(PLAY_STATE_CHANGE))
   }
 

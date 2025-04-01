@@ -51,7 +51,11 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
   fun setLyricsFragment(fragment: LyricsFragment) {
     lyricsFragment = WeakReference(fragment)
-    lyrics = lyrics
+    lyrics?.let {
+      fragment.setLyrics(it)
+    } ?: fragment.setLyricsSearching()
+    fragment.setProgress(progress, duration.toInt())
+    fragment.setOffset(offset)
   }
 
   fun setLockScreenActivity(activity: LockScreenActivity) {
@@ -228,9 +232,21 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
       }
     }
 
-  private var progress: Int
-    get() = TODO()
+  var isPlaying: Boolean = false
+    @UiThread set(value) {
+      field = value
+      desktopLyricsView?.isPlaying = value
+      if (value) {
+        launch(Dispatchers.IO) {
+          updateProgress()
+        }
+      } else {
+        updateProgressJob?.cancel()
+      }
+    }
+  private var progress: Int = 0
     set(value) {
+      field = value
       launch(Dispatchers.Main) {
         lyricsFragment?.get()?.setProgress(value, duration.toInt())
       }
@@ -279,10 +295,12 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
 //    Timber.tag(TAG).d("update progress")
     updateProgressJob?.cancel()
     progress = MusicServiceRemote.getProgress()
-    updateProgressJob = launch(Dispatchers.IO) {
-      // TODO: should we consider thread create cost?
-      delay(UPDATE_INTERVAL)
-      updateProgress()
+    if (isPlaying) {
+      updateProgressJob = launch(Dispatchers.IO) {
+        // TODO: should we consider thread create cost?
+        delay(UPDATE_INTERVAL)
+        updateProgress()
+      }
     }
     updateMutex.unlock()
   }
@@ -301,11 +319,5 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
       }
       updateProgress()
     }
-  }
-
-  @UiThread
-  fun onPlayStateChanged(isPlaying: Boolean) {
-    desktopLyricsView?.isPlaying = isPlaying
-    // TODO
   }
 }

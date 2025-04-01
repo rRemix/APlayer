@@ -52,6 +52,11 @@ class LyricsView @JvmOverloads constructor(
       val padding = (h + 1) / 2
       handler.post {
         binding.innerContainer.setPadding(0, padding, 0, padding)
+        handler.post { // 要等一次 layout
+          if (!isActive) {
+            scrollToLine(lastHighlightLine)
+          }
+        }
       }
     }
   }
@@ -208,6 +213,7 @@ class LyricsView @JvmOverloads constructor(
 
   private val deactivateRunnable = Runnable {
     isActive = false
+    scrollToLine(lastHighlightLine)
   }
   private val scrollToNearestLineRunnable = Runnable {
     scrollToLine(getNearestLine())
