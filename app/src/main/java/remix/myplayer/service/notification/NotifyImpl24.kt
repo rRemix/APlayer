@@ -67,9 +67,6 @@ NotifyImpl24(context: MusicService) : Notify(context) {
     val playPauseIcon =
       if (service.isPlaying) R.drawable.ic_pause_black_24dp else R.drawable.ic_play_arrow_black_24dp
 
-    val deleteIntent = Intent(MusicService.ACTION_CMD)
-    deleteIntent.putExtra(EXTRA_CONTROL, Command.CLOSE_NOTIFY)
-
     val desktopLyricLock = LyricsManager.isDesktopLyricsLocked
 
     val notification = NotificationCompat.Builder(service, PLAYING_NOTIFICATION_CHANNEL_ID)

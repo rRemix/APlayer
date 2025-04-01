@@ -1181,8 +1181,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         //            return;
         //          }
         pause(false)
-        TODO()
-//        LyricsManager.removeDesktopLyrics()
         uiHandler.postDelayed({ notify.cancelPlayingNotify() }, 300)
       }
       //播放选中的歌曲

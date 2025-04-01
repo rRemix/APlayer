@@ -64,6 +64,11 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
       field = value
       ensureDesktopLyrics()
     }
+  var isNotifyShowing: Boolean = false
+    @UiThread set(value) {
+      field = value
+      ensureDesktopLyrics()
+    }
 
   var isDesktopLyricsEnabled: Boolean
     get() = SPUtil.getValue(App.context, LYRICS_KEY.NAME, LYRICS_KEY.DESKTOP_LYRICS_ENABLED, false)
@@ -110,7 +115,7 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
   @UiThread
   private fun ensureDesktopLyrics() {
-    val shouldShow = isServiceAvailable && isDesktopLyricsEnabled
+    val shouldShow = isServiceAvailable && isNotifyShowing && isDesktopLyricsEnabled
     if (shouldShow != (desktopLyricsView != null)) {
       if (shouldShow) {
         createDesktopLyrics()
@@ -148,6 +153,7 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       param.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
     } else {
+      @Suppress("DEPRECATION")
       param.type = WindowManager.LayoutParams.TYPE_PHONE
     }
     param.format = PixelFormat.RGBA_8888
