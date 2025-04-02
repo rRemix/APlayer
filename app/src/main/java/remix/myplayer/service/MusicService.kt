@@ -56,7 +56,6 @@ import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
-import remix.myplayer.ui.widget.desktop.DesktopLyricsView
 import remix.myplayer.util.*
 import remix.myplayer.util.Constants.*
 import remix.myplayer.util.RxUtil.applySingleScheduler
@@ -241,11 +240,6 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   private var control: Int = 0
 
   /**
-   * 桌面歌词控件
-   */
-  private var desktopLyricView: DesktopLyricsView? = null
-
-  /**
    * service是否停止运行
    */
   var stop = true
@@ -257,6 +251,10 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     ScreenReceiver()
   }
   private var screenOn = true
+    set(value) {
+      field = value
+      LyricsManager.isScreenOn = value
+    }
 
   /**
    * 音量控制

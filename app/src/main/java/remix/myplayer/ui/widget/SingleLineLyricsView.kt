@@ -7,6 +7,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.UiThread
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.graphics.withClip
 import remix.myplayer.lyrics.LyricsLine
 import remix.myplayer.lyrics.PerWordLyricsLine
 import kotlin.math.min
@@ -27,8 +28,7 @@ class SingleLineLyricsView @JvmOverloads constructor(
     private const val ELLIPSIS = Typography.ellipsis.toString()
   }
 
-  @ColorInt
-  var sungColor: Int = currentTextColor
+  @ColorInt var sungColor: Int = currentTextColor
     @UiThread set(@ColorInt value) {
       if (value != field) {
         field = value
@@ -36,8 +36,7 @@ class SingleLineLyricsView @JvmOverloads constructor(
       }
     }
 
-  @ColorInt
-  var unsungColor: Int = currentTextColor
+  @ColorInt var unsungColor: Int = currentTextColor
     @UiThread set(@ColorInt value) {
       if (value != field) {
         field = value
@@ -131,23 +130,20 @@ class SingleLineLyricsView @JvmOverloads constructor(
           val l =
             paint.measureText(lyricsLine.words.subList(0, index).joinToString("") { it.content })
           val r = paint.measureText(
-            lyricsLine.words.subList(0, index + 1)
-                .joinToString("") { it.content })
+            lyricsLine.words.subList(0, index + 1).joinToString("") { it.content })
           val highlightWidth = l + (r - l) * (offset - index)
           val left = if (width >= textWidth) {
             (width - textWidth) / 2
           } else {
             (width / 2f - highlightWidth).coerceIn(width - textWidth, 0f)
           }
-          canvas.save()
-          canvas.clipRect(left, 0f, left + highlightWidth, height.toFloat())
-          canvas.drawText(content, left, -fm.top, paint)
-          canvas.restore()
+          canvas.withClip(left, 0f, left + highlightWidth, height.toFloat()) {
+            drawText(content, left, -fm.top, paint)
+          }
           paint.color = unsungColor
-          canvas.save()
-          canvas.clipRect(left + highlightWidth, 0f, left + textWidth, height.toFloat())
-          canvas.drawText(content, left, -fm.top, paint)
-          canvas.restore()
+          canvas.withClip(left + highlightWidth, 0f, left + textWidth, height.toFloat()) {
+            drawText(content, left, -fm.top, paint)
+          }
         } else {
           check(index == lyricsLine.words.size)
           val left = if (width >= textWidth) {

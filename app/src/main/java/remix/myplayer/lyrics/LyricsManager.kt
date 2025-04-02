@@ -73,6 +73,16 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
       field = value
       ensureDesktopLyrics()
     }
+  var isScreenOn: Boolean = true
+    @UiThread set(value) {
+      field = value
+      ensureDesktopLyrics()
+    }
+  var isAppInForeground: Boolean = false
+    @UiThread set(value) {
+      field = value
+      ensureDesktopLyrics()
+    }
 
   var isDesktopLyricsEnabled: Boolean
     get() = SPUtil.getValue(App.context, LYRICS_KEY.NAME, LYRICS_KEY.DESKTOP_LYRICS_ENABLED, false)
@@ -119,7 +129,8 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
   @UiThread
   private fun ensureDesktopLyrics() {
-    val shouldShow = isServiceAvailable && isNotifyShowing && isDesktopLyricsEnabled
+    val shouldShow =
+      isServiceAvailable && isNotifyShowing && isScreenOn && !isAppInForeground && isDesktopLyricsEnabled
     if (shouldShow != (desktopLyricsView != null)) {
       if (shouldShow) {
         createDesktopLyrics()
@@ -170,7 +181,8 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     desktopLyricsView = DesktopLyricsView(ContextThemeWrapper(App.context, ThemeStore.themeRes))
     windowManager.addView(desktopLyricsView, param)
     desktopLyricsView!!.restoreWindowPosition()
-    desktopLyricsView!!.isPlaying = MusicServiceRemote.isPlaying()
+    desktopLyricsView!!.isPlaying = isPlaying
+    desktopLyricsView!!.setLyrics(currentNextLyricsLine)
   }
 
   @UiThread
@@ -264,11 +276,13 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
   private var currentNextLyricsLine: CurrentNextLyricsLine = CurrentNextLyricsLine.SEARCHING
     set(value) {
-      field = value
-      currentLyricsLine = value.currentLine?.content ?: ""
-      launch(Dispatchers.Main) {
-        lockScreenActivity?.get()?.setLyrics(value)
-        desktopLyricsView?.setLyrics(value)
+      if (value != field) {
+        field = value
+        currentLyricsLine = value.currentLine?.content ?: ""
+        launch(Dispatchers.Main) {
+          lockScreenActivity?.get()?.setLyrics(value)
+          desktopLyricsView?.setLyrics(value)
+        }
       }
     }
 
@@ -292,17 +306,20 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
       // 还没拿到歌词或者当前有别的线程在更新
       return
     }
-//    Timber.tag(TAG).d("update progress")
-    updateProgressJob?.cancel()
-    progress = MusicServiceRemote.getProgress()
-    if (isPlaying) {
-      updateProgressJob = launch(Dispatchers.IO) {
-        // TODO: should we consider thread create cost?
-        delay(UPDATE_INTERVAL)
-        updateProgress()
+    try {
+//      Timber.tag(TAG).d("update progress")
+      updateProgressJob?.cancel()
+      progress = MusicServiceRemote.getProgress()
+      if (isPlaying) {
+        updateProgressJob = launch(Dispatchers.IO) {
+          // TODO: should we consider thread create cost?
+          delay(UPDATE_INTERVAL)
+          updateProgress()
+        }
       }
+    } finally {
+      updateMutex.unlock()
     }
-    updateMutex.unlock()
   }
 
   fun updateLyrics(song: Song, provider: ILyricsProvider? = null) {

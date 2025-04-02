@@ -260,8 +260,6 @@ class DesktopLyricsView @JvmOverloads constructor(
     binding.linesContainer.firstLine.sungColor = sungColor
     binding.linesContainer.firstLine.unsungColor = unsungColor
 
-    setLyrics(CurrentNextLyricsLine(null, null, null))
-
     isLocked = isLocked
 
     isPanelVisible = false
