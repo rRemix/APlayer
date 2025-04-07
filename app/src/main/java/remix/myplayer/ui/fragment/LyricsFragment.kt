@@ -62,7 +62,7 @@ class LyricsFragment : BaseMusicFragment<FragmentLrcBinding>(), View.OnClickList
   }
 
   @UiThread
-  fun setOffset(offset: Int) {
+  fun setOffset(offset: Long) {
     view ?: return
     if (hasLyrics()) {
       binding.lyrics.offset = offset
@@ -70,7 +70,7 @@ class LyricsFragment : BaseMusicFragment<FragmentLrcBinding>(), View.OnClickList
   }
 
   @UiThread
-  fun setProgress(progress: Int, duration: Int) {
+  fun setProgress(progress: Long, duration: Long) {
     view ?: return
     if (hasLyrics()) {
       binding.lyrics.setProgress(progress, duration)

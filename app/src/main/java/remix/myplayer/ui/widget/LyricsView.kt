@@ -19,6 +19,7 @@ import remix.myplayer.lyrics.PerWordLyricsLine
 import remix.myplayer.theme.ThemeStore
 import timber.log.Timber
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.milliseconds
 
 class LyricsView @JvmOverloads constructor(
@@ -37,7 +38,7 @@ class LyricsView @JvmOverloads constructor(
   }
 
   fun interface OnSeekToListener {
-    fun onSeekTo(progress: Int)
+    fun onSeekTo(progress: Long)
   }
 
   private val binding = LayoutLyricsViewBinding.inflate(LayoutInflater.from(context), this, true)
@@ -66,7 +67,7 @@ class LyricsView @JvmOverloads constructor(
       LayoutLyricsLineBinding.inflate(LayoutInflater.from(context), binding.innerContainer, true)
     if (line.content.isNotBlank()) {
       layout.content.text = if (line is PerWordLyricsLine) {
-        line.getSpannedString(0f, normalTextColor)
+        line.getSpannedString(0.0, normalTextColor)
       } else {
         line.content
       }
@@ -81,25 +82,24 @@ class LyricsView @JvmOverloads constructor(
    */
   var lyrics: List<LyricsLine> = emptyList()
     @UiThread set(value) {
-      if (value == field) {
-        return
-      }
       field = value
       binding.innerContainer.removeAllViews()
-      isClickable = lyrics.isNotEmpty()
+      isClickable = value.isNotEmpty()
       value.forEach {
         addLayoutForLine(it)
       }
       rawProgressAndDuration = null
       lastHighlightLine = null
+      isActive = false
     }
 
-  private var rawProgressAndDuration: Pair<Int, Int>? = null
+  private data class ProgressAndDuration(val progress: Long, val duration: Long)
+  private var rawProgressAndDuration: ProgressAndDuration? = null
 
   /**
    * 修改时自动更新 UI
    */
-  var offset: Int = 0
+  var offset: Long = 0
     @UiThread set(value) {
       if (value == field) {
         return
@@ -109,7 +109,7 @@ class LyricsView @JvmOverloads constructor(
         updateTimeIndicator()
       }
       rawProgressAndDuration?.run {
-        setProgress(first, second)
+        setProgress(progress, duration)
       }
     }
 
@@ -118,7 +118,7 @@ class LyricsView @JvmOverloads constructor(
     return layout.getChildAt(0) as TextView
   }
 
-  private fun setProgressOfLine(index: Int, progress: Float, @ColorInt color: Int) {
+  private fun setProgressOfLine(index: Int, progress: Double, @ColorInt color: Int) {
     val view = getTextViewOfLine(index)
     val line = lyrics[index]
     if (line.content.isBlank()) {
@@ -134,9 +134,9 @@ class LyricsView @JvmOverloads constructor(
   private var lastHighlightLine: Int? = null
 
   @UiThread
-  fun setProgress(rawProgress: Int, rawDuration: Int) {
+  fun setProgress(rawProgress: Long, rawDuration: Long) {
     check(lyrics.isNotEmpty())
-    rawProgressAndDuration = Pair(rawProgress, rawDuration)
+    rawProgressAndDuration = ProgressAndDuration(rawProgress, rawDuration)
     val progress = rawProgress + offset
     val duration = rawDuration + offset
     check(progress <= duration)
@@ -146,7 +146,7 @@ class LyricsView @JvmOverloads constructor(
     check(index >= -1 && index < lyrics.size)
     if (index != lastHighlightLine) {
       lastHighlightLine?.let {
-        setProgressOfLine(it, 0f, normalTextColor)
+        setProgressOfLine(it, 0.0, normalTextColor)
         lastHighlightLine = null
       }
       if (index >= 0) {
@@ -156,7 +156,7 @@ class LyricsView @JvmOverloads constructor(
             line.getProgress(
               progress, lyrics.getOrNull(index + 1)?.time ?: duration
             )
-          } else 0f, highlightTextColor
+          } else 0.0, highlightTextColor
         )
         lastHighlightLine = index
       }
@@ -206,7 +206,7 @@ class LyricsView @JvmOverloads constructor(
       } else {
         binding.timeIndicator.visibility = View.GONE
         rawProgressAndDuration?.run {
-          setProgress(first, second)
+          setProgress(progress, duration)
         }
       }
     }
@@ -221,10 +221,9 @@ class LyricsView @JvmOverloads constructor(
 
   @SuppressLint("SetTextI18n")
   private fun updateTimeIndicator() {
-    (lyrics[getNearestLine()].time - offset).coerceAtLeast(0).let {
-      binding.time.text =
-        "%02d:%02d.%02d".format(it / 1000 / 60, it / 1000 % 60, (it % 1000 / 10f).roundToInt())
-      // TODO: don't set every time
+    (lyrics[getNearestLine()].time - offset).coerceIn(0, rawProgressAndDuration?.duration ?: 0).let {
+      val time = (it / 10.0).roundToLong()
+      binding.time.text = "%02d:%02d.%02d".format(time / 100 / 60, time / 100 % 60, time % 100)
       binding.playButton.setOnClickListener { _ ->
         onSeekToListener?.onSeekTo(it)
       }

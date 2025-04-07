@@ -1,7 +1,7 @@
 package remix.myplayer.lyrics
 
 import timber.log.Timber
-import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 object LrcParser {
   private const val TAG = "LrcParser"
@@ -15,16 +15,16 @@ object LrcParser {
    * @param offset 正数表示更早，负数表示更晚
    * @return 以毫秒为单位；失败返回 null
    */
-  private fun parseTime(timeStr: String, offset: Int): Int? {
+  private fun parseTime(timeStr: String, offset: Long): Long? {
     try {
       val parts = timeStr.split(':')
       val minutes = when (parts.size) {
-        2 -> parts[0].toInt()
-        3 -> parts[0].toInt() * 60 + parts[1].toInt()
+        2 -> parts[0].toLong()
+        3 -> parts[0].toLong() * 60 + parts[1].toLong()
         else -> throw Exception("Unknown time format")
       }
       val seconds = minutes * 60 + parts.last().toDouble()
-      return (seconds * 1000).roundToInt() - offset
+      return (seconds * 1000).roundToLong() - offset
     } catch (t: Throwable) {
       Timber.tag(TAG).w(t, "Failed to parse time: $timeStr")
     }
@@ -36,7 +36,7 @@ object LrcParser {
    *
    * @param time 整行的开始时间
    */
-  private fun parseWords(time: Int, offset: Int, content: String): LyricsLine {
+  private fun parseWords(time: Long, offset: Long, content: String): LyricsLine {
     val words = ArrayList<Word>()
     var currentTime = time
     var lastStart = 0
@@ -60,7 +60,7 @@ object LrcParser {
 
   fun parse(data: String): ArrayList<LyricsLine> {
     val lines = ArrayList<LyricsLine>()
-    var offset = 0
+    var offset = 0L
 
     data.lines().forEach {
       if (it.isBlank()) {
@@ -78,9 +78,9 @@ object LrcParser {
         // [offset:+/-xxx]
         if (tag.startsWith("offset:")) {
           try {
-            offset = Integer.parseInt(tag.substring(7).trim())
+            offset = tag.substring(7).trim().toLong()
           } catch (t: Throwable) {
-            Timber.tag(TAG).w("Failed to parse offset: $offset")
+            Timber.tag(TAG).w("Failed to parse offset, raw tag: $tag")
           }
           return@forEach
         }
@@ -91,7 +91,7 @@ object LrcParser {
       var index = 0
 
       // 解析时间戳
-      val times = ArrayList<Int>()
+      val times = ArrayList<Long>()
       while (it.startsWith("[", index)) {
         val closing = it.indexOf(']', index)
         if (closing == -1) break

@@ -135,7 +135,7 @@ object MusicServiceRemote {
   }
 
   @JvmStatic
-  fun setProgress(progress: Int) {
+  fun setProgress(progress: Long) {
     service?.setProgress(progress)
   }
 

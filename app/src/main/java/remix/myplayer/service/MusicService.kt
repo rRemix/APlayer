@@ -573,7 +573,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
 
       override fun onSeekTo(pos: Long) {
-        setProgress(pos.toInt())
+        setProgress(pos)
       }
 
       override fun onCustomAction(action: String?, extras: Bundle?) {
@@ -1458,9 +1458,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   /**
    * 设置MediaPlayer播放进度
    */
-  fun setProgress(current: Int) {
+  fun setProgress(current: Long) {
     if (prepared) {
-      mediaPlayer.seekTo(current)
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        mediaPlayer.seekTo(current, MediaPlayer.SEEK_PREVIOUS_SYNC)
+      } else {
+        mediaPlayer.seekTo(current.toInt())
+      }
       launch(Dispatchers.IO) {
         LyricsManager.updateProgress()
       }

@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SimpleLyricsLine(
-  override val time: Int,
+  override val time: Long,
   override val content: String,
   override val translation: String? = null
 ) : LyricsLine() {

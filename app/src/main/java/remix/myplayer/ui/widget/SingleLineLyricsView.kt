@@ -73,7 +73,7 @@ class SingleLineLyricsView @JvmOverloads constructor(
    * - `lyricsLine` is `PerWordLyricsLine`：[0, lyricsLine.words.size]
    * - 否则：[0, 1]
    */
-  var progress: Float? = null
+  var progress: Double? = null
     @UiThread set(value) {
       if (value == field) {
         return
@@ -132,16 +132,17 @@ class SingleLineLyricsView @JvmOverloads constructor(
           val r = paint.measureText(
             lyricsLine.words.subList(0, index + 1).joinToString("") { it.content })
           val highlightWidth = l + (r - l) * (offset - index)
-          val left = if (width >= textWidth) {
+          val left = (if (width >= textWidth) {
             (width - textWidth) / 2
           } else {
-            (width / 2f - highlightWidth).coerceIn(width - textWidth, 0f)
-          }
-          canvas.withClip(left, 0f, left + highlightWidth, height.toFloat()) {
+            (width / 2.0 - highlightWidth).coerceIn((width - textWidth).toDouble(), 0.0)
+          }).toFloat()
+          val mid = (left + highlightWidth).toFloat()
+          canvas.withClip(left, 0f, mid, height.toFloat()) {
             drawText(content, left, -fm.top, paint)
           }
           paint.color = unsungColor
-          canvas.withClip(left + highlightWidth, 0f, left + textWidth, height.toFloat()) {
+          canvas.withClip(mid, 0f, left + textWidth, height.toFloat()) {
             drawText(content, left, -fm.top, paint)
           }
         } else {
@@ -159,7 +160,7 @@ class SingleLineLyricsView @JvmOverloads constructor(
         } else {
           (width - textWidth) * offset
         }
-        canvas.drawText(content, left, -fm.top, paint)
+        canvas.drawText(content, left.toFloat(), -fm.top, paint)
       }
     }
   }

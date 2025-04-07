@@ -465,7 +465,7 @@ class PlayerActivity : BaseMusicActivity() {
 //                if(!mIsPlay){
 //                    seekBar.setProgress(0);
 //                }
-        MusicServiceRemote.setProgress(seekBar.progress)
+        MusicServiceRemote.setProgress(seekBar.progress.toLong())
         isDragSeekBarFromUser = false
       }
     })
@@ -656,11 +656,9 @@ class PlayerActivity : BaseMusicActivity() {
 
   private fun setUpLyricsFragment() {
     lyricsFragment.onSeekToListener = LyricsView.OnSeekToListener { progress ->
-      if (progress in 0..getDuration()) {
-        MusicServiceRemote.setProgress(progress)
-        currentTime = progress
-        handler.sendEmptyMessage(UPDATE_TIME_ALL)
-      }
+      MusicServiceRemote.setProgress(progress)
+      currentTime = getProgress()
+      handler.sendEmptyMessage(UPDATE_TIME_ALL)
     }
   }
 

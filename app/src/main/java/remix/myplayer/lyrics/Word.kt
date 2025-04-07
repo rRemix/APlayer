@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Word(
-  val time: Int, // in ms
+  val time: Long, // in ms
   val content: String
 )

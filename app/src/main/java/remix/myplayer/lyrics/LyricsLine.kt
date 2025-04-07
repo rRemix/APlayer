@@ -9,7 +9,7 @@ sealed class LyricsLine {
   /**
    * 这行歌词的开始时间
    */
-  abstract val time: Int
+  abstract val time: Long
 
   /**
    * 整行歌词的内容，仅文本

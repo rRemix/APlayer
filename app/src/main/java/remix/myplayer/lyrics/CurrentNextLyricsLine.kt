@@ -2,7 +2,7 @@ package remix.myplayer.lyrics
 
 data class CurrentNextLyricsLine(
   val currentLine: LyricsLine?,
-  val currentLineProgress: Float?,
+  val currentLineProgress: Double?,
   val nextLine: LyricsLine?,
 ) {
   companion object {

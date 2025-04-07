@@ -54,7 +54,7 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     lyrics?.let {
       fragment.setLyrics(it)
     } ?: fragment.setLyricsSearching()
-    fragment.setProgress(progress, duration.toInt())
+    fragment.setProgress(progress, duration)
     fragment.setOffset(offset)
   }
 
@@ -193,23 +193,18 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     desktopLyricsView = null
   }
 
-  // TODO: Create desktop lyrics on start?
-
-  private fun getProgressOfLine(line: LyricsLine, time: Int, endTime: Int): Float {
-    return line.let {
-      require(time in it.time..endTime)
-      if (it is PerWordLyricsLine) {
-        it.getProgress(time, endTime)
-      } else {
-        (time - it.time).toFloat() / (endTime - it.time)
-      }
+  private fun getProgressOfLine(line: LyricsLine, time: Long, endTime: Long): Double {
+    require(time in line.time..endTime)
+    return if (line is PerWordLyricsLine) {
+      line.getProgress(time, endTime)
+    } else {
+      (time - line.time).toDouble() / (endTime - line.time)
     }
   }
 
   private fun getCurrentNextLine(
-    lyrics: List<LyricsLine>, offset: Int, progress: Int, duration: Int
+    lyrics: List<LyricsLine>, offset: Long, progress: Long, duration: Long
   ): CurrentNextLyricsLine {
-    // TODO: offset?
     if (lyrics.isEmpty()) {
       return CurrentNextLyricsLine(LyricsLine.LYRICS_LINE_NO_LRC, null, null)
     }
@@ -224,7 +219,6 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     check(index < lyrics.size)
     val cur = lyrics[index]
     val nxt = lyrics.getOrNull(index + 1)
-    // TODO: why duration with offset?
     return CurrentNextLyricsLine(
       cur, getProgressOfLine(cur, progressWithOffset, nxt?.time ?: (duration + offset)), nxt
     )
@@ -256,21 +250,22 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
         updateProgressJob?.cancel()
       }
     }
-  private var progress: Int = 0
+  private var progress: Long = 0
     set(value) {
       field = value
       launch(Dispatchers.Main) {
-        lyricsFragment?.get()?.setProgress(value, duration.toInt())
+        lyricsFragment?.get()?.setProgress(value, duration)
       }
-      currentNextLyricsLine = getCurrentNextLine(lyrics!!, offset, value, duration.toInt())
+      currentNextLyricsLine = getCurrentNextLine(lyrics ?: return, offset, value, duration)
     }
-  var offset: Int = 0
-    set(value) {
+  var offset: Long = 0
+    @UiThread set(value) {
       field = value
-      launch(Dispatchers.Main) {
-        lyricsFragment?.get()?.setOffset(offset)
+      lyricsFragment?.get()?.setOffset(offset)
+      launch(Dispatchers.IO) {
+        updateProgress()
+        LyricsSearcher.saveOffset(MusicServiceRemote.getCurrentSong(), value)
       }
-      LyricsSearcher.saveOffset(MusicServiceRemote.getCurrentSong(), value)
     }
   private var duration: Long = 0
 
@@ -309,7 +304,7 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     try {
 //      Timber.tag(TAG).d("update progress")
       updateProgressJob?.cancel()
-      progress = MusicServiceRemote.getProgress()
+      progress = MusicServiceRemote.getProgress().toLong()
       if (isPlaying) {
         updateProgressJob = launch(Dispatchers.IO) {
           // TODO: should we consider thread create cost?
