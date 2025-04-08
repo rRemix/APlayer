@@ -74,6 +74,8 @@ class LyricsView @JvmOverloads constructor(
     }
     if (!line.translation.isNullOrBlank()) {
       layout.translation.text = line.translation
+    } else {
+      layout.translation.visibility = View.GONE
     }
   }
 
@@ -149,20 +151,20 @@ class LyricsView @JvmOverloads constructor(
         setProgressOfLine(it, 0.0, normalTextColor)
         lastHighlightLine = null
       }
-      if (index >= 0) {
-        val line = lyrics[index]
-        setProgressOfLine(
-          index, if (line is PerWordLyricsLine) {
-            line.getProgress(
-              progress, lyrics.getOrNull(index + 1)?.time ?: duration
-            )
-          } else 0.0, highlightTextColor
-        )
-        lastHighlightLine = index
-      }
       if (!isActive) {
         scrollToLine(index)
       }
+    }
+    if (index >= 0) {
+      val line = lyrics[index]
+      setProgressOfLine(
+        index, if (line is PerWordLyricsLine) {
+          line.getProgress(
+            progress, lyrics.getOrNull(index + 1)?.time ?: duration
+          )
+        } else 0.0, highlightTextColor
+      )
+      lastHighlightLine = index
     }
   }
 

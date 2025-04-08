@@ -15,7 +15,9 @@ data class PerWordLyricsLine(
     require(words.isNotEmpty() && time <= words[0].time)
   }
 
-  override val content = words.joinToString("") { it.content }
+  override val content by lazy {
+    words.joinToString("") { it.content }
+  }
 
   override fun withTranslation(newTranslation: String?): PerWordLyricsLine {
     return PerWordLyricsLine(time, words, newTranslation)

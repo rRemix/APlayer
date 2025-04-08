@@ -164,19 +164,21 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
     Timber.tag(TAG).v("Creating desktop lyrics")
 
-    val param = WindowManager.LayoutParams()
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      param.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-    } else {
-      @Suppress("DEPRECATION")
-      param.type = WindowManager.LayoutParams.TYPE_PHONE
+    val param = WindowManager.LayoutParams().apply {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+      } else {
+        @Suppress("DEPRECATION")
+        type = WindowManager.LayoutParams.TYPE_PHONE
+      }
+      format = PixelFormat.RGBA_8888
+      gravity = Gravity.TOP
+      width = ViewGroup.LayoutParams.MATCH_PARENT
+      height = ViewGroup.LayoutParams.WRAP_CONTENT
+      x = 0
+      y = 0
+      flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
     }
-    param.format = PixelFormat.RGBA_8888
-    param.gravity = Gravity.TOP
-    param.width = ViewGroup.LayoutParams.MATCH_PARENT
-    param.height = ViewGroup.LayoutParams.WRAP_CONTENT
-    param.x = 0
-    param.y = 0
 
     desktopLyricsView = DesktopLyricsView(ContextThemeWrapper(App.context, ThemeStore.themeRes))
     windowManager.addView(desktopLyricsView, param)
@@ -246,8 +248,6 @@ object LyricsManager : CoroutineScope by CoroutineScope(Dispatchers.IO) {
         launch(Dispatchers.IO) {
           updateProgress()
         }
-      } else {
-        updateProgressJob?.cancel()
       }
     }
   private var progress: Long = 0

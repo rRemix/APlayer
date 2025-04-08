@@ -139,7 +139,7 @@ class DesktopLyricsView @JvmOverloads constructor(
       }
     }
 
-  var isPlaying: Boolean = true // 初值与 xml 对应；由 service 负责修改
+  var isPlaying: Boolean = true // 初值与 xml 对应
     set(value) {
       if (value != field) {
         field = value
@@ -230,25 +230,29 @@ class DesktopLyricsView @JvmOverloads constructor(
   var isLocked: Boolean
     get() = SPUtil.getValue(context, DESKTOP_LYRICS_KEY.NAME, DESKTOP_LYRICS_KEY.LOCKED, false)
     set(value) {
-      (layoutParams as WindowManager.LayoutParams?)?.run {
-        flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+      if (isLocked != value) {
+        SPUtil.putValue(context, DESKTOP_LYRICS_KEY.NAME, DESKTOP_LYRICS_KEY.LOCKED, value)
+        ToastUtil.show(
+          context, if (value) R.string.desktop_lyric_lock else R.string.desktop_lyric__unlock
+        )
+      }
+      (layoutParams as WindowManager.LayoutParams).run {
         if (value) {
           flags = flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             alpha = inputManager.maximumObscuringOpacityForTouch
           }
+        } else {
+          flags = flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            alpha = 1f
+          }
         }
         windowManager.updateViewLayout(this@DesktopLyricsView, this)
       }
-      if (isLocked != value) {
-        SPUtil.putValue(context, DESKTOP_LYRICS_KEY.NAME, DESKTOP_LYRICS_KEY.LOCKED, value)
-        MusicServiceRemote.service?.run {
-          updateNotification()
-          updatePlaybackState()
-        }
-        ToastUtil.show(
-          context, if (value) R.string.desktop_lyric_lock else R.string.desktop_lyric__unlock
-        )
+      MusicServiceRemote.service?.run {
+        updateNotification()
+        updatePlaybackState()
       }
     }
 

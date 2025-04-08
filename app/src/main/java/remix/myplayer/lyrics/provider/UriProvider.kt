@@ -12,11 +12,9 @@ class UriProvider(private val uri: Uri) : ILyricsProvider {
     private const val TAG = "UriProvider"
   }
 
-  // 不应该用到
-  override val id: String
-    get() = throw RuntimeException()
+  override val id: String = "uri"
   override val displayName: String
-    get() = throw RuntimeException()
+    get() = throw RuntimeException() // 不应该用到
 
   override suspend fun getLyrics(song: Song): List<LyricsLine> {
     return try {

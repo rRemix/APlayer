@@ -41,7 +41,7 @@ object LrcParser {
     var currentTime = time
     var lastStart = 0
     var match = WORD_TIME_TAG_REGEX.find(content) ?: return SimpleLyricsLine(time, content)
-    while (lastStart < content.length) {
+    while (true) {
       words.add(Word(currentTime, content.substring(lastStart, match.range.first)))
       parseTime(match.value.substring(1, match.value.lastIndex), offset)?.let {
         // 确保同一 LyricsLine 内 time 单调不减
@@ -52,9 +52,7 @@ object LrcParser {
       lastStart = match.range.last + 1
       match = match.next() ?: break
     }
-    if (lastStart < content.length) {
-      words.add(Word(currentTime, content.substring(lastStart)))
-    }
+    words.add(Word(currentTime, content.substring(lastStart)))
     return PerWordLyricsLine(time, words)
   }
 
@@ -95,7 +93,7 @@ object LrcParser {
       while (it.startsWith("[", index)) {
         val closing = it.indexOf(']', index)
         if (closing == -1) break
-        parseTime(it.substring(index + 1, closing - 1), offset)?.let { time ->
+        parseTime(it.substring(index + 1, closing), offset)?.let { time ->
           times.add(time)
         }
         index = closing + 1

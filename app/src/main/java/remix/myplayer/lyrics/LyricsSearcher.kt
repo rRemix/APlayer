@@ -223,7 +223,7 @@ object LyricsSearcher {
           lyrics
         }, 0)
       } catch (t: Throwable) {
-        Timber.tag(TAG).i(t, "Failed to get lyrics from provider `${it.id}`")
+        Timber.tag(TAG).v(t, "Failed to get lyrics from provider `${it.id}`")
       }
     }
     clearCache(song)

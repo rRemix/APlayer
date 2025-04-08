@@ -24,6 +24,9 @@ class PartialForegroundColorSpan(
   override fun getSize(
     paint: Paint, text: CharSequence, start: Int, end: Int, fm: Paint.FontMetricsInt?
   ): Int {
+    if (fm != null) {
+      paint.getFontMetricsInt(fm)
+    }
     return paint.measureText(text, start, end).roundToInt()
   }
 
@@ -46,11 +49,11 @@ class PartialForegroundColorSpan(
     }
 
     val mid = (x + width * proportion).toFloat()
-    canvas.withClip(x, top.toFloat(), mid, bottom.toFloat()) {
+    canvas.withClip(mid, top.toFloat(), x + width, bottom.toFloat()) {
       drawText(text, start, end, x, y.toFloat(), paint)
     }
     paint.color = color
-    canvas.withClip(mid, top.toFloat(), x + width, bottom.toFloat()) {
+    canvas.withClip(x, top.toFloat(), mid, bottom.toFloat()) {
       drawText(text, start, end, x, y.toFloat(), paint)
     }
   }
