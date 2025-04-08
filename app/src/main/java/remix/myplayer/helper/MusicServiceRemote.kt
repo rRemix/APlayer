@@ -135,7 +135,7 @@ object MusicServiceRemote {
   }
 
   @JvmStatic
-  fun setProgress(progress: Int) {
+  fun setProgress(progress: Long) {
     service?.setProgress(progress)
   }
 
@@ -162,10 +162,5 @@ object MusicServiceRemote {
   @JvmStatic
   fun getOperation(): Int {
     return service?.operation ?: Command.NEXT
-  }
-
-  @JvmStatic
-  fun setLyricOffset(offset: Int) {
-    service?.setLyricOffset(offset)
   }
 }

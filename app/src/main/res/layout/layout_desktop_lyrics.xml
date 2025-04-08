@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/root"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:layout_marginHorizontal="16dp"
+  android:background="@color/desktop_lyrics_window_background"
+  android:orientation="vertical">
+
+  <ImageButton
+    android:id="@+id/close"
+    android:layout_width="@dimen/desktop_lyrics_control_button_size"
+    android:layout_height="@dimen/desktop_lyrics_control_button_size"
+    android:layout_gravity="end"
+    android:background="@drawable/bg_oval_ripple_light"
+    android:contentDescription="@string/close_desktop_lyrics"
+    android:padding="@dimen/desktop_lyrics_control_button_padding"
+    android:src="@drawable/ic_close_white_24dp"
+    app:tint="@color/desktop_lyrics_control_color" />
+
+  <include
+    android:id="@+id/lines_container"
+    layout="@layout/layout_desktop_lyrics_lines" />
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <ImageButton
+      android:id="@+id/lock"
+      android:layout_width="@dimen/desktop_lyrics_control_button_size"
+      android:layout_height="@dimen/desktop_lyrics_control_button_size"
+      android:layout_weight="1"
+      android:background="@drawable/bg_oval_ripple_light"
+      android:contentDescription="@string/lock_desktop_lyrics"
+      android:padding="@dimen/desktop_lyrics_control_button_padding"
+      android:src="@drawable/ic_lock_24dp"
+      app:tint="@color/desktop_lyrics_control_color" />
+
+    <ImageButton
+      android:id="@+id/prev"
+      android:layout_width="@dimen/desktop_lyrics_control_button_size"
+      android:layout_height="@dimen/desktop_lyrics_control_button_size"
+      android:layout_weight="1"
+      android:background="@drawable/bg_oval_ripple_light"
+      android:contentDescription="@string/previous"
+      android:padding="@dimen/desktop_lyrics_control_button_padding"
+      android:src="@drawable/ic_skip_previous_black_24dp"
+      app:tint="@color/desktop_lyrics_control_color" />
+
+    <ImageButton
+      android:id="@+id/play_pause"
+      android:layout_width="@dimen/desktop_lyrics_control_button_size"
+      android:layout_height="@dimen/desktop_lyrics_control_button_size"
+      android:layout_weight="1"
+      android:background="@drawable/bg_oval_ripple_light"
+      android:contentDescription="@string/play_pause"
+      android:padding="@dimen/desktop_lyrics_control_button_padding"
+      android:src="@drawable/ic_pause_black_24dp"
+      app:tint="@color/desktop_lyrics_control_color" />
+
+    <ImageButton
+      android:id="@+id/next"
+      android:layout_width="@dimen/desktop_lyrics_control_button_size"
+      android:layout_height="@dimen/desktop_lyrics_control_button_size"
+      android:layout_weight="1"
+      android:background="@drawable/bg_oval_ripple_light"
+      android:contentDescription="@string/next"
+      android:padding="@dimen/desktop_lyrics_control_button_padding"
+      android:src="@drawable/ic_skip_next_black_24dp"
+      app:tint="@color/desktop_lyrics_control_color" />
+
+    <ImageButton
+      android:id="@+id/settings"
+      android:layout_width="@dimen/desktop_lyrics_control_button_size"
+      android:layout_height="@dimen/desktop_lyrics_control_button_size"
+      android:layout_weight="1"
+      android:background="@drawable/bg_oval_ripple_light"
+      android:contentDescription="@string/desktop_lyrics_settings"
+      android:padding="@dimen/desktop_lyrics_control_button_padding"
+      android:src="@drawable/ic_settings_24dp"
+      app:tint="@color/desktop_lyrics_control_color" />
+  </LinearLayout>
+
+  <View
+    android:id="@+id/divider"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/desktop_lyrics_divider_thickness"
+    android:background="@color/desktop_lyrics_control_color" />
+
+  <LinearLayout
+    android:id="@+id/settings_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageButton
+      android:id="@+id/color_settings"
+      android:layout_width="@dimen/desktop_lyrics_control_button_size"
+      android:layout_height="@dimen/desktop_lyrics_control_button_size"
+      android:background="@drawable/bg_oval_ripple_light"
+      android:contentDescription="@string/desktop_lyrics_color"
+      android:padding="@dimen/desktop_lyrics_control_button_padding"
+      android:src="@drawable/ic_palette_24dp"
+      app:tint="@color/desktop_lyrics_control_color" />
+
+    <View
+      android:layout_width="@dimen/desktop_lyrics_divider_thickness"
+      android:layout_height="match_parent"
+      android:background="@color/desktop_lyrics_control_color" />
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+          android:layout_width="@dimen/desktop_lyrics_slider_icon_size"
+          android:layout_height="@dimen/desktop_lyrics_slider_icon_size"
+          android:background="@drawable/bg_oval_ripple_light"
+          android:importantForAccessibility="no"
+          android:padding="@dimen/desktop_lyrics_slider_icon_padding"
+          android:src="@drawable/ic_looks_one_24dp"
+          app:tint="@color/desktop_lyrics_control_color" />
+
+        <ImageView
+          android:layout_width="@dimen/desktop_lyrics_slider_icon_size"
+          android:layout_height="@dimen/desktop_lyrics_slider_icon_size"
+          android:background="@drawable/bg_oval_ripple_light"
+          android:importantForAccessibility="no"
+          android:padding="@dimen/desktop_lyrics_slider_icon_padding"
+          android:src="@drawable/ic_text_decrease_24dp"
+          app:tint="@color/desktop_lyrics_control_color" />
+
+        <com.google.android.material.slider.Slider
+          android:id="@+id/first_line_size_slider"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:stepSize="0.5"
+          android:valueFrom="8"
+          android:valueTo="36" />
+
+        <ImageView
+          android:layout_width="@dimen/desktop_lyrics_slider_icon_size"
+          android:layout_height="@dimen/desktop_lyrics_slider_icon_size"
+          android:background="@drawable/bg_oval_ripple_light"
+          android:importantForAccessibility="no"
+          android:padding="@dimen/desktop_lyrics_slider_icon_padding"
+          android:src="@drawable/ic_text_increase_24dp"
+          app:tint="@color/desktop_lyrics_control_color" />
+      </LinearLayout>
+
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+          android:layout_width="@dimen/desktop_lyrics_slider_icon_size"
+          android:layout_height="@dimen/desktop_lyrics_slider_icon_size"
+          android:background="@drawable/bg_oval_ripple_light"
+          android:importantForAccessibility="no"
+          android:padding="@dimen/desktop_lyrics_slider_icon_padding"
+          android:src="@drawable/ic_looks_two_24dp"
+          app:tint="@color/desktop_lyrics_control_color" />
+
+        <ImageView
+          android:layout_width="@dimen/desktop_lyrics_slider_icon_size"
+          android:layout_height="@dimen/desktop_lyrics_slider_icon_size"
+          android:background="@drawable/bg_oval_ripple_light"
+          android:importantForAccessibility="no"
+          android:padding="@dimen/desktop_lyrics_slider_icon_padding"
+          android:src="@drawable/ic_text_decrease_24dp"
+          app:tint="@color/desktop_lyrics_control_color" />
+
+        <com.google.android.material.slider.Slider
+          android:id="@+id/second_line_size_slider"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:stepSize="0.5"
+          android:valueFrom="8"
+          android:valueTo="36" />
+
+        <ImageView
+          android:layout_width="@dimen/desktop_lyrics_slider_icon_size"
+          android:layout_height="@dimen/desktop_lyrics_slider_icon_size"
+          android:background="@drawable/bg_oval_ripple_light"
+          android:importantForAccessibility="no"
+          android:padding="@dimen/desktop_lyrics_slider_icon_padding"
+          android:src="@drawable/ic_text_increase_24dp"
+          app:tint="@color/desktop_lyrics_control_color" />
+      </LinearLayout>
+    </LinearLayout>
+  </LinearLayout>
+</LinearLayout>

@@ -13,7 +13,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
-import android.provider.Settings
 import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.CompoundButton
@@ -47,15 +46,16 @@ import remix.myplayer.glide.UriFetcher.DOWNLOAD_LASTFM
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.LanguageHelper
 import remix.myplayer.helper.LanguageHelper.AUTO
+import remix.myplayer.helper.LyricsHelper
 import remix.myplayer.helper.M3UHelper.exportPlayListToFile
 import remix.myplayer.helper.M3UHelper.importLocalPlayList
 import remix.myplayer.helper.M3UHelper.importM3UFile
 import remix.myplayer.helper.ShakeDetector
+import remix.myplayer.lyrics.LyricsManager
 import remix.myplayer.misc.AppInfo
 import remix.myplayer.misc.MediaScanner
 import remix.myplayer.misc.SystemInfo
 import remix.myplayer.misc.cache.DiskCache
-import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.misc.handler.MsgHandler
 import remix.myplayer.misc.handler.OnHandleMessage
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
@@ -64,14 +64,11 @@ import remix.myplayer.misc.update.UpdateAgent
 import remix.myplayer.misc.update.UpdateListener
 import remix.myplayer.misc.zipFrom
 import remix.myplayer.misc.zipOutputStream
-import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRIC
 import remix.myplayer.theme.Theme
 import remix.myplayer.theme.Theme.getBaseDialog
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.theme.TintHelper
-import remix.myplayer.ui.ViewCommon
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_LIBRARY
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_RECREATE
 import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_REFRESH_ADAPTER
@@ -79,16 +76,17 @@ import remix.myplayer.ui.activity.MainActivity.Companion.EXTRA_REFRESH_LIBRARY
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_ADAPTIVE_COLOR
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_CUSTOM_IMAGE
 import remix.myplayer.ui.activity.PlayerActivity.Companion.BACKGROUND_THEME
-import remix.myplayer.ui.dialog.LyricPriorityDialog
+import remix.myplayer.ui.dialog.LyricsOrderDialog
 import remix.myplayer.ui.dialog.color.ColorChooserDialog
 import remix.myplayer.ui.misc.FolderChooser
 import remix.myplayer.util.*
 import remix.myplayer.util.Constants.KB
 import remix.myplayer.util.Constants.MB
 import remix.myplayer.util.RxUtil.applySingleScheduler
+import remix.myplayer.util.SPUtil.LYRICS_KEY
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.SPUtil.SETTING_KEY.BOTTOM_OF_NOW_PLAYING_SCREEN
-import remix.myplayer.util.Util.isSupportStatusBarLyric
+import remix.myplayer.util.Util.isStatusBarLyricsSupported
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
 import java.io.File
@@ -101,7 +99,7 @@ import java.io.File
  */
 //todo 重构整个界面
 class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
-    SharedPreferences.OnSharedPreferenceChangeListener {
+    SharedPreferences.OnSharedPreferenceChangeListener, OnCheckedChangeListener {
   private lateinit var binding: ActivitySettingBinding
 
   private lateinit var checkedChangedListener: OnCheckedChangeListener
@@ -147,8 +145,6 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     val keyWord = arrayOf(
         SETTING_KEY.COLOR_NAVIGATION,
         SETTING_KEY.SHAKE,
-        SETTING_KEY.DESKTOP_LYRIC_SHOW,
-        SETTING_KEY.STATUSBAR_LYRIC_SHOW,
         SETTING_KEY.SCREEN_ALWAYS_ON,
         SETTING_KEY.NOTIFY_STYLE_CLASSIC,
         SETTING_KEY.IMMERSIVE_MODE,
@@ -163,8 +159,6 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     arrayOf(
         binding.settingNavaigationSwitch,
         binding.settingShakeSwitch,
-        binding.settingLrcFloatSwitch,
-        binding.settingStatusbarLrcSwitch,
         binding.settingScreenSwitch,
         binding.settingNotifySwitch,
         binding.settingImmersiveSwitch,
@@ -202,34 +196,6 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
               ShakeDetector.getInstance().beginListen()
             } else {
               ShakeDetector.getInstance().stopListen()
-            }
-            //桌面歌词
-            R.id.setting_lrc_float_switch -> {
-              if (isChecked && !FloatWindowManager.getInstance().checkPermission(this@SettingActivity)) {
-                binding.settingLrcFloatSwitch.setOnCheckedChangeListener(null)
-                binding.settingLrcFloatSwitch.isChecked = false
-                binding.settingLrcFloatSwitch.setOnCheckedChangeListener(this)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                  val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-                  intent.data = Uri.parse("package:$packageName")
-                  intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                  Util.startActivitySafely(this@SettingActivity, intent)
-                }
-                ToastUtil.show(this@SettingActivity, R.string.plz_give_float_permission)
-                return
-              }
-              binding.settingLrcFloatTip.setText(if (isChecked) R.string.opened_desktop_lrc else R.string.closed_desktop_lrc)
-              val intent = MusicUtil.makeCmdIntent(Command.TOGGLE_DESKTOP_LYRIC)
-              intent.putExtra(
-                  EXTRA_DESKTOP_LYRIC, binding.settingLrcFloatSwitch.isChecked
-              )
-              sendLocalBroadcast(intent)
-            }
-            //状态栏歌词
-            R.id.setting_statusbar_lrc_switch -> {
-              val intent =
-                  MusicUtil.makeCmdIntent(Command.TOGGLE_STATUS_BAR_LRC)
-              sendLocalBroadcast(intent)
             }
             //沉浸式状态栏
             R.id.setting_immersive_switch -> {
@@ -287,14 +253,30 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
       view.setOnCheckedChangeListener(checkedChangedListener)
     }
 
-    //桌面歌词
-    binding.settingLrcFloatTip.setText(
-        if (binding.settingLrcFloatSwitch.isChecked) R.string.opened_desktop_lrc else R.string.closed_desktop_lrc
-    )
-
-    if (!isSupportStatusBarLyric(this)) {
+    // 桌面歌词 & 状态栏歌词
+    listOf(binding.settingLrcFloatSwitch, binding.settingStatusbarLrcSwitch).forEach {
+      TintHelper.setTintAuto(it, ThemeStore.accentColor, false)
+    }
+    if (LyricsManager.isDesktopLyricsEnabled) {
+      binding.settingLrcFloatSwitch.isChecked = true
+      binding.settingLrcFloatTip.setText(R.string.opened_desktop_lrc)
+    } else {
+      binding.settingLrcFloatSwitch.isChecked = false
+      binding.settingLrcFloatTip.setText(R.string.closed_desktop_lrc)
+    }
+    binding.settingLrcFloatSwitch.setOnCheckedChangeListener(this)
+    if (isStatusBarLyricsSupported(this)) {
+      binding.settingStatusbarLrcSwitch.run {
+        isChecked = LyricsManager.isStatusBarLyricsEnabled
+        setOnCheckedChangeListener(this@SettingActivity)
+      }
+    } else {
       binding.settingStatusbarLrcContainer.visibility = View.GONE
     }
+    getSharedPreferences(
+      LYRICS_KEY.NAME,
+      Context.MODE_PRIVATE
+    ).registerOnSharedPreferenceChangeListener(this)
 
     //主题颜色指示器
     (binding.settingColorPrimaryIndicator.drawable as GradientDrawable).setColor(
@@ -401,12 +383,6 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     if (!BuildConfig.ENABLE_UPDATER) {
       binding.settingUpdateContainer.visibility = View.GONE
     }
-
-    getSharedPreferences(
-        SETTING_KEY.NAME, Context.MODE_PRIVATE
-    ).registerOnSharedPreferenceChangeListener(
-        this
-    )
 
     // 点击事件处理
     arrayOf(
@@ -914,10 +890,8 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
    * 歌词搜索优先级
    */
   private fun configLyricPriority() {
-    ViewCommon.showLocalLyricTip(this) {
-      LyricPriorityDialog.newInstance().show(
-        supportFragmentManager, "configLyricPriority"
-      )
+    LyricsHelper.showLocalLyricsTip(this) {
+      LyricsOrderDialog().show(supportFragmentManager, "configLyricPriority")
     }
   }
 
@@ -1031,7 +1005,6 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
                 //清除配置文件、数据库等缓存
                 Util.deleteFilesByDirectory(cacheDir)
 //                Util.deleteFilesByDirectory(externalCacheDir)
-                DiskCache.init(this@SettingActivity, "lyric")
                 //清除glide缓存
                 Glide.get(this@SettingActivity).clearDiskCache()
                 UriFetcher.clearAllCache()
@@ -1312,15 +1285,38 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
     }
   }
 
+  override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+    when (buttonView) {
+      binding.settingLrcFloatSwitch -> {
+        LyricsManager.setDesktopLyricsEnabled(isChecked, this)
+        binding.settingLrcFloatSwitch.run {
+          setOnCheckedChangeListener(null)
+          setChecked(LyricsManager.isDesktopLyricsEnabled)
+          setOnCheckedChangeListener(this@SettingActivity)
+        }
+      }
+      binding.settingStatusbarLrcSwitch -> LyricsManager.isStatusBarLyricsEnabled = isChecked
+    }
+  }
+
   override fun onSharedPreferenceChanged(
-      sharedPreferences: SharedPreferences?, key: String?
+      sharedPreferences: SharedPreferences, key: String?
   ) {
-    if (key == SETTING_KEY.DESKTOP_LYRIC_SHOW) {
-      binding.settingLrcFloatSwitch.setOnCheckedChangeListener(null)
-      binding.settingLrcFloatSwitch.isChecked = SPUtil.getValue(
-          this, SETTING_KEY.NAME, SETTING_KEY.DESKTOP_LYRIC_SHOW, false
-      )
-      binding.settingLrcFloatSwitch.setOnCheckedChangeListener(checkedChangedListener)
+    when (key) {
+      LYRICS_KEY.DESKTOP_LYRICS_ENABLED -> {
+        binding.settingLrcFloatSwitch.run {
+          setOnCheckedChangeListener(null)
+          isChecked = LyricsManager.isDesktopLyricsEnabled
+          setOnCheckedChangeListener(this@SettingActivity)
+        }
+      }
+      LYRICS_KEY.STATUS_BAR_LYRICS_ENABLED -> {
+        binding.settingStatusbarLrcSwitch.run {
+          setOnCheckedChangeListener(null)
+          isChecked = LyricsManager.isStatusBarLyricsEnabled
+          setOnCheckedChangeListener(this@SettingActivity)
+        }
+      }
     }
   }
 

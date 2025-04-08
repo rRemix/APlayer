@@ -16,6 +16,7 @@ import androidx.core.app.ServiceCompat
 import androidx.core.app.TaskStackBuilder
 import com.bumptech.glide.request.target.CustomTarget
 import remix.myplayer.R
+import remix.myplayer.lyrics.LyricsManager
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -137,35 +138,27 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     intent.putExtra(EXTRA_CONTROL, operation)
     intent.component = ComponentName(context, MusicService::class.java)
 
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-      return PendingIntent.getService(context, operation, intent,
-        getPendingIntentFlag()
-      )
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !listOf(
+        Command.TOGGLE_DESKTOP_LYRIC,
+        Command.CLOSE_NOTIFY,
+        Command.UNLOCK_DESKTOP_LYRIC
+      ).contains(operation)
+    ) {
+      PendingIntent.getForegroundService(context, operation, intent, getPendingIntentFlag())
     } else {
-      if (operation != Command.TOGGLE_DESKTOP_LYRIC &&
-          operation != Command.CLOSE_NOTIFY &&
-          operation != Command.UNLOCK_DESKTOP_LYRIC) {
-        return PendingIntent.getForegroundService(context, operation, intent,
-          getPendingIntentFlag()
-        )
-      } else {
-        PendingIntent.getService(context, operation, intent,
-          getPendingIntentFlag()
-        )
-      }
+      PendingIntent.getService(context, operation, intent, getPendingIntentFlag())
     }
-
-    return PendingIntent.getService(context, operation, intent,
-      getPendingIntentFlag()
-    )
   }
 
   companion object {
     /**
      * 通知栏是否显示
      */
-    @JvmStatic
     var isNotifyShowing = false
+      set(value) {
+        field = value
+        LyricsManager.isNotifyShowing = value
+      }
 
     private const val NOTIFY_MODE_FOREGROUND = 1
     private const val NOTIFY_MODE_BACKGROUND = 2

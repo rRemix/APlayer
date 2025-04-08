@@ -3,6 +3,7 @@ package remix.myplayer.misc.manager
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import remix.myplayer.lyrics.LyricsManager
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -30,6 +31,10 @@ open class APlayerActivityManager :Application.ActivityLifecycleCallbacks{
         }
 
         private var foregroundActivityCount = 0
+            set(value) {
+                field = value
+                LyricsManager.isAppInForeground = isAppForeground
+            }
         val isAppForeground: Boolean
             get() = foregroundActivityCount > 0
     }

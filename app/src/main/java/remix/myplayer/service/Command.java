@@ -17,11 +17,11 @@ public interface Command {
   int UNLOCK_DESKTOP_LYRIC = 11;
   int CLOSE_NOTIFY = 12;
   int ADD_TO_NEXT_SONG = 13;
-  int CHANGE_LYRIC = 14;
+//  int CHANGE_LYRIC = 14;
   int PLAY_AT_BREAKPOINT = 15;
   int TOGGLE_TIMER = 16;
   int TOGGLE_DESKTOP_LYRIC = 17;
   int HEADSET_CHANGE = 18;
-  int LOCK_DESKTOP_LYRIC = 19;
-  int TOGGLE_STATUS_BAR_LRC = 20;
+//  int LOCK_DESKTOP_LYRIC = 19;
+//  int TOGGLE_STATUS_BAR_LRC = 20;
 }

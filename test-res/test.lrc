@@ -1,0 +1,20 @@
+[#: https://en.wikipedia.org/wiki/LRC_(file_format)]
+[ti: Some title]
+[length: 11:45]
+[#: lyrics appear 114 ms earlier]
+[offset: +114]
+
+[00:00.00]Example line
+[00:00.00]Example translation
+[00:00.00]multiple translations?
+
+[00:05.00]
+
+[00:10.00]Example line without translation
+
+[00:15.00]Example very long line aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+[00:15.00]Example very long translation aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+[00:20.00]Example<00:21.00> line<00:23.00> with<00:25.00> word<00:27.00> time<00:29.00> tag<00:30.00>
+
+[00:05.00][00:30.00]Example line with multiple time tags
