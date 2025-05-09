@@ -120,7 +120,7 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     setStatusBarMode()
   }
 
-  override fun setContentView(view: View) {
+  override fun setContentView(view: View?) {
     super.setContentView(view)
     setStatusBarColor()
     setStatusBarMode()

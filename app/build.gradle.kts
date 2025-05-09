@@ -32,13 +32,13 @@ kotlin {
 android {
     namespace = "remix.myplayer"
 
-    compileSdk = 34
+    compileSdk = 35
     buildToolsVersion = "34.0.0"
     ndkVersion = "25.2.9519653"
 
     defaultConfig {
         applicationId = "remix.myplayer"
-        minSdk = 19
+        minSdk = 21
         targetSdk = 33
 
         versionCode = 16500
@@ -187,6 +187,11 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
 
     dependenciesInfo {
@@ -263,6 +268,18 @@ dependencies {
 
     val googleImplementation by configurations
     googleImplementation(libs.billingclient)
+
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.runtime.livedata)
 }
 
 // 上传mapping文件

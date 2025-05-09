@@ -2084,7 +2084,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       if (bitmap == null || bitmap.isRecycled) {
         return null
       }
-      val config: Bitmap.Config = bitmap.config
+      val config: Bitmap.Config = bitmap.config ?: return null
       return try {
         bitmap.copy(config, false)
       } catch (e: OutOfMemoryError) {

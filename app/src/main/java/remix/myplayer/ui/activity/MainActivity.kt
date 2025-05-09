@@ -108,7 +108,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
 
   private var forceDialog: MaterialDialog? = null
 
-  override fun onNewIntent(intent: Intent?) {
+  override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
   }
 
