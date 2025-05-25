@@ -108,7 +108,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
 
   private var forceDialog: MaterialDialog? = null
 
-  override fun onNewIntent(intent: Intent?) {
+  override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
   }
 
@@ -255,7 +255,7 @@ class MainActivity : MenuActivity(), View.OnClickListener {
     else
       Gson().fromJson<ArrayList<Library>>(libraryJson, object : TypeToken<List<Library>>() {}.type)
     if (libraries.isEmpty()) {
-      val defaultLibraries = Library.getDefaultLibrary()
+      val defaultLibraries = Library.allLibraries
       libraries.addAll(defaultLibraries)
       SPUtil.putValue(this, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LIBRARY,
           Gson().toJson(defaultLibraries, object : TypeToken<List<Library>>() {}.type))

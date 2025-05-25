@@ -9,10 +9,12 @@ import androidx.multidex.MultiDexApplication
 import com.hjq.permissions.XXPermissions
 import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy
+import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.plugins.RxJavaPlugins
 import remix.myplayer.appshortcuts.DynamicShortcutManager
+import remix.myplayer.compose.ui.widget.app.hackTabMinWidth
 import remix.myplayer.helper.LanguageHelper.onConfigurationChanged
 import remix.myplayer.helper.LanguageHelper.saveSystemCurrentLanguage
 import remix.myplayer.helper.LanguageHelper.setApplicationLanguage
@@ -29,6 +31,7 @@ import timber.log.Timber
 /**
  * Created by Remix on 16-3-16.
  */
+@HiltAndroidApp
 class App : MultiDexApplication() {
 
   override fun attachBaseContext(base: Context) {
@@ -57,6 +60,8 @@ class App : MultiDexApplication() {
       CrashReport.postCatchedException(throwable)
     }
     registerActivityLifecycleCallbacks(APlayerActivityManager())
+
+    hackTabMinWidth()
   }
 
   private fun checkMigration() {

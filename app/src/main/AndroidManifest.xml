@@ -41,12 +41,10 @@
     android:theme="@style/AppTheme"
     android:networkSecurityConfig="@xml/network_security_config">
 
-    <!-- 主页面 -->
-    <activity
-      android:name=".ui.activity.MainActivity"
-      android:theme="@style/ActivityStyle"
-      android:launchMode="singleTop"
-      android:exported="true">
+    <activity android:name="remix.myplayer.compose.activity.ComposeActivity"
+        android:theme="@style/ActivityStyle"
+        android:launchMode="singleTop"
+        android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <action android:name="android.intent.action.MUSIC_PLAYER"/>
@@ -92,15 +90,67 @@
         <data android:mimeType="vnd.android.cursor.dir/audio"/>
       </intent-filter>
     </activity>
+
+    <!-- 主页面 -->
+<!--    <activity-->
+    <!--      android:name=".ui.activity.MainActivity"-->
+    <!--      android:theme="@style/ActivityStyle"-->
+    <!--      android:launchMode="singleTop"-->
+    <!--      android:exported="true">-->
+    <!--      <intent-filter>-->
+    <!--        <action android:name="android.intent.action.MAIN"/>-->
+    <!--        <action android:name="android.intent.action.MUSIC_PLAYER"/>-->
+
+    <!--        <category android:name="android.intent.category.LAUNCHER"/>-->
+    <!--        <category android:name="android.intent.category.APP_MUSIC"/>-->
+    <!--        <category android:name="android.intent.category.DEFAULT"/>-->
+    <!--      </intent-filter>-->
+
+    <!--      <intent-filter>-->
+    <!--        <action android:name="android.intent.action.VIEW"/>-->
+
+    <!--        <category android:name="android.intent.category.DEFAULT"/>-->
+
+    <!--        <data android:scheme="content"/>-->
+    <!--        <data android:mimeType="audio/*"/>-->
+    <!--        <data android:mimeType="application/ogg"/>-->
+    <!--        <data android:mimeType="application/x-ogg"/>-->
+    <!--        <data android:mimeType="application/itunes"/>-->
+    <!--      </intent-filter>-->
+    <!--      <intent-filter>-->
+    <!--        <action android:name="android.intent.action.VIEW"/>-->
+
+    <!--        <category android:name="android.intent.category.DEFAULT"/>-->
+
+    <!--        <data android:scheme="file"/>-->
+    <!--        <data android:mimeType="audio/*"/>-->
+    <!--        <data android:mimeType="application/ogg"/>-->
+    <!--        <data android:mimeType="application/x-ogg"/>-->
+    <!--        <data android:mimeType="application/itunes"/>-->
+    <!--      </intent-filter>-->
+    <!--      <intent-filter>-->
+    <!--        <action android:name="com.cyanogenmod.eleven.AUDIO_PLAYER"/>-->
+
+    <!--        <category android:name="android.intent.category.DEFAULT"/>-->
+    <!--      </intent-filter>-->
+    <!--      <intent-filter>-->
+    <!--        <action android:name="android.intent.action.PICK"/>-->
+
+    <!--        <category android:name="android.intent.category.DEFAULT"/>-->
+    <!--        <category android:name="android.intent.category.OPENABLE"/>-->
+
+    <!--        <data android:mimeType="vnd.android.cursor.dir/audio"/>-->
+    <!--      </intent-filter>-->
+    <!--    </activity>-->
     <!-- 播放界面 -->
     <activity
       android:name=".ui.activity.PlayerActivity"
-      android:parentActivityName=".ui.activity.MainActivity"
+      android:parentActivityName=".compose.activity.ComposeActivity"
       android:theme="@style/PlayerActivityStyle"
       android:windowSoftInputMode="adjustPan">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value=".ui.activity.MainActivity"/>
+        android:value=".compose.activity.ComposeActivity"/>
     </activity>
     <!-- 搜索 -->
     <activity

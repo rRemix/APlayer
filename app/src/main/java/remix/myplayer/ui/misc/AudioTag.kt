@@ -34,11 +34,12 @@ import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.lang.ref.WeakReference
 import java.util.EnumMap
 
 
-class AudioTag(private val activity: BaseActivity, private val song: Song) : ContextWrapper(activity) {
-
+class AudioTag(activity: BaseActivity, private val song: Song) : ContextWrapper(activity) {
+  private val actRef = WeakReference(activity)
   private var title: String = ""
   private var album: String = ""
   private var artist: String = ""
@@ -149,6 +150,7 @@ class AudioTag(private val activity: BaseActivity, private val song: Song) : Con
   }
 
   fun saveTag() {
+    val activity = actRef.get() ?: return
     fun saveTag(file: File) {
       val audioFile = AudioFileIO.read(file)
       val fieldKeyValueMap = EnumMap<FieldKey, String>(FieldKey::class.java)

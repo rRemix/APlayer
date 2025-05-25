@@ -1,6 +1,7 @@
 package remix.myplayer.ui.adapter
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -132,7 +133,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
     //半圆着色
     if (mode == GRID_MODE) {
       Theme.tintDrawable(holder.ivHalfCircle, R.drawable.icon_half_circular_left,
-          getBackgroundColorMain(context))
+        Color.RED)
     }
     setMarginForGridLayout(holder, position)
   }

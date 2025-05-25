@@ -292,4 +292,15 @@ public class Theme {
     return drawable;
   }
 
+  public static int resolveResourceId(Context context, @AttrRes int attr) {
+    int resourceId = 0;
+
+    try(TypedArray ta = context.getTheme().obtainStyledAttributes(new int[]{attr})) {
+        resourceId = ta.getResourceId(0, -1);
+    } catch (Resources.NotFoundException ignored) {
+    }
+
+    return resourceId;
+  }
+
 }

@@ -1,13 +1,22 @@
 [versions]
-agp = "8.3.2"
+accompanistDrawablepainter = "0.37.3"
+agp = "8.6.0"
+constraintlayoutCompose = "1.1.1"
+hiltAndroid = "2.55"
 kotlin = "1.9.23"
 ksp = "1.9.23-1.0.19"
+hilt = "2.55"
 
 glide = "4.16.0"
+glideCompose = "1.0.0-beta01"
 retrofit = "2.11.0"
 room = "2.6.1"
 xxpermissions = "20.0"
 
+activityCompose = "1.10.1"
+composeBom = "2025.05.00"
+lifecycleRuntimeKtx = "2.9.0"
+lifecycleViewmodelCompose = "2.9.0"
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }
@@ -15,13 +24,18 @@ kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
-
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt"}
 
 [libraries]
 # kotlin
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.0" }
 
+# hilt
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
+
 # androidx
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version = "1.6.1" }
 cardview = { group = "androidx.cardview", name = "cardview", version = "1.0.0" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.1.4" }
@@ -37,6 +51,7 @@ material = { group = "com.google.android.material", name = "material", version =
 # glide
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 glide-ksp = { group = "com.github.bumptech.glide", name = "ksp", version.ref = "glide" }
+glide-compose = { module = "com.github.bumptech.glide:compose", version.ref = "glideCompose" }
 
 # retrofit
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
@@ -65,3 +80,17 @@ slf4j = { group = "org.slf4j", name = "slf4j-api", version = "2.0.13" }
 timber = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
 # noinspection GradleDependency
 tinypinyin = { group = "io.github.biezhi", name = "TinyPinyin", version = "2.0.3.RELEASE" }
+
+# compsoe
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
+accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablepainter" }
