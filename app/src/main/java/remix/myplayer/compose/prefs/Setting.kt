@@ -2,8 +2,10 @@ package remix.myplayer.compose.prefs
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import remix.myplayer.helper.LanguageHelper.AUTO
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.ui.adapter.HeaderAdapter
+import remix.myplayer.util.Constants
 import remix.myplayer.util.Constants.MB
 import remix.myplayer.util.SPUtil
 import javax.inject.Inject
@@ -32,4 +34,13 @@ class Setting @Inject constructor(
   var deleteIds by PrefsDelegate(sp, SPUtil.SETTING_KEY.BLACKLIST_SONG, emptySet<String>())
   var blacklist by PrefsDelegate(sp, SPUtil.SETTING_KEY.BLACKLIST, emptySet<String>())
 
+  var lockScreen by PrefsDelegate(sp, defaultVal = Constants.APLAYER_LOCKSCREEN)
+  var language by PrefsDelegate(sp, defaultVal = AUTO)
+  var playAtBreakPoint by PrefsDelegate(sp, SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT, false)
+  var shake by PrefsDelegate(sp, SPUtil.SETTING_KEY.SHAKE, false)
+  var showDisplayName by PrefsDelegate(sp, SPUtil.SETTING_KEY.SHOW_DISPLAYNAME, false)
+
+  var exitAfterTimerFinish by PrefsDelegate(sp, SPUtil.SETTING_KEY.TIMER_EXIT_AFTER_FINISH, false)
+  var timerStartAuto by PrefsDelegate(sp, SPUtil.SETTING_KEY.TIMER_DEFAULT, false)
+  var timerDefaultDuration by PrefsDelegate(sp, SPUtil.SETTING_KEY.TIMER_DURATION, -1)
 }

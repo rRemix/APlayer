@@ -17,16 +17,16 @@ import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
@@ -42,7 +42,7 @@ fun ListSong(
   onClickSong: () -> Unit,
   onLongClickSong: () -> Unit,
   num: Int? = null,
-  viewModel: MusicViewModel = viewModel()
+  vm: MusicViewModel = activityViewModel()
 ) {
   ConstraintLayout(
     modifier = modifier
@@ -57,7 +57,7 @@ fun ListSong(
   ) {
     val (indicator, count, cover, popButton, column) = createRefs()
 
-    val currentSong = viewModel.currentSong.observeAsState()
+    val currentSong = vm.currentSong.collectAsStateWithLifecycle()
     val isPlayingSong by remember {
       derivedStateOf {
         currentSong.value == song

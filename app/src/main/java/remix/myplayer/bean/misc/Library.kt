@@ -1,8 +1,6 @@
 package remix.myplayer.bean.misc
 
 import android.content.Context
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.helper.SortOrder
@@ -13,8 +11,8 @@ import remix.myplayer.ui.fragment.FolderFragment
 import remix.myplayer.ui.fragment.GenreFragment
 import remix.myplayer.ui.fragment.PlayListFragment
 import remix.myplayer.ui.fragment.SongFragment
+import java.io.Serializable
 
-@Parcelize
 data class Library(
   val tag: Int,
   val order: Int = tag,
@@ -28,7 +26,7 @@ data class Library(
     TAG_CLOUD -> RemoteFragment::class.java.name
     else -> throw IllegalArgumentException("unknown tag: $tag")
   }
-) : Parcelable {
+) : Serializable {
 
   fun isPlayList(): Boolean {
     return className == PlayListFragment::class.java.name

@@ -19,7 +19,7 @@ import remix.myplayer.bean.misc.Library
 import remix.myplayer.compose.ui.theme.LocalTheme
 
 @Composable
-fun MainContent(
+fun HomeContent(
   contentPadding: PaddingValues,
   pagerState: PagerState,
   libraries: List<Library>,

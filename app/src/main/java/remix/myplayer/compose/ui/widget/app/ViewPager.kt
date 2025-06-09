@@ -15,10 +15,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import remix.myplayer.bean.misc.Library
-import remix.myplayer.compose.ui.widget.library.screen.AlbumScreen
-import remix.myplayer.compose.ui.widget.library.screen.SongScreen
+import remix.myplayer.compose.activityViewModel
+import remix.myplayer.compose.ui.screen.AlbumScreen
+import remix.myplayer.compose.ui.screen.SongScreen
 import remix.myplayer.compose.viewmodel.LibraryViewModel
 
 @Composable
@@ -26,9 +26,8 @@ fun ViewPager(
   modifier: Modifier = Modifier,
   libraries: List<Library>,
   pagerState: PagerState,
-  viewModel: LibraryViewModel = viewModel()
+  vm: LibraryViewModel = activityViewModel()
 ) {
-
   HorizontalPager(
     modifier = modifier,
     state = pagerState,
@@ -42,7 +41,7 @@ fun ViewPager(
   }
 
   LaunchedEffect(pagerState.currentPage) {
-    viewModel.changeLibrary(libraries[pagerState.currentPage])
+    vm.changeLibrary(libraries[pagerState.currentPage])
   }
 }
 

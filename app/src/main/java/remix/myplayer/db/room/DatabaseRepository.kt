@@ -27,6 +27,7 @@ import kotlin.collections.LinkedHashSet
 /**
  * Created by remix on 2019/1/12
  */
+// TODO refactor
 class DatabaseRepository private constructor() {
 
   private val db = AppDatabase.getInstance(App.context.applicationContext)

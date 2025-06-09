@@ -6,12 +6,13 @@ hiltAndroid = "2.55"
 kotlin = "1.9.23"
 ksp = "1.9.23-1.0.19"
 hilt = "2.55"
+nav = "2.9.0"
 
 glide = "4.16.0"
 glideCompose = "1.0.0-beta01"
 retrofit = "2.11.0"
 room = "2.6.1"
-xxpermissions = "20.0"
+xxpermissions = "21.2"
 
 activityCompose = "1.10.1"
 composeBom = "2025.05.00"
@@ -21,18 +22,20 @@ lifecycleViewmodelCompose = "2.9.0"
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+#kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt"}
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 [libraries]
 # kotlin
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.0" }
+kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.5.1"}
 
 # hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
+
 
 # androidx
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
@@ -94,3 +97,5 @@ androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablepainter" }
+androidx-nav = { module = "androidx.navigation:navigation-compose", version.ref = "nav" }
+androidx-hilt-navi-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0"}

@@ -1,5 +1,8 @@
 package remix.myplayer.compose.ui.widget.app
 
+import android.content.ComponentName
+import android.content.Intent
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
@@ -22,9 +26,9 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,15 +40,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.bean.mp3.Song
+import remix.myplayer.compose.activityViewModel
+import remix.myplayer.compose.nav.LocalNavController
+import remix.myplayer.compose.nav.RouteSetting
 import remix.myplayer.compose.ui.theme.AppTheme
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.library.GlideCover
 import remix.myplayer.compose.viewmodel.MusicViewModel
+import remix.myplayer.misc.receiver.ExitReceiver
+import remix.myplayer.ui.activity.HistoryActivity
+import remix.myplayer.ui.activity.RecentlyActivity
+import remix.myplayer.ui.activity.SupportActivity
+import remix.myplayer.util.Constants
 
 private val drawerTitles = intArrayOf(
   R.string.drawer_song,
@@ -65,7 +77,9 @@ private val drawerIcons = intArrayOf(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun Drawer(viewModel: MusicViewModel = viewModel()) {
+fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
+  val navController = LocalNavController.current
+
   val theme = LocalTheme.current
   ModalDrawerSheet(
     modifier = Modifier
@@ -85,7 +99,7 @@ fun Drawer(viewModel: MusicViewModel = viewModel()) {
       Spacer(modifier = Modifier.height(with(LocalDensity.current) {
         WindowInsets.systemBars.getTop(this).toDp()
       }))
-      val currentSong by viewModel.currentSong.observeAsState(Song.EMPTY_SONG)
+      val currentSong by vm.currentSong.collectAsStateWithLifecycle()
       GlideCover(
         model = currentSong,
         circle = false,
@@ -113,16 +127,42 @@ fun Drawer(viewModel: MusicViewModel = viewModel()) {
 
     var selectDrawer by remember { mutableIntStateOf(0) }
     Column(modifier = Modifier.background(theme.drawerDefault)) {
+      val activity = LocalActivity.current
+      val scope = rememberCoroutineScope()
       drawerTitles.mapIndexed { index, _ ->
         NavigationDrawerItem(
           label = {
             TextPrimary(
               modifier = Modifier.padding(start = 4.dp),
-              text = stringResource(drawerTitles[index])
+              text = stringResource(drawerTitles[index]),
+              fontSize = 16.sp
             )
           },
           selected = selectDrawer == index,
-          onClick = { selectDrawer = index },
+          onClick = {
+            selectDrawer = index
+
+            val activity = activity ?: return@NavigationDrawerItem
+            when (index) {
+              // 歌曲库
+              0 -> scope.launch { drawerState.close() }
+              // 历史
+              1 -> activity.startActivity(Intent(activity, HistoryActivity::class.java))
+              // 最近添加
+              2 -> activity.startActivity(Intent(activity, RecentlyActivity::class.java))
+              // 捐赠
+              3 -> activity.startActivity(Intent(activity, SupportActivity::class.java))
+              // 设置
+              4 -> navController.navigate(RouteSetting)
+              // 退出
+              5 -> {
+                activity.sendBroadcast(
+                  Intent(Constants.ACTION_EXIT)
+                    .setComponent(ComponentName(activity, ExitReceiver::class.java))
+                )
+              }
+            }
+          },
           icon = {
             Icon(
               modifier = Modifier.padding(start = 8.dp),

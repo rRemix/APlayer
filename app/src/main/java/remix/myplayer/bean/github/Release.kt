@@ -1,10 +1,8 @@
 package remix.myplayer.bean.github
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 import java.util.*
 
-@Parcelize
 data class Release(var url: String?,
                    var assets_url: String?,
                    var upload_url: String?,
@@ -21,10 +19,8 @@ data class Release(var url: String?,
                    var tarball_url: String,
                    var zipball_url: String?,
                    var body: String?,
-                   var assets: ArrayList<AssetsBean>?) :
-    Parcelable {
+                   var assets: ArrayList<AssetsBean>?) : Serializable{
 
-  @Parcelize
   data class AssetsBean(var url: String?,
                         var id: Int = 0,
                         var node_id: String?,
@@ -36,7 +32,6 @@ data class Release(var url: String?,
                         var download_count: Int = 0,
                         var created_at: String?,
                         var updated_at: String?,
-                        var browser_download_url: String?)
-    : Parcelable
+                        var browser_download_url: String?) : Serializable
 
 }

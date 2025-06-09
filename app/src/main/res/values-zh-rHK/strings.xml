@@ -366,7 +366,7 @@
   <string name="no_equalizer">沒有找到等化器</string>
   <string name="clear_download_cover">是否清除已經下載的封面</string>
   <string name="updating">更新中</string>
-  <string name="player">播放頁面</string>
+  <string name="playing_screen">播放頁面</string>
   <string name="show_on_bottom">底部顯示</string>
   <string name="show_of_bottom_tip">是否顯示下一首或者音量控制</string>
   <string name="show_next_song_only">僅顯示下一首</string>

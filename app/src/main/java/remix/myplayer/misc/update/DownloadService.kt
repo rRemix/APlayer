@@ -54,7 +54,7 @@ class DownloadService : IntentService("DownloadService") {
     }
 
     try {
-      val release: Release = intent.getParcelableExtra(EXTRA_RESPONSE)!!
+      val release: Release = (intent.getSerializableExtra(EXTRA_RESPONSE) as? Release) ?: return
       val asset = release.assets ?: arrayListOf()
       val downloadUrl = asset[0].browser_download_url
       val downloadDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)

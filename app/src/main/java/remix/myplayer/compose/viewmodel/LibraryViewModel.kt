@@ -29,7 +29,6 @@ class LibraryViewModel @Inject constructor(
   private val songRepo: SongRepository,
   private val albumRepo: AlbumRepository,
   val setting: Setting,
-//  val appTheme: AppTheme
 ) : ViewModel() {
   fun loadInit(hasPermission: Boolean) {
     // load libraries
@@ -37,14 +36,15 @@ class LibraryViewModel @Inject constructor(
     val libraries = if (TextUtils.isEmpty(libraryJson))
       ArrayList()
     else
-      Gson().fromJson<java.util.ArrayList<Library>>(
+      Gson().fromJson<ArrayList<Library>>(
         libraryJson,
         object : TypeToken<List<Library>>() {}.type
       )
     if (libraries.isEmpty()) {
       val defaultLibraries = Library.allLibraries
       libraries.addAll(defaultLibraries)
-      setting.libraryJson = Gson().toJson(defaultLibraries, object : TypeToken<List<Library>>() {}.type)
+      setting.libraryJson =
+        Gson().toJson(defaultLibraries, object : TypeToken<List<Library>>() {}.type)
     }
 
     setAllLibraries(libraries)
@@ -75,10 +75,8 @@ class LibraryViewModel @Inject constructor(
   private val _songs = MutableStateFlow<List<Song>>(emptyList())
   val songs: StateFlow<List<Song>> = _songs.asStateFlow()
 
-  fun fetchSongs() {
-    viewModelScope.launch(Dispatchers.IO) {
-      _songs.value = songRepo.allSongs()
-    }
+  fun fetchSongs() = viewModelScope.launch(Dispatchers.IO) {
+    _songs.value = songRepo.allSongs()
   }
 
   private val _albums = MutableStateFlow<List<Album>>(emptyList())
@@ -86,5 +84,10 @@ class LibraryViewModel @Inject constructor(
 
   fun fetchAlbums() = viewModelScope.launch(Dispatchers.IO) {
     _albums.value = albumRepo.allAlbums()
+  }
+
+  fun fetchMedia() {
+    fetchSongs()
+    fetchAlbums()
   }
 }

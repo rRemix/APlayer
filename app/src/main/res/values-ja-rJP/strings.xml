@@ -367,7 +367,7 @@
   <string name="no_equalizer">イコライザーアプリが見つかりません</string>
   <string name="clear_download_cover">ダウンロード済みのカバー画像を削除しますか?</string>
   <string name="updating">アップデート中</string>
-  <string name="player">再生中画面</string>
+  <string name="playing_screen">再生中画面</string>
   <string name="show_on_bottom">画面下部の設定</string>
   <string name="show_of_bottom_tip">次の曲 / 音量コントロールのどちらを表示するかを選択します</string>
   <string name="show_next_song_only">次の曲のみを表示</string>

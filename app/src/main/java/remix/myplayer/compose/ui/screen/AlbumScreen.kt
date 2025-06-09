@@ -1,4 +1,4 @@
-package remix.myplayer.compose.ui.widget.library.screen
+package remix.myplayer.compose.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -6,7 +6,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -14,7 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.spanCount
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.library.ModeHeader
@@ -24,10 +26,9 @@ import remix.myplayer.compose.viewmodel.LibraryViewModel
 import remix.myplayer.ui.adapter.HeaderAdapter
 
 @Composable
-fun AlbumScreen() {
-  val libraryVM: LibraryViewModel = viewModel()
-  val albums by libraryVM.album.collectAsStateWithLifecycle()
-  val setting = libraryVM.setting
+fun AlbumScreen(vm: LibraryViewModel = activityViewModel()) {
+  val albums by vm.album.collectAsStateWithLifecycle()
+  val setting = vm.setting
 
   var grid by rememberSaveable { mutableIntStateOf(setting.albumMode) }
 
@@ -41,7 +42,8 @@ fun AlbumScreen() {
       setting.albumMode = grid
     }
     if (grid == HeaderAdapter.LIST_MODE) {
-      LazyColumn {
+      val listState = rememberLazyListState()
+      LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
         itemsIndexed(albums, key = { index, album ->
           album.albumID
         }) { pos, album ->
@@ -49,8 +51,10 @@ fun AlbumScreen() {
         }
       }
     } else {
+      val gridState = rememberLazyGridState()
       LazyVerticalGrid(
-        modifier = Modifier,
+        modifier = Modifier.weight(1f),
+        state = gridState,
         columns = GridCells.Fixed(spanCount()),
         content = {
           items(albums, key = {

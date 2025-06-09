@@ -41,7 +41,7 @@
     android:theme="@style/AppTheme"
     android:networkSecurityConfig="@xml/network_security_config">
 
-    <activity android:name="remix.myplayer.compose.activity.ComposeActivity"
+    <activity android:name="remix.myplayer.compose.activity.ComposeMainActivity"
         android:theme="@style/ActivityStyle"
         android:launchMode="singleTop"
         android:exported="true">
@@ -145,12 +145,12 @@
     <!-- 播放界面 -->
     <activity
       android:name=".ui.activity.PlayerActivity"
-      android:parentActivityName=".compose.activity.ComposeActivity"
+      android:parentActivityName=".compose.activity.ComposeMainActivity"
       android:theme="@style/PlayerActivityStyle"
       android:windowSoftInputMode="adjustPan">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value=".compose.activity.ComposeActivity"/>
+        android:value=".compose.activity.ComposeMainActivity"/>
     </activity>
     <!-- 搜索 -->
     <activity

@@ -1,6 +1,5 @@
 package remix.myplayer.compose.ui.widget.popup
 
-import android.provider.MediaStore
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,23 +19,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
+import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.viewmodel.LibraryViewModel
 
 @Composable
-fun ScreenPopupButton(library: Library?) {
+fun ScreenPopupButton(library: Library?, vm : LibraryViewModel = activityViewModel()) {
   if (library == null) {
     return
   }
-  val setting = viewModel<LibraryViewModel>().setting
+  val setting = vm.setting
   var expanded by remember { mutableStateOf(false) }
   var iconHeight by remember { mutableStateOf(0.dp) }
 
@@ -75,7 +73,6 @@ fun ScreenPopupButton(library: Library?) {
     containerColor = LocalTheme.current.dialogBackground,
     onDismissRequest = { expanded = false }
   ) {
-    val context = LocalContext.current
     fun saveSortOrder(index: Int) {
       val type = library.tag
       val ret = sortOrders[index]
@@ -91,7 +88,7 @@ fun ScreenPopupButton(library: Library?) {
         setting.genreSortOrder = ret
       }
       expanded = false
-      context.contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
+      vm.fetchMedia()
     }
 
     menuItems.forEachIndexed { index, res ->

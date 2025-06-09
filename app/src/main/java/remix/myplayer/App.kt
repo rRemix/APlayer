@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Process
+import android.os.StrictMode
 import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication
 import com.hjq.permissions.XXPermissions
@@ -43,6 +44,7 @@ class App : MultiDexApplication() {
   override fun onCreate() {
     super.onCreate()
     context = this
+
     checkMigration()
     setUp()
 
@@ -52,7 +54,8 @@ class App : MultiDexApplication() {
     }
 
     // 加载第三方库
-    loadLibrary()
+    // TODO
+//    loadLibrary()
 
     // 处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
     RxJavaPlugins.setErrorHandler { throwable: Throwable? ->

@@ -9,6 +9,7 @@ import remix.myplayer.App
 import remix.myplayer.util.SPUtil
 import timber.log.Timber
 import java.io.Serial
+import androidx.core.net.toUri
 
 /**
  * Created by Remix on 2015/11/30.
@@ -100,14 +101,11 @@ sealed class Song(
     get() = if (isLocal()) {
       ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
     } else {
-      Uri.parse(data)
+      data.toUri()
     }
 
   val artUri: Uri
-    get() = ContentUris.withAppendedId(
-      Uri.parse("content://media/external/audio/albumart/"),
-      albumId
-    )
+    get() = ContentUris.withAppendedId("content://media/external/audio/albumart/".toUri(), albumId)
 
   val showName: String
     get() = if (!SHOW_DISPLAYNAME) title else displayName

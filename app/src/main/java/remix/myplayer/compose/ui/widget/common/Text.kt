@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
@@ -20,6 +21,7 @@ fun TextPrimary(
   maxLine: Int = 1,
   overflow: TextOverflow = TextOverflow.Ellipsis,
   textAlign: TextAlign? = TextAlign.Start,
+  fontWeight: FontWeight = FontWeight.Normal
 ) {
   Text(
     text = text,
@@ -27,6 +29,7 @@ fun TextPrimary(
       lineHeight = 1.em,
       textAlign = textAlign ?: TextAlign.Unspecified,
       fontSize = fontSize,
+      fontWeight = fontWeight,
       color = LocalTheme.current.textPrimary,
       platformStyle = PlatformTextStyle(
         includeFontPadding = false,
@@ -46,6 +49,7 @@ fun TextSecondary(
   maxLine: Int = 1,
   overflow: TextOverflow = TextOverflow.Ellipsis,
   textAlign: TextAlign? = TextAlign.Start,
+  fontWeight: FontWeight = FontWeight.Normal
 ) {
   Text(
     text = text,
@@ -53,6 +57,7 @@ fun TextSecondary(
     maxLines = maxLine,
     textAlign = textAlign,
     fontSize = fontSize,
+    fontWeight = fontWeight,
     color = LocalTheme.current.textSecondary,
     overflow = overflow,
   )

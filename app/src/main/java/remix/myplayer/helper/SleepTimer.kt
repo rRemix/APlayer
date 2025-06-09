@@ -4,6 +4,7 @@ import android.os.CountDownTimer
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.util.ToastUtil
+import timber.log.Timber
 
 class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer(millisInFuture, countDownInterval) {
 
@@ -37,6 +38,8 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer
     @JvmStatic
     private var millisUntilFinish: Long = 0
 
+    private var running = false
+
     @JvmStatic
     fun getMillisUntilFinish(): Long {
       return millisUntilFinish
@@ -49,7 +52,7 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer
 
     @JvmStatic
     fun isTicking(): Boolean {
-      return millisUntilFinish > 0
+      return running
     }
 
     /**
@@ -80,6 +83,7 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) : CountDownTimer
         }
         millisUntilFinish = 0
       }
+      running = start
       ToastUtil.show(context, if (!start) context.getString(R.string.cancel_timer) else context.getString(R.string.will_stop_at_x, Math.ceil((duration / 1000 / 60).toDouble()).toInt()))
     }
 

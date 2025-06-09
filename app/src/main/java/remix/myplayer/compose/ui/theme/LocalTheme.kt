@@ -12,7 +12,11 @@ import remix.myplayer.util.ColorUtil
 
 
 val LocalTheme = compositionLocalOf<AppTheme> {
-  error("no theme provide")
+  return@compositionLocalOf AppTheme(
+    primary = Color(0xff698cf6),
+    secondary = Color(0xff698cf6),
+    theme = AppTheme.LIGHT
+  )
 }
 
 data class AppTheme(

@@ -4,7 +4,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.application)
     alias(libs.plugins.kotlin)
-    alias(libs.plugins.kotlin.parcelize)
+//    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.hilt)
@@ -220,6 +220,7 @@ androidComponents {
 
 dependencies {
     implementation(libs.kotlinx.coroutines)
+//    implementation(libs.kotlinx.serialization)
 
     implementation(libs.appcompat)
     implementation(libs.cardview)
@@ -283,6 +284,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.constraintlayout.compose)
+    implementation(libs.androidx.nav)
+    implementation(libs.androidx.hilt.navi.compose)
     implementation(libs.accompanist.drawablepainter)
     
     implementation(libs.hilt.android)

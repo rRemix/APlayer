@@ -367,7 +367,7 @@
   <string name="no_equalizer">No equalizer found</string>
   <string name="clear_download_cover">Clear the downloaded covers?</string>
   <string name="updating">Updating</string>
-  <string name="player">Now playing screen</string>
+  <string name="playing_screen">Now playing screen</string>
   <string name="show_on_bottom">Display of bottom control</string>
   <string name="show_of_bottom_tip">Option to toggle next song or volume controls</string>
   <string name="show_next_song_only">Show next song only</string>
