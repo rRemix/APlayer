@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Process
-import android.os.StrictMode
 import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication
 import com.hjq.permissions.XXPermissions
@@ -15,7 +14,7 @@ import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.plugins.RxJavaPlugins
 import remix.myplayer.appshortcuts.DynamicShortcutManager
-import remix.myplayer.compose.ui.widget.app.hackTabMinWidth
+import remix.myplayer.compose.ui.screen.hackTabMinWidth
 import remix.myplayer.helper.LanguageHelper.onConfigurationChanged
 import remix.myplayer.helper.LanguageHelper.saveSystemCurrentLanguage
 import remix.myplayer.helper.LanguageHelper.setApplicationLanguage

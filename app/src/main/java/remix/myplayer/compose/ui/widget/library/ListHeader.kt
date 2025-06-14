@@ -22,8 +22,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.compose.clickableWithoutRipple
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.ui.widget.app.clickableWithoutRipple
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.service.Command
 import remix.myplayer.ui.adapter.HeaderAdapter

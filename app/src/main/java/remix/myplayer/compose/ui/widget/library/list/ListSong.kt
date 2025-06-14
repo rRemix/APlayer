@@ -110,7 +110,7 @@ fun ListSong(
         width = Dimension.fillToConstraints
       }
     ) {
-      TextPrimary(song.title)
+      TextPrimary(song.showName)
       Spacer(modifier = Modifier.height(4.dp))
       TextSecondary(String.format("%s-%s", song.artist, song.album))
     }

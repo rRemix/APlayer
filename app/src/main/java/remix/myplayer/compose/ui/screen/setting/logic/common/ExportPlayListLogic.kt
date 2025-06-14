@@ -56,7 +56,6 @@ fun ExportPlayListLogic() {
     rememberLauncherForActivityResult<Intent, ActivityResult>(contract = ActivityResultContracts.StartActivityForResult()) { result ->
       if (result.resultCode == Activity.RESULT_OK) {
         val uri = result.data?.data ?: return@rememberLauncherForActivityResult
-        Timber.v("rRemix, select: $select uri: $uri")
         exportPlayListToFile(context, select, uri)
       }
     }

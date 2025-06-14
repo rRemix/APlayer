@@ -1,8 +1,6 @@
 package remix.myplayer.compose.ui.widget.app
 
 import android.annotation.SuppressLint
-import android.text.TextUtils
-import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -18,21 +16,30 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
+import remix.myplayer.compose.activityViewModel
+import remix.myplayer.compose.clickableWithoutRipple
+import remix.myplayer.compose.nav.LocalNavController
+import remix.myplayer.compose.nav.RouteSongChoose
+import remix.myplayer.compose.ui.dialog.InputDialog
+import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.db.room.model.PlayList
-import remix.myplayer.theme.Theme
-import remix.myplayer.ui.activity.SongChooseActivity
+import remix.myplayer.compose.viewmodel.LibraryViewModel
 import remix.myplayer.ui.misc.MultipleChoice
-import remix.myplayer.util.RxUtil.applySingleScheduler
 import remix.myplayer.util.ToastUtil
 
 @SuppressLint("CheckResult")
@@ -46,45 +53,56 @@ fun FAButton(pagerState: PagerState, libraries: List<Library>) {
     }
   }
 
-  val context = LocalActivity.current
-  AnimatedVisibility(showFb,
+  val navController = LocalNavController.current
+  val context = LocalContext.current
+  val scope = rememberCoroutineScope()
+  val vm = activityViewModel<LibraryViewModel>()
+  var text by remember {
+    mutableStateOf("")
+  }
+  val dialogState = rememberDialogState(false)
+
+  InputDialog(
+    dialogState = dialogState,
+    title = stringResource(R.string.new_playlist),
+    positive = stringResource(R.string.create),
+    text = text,
+    onDismissRequest = {
+      text = ""
+    },
+    onValueChange = {
+      text = it
+    }
+  ) {
+    scope.launch {
+      try {
+        val id = vm.insertPlayList(it)
+        if (id > 0) {
+          navController.navigate("$RouteSongChoose/${id}/$it")
+        }
+      } catch (e: Exception) {
+        ToastUtil.show(context, R.string.create_playlist_fail, e)
+      }
+    }
+  }
+
+  AnimatedVisibility(
+    showFb,
     modifier = Modifier.padding(end = 38.dp, bottom = 80.dp),
     enter = scaleIn() + fadeIn(),
-    exit = scaleOut() + fadeOut()) {
+    exit = scaleOut() + fadeOut()
+  ) {
     Box(
       modifier = Modifier
         .size(48.dp)
         .background(color = LocalTheme.current.secondary, shape = CircleShape)
         .clickableWithoutRipple {
-          if (MultipleChoice.isActiveSomeWhere || context == null) {
+          if (MultipleChoice.isActiveSomeWhere) {
             return@clickableWithoutRipple
           }
 
-          DatabaseRepository.getInstance()
-            .getAllPlaylist()
-            .compose<List<PlayList>>(applySingleScheduler<List<PlayList>>())
-            .subscribe { playLists ->
-              Theme.getBaseDialog(context)
-                .title(R.string.new_playlist)
-                .positiveText(R.string.create)
-                .negativeText(R.string.cancel)
-                .inputRange(1, 25)
-                .input("", context.getString(R.string.local_list) + playLists.size) { _, input ->
-                  if (!TextUtils.isEmpty(input)) {
-                    DatabaseRepository.getInstance()
-                      .insertPlayList(input.toString())
-                      .compose(applySingleScheduler())
-                      .subscribe({ id ->
-                        //跳转到添加歌曲界面
-                        SongChooseActivity.start(context, id, input.toString())
-                      }, { throwable ->
-                        ToastUtil
-                          .show(context, R.string.create_playlist_fail, throwable.toString())
-                      })
-                  }
-                }
-                .show()
-            }
+          text = "${context.getString(R.string.local_list)}${vm.playLists.value.size}"
+          dialogState.show()
         },
       contentAlignment = Alignment.Center
     ) {

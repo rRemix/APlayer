@@ -20,6 +20,8 @@ data class PlayList(
     val date: Long
 ) : APlayerModel {
 
+  fun isFavorite() = id == 1L
+
   class Converter {
     @TypeConverter
     fun toStrList(listStr: String?): LinkedHashSet<Long>? {

@@ -479,4 +479,13 @@
   <string name="last_play_desc">Last Play TimeAt Desc</string>
   <string name="play_cross_fade">Fade in and out</string>
   <string name="play_cross_fade_tip">Use fade-in and fade-out effects when playing and pausing</string>
+
+  <plurals name="song_num">
+    <item quantity="one">%d song</item>
+    <item quantity="other">%d songs</item>
+  </plurals>
+  <plurals name="song_num_1">
+    <item quantity="one">%1$s    %2$d song</item>
+    <item quantity="other">%1$s    %2$d songs</item>
+  </plurals>
 </resources>

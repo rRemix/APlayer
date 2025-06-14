@@ -1,7 +1,13 @@
 package remix.myplayer.compose.repo
 
+import android.database.Cursor
+import android.os.Build
 import android.provider.MediaStore.Audio
+import android.provider.MediaStore.Audio.AudioColumns
+import remix.myplayer.bean.mp3.Song
+import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
 import remix.myplayer.compose.prefs.Setting
+import remix.myplayer.util.Util
 
 abstract class AbstractRepository(private val setting: Setting) {
   protected val forceSort by lazy {
@@ -53,4 +59,71 @@ abstract class AbstractRepository(private val setting: Setting) {
       }
       return selectionArgs
     }
+
+  val baseProjection: Array<String> = run {
+    val projection = ArrayList(
+      listOf(
+        AudioColumns._ID,
+        AudioColumns.TITLE,
+        AudioColumns.TITLE_KEY,
+        AudioColumns.DISPLAY_NAME,
+        AudioColumns.TRACK,
+        AudioColumns.SIZE,
+        AudioColumns.YEAR,
+        AudioColumns.TRACK,
+        AudioColumns.DURATION,
+        AudioColumns.DATE_MODIFIED,
+        AudioColumns.DATE_ADDED,
+        AudioColumns.DATA,
+        AudioColumns.ALBUM_ID,
+        AudioColumns.ALBUM,
+        AudioColumns.ARTIST_ID,
+        AudioColumns.ARTIST
+      )
+    )
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      projection.add(AudioColumns.GENRE)
+    }
+    projection.toTypedArray()
+  }
+
+  fun resolveSong(cursor: Cursor?): Song {
+    if (cursor == null || cursor.columnCount <= 0) {
+      return EMPTY_SONG
+    }
+    return Song.Local(
+      id = cursor.getLong(cursor.getColumnIndex(AudioColumns._ID)),
+      displayName = Util.processInfo(
+        cursor.getString(cursor.getColumnIndex(AudioColumns.DISPLAY_NAME)),
+        Util.TYPE_DISPLAYNAME
+      ),
+      title = Util.processInfo(
+        cursor.getString(cursor.getColumnIndex(AudioColumns.TITLE)),
+        Util.TYPE_SONG
+      ),
+      album = Util.processInfo(
+        cursor.getString(cursor.getColumnIndex(AudioColumns.ALBUM)),
+        Util.TYPE_ALBUM
+      ),
+      albumId = cursor.getLong(cursor.getColumnIndex(AudioColumns.ALBUM_ID)),
+      artist = Util.processInfo(
+        cursor.getString(cursor.getColumnIndex(AudioColumns.ARTIST)),
+        Util.TYPE_ARTIST
+      ),
+      artistId = cursor.getLong(cursor.getColumnIndex(AudioColumns.ARTIST_ID)),
+      _duration = cursor.getLong(cursor.getColumnIndex(AudioColumns.DURATION)),
+      data = cursor.getString(cursor.getColumnIndex(AudioColumns.DATA)),
+      size = cursor.getLong(cursor.getColumnIndex(AudioColumns.SIZE)),
+      year = cursor.getLong(cursor.getColumnIndex(AudioColumns.YEAR)).toString(),
+      _genre = cursor.getColumnIndex(AudioColumns.GENRE).let {
+        if (it != -1) {
+          cursor.getString(it)
+        } else {
+          null
+        }
+      },
+      track = cursor.getLong(cursor.getColumnIndex(AudioColumns.TRACK)).toString(),
+      dateModified = cursor.getLong(cursor.getColumnIndex(AudioColumns.DATE_MODIFIED))
+    )
+  }
 }

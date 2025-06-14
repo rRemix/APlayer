@@ -17,8 +17,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.bean.misc.Library
 import remix.myplayer.compose.activityViewModel
-import remix.myplayer.compose.ui.screen.AlbumScreen
-import remix.myplayer.compose.ui.screen.SongScreen
+import remix.myplayer.compose.ui.screen.RemoteScreen
+import remix.myplayer.compose.ui.screen.library.AlbumScreen
+import remix.myplayer.compose.ui.screen.library.ArtistScreen
+import remix.myplayer.compose.ui.screen.library.FolderScreen
+import remix.myplayer.compose.ui.screen.library.GenreScreen
+import remix.myplayer.compose.ui.screen.library.PlayListScreen
+import remix.myplayer.compose.ui.screen.library.SongScreen
 import remix.myplayer.compose.viewmodel.LibraryViewModel
 
 @Composable
@@ -36,6 +41,11 @@ fun ViewPager(
     when (libraries[page].tag) {
       Library.TAG_SONG -> SongScreen()
       Library.TAG_ALBUM -> AlbumScreen()
+      Library.TAG_ARTIST -> ArtistScreen()
+      Library.TAG_GENRE -> GenreScreen()
+      Library.TAG_PLAYLIST -> PlayListScreen()
+      Library.TAG_FOLDER -> FolderScreen()
+      Library.TAG_REMOTE -> RemoteScreen()
       else -> PageContent("Page: ${libraries[page]}")
     }
   }

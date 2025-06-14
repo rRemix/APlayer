@@ -1,8 +1,6 @@
 package remix.myplayer.compose.ui.screen.setting
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,9 +10,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import remix.myplayer.R
+import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
@@ -97,9 +94,7 @@ fun Preference(
     modifier = Modifier
       .fillMaxWidth()
       .wrapContentHeight()
-      .clickable(
-        indication = ripple(color = LocalTheme.current.ripple),
-        interactionSource = remember { MutableInteractionSource() }) {
+      .clickWithRipple(false) {
         onClick()
       }
       .background(color = LocalTheme.current.mainBackground, shape = RectangleShape)

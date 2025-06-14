@@ -4,7 +4,7 @@ import androidx.room.*
 import remix.myplayer.db.room.model.PlayList
 import androidx.sqlite.db.SupportSQLiteQuery
 import androidx.room.RawQuery
-
+import kotlinx.coroutines.flow.Flow
 
 
 /**
@@ -13,12 +13,29 @@ import androidx.room.RawQuery
 @Dao
 interface PlayListDao {
   @Insert(onConflict = OnConflictStrategy.ABORT)
+  suspend fun insertPlayListSuspend(playlist: PlayList): Long
+
+  @Query("""
+    SELECT * FROM PlayList
+    WHERE id = :id
+  """)
+  suspend fun selectByIdSuspend(id: Long): PlayList?
+
+  @Update
+  suspend fun updateSuspend(playlist: PlayList): Int
+
+  @Insert(onConflict = OnConflictStrategy.ABORT)
   fun insertPlayList(playlist: PlayList): Long
 
   @Query("""
     SELECT * FROM PlayList
   """)
   fun selectAll(): List<PlayList>
+
+  @Query("""
+    SELECT * FROM PlayList ORDER BY :orderBy
+  """)
+  fun selectAllOrderBy(orderBy : String): Flow<List<PlayList>>
 
   @RawQuery
   fun runtimeQuery(sortQuery: SupportSQLiteQuery): List<PlayList>

@@ -20,7 +20,7 @@ fun TextPrimary(
   fontSize: TextUnit = 14.sp,
   maxLine: Int = 1,
   overflow: TextOverflow = TextOverflow.Ellipsis,
-  textAlign: TextAlign? = TextAlign.Start,
+  textAlign: TextAlign? = TextAlign.Unspecified,
   fontWeight: FontWeight = FontWeight.Normal
 ) {
   Text(
@@ -48,16 +48,19 @@ fun TextSecondary(
   fontSize: TextUnit = 12.sp,
   maxLine: Int = 1,
   overflow: TextOverflow = TextOverflow.Ellipsis,
-  textAlign: TextAlign? = TextAlign.Start,
+  textAlign: TextAlign? = TextAlign.Unspecified,
   fontWeight: FontWeight = FontWeight.Normal
 ) {
   Text(
     text = text,
     modifier = modifier,
+    style = TextStyle(
+      lineHeight = 1.em,
+      textAlign = textAlign ?: TextAlign.Unspecified,
+      fontSize = fontSize,
+      fontWeight = fontWeight,
+    ),
     maxLines = maxLine,
-    textAlign = textAlign,
-    fontSize = fontSize,
-    fontWeight = fontWeight,
     color = LocalTheme.current.textSecondary,
     overflow = overflow,
   )

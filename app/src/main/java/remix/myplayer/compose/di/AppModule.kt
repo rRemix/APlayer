@@ -13,5 +13,5 @@ import javax.inject.Singleton
 abstract class AppModule {
   @Singleton
   @Binds
-  abstract fun bindSongRepo(controller: ThemeControllerImpl): ThemeController
+  abstract fun bindThemeController(controller: ThemeControllerImpl): ThemeController
 }

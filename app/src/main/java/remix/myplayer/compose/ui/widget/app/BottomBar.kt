@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.compose.activityViewModel
+import remix.myplayer.compose.clickableWithoutRipple
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
@@ -160,14 +161,4 @@ fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = activityViewMo
       )
     }
   }
-}
-
-fun Modifier.clickableWithoutRipple(
-  interactionSource: MutableInteractionSource = MutableInteractionSource(),
-  onClick: () -> Unit
-) = this.clickable(
-  interactionSource = interactionSource,
-  indication = null,
-) {
-  onClick()
 }

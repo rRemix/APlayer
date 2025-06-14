@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
 import remix.myplayer.compose.activityViewModel
+import remix.myplayer.compose.clickableWithoutRipple
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
@@ -93,7 +94,7 @@ fun AppBar(
 private fun AppBarActions(vm: LibraryViewModel = activityViewModel()) {
   val library by vm.currentLibrary.collectAsStateWithLifecycle()
 
-  if (library.tag != Library.TAG_FOLDER && library.tag != Library.TAG_CLOUD) {
+  if (library.tag != Library.TAG_FOLDER && library.tag != Library.TAG_REMOTE) {
     ScreenPopupButton(library)
   }
 

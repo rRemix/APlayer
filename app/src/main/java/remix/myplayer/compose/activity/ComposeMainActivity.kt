@@ -45,7 +45,6 @@ class ComposeMainActivity : BaseMusicActivity() {
         }
       }
     }
-    libraryViewModel.loadInit(hasPermission)
   }
 
   override fun onPermissionChanged(has: Boolean) {

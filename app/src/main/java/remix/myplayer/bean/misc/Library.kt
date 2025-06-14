@@ -23,7 +23,7 @@ data class Library(
     TAG_PLAYLIST -> PlayListFragment::class.java.name
     TAG_GENRE -> GenreFragment::class.java.name
     TAG_FOLDER -> FolderFragment::class.java.name
-    TAG_CLOUD -> RemoteFragment::class.java.name
+    TAG_REMOTE -> RemoteFragment::class.java.name
     else -> throw IllegalArgumentException("unknown tag: $tag")
   }
 ) : Serializable {
@@ -40,7 +40,7 @@ data class Library(
       TAG_PLAYLIST -> R.string.tab_playlist
       TAG_GENRE -> R.string.tab_genre
       TAG_FOLDER -> R.string.tab_folder
-      TAG_CLOUD -> R.string.tab_remote
+      TAG_REMOTE -> R.string.tab_remote
       else -> throw IllegalArgumentException("unknown tag: $tag")
     }
 
@@ -135,7 +135,7 @@ data class Library(
         TAG_PLAYLIST -> R.string.tab_playlist
         TAG_GENRE -> R.string.tab_genre
         TAG_FOLDER -> R.string.tab_folder
-        TAG_CLOUD -> R.string.tab_remote
+        TAG_REMOTE -> R.string.tab_remote
         else -> throw IllegalArgumentException("unknown tag: $tag")
       }
     )
@@ -149,7 +149,7 @@ data class Library(
     const val TAG_GENRE = 3
     const val TAG_PLAYLIST = 4
     const val TAG_FOLDER = 5
-    const val TAG_CLOUD = 6
+    const val TAG_REMOTE = 6
 
     val allLibraries = listOf(
       Library(TAG_SONG),
@@ -158,7 +158,7 @@ data class Library(
       Library(TAG_GENRE),
       Library(TAG_PLAYLIST),
       Library(TAG_FOLDER),
-      Library(TAG_CLOUD)
+      Library(TAG_REMOTE)
     )
 
     val defaultLibrary = Library(TAG_SONG, 0)

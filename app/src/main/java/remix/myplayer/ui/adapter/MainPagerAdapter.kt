@@ -7,7 +7,6 @@ import androidx.fragment.app.FragmentPagerAdapter
 import remix.myplayer.bean.misc.Library
 import remix.myplayer.ui.activity.RemoteFragment
 import remix.myplayer.ui.fragment.*
-import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 
 /**
@@ -80,7 +79,7 @@ class MainPagerAdapter(private val fm: FragmentManager) : FragmentPagerAdapter(f
       Library.TAG_GENRE -> GenreFragment()
       Library.TAG_PLAYLIST -> PlayListFragment()
       Library.TAG_FOLDER -> FolderFragment()
-      Library.TAG_CLOUD -> RemoteFragment()
+      Library.TAG_REMOTE -> RemoteFragment()
       else -> throw IllegalArgumentException("unknown library: ${libraries[position]}")
     }
 //    val fragment: Fragment = if (tag == Library.TAG_SONG) SongFragment() else if (tag == Library.TAG_ALBUM) AlbumFragment() else if (tag == Library.TAG_ARTIST) ArtistFragment() else if (tag == Library.TAG_PLAYLIST) PlayListFragment() else FolderFragment()

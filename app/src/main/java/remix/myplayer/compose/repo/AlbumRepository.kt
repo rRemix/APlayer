@@ -21,7 +21,7 @@ class AlbumRepoImpl @Inject constructor(
 
   override fun allAlbums(): List<Album> {
     if (!PermissionUtil.hasNecessaryPermission()) {
-      return ArrayList()
+      return emptyList()
     }
     val albumMaps: MutableMap<Long, MutableList<Album>> = LinkedHashMap()
     val albums: MutableList<Album> = ArrayList()

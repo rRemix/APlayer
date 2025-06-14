@@ -1,4 +1,4 @@
-package remix.myplayer.compose.ui.screen
+package remix.myplayer.compose.ui.screen.library
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height

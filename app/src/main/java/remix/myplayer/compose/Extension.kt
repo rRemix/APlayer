@@ -1,12 +1,20 @@
 package remix.myplayer.compose
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStoreOwner
+import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.misc.isPortraitOrientation
 
 private const val PORTRAIT_SPAN_COUNT = 2
@@ -22,6 +30,29 @@ fun spanCount(): Int {
     val count = LocalConfiguration.current.screenWidthDp / 180
     if (count > GRID_MAX_SPAN_COUNT) GRID_MAX_SPAN_COUNT else count
   }
+}
+
+// TODO replaceAll
+@Composable
+fun Modifier.clickWithRipple(circle: Boolean = true, onClick: () -> Unit): Modifier {
+  var modifier = this
+  if (circle) {
+    modifier = modifier.clip(CircleShape)
+  }
+  return modifier.clickable(
+    interactionSource = remember { MutableInteractionSource() },
+    indication = ripple(color = LocalTheme.current.ripple), onClick = onClick
+  )
+}
+
+fun Modifier.clickableWithoutRipple(
+  interactionSource: MutableInteractionSource = MutableInteractionSource(),
+  onClick: () -> Unit
+) = this.clickable(
+  interactionSource = interactionSource,
+  indication = null,
+) {
+  onClick()
 }
 
 @Composable

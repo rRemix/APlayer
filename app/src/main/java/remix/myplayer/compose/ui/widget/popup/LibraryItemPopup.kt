@@ -5,16 +5,12 @@ import android.app.Activity
 import android.content.Context
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,13 +19,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.soundcloud.android.crop.Crop
 import io.reactivex.functions.Consumer
@@ -43,6 +36,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.bean.mp3.popMenuItems
 import remix.myplayer.bean.mp3.songIds
 import remix.myplayer.bean.mp3.type
+import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
@@ -70,11 +64,7 @@ fun LibraryItemPopupButton(
   Box(
     contentAlignment = Alignment.Center,
     modifier = modifier
-      .clip(CircleShape)
-      .clickable(
-        interactionSource = remember { MutableInteractionSource() },
-        indication = ripple(color = LocalTheme.current.ripple)
-      ) {
+      .clickWithRipple {
         expanded = !expanded
       }
       .size(dimensionResource(id = R.dimen.item_list_btn_size))
@@ -93,18 +83,18 @@ fun LibraryItemPopupButton(
 }
 
 @Composable
-private fun LibraryItemDropdownMenu(
+fun LibraryItemDropdownMenu(
   expanded: Boolean,
   model: APlayerModel,
   onDismissRequest: () -> Unit
 ) {
   val scope = rememberCoroutineScope()
-  var expanded1 = expanded
   val items = model.popMenuItems()
   DropdownMenu(
     modifier = Modifier.wrapContentSize(Alignment.TopEnd),
-    expanded = expanded1,
-    offset = DpOffset(0.dp, -dimensionResource(R.dimen.item_list_btn_size)),
+    expanded = expanded,
+    // TODO
+//    offset = DpOffset(0.dp, -dimensionResource(R.dimen.item_list_btn_size)),
     containerColor = LocalTheme.current.dialogBackground,
     onDismissRequest = onDismissRequest
   ) {
@@ -131,8 +121,7 @@ private fun handleClickMenuItem(
   context: Context,
   songs: List<Song>,
   model: APlayerModel,
-  titleId: Int,
-  extra: String = ""
+  titleId: Int
 ) {
   if (songs.isEmpty()) {
     return
@@ -171,7 +160,7 @@ private fun handleClickMenuItem(
     //删除
     R.string.delete -> {
       R.string.my_favorite
-      if (extra == context.getString(R.string.my_favorite)) {
+      if (model is PlayList && model.isFavorite()) {
         //我的收藏不可删除
         ToastUtil.show(context, R.string.mylove_cant_edit)
         return
@@ -202,7 +191,8 @@ private fun handleClickMenuItem(
         .show()
     }
     //设置封面
-    R.id.menu_album_thumb -> {
+    R.string.set_album_cover, R.string.set_artist_cover, R.string.set_playlist_cover -> {
+      // TODO
       val customCover = CustomCover(model, model.type())
       val thumbIntent = (context as Activity).intent
       thumbIntent.putExtra(EXTRA_COVER, customCover)
@@ -211,7 +201,10 @@ private fun handleClickMenuItem(
     }
     //列表重命名
     R.string.rename -> {
-      if (extra == context.getString(R.string.my_favorite)) {
+      if (model !is PlayList) {
+        return
+      }
+      if (model.isFavorite()) {
         //我的收藏不可删除
         ToastUtil.show(context, R.string.mylove_cant_edit)
         return

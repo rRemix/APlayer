@@ -5,12 +5,10 @@ import android.database.Cursor
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio
-import android.provider.MediaStore.Audio.AudioColumns
 import dagger.hilt.android.qualifiers.ApplicationContext
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.prefs.Setting
 import remix.myplayer.util.ItemsSorter
-import remix.myplayer.util.MediaStoreUtil.getSongInfo
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -47,7 +45,7 @@ class SongRepoImpl @Inject constructor(
       makeSongCursor(selection, selectionValues, sortOrder).use { cursor ->
         if (cursor != null && cursor.count > 0) {
           while (cursor.moveToNext()) {
-            songs.add(getSongInfo(cursor))
+            songs.add(resolveSong(cursor))
           }
         }
       }
@@ -107,33 +105,4 @@ class SongRepoImpl @Inject constructor(
     TODO("Not yet implemented")
   }
 
-
-  companion object {
-    private val baseProjection: Array<String> = run {
-      val projection = ArrayList(
-        listOf(
-          AudioColumns._ID,
-          AudioColumns.TITLE,
-          AudioColumns.TITLE_KEY,
-          AudioColumns.DISPLAY_NAME,
-          AudioColumns.TRACK,
-          AudioColumns.SIZE,
-          AudioColumns.YEAR,
-          AudioColumns.TRACK,
-          AudioColumns.DURATION,
-          AudioColumns.DATE_MODIFIED,
-          AudioColumns.DATE_ADDED,
-          AudioColumns.DATA,
-          AudioColumns.ALBUM_ID,
-          AudioColumns.ALBUM,
-          AudioColumns.ARTIST_ID,
-          AudioColumns.ARTIST
-        )
-      )
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        projection.add(AudioColumns.GENRE)
-      }
-      projection.toTypedArray()
-    }
-  }
 }

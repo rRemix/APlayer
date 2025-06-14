@@ -115,10 +115,20 @@ data class AppTheme(
       }
     )
 
+  val iconColor: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (isLight) Color.Black else Color.White
+
   val primaryReverse: Color
     @Composable
     @ReadOnlyComposable
     get() = if (!isPrimaryCloseToWhite) Color.White else Color.Black
+
+  val textPrimaryReverse
+    @Composable
+    @ReadOnlyComposable
+    get() = colorResource(if (!isPrimaryCloseToWhite) R.color.dark_text_color_primary else R.color.light_text_color_primary)
 
   val highLightText: Color
     @Composable

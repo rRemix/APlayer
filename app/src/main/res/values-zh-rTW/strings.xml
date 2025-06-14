@@ -479,4 +479,12 @@
   <string name="last_play_desc">最後播放降序</string>
   <string name="play_cross_fade">淡入淡出</string>
   <string name="play_cross_fade_tip">播放、暫停時使用淡入淡出效果</string>
+
+  <plurals name="song_num">
+    <item quantity="other">%d首</item>
+  </plurals>
+
+  <plurals name="song_num_1">
+    <item quantity="other">%1$s    %2$d 首</item>
+  </plurals>
 </resources>

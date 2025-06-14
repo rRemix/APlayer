@@ -4,16 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,19 +17,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
 import com.afollestad.materialdialogs.DialogAction.POSITIVE
 import com.soundcloud.android.crop.Crop
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.DeleteHelper
@@ -64,11 +58,7 @@ fun SongPopupButton(
   Box(
     contentAlignment = Alignment.Center,
     modifier = modifier
-      .clip(CircleShape)
-      .clickable(
-        interactionSource = remember { MutableInteractionSource() },
-        indication = ripple(color = LocalTheme.current.ripple)
-      ) {
+      .clickWithRipple {
         expanded = !expanded
       }
       .size(dimensionResource(id = R.dimen.item_list_btn_size))
@@ -85,9 +75,8 @@ fun SongPopupButton(
   }
 }
 
-
 @Composable
-fun SongDropdownMenu(
+private fun SongDropdownMenu(
   expanded: Boolean,
   song: Song,
   isDeletePlayList: Boolean = false,
@@ -111,7 +100,8 @@ fun SongDropdownMenu(
   DropdownMenu(
     modifier = Modifier.wrapContentSize(Alignment.TopEnd),
     expanded = expanded,
-    offset = DpOffset(0.dp, -dimensionResource(R.dimen.item_list_btn_size)),
+    // TODO
+//    offset = DpOffset(0.dp, -dimensionResource(R.dimen.item_list_btn_size)),
     containerColor = LocalTheme.current.dialogBackground,
     onDismissRequest = onDismissRequest
   ) {
@@ -125,7 +115,6 @@ fun SongDropdownMenu(
       )
     }
   }
-
 }
 
 @SuppressLint("CheckResult")

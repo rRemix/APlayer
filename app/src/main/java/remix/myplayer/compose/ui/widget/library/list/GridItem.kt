@@ -27,7 +27,7 @@ import remix.myplayer.compose.ui.widget.library.GlideCover
 import remix.myplayer.compose.ui.widget.popup.LibraryItemPopupButton
 
 @Composable
-fun GridItem(model: APlayerModel, text1: String, text2: String?, onClick: () -> Unit, onLongClick: () -> Unit) {
+fun GridItem(model: APlayerModel, text1: String, text2: String? = null, onClick: () -> Unit, onLongClick: () -> Unit) {
   Column(
     modifier = Modifier
       .padding(start = 3.dp, top = 4.dp, end = 3.dp, bottom = 4.dp)

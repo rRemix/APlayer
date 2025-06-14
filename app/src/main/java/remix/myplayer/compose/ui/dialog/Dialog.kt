@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import remix.myplayer.R
+import remix.myplayer.compose.clickableWithoutRipple
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.ui.widget.app.clickableWithoutRipple
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import timber.log.Timber
 

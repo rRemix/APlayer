@@ -1,6 +1,5 @@
 package remix.myplayer.ui.activity
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.Loader
@@ -99,11 +98,11 @@ class SongChooseActivity : LibraryActivity<Song, SongChooseAdapter>() {
     val TAG = SongChooseActivity::class.java.simpleName
     const val EXTRA_NAME = "PlayListName"
     const val EXTRA_ID = "PlayListID"
-    fun start(activity: Activity, playListId: Int, playListName: String?) {
-      val intent = Intent(activity, SongChooseActivity::class.java)
+    fun start(context: Context, playListId: Int, playListName: String?) {
+      val intent = Intent(context, SongChooseActivity::class.java)
       intent.putExtra(EXTRA_ID, playListId)
       intent.putExtra(EXTRA_NAME, playListName)
-      activity.startActivity(intent)
+      context.startActivity(intent)
     }
   }
 }
