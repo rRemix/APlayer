@@ -375,8 +375,8 @@
   <string name="tap_to_toggle">タップで切替</string>
   <string name="change_offset">歌詞オフセットを調整</string>
   <string name="lyric_offset_reset">初期値に戻す</string>
-  <string name="lyric_advance_x_second">%1$s 秒 早める</string>
-  <string name="lyric_delay_x_second">%1$s 秒 遅延させる</string>
+  <string name="lyric_advance_x_second">%.1f 秒 早める</string>
+  <string name="lyric_delay_x_second">%.1f 秒 遅延させる</string>
   <string name="lyric_adjust_font_size">フォントサイズを調整</string>
   <string name="speed">再生速度</string>
   <string name="whether_change_theme">現在ナイトモードですが、テーマカラーを切り替えますか?</string>

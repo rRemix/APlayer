@@ -13,6 +13,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.bumptech.glide.signature.ObjectKey
 import remix.myplayer.R
 import remix.myplayer.glide.UriFetcher
+import remix.myplayer.lyrics.LyricsManager
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.ColorUtil
@@ -77,9 +78,9 @@ class NotifyImpl(context: MusicService) : Notify(context) {
 
     //桌面歌词
     remoteBigView.setImageViewResource(R.id.notify_lyric,
-        if (service.isDesktopLyricLocked) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)
+        if (LyricsManager.isDesktopLyricsLocked) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)
     remoteView.setImageViewResource(R.id.notify_lyric,
-        if (service.isDesktopLyricLocked) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)
+        if (LyricsManager.isDesktopLyricsLocked) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)
 
     //设置播放按钮
     if (!isPlay) {
@@ -174,7 +175,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
 
     //桌面歌词
     val lyricIntent = buildPendingIntent(context,
-        if (service.isDesktopLyricLocked) Command.UNLOCK_DESKTOP_LYRIC else Command.TOGGLE_DESKTOP_LYRIC)
+        if (LyricsManager.isDesktopLyricsLocked) Command.UNLOCK_DESKTOP_LYRIC else Command.TOGGLE_DESKTOP_LYRIC)
     remoteBigView.setOnClickPendingIntent(R.id.notify_lyric, lyricIntent)
     remoteView.setOnClickPendingIntent(R.id.notify_lyric, lyricIntent)
   }

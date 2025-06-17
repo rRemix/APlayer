@@ -1,83 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:gravity="center"
-  android:orientation="vertical"
-  android:paddingBottom="@dimen/d12_size">
+  android:padding="16dp"
+  android:orientation="vertical">
 
-  <remix.myplayer.lyric.LrcView
-    android:id="@+id/lrcView"
+  <remix.myplayer.ui.widget.LyricsView
+    android:id="@+id/lyrics"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="@dimen/d10_size"
-    android:layout_marginRight="@dimen/d10_size"
-    android:layout_marginTop="@dimen/d8_size"
-    android:paddingLeft="@dimen/d30_size"
-    android:paddingRight="@dimen/d30_size"
-    android:visibility="visible"/>
+    android:visibility="gone" />
+
+  <TextView
+    android:id="@+id/lyrics_no_lrc"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:text="@string/no_lrc"
+    android:textAlignment="center"
+    android:visibility="visible" />
+
+  <TextView
+    android:id="@+id/lyrics_searching"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:text="@string/searching"
+    android:textAlignment="center"
+    android:visibility="gone" />
+
 
   <LinearLayout
-    android:id="@+id/offsetContainer"
-    android:layout_width="wrap_content"
+    android:id="@+id/offset_panel"
+    android:layout_width="@dimen/lrc_fragment_offset_button_size"
     android:layout_height="wrap_content"
     android:layout_gravity="end|center_vertical"
-    android:layout_marginTop="20dp"
-    android:gravity="center"
     android:orientation="vertical"
-    android:visibility="gone">
+    android:visibility="gone"
+    tools:visibility="visible">
 
-    <LinearLayout
-      android:id="@+id/offsetReduce"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:background="@drawable/bg_oval_ripple_light"
-      android:orientation="vertical"
-      android:gravity="center"
-      android:padding="12dp">
-      <ImageView
-        android:id="@+id/iv_offset_reduce_arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:src="@drawable/icon_lyric_reduce_offset"/>
+    <Button
+      android:id="@+id/offset_inc"
+      android:layout_width="@dimen/lrc_fragment_offset_button_size"
+      android:layout_height="@dimen/lrc_fragment_offset_button_size"
+      android:background="?attr/background_oval_ripple"
+      android:drawableTop="@drawable/ic_stat_1_24dp"
+      android:text="+0.5s"
+      android:textAllCaps="false"
+      android:textSize="@dimen/lrc_fragment_offset_text_size"
+      app:drawableTint="?attr/text_color_primary"
+      tools:ignore="HardcodedText" />
 
-      <ImageView
-        android:id="@+id/iv_offset_reduce_second"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/icon_lyric_reduce_offset_second"/>
-    </LinearLayout>
+    <ImageButton
+      android:id="@+id/offset_reset"
+      android:layout_width="@dimen/lrc_fragment_offset_button_size"
+      android:layout_height="@dimen/lrc_fragment_offset_button_size"
+      android:layout_marginVertical="8dp"
+      android:background="?attr/background_oval_ripple"
+      android:contentDescription="@string/reset"
+      android:src="@drawable/ic_refresh_24dp"
+      app:tint="?attr/text_color_primary" />
 
-    <ImageView
-      android:id="@+id/offsetReset"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="8dp"
-      android:layout_marginTop="8dp"
-      android:src="@drawable/icon_lyric_reset"
-      android:background="@drawable/bg_oval_ripple_light"/>
-
-    <LinearLayout
-      android:id="@+id/offsetAdd"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:background="@drawable/bg_oval_ripple_light"
-      android:orientation="vertical"
-      android:padding="12dp"
-      android:gravity="center">
-      <ImageView
-        android:id="@+id/iv_offset_add_second"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/icon_lyric_add_offset_second"
-        android:layout_marginBottom="4dp"/>
-      <ImageView
-        android:id="@+id/iv_offset_add_arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/icon_lyric_add_offset"/>
-    </LinearLayout>
+    <Button
+      android:id="@+id/offset_dec"
+      android:layout_width="@dimen/lrc_fragment_offset_button_size"
+      android:layout_height="@dimen/lrc_fragment_offset_button_size"
+      android:background="?attr/background_oval_ripple"
+      android:drawableBottom="@drawable/ic_stat_minus_1_24dp"
+      android:text="-0.5s"
+      android:textAllCaps="false"
+      android:textSize="@dimen/lrc_fragment_offset_text_size"
+      app:drawableTint="?attr/text_color_primary"
+      tools:ignore="HardcodedText" />
   </LinearLayout>
 </FrameLayout>
