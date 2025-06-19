@@ -89,7 +89,7 @@ class AlbumAdapter(layoutId: Int, multipleChoice: MultipleChoice<Album>,
         .into(holder.iv)
 
     if (holder is AlbumListHolder) {
-      holder.tv2.text = App.context.getString(R.string.song_count_2, album.artist, album.count)
+      holder.tv2.text = context.resources.getQuantityString(R.plurals.song_num_1, album.count, album.artist, album.count)
     } else {
       holder.tv2.text = album.artist
     }

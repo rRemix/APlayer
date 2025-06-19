@@ -179,9 +179,6 @@
   <string name="choose_or_close_lockscreen">选择锁屏显示方式或者关闭锁屏</string>
   <string name="cant_play_this_sont">无法播放该歌曲</string>
   <string name="illegal_arg">参数错误</string>
-  <string name="song_count">%d首歌曲</string>
-  <string name="song_count_1">%d首</string>
-  <string name="song_count_2">%1$s    %2$d首</string>
   <string name="searching">正在搜索</string>
   <string name="no_lrc">暂无歌词</string>
   <string name="local_list">本地歌单</string>
@@ -367,7 +364,7 @@
   <string name="no_equalizer">没有找到均衡器</string>
   <string name="clear_download_cover">是否清除已经下载的封面</string>
   <string name="updating">更新中</string>
-  <string name="player">播放界面</string>
+  <string name="playing_screen">播放界面</string>
   <string name="show_on_bottom">底部显示</string>
   <string name="show_of_bottom_tip">是否显示下一首或者音量控制</string>
   <string name="show_next_song_only">仅显示下一首</string>
@@ -479,4 +476,12 @@
   <string name="last_play_desc">最后播放降序</string>
   <string name="play_cross_fade">淡入淡出</string>
   <string name="play_cross_fade_tip">播放、暂停时使用淡入淡出效果</string>
+
+  <plurals name="song_num">
+    <item quantity="other">%d首</item>
+  </plurals>
+
+  <plurals name="song_num_1">
+    <item quantity="other">%1$s    %2$d首</item>
+  </plurals>
 </resources>

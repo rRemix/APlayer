@@ -78,11 +78,7 @@ class GenreAdapter(
     //设置歌手名
     holder.tv1.text = genre.genre
     if (holder is GenreListHolder) {
-      if (genre.count > 0) {
-        holder.tv2.text = context.getString(R.string.song_count_1, genre.count)
-      } else {
-        holder.tv2.text = App.context.getString(R.string.song_count_1, genre.count)
-      }
+      holder.tv2.text = context.resources.getQuantityString(R.plurals.song_num, genre.count, genre.count)
     }
     //设置封面
     val options = RequestOptions()

@@ -179,9 +179,6 @@
   <string name="choose_or_close_lockscreen"></string>
   <string name="cant_play_this_sont">Unable to play this song</string>
   <string name="illegal_arg">Parameters error</string>
-  <string name="song_count">%d songs</string>
-  <string name="song_count_1">%d songs</string>
-  <string name="song_count_2">%1$s    %2$d songs</string>
   <string name="searching">Searching</string>
   <string name="no_lrc">No lyrics</string>
   <string name="local_list">Playlist</string>
@@ -367,7 +364,7 @@
   <string name="no_equalizer">No equalizer found</string>
   <string name="clear_download_cover">Clear the downloaded covers?</string>
   <string name="updating">Updating</string>
-  <string name="player">Now playing screen</string>
+  <string name="playing_screen">Now playing screen</string>
   <string name="show_on_bottom">Display of bottom control</string>
   <string name="show_of_bottom_tip">Option to toggle next song or volume controls</string>
   <string name="show_next_song_only">Show next song only</string>
@@ -479,4 +476,13 @@
   <string name="last_play_desc">Last Play TimeAt Desc</string>
   <string name="play_cross_fade">Fade in and out</string>
   <string name="play_cross_fade_tip">Use fade-in and fade-out effects when playing and pausing</string>
+
+  <plurals name="song_num">
+    <item quantity="one">%d song</item>
+    <item quantity="other">%d songs</item>
+  </plurals>
+  <plurals name="song_num_1">
+    <item quantity="one">%1$s    %2$d song</item>
+    <item quantity="other">%1$s    %2$d songs</item>
+  </plurals>
 </resources>

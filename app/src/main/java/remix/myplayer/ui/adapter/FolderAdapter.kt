@@ -41,7 +41,7 @@ class FolderAdapter(layoutId: Int, private val multiChoice: MultipleChoice<Folde
     //设置文件夹名字 路径名 歌曲数量
     holder.binding.folderName.text = folder.name
     holder.binding.folderPath.text = folder.path
-    holder.binding.folderNum.text = String.format("%d首", folder.count)
+    holder.binding.folderNum.text = context.resources.getQuantityString(R.plurals.song_num, folder.count, folder.count)
     //根据主题模式 设置图片
     val tintColor = libraryBtnColor
     Theme.tintDrawable(holder.binding.folderButton, R.drawable.icon_player_more, tintColor)

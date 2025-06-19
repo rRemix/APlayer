@@ -211,7 +211,8 @@ class ChildHolderActivity : LibraryActivity<Song, ChildHolderAdapter>() {
 
   override fun onLoadFinished(loader: Loader<List<Song>>, data: List<Song>?) {
     super.onLoadFinished(loader, data)
-    binding.childholderItemNum.text = getString(R.string.song_count, data?.size ?: 0)
+    val size =  data?.size ?: 0
+    binding.childholderItemNum.text = resources.getQuantityString(R.plurals.song_num, size, size)
   }
 
   override fun onServiceConnected(service: MusicService) {

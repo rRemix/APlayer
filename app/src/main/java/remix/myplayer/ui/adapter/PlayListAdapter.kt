@@ -68,7 +68,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
 
     val context = holder.itemView.context
     holder.tvName.text = data.name
-    holder.tvOther.text = context.getString(R.string.song_count, data.audioIds.size)
+    holder.tvOther.text = context.resources.getQuantityString(R.plurals.song_num, data.audioIds.size, data.audioIds.size)
 
     //设置专辑封面
     val options = RequestOptions()

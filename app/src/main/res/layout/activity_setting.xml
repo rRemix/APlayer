@@ -879,7 +879,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_margin="@dimen/d14_size"
-          android:text="@string/player"
+          android:text="@string/playing_screen"
           android:textColor="?attr/colorAccent"
           android:textSize="@dimen/s16_size" />
 

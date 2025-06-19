@@ -1,7 +1,7 @@
 <resources>
     <string name="version">v1.2.7</string>
     <string name="app_name">APlayer</string>
-  
+
     <string name="tab_song">曲</string>
     <string name="tab_album">アルバム</string>
     <string name="tab_artist">アーティスト</string>
@@ -179,9 +179,6 @@
   <string name="choose_or_close_lockscreen">ロック画面にアルバムカバーを表示する</string>
   <string name="cant_play_this_sont">曲を再生できません</string>
   <string name="illegal_arg">パラメータエラー</string>
-  <string name="song_count">%d 曲</string>
-  <string name="song_count_1">%d 曲</string>
-  <string name="song_count_2">%1$s    %2$d 曲</string>
   <string name="searching">検索中</string>
   <string name="no_lrc">歌詞なし</string>
   <string name="local_list">プレイリスト</string>
@@ -367,7 +364,7 @@
   <string name="no_equalizer">イコライザーアプリが見つかりません</string>
   <string name="clear_download_cover">ダウンロード済みのカバー画像を削除しますか?</string>
   <string name="updating">アップデート中</string>
-  <string name="player">再生中画面</string>
+  <string name="playing_screen">再生中画面</string>
   <string name="show_on_bottom">画面下部の設定</string>
   <string name="show_of_bottom_tip">次の曲 / 音量コントロールのどちらを表示するかを選択します</string>
   <string name="show_next_song_only">次の曲のみを表示</string>
@@ -476,4 +473,12 @@
   <string name="last_play">最後にプレイした</string>
   <string name="play_cross_fade">フェードインとフェードアウト</string>
   <string name="play_cross_fade_tip">再生中および一時停止中にフェード効果を使用する</string>
+
+  <plurals name="song_num">
+      <item quantity="other">%d曲</item>
+  </plurals>
+
+  <plurals name="song_num_1">
+      <item quantity="other">%1$s    %2$d 曲</item>
+  </plurals>
 </resources>

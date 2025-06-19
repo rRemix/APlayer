@@ -69,11 +69,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
     //设置歌手名
     holder.tv1.text = artist.artist
     if (holder is ArtistListHolder) {
-      if (artist.count > 0) {
-        holder.tv2.text = context.getString(R.string.song_count_1, artist.count)
-      } else {
-        holder.tv2.text = App.context.getString(R.string.song_count_1, artist.count)
-      }
+      holder.tv2.text = context.resources.getQuantityString(R.plurals.song_num, artist.count, artist.count)
     }
     //设置封面
     val options = RequestOptions()
