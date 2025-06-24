@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -30,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -57,6 +56,7 @@ import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
 import remix.myplayer.compose.ui.widget.popup.ScreenPopupButton
 import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.SettingViewModel
 import remix.myplayer.helper.SleepTimer.Companion.getMillisUntilFinish
 import remix.myplayer.helper.SleepTimer.Companion.isTicking
 import remix.myplayer.helper.SleepTimer.Companion.toggleTimer
@@ -91,7 +91,7 @@ fun AppBar(
 }
 
 @Composable
-private fun AppBarActions(vm: LibraryViewModel = activityViewModel()) {
+private fun AppBarActions(vm: SettingViewModel = activityViewModel()) {
   val library by vm.currentLibrary.collectAsStateWithLifecycle()
 
   if (library.tag != Library.TAG_FOLDER && library.tag != Library.TAG_REMOTE) {
@@ -158,7 +158,7 @@ private val defaultActions: List<AppBarAction>
   @Composable
   get() {
     val context = LocalContext.current
-    val setting = activityViewModel<LibraryViewModel>().setting
+    val setting = activityViewModel<LibraryViewModel>().settingPrefs
 
     val tipDialogState = rememberDialogState(false)
     NormalDialog(
@@ -186,10 +186,10 @@ private val defaultActions: List<AppBarAction>
     var positiveText by rememberSaveable {
       mutableIntStateOf(R.string.start_timer)
     }
-    var minuteText by remember {
+    var minuteText by rememberSaveable {
       mutableStateOf("00")
     }
-    var secondText by remember {
+    var secondText by rememberSaveable {
       mutableStateOf("00")
     }
 
@@ -221,119 +221,127 @@ private val defaultActions: List<AppBarAction>
       },
       positiveRes = positiveText,
       custom = {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-          Box(
-            modifier = Modifier.padding(top = 24.dp, bottom = 36.dp),
-            contentAlignment = Alignment.Center
-          ) {
-            CircleSeekBar(Modifier.size(180.dp), progress = progress) { current, max ->
-              durationInSec = current / 60 * 60
-              updateTextAndProgress(durationInSec)
-            }
+        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
+          modifier = Modifier
+            .weight(1f, false)) {
+          item {
+            Box(
+              modifier = Modifier.padding(top = 24.dp, bottom = 36.dp),
+              contentAlignment = Alignment.Center
+            ) {
+              CircleSeekBar(Modifier.size(180.dp), progress = progress) { current, max ->
+                durationInSec = current / 60 * 60
+                updateTextAndProgress(durationInSec)
+              }
 
-            @Composable
-            fun TextWithLine(text: String) {
-              Box(
-                modifier = Modifier
-                  .background(Color.Transparent, RoundedCornerShape(1.dp))
-                  .border(1.dp, LocalTheme.current.textSecondary)
-                  .padding(1.dp),
-                contentAlignment = Alignment.Center
-              ) {
-                TextPrimary(text, modifier = Modifier, fontSize = 24.sp)
-                Spacer(
+              @Composable
+              fun TextWithLine(text: String) {
+                Box(
                   modifier = Modifier
-                    .matchParentSize()
-                    .requiredHeight(1.dp)
-                    .background(LocalTheme.current.dialogBackground)
-                    .align(Alignment.Center)
-                )
+                    .background(Color.Transparent, RoundedCornerShape(1.dp))
+                    .border(1.dp, LocalTheme.current.textSecondary)
+                    .padding(1.dp),
+                  contentAlignment = Alignment.Center
+                ) {
+                  TextPrimary(text, modifier = Modifier, fontSize = 24.sp)
+                  Spacer(
+                    modifier = Modifier
+                      .matchParentSize()
+                      .requiredHeight(1.dp)
+                      .background(LocalTheme.current.dialogBackground)
+                      .align(Alignment.Center)
+                  )
+                }
+              }
+
+              Row(
+                modifier = Modifier
+                  .wrapContentSize(), verticalAlignment = Alignment.CenterVertically
+              ) {
+                TextWithLine(minuteText)
+                TextSecondary(":", modifier = Modifier.padding(horizontal = 4.dp), fontSize = 20.sp)
+                TextWithLine(secondText)
               }
             }
+          }
 
+          item {
             Row(
+              horizontalArrangement = Arrangement.End,
+              verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier
-                .wrapContentSize(), verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth()
+                .padding(end = 20.dp)
             ) {
-              TextWithLine(minuteText)
-              TextSecondary(":", modifier = Modifier.padding(horizontal = 4.dp), fontSize = 20.sp)
-              TextWithLine(secondText)
+              Icon(
+                modifier = Modifier
+                  .padding(end = 4.dp)
+                  .clickableWithoutRipple {
+                    tipDialogState.show()
+                  },
+                painter = painterResource(R.drawable.ic_info_24dp),
+                contentDescription = "TimerTip"
+              )
+
+              TextPrimary(
+                stringResource(R.string.as_default),
+                modifier = Modifier.padding(end = 8.dp)
+              )
+
+              Switch(
+                checked = timerStartAuto,
+                colors = SwitchDefaults.colors().copy(
+                  checkedTrackColor = LocalTheme.current.secondary,
+                  uncheckedTrackColor = Color.Transparent
+                ),
+                onCheckedChange = { isChecked ->
+                  if (isChecked) {
+                    if (durationInSec > 0) {
+                      ToastUtil.show(context, R.string.set_success)
+                      setting.timerStartAuto = true
+                      setting.timerDefaultDuration = durationInSec
+                      timerStartAuto = true
+                    } else {
+                      ToastUtil.show(context, R.string.plz_set_correct_time)
+                    }
+                  } else {
+                    ToastUtil.show(context, R.string.cancel_success)
+                    setting.timerStartAuto = false
+                    setting.timerDefaultDuration = -1
+                    timerStartAuto = false
+                  }
+
+                },
+                modifier = Modifier.scale(0.9f)
+              )
             }
           }
 
-          Row(
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(end = 20.dp)
-          ) {
-            Icon(
+          item {
+            Row(
+              horizontalArrangement = Arrangement.End,
+              verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier
-                .padding(end = 4.dp)
-                .clickableWithoutRipple {
-                  tipDialogState.show()
+                .fillMaxWidth()
+                .padding(bottom = 16.dp, end = 20.dp)
+            ) {
+              TextPrimary(
+                stringResource(R.string.timer_pending_close),
+                modifier = Modifier.padding(end = 8.dp)
+              )
+              Switch(
+                checked = exitAfterTimerFinish,
+                colors = SwitchDefaults.colors().copy(
+                  checkedTrackColor = LocalTheme.current.secondary,
+                  uncheckedTrackColor = Color.Transparent
+                ),
+                onCheckedChange = {
+                  setting.exitAfterTimerFinish = it
+                  exitAfterTimerFinish = it
                 },
-              painter = painterResource(R.drawable.ic_info_24dp),
-              contentDescription = "TimerTip"
-            )
-
-            TextPrimary(
-              stringResource(R.string.as_default),
-              modifier = Modifier.padding(end = 8.dp)
-            )
-
-            Switch(
-              checked = timerStartAuto,
-              colors = SwitchDefaults.colors().copy(
-                checkedTrackColor = LocalTheme.current.secondary,
-                uncheckedTrackColor = Color.Transparent
-              ),
-              onCheckedChange = { isChecked ->
-                if (isChecked) {
-                  if (durationInSec > 0) {
-                    ToastUtil.show(context, R.string.set_success)
-                    setting.timerStartAuto = true
-                    setting.timerDefaultDuration = durationInSec
-                    timerStartAuto = true
-                  } else {
-                    ToastUtil.show(context, R.string.plz_set_correct_time)
-                  }
-                } else {
-                  ToastUtil.show(context, R.string.cancel_success)
-                  setting.timerStartAuto = false
-                  setting.timerDefaultDuration = -1
-                  timerStartAuto = false
-                }
-
-              },
-              modifier = Modifier.scale(0.8f)
-            )
-          }
-
-          Row(
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(bottom = 16.dp, end = 20.dp)
-          ) {
-            TextPrimary(
-              stringResource(R.string.timer_pending_close),
-              modifier = Modifier.padding(end = 8.dp)
-            )
-            Switch(
-              checked = exitAfterTimerFinish,
-              colors = SwitchDefaults.colors().copy(
-                checkedTrackColor = LocalTheme.current.secondary,
-                uncheckedTrackColor = Color.Transparent
-              ),
-              onCheckedChange = {
-                setting.exitAfterTimerFinish = it
-                exitAfterTimerFinish = it
-              },
-              modifier = Modifier.scale(0.8f)
-            )
+                modifier = Modifier.scale(0.8f)
+              )
+            }
           }
         }
       },

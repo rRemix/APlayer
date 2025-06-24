@@ -1,5 +1,6 @@
 package remix.myplayer.util
 
+import android.app.Activity
 import android.app.RecoverableSecurityException
 import android.content.ContentUris
 import android.content.ContentValues
@@ -478,7 +479,7 @@ object MediaStoreUtil {
   /**
    * 删除单个源文件
    */
-  fun deleteSource(activity: BaseActivity, song: Song) {
+  fun deleteSource(activity: Activity, song: Song) {
     try {
       try {
         context.contentResolver.delete(

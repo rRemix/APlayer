@@ -42,7 +42,7 @@
     android:networkSecurityConfig="@xml/network_security_config">
 
     <activity android:name="remix.myplayer.compose.activity.ComposeMainActivity"
-        android:theme="@style/ActivityStyle"
+        android:theme="@style/AppTheme"
         android:launchMode="singleTop"
         android:exported="true">
       <intent-filter>
@@ -88,6 +88,12 @@
         <category android:name="android.intent.category.OPENABLE"/>
 
         <data android:mimeType="vnd.android.cursor.dir/audio"/>
+      </intent-filter>
+
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <data android:scheme="aplayer" android:host="playing_screen" />
       </intent-filter>
     </activity>
 

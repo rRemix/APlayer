@@ -5,9 +5,10 @@ constraintlayoutCompose = "1.1.1"
 hiltAndroid = "2.55"
 kotlin = "1.9.23"
 ksp = "1.9.23-1.0.19"
+#kotlin = "2.1.20"
+#ksp = "2.1.21-2.0.1"
 hilt = "2.55"
 nav = "2.9.0"
-
 glide = "4.16.0"
 glideCompose = "1.0.0-beta01"
 retrofit = "2.11.0"
@@ -99,3 +100,4 @@ androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constr
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablepainter" }
 androidx-nav = { module = "androidx.navigation:navigation-compose", version.ref = "nav" }
 androidx-hilt-navi-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0"}
+reorderable = { module = "sh.calvin.reorderable:reorderable", version = "2.5.1" }

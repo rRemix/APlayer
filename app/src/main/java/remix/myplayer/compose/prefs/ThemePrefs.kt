@@ -13,15 +13,16 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class Theme @Inject constructor(@ApplicationContext val context: Context) : AbstractPref(context, name = "aplayer-theme") {
+class ThemePrefs @Inject constructor(@ApplicationContext val context: Context) : AbstractPref(context, name = "aplayer-theme") {
   var primaryColor by PrefsDelegate(sp, "primary_color", "#698cf6".toColorInt())
   var secondaryColor by PrefsDelegate(sp, "accent_color", "#698cf6".toColorInt())
 
-  var darkTheme by PrefsDelegate(sp, "dark_theme", FOLLOW_SYSTEM)
+  var darkTheme by PrefsDelegate(sp, "dark_theme_v2", FOLLOW_SYSTEM)
   var blackTheme by PrefsDelegate(sp, "black_theme", false)
 
-  fun theme(): String {
-    val darkTheme = darkTheme
+  var coloredNaviBar by PrefsDelegate(sp, "color_Navigation", false)
+
+  fun resolveTheme(darkTheme: Int, blackTheme: Boolean): String {
     return if (darkTheme == ALWAYS_ON || (darkTheme == FOLLOW_SYSTEM && (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)) {
       if (blackTheme) {
         BLACK

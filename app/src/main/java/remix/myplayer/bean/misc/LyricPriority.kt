@@ -4,6 +4,7 @@ import remix.myplayer.App
 import remix.myplayer.R
 import java.util.*
 
+@Deprecated("")
 enum class LyricPriority(val priority: Int, val desc: String) {
   DEF(0, App.context.getString(R.string.default_lyric_priority)),
   IGNORE(1, App.context.getString(R.string.ignore_lrc)),

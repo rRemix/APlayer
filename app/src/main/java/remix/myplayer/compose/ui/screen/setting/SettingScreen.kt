@@ -1,19 +1,18 @@
 package remix.myplayer.compose.ui.screen.setting
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.R
+import remix.myplayer.compose.nav.LocalNavController
+import remix.myplayer.compose.nav.RouteAbout
 import remix.myplayer.compose.ui.screen.setting.logic.common.BlackListLogic
 import remix.myplayer.compose.ui.screen.setting.logic.common.BreakPointLogic
 import remix.myplayer.compose.ui.screen.setting.logic.common.ExportPlayListLogic
@@ -26,19 +25,38 @@ import remix.myplayer.compose.ui.screen.setting.logic.common.RestoreDeleteLogic
 import remix.myplayer.compose.ui.screen.setting.logic.common.ScanSizeLogic
 import remix.myplayer.compose.ui.screen.setting.logic.common.ShakeLogic
 import remix.myplayer.compose.ui.screen.setting.logic.common.ShowDisplayNameLogic
+import remix.myplayer.compose.ui.screen.setting.logic.cover.AutoDownloadLogic
+import remix.myplayer.compose.ui.screen.setting.logic.cover.DownloadSourceLogic
+import remix.myplayer.compose.ui.screen.setting.logic.cover.IgnoreMediaStoreLogic
+import remix.myplayer.compose.ui.screen.setting.logic.library.LibraryLogic
+import remix.myplayer.compose.ui.screen.setting.logic.lyric.DesktopLyricLogic
+import remix.myplayer.compose.ui.screen.setting.logic.lyric.LyricPriorityLogic
+import remix.myplayer.compose.ui.screen.setting.logic.lyric.StatusBarLyricLogic
+import remix.myplayer.compose.ui.screen.setting.logic.notification.ClassicNotifyLogic
+import remix.myplayer.compose.ui.screen.setting.logic.notification.NotifyBackgroundLogic
+import remix.myplayer.compose.ui.screen.setting.logic.other.ClearCacheLogic
+import remix.myplayer.compose.ui.screen.setting.logic.other.FeedbackLogic
+import remix.myplayer.compose.ui.screen.setting.logic.play.AutoPlayLogic
+import remix.myplayer.compose.ui.screen.setting.logic.play.IgnoreAudioFocusLogic
+import remix.myplayer.compose.ui.screen.setting.logic.play.PlayFadeLogic
+import remix.myplayer.compose.ui.screen.setting.logic.playingscreen.KeepScreenOnLogic
+import remix.myplayer.compose.ui.screen.setting.logic.playingscreen.PlayingScreenBackgroundLogic
+import remix.myplayer.compose.ui.screen.setting.logic.playingscreen.PlayingScreenBottomLogic
+import remix.myplayer.compose.ui.screen.setting.logic.theme.BlackThemeLogic
+import remix.myplayer.compose.ui.screen.setting.logic.theme.ColoredNaviBarLogic
+import remix.myplayer.compose.ui.screen.setting.logic.theme.DarkThemeLogic
+import remix.myplayer.compose.ui.screen.setting.logic.theme.PrimaryColorLogic
+import remix.myplayer.compose.ui.screen.setting.logic.theme.SecondaryColorLogic
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.app.CommonAppBar
-import remix.myplayer.compose.ui.widget.common.TextSecondary
-
-private const val REQUEST_THEME_COLOR = 0x10
-private const val REQUEST_IMPORT_PLAYLIST = 0x102
-private const val REQUEST_EXPORT_PLAYLIST = 0x103
-private const val REQUEST_CODE_ADD_BLACKLIST = 0x104
+import remix.myplayer.helper.EQHelper
+import remix.myplayer.misc.update.UpdateAgent
+import remix.myplayer.misc.update.UpdateListener
 
 @Composable
 fun SettingScreen() {
   Scaffold(
-    topBar = { CommonAppBar(title = stringResource(R.string.setting)) },
+    topBar = { CommonAppBar(title = stringResource(R.string.setting), actions = emptyList()) },
     containerColor = LocalTheme.current.mainBackground,
   ) { contentPadding ->
 
@@ -50,172 +68,21 @@ fun SettingScreen() {
       item {
         CommonPreferences()
 
-        SettingTitle(R.string.play)
-        var ignoreFocus by remember { mutableStateOf(false) }
-        SwitchPreference(
-          stringResource(R.string.audio_focus),
-          stringResource(R.string.audio_focus_tip),
-          ignoreFocus
-        ) {
-          ignoreFocus = !ignoreFocus
-        }
+        PlayPreferences()
 
-        var playFade by remember { mutableStateOf(false) }
-        SwitchPreference(
-          stringResource(R.string.play_cross_fade),
-          stringResource(R.string.play_cross_fade_tip),
-          playFade
-        ) {
+        ColorPreferences()
 
-        }
+        LibraryPreferences()
 
-        NormalPreference(
-          stringResource(R.string.auto_play),
-          stringResource(R.string.audio_focus_tip)
-        ) {
+        PlayingScreenPreferences()
 
-        }
+        CoverPreferences()
 
-        SettingTitle(R.string.color)
+        LyricPreferences()
 
-        NormalPreference(stringResource(R.string.dark_theme)) {
+        NotificationPreferences()
 
-        }
-
-        var blackTheme by remember { mutableStateOf(false) }
-        SwitchPreference(
-          stringResource(R.string.black_theme),
-          stringResource(R.string.black_theme_tip),
-          blackTheme
-        ) {
-
-        }
-
-        ThemePreference(
-          stringResource(R.string.primary_color),
-          stringResource(R.string.primary_color_tip)
-        ) {
-
-        }
-
-        ThemePreference(
-          stringResource(R.string.accent_color),
-          stringResource(R.string.accent_color_tip),
-          false
-        ) {
-
-        }
-
-        var coloredNaviBar by remember { mutableStateOf(false) }
-        SwitchPreference(
-          stringResource(R.string.navigation_color),
-          stringResource(R.string.navigation_is_show),
-          coloredNaviBar
-        ) {
-
-        }
-
-        SettingTitle(R.string.library)
-
-        NormalPreference(
-          stringResource(R.string.library_category),
-          stringResource(R.string.configure_library_category)
-        ) { }
-
-        SettingTitle(R.string.playing_screen)
-
-        NormalPreference(
-          stringResource(R.string.now_playing_screen_background),
-          stringResource(R.string.now_playing_screen_theme)
-        ) { }
-
-        NormalPreference(
-          stringResource(R.string.show_on_bottom),
-          stringResource(R.string.show_of_bottom_tip)
-        ) { }
-
-        var screenAlwaysOn by remember { mutableStateOf(false) }
-        SwitchPreference(
-          stringResource(R.string.screen_always_on_title),
-          stringResource(R.string.screen_always_on_tip),
-          screenAlwaysOn
-        ) {
-
-        }
-
-        SettingTitle(R.string.cover)
-
-        var ignoreMediaStore by remember { mutableStateOf(false) }
-        SwitchPreference(
-          stringResource(R.string.ignore_mediastore_artwork),
-          stringResource(R.string.ignore_mediastore_artwork_tips),
-          ignoreMediaStore
-        ) {
-        }
-
-        NormalPreference(
-          stringResource(R.string.auto_download_album_artist_cover),
-          stringResource(R.string.always)
-        ) { }
-
-        NormalPreference(
-          stringResource(R.string.cover_download_source),
-          stringResource(R.string.cover_download_from_lastfm)
-        ) { }
-
-        SettingTitle(R.string.lrc)
-        var desktopLyric by remember { mutableStateOf(false) }
-        SwitchPreference(
-          stringResource(R.string.float_lrc),
-          stringResource(R.string.opened_desktop_lrc),
-          desktopLyric
-        ) {
-        }
-
-        var statusBarLyric by remember { mutableStateOf(false) }
-        SwitchPreference(
-          stringResource(R.string.statusbar_lrc),
-          checked = statusBarLyric
-        ) {
-        }
-
-        NormalPreference(
-          stringResource(R.string.lrc_priority),
-          stringResource(R.string.lrc_priority_tip)
-        ) { }
-
-        SettingTitle(R.string.notify)
-
-        var classicNotification by remember { mutableStateOf(false) }
-        SwitchPreference(
-          stringResource(R.string.notify_style),
-          stringResource(R.string.notify_style_tip),
-          classicNotification
-        ) {
-        }
-
-        NormalPreference(
-          stringResource(R.string.notify_bg_color),
-          stringResource(R.string.notify_bg_color_info)
-        ) { }
-
-
-        SettingTitle(R.string.other)
-
-        ArrowPreference(R.string.eq_setting) {
-        }
-
-        ArrowPreference(R.string.feedback_info) {
-        }
-
-        ArrowPreference(R.string.about_info) {
-        }
-
-        Preference(onClick = {}, title = stringResource(R.string.check_update))
-        Preference(onClick = {}, title = stringResource(R.string.clear_cache)) {
-          TextSecondary(text = "0MB", fontSize = 14.sp)
-        }
-
+        OtherPreferences()
       }
     }
 
@@ -251,6 +118,108 @@ private fun CommonPreferences() {
   ForceSortLogic()
 }
 
+@Composable
+private fun PlayPreferences() {
+  SettingTitle(R.string.play)
+
+  IgnoreAudioFocusLogic()
+
+  PlayFadeLogic()
+
+  AutoPlayLogic()
+}
+
+@Composable
+private fun ColorPreferences() {
+  SettingTitle(R.string.color)
+
+  DarkThemeLogic()
+
+  BlackThemeLogic()
+
+  PrimaryColorLogic()
+
+  SecondaryColorLogic()
+
+  ColoredNaviBarLogic()
+
+}
+
+@Composable
+private fun LibraryPreferences() {
+  SettingTitle(R.string.library)
+
+  LibraryLogic()
+}
+
+@Composable
+private fun PlayingScreenPreferences() {
+  SettingTitle(R.string.playing_screen)
+
+  PlayingScreenBackgroundLogic()
+
+  PlayingScreenBottomLogic()
+
+  KeepScreenOnLogic()
+}
+
+@Composable
+private fun CoverPreferences() {
+  SettingTitle(R.string.cover)
+
+  IgnoreMediaStoreLogic()
+
+  AutoDownloadLogic()
+
+  DownloadSourceLogic()
+}
+
+@Composable
+private fun NotificationPreferences() {
+  SettingTitle(R.string.notify)
+
+  ClassicNotifyLogic()
+
+  NotifyBackgroundLogic()
+}
+
+@Composable
+private fun LyricPreferences() {
+  SettingTitle(R.string.lrc)
+
+  DesktopLyricLogic()
+
+  StatusBarLyricLogic()
+
+  LyricPriorityLogic()
+}
+
+@Composable
+private fun OtherPreferences() {
+  SettingTitle(R.string.other)
+
+  val activity = LocalActivity.current
+  val nav = LocalNavController.current
+
+  ArrowPreference(R.string.eq_setting) {
+    EQHelper.startEqualizer(activity ?: return@ArrowPreference)
+  }
+
+  FeedbackLogic()
+
+  ArrowPreference(R.string.about_info) {
+    nav.navigate(RouteAbout)
+  }
+
+  Preference(onClick = {
+    val act = activity ?: return@Preference
+    UpdateAgent.forceCheck = true
+    UpdateAgent.listener = UpdateListener(act)
+    UpdateAgent.check(act)
+  }, title = stringResource(R.string.check_update))
+
+  ClearCacheLogic()
+}
 
 @Composable
 private fun SettingTitle(res: Int) {

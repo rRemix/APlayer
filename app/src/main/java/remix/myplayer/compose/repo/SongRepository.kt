@@ -7,7 +7,7 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Audio
 import dagger.hilt.android.qualifiers.ApplicationContext
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.compose.prefs.Setting
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.util.ItemsSorter
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,13 +26,13 @@ interface SongRepository {
 
 class SongRepoImpl @Inject constructor(
   @ApplicationContext private val context: Context,
-  private val setting: Setting
-) : SongRepository, AbstractRepository(setting) {
+  private val settingPrefs: SettingPrefs
+) : SongRepository, AbstractRepository(settingPrefs) {
   override fun allSongs(): List<Song> {
     return getSongs(
       null,
       null,
-      setting.songSortOrder
+      settingPrefs.songSortOrder
     )
   }
 

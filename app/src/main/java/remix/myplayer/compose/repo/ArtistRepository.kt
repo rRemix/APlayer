@@ -4,7 +4,7 @@ import android.content.Context
 import android.provider.MediaStore.Audio
 import dagger.hilt.android.qualifiers.ApplicationContext
 import remix.myplayer.bean.mp3.Artist
-import remix.myplayer.compose.prefs.Setting
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.util.ItemsSorter
 import remix.myplayer.util.PermissionUtil
 import timber.log.Timber
@@ -16,8 +16,8 @@ interface ArtistRepository {
 
 class ArtistRepoImpl @Inject constructor(
   @ApplicationContext private val context: Context,
-  private val setting: Setting
-) : ArtistRepository, AbstractRepository(setting) {
+  private val settingPrefs: SettingPrefs
+) : ArtistRepository, AbstractRepository(settingPrefs) {
 
   override fun allArtists(): List<Artist> {
     if (!PermissionUtil.hasNecessaryPermission()) {
@@ -26,7 +26,7 @@ class ArtistRepoImpl @Inject constructor(
 
     val artistMaps: MutableMap<Long, MutableList<Artist>> = LinkedHashMap()
     val artists: MutableList<Artist> = ArrayList()
-    val sortOrder = setting.artistSortOrder
+    val sortOrder = settingPrefs.artistSortOrder
     try {
       context.contentResolver
         .query(

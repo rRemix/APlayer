@@ -14,7 +14,7 @@ import remix.myplayer.helper.ShakeDetector
 
 @Composable
 fun ShakeLogic() {
-  val setting = activityViewModel<LibraryViewModel>().setting
+  val setting = activityViewModel<LibraryViewModel>().settingPrefs
 
   var shake by remember { mutableStateOf(setting.shake) }
   SwitchPreference(stringResource(R.string.shake), stringResource(R.string.shake_tip), shake) {

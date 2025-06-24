@@ -1,13 +1,10 @@
 package remix.myplayer.compose.viewmodel
 
 import android.content.Context
-import android.text.TextUtils
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -15,13 +12,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import remix.myplayer.bean.misc.Library
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Folder
 import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.compose.prefs.Setting
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.compose.repo.AlbumRepository
 import remix.myplayer.compose.repo.ArtistRepository
 import remix.myplayer.compose.repo.FolderRepository
@@ -43,14 +39,8 @@ class LibraryViewModel @Inject constructor(
   private val genreRepo: GenreRepository,
   private val playListRepository: PlayListRepository,
   private val folderRepository: FolderRepository,
-  val setting: Setting,
+  val settingPrefs: SettingPrefs,
 ) : ViewModel() {
-
-  private val _allLibraries = MutableStateFlow(Library.allLibraries)
-  val allLibraries: StateFlow<List<Library>> = _allLibraries
-
-  private val _currentLibrary = MutableStateFlow<Library>(Library.defaultLibrary)
-  val currentLibrary: StateFlow<Library> = _currentLibrary
 
   private val _songs = MutableStateFlow<List<Song>>(emptyList())
   val songs: StateFlow<List<Song>> = _songs.asStateFlow()
@@ -71,26 +61,6 @@ class LibraryViewModel @Inject constructor(
   val folders: StateFlow<List<Folder>> = _folders.asStateFlow()
 
   init {
-    // load libraries
-    val libraryJson = setting.libraryJson
-    val libraries = if (TextUtils.isEmpty(libraryJson))
-      ArrayList()
-    else
-      Gson().fromJson<ArrayList<Library>>(
-        libraryJson,
-        object : TypeToken<List<Library>>() {}.type
-      )
-    if (libraries.isEmpty()) {
-      val defaultLibraries = Library.allLibraries
-      libraries.addAll(defaultLibraries)
-      setting.libraryJson =
-        Gson().toJson(defaultLibraries, object : TypeToken<List<Library>>() {}.type)
-    }
-
-    setAllLibraries(libraries)
-
-    changeLibrary(libraries[0])
-
     // load all media
     if (PermissionUtil.hasNecessaryPermission()) {
       fetchMedia()
@@ -101,14 +71,6 @@ class LibraryViewModel @Inject constructor(
         _playLists.value = it
       }
     }
-  }
-
-  fun setAllLibraries(libraries: List<Library>) {
-    _allLibraries.value = libraries
-  }
-
-  fun changeLibrary(library: Library) {
-    _currentLibrary.value = library
   }
 
   fun fetchSongs() = viewModelScope.launch(Dispatchers.IO) {

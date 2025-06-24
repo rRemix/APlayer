@@ -1,5 +1,7 @@
 package remix.myplayer.compose.ui.screen
 
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +20,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -35,13 +40,22 @@ import remix.myplayer.compose.ui.widget.app.BottomBar
 import remix.myplayer.compose.ui.widget.app.Drawer
 import remix.myplayer.compose.ui.widget.app.FAButton
 import remix.myplayer.compose.ui.widget.app.ViewPager
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.SettingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun HomeScreen(vm: LibraryViewModel = activityViewModel()) {
-
+fun HomeScreen(vm: SettingViewModel = activityViewModel()) {
   val drawerState = rememberDrawerState(DrawerValue.Closed)
+  val scope = rememberCoroutineScope()
+
+  BackPressHandler(enabled = drawerState.isOpen) {
+    if (drawerState.isOpen) {
+      scope.launch {
+        drawerState.close()
+      }
+    }
+  }
+
   ModalNavigationDrawer(
     drawerState = drawerState,
     drawerContent = { Drawer(drawerState) }) {
@@ -117,5 +131,31 @@ fun hackTabMinWidth() {
       }.set(null, 72f)
   } catch (e: Exception) {
     e.printStackTrace()
+  }
+}
+
+@Composable
+private fun BackPressHandler(
+  enabled: Boolean = true,
+  onBackPressed: () -> Unit
+) {
+  val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+  val backCallback = remember {
+    object : OnBackPressedCallback(enabled) {
+      override fun handleOnBackPressed() {
+        onBackPressed()
+      }
+    }
+  }
+
+  LaunchedEffect(enabled) {
+    backCallback.isEnabled = enabled
+  }
+
+  DisposableEffect(dispatcher) {
+    dispatcher?.addCallback(backCallback)
+    onDispose {
+      backCallback.remove()
+    }
   }
 }

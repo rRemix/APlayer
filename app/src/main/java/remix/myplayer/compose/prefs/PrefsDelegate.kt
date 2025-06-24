@@ -25,7 +25,7 @@ class PrefsDelegate<T>(
   }
 
   override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-    pref.edit {
+    pref.edit(commit = true) {
       when (value) {
         is Set<*> -> putStringSet(key(property), value as Set<String>)
         is String -> putString(key(property), value)
@@ -39,29 +39,29 @@ class PrefsDelegate<T>(
   }
 
 }
-//
-//fun <T> SharedPreferences.delegate(key: String, defaultVal: T) =
-//  PrefsDelegate(this, key, defaultVal)
-//
-//inline fun <reified T> SharedPreferences.delegate(
-//  defaultVal: T,
-//  crossinline keyProvider: (KProperty<*>) -> String = { it.name }
-//) = object : ReadWriteProperty<Any?, T> {
-//  private var property: KProperty<*>? = null
-//
-//  private val delegate by lazy {
-//    val prop = property ?: error("property not initialized")
-//    delegate(keyProvider(prop), defaultVal)
-//  }
-//
-//  override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-//    this.property = property
-//    return delegate.getValue(thisRef, property)
-//  }
-//
-//  override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-//    this.property = property
-//    delegate.setValue(thisRef, property, value)
-//  }
-//
-//}
+
+fun <T> SharedPreferences.delegate(key: String, defaultVal: T) =
+  PrefsDelegate(this, key, defaultVal)
+
+inline fun <reified T> SharedPreferences.delegate(
+  defaultVal: T,
+  crossinline keyProvider: (KProperty<*>) -> String = { it.name }
+) = object : ReadWriteProperty<Any?, T> {
+  private var property: KProperty<*>? = null
+
+  private val delegate by lazy {
+    val prop = property ?: error("property not initialized")
+    delegate(keyProvider(prop), defaultVal)
+  }
+
+  override fun getValue(thisRef: Any?, property: KProperty<*>): T {
+    this.property = property
+    return delegate.getValue(thisRef, property)
+  }
+
+  override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+    this.property = property
+    delegate.setValue(thisRef, property, value)
+  }
+
+}

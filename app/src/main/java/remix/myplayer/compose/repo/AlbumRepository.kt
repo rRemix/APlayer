@@ -4,7 +4,7 @@ import android.content.Context
 import android.provider.MediaStore.Audio
 import dagger.hilt.android.qualifiers.ApplicationContext
 import remix.myplayer.bean.mp3.Album
-import remix.myplayer.compose.prefs.Setting
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.util.ItemsSorter
 import remix.myplayer.util.PermissionUtil
 import timber.log.Timber
@@ -16,8 +16,8 @@ interface AlbumRepository {
 
 class AlbumRepoImpl @Inject constructor(
   @ApplicationContext private val context: Context,
-  private val setting: Setting
-) : AlbumRepository, AbstractRepository(setting) {
+  private val settingPrefs: SettingPrefs
+) : AlbumRepository, AbstractRepository(settingPrefs) {
 
   override fun allAlbums(): List<Album> {
     if (!PermissionUtil.hasNecessaryPermission()) {
@@ -25,7 +25,7 @@ class AlbumRepoImpl @Inject constructor(
     }
     val albumMaps: MutableMap<Long, MutableList<Album>> = LinkedHashMap()
     val albums: MutableList<Album> = ArrayList()
-    val sortOrder = setting.albumSortOrder
+    val sortOrder = settingPrefs.albumSortOrder
     try {
       context.contentResolver
         .query(

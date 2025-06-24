@@ -287,7 +287,8 @@ dependencies {
     implementation(libs.androidx.nav)
     implementation(libs.androidx.hilt.navi.compose)
     implementation(libs.accompanist.drawablepainter)
-    
+    implementation(libs.reorderable)
+
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 }

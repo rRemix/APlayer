@@ -2,26 +2,27 @@ package remix.myplayer.compose.ui.screen.setting
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import remix.myplayer.R
 import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.ui.theme.LocalTheme
@@ -48,16 +49,10 @@ fun NormalPreference(title: String, content: String = "", onClick: () -> Unit) {
 @Composable
 fun ThemePreference(title: String, content: String, primary: Boolean = true, onClick: () -> Unit) {
   Preference(onClick = onClick, title, content) {
-    Icon(
-      painter = rememberDrawablePainter(
-        ContextCompat.getDrawable(
-          LocalContext.current,
-          R.drawable.bg_circle_small
-        )
-      ),
-      tint = if (primary) LocalTheme.current.primary else LocalTheme.current.secondary,
-      contentDescription = "Theme_${primary}"
-    )
+    Box(modifier = Modifier
+      .size(32.dp)
+      .background(if (primary) LocalTheme.current.primary else LocalTheme.current.secondary,
+        CircleShape))
   }
 }
 
@@ -72,6 +67,7 @@ fun SwitchPreference(
     onCheckedChange(!checked)
   }, title, content) {
     Switch(
+      modifier = Modifier.scale(0.9f),
       checked = checked,
       colors = SwitchDefaults.colors().copy(
         checkedTrackColor = LocalTheme.current.secondary,

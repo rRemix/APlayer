@@ -13,7 +13,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -32,9 +32,9 @@ import remix.myplayer.ui.adapter.HeaderAdapter
 @Composable
 fun AlbumScreen(vm: LibraryViewModel = activityViewModel()) {
   val albums by vm.albums.collectAsStateWithLifecycle()
-  val setting = vm.setting
+  val setting = vm.settingPrefs
 
-  var grid by rememberSaveable { mutableIntStateOf(setting.albumMode) }
+  var grid by remember { mutableIntStateOf(setting.albumMode) }
 
   Column(
     modifier = Modifier.background(LocalTheme.current.libraryBackground)
@@ -57,7 +57,8 @@ fun AlbumScreen(vm: LibraryViewModel = activityViewModel()) {
             modifier = Modifier.height(64.dp),
             model = album,
             text1 = album.album,
-            text2 = pluralStringResource(R.plurals.song_num_1, album.count, album.artist, album.count),
+            text2 = pluralStringResource(R.plurals.song_num_1, album.count, album.artist,
+              album.count),
             onClick = {},
             onLongClick = {})
         }

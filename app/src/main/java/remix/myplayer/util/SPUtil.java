@@ -107,6 +107,7 @@ public class SPUtil {
     String NAME = "Lyric";
     //歌词搜索优先级
     String PRIORITY_LYRIC = "priority_lyric";
+    String PRIORITY_LYRIC_v1 = "priority_lyric_v1";
     String DEFAULT_PRIORITY = new Gson().toJson(Arrays
             .asList(
                 LyricPriority.EMBEDDED,

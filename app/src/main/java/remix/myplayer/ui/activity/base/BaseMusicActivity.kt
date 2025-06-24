@@ -47,6 +47,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
+    Timber.tag(TAG).v("onNewIntent")
     setIntent(intent)
     hasNewIntent = true
   }

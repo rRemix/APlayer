@@ -4,8 +4,7 @@ import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
@@ -18,12 +17,19 @@ import remix.myplayer.compose.ui.screen.setting.NormalPreference
 import remix.myplayer.compose.viewmodel.LibraryViewModel
 import remix.myplayer.helper.LanguageHelper
 
+private val itemRes = listOf(
+  R.string.auto,
+  R.string.zh_simple,
+  R.string.zh_traditional,
+  R.string.english,
+  R.string.japanese,
+)
 @Composable
 fun LanguageLogic() {
   val context = LocalContext.current
-  val setting = activityViewModel<LibraryViewModel>().setting
+  val setting = activityViewModel<LibraryViewModel>().settingPrefs
 
-  var select by rememberSaveable {
+  val select by remember {
     mutableIntStateOf(setting.language)
   }
   val state = rememberDialogState(false)
@@ -36,16 +42,14 @@ fun LanguageLogic() {
 
   NormalDialog(
     dialogState = state,
+    titleRes = R.string.select_language,
     positiveRes = null,
     negativeRes = null,
-    itemRes = listOf(
-      R.string.auto,
-      R.string.zh_simple,
-      R.string.zh_traditional,
-      R.string.english,
-      R.string.japanese,
-    ),
+    itemRes = itemRes,
     itemsCallbackSingleChoice = ItemsCallbackSingleChoice(select) {
+      if (select == it) {
+        return@ItemsCallbackSingleChoice
+      }
       LanguageHelper.saveSelectLanguage(context, it)
 
       val intent = Intent(context, ComposeMainActivity::class.java)

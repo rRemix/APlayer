@@ -13,7 +13,7 @@ import remix.myplayer.util.ToastUtil
 fun RestoreDeleteLogic() {
   val context = LocalContext.current
   val vm = activityViewModel<LibraryViewModel>()
-  val setting = vm.setting
+  val setting = vm.settingPrefs
 
   NormalPreference(
     stringResource(R.string.restore_songs),

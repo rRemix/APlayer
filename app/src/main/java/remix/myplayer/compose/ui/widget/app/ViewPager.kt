@@ -24,14 +24,14 @@ import remix.myplayer.compose.ui.screen.library.FolderScreen
 import remix.myplayer.compose.ui.screen.library.GenreScreen
 import remix.myplayer.compose.ui.screen.library.PlayListScreen
 import remix.myplayer.compose.ui.screen.library.SongScreen
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.SettingViewModel
 
 @Composable
 fun ViewPager(
   modifier: Modifier = Modifier,
   libraries: List<Library>,
   pagerState: PagerState,
-  vm: LibraryViewModel = activityViewModel()
+  vm: SettingViewModel = activityViewModel()
 ) {
   HorizontalPager(
     modifier = modifier,

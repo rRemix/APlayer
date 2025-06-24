@@ -14,7 +14,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.ui.platform.LocalContext
@@ -55,13 +54,13 @@ fun ImportPlayListLogic() {
   // dialog for new playlistName
   val inputState = rememberDialogState(false)
 
-  var allPlaylists by rememberSaveable {
+  var allPlaylists by remember {
     mutableStateOf(emptyList<String>())
   }
-  var uri by rememberSaveable {
+  var uri by remember {
     mutableStateOf(Uri.EMPTY)
   }
-  var inputText by rememberSaveable {
+  var inputText by remember {
     mutableStateOf("")
   }
 
@@ -77,8 +76,8 @@ fun ImportPlayListLogic() {
   }
 
   // dialog for choosing mediaStore playlist to import
-  var choosePlaylistState = rememberDialogState(false)
-  var mediaStorePlayLists by rememberSaveable {
+  val choosePlaylistState = rememberDialogState(false)
+  var mediaStorePlayLists by remember {
     mutableStateOf(emptyMap<String, List<Long>>())
   }
   val selectedIndicates = remember {

@@ -15,7 +15,7 @@ import remix.myplayer.compose.viewmodel.LibraryViewModel
 @Composable
 fun ShowDisplayNameLogic() {
   val vm = activityViewModel<LibraryViewModel>()
-  val setting = vm.setting
+  val setting = vm.settingPrefs
   var displayName by remember { mutableStateOf(setting.showDisplayName) }
 
   SwitchPreference(

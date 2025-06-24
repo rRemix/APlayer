@@ -8,7 +8,7 @@ abstract class AbstractPref(context: Context, name: String? = null) {
   private val name by lazy {
     name ?: this.javaClass.simpleName
   }
-  protected val sp: SharedPreferences by lazy {
+  val sp: SharedPreferences by lazy {
     context.getSharedPreferences(this.name, Context.MODE_PRIVATE)
   }
 

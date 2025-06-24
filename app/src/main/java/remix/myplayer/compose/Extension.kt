@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,7 +34,6 @@ fun spanCount(): Int {
   }
 }
 
-// TODO replaceAll
 @Composable
 fun Modifier.clickWithRipple(circle: Boolean = true, onClick: () -> Unit): Modifier {
   var modifier = this
@@ -45,6 +46,7 @@ fun Modifier.clickWithRipple(circle: Boolean = true, onClick: () -> Unit): Modif
   )
 }
 
+@Composable
 fun Modifier.clickableWithoutRipple(
   interactionSource: MutableInteractionSource = MutableInteractionSource(),
   onClick: () -> Unit
@@ -58,5 +60,22 @@ fun Modifier.clickableWithoutRipple(
 @Composable
 inline fun <reified VM : ViewModel> activityViewModel(): VM {
   val context = LocalContext.current
-  return hiltViewModel(context as? ViewModelStoreOwner ?: error("context: $context is not a viewModelStoreOwner"))
+  return hiltViewModel(
+    context as? ViewModelStoreOwner ?: error("context: $context is not a viewModelStoreOwner")
+  )
+}
+
+fun Color.toHexString(withAlpha: Boolean = false): String {
+  val argb = this.toArgb()
+  return if (withAlpha) {
+    String.format(
+      "%08X",
+      argb
+    )
+  } else {
+    String.format(
+      "%06X",
+      argb and 0xFFFFFF  // 移除Alpha通道
+    )
+  }
 }

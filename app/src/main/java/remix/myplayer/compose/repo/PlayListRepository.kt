@@ -3,14 +3,12 @@ package remix.myplayer.compose.repo
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import remix.myplayer.compose.prefs.Setting
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.db.room.dao.PlayListDao
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.util.ItemsSorter
-import remix.myplayer.util.PermissionUtil
 import java.util.Date
 import javax.inject.Inject
 
@@ -23,15 +21,15 @@ interface PlayListRepository {
 class PlayListRepoImpl @Inject constructor(
   @ApplicationContext private val context: Context,
   private val playListDao: PlayListDao,
-  private val setting: Setting
-) : PlayListRepository, AbstractRepository(setting) {
+  private val settingPrefs: SettingPrefs
+) : PlayListRepository, AbstractRepository(settingPrefs) {
 
   override fun allPlayLists(): Flow<List<PlayList>> {
 //    if (!PermissionUtil.hasNecessaryPermission()) {
 //      return flow { emptyList<PlayList>() }
 //    }
 
-    var sortOrder = setting.playlistSortOrder
+    var sortOrder = settingPrefs.playlistSortOrder
     sortOrder = when (sortOrder) {
       SortOrder.PLAYLIST_A_Z -> {
         "name"

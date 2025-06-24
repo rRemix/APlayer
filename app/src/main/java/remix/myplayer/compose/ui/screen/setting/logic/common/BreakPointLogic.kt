@@ -13,7 +13,7 @@ import remix.myplayer.compose.viewmodel.LibraryViewModel
 
 @Composable
 fun BreakPointLogic() {
-  val setting = activityViewModel<LibraryViewModel>().setting
+  val setting = activityViewModel<LibraryViewModel>().settingPrefs
 
   var breakPoint by remember { mutableStateOf(setting.playAtBreakPoint) }
   SwitchPreference(

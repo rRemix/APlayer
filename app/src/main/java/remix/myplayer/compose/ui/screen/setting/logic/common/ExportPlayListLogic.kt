@@ -9,8 +9,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -23,7 +23,6 @@ import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.M3UHelper.exportPlayListToFile
-import timber.log.Timber
 
 @Composable
 fun ExportPlayListLogic() {
@@ -31,10 +30,10 @@ fun ExportPlayListLogic() {
   val scope = rememberCoroutineScope()
   val state = rememberDialogState(false)
 
-  var allPlayListName by rememberSaveable {
+  var allPlayListName by remember {
     mutableStateOf(emptyList<String>())
   }
-  var select by rememberSaveable {
+  var select by remember {
     mutableStateOf("")
   }
 
@@ -53,7 +52,8 @@ fun ExportPlayListLogic() {
   }
 
   val fileLauncher =
-    rememberLauncherForActivityResult<Intent, ActivityResult>(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+    rememberLauncherForActivityResult<Intent, ActivityResult>(
+      contract = ActivityResultContracts.StartActivityForResult()) { result ->
       if (result.resultCode == Activity.RESULT_OK) {
         val uri = result.data?.data ?: return@rememberLauncherForActivityResult
         exportPlayListToFile(context, select, uri)

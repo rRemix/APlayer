@@ -22,7 +22,7 @@ class DialogState(initialValue: Boolean = false) {
   companion object {
     fun Saver(): Saver<DialogState, *> {
       return Saver(
-        save = { it ->
+        save = {
           it.isOpen
         },
         restore = {

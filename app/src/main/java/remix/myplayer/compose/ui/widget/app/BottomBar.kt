@@ -1,9 +1,7 @@
 package remix.myplayer.compose.ui.widget.app
 
-import android.app.Activity
 import android.content.Intent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -25,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,6 +30,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.clickableWithoutRipple
+import remix.myplayer.compose.nav.LocalNavController
+import remix.myplayer.compose.nav.RoutePlayingScreen
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
@@ -41,7 +40,6 @@ import remix.myplayer.compose.viewmodel.MusicViewModel
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
-import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.util.Util
 import kotlin.math.absoluteValue
 
@@ -50,12 +48,12 @@ private const val triggerThreshold = 10
 @Composable
 fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = activityViewModel()) {
   val currentSong by vm.currentSong.collectAsStateWithLifecycle()
-  if (currentSong.id < 0) {
-    return
-  }
+//  if (currentSong.id < 0) {
+//    return
+//  }
+  val nav = LocalNavController.current
   val playing by vm.playing.collectAsStateWithLifecycle(false)
 
-  val context = LocalContext.current
   val interactionSource = remember { MutableInteractionSource() }
 
   var hasTriggerAct by remember { mutableStateOf(false) }
@@ -66,14 +64,11 @@ fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = activityViewMo
         if (currentSong.id == 0L) {
           return@clickableWithoutRipple
         }
-        val intent = Intent(context, PlayerActivity::class.java)
-        val activity = context as? Activity
-        if (activity != null && !activity.isDestroyed) {
-          activity.startActivity(intent)
-        }
+
+        nav.navigate(RoutePlayingScreen)
       }
       .pointerInput(Unit) {
-        // 向上滑动跳转PlayerActivity
+        // 向上滑动跳转PlayingScreen
         detectVerticalDragGestures(onDragStart = {
           hasTriggerAct = false
         }) { _, dragAmount ->
@@ -82,10 +77,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = activityViewMo
             if (currentSong.id == 0L) {
               return@detectVerticalDragGestures
             }
-            val activity = context as? Activity
-            activity?.takeIf { !it.isDestroyed }?.run {
-              startActivity(Intent(context, PlayerActivity::class.java))
-            }
+            nav.navigate(RoutePlayingScreen)
           }
         }
       }

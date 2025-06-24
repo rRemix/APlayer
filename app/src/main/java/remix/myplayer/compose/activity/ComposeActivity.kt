@@ -7,8 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import remix.myplayer.compose.activity.base.BaseMusicActivity
 import remix.myplayer.compose.nav.AppNav
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.ui.theme.APlayerTheme
@@ -18,11 +21,13 @@ import remix.myplayer.compose.ui.theme.ThemeController
 import remix.myplayer.compose.viewmodel.LibraryViewModel
 import remix.myplayer.compose.viewmodel.MusicViewModel
 import remix.myplayer.helper.MusicServiceRemote
-import remix.myplayer.ui.activity.base.BaseMusicActivity
+import remix.myplayer.service.MusicService
+import remix.myplayer.theme.Theme
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class ComposeMainActivity : BaseMusicActivity() {
+
   private val libraryViewModel: LibraryViewModel by viewModels()
   private val musicViewModel: MusicViewModel by viewModels()
 
@@ -40,6 +45,16 @@ class ComposeMainActivity : BaseMusicActivity() {
     )
     setContent {
       AppCompositionLocalProvider(themeController) {
+        val theme = LocalTheme.current
+        val color = if (theme.coloredNaviBar) {
+          theme.primary
+        } else {
+          Color.White
+        }
+        // TODO
+        window.navigationBarColor = color.toArgb()
+        Theme.setLightNavigationBarAuto(this, theme.isPrimaryLight)
+
         APlayerTheme {
           AppNav()
         }
@@ -52,6 +67,11 @@ class ComposeMainActivity : BaseMusicActivity() {
     fetchMedia()
   }
 
+  override fun onServiceConnected(service: MusicService) {
+    super.onServiceConnected(service)
+    onMetaChanged()
+  }
+
   override fun onMediaStoreChanged() {
     super.onMediaStoreChanged()
     fetchMedia()
@@ -60,6 +80,7 @@ class ComposeMainActivity : BaseMusicActivity() {
   override fun onMetaChanged() {
     super.onMetaChanged()
     musicViewModel.setCurrentSong(MusicServiceRemote.getCurrentSong())
+    musicViewModel.setPlaying(MusicServiceRemote.isPlaying())
   }
 
   override fun onPlayStateChange() {

@@ -16,18 +16,19 @@ import androidx.core.app.ServiceCompat
 import androidx.core.app.TaskStackBuilder
 import com.bumptech.glide.request.target.CustomTarget
 import remix.myplayer.R
+import remix.myplayer.compose.activity.ComposeMainActivity
+import remix.myplayer.compose.nav.playingScreenDeepLink
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
-import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
-import remix.myplayer.ui.activity.PlayerActivity
 
 /**
  * Created by Remix on 2017/11/22.
  */
 
 abstract class Notify internal constructor(internal var service: MusicService) {
+
   private val FLAG_ALWAYS_SHOW_TICKER = 0x1000000
   private val FLAG_ONLY_UPDATE_TICKER = 0x2000000
 
@@ -40,20 +41,14 @@ abstract class Notify internal constructor(internal var service: MusicService) {
   private var notifyMode = NOTIFY_MODE_BACKGROUND
 
   internal val contentIntent: PendingIntent
-    get() {
-      val result = Intent(service, PlayerActivity::class.java)
-      result.putExtra(EXTRA_SONG, service.currentSong)
-
-      val stackBuilder = TaskStackBuilder.create(service)
-      stackBuilder.addParentStack(PlayerActivity::class.java)
-      stackBuilder.addNextIntent(result)
-
-//      stackBuilder.editIntentAt(1)?.putExtra(EXTRA_SHOW_ANIMATION, false)
-//      stackBuilder.editIntentAt(0)?.putExtra(EXTRA_SHOW_ANIMATION, false)
-      return stackBuilder.getPendingIntent(
-          0,
-        getPendingIntentFlag()
-      )!!
+    get() = TaskStackBuilder.create(service).run {
+      addNextIntentWithParentStack(Intent(
+        Intent.ACTION_VIEW,
+        playingScreenDeepLink,
+        service,
+        ComposeMainActivity::class.java
+      ))
+      getPendingIntent(0, getPendingIntentFlag())!!
     }
 
   init {
@@ -64,11 +59,13 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
   @RequiresApi(api = Build.VERSION_CODES.O)
   private fun createNotificationChannel() {
-    val playingNotificationChannel = NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID, service.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW)
+    val playingNotificationChannel = NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID,
+      service.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW)
     playingNotificationChannel.setShowBadge(false)
     playingNotificationChannel.enableLights(false)
     playingNotificationChannel.enableVibration(false)
-    playingNotificationChannel.description = service.getString(R.string.playing_notification_description)
+    playingNotificationChannel.description = service.getString(
+      R.string.playing_notification_description)
     notificationManager.createNotificationChannel(playingNotificationChannel)
   }
 
@@ -79,12 +76,12 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     val song = service.currentSong
     val builder = NotificationCompat.Builder(service, PLAYING_NOTIFICATION_CHANNEL_ID)
     builder.setContentText("${song.artist} - ${song.album}")
-        .setContentTitle(song.title)
-        .setShowWhen(false)
-        .setTicker(lrc)
-        .setOngoing(service.isPlaying)
-        .setContentIntent(contentIntent)
-        .setSmallIcon(R.drawable.icon_notifbar)
+      .setContentTitle(song.title)
+      .setShowWhen(false)
+      .setTicker(lrc)
+      .setOngoing(service.isPlaying)
+      .setContentIntent(contentIntent)
+      .setSmallIcon(R.drawable.icon_notifbar)
 
     val notification = builder.build()
     notification.extras.putInt("ticker_icon", R.drawable.icon_notifibar_lrc)
@@ -110,7 +107,8 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     }
     if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        service.startForeground(PLAYING_NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+        service.startForeground(PLAYING_NOTIFICATION_ID, notification,
+          ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
       } else {
         service.startForeground(PLAYING_NOTIFICATION_ID, notification)
       }
@@ -143,8 +141,9 @@ abstract class Notify internal constructor(internal var service: MusicService) {
       )
     } else {
       if (operation != Command.TOGGLE_DESKTOP_LYRIC &&
-          operation != Command.CLOSE_NOTIFY &&
-          operation != Command.UNLOCK_DESKTOP_LYRIC) {
+        operation != Command.CLOSE_NOTIFY &&
+        operation != Command.UNLOCK_DESKTOP_LYRIC
+      ) {
         return PendingIntent.getForegroundService(context, operation, intent,
           getPendingIntentFlag()
         )
@@ -161,6 +160,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
   }
 
   companion object {
+
     /**
      * 通知栏是否显示
      */

@@ -14,7 +14,7 @@ import remix.myplayer.compose.viewmodel.LibraryViewModel
 @Composable
 fun ForceSortLogic() {
   val vm = activityViewModel<LibraryViewModel>()
-  val setting = vm.setting
+  val setting = vm.settingPrefs
   var forceSort by remember { mutableStateOf(setting.forceSort) }
 
   SwitchPreference(

@@ -6,7 +6,7 @@ import com.tencent.bugly.crashreport.CrashReport
 import dagger.hilt.android.qualifiers.ApplicationContext
 import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.compose.prefs.Setting
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.util.PermissionUtil
 import javax.inject.Inject
 
@@ -16,8 +16,8 @@ interface GenreRepository {
 
 class GenreRepoImpl @Inject constructor(
   @ApplicationContext private val context: Context,
-  private val setting: Setting
-) : GenreRepository, AbstractRepository(setting) {
+  private val settingPrefs: SettingPrefs
+) : GenreRepository, AbstractRepository(settingPrefs) {
 
   override fun allGenres(): List<Genre> {
     if (!PermissionUtil.hasNecessaryPermission()) {
@@ -31,7 +31,7 @@ class GenreRepoImpl @Inject constructor(
         arrayOf(Genres._ID, Genres.NAME),
         null,
         null,
-        setting.genreSortOrder
+        settingPrefs.genreSortOrder
       )?.use { cursor ->
         while (cursor.moveToNext()) {
           val genreId = cursor.getLong(0)

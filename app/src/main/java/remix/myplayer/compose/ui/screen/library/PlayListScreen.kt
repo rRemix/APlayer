@@ -13,11 +13,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
@@ -33,9 +32,9 @@ import remix.myplayer.ui.adapter.HeaderAdapter
 @Composable
 fun PlayListScreen(vm: LibraryViewModel = activityViewModel()) {
   val playlists by vm.playLists.collectAsStateWithLifecycle()
-  val setting = vm.setting
+  val setting = vm.settingPrefs
 
-  var grid by rememberSaveable { mutableIntStateOf(setting.playlistMode) }
+  var grid by remember { mutableIntStateOf(setting.playlistMode) }
 
   Column(
     modifier = Modifier.background(LocalTheme.current.libraryBackground)

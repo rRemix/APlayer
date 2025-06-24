@@ -22,7 +22,8 @@ val LocalTheme = compositionLocalOf<AppTheme> {
 data class AppTheme(
   var primary: Color,
   var secondary: Color,
-  var theme: String
+  var theme: String,
+  var coloredNaviBar: Boolean = false
 ) {
 
   val isLight: Boolean
@@ -35,12 +36,14 @@ data class AppTheme(
   val textPrimary
     @Composable
     @ReadOnlyComposable
-    get() = colorResource(if (isLight) R.color.light_text_color_primary else R.color.dark_text_color_primary)
+    get() = colorResource(
+      if (isLight) R.color.light_text_color_primary else R.color.dark_text_color_primary)
 
   val textSecondary
     @Composable
     @ReadOnlyComposable
-    get() = colorResource(if (isLight) R.color.light_text_color_secondary else R.color.dark_text_color_secondary)
+    get() = colorResource(
+      if (isLight) R.color.light_text_color_secondary else R.color.dark_text_color_secondary)
 
   val ripple
     @Composable
@@ -50,7 +53,8 @@ data class AppTheme(
   val tabText
     @Composable
     @ReadOnlyComposable
-    get() = colorResource(if (isPrimaryCloseToWhite) R.color.dark_normal_tab_text_color else R.color.light_normal_tab_text_color)
+    get() = colorResource(
+      if (isPrimaryCloseToWhite) R.color.dark_normal_tab_text_color else R.color.light_normal_tab_text_color)
 
   val mainBackground
     @Composable
@@ -67,7 +71,8 @@ data class AppTheme(
   val dialogBackground
     @Composable
     @ReadOnlyComposable
-    get() = colorResource(if (isLight) R.color.light_background_color_dialog else R.color.dark_background_color_dialog)
+    get() = colorResource(
+      if (isLight) R.color.light_background_color_dialog else R.color.dark_background_color_dialog)
 
   val libraryBackground
     @Composable
@@ -98,7 +103,7 @@ data class AppTheme(
       when (theme) {
         LIGHT -> R.color.drawer_effect_light
         DARK -> R.color.drawer_effect_dark
-        BLACK -> R.color.drawer_effect_light
+        BLACK -> R.color.drawer_effect_black
         else -> throw IllegalArgumentException("unknown theme: $theme")
       }
     )
@@ -128,7 +133,8 @@ data class AppTheme(
   val textPrimaryReverse
     @Composable
     @ReadOnlyComposable
-    get() = colorResource(if (!isPrimaryCloseToWhite) R.color.dark_text_color_primary else R.color.light_text_color_primary)
+    get() = colorResource(
+      if (!isPrimaryCloseToWhite) R.color.dark_text_color_primary else R.color.light_text_color_primary)
 
   val highLightText: Color
     @Composable
@@ -154,6 +160,11 @@ data class AppTheme(
     @ReadOnlyComposable
     get() = if (isLight) R.drawable.artist_empty_bg_day else R.drawable.artist_empty_bg_night
 
+  val inActiveColor: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = Color((if (isLight) "#ffe0e0e0" else "#ff424242").toColorInt())
+
   val isPrimaryLight: Boolean
     get() = ColorUtil.isColorLight(primary.toArgb())
 
@@ -165,13 +176,16 @@ data class AppTheme(
 
 
   companion object {
+
     const val LIGHT = "Light"
     const val DARK = "Dark"
     const val BLACK = "Black"
 
-    const val ALWAYS_OFF = "always_off"
-    const val ALWAYS_ON = "always_on"
-    const val FOLLOW_SYSTEM = "follow_system"
+    // 不兼容以前的配置
+    const val ALWAYS_OFF = 0
+    const val ALWAYS_ON = 1
+    const val FOLLOW_SYSTEM = 2
+
     var sColoredNavigation: Boolean = false
     var sImmersiveMode: Boolean = false
 

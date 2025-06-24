@@ -6,19 +6,19 @@ import android.provider.MediaStore.Audio
 import android.provider.MediaStore.Audio.AudioColumns
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
-import remix.myplayer.compose.prefs.Setting
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.util.Util
 
-abstract class AbstractRepository(private val setting: Setting) {
+abstract class AbstractRepository(private val settingPrefs: SettingPrefs) {
   protected val forceSort by lazy {
-    setting.forceSort
+    settingPrefs.forceSort
   }
 
   val baseSelection: String
     get() {
-      val deleteIds = setting.deleteIds
-      val blacklist = setting.blacklist
-      val baseSelection = " _data != '' AND " + Audio.Media.SIZE + " > " + setting.scanSize
+      val deleteIds = settingPrefs.deleteIds
+      val blacklist = settingPrefs.blacklist
+      val baseSelection = " _data != '' AND " + Audio.Media.SIZE + " > " + settingPrefs.scanSize
       if (deleteIds.isEmpty() && blacklist.isEmpty()) {
         return baseSelection
       }
@@ -49,7 +49,7 @@ abstract class AbstractRepository(private val setting: Setting) {
 
   val baseSelectionArgs: Array<String?>
     get() {
-      val blacklist = setting.blacklist
+      val blacklist = settingPrefs.blacklist
       val selectionArgs = arrayOfNulls<String>(blacklist.size)
       val iterator: Iterator<String> = blacklist.iterator()
       var i = 0

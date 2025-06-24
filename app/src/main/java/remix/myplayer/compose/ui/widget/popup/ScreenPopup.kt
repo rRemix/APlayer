@@ -34,7 +34,7 @@ fun ScreenPopupButton(library: Library?, vm : LibraryViewModel = activityViewMod
   if (library == null) {
     return
   }
-  val setting = vm.setting
+  val setting = vm.settingPrefs
   var expanded by remember { mutableStateOf(false) }
   var iconHeight by remember { mutableStateOf(0.dp) }
 
