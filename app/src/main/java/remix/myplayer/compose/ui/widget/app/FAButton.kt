@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,7 +57,7 @@ fun FAButton(pagerState: PagerState, libraries: List<Library>) {
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
   val vm = activityViewModel<LibraryViewModel>()
-  var text by remember {
+  var text by rememberSaveable {
     mutableStateOf("")
   }
   val dialogState = rememberDialogState(false)

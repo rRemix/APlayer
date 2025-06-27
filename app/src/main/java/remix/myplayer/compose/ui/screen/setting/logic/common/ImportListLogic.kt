@@ -6,14 +6,12 @@ import android.content.Intent.EXTRA_ALLOW_MULTIPLE
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.ui.platform.LocalContext
@@ -23,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
+import remix.myplayer.compose.rememberMutableStateSetOf
 import remix.myplayer.compose.ui.dialog.DialogState
 import remix.myplayer.compose.ui.dialog.InputDialog
 import remix.myplayer.compose.ui.dialog.ItemsCallbackMultiChoice
@@ -54,13 +53,13 @@ fun ImportPlayListLogic() {
   // dialog for new playlistName
   val inputState = rememberDialogState(false)
 
-  var allPlaylists by remember {
+  var allPlaylists by rememberSaveable {
     mutableStateOf(emptyList<String>())
   }
-  var uri by remember {
+  var uri by rememberSaveable {
     mutableStateOf(Uri.EMPTY)
   }
-  var inputText by remember {
+  var inputText by rememberSaveable {
     mutableStateOf("")
   }
 
@@ -77,16 +76,14 @@ fun ImportPlayListLogic() {
 
   // dialog for choosing mediaStore playlist to import
   val choosePlaylistState = rememberDialogState(false)
-  var mediaStorePlayLists by remember {
+  var mediaStorePlayLists by rememberSaveable {
     mutableStateOf(emptyMap<String, List<Long>>())
   }
-  val selectedIndicates = remember {
-    mutableStateSetOf<Int>()
-  }
+  val selectedIndicates = rememberMutableStateSetOf(*emptyArray<Int>())
   ImportFromMediaStore(choosePlaylistState, mediaStorePlayLists, selectedIndicates)
 
   val chooseM3ULauncher =
-    rememberLauncherForActivityResult<Intent, ActivityResult>(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+    rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
       if (result.resultCode == Activity.RESULT_OK) {
         uri = result.data?.data ?: return@rememberLauncherForActivityResult
         inputText = DocumentFile.fromSingleUri(context, uri)?.name?.removeSuffix(".m3u") ?: ""
@@ -125,7 +122,7 @@ fun ImportPlayListLogic() {
             mediaStorePlayLists = withContext(Dispatchers.IO) {
               DatabaseRepository.getInstance().playlistFromMediaStore
             }
-            selectedIndicates.addAll(mediaStorePlayLists.keys.mapIndexed { index, str ->
+            selectedIndicates.addAll(List(mediaStorePlayLists.keys.size) { index ->
               index
             })
             if (mediaStorePlayLists.isEmpty()) {
@@ -166,7 +163,7 @@ private fun ImportFromStorage(
       inputState.show()
     },
     itemsCallback = { index, text ->
-      importM3UFile(context, uri, text.toString(), false)
+      importM3UFile(context, uri, text, false)
     })
 
   NormalDialog(
@@ -190,10 +187,10 @@ private fun ImportFromStorage(
       onValueChange(it)
     }
   ) { input ->
-    if (allPlaylists.contains(input.toString())) {
+    if (allPlaylists.contains(input)) {
       ToastUtil.show(context, R.string.playlist_already_exist)
     } else if (input.isNotBlank()) {
-      importM3UFile(context, uri, input.toString(), true)
+      importM3UFile(context, uri, input, true)
     }
   }
 }
@@ -202,7 +199,7 @@ private fun ImportFromStorage(
 private fun ImportFromMediaStore(
   choosePlaylistState: DialogState,
   mediaStorePlayLists: Map<String, List<Long>>,
-  selectedIndicates: SnapshotStateSet<Int>
+  selectedIndicates: MutableSet<Int>
 ) {
   val context = LocalContext.current
 
@@ -224,6 +221,4 @@ private fun ImportFromMediaStore(
       }
     }
   )
-
-
 }

@@ -51,10 +51,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import remix.myplayer.R
-import remix.myplayer.compose.toHexString
 import remix.myplayer.compose.ui.theme.APlayerTheme
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
+import remix.myplayer.misc.toHexString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

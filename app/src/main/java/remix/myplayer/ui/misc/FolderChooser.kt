@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.storage.StorageManager
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.theme.Theme
 import remix.myplayer.ui.activity.base.BaseActivity

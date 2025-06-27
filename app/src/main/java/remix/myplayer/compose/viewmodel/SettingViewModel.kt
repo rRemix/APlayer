@@ -10,7 +10,7 @@ import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import remix.myplayer.bean.misc.Library
 import remix.myplayer.compose.prefs.LyricPrefs
@@ -27,10 +27,10 @@ class SettingViewModel @Inject constructor(
 ) : ViewModel() {
 
   private val _currentLibrary = MutableStateFlow(Library.defaultLibrary)
-  val currentLibrary: StateFlow<Library> = _currentLibrary
+  val currentLibrary = _currentLibrary.asStateFlow()
 
   private val _allLibraries = MutableStateFlow(Library.allLibraries)
-  val allLibraries: StateFlow<List<Library>> = _allLibraries
+  val allLibraries = _allLibraries.asStateFlow()
 
   init {
     // load libraries

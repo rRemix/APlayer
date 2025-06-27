@@ -64,7 +64,6 @@ fun SettingScreen() {
       modifier = Modifier
         .padding(contentPadding)
     ) {
-
       item {
         CommonPreferences()
 
@@ -85,7 +84,6 @@ fun SettingScreen() {
         OtherPreferences()
       }
     }
-
   }
 }
 

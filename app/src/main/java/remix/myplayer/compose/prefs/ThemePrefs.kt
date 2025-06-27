@@ -20,7 +20,7 @@ class ThemePrefs @Inject constructor(@ApplicationContext val context: Context) :
   var darkTheme by PrefsDelegate(sp, "dark_theme_v2", FOLLOW_SYSTEM)
   var blackTheme by PrefsDelegate(sp, "black_theme", false)
 
-  var coloredNaviBar by PrefsDelegate(sp, "color_Navigation", false)
+  var coloredNaviBar by PrefsDelegate(sp, "color_navigation", false)
 
   fun resolveTheme(darkTheme: Int, blackTheme: Boolean): String {
     return if (darkTheme == ALWAYS_ON || (darkTheme == FOLLOW_SYSTEM && (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)) {

@@ -33,6 +33,7 @@ class SettingPrefs @Inject constructor(
   var genreMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_GENRE, HeaderAdapter.GRID_MODE)
   var playlistMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_PLAYLIST, HeaderAdapter.GRID_MODE)
 
+  var manualScanFolder by PrefsDelegate(sp, SPUtil.SETTING_KEY.MANUAL_SCAN_FOLDER, "")
   var deleteIds by PrefsDelegate(sp, SPUtil.SETTING_KEY.BLACKLIST_SONG, emptySet<String>())
   var blacklist by PrefsDelegate(sp, SPUtil.SETTING_KEY.BLACKLIST, emptySet<String>())
 
@@ -51,7 +52,7 @@ class SettingPrefs @Inject constructor(
   var keepScreenOn by PrefsDelegate(sp, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON, false)
 
   var ignoreMediaStore by PrefsDelegate(sp, SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE, false)
-  var autoDownloadCover by PrefsDelegate(sp,SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, DOWNLOAD_COVER_ALWAYS)
+  var autoDownloadCover by PrefsDelegate(sp,"auto_download_album_cover_v1", DOWNLOAD_COVER_ALWAYS)
   var downloadSource by PrefsDelegate(sp, SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, DOWNLOAD_LASTFM)
 
   var desktopLyric by PrefsDelegate(sp, SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW, false)

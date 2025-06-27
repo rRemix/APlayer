@@ -7,6 +7,8 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Looper
 import android.provider.MediaStore
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.thegrizzlylabs.sardineandroid.DavResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -175,3 +177,18 @@ fun DavResource.isAudio(): Boolean {
 
 // glide加载图片之前检查activity是否被销毁
 fun Context.isValidGlideContext() = this !is Activity || (!this.isDestroyed && !this.isFinishing)
+
+fun Color.toHexString(withAlpha: Boolean = false): String {
+  val argb = this.toArgb()
+  return if (withAlpha) {
+    String.format(
+      "%08X",
+      argb
+    )
+  } else {
+    String.format(
+      "%06X",
+      argb and 0xFFFFFF  // 移除Alpha通道
+    )
+  }
+}

@@ -7,10 +7,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.SaverScope
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateSet
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,7 +35,7 @@ fun spanCount(): Int {
     PORTRAIT_SPAN_COUNT
   } else {
     val count = LocalConfiguration.current.screenWidthDp / 180
-    if (count > GRID_MAX_SPAN_COUNT) GRID_MAX_SPAN_COUNT else count
+    count.coerceAtMost(GRID_MAX_SPAN_COUNT)
   }
 }
 
@@ -65,17 +70,37 @@ inline fun <reified VM : ViewModel> activityViewModel(): VM {
   )
 }
 
-fun Color.toHexString(withAlpha: Boolean = false): String {
-  val argb = this.toArgb()
-  return if (withAlpha) {
-    String.format(
-      "%08X",
-      argb
-    )
-  } else {
-    String.format(
-      "%06X",
-      argb and 0xFFFFFF  // 移除Alpha通道
-    )
+@Composable
+fun <T : Any> rememberMutableStateSetOf(vararg elements: T): SnapshotStateSet<T> {
+  return rememberSaveable(saver = object : Saver<SnapshotStateSet<T>, Set<T>> {
+    override fun restore(value: Set<T>): SnapshotStateSet<T> {
+      return SnapshotStateSet<T>().also {
+        it.addAll(value)
+      }
+    }
+
+    override fun SaverScope.save(value: SnapshotStateSet<T>): Set<T>? {
+      value.forEach { item ->
+        require(canBeSaved(item)) { "item can't be saved" }
+      }
+      return if (value.isNotEmpty()) HashSet(value) else null
+    }
+
+  }) {
+    SnapshotStateSet<T>().also {
+      it.addAll(elements)
+    }
   }
 }
+
+@Composable
+fun <T : Any> rememberMutableStateListOf(vararg elements: T): SnapshotStateList<T> {
+  return rememberSaveable(saver = snapshotStateListSaver()) {
+    elements.toList().toMutableStateList()
+  }
+}
+
+private fun <T : Any> snapshotStateListSaver() = listSaver<SnapshotStateList<T>, T>(
+  save = { stateList -> stateList.toList() },
+  restore = { it.toMutableStateList() },
+)

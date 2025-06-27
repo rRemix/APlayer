@@ -2,7 +2,6 @@ package remix.myplayer.compose.ui.widget.app
 
 import android.content.ComponentName
 import android.content.Intent
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -52,13 +54,14 @@ import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.library.GlideCover
 import remix.myplayer.compose.viewmodel.MusicViewModel
+import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.ui.activity.HistoryActivity
 import remix.myplayer.ui.activity.RecentlyActivity
 import remix.myplayer.ui.activity.SupportActivity
 import remix.myplayer.util.Constants
 
-private val drawerTitles = intArrayOf(
+private val drawerTitles = listOf(
   R.string.drawer_song,
   R.string.drawer_history,
   R.string.drawer_recently_add,
@@ -66,7 +69,7 @@ private val drawerTitles = intArrayOf(
   R.string.drawer_setting,
   R.string.exit
 )
-private val drawerIcons = intArrayOf(
+private val drawerIcons = listOf(
   R.drawable.ic_library_music_24dp,
   R.drawable.ic_history_24dp,
   R.drawable.ic_recent_24dp,
@@ -79,8 +82,9 @@ private val drawerIcons = intArrayOf(
 @Composable
 fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
   val navController = LocalNavController.current
-
+  val context = LocalContext.current
   val theme = LocalTheme.current
+
   ModalDrawerSheet(
     modifier = Modifier
       .width(264.dp)
@@ -100,12 +104,13 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
         WindowInsets.systemBars.getTop(this).toDp()
       }))
       val currentSong by vm.currentSong.collectAsStateWithLifecycle()
+      val isPortrait = context.isPortraitOrientation()
       GlideCover(
         model = currentSong,
         circle = false,
         modifier = Modifier
-          .padding(top = 20.dp, bottom = 20.dp)
-          .size(128.dp)
+          .padding(if (isPortrait) 20.dp else 12.dp)
+          .size(if (isPortrait) 128.dp else 98.dp)
       )
       Text(
         modifier = Modifier
@@ -118,18 +123,17 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
         text = stringResource(R.string.play_now, currentSong.title),
         textAlign = TextAlign.Center,
         color = theme.primaryReverse,
-        fontSize = 14.sp,
+        fontSize = if (isPortrait) 14.sp else 12.sp,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
       )
-      Spacer(modifier = Modifier.height(20.dp))
+      Spacer(modifier = Modifier.height(if (isPortrait) 20.dp else 12.dp))
     }
 
     var selectDrawer by remember { mutableIntStateOf(0) }
-    Column(modifier = Modifier.background(theme.drawerDefault)) {
-      val activity = LocalActivity.current
-      val scope = rememberCoroutineScope()
-      drawerTitles.mapIndexed { index, _ ->
+    val scope = rememberCoroutineScope()
+    LazyColumn(modifier = Modifier.background(theme.drawerDefault)) {
+      itemsIndexed(drawerTitles) { index, item ->
         NavigationDrawerItem(
           label = {
             TextPrimary(
@@ -142,23 +146,23 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
           onClick = {
             selectDrawer = index
 
-            val activity = activity ?: return@NavigationDrawerItem
             when (index) {
               // 歌曲库
               0 -> scope.launch { drawerState.close() }
               // 历史
-              1 -> activity.startActivity(Intent(activity, HistoryActivity::class.java))
+              1 -> context.startActivity(Intent(context, HistoryActivity::class.java))
               // 最近添加
-              2 -> activity.startActivity(Intent(activity, RecentlyActivity::class.java))
+              2 -> context.startActivity(Intent(context, RecentlyActivity::class.java))
               // 捐赠
-              3 -> activity.startActivity(Intent(activity, SupportActivity::class.java))
+              3 -> context.startActivity(Intent(context, SupportActivity::class.java))
               // 设置
               4 -> navController.navigate(RouteSetting)
+//              4 -> activity.startActivity(Intent(activity, SettingActivity::class.java))
               // 退出
               5 -> {
-                activity.sendBroadcast(
+                context.sendBroadcast(
                   Intent(Constants.ACTION_EXIT)
-                    .setComponent(ComponentName(activity, ExitReceiver::class.java))
+                    .setComponent(ComponentName(context, ExitReceiver::class.java))
                 )
               }
             }
@@ -178,7 +182,11 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
           )
         )
       }
-      Spacer(modifier = Modifier.weight(1f))
+
+      item {
+        Spacer(modifier = Modifier.weight(1f))
+      }
     }
+
   }
 }

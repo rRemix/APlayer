@@ -2,13 +2,12 @@ package remix.myplayer.compose.ui.screen.setting.logic.library
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateSetOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
 import remix.myplayer.compose.activityViewModel
+import remix.myplayer.compose.rememberMutableStateSetOf
 import remix.myplayer.compose.ui.dialog.ItemsCallbackMultiChoice
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
@@ -19,18 +18,18 @@ import remix.myplayer.compose.viewmodel.SettingViewModel
 fun LibraryLogic() {
   val vm: SettingViewModel = activityViewModel<SettingViewModel>()
 
+  val libraries by vm.allLibraries.collectAsStateWithLifecycle()
+  val currentLibrary by vm.currentLibrary.collectAsStateWithLifecycle()
+
+  val selectedIndicates = rememberMutableStateSetOf(*libraries.map { it.order }.toTypedArray())
+
   val state = rememberDialogState(false)
   NormalPreference(
     stringResource(R.string.library_category),
     stringResource(R.string.configure_library_category)
   ) {
+    selectedIndicates.addAll(libraries.map { it.order })
     state.show()
-  }
-
-  val libraries by vm.allLibraries.collectAsStateWithLifecycle()
-  val currentLibrary by vm.currentLibrary.collectAsStateWithLifecycle()
-  val selectedIndicates = remember {
-    mutableStateSetOf(*libraries.map { it.order }.toTypedArray())
   }
 
   NormalDialog(
