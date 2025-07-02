@@ -7,6 +7,7 @@
 
 ## Intro
 - A beautiful and powerful music player
+- [Migrating to Jetpack Compose](https://github.com/rRemix/APlayer/tree/compose)
 
 ## Download
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
