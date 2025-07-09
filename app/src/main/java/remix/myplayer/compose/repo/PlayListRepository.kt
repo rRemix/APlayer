@@ -14,8 +14,10 @@ import javax.inject.Inject
 
 interface PlayListRepository {
   fun allPlayLists(): Flow<List<PlayList>>
-  suspend fun addSongsToPlayList(audioIds: List<Long>, playlistId: Long): Int
+  suspend fun addSongsToPlayList(audioIds: List<Long>, playListName: String): Int
   suspend fun insertPlayList(name: String): Long
+  suspend fun updatePlayList(playList: PlayList): Int
+  suspend fun deletePlayList(id: Long): Int
 }
 
 class PlayListRepoImpl @Inject constructor(
@@ -54,8 +56,9 @@ class PlayListRepoImpl @Inject constructor(
     }
   }
 
-  override suspend fun addSongsToPlayList(audioIds: List<Long>, playlistId: Long): Int {
-    val playList = playListDao.selectByIdSuspend(playlistId) ?: throw IllegalArgumentException("No Playlist Found")
+  override suspend fun addSongsToPlayList(audioIds: List<Long>, playListName: String): Int {
+    val playList = playListDao.selectByNameSuspend(playListName)
+      ?: throw IllegalArgumentException("No Playlist Found")
 
     //不重复添加
     val old = playList.audioIds.size
@@ -65,7 +68,10 @@ class PlayListRepoImpl @Inject constructor(
     return count
   }
 
-  override suspend fun insertPlayList(name: String): Long {
-    return playListDao.insertPlayListSuspend(PlayList(0, name, LinkedHashSet(), Date().time))
-  }
+  override suspend fun insertPlayList(name: String) =
+    playListDao.insertPlayListSuspend(PlayList(0, name, LinkedHashSet(), Date().time))
+
+  override suspend fun updatePlayList(playList: PlayList) = playListDao.updateSuspend(playList)
+
+  override suspend fun deletePlayList(id: Long) = playListDao.deleteSuspend(id)
 }

@@ -11,7 +11,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import remix.myplayer.R
+import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Folder
@@ -26,7 +29,10 @@ import remix.myplayer.compose.repo.PlayListRepository
 import remix.myplayer.compose.repo.SongRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.glide.UriFetcher
+import remix.myplayer.helper.MusicEventCallback
+import remix.myplayer.service.MusicService
 import remix.myplayer.util.PermissionUtil
+import remix.myplayer.util.ToastUtil
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,7 +46,8 @@ class LibraryViewModel @Inject constructor(
   private val playListRepository: PlayListRepository,
   private val folderRepository: FolderRepository,
   val settingPrefs: SettingPrefs,
-) : ViewModel() {
+) : ViewModel(), MusicEventCallback {
+  private var hasPermission = false
 
   private val _songs = MutableStateFlow<List<Song>>(emptyList())
   val songs: StateFlow<List<Song>> = _songs.asStateFlow()
@@ -62,7 +69,8 @@ class LibraryViewModel @Inject constructor(
 
   init {
     // load all media
-    if (PermissionUtil.hasNecessaryPermission()) {
+    hasPermission = PermissionUtil.hasNecessaryPermission()
+    if (hasPermission) {
       fetchMedia()
     }
 
@@ -93,10 +101,45 @@ class LibraryViewModel @Inject constructor(
     _folders.value = folderRepository.allFolders()
   }
 
-  suspend fun insertPlayList(name: String) = playListRepository.insertPlayList(name)
+  fun insertPlayList(name: String, onSuccess: (Long) -> Unit) {
+    viewModelScope.launch {
+      val id = playListRepository.insertPlayList(name)
+      onSuccess(id)
+    }
+  }
 
-  suspend fun addSongsToPlayList(audioIds: List<Long>, playlistId: Long) =
-    playListRepository.addSongsToPlayList(audioIds, playlistId)
+  fun addSongsToPlayList(audioIds: List<Long>, playListName: String, createNew: Boolean = false) {
+    viewModelScope.launch {
+      try {
+        if (createNew) {
+          playListRepository.insertPlayList(playListName)
+        }
+
+        val count = playListRepository.addSongsToPlayList(audioIds, playListName = playListName)
+        ToastUtil.show(
+          context,
+          context.getString(R.string.add_song_playlist_success, count, playListName)
+        )
+      } catch (ignore: Exception) {
+        ToastUtil.show(context, R.string.add_song_playlist_error)
+      }
+    }
+  }
+
+  fun loadSongsByModels(models: List<APlayerModel>) = songRepo.getSongsByModels(models)
+
+  fun renamePlayList(id: Long, name: String) {
+    viewModelScope.launch {
+      try {
+        val playList = playLists.first().firstOrNull { it.id == id }
+          ?: throw IllegalArgumentException("not found")
+        playListRepository.updatePlayList(playList.copy(name = name))
+        ToastUtil.show(context, R.string.save_success)
+      } catch (e: Exception) {
+        ToastUtil.show(context, R.string.save_error)
+      }
+    }
+  }
 
   fun fetchMedia(clear: Boolean = false) {
     if (clear) {
@@ -110,5 +153,39 @@ class LibraryViewModel @Inject constructor(
     fetchArtists()
     fetchGenres()
     fetchFolders()
+  }
+
+  override fun onMediaStoreChanged() {
+    if (hasPermission) {
+      fetchMedia()
+    }
+  }
+
+  override fun onPermissionChanged(has: Boolean) {
+    if (has && !hasPermission) {
+      fetchMedia()
+    }
+    hasPermission = has
+  }
+
+  override fun onPlayListChanged(name: String) {
+  }
+
+  override fun onServiceConnected(service: MusicService) {
+  }
+
+  override fun onMetaChanged() {
+  }
+
+  override fun onPlayStateChange() {
+  }
+
+  override fun onServiceDisConnected() {
+  }
+
+  override fun onTagChanged(
+    oldSong: Song,
+    newSong: Song
+  ) {
   }
 }

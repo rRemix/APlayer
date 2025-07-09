@@ -27,11 +27,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import kotlinx.coroutines.launch
+import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
 import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.theme.LocalTheme
@@ -101,12 +103,14 @@ private fun HomeContent(
       containerColor = LocalTheme.current.primary
     ) {
       libraries.forEachIndexed { index, library ->
+        val theme = LocalTheme.current
         Tab(
           selected = pagerState.currentPage == index,
           onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
           text = { Text(stringResource(library.stringRes), maxLines = 1) },
-          selectedContentColor = LocalTheme.current.primaryReverse,
-          unselectedContentColor = LocalTheme.current.tabText
+          selectedContentColor = theme.primaryReverse,
+          unselectedContentColor = colorResource(
+            if (theme.isPrimaryCloseToWhite) R.color.dark_normal_tab_text_color else R.color.light_normal_tab_text_color)
         )
       }
     }

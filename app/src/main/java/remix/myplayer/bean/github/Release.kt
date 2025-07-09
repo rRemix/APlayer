@@ -35,3 +35,8 @@ data class Release(var url: String?,
                         var browser_download_url: String?) : Serializable
 
 }
+
+fun Release.isForce(): Boolean {
+  val split = name?.split("-")
+  return split != null && split.size > 3
+}

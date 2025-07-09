@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -19,11 +20,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.R
-import remix.myplayer.compose.ui.BaseDialog
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 
@@ -69,6 +70,9 @@ fun InputDialog(
           .fillMaxWidth()
           .padding(vertical = 16.dp),
         visualTransformation = VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(
+          keyboardType = KeyboardType.Text
+        ),
         interactionSource = interactionSource,
         enabled = true,
         singleLine = false,

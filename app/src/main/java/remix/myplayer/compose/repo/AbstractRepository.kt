@@ -126,4 +126,16 @@ abstract class AbstractRepository(private val settingPrefs: SettingPrefs) {
       dateModified = cursor.getLong(cursor.getColumnIndex(AudioColumns.DATE_MODIFIED))
     )
   }
+
+  companion object {
+    fun makeInStr(audioIds: List<Long>): String {
+      val inStrBuilder = StringBuilder(127)
+
+      for (i in audioIds.indices) {
+        inStrBuilder.append(audioIds[i]).append(if (i != audioIds.size - 1) "," else " ")
+      }
+
+      return inStrBuilder.toString()
+    }
+  }
 }

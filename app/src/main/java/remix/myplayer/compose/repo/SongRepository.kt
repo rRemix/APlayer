@@ -6,17 +6,28 @@ import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio
 import dagger.hilt.android.qualifiers.ApplicationContext
+import remix.myplayer.bean.mp3.APlayerModel
+import remix.myplayer.bean.mp3.Album
+import remix.myplayer.bean.mp3.Artist
+import remix.myplayer.bean.mp3.Folder
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.prefs.SettingPrefs
+import remix.myplayer.db.room.model.PlayList
+import remix.myplayer.misc.checkWorkerThread
 import remix.myplayer.util.ItemsSorter
 import timber.log.Timber
 import javax.inject.Inject
 
 interface SongRepository {
+
   fun allSongs(): List<Song>
+
   fun getSongs(selection: String?, selectionValues: Array<String?>?, sortOrder: String?): List<Song>
 
-  fun song(id: Long): Song
+  fun song(id: Long): Song?
+
+  fun getSongsByModels(models: List<APlayerModel>): List<Song>
+
   fun makeSongCursor(
     selection: String?,
     selectionValues: Array<String?>?,
@@ -28,6 +39,7 @@ class SongRepoImpl @Inject constructor(
   @ApplicationContext private val context: Context,
   private val settingPrefs: SettingPrefs
 ) : SongRepository, AbstractRepository(settingPrefs) {
+
   override fun allSongs(): List<Song> {
     return getSongs(
       null,
@@ -100,9 +112,57 @@ class SongRepoImpl @Inject constructor(
     }
   }
 
+  override fun song(id: Long) =
+    getSongs(Audio.Media._ID + "=?", arrayOf(id.toString() + ""), null).firstOrNull()
 
-  override fun song(id: Long): Song {
-    TODO("Not yet implemented")
+  override fun getSongsByModels(models: List<APlayerModel>): List<Song> {
+    checkWorkerThread()
+    val songs = arrayListOf<Song>()
+
+    models.forEach {
+      when (it) {
+        is Song -> {
+          songs.add(it)
+        }
+
+        is Album -> {
+          songs.addAll(
+            getSongs(
+              Audio.Media.ALBUM_ID + "=?",
+              arrayOf(it.albumID.toString()),
+              settingPrefs.albumDetailSortOrder
+            )
+          )
+        }
+
+        is Artist -> {
+          songs.addAll(
+            getSongs(
+              Audio.Media.ARTIST_ID + "=?",
+              arrayOf(it.artistID.toString()),
+              settingPrefs.artistDetailSortOrder
+            )
+          )
+        }
+
+        is Folder -> {
+          songs.addAll(getSongs(null, null, settingPrefs.folderDetailSortOrder).filter { song ->
+            song.data.substring(0, song.data.lastIndexOf("/")) == it.path
+          })
+        }
+
+        is PlayList -> {
+          songs.addAll(
+            getSongs(
+              Audio.Media._ID + " in(" + makeInStr(it.audioIds.toList()) + ")",
+              null,
+              null
+            )
+          )
+        }
+      }
+    }
+
+    return songs
   }
-
 }

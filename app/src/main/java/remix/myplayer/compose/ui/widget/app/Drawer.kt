@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -50,6 +51,9 @@ import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.nav.RouteSetting
 import remix.myplayer.compose.ui.theme.AppTheme
+import remix.myplayer.compose.ui.theme.AppTheme.Companion.BLACK
+import remix.myplayer.compose.ui.theme.AppTheme.Companion.DARK
+import remix.myplayer.compose.ui.theme.AppTheme.Companion.LIGHT
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.library.GlideCover
@@ -85,12 +89,29 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
   val context = LocalContext.current
   val theme = LocalTheme.current
 
+  val drawerDefault = colorResource(
+    when (theme.theme) {
+      LIGHT -> R.color.drawer_default_light
+      DARK -> R.color.drawer_default_dark
+      BLACK -> R.color.drawer_default_black
+      else -> throw IllegalArgumentException("unknown theme: $theme")
+    }
+  )
+  val drawerEffect = colorResource(
+    when (theme.theme) {
+      LIGHT -> R.color.drawer_effect_light
+      DARK -> R.color.drawer_effect_dark
+      BLACK -> R.color.drawer_effect_black
+      else -> throw IllegalArgumentException("unknown theme: $theme")
+    }
+  )
+
   ModalDrawerSheet(
     modifier = Modifier
       .width(264.dp)
       .fillMaxHeight(),
     drawerShape = RectangleShape,
-    drawerContainerColor = theme.drawerDefault,
+    drawerContainerColor = drawerDefault,
     windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Start)
   ) {
     Column(
@@ -103,10 +124,10 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
       Spacer(modifier = Modifier.height(with(LocalDensity.current) {
         WindowInsets.systemBars.getTop(this).toDp()
       }))
-      val currentSong by vm.currentSong.collectAsStateWithLifecycle()
+      val musicState by vm.musicState.collectAsStateWithLifecycle()
       val isPortrait = context.isPortraitOrientation()
       GlideCover(
-        model = currentSong,
+        model = musicState.song,
         circle = false,
         modifier = Modifier
           .padding(if (isPortrait) 20.dp else 12.dp)
@@ -120,7 +141,7 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
           )
           .width(170.dp)
           .padding(horizontal = 8.dp, vertical = 6.dp),
-        text = stringResource(R.string.play_now, currentSong.title),
+        text = stringResource(R.string.play_now, musicState.song.title),
         textAlign = TextAlign.Center,
         color = theme.primaryReverse,
         fontSize = if (isPortrait) 14.sp else 12.sp,
@@ -132,8 +153,9 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
 
     var selectDrawer by remember { mutableIntStateOf(0) }
     val scope = rememberCoroutineScope()
-    LazyColumn(modifier = Modifier.background(theme.drawerDefault)) {
+    LazyColumn(modifier = Modifier.background(drawerDefault)) {
       itemsIndexed(drawerTitles) { index, item ->
+
         NavigationDrawerItem(
           label = {
             TextPrimary(
@@ -177,8 +199,8 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
           },
           shape = RectangleShape,
           colors = NavigationDrawerItemDefaults.colors(
-            selectedContainerColor = theme.drawerEffect,
-            unselectedContainerColor = theme.drawerDefault
+            selectedContainerColor = drawerEffect,
+            unselectedContainerColor = drawerDefault
           )
         )
       }

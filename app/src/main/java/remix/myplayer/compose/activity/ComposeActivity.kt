@@ -9,8 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import remix.myplayer.compose.activity.base.BaseMusicActivity
 import remix.myplayer.compose.nav.AppNav
 import remix.myplayer.compose.nav.LocalNavController
@@ -19,23 +21,26 @@ import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.theme.LocalThemeController
 import remix.myplayer.compose.ui.theme.ThemeController
 import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.MainViewModel
 import remix.myplayer.compose.viewmodel.MusicViewModel
-import remix.myplayer.helper.MusicServiceRemote
-import remix.myplayer.service.MusicService
 import remix.myplayer.theme.Theme
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ComposeMainActivity : BaseMusicActivity() {
+class ComposeActivity : BaseMusicActivity() {
 
   private val libraryViewModel: LibraryViewModel by viewModels()
   private val musicViewModel: MusicViewModel by viewModels()
+  private val mainViewModel: MainViewModel by viewModels()
 
   @Inject
   lateinit var themeController: ThemeController
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    addMusicServiceEventListener(libraryViewModel)
+    addMusicServiceEventListener(musicViewModel)
 
     enableEdgeToEdge(
       navigationBarStyle = SystemBarStyle.auto(
@@ -60,37 +65,9 @@ class ComposeMainActivity : BaseMusicActivity() {
         }
       }
     }
-  }
 
-  override fun onPermissionChanged(has: Boolean) {
-    super.onPermissionChanged(has)
-    fetchMedia()
-  }
-
-  override fun onServiceConnected(service: MusicService) {
-    super.onServiceConnected(service)
-    onMetaChanged()
-  }
-
-  override fun onMediaStoreChanged() {
-    super.onMediaStoreChanged()
-    fetchMedia()
-  }
-
-  override fun onMetaChanged() {
-    super.onMetaChanged()
-    musicViewModel.setCurrentSong(MusicServiceRemote.getCurrentSong())
-    musicViewModel.setPlaying(MusicServiceRemote.isPlaying())
-  }
-
-  override fun onPlayStateChange() {
-    super.onPlayStateChange()
-    musicViewModel.setPlaying(MusicServiceRemote.isPlaying())
-  }
-
-  private fun fetchMedia() {
-    if (hasPermission) {
-      libraryViewModel.fetchMedia()
+    lifecycleScope.launch {
+      mainViewModel.checkInAppUpdate()
     }
   }
 }

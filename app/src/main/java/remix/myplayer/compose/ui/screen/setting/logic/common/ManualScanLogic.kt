@@ -3,10 +3,12 @@ package remix.myplayer.compose.ui.screen.setting.logic.common
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.dialog.FolderDialog
@@ -19,6 +21,7 @@ import java.io.File
 @Composable
 fun ManualScanLogic() {
   val context = LocalContext.current
+  val scope = rememberCoroutineScope()
   val vm = activityViewModel<SettingViewModel>()
   val dialogState = rememberDialogState()
   var initialPath by rememberSaveable {
@@ -39,7 +42,9 @@ fun ManualScanLogic() {
     onPositive = {
       dialogState.dismiss()
       vm.settingPrefs.manualScanFolder = it
-      MediaScanner(context).scanFiles(File(it))
+      scope.launch {
+        MediaScanner(context).scan(File(it))
+      }
     }
   )
 }

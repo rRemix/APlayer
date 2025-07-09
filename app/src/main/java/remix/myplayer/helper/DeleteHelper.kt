@@ -1,5 +1,6 @@
 package remix.myplayer.helper
 
+import android.app.Activity
 import io.reactivex.Single
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.ui.activity.base.BaseActivity
@@ -37,7 +38,7 @@ object DeleteHelper {
    * 在列表内(如专辑、艺术家列表内删除歌曲)
    */
   @JvmStatic
-  fun deleteSong(activity: BaseActivity, songId: Long, deleteSource: Boolean, deleteFromPlayList: Boolean = false, playListName: String = ""):
+  fun deleteSong(activity: Activity, songId: Long, deleteSource: Boolean, deleteFromPlayList: Boolean = false, playListName: String = ""):
       Single<Boolean> {
     return Single
         .fromCallable {

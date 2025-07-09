@@ -11,6 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.R
+import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.nav.RouteAbout
 import remix.myplayer.compose.ui.screen.setting.logic.common.BlackListLogic
@@ -49,9 +50,8 @@ import remix.myplayer.compose.ui.screen.setting.logic.theme.PrimaryColorLogic
 import remix.myplayer.compose.ui.screen.setting.logic.theme.SecondaryColorLogic
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.app.CommonAppBar
+import remix.myplayer.compose.viewmodel.MainViewModel
 import remix.myplayer.helper.EQHelper
-import remix.myplayer.misc.update.UpdateAgent
-import remix.myplayer.misc.update.UpdateListener
 
 @Composable
 fun SettingScreen() {
@@ -196,6 +196,7 @@ private fun LyricPreferences() {
 private fun OtherPreferences() {
   SettingTitle(R.string.other)
 
+  val mainViewModel = activityViewModel<MainViewModel>()
   val activity = LocalActivity.current
   val nav = LocalNavController.current
 
@@ -210,10 +211,7 @@ private fun OtherPreferences() {
   }
 
   Preference(onClick = {
-    val act = activity ?: return@Preference
-    UpdateAgent.forceCheck = true
-    UpdateAgent.listener = UpdateListener(act)
-    UpdateAgent.check(act)
+    mainViewModel.checkInAppUpdate(true)
   }, title = stringResource(R.string.check_update))
 
   ClearCacheLogic()

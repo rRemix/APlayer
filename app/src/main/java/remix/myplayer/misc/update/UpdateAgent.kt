@@ -15,6 +15,7 @@ import remix.myplayer.util.SPUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
 
+@Deprecated("use InAppUpdater instead")
 object UpdateAgent {
   private const val TAG = "UpdateAgent"
 

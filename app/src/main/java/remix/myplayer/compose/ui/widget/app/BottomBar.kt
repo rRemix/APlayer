@@ -22,10 +22,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.compose.activityViewModel
@@ -47,12 +49,11 @@ private const val triggerThreshold = 10
 
 @Composable
 fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = activityViewModel()) {
-  val currentSong by vm.currentSong.collectAsStateWithLifecycle()
+  val musicState by vm.musicState.collectAsStateWithLifecycle()
 //  if (currentSong.id < 0) {
 //    return
 //  }
   val nav = LocalNavController.current
-  val playing by vm.playing.collectAsStateWithLifecycle(false)
 
   val interactionSource = remember { MutableInteractionSource() }
 
@@ -61,7 +62,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = activityViewMo
   Row(
     modifier = modifier
       .clickableWithoutRipple(interactionSource) {
-        if (currentSong.id == 0L) {
+        if (musicState.song.id == 0L) {
           return@clickableWithoutRipple
         }
 
@@ -74,7 +75,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = activityViewMo
         }) { _, dragAmount ->
           if (dragAmount < -triggerThreshold && !hasTriggerAct) {
             hasTriggerAct = true
-            if (currentSong.id == 0L) {
+            if (musicState.song.id == 0L) {
               return@detectVerticalDragGestures
             }
             nav.navigate(RoutePlayingScreen)
@@ -105,7 +106,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = activityViewMo
     verticalAlignment = Alignment.CenterVertically,
   ) {
     GlideCover(
-      model = currentSong,
+      model = musicState.song,
       modifier = Modifier
         .padding(start = 12.dp)
         .size(48.dp)
@@ -117,16 +118,17 @@ fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = activityViewMo
         .fillMaxHeight()
         .padding(horizontal = 8.dp)
     ) {
-      TextPrimary(currentSong.title, fontSize = 16.sp)
+      TextPrimary(musicState.song.title, fontSize = 16.sp)
       Spacer(modifier = Modifier.height(2.dp))
-      TextSecondary(text = currentSong.artist, fontSize = 14.sp)
+      TextSecondary(text = musicState.song.artist, fontSize = 14.sp)
     }
 
     Row(
       modifier = Modifier.padding(end = 16.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
-      val buttonColor = LocalTheme.current.bottomBarButton
+      val buttonColor =
+        Color((if (LocalTheme.current.isLight) "#323334" else "#FFFFFF").toColorInt())
       Icon(
         modifier = modifier
           .clickableWithoutRipple(interactionSource) {
@@ -136,7 +138,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = activityViewMo
             )
           }
           .padding(end = 16.dp),
-        painter = painterResource(if (playing) R.drawable.bf_btn_stop else R.drawable.bf_btn_play),
+        painter = painterResource(if (musicState.playing) R.drawable.bf_btn_stop else R.drawable.bf_btn_play),
         contentDescription = "PlayPause",
         tint = buttonColor
       )

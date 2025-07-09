@@ -3,6 +3,7 @@ package remix.myplayer.compose.ui.widget.common
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -21,7 +22,8 @@ fun TextPrimary(
   maxLine: Int = 1,
   overflow: TextOverflow = TextOverflow.Ellipsis,
   textAlign: TextAlign? = TextAlign.Unspecified,
-  fontWeight: FontWeight = FontWeight.Normal
+  fontWeight: FontWeight = FontWeight.Normal,
+  color: Color = LocalTheme.current.textPrimary,
 ) {
   Text(
     text = text,
@@ -30,7 +32,7 @@ fun TextPrimary(
       textAlign = textAlign ?: TextAlign.Unspecified,
       fontSize = fontSize,
       fontWeight = fontWeight,
-      color = LocalTheme.current.textPrimary,
+      color = color,
       platformStyle = PlatformTextStyle(
         includeFontPadding = false,
       )

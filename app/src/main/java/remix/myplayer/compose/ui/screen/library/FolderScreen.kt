@@ -29,6 +29,7 @@ import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.ui.theme.APlayerTheme
 import remix.myplayer.compose.ui.theme.LocalTheme
+import remix.myplayer.compose.ui.theme.icon
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
 import remix.myplayer.compose.ui.widget.popup.LibraryItemPopupButton
@@ -49,7 +50,6 @@ fun FolderScreen(vm: LibraryViewModel = activityViewModel()) {
   }
 }
 
-
 @Composable
 fun FolderItem(folder: Folder, onClick: () -> Unit) {
   val theme = LocalTheme.current
@@ -66,7 +66,7 @@ fun FolderItem(folder: Folder, onClick: () -> Unit) {
     Icon(
       painter = painterResource(id = R.drawable.icon_folder),
       contentDescription = "Folder Icon",
-      tint = theme.iconColor,
+      tint = theme.icon(),
       modifier = Modifier
         .padding(15.dp)
         .align(Alignment.CenterStart)
@@ -98,7 +98,6 @@ fun FolderItem(folder: Folder, onClick: () -> Unit) {
 
   }
 }
-
 
 @Preview(showBackground = true)
 @Composable

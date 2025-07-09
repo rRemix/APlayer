@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
@@ -42,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
@@ -177,7 +177,7 @@ private fun SliderWithText(space: ColorSpace, color: Color, onValueChange: (Floa
         .padding(horizontal = 12.dp)
         .height(36.dp)
         .weight(1f),
-      trackColor = color,
+      trackBackgroundColor = color,
       thumbColor = color,
     )
     TextPrimary(
@@ -192,14 +192,18 @@ private fun SliderWithText(space: ColorSpace, color: Color, onValueChange: (Floa
 fun LineSlider(
   value: Float,
   onValueChange: (Float) -> Unit,
+  onValueChangeFinished: () -> Unit = {},
   modifier: Modifier = Modifier,
   interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
   steps: Int = 0,
   valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
   trackHeight: Dp = 4.dp,
-  trackColor: Color = LocalTheme.current.primary,
-  thumbSize: Dp = 12.dp,
-  thumbColor: Color = LocalTheme.current.primary
+  trackBackgroundColor: Color = LocalTheme.current.primary,
+  trackProgressColor: Color = LocalTheme.current.primary,
+  thumbWidth: Dp = 12.dp,
+  thumbHeight: Dp = 12.dp,
+  thumbShape: Shape = CircleShape,
+  thumbColor: Color = LocalTheme.current.primary,
 ) {
   val theme = LocalTheme.current
 
@@ -208,12 +212,18 @@ fun LineSlider(
   Slider(
     value = sliderAnimValue,
     onValueChange = onValueChange,
+    onValueChangeFinished = onValueChangeFinished,
     modifier = modifier,
     interactionSource = interactionSource,
     steps = steps,
     valueRange = valueRange,
     track = { sliderState ->
-      Track(sliderState, trackHeight = trackHeight, trackColor = trackColor)
+      Track(
+        sliderState,
+        trackHeight = trackHeight,
+        background = trackBackgroundColor,
+        progress = trackProgressColor
+      )
     },
     thumb = {
       val interactions = remember { mutableStateListOf<Interaction>() }
@@ -237,13 +247,13 @@ fun LineSlider(
       Box(
         modifier = Modifier
           .fillMaxHeight()
-          .width(thumbSize)
           .wrapContentSize(Alignment.Center)
-          .size(thumbSize)
+          .width(thumbWidth)
+          .height(thumbHeight)
           .scale(thumbScaleAnimValue)
           .indication(interactionSource, ripple(color = theme.ripple, bounded = false))
           .hoverable(interactionSource = interactionSource)
-          .background(thumbColor, CircleShape)
+          .background(thumbColor, thumbShape)
       )
     }
   )
@@ -251,20 +261,23 @@ fun LineSlider(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Track(sliderState: SliderState, trackHeight: Dp = 4.dp, trackColor: Color) {
-  val theme = LocalTheme.current
-
+private fun Track(
+  sliderState: SliderState,
+  trackHeight: Dp = 4.dp,
+  background: Color = Color((if (LocalTheme.current.isLight) "#ffe0e0e0" else "#ff424242").toColorInt()),
+  progress: Color = LocalTheme.current.primary
+) {
   Spacer(
     modifier = Modifier
       .fillMaxWidth()
       .height(trackHeight)
-      .background(theme.inActiveColor)
+      .background(background)
   )
   Spacer(
     modifier = Modifier
       .fillMaxWidth(fraction = sliderState.value / sliderState.valueRange.endInclusive)
       .height(trackHeight)
-      .background(trackColor)
+      .background(progress)
   )
 }
 
@@ -277,7 +290,7 @@ private fun TrackPreview() {
       value = 25f,
       valueRange = 0f..255f
     ),
-    trackColor = Color.Red
+    progress = Color.Red
   )
 }
 

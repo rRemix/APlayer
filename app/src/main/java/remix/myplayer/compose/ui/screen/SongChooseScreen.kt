@@ -34,7 +34,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.activityViewModel
@@ -100,11 +99,8 @@ fun SongChooseScreen(id: Long, name: String, vm: LibraryViewModel = activityView
                   return@clickWithRipple
                 }
 
-                scope.launch {
-                  val count = vm.addSongsToPlayList(selectedIds.toList(), id)
-                  ToastUtil.show(context, context.getString(R.string.add_song_playlist_success, count, name))
-                  nav.popBackStack()
-                }
+                vm.addSongsToPlayList(selectedIds.toList(), name)
+                nav.popBackStack()
               },
             contentAlignment = Alignment.Center
           ) {

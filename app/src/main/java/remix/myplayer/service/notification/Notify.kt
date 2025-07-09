@@ -16,7 +16,7 @@ import androidx.core.app.ServiceCompat
 import androidx.core.app.TaskStackBuilder
 import com.bumptech.glide.request.target.CustomTarget
 import remix.myplayer.R
-import remix.myplayer.compose.activity.ComposeMainActivity
+import remix.myplayer.compose.activity.ComposeActivity
 import remix.myplayer.compose.nav.playingScreenDeepLink
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
@@ -46,7 +46,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
         Intent.ACTION_VIEW,
         playingScreenDeepLink,
         service,
-        ComposeMainActivity::class.java
+        ComposeActivity::class.java
       ))
       getPendingIntent(0, getPendingIntentFlag())!!
     }

@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activity.ComposeMainActivity
+import remix.myplayer.compose.activity.ComposeActivity
 import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.dialog.ItemsCallbackSingleChoice
 import remix.myplayer.compose.ui.dialog.NormalDialog
@@ -52,7 +52,7 @@ fun LanguageLogic() {
       }
       LanguageHelper.saveSelectLanguage(context, it)
 
-      val intent = Intent(context, ComposeMainActivity::class.java)
+      val intent = Intent(context, ComposeActivity::class.java)
       intent.action = Intent.ACTION_MAIN
       intent.addCategory(Intent.CATEGORY_LAUNCHER)
       intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK

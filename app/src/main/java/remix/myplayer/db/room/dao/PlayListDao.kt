@@ -17,12 +17,18 @@ interface PlayListDao {
 
   @Query("""
     SELECT * FROM PlayList
-    WHERE id = :id
+    WHERE name = :name
   """)
-  suspend fun selectByIdSuspend(id: Long): PlayList?
+  suspend fun selectByNameSuspend(name: String): PlayList?
 
   @Update
   suspend fun updateSuspend(playlist: PlayList): Int
+
+  @Query("""
+    DELETE FROM PlayList
+    WHERE id = :id
+  """)
+  suspend fun deleteSuspend(id: Long): Int
 
   @Insert(onConflict = OnConflictStrategy.ABORT)
   fun insertPlayList(playlist: PlayList): Long

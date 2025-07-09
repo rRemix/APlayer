@@ -445,7 +445,7 @@ object MediaStoreUtil {
    * 删除指定歌曲
    */
   @WorkerThread
-  fun delete(activity: BaseActivity, songs: List<Song>?, deleteSource: Boolean): Int {
+  fun delete(activity: Activity, songs: List<Song>?, deleteSource: Boolean): Int {
     //保存是否删除源文件
     SPUtil.putValue(App.context, SETTING_KEY.NAME, SETTING_KEY.DELETE_SOURCE,
         deleteSource)
@@ -514,7 +514,7 @@ object MediaStoreUtil {
   /**
    * 删除多个源文件
    */
-  private fun deleteSource(activity: BaseActivity, songs: List<Song>?) {
+  private fun deleteSource(activity: Activity, songs: List<Song>?) {
     if (songs == null || songs.isEmpty()) {
       return
     }
@@ -531,7 +531,8 @@ object MediaStoreUtil {
       }
     }
     if (toDeleteSongs.isNotEmpty()) {
-      activity.toDeleteSongs = toDeleteSongs
+      // TODO
+//      activity.toDeleteSongs = toDeleteSongs
       deleteSource(activity, toDeleteSongs[0])
     }
   }

@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.R
 import remix.myplayer.compose.clickWithRipple
-import remix.myplayer.compose.ui.BaseDialog
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 
 class ItemsCallbackMultiChoice(
@@ -42,6 +41,7 @@ typealias ItemsCallback = ((Int, String) -> Unit)
 fun NormalDialog(
   dialogState: DialogState,
   autoDismiss: Boolean = true,
+  cancelOutside: Boolean = true,
   containerPadding: Dp = 20.dp,
   titleRes: Int? = null,
   titleAlignment: Alignment.Horizontal = Alignment.Start,
@@ -83,6 +83,7 @@ fun NormalDialog(
   dialogState: DialogState,
   containerPadding: Dp = 16.dp,
   autoDismiss: Boolean = true,
+  cancelOutside: Boolean = true,
   // space between title,content,items,buttons
   contentSpacer: Dp = 16.dp,
   title: String? = null,

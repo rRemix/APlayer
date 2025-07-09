@@ -33,6 +33,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.App.Companion.IS_GOOGLEPLAY
 import remix.myplayer.BuildConfig
@@ -475,7 +476,9 @@ class SettingActivity : ToolbarActivity(), ColorChooserDialog.ColorCallback,
                   SETTING_KEY.MANUAL_SCAN_FOLDER,
                   object : FolderChooser.FolderCallback {
                     override fun onFolderSelection(chooser: FolderChooser, folder: File) {
-                      MediaScanner(this@SettingActivity).scanFiles(folder)
+                      launch {
+                        MediaScanner(this@SettingActivity).scan(folder)
+                      }
                       needRefreshAdapter = true
                     }
                   }).show()

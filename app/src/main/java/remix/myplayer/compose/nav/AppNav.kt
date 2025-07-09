@@ -25,10 +25,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import remix.myplayer.BuildConfig
+import remix.myplayer.compose.ui.dialog.DialogContainer
 import remix.myplayer.compose.ui.screen.AboutScreen
 import remix.myplayer.compose.ui.screen.HomeScreen
-import remix.myplayer.compose.ui.screen.PlayingScreen
 import remix.myplayer.compose.ui.screen.SongChooseScreen
+import remix.myplayer.compose.ui.screen.playing.PlayingScreen
 import remix.myplayer.compose.ui.screen.setting.SettingScreen
 
 const val RouteHome = "home"
@@ -41,6 +42,8 @@ val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 
 @Composable
 fun AppNav() {
+  DialogContainer()
+
   NavHost(LocalNavController.current, startDestination = RouteHome) {
     normalAnimatedScreen(
       RouteHome,

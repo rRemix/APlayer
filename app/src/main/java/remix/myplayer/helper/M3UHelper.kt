@@ -51,32 +51,7 @@ object M3UHelper {
           }
         }
         .map {
-          val audioIds = ArrayList<Long>()
-          val stream = context.contentResolver.openInputStream(uri)
-          val reader = BufferedReader(InputStreamReader(stream))
-          reader.readLines().forEachIndexed { i: Int, path: String ->
-            if (i != 0 && !path.startsWith(ENTRY)) {
-              val id: Long
-              // 先直接判断本地文件是否存在
-              val song = File(path)
-              id = if (song.exists() && song.isFile) {
-                MediaStoreUtil.getSongIdByUrl(path)
-              } else {
-                // 再根据歌曲名去查找
-                MediaStoreUtil.getSongId(
-                    MediaStore.Audio.Media.DATA + " like ?",
-                    arrayOf("%" + path.replace("\\", "/"))
-                )
-              }
-              if (id > 0) {
-                audioIds.add(id)
-              }
-            }
-          }
-          return@map audioIds
-              .filter { audioId ->
-                audioId > 0
-              }
+          return@map parseSongIds(context, uri)
         }
         .flatMap {
           databaseRepository.insertToPlayList(it, playlistName)
@@ -154,5 +129,35 @@ object M3UHelper {
           ToastUtil.show(context, R.string.export_fail, it.toString())
         })
   }
+
+  fun parseSongIds(context: Context, uri: Uri): List<Long> {
+    val audioIds = ArrayList<Long>()
+    val stream = context.contentResolver.openInputStream(uri)
+    val reader = BufferedReader(InputStreamReader(stream))
+    reader.readLines().forEachIndexed { i: Int, path: String ->
+      if (i != 0 && !path.startsWith(ENTRY)) {
+        val id: Long
+        // 先直接判断本地文件是否存在
+        val song = File(path)
+        id = if (song.exists() && song.isFile) {
+          MediaStoreUtil.getSongIdByUrl(path)
+        } else {
+          // 再根据歌曲名去查找
+          MediaStoreUtil.getSongId(
+            MediaStore.Audio.Media.DATA + " like ?",
+            arrayOf("%" + path.replace("\\", "/"))
+          )
+        }
+        if (id > 0) {
+          audioIds.add(id)
+        }
+      }
+    }
+    return audioIds
+      .filter { audioId ->
+        audioId > 0
+      }
+  }
 }
+
 

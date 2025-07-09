@@ -37,24 +37,20 @@ data class AppTheme(
     @Composable
     @ReadOnlyComposable
     get() = colorResource(
-      if (isLight) R.color.light_text_color_primary else R.color.dark_text_color_primary)
+      if (isLight) R.color.light_text_color_primary else R.color.dark_text_color_primary
+    )
 
   val textSecondary
     @Composable
     @ReadOnlyComposable
     get() = colorResource(
-      if (isLight) R.color.light_text_color_secondary else R.color.dark_text_color_secondary)
+      if (isLight) R.color.light_text_color_secondary else R.color.dark_text_color_secondary
+    )
 
   val ripple
     @Composable
     @ReadOnlyComposable
     get() = colorResource(if (isLight) R.color.light_ripple_color else R.color.dark_ripple_color)
-
-  val tabText
-    @Composable
-    @ReadOnlyComposable
-    get() = colorResource(
-      if (isPrimaryCloseToWhite) R.color.dark_normal_tab_text_color else R.color.light_normal_tab_text_color)
 
   val mainBackground
     @Composable
@@ -72,7 +68,8 @@ data class AppTheme(
     @Composable
     @ReadOnlyComposable
     get() = colorResource(
-      if (isLight) R.color.light_background_color_dialog else R.color.dark_background_color_dialog)
+      if (isLight) R.color.light_background_color_dialog else R.color.dark_background_color_dialog
+    )
 
   val libraryBackground
     @Composable
@@ -86,45 +83,6 @@ data class AppTheme(
       }
     )
 
-  val libraryButton
-    @Composable
-    @ReadOnlyComposable
-    get() = Color((if (isLight) "#6C6A6C" else "#FFFFFF").toColorInt())
-
-  val bottomBarButton
-    @Composable
-    @ReadOnlyComposable
-    get() = Color((if (isLight) "#323334" else "#FFFFFF").toColorInt())
-
-  val drawerEffect
-    @Composable
-    @ReadOnlyComposable
-    get() = colorResource(
-      when (theme) {
-        LIGHT -> R.color.drawer_effect_light
-        DARK -> R.color.drawer_effect_dark
-        BLACK -> R.color.drawer_effect_black
-        else -> throw IllegalArgumentException("unknown theme: $theme")
-      }
-    )
-
-  val drawerDefault
-    @Composable
-    @ReadOnlyComposable
-    get() = colorResource(
-      when (theme) {
-        LIGHT -> R.color.drawer_default_light
-        DARK -> R.color.drawer_default_dark
-        BLACK -> R.color.drawer_default_black
-        else -> throw IllegalArgumentException("unknown theme: $theme")
-      }
-    )
-
-  val iconColor: Color
-    @Composable
-    @ReadOnlyComposable
-    get() = if (isLight) Color.Black else Color.White
-
   val primaryReverse: Color
     @Composable
     @ReadOnlyComposable
@@ -134,21 +92,8 @@ data class AppTheme(
     @Composable
     @ReadOnlyComposable
     get() = colorResource(
-      if (!isPrimaryCloseToWhite) R.color.dark_text_color_primary else R.color.light_text_color_primary)
-
-  val highLightText: Color
-    @Composable
-    @ReadOnlyComposable
-    get() {
-      var primaryColor = primary
-      if (isPrimaryCloseToWhite && isLight) {
-        primaryColor = textPrimary
-      }
-      if (isPrimaryCloseToBlack && isBlack) {
-        primaryColor = textPrimary
-      }
-      return primaryColor
-    }
+      if (!isPrimaryCloseToWhite) R.color.dark_text_color_primary else R.color.light_text_color_primary
+    )
 
   val albumPlaceHolder: Int
     @Composable
@@ -160,11 +105,6 @@ data class AppTheme(
     @ReadOnlyComposable
     get() = if (isLight) R.drawable.artist_empty_bg_day else R.drawable.artist_empty_bg_night
 
-  val inActiveColor: Color
-    @Composable
-    @ReadOnlyComposable
-    get() = Color((if (isLight) "#ffe0e0e0" else "#ff424242").toColorInt())
-
   val isPrimaryLight: Boolean
     get() = ColorUtil.isColorLight(primary.toArgb())
 
@@ -173,7 +113,6 @@ data class AppTheme(
 
   val isPrimaryCloseToBlack: Boolean
     get() = ColorUtil.isColorCloseToBlack(primary.toArgb())
-
 
   companion object {
 
@@ -186,7 +125,6 @@ data class AppTheme(
     const val ALWAYS_ON = 1
     const val FOLLOW_SYSTEM = 2
 
-    var sColoredNavigation: Boolean = false
     var sImmersiveMode: Boolean = false
 
     fun darkenColor(color: Color): Color {
@@ -194,3 +132,24 @@ data class AppTheme(
     }
   }
 }
+
+@Composable
+@ReadOnlyComposable
+fun AppTheme.highLightText(): Color {
+  var primaryColor = primary
+  if (isPrimaryCloseToWhite && isLight) {
+    primaryColor = textPrimary
+  }
+  if (isPrimaryCloseToBlack && isBlack) {
+    primaryColor = textPrimary
+  }
+  return primaryColor
+}
+
+@Composable
+@ReadOnlyComposable
+fun AppTheme.icon() = if (isLight) Color.Black else Color.White
+
+@Composable
+@ReadOnlyComposable
+fun AppTheme.popupButton() = Color((if (isLight) "#6C6A6C" else "#FFFFFF").toColorInt())

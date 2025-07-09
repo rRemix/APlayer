@@ -14,6 +14,8 @@ import remix.myplayer.compose.repo.GenreRepoImpl
 import remix.myplayer.compose.repo.GenreRepository
 import remix.myplayer.compose.repo.PlayListRepoImpl
 import remix.myplayer.compose.repo.PlayListRepository
+import remix.myplayer.compose.repo.PlayQueueRepoImpl
+import remix.myplayer.compose.repo.PlayQueueRepository
 import remix.myplayer.compose.repo.SongRepoImpl
 import remix.myplayer.compose.repo.SongRepository
 import javax.inject.Singleton
@@ -44,4 +46,8 @@ abstract class RepositoryModule {
   @Singleton
   @Binds
   abstract fun bindFolderRepo(repo: FolderRepoImpl): FolderRepository
+
+  @Singleton
+  @Binds
+  abstract fun bindPlayQueueRepo(repo: PlayQueueRepoImpl): PlayQueueRepository
 }

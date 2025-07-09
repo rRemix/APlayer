@@ -15,7 +15,6 @@ import kotlinx.coroutines.withContext
 import remix.myplayer.App.Companion.IS_GOOGLEPLAY
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
-import remix.myplayer.compose.ui.dialog.DialogState
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.ArrowPreference

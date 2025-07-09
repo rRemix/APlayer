@@ -33,7 +33,6 @@ import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import timber.log.Timber
 
 @Composable
 fun LyricPriorityLogic() {

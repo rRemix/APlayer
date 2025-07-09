@@ -24,6 +24,7 @@ import remix.myplayer.R
 import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.ui.theme.APlayerTheme
 import remix.myplayer.compose.ui.theme.LocalTheme
+import remix.myplayer.compose.ui.theme.icon
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.ui.activity.WebDavActivity
 
@@ -64,7 +65,7 @@ private fun RemoteItem(item: Item) {
       Icon(
         painter = painterResource(item.icon),
         contentDescription = stringResource(item.desc),
-        tint = LocalTheme.current.iconColor,
+        tint = LocalTheme.current.icon(),
         modifier = Modifier
           .padding(all = 32.dp)
           .fillMaxSize()

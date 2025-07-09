@@ -2,6 +2,7 @@ package remix.myplayer.compose.prefs
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import remix.myplayer.compose.ui.screen.setting.Preference
 import remix.myplayer.glide.UriFetcher.DOWNLOAD_LASTFM
 import remix.myplayer.helper.LanguageHelper.AUTO
 import remix.myplayer.helper.SortOrder
@@ -28,6 +29,12 @@ class SettingPrefs @Inject constructor(
   var playlistSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER, SortOrder.PLAYLIST_DATE)
   var genreSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.GENRE_SORT_ORDER, SortOrder.GENRE_A_Z)
 
+  var albumDetailSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.TRACK_NUMBER)
+  var artistDetailSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.SONG_A_Z)
+  var playListDetailSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.SONG_A_Z)
+  var genreDetailSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.SONG_A_Z)
+  var folderDetailSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.SONG_A_Z)
+
   var albumMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_ALBUM, HeaderAdapter.GRID_MODE)
   var artistMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_ARTIST, HeaderAdapter.GRID_MODE)
   var genreMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_GENRE, HeaderAdapter.GRID_MODE)
@@ -36,6 +43,7 @@ class SettingPrefs @Inject constructor(
   var manualScanFolder by PrefsDelegate(sp, SPUtil.SETTING_KEY.MANUAL_SCAN_FOLDER, "")
   var deleteIds by PrefsDelegate(sp, SPUtil.SETTING_KEY.BLACKLIST_SONG, emptySet<String>())
   var blacklist by PrefsDelegate(sp, SPUtil.SETTING_KEY.BLACKLIST, emptySet<String>())
+  var deleteSource by PrefsDelegate(sp, SPUtil.SETTING_KEY.DELETE_SOURCE, false)
 
   var lockScreen by PrefsDelegate(sp, defaultVal = Constants.APLAYER_LOCKSCREEN)
   var language by PrefsDelegate(sp, defaultVal = AUTO)
@@ -46,6 +54,7 @@ class SettingPrefs @Inject constructor(
   var ignoreAudioFocus by PrefsDelegate(sp, SPUtil.SETTING_KEY.AUDIO_FOCUS, false)
   var autoPlay by PrefsDelegate(sp, SPUtil.SETTING_KEY.AUTO_PLAY, HeadsetPlugReceiver.NEVER)
   var playFade by PrefsDelegate(sp, SPUtil.SETTING_KEY.CROSS_FADE, false)
+  var speed by PrefsDelegate(sp, SPUtil.SETTING_KEY.SPEED, "1.0")
 
   var playingScreenBackground by PrefsDelegate(sp, SPUtil.SETTING_KEY.PLAYER_BACKGROUND, BACKGROUND_ADAPTIVE_COLOR)
   var playingScreenBottom by PrefsDelegate(sp, SPUtil.SETTING_KEY.PLAYER_BACKGROUND, BOTTOM_SHOW_BOTH)

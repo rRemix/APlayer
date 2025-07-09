@@ -54,6 +54,10 @@ public class PlayPauseView extends FrameLayout {
 
   }
 
+  public PlayPauseView(Context context) {
+    this(context, null);
+  }
+
   //    @Override
 //    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 //        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -124,10 +128,15 @@ public class PlayPauseView extends FrameLayout {
     }
   }
 
+  private boolean lastState = false;
   public void updateState(boolean isPlay, boolean withAnim) {
     if (mDrawable.isPlay() != isPlay) {
       return;
     }
+    if (lastState == isPlay) {
+      return;
+    }
+    lastState = isPlay;
     toggle(withAnim);
   }
 

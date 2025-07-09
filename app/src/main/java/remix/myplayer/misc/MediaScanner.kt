@@ -5,16 +5,26 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
-import io.reactivex.*
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.FlowableOnSubscribe
+import io.reactivex.FlowableSubscriber
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import org.reactivestreams.Subscription
 import remix.myplayer.R
+import remix.myplayer.compose.ui.dialog.dismissLoading
+import remix.myplayer.compose.ui.dialog.showLoading
+import remix.myplayer.compose.ui.dialog.updateLoadingText
 import remix.myplayer.theme.Theme
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.ToastUtil
 import timber.log.Timber
 import java.io.File
+import kotlin.coroutines.resume
 
 
 /**
@@ -23,64 +33,58 @@ import java.io.File
 
 class MediaScanner(private val context: Context) {
 
-  fun scanFiles(folder: File) {
-    var subscription: Subscription? = null
-    var connection: MediaScannerConnection? = null
-    val toScanFiles = ArrayList<File>()
+  suspend fun scan(folder: File) {
+    try {
+      showLoading(false, context.getString(R.string.please_wait))
 
-    val loadingDialog = Theme.getBaseDialog(context)
-        .cancelable(false)
-        .title(R.string.please_wait)
-        .content(R.string.scaning)
-        .progress(true, 0)
-        .progressIndeterminateStyle(false)
-        .dismissListener { connection?.disconnect() }
-        .build()
-
-    connection = MediaScannerConnection(context, object : MediaScannerConnection.MediaScannerConnectionClient {
-      override fun onMediaScannerConnected() {
-        Flowable.create(FlowableOnSubscribe<File> { emitter ->
-          getScanFiles(folder, toScanFiles)
-          for (file in toScanFiles) {
-            emitter.onNext(file)
-          }
-          emitter.onComplete()
-        }, BackpressureStrategy.BUFFER)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : FlowableSubscriber<File> {
-              override fun onSubscribe(s: Subscription) {
-                loadingDialog.show()
-                subscription = s
-                subscription?.request(1)
-              }
-
-              override fun onNext(file: File) {
-                loadingDialog.setContent(file.absolutePath)
-                connection?.scanFile(file.absolutePath, "audio/*")
-              }
-
-              override fun onError(throwable: Throwable) {
-                loadingDialog.dismiss()
-                ToastUtil.show(context, R.string.scan_failed, throwable.toString())
-              }
-
-              override fun onComplete() {
-                loadingDialog.dismiss()
-                ToastUtil.show(context, context.getString(R.string.scanned_finish))
-                context.contentResolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null)
-              }
-            })
+      val toScanFiles = ArrayList<File>()
+      withContext(Dispatchers.IO) {
+        getScanFiles(folder, toScanFiles)
       }
 
-
-      override fun onScanCompleted(path: String, uri: Uri) {
-        subscription?.request(1)
-        Timber.tag(TAG).v("onScanCompleted, path: $path uri: $uri")
+      for (file in toScanFiles) {
+        updateLoadingText(file.name)
+        val uri = withContext(Dispatchers.IO) {
+          scanSingleFile(context, file)
+        }
+        Timber.v("MediaScanner scan file: $file uri: $uri")
       }
-    })
-    connection.connect()
+
+      ToastUtil.show(context, context.getString(R.string.scanned_finish))
+      context.contentResolver.notifyChange(
+        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+        null
+      )
+    } catch (e: Exception) {
+      ToastUtil.show(context, R.string.scan_failed, e.toString())
+    } finally {
+      dismissLoading()
+    }
   }
+
+  // scan single file
+  private suspend fun scanSingleFile(context: Context, file: File) =
+    suspendCancellableCoroutine { continuation ->
+      var connection: MediaScannerConnection? = null
+      connection = MediaScannerConnection(
+        context,
+        object : MediaScannerConnection.MediaScannerConnectionClient {
+          override fun onMediaScannerConnected() {
+            connection?.scanFile(file.absolutePath, "audio/*")
+          }
+
+          override fun onScanCompleted(path: String, uri: Uri?) {
+            connection?.disconnect()
+            continuation.resume(uri)
+          }
+        })
+
+      connection.connect()
+
+      continuation.invokeOnCancellation {
+        connection.disconnect()
+      }
+    }
 
   private fun getScanFiles(file: File, toScanFiles: ArrayList<File>) {
     if (file.isFile) {

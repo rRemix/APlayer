@@ -28,7 +28,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
 import remix.myplayer.compose.activityViewModel
@@ -40,7 +39,6 @@ import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.viewmodel.LibraryViewModel
 import remix.myplayer.ui.misc.MultipleChoice
-import remix.myplayer.util.ToastUtil
 
 @SuppressLint("CheckResult")
 @Composable
@@ -74,14 +72,9 @@ fun FAButton(pagerState: PagerState, libraries: List<Library>) {
       text = it
     }
   ) {
-    scope.launch {
-      try {
-        val id = vm.insertPlayList(it)
-        if (id > 0) {
-          navController.navigate("$RouteSongChoose/${id}/$it")
-        }
-      } catch (e: Exception) {
-        ToastUtil.show(context, R.string.create_playlist_fail, e)
+    vm.insertPlayList(it) { id ->
+      if (id > 0) {
+        navController.navigate("$RouteSongChoose/${id}/$it")
       }
     }
   }

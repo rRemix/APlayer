@@ -28,6 +28,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.theme.LocalTheme
+import remix.myplayer.compose.ui.theme.highLightText
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
 import remix.myplayer.compose.ui.widget.library.GlideCover
@@ -57,10 +58,10 @@ fun ListSong(
   ) {
     val (indicator, count, cover, popButton, column) = createRefs()
 
-    val currentSong = vm.currentSong.collectAsStateWithLifecycle()
+    val musicState by vm.musicState.collectAsStateWithLifecycle()
     val isPlayingSong by remember {
       derivedStateOf {
-        currentSong.value == song
+        musicState.song == song
       }
     }
 
@@ -70,7 +71,7 @@ fun ListSong(
           .width(4.dp)
           .fillMaxHeight()
           .padding(vertical = 8.dp)
-          .background(LocalTheme.current.highLightText)
+          .background(LocalTheme.current.highLightText())
           .constrainAs(indicator) {
             top.linkTo(parent.top)
             bottom.linkTo(parent.bottom)
@@ -80,7 +81,8 @@ fun ListSong(
     }
 
     if (num != null) {
-      TextPrimary(num.toString(),
+      TextPrimary(
+        num.toString(),
         modifier = Modifier
           .width(28.dp)
           .constrainAs(count) {
