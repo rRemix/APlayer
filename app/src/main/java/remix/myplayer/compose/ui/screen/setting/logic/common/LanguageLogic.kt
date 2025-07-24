@@ -9,12 +9,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
 import remix.myplayer.compose.activity.ComposeActivity
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.dialog.ItemsCallbackSingleChoice
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
 import remix.myplayer.helper.LanguageHelper
 
 private val itemRes = listOf(
@@ -27,7 +26,7 @@ private val itemRes = listOf(
 @Composable
 fun LanguageLogic() {
   val context = LocalContext.current
-  val setting = activityViewModel<LibraryViewModel>().settingPrefs
+  val setting = libraryViewModel.settingPrefs
 
   val select by remember {
     mutableIntStateOf(setting.language)

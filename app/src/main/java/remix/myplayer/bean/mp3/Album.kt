@@ -4,11 +4,13 @@ import android.content.ContentUris
 import android.net.Uri
 import java.io.Serial
 import androidx.core.net.toUri
+import kotlinx.serialization.Serializable
 
 /**
  * Created by Remix on 2017/10/22.
  */
 
+@Serializable
 data class Album(val albumID: Long,
                  val album: String,
                  val artistID: Long,

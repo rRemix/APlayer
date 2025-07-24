@@ -63,9 +63,11 @@ sealed class Song(
     this.dateModified = dateModified
   }
 
+  private var triedDuration = false
   val duration: Long
     get() {
-      if (_duration <= 0 && data.isNotEmpty() && this !is Remote) {
+      if (!triedDuration && _duration <= 0 && data.isNotEmpty() && this !is Remote) {
+        triedDuration = true
         val metadataRetriever = MediaMetadataRetriever()
         try {
           metadataRetriever.setDataSource(data)
@@ -81,9 +83,11 @@ sealed class Song(
       return _duration
     }
 
+  private var triedGenre = false
   val genre: String
     get() {
-      if (_genre.isNullOrEmpty() && id > 0 && data.isNotEmpty() && this !is Remote) {
+      if (!triedGenre && _genre.isNullOrEmpty() && id > 0 && data.isNotEmpty() && this !is Remote) {
+        triedGenre = true
         val metadataRetriever = MediaMetadataRetriever()
         try {
           metadataRetriever.setDataSource(data)
@@ -111,7 +115,7 @@ sealed class Song(
     get() = if (!SHOW_DISPLAYNAME) title else displayName
 
   override fun getKey(): String {
-    return albumId.toString()
+    return id.toString()
   }
 
   fun copy(): Song {
@@ -141,6 +145,43 @@ sealed class Song(
 
     }
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is Song) return false
+
+    if (id != other.id) return false
+    if (albumId != other.albumId) return false
+    if (artistId != other.artistId) return false
+    if (dateModified != other.dateModified) return false
+    if (title != other.title) return false
+    if (album != other.album) return false
+    if (artist != other.artist) return false
+    if (data != other.data) return false
+    if (year != other.year) return false
+    if (track != other.track) return false
+    if (_duration != other._duration) return false
+    if (_genre != other._genre) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = id.hashCode()
+    result = 31 * result + albumId.hashCode()
+    result = 31 * result + artistId.hashCode()
+    result = 31 * result + dateModified.hashCode()
+    result = 31 * result + title.hashCode()
+    result = 31 * result + album.hashCode()
+    result = 31 * result + artist.hashCode()
+    result = 31 * result + data.hashCode()
+    result = 31 * result + year.hashCode()
+    result = 31 * result + (track?.hashCode() ?: 0)
+    result = 31 * result + _duration.hashCode()
+    result = 31 * result + _genre.hashCode()
+    return result
+  }
+
 
   class Local(
     id: Long,
@@ -173,19 +214,6 @@ sealed class Song(
     track,
     dateModified
   ) {
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (javaClass != other?.javaClass) return false
-
-      other as Song
-
-      return id == other.id
-    }
-
-    override fun hashCode(): Int {
-      return id.hashCode()
-    }
-
     override fun toString(): String {
       return "LocalSong(id='$id', data='$data')"
     }

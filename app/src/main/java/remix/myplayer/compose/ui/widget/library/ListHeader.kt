@@ -34,6 +34,9 @@ import remix.myplayer.util.ToastUtil
 @Composable
 fun SongListHeader(songs: List<Song>) {
   val context = LocalContext.current
+  if (songs.isEmpty()) {
+    return
+  }
   Row(
     modifier = Modifier
       .height(48.dp)
@@ -77,7 +80,7 @@ fun ModeHeader(grid: Boolean, onClick: (mode: Int) -> Unit) {
       },
       painter = painterResource(R.drawable.ic_apps_white_24dp),
       contentDescription = "ModeGrid",
-      tint = Color(if (grid) LocalTheme.current.secondary.toArgb() else ColorUtil.getColor(R.color.default_model_button_color))
+      tint = if (grid) LocalTheme.current.secondary else Color(ColorUtil.getColor(R.color.default_model_button_color))
     )
     Icon(
       modifier = Modifier
@@ -87,7 +90,7 @@ fun ModeHeader(grid: Boolean, onClick: (mode: Int) -> Unit) {
         } ,
       painter = painterResource(R.drawable.ic_format_list_bulleted_white_24dp),
       contentDescription = "ModeList",
-      tint = Color(if (!grid) LocalTheme.current.secondary.toArgb() else ColorUtil.getColor(R.color.default_model_button_color))
+      tint = if (!grid) LocalTheme.current.secondary else Color(ColorUtil.getColor(R.color.default_model_button_color))
     )
   }
 }

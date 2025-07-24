@@ -27,18 +27,26 @@ import remix.myplayer.compose.ui.widget.library.GlideCover
 import remix.myplayer.compose.ui.widget.popup.LibraryItemPopupButton
 
 @Composable
-fun GridItem(model: APlayerModel, text1: String, text2: String? = null, onClick: () -> Unit, onLongClick: () -> Unit) {
+fun GridItem(
+  model: APlayerModel,
+  text1: String,
+  text2: String? = null,
+  selected: Boolean,
+  onClick: () -> Unit,
+  onLongClick: () -> Unit
+) {
+  val theme = LocalTheme.current
   Column(
     modifier = Modifier
       .padding(start = 3.dp, top = 4.dp, end = 3.dp, bottom = 4.dp)
       .fillMaxWidth()
       .combinedClickable(
         interactionSource = remember { MutableInteractionSource() },
-        indication = ripple(color = LocalTheme.current.ripple),
+        indication = ripple(color = theme.ripple),
         onClick = { onClick() },
         onLongClick = { onLongClick() }
       )
-      .background(LocalTheme.current.mainBackground)
+      .background(if (selected) theme.select else theme.mainBackground)
   ) {
     GlideCover(
       modifier = Modifier

@@ -47,7 +47,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.nav.RouteSetting
 import remix.myplayer.compose.ui.theme.AppTheme
@@ -58,6 +57,7 @@ import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.library.GlideCover
 import remix.myplayer.compose.viewmodel.MusicViewModel
+import remix.myplayer.compose.viewmodel.musicViewModel
 import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.ui.activity.HistoryActivity
@@ -84,7 +84,7 @@ private val drawerIcons = listOf(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun Drawer(drawerState: DrawerState, vm: MusicViewModel = activityViewModel()) {
+fun Drawer(drawerState: DrawerState, vm: MusicViewModel = musicViewModel) {
   val navController = LocalNavController.current
   val context = LocalContext.current
   val theme = LocalTheme.current

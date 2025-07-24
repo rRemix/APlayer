@@ -8,9 +8,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.screen.setting.SwitchPreference
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.service.Command
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.Util.isSupportStatusBarLyric
@@ -22,7 +21,7 @@ fun StatusBarLyricLogic() {
   if (!isSupportStatusBarLyric(context)) {
     return
   }
-  val vm = activityViewModel<SettingViewModel>()
+  val vm = settingViewModel
   var statusBarLyric by remember { mutableStateOf(vm.settingPrefs.statusBarLyric) }
 
   SwitchPreference(

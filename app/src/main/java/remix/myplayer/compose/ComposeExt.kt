@@ -23,6 +23,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStoreOwner
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.misc.isPortraitOrientation
 
@@ -117,5 +119,18 @@ fun CenterInBox(
     contentAlignment = Alignment.Center
   ) {
     content()
+  }
+}
+
+inline fun <T> MutableStateFlow<T>.updateIf(
+  condition: (T) -> Boolean,
+  crossinline transform: (T) -> T
+) {
+  update {
+    if (condition(it)) {
+      transform(it)
+    } else {
+      it
+    }
   }
 }

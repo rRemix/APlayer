@@ -4,15 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
 import remix.myplayer.util.ToastUtil
 
 @Composable
 fun RestoreDeleteLogic() {
   val context = LocalContext.current
-  val vm = activityViewModel<LibraryViewModel>()
+  val vm = libraryViewModel
   val setting = vm.settingPrefs
 
   NormalPreference(

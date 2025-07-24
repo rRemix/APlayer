@@ -7,13 +7,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.screen.setting.SwitchPreference
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
 
 @Composable
 fun ForceSortLogic() {
-  val vm = activityViewModel<LibraryViewModel>()
+  val vm = libraryViewModel
   val setting = vm.settingPrefs
   var forceSort by remember { mutableStateOf(setting.forceSort) }
 

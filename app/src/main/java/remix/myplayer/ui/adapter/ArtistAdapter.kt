@@ -143,7 +143,7 @@ class ArtistAdapter(layoutId: Int, multiChoice: MultipleChoice<Artist>, recycler
         else -> ""
       }
       if (key.isNotEmpty())
-        return Pinyin.toPinyin(key[0]).toUpperCase(Locale.getDefault()).substring(0, 1)
+        return Pinyin.toPinyin(key[0]).uppercase(Locale.getDefault()).substring(0, 1)
     }
     return ""
   }

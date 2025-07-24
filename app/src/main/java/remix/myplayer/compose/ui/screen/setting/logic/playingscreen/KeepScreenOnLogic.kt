@@ -7,13 +7,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.screen.setting.SwitchPreference
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 
 @Composable
 fun KeepScreenOnLogic() {
-  val vm = activityViewModel<SettingViewModel>()
+  val vm = settingViewModel
   var screenAlwaysOn by remember { mutableStateOf(vm.settingPrefs.keepScreenOn) }
 
   SwitchPreference(

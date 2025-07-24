@@ -6,12 +6,11 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.compose.activity.base.BaseActivity
-import remix.myplayer.compose.activityViewModel
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 
 @Composable
 fun RemoveSongDialog() {
-  val settingVM = activityViewModel<SettingViewModel>()
+  val settingVM = settingViewModel
   val state by settingVM.deleteSongState.collectAsStateWithLifecycle()
   val activity = LocalActivity.current
 
@@ -23,7 +22,7 @@ fun RemoveSongDialog() {
       settingVM.updateDeleteSongState(deleteSource = selected)
     },
     onPositive = {
-      settingVM.deleteSongs(activity as? BaseActivity, state.models, state.deleteSource)
+      settingVM.deleteSongs(activity as? BaseActivity, state.models, state.deleteSource, state.parent)
     }
   )
 }

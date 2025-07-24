@@ -7,14 +7,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.screen.setting.SwitchPreference
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
 import remix.myplayer.helper.ShakeDetector
 
 @Composable
 fun ShakeLogic() {
-  val setting = activityViewModel<LibraryViewModel>().settingPrefs
+  val setting = libraryViewModel.settingPrefs
 
   var shake by remember { mutableStateOf(setting.shake) }
   SwitchPreference(stringResource(R.string.shake), stringResource(R.string.shake_tip), shake) {

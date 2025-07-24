@@ -8,19 +8,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.dialog.ItemsCallbackSingleChoice
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.util.ToastUtil
 
 private val itemRes = listOf(R.string.use_system_color, R.string.use_black_color)
 
 @Composable
 fun NotifyBackgroundLogic() {
-  val vm = activityViewModel<SettingViewModel>()
+  val vm = settingViewModel
   val context = LocalContext.current
   var select by remember {
     mutableIntStateOf(if (vm.settingPrefs.notifyUseSystemBackground) 0 else 1)

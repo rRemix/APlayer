@@ -7,21 +7,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.bean.github.isForce
-import remix.myplayer.compose.activityViewModel
-import remix.myplayer.compose.viewmodel.MainViewModel
+import remix.myplayer.compose.viewmodel.mainViewModel
 import remix.myplayer.misc.update.DownloadService
 import remix.myplayer.misc.update.DownloadService.Companion.EXTRA_RESPONSE
 
 @Composable
 fun InAppUpdateDialog() {
-  val mainVM = activityViewModel<MainViewModel>()
+  val mainVM = mainViewModel
   val state by mainVM.inAppUpdateState.collectAsStateWithLifecycle()
 
   val release = state.release ?: return
   val context = LocalContext.current
 
-  val force = release.isForce()
+  val force = release.isForceUpdate()
 
   NormalDialog(
     dialogState = state.dialogState,
@@ -37,11 +35,15 @@ fun InAppUpdateDialog() {
     },
     negative = if (!force) stringResource(R.string.ignore_check_update_forever) else null,
     onNegative = {
-      mainVM.ignoreForever()
+      if (!force) {
+        mainVM.ignoreForever()
+      }
     },
     neutral = if (!force) stringResource(R.string.ignore_this_version) else null,
     onNeutral = {
-      mainVM.ignoreCurrentVersion(release)
+      if (!force) {
+        mainVM.ignoreCurrentVersion(release)
+      }
     }
   )
 }

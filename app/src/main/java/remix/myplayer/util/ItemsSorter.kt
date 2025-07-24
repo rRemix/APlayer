@@ -19,7 +19,7 @@ object ItemsSorter {
             return it
         }
       } else {
-        o1[i].toLowerCase().compareTo(o2[i].toLowerCase()).let {
+        o1[i].lowercaseChar().compareTo(o2[i].lowercaseChar()).let {
           if (it != 0)
             return it
         }

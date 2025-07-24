@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.ui.theme.APlayerTheme
@@ -45,11 +44,12 @@ import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
 import remix.myplayer.compose.ui.widget.library.GlideCover
 import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
 import remix.myplayer.util.ToastUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SongChooseScreen(id: Long, name: String, vm: LibraryViewModel = activityViewModel()) {
+fun SongChooseScreen(id: Long, name: String, vm: LibraryViewModel = libraryViewModel) {
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
   val theme = LocalTheme.current

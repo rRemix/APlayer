@@ -69,7 +69,7 @@ class PlayListRepoImpl @Inject constructor(
   }
 
   override suspend fun insertPlayList(name: String) =
-    playListDao.insertPlayListSuspend(PlayList(0, name, LinkedHashSet(), Date().time))
+    playListDao.insertPlayListSuspend(PlayList(0, name, ArrayList<Long>(), Date().time))
 
   override suspend fun updatePlayList(playList: PlayList) = playListDao.updateSuspend(playList)
 

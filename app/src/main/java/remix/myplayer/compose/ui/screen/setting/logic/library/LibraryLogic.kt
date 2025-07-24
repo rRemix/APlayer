@@ -6,17 +6,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.rememberMutableStateSetOf
 import remix.myplayer.compose.ui.dialog.ItemsCallbackMultiChoice
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
 import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 
 @Composable
 fun LibraryLogic() {
-  val vm: SettingViewModel = activityViewModel<SettingViewModel>()
+  val vm: SettingViewModel = settingViewModel
 
   val libraries by vm.allLibraries.collectAsStateWithLifecycle()
   val currentLibrary by vm.currentLibrary.collectAsStateWithLifecycle()

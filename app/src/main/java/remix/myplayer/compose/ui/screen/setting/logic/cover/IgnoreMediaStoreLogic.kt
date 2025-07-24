@@ -7,15 +7,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.screen.setting.SwitchPreference
-import remix.myplayer.compose.viewmodel.LibraryViewModel
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 
 @Composable
 fun IgnoreMediaStoreLogic() {
-  val settingVM = activityViewModel<SettingViewModel>()
-  val libraryVM = activityViewModel<LibraryViewModel>()
+  val settingVM = settingViewModel
+  val libraryVM = libraryViewModel
   var ignoreMediaStore by remember { mutableStateOf(settingVM.settingPrefs.ignoreMediaStore) }
 
   SwitchPreference(

@@ -1,11 +1,12 @@
 package remix.myplayer.bean.mp3
 
+import kotlinx.serialization.Serializable
 import java.io.Serial
 
 /**
  * Created by Remix on 2017/10/22.
  */
-
+@Serializable
 data class Artist(val artistID: Long,
                   val artist: String,
                   var count: Int) : APlayerModel {

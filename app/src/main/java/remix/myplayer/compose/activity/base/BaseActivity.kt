@@ -8,20 +8,23 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
-import remix.myplayer.compose.AudioTagEditor
 import remix.myplayer.helper.LanguageHelper.setLocal
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
+import java.util.EnumMap
 
 /**
  * Created by Remix on 2016/3/16.
@@ -36,16 +39,25 @@ open class BaseActivity : ComponentActivity(), CoroutineScope by MainScope() {
   @JvmField
   protected var hasPermission = false
 
-  var audioTag: AudioTagEditor? = null
-
-  val deleteSongLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
-    Timber.v("deleteSongLauncher resultCode: ${it.resultCode} data: ${it.data}")
-    if (it.resultCode == RESULT_OK) {
-      ToastUtil.show(this, R.string.delete_success)
-    } else {
-      ToastUtil.show(this, R.string.grant_delete_permission_tip)
+  val deleteSongLauncher =
+    registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+      Timber.v("deleteSongLauncher resultCode: ${it.resultCode} data: ${it.data}")
+      if (it.resultCode == RESULT_OK) {
+        ToastUtil.show(this, R.string.delete_success)
+      } else {
+        ToastUtil.show(this, R.string.grant_delete_permission_tip)
+      }
     }
-  }
+
+  val writeSongLauncher =
+    registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+      Timber.v("writeSongLauncher resultCode: ${it.resultCode} data: ${it.data}")
+      lifecycleScope.launch {
+        Util.saveAudioTag(this@BaseActivity, pendingWriteRequest ?: return@launch)
+      }
+    }
+
+  var pendingWriteRequest: PendingWriteRequest? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     hasPermission = PermissionUtil.hasNecessaryPermission()
@@ -168,3 +180,8 @@ open class BaseActivity : ComponentActivity(), CoroutineScope by MainScope() {
       }
   }
 }
+
+data class PendingWriteRequest(
+  val path: String,
+  val fieldMap: EnumMap<FieldKey, String>
+)

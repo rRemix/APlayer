@@ -11,30 +11,40 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
+import remix.myplayer.compose.nav.DetailScreenRoute
+import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.spanCount
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.library.ModeHeader
 import remix.myplayer.compose.ui.widget.library.list.GridItem
 import remix.myplayer.compose.ui.widget.library.list.ListItem
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.MultiSelectState
+import remix.myplayer.compose.viewmodel.libraryViewModel
+import remix.myplayer.compose.viewmodel.mainViewModel
 import remix.myplayer.ui.adapter.HeaderAdapter
 
 @Composable
-fun PlayListScreen(vm: LibraryViewModel = activityViewModel()) {
-  val playlists by vm.playLists.collectAsStateWithLifecycle()
-  val setting = vm.settingPrefs
-
+fun PlayListScreen() {
+  val libraryVM = libraryViewModel
+  val playlists by libraryVM.playLists.collectAsStateWithLifecycle()
+  val setting = libraryVM.settingPrefs
+  val nav = LocalNavController.current
   var grid by remember { mutableIntStateOf(setting.playlistMode) }
+
+  val mainVM = mainViewModel
+  val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
+  val context = LocalContext.current
 
   Column(
     modifier = Modifier.background(LocalTheme.current.libraryBackground)
@@ -47,6 +57,13 @@ fun PlayListScreen(vm: LibraryViewModel = activityViewModel()) {
         if (grid == HeaderAdapter.GRID_MODE) HeaderAdapter.LIST_MODE else HeaderAdapter.GRID_MODE
       setting.playlistMode = grid
     }
+
+    val selectedIds by remember {
+      derivedStateOf {
+        multiSelectState.selectedModels(MultiSelectState.Where.PlayList)
+      }
+    }
+
     if (grid == HeaderAdapter.LIST_MODE) {
       val listState = rememberLazyListState()
       LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
@@ -58,8 +75,18 @@ fun PlayListScreen(vm: LibraryViewModel = activityViewModel()) {
             model = pl,
             text1 = pl.name,
             text2 = pluralStringResource(R.plurals.song_num, pl.audioIds.size, pl.audioIds.size),
-            onClick = {},
-            onLongClick = {})
+            selected = selectedIds.contains(pl.getKey()),
+            onClick = {
+              if (multiSelectState.where == MultiSelectState.Where.PlayList) {
+                mainVM.updateMultiSelectModel(pl)
+                return@ListItem
+              }
+
+              nav.navigate(DetailScreenRoute(playList = pl))
+            },
+            onLongClick = {
+              mainVM.showMultiSelect(context, MultiSelectState.Where.PlayList, pl)
+            })
         }
       }
     } else {
@@ -71,8 +98,21 @@ fun PlayListScreen(vm: LibraryViewModel = activityViewModel()) {
         content = {
           items(playlists, key = {
             it.id
-          }) {
-            GridItem(it, text1 = it.name, onClick = {}, onLongClick = {})
+          }) { pl ->
+            GridItem(
+              pl, text1 = pl.name,
+              selected = selectedIds.contains(pl.getKey()),
+              onClick = {
+                if (multiSelectState.where == MultiSelectState.Where.PlayList) {
+                  mainVM.updateMultiSelectModel(pl)
+                  return@GridItem
+                }
+
+                nav.navigate(DetailScreenRoute(playList = pl))
+              },
+              onLongClick = {
+                mainVM.showMultiSelect(context, MultiSelectState.Where.PlayList, pl)
+              })
           }
         })
     }

@@ -7,20 +7,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
-import remix.myplayer.compose.viewmodel.LibraryViewModel
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.util.ToastUtil
 
 @Composable
 fun AddSongsToPlayListDialog() {
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
-  val libraryVM = activityViewModel<LibraryViewModel>()
-  val settingVM = activityViewModel<SettingViewModel>()
+  val libraryVM = libraryViewModel
+  val settingVM = settingViewModel
 
   val allPlaylists by libraryVM.playLists.collectAsStateWithLifecycle()
-  val state by settingVM.importPlayListState.collectAsStateWithLifecycle()
+  val state by settingVM.addSongToPlayListState.collectAsStateWithLifecycle()
 
   NormalDialog(
     dialogState = state.baseDialogState,

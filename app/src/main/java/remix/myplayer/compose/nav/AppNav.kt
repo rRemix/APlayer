@@ -1,19 +1,8 @@
 package remix.myplayer.compose.nav
 
+import android.net.Uri
 import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.VisibilityThreshold
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.IntOffset
 import androidx.core.net.toUri
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -24,19 +13,35 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import remix.myplayer.BuildConfig
+import androidx.navigation.toRoute
+import androidx.savedstate.SavedState
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
+import remix.myplayer.bean.mp3.APlayerModel
+import remix.myplayer.bean.mp3.Album
+import remix.myplayer.bean.mp3.Artist
+import remix.myplayer.bean.mp3.Folder
+import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.compose.ui.dialog.DialogContainer
 import remix.myplayer.compose.ui.screen.AboutScreen
+import remix.myplayer.compose.ui.screen.CustomSortScreen
 import remix.myplayer.compose.ui.screen.HomeScreen
 import remix.myplayer.compose.ui.screen.SongChooseScreen
+import remix.myplayer.compose.ui.screen.detail.DetailScreen
 import remix.myplayer.compose.ui.screen.playing.PlayingScreen
 import remix.myplayer.compose.ui.screen.setting.SettingScreen
+import remix.myplayer.db.room.model.PlayList
+import kotlin.reflect.KClass
+import kotlin.reflect.typeOf
 
 const val RouteHome = "home"
 const val RouteSetting = "setting"
 const val RouteSongChoose = "song_choose"
 const val RoutePlayingScreen = "playing_screen"
 const val RouteAbout = "about"
+const val RouteCustomSort = "custom_sort"
 
 val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 
@@ -67,6 +72,24 @@ fun AppNav() {
       AboutScreen()
     }
 
+    composable<DetailScreenRoute>(
+      typeMap = mapOf(
+        typeOf<Album?>() to DetailScreenRouteType.album,
+        typeOf<Artist?>() to DetailScreenRouteType.artist,
+        typeOf<Genre?>() to DetailScreenRouteType.genre,
+        typeOf<PlayList?>() to DetailScreenRouteType.playList,
+        typeOf<Folder?>() to DetailScreenRouteType.folder,
+      ),
+      enterTransition = enterTransition(),
+      exitTransition = exitTransition(),
+      popEnterTransition = popEnterTransition(),
+      popExitTransition = popExitTransition(),
+    ) {
+      val route = it.toRoute<DetailScreenRoute>()
+
+      DetailScreen(route.findNotNull())
+    }
+
     composable(
       RoutePlayingScreen,
       deepLinks = listOf(navDeepLink {
@@ -82,6 +105,13 @@ fun AppNav() {
       }) {
       PlayingScreen()
     }
+
+    normalAnimatedScreen("${RouteCustomSort}/{id}", arguments = listOf(navArgument("id") {
+      type = NavType.LongType
+    })) {
+      val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
+      CustomSortScreen(id)
+    }
   }
 }
 
@@ -95,86 +125,72 @@ private fun NavGraphBuilder.normalAnimatedScreen(
     route = route,
     arguments = arguments,
     deepLinks = deepLinks,
-    enterTransition = {
-      slideInFromRight()
-    },
-    exitTransition = {
-      // playingScreen has special animation
-      when (targetState.destination.route) {
-        RoutePlayingScreen -> {
-          slideOutToTop()
-        }
-
-        else -> {
-          slideOutToLeft()
-        }
-      }
-    },
-    popEnterTransition = {
-      // playingScreen has special animation
-      when (initialState.destination.route) {
-        RoutePlayingScreen -> {
-          slideInFromTop()
-        }
-
-        else -> {
-          slideInFromLeft()
-        }
-      }
-    },
-    popExitTransition = {
-      slideOutToRight()
-    },
+    enterTransition = enterTransition(),
+    exitTransition = exitTransition(),
+    popEnterTransition = popEnterTransition(),
+    popExitTransition = popExitTransition(),
     content = content
   )
 }
 
-private val duration = if (BuildConfig.DEBUG) 2000 else 350
 
-//private val slideSpec = tween<IntOffset>(durationMillis = duration)
-private val slideSpec = spring(
-  stiffness = Spring.StiffnessMediumLow,
-  visibilityThreshold = IntOffset.VisibilityThreshold
-)
+@Serializable
+data class DetailScreenRoute(
+  val album: Album? = null,
+  val artist: Artist? = null,
+  val genre: Genre? = null,
+  val playList: PlayList? = null,
+  val folder: Folder? = null
+) {
 
-//private val fadeSpec = tween<Float>(durationMillis = duration)
-private val fadeSpec = spring<Float>(stiffness = Spring.StiffnessMediumLow)
+  fun findNotNull(): APlayerModel {
+    return when {
+      album != null -> album
+      artist != null -> artist
+      genre != null -> genre
+      playList != null -> playList
+      folder != null -> folder
+      else -> error("valid model not found")
+    }
+  }
 
-private fun slideInFromRight(): EnterTransition =
-  slideInHorizontally(animationSpec = slideSpec, initialOffsetX = {
-    it
-  }) + fadeIn(animationSpec = fadeSpec)
+}
 
-private fun slideInFromLeft(): EnterTransition =
-  slideInHorizontally(animationSpec = slideSpec, initialOffsetX = {
-    (-it * 0.35f).toInt()
-  }) + fadeIn(animationSpec = fadeSpec)
+private object DetailScreenRouteType {
 
-private fun slideOutToRight(): ExitTransition =
-  slideOutHorizontally(animationSpec = slideSpec, targetOffsetX = { it }) + fadeOut(
-    animationSpec = fadeSpec
-  )
+  val album = RouteType(Album::class)
+  val artist = RouteType(Artist::class)
+  val genre = RouteType(Genre::class)
+  val playList = RouteType(PlayList::class)
+  val folder = RouteType(Folder::class)
 
-private fun slideOutToLeft(): ExitTransition? = slideOutHorizontally(
-  animationSpec = slideSpec,
-  targetOffsetX = { (-it * 0.35f).toInt() }) + fadeOut(animationSpec = fadeSpec)
+  @OptIn(InternalSerializationApi::class)
+  class RouteType<T : APlayerModel>(private val kClass: KClass<T>) : NavType<T?>(true) {
 
-private fun slideInFromTop(): EnterTransition = slideInVertically(
-  animationSpec = slideSpec,
-  initialOffsetY = { -(it * 0.2).toInt() }) +
-    fadeIn(animationSpec = fadeSpec, initialAlpha = 0.5f)
+    override fun put(bundle: SavedState, key: String, value: T?) {
+      if (value != null) {
+        bundle.putString(key, Json.encodeToString(kClass.serializer(), value))
+      }
+    }
 
-private fun slideOutToTop(): ExitTransition = slideOutVertically(
-  animationSpec = slideSpec,
-  targetOffsetY = { -(it * 0.2).toInt() }) + fadeOut(animationSpec = fadeSpec)
+    override fun get(bundle: SavedState, key: String): T? {
+      return Json.decodeFromString(kClass.serializer(), bundle.getString(key) ?: return null)
+    }
 
-private fun slideInFromBottom(): EnterTransition =
-  slideInVertically(
-    animationSpec = slideSpec,
-    initialOffsetY = { (it * 0.05).toInt() }) +
-      fadeIn(animationSpec = fadeSpec, initialAlpha = 0.5f)
+    override fun parseValue(value: String): T? {
+      if (value.isEmpty()) {
+        return null
+      }
+      return Json.decodeFromString(kClass.serializer(), Uri.decode(value))
+    }
 
-private fun slideOutToBottom(): ExitTransition =
-  slideOutVertically(
-    animationSpec = slideSpec,
-    targetOffsetY = { (it * 0.2).toInt() }) + fadeOut(animationSpec = fadeSpec)
+    override fun serializeAsValue(value: T?): String {
+      if (value == null) {
+        return Uri.EMPTY.toString()
+      }
+      return Uri.encode(Json.encodeToString(kClass.serializer(), value))
+    }
+
+  }
+
+}

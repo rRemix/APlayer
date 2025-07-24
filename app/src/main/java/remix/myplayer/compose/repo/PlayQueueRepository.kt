@@ -1,7 +1,6 @@
 package remix.myplayer.compose.repo
 
 import android.content.Context
-import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -83,7 +82,7 @@ class PlayQueueRepoImpl @Inject constructor(
     if (isLocal) {
       val ids = queues.map { it.audio_id }
       val songs =
-        songRepo.getSongs(MediaStore.Audio.Media._ID + " in(" + makeInStr(ids) + ")", null, null)
+        songRepo.getSongs(makeInStrQuery(ids), null, null)
 
       // 按照查询顺序返回
       val tempArray: Array<Song> = Array(ids.size) { Song.EMPTY_SONG }
@@ -104,6 +103,5 @@ class PlayQueueRepoImpl @Inject constructor(
   companion object {
 
     private const val TAG = "PlayQueueRepo"
-    private const val CUSTOMSORT = "CUSTOMSORT"
   }
 }

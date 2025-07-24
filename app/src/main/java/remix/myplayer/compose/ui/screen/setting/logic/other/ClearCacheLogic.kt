@@ -15,18 +15,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.Preference
 import remix.myplayer.compose.ui.widget.common.TextSecondary
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.util.Util
 
 @Composable
 fun ClearCacheLogic() {
-  val vm = activityViewModel<LibraryViewModel>()
+  val vm = libraryViewModel
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
   var cacheSize by remember {

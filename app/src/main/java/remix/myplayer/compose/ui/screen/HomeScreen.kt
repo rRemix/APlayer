@@ -2,6 +2,10 @@ package remix.myplayer.compose.ui.screen
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +26,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,26 +40,32 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.ui.widget.app.AppBar
 import remix.myplayer.compose.ui.widget.app.BottomBar
 import remix.myplayer.compose.ui.widget.app.Drawer
 import remix.myplayer.compose.ui.widget.app.FAButton
+import remix.myplayer.compose.ui.widget.app.HomeAppBar
+import remix.myplayer.compose.ui.widget.app.MultiSelectBar
 import remix.myplayer.compose.ui.widget.app.ViewPager
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.mainViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun HomeScreen(vm: SettingViewModel = activityViewModel()) {
+fun HomeScreen() {
+  val mainVM = mainViewModel
+
+  val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
-  BackPressHandler(enabled = drawerState.isOpen) {
+  BackPressHandler(enabled = drawerState.isOpen || multiSelectState.isShowing()) {
     if (drawerState.isOpen) {
       scope.launch {
         drawerState.close()
       }
+    } else if (multiSelectState.isShowing()) {
+      mainVM.closeMultiSelect()
     }
   }
 
@@ -62,16 +73,42 @@ fun HomeScreen(vm: SettingViewModel = activityViewModel()) {
     drawerState = drawerState,
     drawerContent = { Drawer(drawerState) }) {
 
-    val libraries by vm.allLibraries.collectAsStateWithLifecycle()
+    val libraries by settingViewModel.allLibraries.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState { libraries.size }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    val showMultiSelect by remember {
+      derivedStateOf {
+        multiSelectState.isShowInLibrary()
+      }
+    }
 
     Scaffold(
       Modifier
         .fillMaxSize()
         .nestedScroll(scrollBehavior.nestedScrollConnection),
       containerColor = LocalTheme.current.libraryBackground,
-      topBar = { AppBar(scrollBehavior, drawerState) },
+      topBar = {
+        AnimatedContent(
+          targetState = showMultiSelect,
+          transitionSpec = {
+            if (targetState) {
+              slideInVertically() togetherWith slideOutVertically { height -> height / 2 }
+            } else {
+              slideInVertically { height -> height } togetherWith slideOutVertically()
+            }
+          }
+        ) { isMultiSelect ->
+          if (!isMultiSelect) {
+            HomeAppBar(scrollBehavior, drawerState)
+          } else {
+            MultiSelectBar(
+              state = multiSelectState,
+              scrollBehavior = scrollBehavior,
+            )
+          }
+        }
+      },
       floatingActionButton = {
         FAButton(pagerState, libraries)
       })
@@ -110,7 +147,8 @@ private fun HomeContent(
           text = { Text(stringResource(library.stringRes), maxLines = 1) },
           selectedContentColor = theme.primaryReverse,
           unselectedContentColor = colorResource(
-            if (theme.isPrimaryCloseToWhite) R.color.dark_normal_tab_text_color else R.color.light_normal_tab_text_color)
+            if (theme.isPrimaryCloseToWhite) R.color.dark_normal_tab_text_color else R.color.light_normal_tab_text_color
+          )
         )
       }
     }
@@ -120,6 +158,7 @@ private fun HomeContent(
       libraries = libraries,
       pagerState = pagerState
     )
+
     BottomBar()
   }
 }
@@ -139,7 +178,7 @@ fun hackTabMinWidth() {
 }
 
 @Composable
-private fun BackPressHandler(
+fun BackPressHandler(
   enabled: Boolean = true,
   onBackPressed: () -> Unit
 ) {

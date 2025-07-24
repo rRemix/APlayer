@@ -43,14 +43,13 @@ import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.CenterInBox
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.ui.dialog.BottomSheetDialog
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
 import remix.myplayer.compose.viewmodel.MusicState
-import remix.myplayer.compose.viewmodel.MusicViewModel
+import remix.myplayer.compose.viewmodel.musicViewModel
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.widget.playpause.PlayPauseView
@@ -73,7 +72,7 @@ internal fun PlayingControl(
   musicState: MusicState,
   swatch: Palette.Swatch
 ) {
-  val musicVM = activityViewModel<MusicViewModel>()
+  val musicVM = musicViewModel
   val context = LocalContext.current
   Row(
     modifier = modifier
@@ -172,7 +171,7 @@ private fun PlayQueueDialog(
   state: SheetState,
   musicState: MusicState
 ) {
-  val playingVM = activityViewModel<MusicViewModel>()
+  val playingVM = musicViewModel
   val songs by playingVM.playQueueSongs.collectAsStateWithLifecycle()
 
   BottomSheetDialog(state) {

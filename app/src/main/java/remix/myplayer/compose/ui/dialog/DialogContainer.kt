@@ -18,4 +18,8 @@ fun DialogContainer() {
   ReNamePlayListDialog()
 
   InAppUpdateDialog()
+
+  SongDetailDialog()
+
+  SongEditDialog()
 }

@@ -7,12 +7,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.dialog.ItemsCallbackSingleChoice
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
 import remix.myplayer.util.Constants.KB
 import remix.myplayer.util.Constants.MB
 
@@ -20,7 +19,7 @@ private val items = intArrayOf(0, 500 * KB, MB, 2 * MB, 5 * MB)
 
 @Composable
 fun ScanSizeLogic() {
-  val vm: LibraryViewModel = activityViewModel()
+  val vm = libraryViewModel
   val setting = vm.settingPrefs
 
   val scanSizeState = rememberDialogState(false)

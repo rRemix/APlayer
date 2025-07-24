@@ -10,11 +10,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.dialog.FolderDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.misc.MediaScanner
 import java.io.File
 
@@ -22,7 +21,7 @@ import java.io.File
 fun ManualScanLogic() {
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
-  val vm = activityViewModel<SettingViewModel>()
+  val vm = settingViewModel
   val dialogState = rememberDialogState()
   var initialPath by rememberSaveable {
     mutableStateOf(vm.settingPrefs.manualScanFolder)

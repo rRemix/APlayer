@@ -31,7 +31,7 @@ class SSLSocketFactoryCompat(tm: X509TrustManager?) : SSLSocketFactory() {
           // - remove all SSL versions (especially SSLv3) because they're insecure now
           val protocols: MutableList<String> = LinkedList()
           for (protocol in socket.supportedProtocols) {
-            if (!protocol.toUpperCase(Locale.ROOT).contains("SSL")) {
+            if (!protocol.uppercase(Locale.ROOT).contains("SSL")) {
               protocols.add(protocol)
             }
           }

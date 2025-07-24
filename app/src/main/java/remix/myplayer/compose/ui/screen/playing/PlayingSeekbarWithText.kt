@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,16 +24,17 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.palette.graphics.Palette
 import kotlinx.coroutines.delay
-import remix.myplayer.compose.activityViewModel
-import remix.myplayer.compose.ui.dialog.LineSlider
+import kotlinx.coroutines.isActive
 import remix.myplayer.compose.ui.theme.LocalTheme
+import remix.myplayer.compose.ui.widget.common.LineSlider
+import remix.myplayer.compose.ui.widget.common.defaultLineSliderProperties
 import remix.myplayer.compose.viewmodel.MusicState
-import remix.myplayer.compose.viewmodel.MusicViewModel
+import remix.myplayer.compose.viewmodel.musicViewModel
 import remix.myplayer.util.Util
 
 @Composable
 internal fun PlayingSeekbarWithText(musicState: MusicState, swatch: Palette.Swatch) {
-  val musicVM = activityViewModel<MusicViewModel>()
+  val musicVM = musicViewModel
   var dragging by remember {
     mutableStateOf(false)
   }
@@ -44,9 +46,32 @@ internal fun PlayingSeekbarWithText(musicState: MusicState, swatch: Palette.Swat
 
   val time by remember {
     derivedStateOf {
-      val elapsed = (progress * duration).toLong()
-      Time(Util.getTime(elapsed), Util.getTime(duration - elapsed))
+      if (duration <= 0) {
+        Time("00:00", "00:00")
+      } else {
+        val elapsed = (progress * duration).toLong()
+        val remaining = duration - elapsed
+        Time(Util.getTime(elapsed), Util.getTime(remaining))
+      }
     }
+  }
+
+  val playingTrackBackgroundColor = playingTrackBackgroundColor
+  val baseProperties = defaultLineSliderProperties
+  val sliderProperties = remember(swatch.rgb) {
+    baseProperties.copy(
+      trackBackgroundColor = playingTrackBackgroundColor,
+      trackProgressColor = Color(swatch.rgb),
+      trackHeight = 2.dp,
+      thumbColor = Color(swatch.rgb),
+      thumbWidth = 2.dp,
+      thumbHeight = 6.dp,
+      thumbShape = RectangleShape
+    )
+  }
+
+  val textColor = remember {
+    Color("#6b6b6b".toColorInt())
   }
 
   Row(
@@ -57,8 +82,11 @@ internal fun PlayingSeekbarWithText(musicState: MusicState, swatch: Palette.Swat
 
     Text(
       text = time.elapsed,
-      fontSize = 12.sp
+      fontSize = 12.sp,
+      modifier = Modifier.width(36.dp),
+      color = textColor
     )
+
     LineSlider(
       value = progress,
       onValueChange = {
@@ -72,23 +100,19 @@ internal fun PlayingSeekbarWithText(musicState: MusicState, swatch: Palette.Swat
       modifier = Modifier
         .height(12.dp)
         .weight(1f),
-      trackHeight = 2.dp,
-      trackBackgroundColor = trackBackgroundColor(),
-      trackProgressColor = Color((swatch.rgb)),
-      thumbColor = Color(swatch.rgb),
-      thumbWidth = 2.dp,
-      thumbHeight = 6.dp,
-      thumbShape = RectangleShape
+      properties = sliderProperties
     )
 
     Text(
       text = time.remaining,
-      fontSize = 12.sp
+      fontSize = 12.sp,
+      modifier = Modifier.width(36.dp),
+      color = textColor
     )
   }
 
   LaunchedEffect(musicState.playing) {
-    while (musicState.playing) {
+    while (musicState.playing && isActive) {
       withFrameMillis {
         progress = musicVM.getProgress().toFloat() / duration
       }
@@ -97,13 +121,15 @@ internal fun PlayingSeekbarWithText(musicState: MusicState, swatch: Palette.Swat
   }
 }
 
-@Composable
-fun trackBackgroundColor(): Color = Color(
-  if (LocalTheme.current.isLight) {
-    "#efeeed"
-  } else {
-    "#343438"
-  }.toColorInt()
-)
+val playingTrackBackgroundColor: Color
+  @Composable
+  get() = Color(
+    if (LocalTheme.current.isLight) {
+      "#efeeed"
+    } else {
+      "#343438"
+    }.toColorInt()
+  )
+
 
 private data class Time(val elapsed: String, val remaining: String)

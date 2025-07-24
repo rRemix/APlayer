@@ -3,13 +3,20 @@ package remix.myplayer.util
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
+import android.app.RecoverableSecurityException
 import android.app.Service
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.BroadcastReceiver
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaFormat
+import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
@@ -22,21 +29,34 @@ import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.result.IntentSenderRequest
 import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.App
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.compose.activity.base.BaseActivity
+import remix.myplayer.compose.activity.base.PendingWriteRequest
 import remix.myplayer.misc.floatpermission.rom.RomUtils
 import remix.myplayer.misc.manager.APlayerActivityManager
 import timber.log.Timber
-import java.io.*
+import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
+import java.io.Closeable
+import java.io.File
+import java.io.FileReader
+import java.io.IOException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.util.EnumMap
 
 /**
  * Created by Remix on 2015/11/30.
@@ -45,6 +65,7 @@ import java.security.NoSuchAlgorithmException
  * 通用工具类
  */
 object Util {
+
   /**
    * 注册本地Receiver
    */
@@ -192,15 +213,19 @@ object Util {
       mimeType == MediaFormat.MIMETYPE_AUDIO_MPEG -> {
         "mp3"
       }
+
       mimeType == MediaFormat.MIMETYPE_AUDIO_FLAC -> {
         "flac"
       }
+
       mimeType == MediaFormat.MIMETYPE_AUDIO_AAC -> {
         "aac"
       }
+
       mimeType.contains("ape") -> {
         "ape"
       }
+
       else -> {
         try {
           if (mimeType.contains("audio/")) {
@@ -577,7 +602,8 @@ object Util {
 
   suspend fun saveToAlbum(context: Context, resId: Int, fileName: String) {
     val bitmap = BitmapFactory.decodeResource(context.resources, resId)
-    val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), fileName)
+    val file =
+      File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), fileName)
 
     withContext(Dispatchers.IO) {
       if (file.exists()) {
@@ -602,7 +628,8 @@ object Util {
     values.put(MediaStore.Images.ImageColumns.WIDTH, bitmap.width)
     values.put(MediaStore.Images.ImageColumns.HEIGHT, bitmap.height)
 
-    val insertUri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values) ?: return
+    val insertUri =
+      context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values) ?: return
 
     context.contentResolver.openOutputStream(insertUri)?.use {
       ByteArrayOutputStream().use { bos ->
@@ -614,4 +641,92 @@ object Util {
     Timber.v("insertUri: $insertUri")
     ToastUtil.show(context, R.string.save_success)
   }
+
+  fun requestSaveAudioTag(
+    activity: BaseActivity, song: Song,
+    newTitle: String, newAlbum: String, newArtist: String,
+    newGenre: String, newYear: String, newTrackNum: String
+  ) {
+    val fieldMap = EnumMap<FieldKey, String>(FieldKey::class.java)
+
+    fieldMap[FieldKey.TITLE] = newTitle
+    fieldMap[FieldKey.ALBUM] = newAlbum
+    fieldMap[FieldKey.ARTIST] = newArtist
+    fieldMap[FieldKey.GENRE] = newGenre
+    fieldMap[FieldKey.YEAR] = newYear
+    fieldMap[FieldKey.TRACK] = newTrackNum
+
+    val request = PendingWriteRequest(song.data, fieldMap)
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      activity.pendingWriteRequest = request
+      activity.writeSongLauncher.launch(
+        IntentSenderRequest.Builder(
+          MediaStore.createWriteRequest(
+            context.contentResolver,
+            listOf(song.contentUri)
+          ).intentSender
+        ).build()
+      )
+    } else {
+      // TODO test
+      activity.lifecycleScope.launch {
+        try {
+          saveAudioTag(activity, request)
+        } catch (e: Exception) {
+          try {
+            var songFD =
+              activity.contentResolver.openFileDescriptor(
+                song.contentUri,
+                "w"
+              )!! // test if we can write
+            songFD.close()
+          } catch (securityException: SecurityException) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && securityException is RecoverableSecurityException) {
+              activity.pendingWriteRequest = request
+              activity.writeSongLauncher.launch(
+                IntentSenderRequest.Builder(
+                  securityException.userAction.actionIntent.intentSender,
+                ).build()
+              )
+              return@launch
+            }
+
+            throw securityException
+          }
+
+          Timber.v("Fail to save tag: $e")
+          ToastUtil.show(activity, R.string.save_error_arg, e.toString())
+        }
+      }
+    }
+  }
+
+  suspend fun saveAudioTag(context: Context, request: PendingWriteRequest) =
+    withContext(Dispatchers.IO) {
+      val audioFile = AudioFileIO.read(File(request.path))
+
+      val tag = audioFile.tagOrCreateAndSetDefault
+      for ((key, value) in request.fieldMap) {
+        try {
+          tag.setField(key, value)
+        } catch (e: Exception) {
+          Timber.v("setField($key, $value) failed: $e")
+        }
+      }
+
+      audioFile.commit()
+      MediaScannerConnection.scanFile(
+        context,
+        arrayOf(request.path), null
+      ) { _, uri ->
+//        context.contentResolver.notifyChange(Audio.Media.EXTERNAL_CONTENT_URI, null)
+        context.contentResolver.notifyChange(uri, null)
+      }
+
+      withContext(Dispatchers.Main) {
+        ToastUtil.show(context, R.string.save_success)
+      }
+    }
 }

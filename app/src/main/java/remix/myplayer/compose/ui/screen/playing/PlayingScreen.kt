@@ -30,11 +30,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.prefs.SettingPrefs
-import remix.myplayer.compose.viewmodel.MusicViewModel
-import remix.myplayer.compose.viewmodel.PlayingViewModel
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.musicViewModel
+import remix.myplayer.compose.viewmodel.playingViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.misc.isPortraitOrientation
 
 @Composable
@@ -56,10 +55,10 @@ private fun Portrait() {
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(30.dp)
   ) {
-    val musicState by activityViewModel<MusicViewModel>().musicState.collectAsStateWithLifecycle()
+    val musicState by musicViewModel.musicState.collectAsStateWithLifecycle()
     val song = musicState.song
 
-    val playingVM = activityViewModel<PlayingViewModel>()
+    val playingVM = playingViewModel
     val swatch by playingVM.swatch.collectAsStateWithLifecycle()
 
     PlayingTopBar(song, swatch)
@@ -93,7 +92,7 @@ private fun Portrait() {
     PlayingSeekbarWithText(musicState, swatch)
 
     val showBottomBar =
-      activityViewModel<SettingViewModel>().settingPrefs.playingScreenBottom != SettingPrefs.BOTTOM_SHOW_NONE
+      settingViewModel.settingPrefs.playingScreenBottom != SettingPrefs.BOTTOM_SHOW_NONE
     PlayingControl(Modifier.weight(if (showBottomBar) 1f else 2f), musicState, swatch)
 
     if (showBottomBar) {
@@ -101,7 +100,9 @@ private fun Portrait() {
         Modifier
           .weight(1.5f)
           .fillMaxWidth()
-          .padding(top = 12.dp), swatch
+          .padding(top = 12.dp),
+        musicState,
+        swatch
       )
     }
 
@@ -146,10 +147,10 @@ private fun Landscape() {
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(12.dp)
   ) {
-    val musicState by activityViewModel<MusicViewModel>().musicState.collectAsStateWithLifecycle()
+    val musicState by musicViewModel.musicState.collectAsStateWithLifecycle()
     val song = musicState.song
 
-    val swatch by activityViewModel<PlayingViewModel>().swatch.collectAsStateWithLifecycle()
+    val swatch by playingViewModel.swatch.collectAsStateWithLifecycle()
 
     PlayingTopBar(song, swatch)
 

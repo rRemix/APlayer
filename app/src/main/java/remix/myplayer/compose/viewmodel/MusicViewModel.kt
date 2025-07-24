@@ -8,15 +8,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.repo.PlayQueueRepository
-import remix.myplayer.compose.ui.dialog.DialogState
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -54,17 +53,19 @@ class MusicViewModel @Inject constructor(
   val playQueueSongs: StateFlow<List<Song>> = _playQueueSongs.asStateFlow()
 
   fun updateMusicState(
-    song: Song = _musicState.value.song,
-    newSong: Song = serviceRef?.get()?.nextSong ?: Song.EMPTY_SONG,
-    playing: Boolean = _musicState.value.playing,
-    playModel: Int = serviceRef?.get()?.playModel ?: MODE_LOOP
+    song: Song? = null,
+    newSong: Song? = null,
+    playing: Boolean? = null,
+    playModel: Int? = null
   ) {
-    _musicState.value = _musicState.value.copy(
-      song = song,
-      nextSong = newSong,
-      playing = playing,
-      playMode = playModel
-    )
+    _musicState.update { currentState ->
+      currentState.copy(
+        song = song ?: currentState.song,
+        nextSong = newSong ?: serviceRef?.get()?.nextSong ?: Song.EMPTY_SONG,
+        playing = playing ?: currentState.playing,
+        playMode = playModel ?: serviceRef?.get()?.playModel ?: MODE_LOOP
+      )
+    }
   }
 
   fun setPlayModel(mode: Int) {
@@ -78,6 +79,10 @@ class MusicViewModel @Inject constructor(
 
   fun getProgress(): Int {
     return serviceRef?.get()?.progress ?: 0
+  }
+
+  fun isPlayingSong(songId: Long): Boolean {
+    return _musicState.value.song.id == songId
   }
 
   fun removeFromQueue(id: Long) {

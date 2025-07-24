@@ -229,7 +229,7 @@ class DatabaseRepository private constructor() {
   fun insertPlayList(name: String): Single<Int> {
     return Single
         .fromCallable {
-          db.playListDao().insertPlayList(PlayList(0, name, LinkedHashSet(), Date().time)).toInt()
+          db.playListDao().insertPlayList(PlayList(0, name, ArrayList<Long>(), Date().time)).toInt()
         }
 
   }

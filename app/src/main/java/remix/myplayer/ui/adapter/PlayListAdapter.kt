@@ -134,7 +134,7 @@ class PlayListAdapter(layoutId: Int, multiChoice: MultipleChoice<PlayList>, recy
         else -> ""
       }
       if (key.isNotEmpty())
-        return Pinyin.toPinyin(key[0]).toUpperCase(Locale.getDefault()).substring(0, 1)
+        return Pinyin.toPinyin(key[0]).uppercase(Locale.getDefault()).substring(0, 1)
     }
     return ""
   }

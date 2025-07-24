@@ -57,8 +57,7 @@ class DownloadService : IntentService("DownloadService") {
       val release: Release = (intent.getSerializableExtra(EXTRA_RESPONSE) as? Release) ?: return
       val asset = release.assets ?: arrayListOf()
       val downloadUrl = asset[0].browser_download_url
-      val downloadDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-          ?: throw RuntimeException("下载目录不存在")
+      val downloadDir = File(applicationInfo.dataDir, "files/apks/")
       if (!downloadDir.exists() && !downloadDir.mkdirs()) {
         throw RuntimeException("下载目录创建失败")
       }
@@ -75,7 +74,7 @@ class DownloadService : IntentService("DownloadService") {
         }
       }
       postNotification(asset[0].size, 0)
-      if (isForce(release)) {
+      if (release.isForceUpdate()) {
         sendLocalBroadcast(Intent(ACTION_SHOW_DIALOG))
       }
       HttpsURLConnection.setDefaultSSLSocketFactory(OkHttpHelper.sSLSocketFactory)
@@ -148,12 +147,6 @@ class DownloadService : IntentService("DownloadService") {
 //            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
 //            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 //        }
-  }
-
-
-  private fun isForce(release: Release?): Boolean {
-    val split = release?.name?.split("-")
-    return split != null && split.size > 3
   }
 
   companion object {

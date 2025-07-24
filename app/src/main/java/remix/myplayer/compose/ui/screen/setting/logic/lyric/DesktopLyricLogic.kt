@@ -15,9 +15,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.screen.setting.SwitchPreference
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRIC
@@ -28,7 +27,7 @@ import remix.myplayer.util.Util.sendLocalBroadcast
 
 @Composable
 fun DesktopLyricLogic() {
-  val vm = activityViewModel<SettingViewModel>()
+  val vm = settingViewModel
   val context = LocalContext.current
 
   // TODO improve?

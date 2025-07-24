@@ -15,63 +15,56 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.theme.highLightText
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
 import remix.myplayer.compose.ui.widget.library.GlideCover
 import remix.myplayer.compose.ui.widget.popup.SongPopupButton
-import remix.myplayer.compose.viewmodel.MusicViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ListSong(
   modifier: Modifier = Modifier,
   song: Song,
+  modelParent: APlayerModel,
+  selected: Boolean,
+  playing: Boolean,
   onClickSong: () -> Unit,
   onLongClickSong: () -> Unit,
   num: Int? = null,
-  vm: MusicViewModel = activityViewModel()
 ) {
+  val theme = LocalTheme.current
+
   ConstraintLayout(
     modifier = modifier
       .fillMaxWidth()
       .combinedClickable(
         interactionSource = remember { MutableInteractionSource() },
-        indication = ripple(color = LocalTheme.current.ripple),
+        indication = ripple(color = theme.ripple),
         onClick = { onClickSong() },
         onLongClick = { onLongClickSong() }
       )
-      .background(LocalTheme.current.mainBackground)
+      .background(if (selected) theme.select else theme.mainBackground)
   ) {
     val (indicator, count, cover, popButton, column) = createRefs()
 
-    val musicState by vm.musicState.collectAsStateWithLifecycle()
-    val isPlayingSong by remember {
-      derivedStateOf {
-        musicState.song == song
-      }
-    }
-
-    if (isPlayingSong) {
+    if (playing) {
       Box(
         modifier = Modifier
           .width(4.dp)
           .fillMaxHeight()
           .padding(vertical = 8.dp)
-          .background(LocalTheme.current.highLightText())
+          .background(theme.highLightText())
           .constrainAs(indicator) {
             top.linkTo(parent.top)
             bottom.linkTo(parent.bottom)
@@ -122,7 +115,9 @@ fun ListSong(
         top.linkTo(parent.top)
         bottom.linkTo(parent.bottom)
         end.linkTo(parent.end)
-      }, song
+      },
+      song = song,
+      parent = modelParent
     )
   }
 }

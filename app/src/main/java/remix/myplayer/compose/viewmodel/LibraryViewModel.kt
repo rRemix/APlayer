@@ -11,7 +11,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.APlayerModel
@@ -47,6 +46,7 @@ class LibraryViewModel @Inject constructor(
   private val folderRepository: FolderRepository,
   val settingPrefs: SettingPrefs,
 ) : ViewModel(), MusicEventCallback {
+
   private var hasPermission = false
 
   private val _songs = MutableStateFlow<List<Song>>(emptyList())
@@ -128,12 +128,10 @@ class LibraryViewModel @Inject constructor(
 
   fun loadSongsByModels(models: List<APlayerModel>) = songRepo.getSongsByModels(models)
 
-  fun renamePlayList(id: Long, name: String) {
+  fun updatePlayList(playList: PlayList) {
     viewModelScope.launch {
       try {
-        val playList = playLists.first().firstOrNull { it.id == id }
-          ?: throw IllegalArgumentException("not found")
-        playListRepository.updatePlayList(playList.copy(name = name))
+        playListRepository.updatePlayList(playList)
         ToastUtil.show(context, R.string.save_success)
       } catch (e: Exception) {
         ToastUtil.show(context, R.string.save_error)
@@ -148,6 +146,7 @@ class LibraryViewModel @Inject constructor(
       Glide.get(context).clearMemory()
     }
 
+    // TODO compare list
     fetchSongs()
     fetchAlbums()
     fetchArtists()

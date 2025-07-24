@@ -28,15 +28,17 @@ import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.mp3.APlayerModel
-import remix.myplayer.bean.mp3.popMenuItems
+import remix.myplayer.bean.mp3.Album
+import remix.myplayer.bean.mp3.Artist
+import remix.myplayer.bean.mp3.Folder
+import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.bean.mp3.type
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.theme.popupButton
-import remix.myplayer.compose.viewmodel.LibraryViewModel
-import remix.myplayer.compose.viewmodel.MusicViewModel
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
+import remix.myplayer.compose.viewmodel.musicViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.misc.menu.LibraryListener.Companion.EXTRA_COVER
@@ -80,9 +82,9 @@ fun LibraryItemDropdownMenu(
 ) {
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
-  val libraryVM = activityViewModel<LibraryViewModel>()
-  val musicVM = activityViewModel<MusicViewModel>()
-  val settingVM = activityViewModel<SettingViewModel>()
+  val libraryVM = libraryViewModel
+  val musicVM = musicViewModel
+  val settingVM = settingViewModel
   val items = model.popMenuItems()
 
   DropdownMenu(
@@ -130,7 +132,7 @@ fun LibraryItemDropdownMenu(
               }
               //添加到播放列表
               R.string.add_to_playlist -> {
-                settingVM.showImportPlayListDialog(ids, "")
+                settingVM.showAddSongToPlayListDialog(ids, "")
               }
               //删除
               R.string.delete -> {
@@ -163,7 +165,7 @@ fun LibraryItemDropdownMenu(
                   return@launch
                 }
 
-                settingVM.showReNamePlayListDialog(model.getKey().toLong())
+                settingVM.showReNamePlayListDialog(model)
               }
 
               else -> {
@@ -173,5 +175,49 @@ fun LibraryItemDropdownMenu(
         }
       )
     }
+  }
+}
+
+private fun APlayerModel.popMenuItems(): List<Int> {
+  return when (this) {
+    is Album -> listOf(
+      R.string.play,
+      R.string.add_to_play_queue,
+      R.string.add_to_playlist,
+      R.string.set_album_cover,
+      R.string.delete
+    )
+
+    is Artist -> listOf(
+      R.string.play,
+      R.string.add_to_play_queue,
+      R.string.add_to_playlist,
+      R.string.set_artist_cover,
+      R.string.delete
+    )
+
+    is PlayList -> listOf(
+      R.string.play,
+      R.string.add_to_play_queue,
+      R.string.add_to_playlist,
+      R.string.set_playlist_cover,
+      R.string.rename,
+      R.string.delete
+    )
+
+    is Genre -> listOf(
+      R.string.play,
+      R.string.add_to_play_queue,
+      R.string.add_to_playlist
+    )
+
+    is Folder -> listOf(
+      R.string.play,
+      R.string.add_to_play_queue,
+      R.string.add_to_playlist,
+      R.string.delete
+    )
+
+    else -> throw IllegalArgumentException("unknown model: $this")
   }
 }

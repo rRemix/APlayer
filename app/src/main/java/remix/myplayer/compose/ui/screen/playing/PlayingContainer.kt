@@ -19,14 +19,13 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.viewmodel.PlayingViewModel
+import remix.myplayer.compose.viewmodel.playingViewModel
 import remix.myplayer.theme.Theme
 
 @Composable
-internal fun PlayingContainer(content: @Composable () -> Unit) {
-  val playingVM = activityViewModel<PlayingViewModel>()
+fun PlayingContainer(content: @Composable () -> Unit) {
+  val playingVM = playingViewModel
   val theme = LocalTheme.current
   val context = LocalContext.current
   val swatch by playingVM.swatch.collectAsStateWithLifecycle()

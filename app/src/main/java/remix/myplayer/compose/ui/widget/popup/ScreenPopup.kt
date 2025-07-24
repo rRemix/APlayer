@@ -25,12 +25,12 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
 
 @Composable
-fun ScreenPopupButton(library: Library?, vm : LibraryViewModel = activityViewModel()) {
+fun ScreenPopupButton(library: Library?, vm: LibraryViewModel = libraryViewModel) {
   if (library == null) {
     return
   }
@@ -47,11 +47,11 @@ fun ScreenPopupButton(library: Library?, vm : LibraryViewModel = activityViewMod
     }) {
     Icon(
       painter = painterResource(R.drawable.ic_sort_white_24dp),
-      contentDescription = "Timer"
+      contentDescription = "ScreenSortOrderPopUp"
     )
   }
 
-  val menuItems = library.menuItems
+  val sortOrderItems = library.menuItems
   val sortOrders = library.sortOrders
   val sortOrder = when (library.tag) {
     Library.TAG_SONG -> setting.songSortOrder
@@ -91,7 +91,7 @@ fun ScreenPopupButton(library: Library?, vm : LibraryViewModel = activityViewMod
       vm.fetchMedia()
     }
 
-    menuItems.forEachIndexed { index, res ->
+    sortOrderItems.forEachIndexed { index, res ->
       DropdownMenuItem(
         text = {
           Row(

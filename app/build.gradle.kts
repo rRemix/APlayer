@@ -4,10 +4,11 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.application)
     alias(libs.plugins.kotlin)
-//    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.compose.compiler)
 }
 
 fun readProperties(file: File): Properties {
@@ -288,6 +289,7 @@ dependencies {
     implementation(libs.androidx.hilt.navi.compose)
     implementation(libs.accompanist.drawablepainter)
     implementation(libs.reorderable)
+    implementation(libs.kotlinx.serialization)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

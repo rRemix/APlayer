@@ -31,19 +31,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.clickableWithoutRipple
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.app.CircleSeekBar
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
-import remix.myplayer.compose.viewmodel.TimerViewModel
+import remix.myplayer.compose.viewmodel.timerViewModel
+import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.util.ToastUtil
 
 @Composable
 fun TimerDialog() {
   val context = LocalContext.current
-  val timerVM = activityViewModel<TimerViewModel>()
+  val timerVM = timerViewModel
   val timerState by timerVM.timerState.collectAsStateWithLifecycle()
 
   val tipDialogState = rememberDialogState(false)
@@ -83,7 +83,12 @@ fun TimerDialog() {
       ) {
         item {
           Box(
-            modifier = Modifier.padding(top = 24.dp, bottom = 36.dp),
+            modifier = Modifier
+              .padding(
+                top = if (context.isPortraitOrientation()) 24.dp else 8.dp,
+                bottom = 36.dp
+              )
+              .fillMaxWidth(),
             contentAlignment = Alignment.Center
           ) {
             CircleSeekBar(Modifier.size(180.dp), progress = timerState.progress) { current, max ->

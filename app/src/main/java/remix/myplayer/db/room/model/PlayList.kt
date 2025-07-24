@@ -3,12 +3,14 @@ package remix.myplayer.db.room.model
 import androidx.room.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.serialization.Serializable
 import remix.myplayer.bean.mp3.APlayerModel
 import java.io.Serial
 
 /**
  * Created by remix on 2019/1/12
  */
+@Serializable
 @Entity(indices = [Index(value = ["name"], unique = true)])
 @TypeConverters(PlayList.Converter::class)
 data class PlayList(
@@ -16,21 +18,25 @@ data class PlayList(
     val id: Long,
     val name: String,
 //    val count: Int,
-    val audioIds: LinkedHashSet<Long>,
+    val audioIds: ArrayList<Long>,
     val date: Long
 ) : APlayerModel {
 
   fun isFavorite() = id == 1L
 
+  override fun getKey(): String {
+    return id.toString()
+  }
+
   class Converter {
     @TypeConverter
-    fun toStrList(listStr: String?): LinkedHashSet<Long>? {
+    fun toStrList(listStr: String?): ArrayList<Long>? {
       val gson = Gson()
-      return gson.fromJson(listStr, object : TypeToken<LinkedHashSet<Long>>() {}.type)
+      return gson.fromJson(listStr, object : TypeToken<ArrayList<Long>>() {}.type)
     }
 
     @TypeConverter
-    fun toListStr(list: LinkedHashSet<Long>?): String? {
+    fun toListStr(list: ArrayList<Long>?): String? {
       return Gson().toJson(list)
     }
   }
@@ -40,9 +46,4 @@ data class PlayList(
     private const val serialVersionUID: Long = 7380279450459904510L
     const val TABLE_NAME = "PlayList"
   }
-
-  override fun getKey(): String {
-    return id.toString()
-  }
-
 }

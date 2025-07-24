@@ -52,6 +52,11 @@ data class AppTheme(
     @ReadOnlyComposable
     get() = colorResource(if (isLight) R.color.light_ripple_color else R.color.dark_ripple_color)
 
+  val select
+    @Composable
+    @ReadOnlyComposable
+    get() = colorResource(if (isLight) R.color.light_select_color else R.color.dark_select_color)
+
   val mainBackground
     @Composable
     @ReadOnlyComposable

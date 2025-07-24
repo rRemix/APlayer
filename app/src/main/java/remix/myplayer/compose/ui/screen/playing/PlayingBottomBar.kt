@@ -41,27 +41,27 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.compose.CenterInBox
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.clickableWithoutRipple
 import remix.myplayer.compose.prefs.SettingPrefs.Companion.BOTTOM_SHOW_BOTH
 import remix.myplayer.compose.prefs.SettingPrefs.Companion.BOTTOM_SHOW_NEXT
 import remix.myplayer.compose.prefs.SettingPrefs.Companion.BOTTOM_SHOW_NONE
 import remix.myplayer.compose.prefs.SettingPrefs.Companion.BOTTOM_SHOW_VOLUME
-import remix.myplayer.compose.ui.dialog.LineSlider
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.viewmodel.MusicViewModel
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.ui.widget.common.LineSlider
+import remix.myplayer.compose.ui.widget.common.defaultLineSliderProperties
+import remix.myplayer.compose.viewmodel.MusicState
+import remix.myplayer.compose.viewmodel.settingViewModel
 
 @Composable
-internal fun PlayingBottomBar(modifier: Modifier, swatch: Palette.Swatch) {
-  val settingVM = activityViewModel<SettingViewModel>()
+internal fun PlayingBottomBar(modifier: Modifier, musicState: MusicState, swatch: Palette.Swatch) {
+  val settingVM = settingViewModel
 
   Box(modifier = modifier, contentAlignment = Alignment.TopCenter) {
     val swatchColor = Color(swatch.rgb)
@@ -75,29 +75,29 @@ internal fun PlayingBottomBar(modifier: Modifier, swatch: Palette.Swatch) {
       mutableStateOf(playingScreenBottom != BOTTOM_SHOW_NEXT)
     }
 
-    var count by remember {
+    var refreshKey by remember {
       mutableIntStateOf(0)
     }
 
     AnimatedVisibility(nextSongIsVisible, enter = fadeIn(), exit = fadeOut()) {
-      NextSong(swatchColor) {
+      NextSong(musicState, swatchColor) {
         if (playingScreenBottom != BOTTOM_SHOW_NEXT) {
           nextSongIsVisible = false
           volumeIsVisible = true
-          count++
+          refreshKey++
         }
       }
     }
     AnimatedVisibility(volumeIsVisible, enter = fadeIn(), exit = fadeOut()) {
       VolumeSeekbar(swatchColor) {
         if (playingScreenBottom != BOTTOM_SHOW_VOLUME) {
-          count++
+          refreshKey++
         }
       }
     }
 
-    LaunchedEffect(count) {
-      if (count == 0 && playingScreenBottom == BOTTOM_SHOW_BOTH || count > 0) {
+    LaunchedEffect(refreshKey) {
+      if (refreshKey == 0 && playingScreenBottom == BOTTOM_SHOW_BOTH || refreshKey > 0) {
         // nextSong -> GONE
         // volume -> VISIBLE
         delay(3000)
@@ -109,7 +109,7 @@ internal fun PlayingBottomBar(modifier: Modifier, swatch: Palette.Swatch) {
 }
 
 @Composable
-private fun NextSong(swatchColor: Color, onClick: (() -> Unit)? = null) {
+private fun NextSong(musicState: MusicState, swatchColor: Color, onClick: (() -> Unit)? = null) {
   CenterInBox(
     modifier = Modifier
       .padding(horizontal = 36.dp)
@@ -119,7 +119,6 @@ private fun NextSong(swatchColor: Color, onClick: (() -> Unit)? = null) {
         onClick?.invoke()
       }
   ) {
-    val musicState by activityViewModel<MusicViewModel>().musicState.collectAsStateWithLifecycle()
     Text(
       text = stringResource(R.string.next_song, musicState.nextSong.title),
       color = Color(
@@ -219,13 +218,15 @@ private fun RowScope.VolumeSeekBar(
     modifier = Modifier
       .height(48.dp)
       .weight(1f),
-    trackHeight = 2.dp,
-    trackBackgroundColor = trackBackgroundColor(),
-    trackProgressColor = swatchColor,
-    thumbColor = swatchColor,
-    thumbWidth = 2.dp,
-    thumbHeight = 6.dp,
-    thumbShape = RectangleShape
+    properties = defaultLineSliderProperties.copy(
+      trackHeight = 2.dp,
+      trackBackgroundColor = playingTrackBackgroundColor,
+      trackProgressColor = swatchColor,
+      thumbColor = swatchColor,
+      thumbWidth = 2.dp,
+      thumbHeight = 6.dp,
+      thumbShape = RectangleShape
+    )
   )
 
   LaunchedEffect(Unit) {
@@ -238,7 +239,7 @@ private fun RowScope.VolumeSeekBar(
   val scope = rememberCoroutineScope()
   DisposableEffect(Unit) {
     scope.launch {
-      while (true) {
+      while (isActive) {
         current = audioManager.getStreamVolume(STREAM_MUSIC)
         delay(1000)
       }

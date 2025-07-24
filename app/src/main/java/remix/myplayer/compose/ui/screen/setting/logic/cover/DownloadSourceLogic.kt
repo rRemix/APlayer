@@ -9,20 +9,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.dialog.ItemsCallbackSingleChoice
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
-import remix.myplayer.compose.viewmodel.LibraryViewModel
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 
 private val itemRes = listOf(R.string.lastfm, R.string.netease)
 
 @Composable
 fun DownloadSourceLogic() {
-  val settingVM = activityViewModel<SettingViewModel>()
-  val libraryVM = activityViewModel<LibraryViewModel>()
+  val settingVM = settingViewModel
+  val libraryVM = libraryViewModel
   val context = LocalContext.current
   var selected by remember {
     mutableIntStateOf(settingVM.settingPrefs.downloadSource)

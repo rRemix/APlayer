@@ -7,13 +7,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.screen.setting.SwitchPreference
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
 
 @Composable
 fun IgnoreAudioFocusLogic() {
-    val setting = activityViewModel<LibraryViewModel>().settingPrefs
+    val setting = libraryViewModel.settingPrefs
 
     var ignoreAudioFocus by remember { mutableStateOf(setting.ignoreAudioFocus) }
 

@@ -15,19 +15,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.documentfile.provider.DocumentFile
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.rememberMutableStateSetOf
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
-import remix.myplayer.compose.viewmodel.LibraryViewModel
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 
 @Composable
 fun BlackListLogic() {
   val context = LocalContext.current
-  val settingVM = activityViewModel<SettingViewModel>()
-  val libraryVM = activityViewModel<LibraryViewModel>()
+  val settingVM = settingViewModel
+  val libraryVM = libraryViewModel
 
   val blackList = rememberMutableStateSetOf(*settingVM.settingPrefs.blacklist.toTypedArray())
   var pendingDelete by rememberSaveable {

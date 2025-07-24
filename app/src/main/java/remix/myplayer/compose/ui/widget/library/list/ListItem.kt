@@ -30,18 +30,20 @@ fun ListItem(
   model: APlayerModel,
   text1: String,
   text2: String,
+  selected: Boolean,
   onClick: () -> Unit,
   onLongClick: () -> Unit
 ) {
+  val theme = LocalTheme.current
   Row(
     modifier = modifier
       .combinedClickable(
         interactionSource = remember { MutableInteractionSource() },
-        indication = ripple(color = LocalTheme.current.ripple),
+        indication = ripple(color = theme.ripple),
         onClick = onClick,
         onLongClick = onLongClick
       )
-      .background(LocalTheme.current.mainBackground),
+      .background(if (selected) theme.select else theme.mainBackground),
     verticalAlignment = Alignment.CenterVertically
   ) {
     GlideCover(

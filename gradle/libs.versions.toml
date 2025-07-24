@@ -1,37 +1,39 @@
 [versions]
 accompanistDrawablepainter = "0.37.3"
-agp = "8.6.0"
+agp = "8.6.1"
 constraintlayoutCompose = "1.1.1"
-hiltAndroid = "2.55"
-kotlin = "1.9.23"
-ksp = "1.9.23-1.0.19"
+hiltAndroid = "2.56.2"
+kotlin = "2.1.21"
+kotlinxSerializationJson = "1.9.0"
+ksp = "2.1.21-2.0.2"
 #kotlin = "2.1.20"
 #ksp = "2.1.21-2.0.1"
-hilt = "2.55"
-nav = "2.9.0"
+hilt = "2.56.2"
+nav = "2.9.2"
 glide = "4.16.0"
 glideCompose = "1.0.0-beta01"
 retrofit = "2.11.0"
-room = "2.6.1"
+room = "2.7.2"
 xxpermissions = "21.2"
 
 activityCompose = "1.10.1"
-composeBom = "2025.05.00"
-lifecycleRuntimeKtx = "2.9.0"
-lifecycleViewmodelCompose = "2.9.0"
+composeBom = "2025.07.00"
+lifecycleRuntimeKtx = "2.9.2"
+lifecycleViewmodelCompose = "2.9.2"
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-#kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 [libraries]
 # kotlin
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.0" }
-kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.5.1"}
+kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.9.0"}
 
 # hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }

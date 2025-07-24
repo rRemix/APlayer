@@ -478,8 +478,8 @@ class PlayerActivity : BaseMusicActivity() {
 
       runOnUiThread {
         if (min != 0) {
-          @RequiresApi(Build.VERSION_CODES.O)
-          volumeSeekbar.min = min
+//          @RequiresApi(Build.VERSION_CODES.O)
+//          volumeSeekbar.min = min
         }
         volumeSeekbar.max = max
         volumeSeekbar.progress = current

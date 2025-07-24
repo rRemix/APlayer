@@ -16,7 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.bean.misc.Library
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.screen.RemoteScreen
 import remix.myplayer.compose.ui.screen.library.AlbumScreen
 import remix.myplayer.compose.ui.screen.library.ArtistScreen
@@ -25,13 +24,14 @@ import remix.myplayer.compose.ui.screen.library.GenreScreen
 import remix.myplayer.compose.ui.screen.library.PlayListScreen
 import remix.myplayer.compose.ui.screen.library.SongScreen
 import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 
 @Composable
 fun ViewPager(
   modifier: Modifier = Modifier,
   libraries: List<Library>,
   pagerState: PagerState,
-  vm: SettingViewModel = activityViewModel()
+  vm: SettingViewModel = settingViewModel
 ) {
   HorizontalPager(
     modifier = modifier,

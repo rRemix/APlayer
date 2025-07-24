@@ -19,14 +19,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.rememberMutableStateSetOf
 import remix.myplayer.compose.ui.dialog.DialogState
 import remix.myplayer.compose.ui.dialog.ItemsCallbackMultiChoice
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.helper.M3UHelper
 import remix.myplayer.helper.M3UHelper.importLocalPlayList
@@ -36,7 +35,7 @@ import remix.myplayer.util.ToastUtil
 fun ImportPlayListLogic() {
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
-  val settingVM = activityViewModel<SettingViewModel>()
+  val settingVM = settingViewModel
 
   val importPlaylistState = rememberDialogState(false)
   NormalPreference(
@@ -61,7 +60,7 @@ fun ImportPlayListLogic() {
 
         scope.launch(Dispatchers.IO) {
           val ids = withContext(Dispatchers.IO) { M3UHelper.parseSongIds(context, uri) }
-          settingVM.showImportPlayListDialog(
+          settingVM.showAddSongToPlayListDialog(
             ids,
             DocumentFile.fromSingleUri(context, uri)?.name?.removeSuffix(".m3u") ?: ""
           )

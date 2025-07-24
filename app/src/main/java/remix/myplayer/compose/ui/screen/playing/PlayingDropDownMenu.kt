@@ -16,16 +16,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.compose.AudioTagEditor
 import remix.myplayer.compose.activity.base.BaseActivity
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.dialog.DialogState
 import remix.myplayer.compose.ui.dialog.InputDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.viewmodel.LibraryViewModel
-import remix.myplayer.compose.viewmodel.SettingViewModel
-import remix.myplayer.compose.viewmodel.TimerViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
+import remix.myplayer.compose.viewmodel.timerViewModel
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.util.ToastUtil
 
@@ -35,8 +33,8 @@ fun PlayingDropDownMenu(
   song: Song,
   onDismissRequest: () -> Unit
 ) {
-  val libraryVM = activityViewModel<LibraryViewModel>()
-  val settingVM = activityViewModel<SettingViewModel>()
+  val libraryVM = libraryViewModel
+  val settingVM = settingViewModel
   val menuItems =
     listOf(
       R.string.song_edit,
@@ -51,7 +49,7 @@ fun PlayingDropDownMenu(
     )
   val activity = LocalActivity.current as? BaseActivity
 
-  val timerVM = activityViewModel<TimerViewModel>()
+  val timerVM = timerViewModel
 
   val speedDialogState = rememberDialogState()
   SpeedDialog(speedDialogState)
@@ -72,7 +70,7 @@ fun PlayingDropDownMenu(
                 return@DropdownMenuItem
               }
               if (song.isLocal()) {
-                AudioTagEditor(activity, song).edit()
+                settingVM.showSongEditDialog(song)
               }
             }
 
@@ -80,9 +78,7 @@ fun PlayingDropDownMenu(
               if (activity == null) {
                 return@DropdownMenuItem
               }
-              if (song.isLocal()) {
-                AudioTagEditor(activity, song).detail()
-              }
+              settingVM.showSongDetailDialog(song)
             }
 
             R.string.collect -> {
@@ -96,7 +92,7 @@ fun PlayingDropDownMenu(
             }
 
             R.string.add_to_playlist -> {
-              settingVM.showImportPlayListDialog(listOf(song.id))
+              settingVM.showAddSongToPlayListDialog(listOf(song.id))
             }
 
             R.string.sleep_timer -> {
@@ -132,7 +128,7 @@ fun PlayingDropDownMenu(
 
 @Composable
 private fun SpeedDialog(state: DialogState) {
-  val settingPrefs = activityViewModel<SettingViewModel>().settingPrefs
+  val settingPrefs = settingViewModel.settingPrefs
   val context = LocalContext.current
 
   var text by rememberSaveable {

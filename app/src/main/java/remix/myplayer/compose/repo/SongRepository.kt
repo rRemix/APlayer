@@ -5,16 +5,24 @@ import android.database.Cursor
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio
+import android.provider.MediaStore.Audio.Genres
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Folder
+import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.prefs.SettingPrefs
+import remix.myplayer.db.room.dao.PlayListDao
 import remix.myplayer.db.room.model.PlayList
+import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.checkWorkerThread
 import remix.myplayer.util.ItemsSorter
+import remix.myplayer.util.MediaStoreUtil.getSongInfo
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -37,8 +45,9 @@ interface SongRepository {
 
 class SongRepoImpl @Inject constructor(
   @ApplicationContext private val context: Context,
+  private val playListDao: PlayListDao,
   private val settingPrefs: SettingPrefs
-) : SongRepository, AbstractRepository(settingPrefs) {
+) : SongRepository, AbstractRepository(settingPrefs), CoroutineScope by MainScope() {
 
   override fun allSongs(): List<Song> {
     return getSongs(
@@ -117,16 +126,16 @@ class SongRepoImpl @Inject constructor(
 
   override fun getSongsByModels(models: List<APlayerModel>): List<Song> {
     checkWorkerThread()
-    val songs = arrayListOf<Song>()
+    val result = arrayListOf<Song>()
 
     models.forEach {
       when (it) {
         is Song -> {
-          songs.add(it)
+          result.add(it)
         }
 
         is Album -> {
-          songs.addAll(
+          result.addAll(
             getSongs(
               Audio.Media.ALBUM_ID + "=?",
               arrayOf(it.albumID.toString()),
@@ -136,7 +145,7 @@ class SongRepoImpl @Inject constructor(
         }
 
         is Artist -> {
-          songs.addAll(
+          result.addAll(
             getSongs(
               Audio.Media.ARTIST_ID + "=?",
               arrayOf(it.artistID.toString()),
@@ -145,24 +154,67 @@ class SongRepoImpl @Inject constructor(
           )
         }
 
+        is Genre -> {
+          context.contentResolver.query(
+            Genres.Members.getContentUri("external", it.id),
+            baseProjection,
+            null,
+            null,
+            settingPrefs.genreDetailSortOrder
+          )?.use { songCursor ->
+            while (songCursor.moveToNext()) {
+              result.add(getSongInfo(songCursor))
+            }
+          }
+        }
+
         is Folder -> {
-          songs.addAll(getSongs(null, null, settingPrefs.folderDetailSortOrder).filter { song ->
+          result.addAll(getSongs(null, null, settingPrefs.folderDetailSortOrder).filter { song ->
             song.data.substring(0, song.data.lastIndexOf("/")) == it.path
           })
         }
 
         is PlayList -> {
-          songs.addAll(
-            getSongs(
-              Audio.Media._ID + " in(" + makeInStr(it.audioIds.toList()) + ")",
-              null,
-              null
-            )
+          val customSort = settingPrefs.playListDetailSortOrder == SortOrder.PLAYLIST_SONG_CUSTOM
+          val ids = it.audioIds.toList()
+
+          val songs = getSongs(
+            makeInStrQuery(ids),
+            null,
+            if (customSort) null else settingPrefs.playListDetailSortOrder
           )
+
+          val tempArray: Array<Song> = Array(ids.size) { Song.EMPTY_SONG }
+          songs.forEachIndexed { index, song ->
+            tempArray[if (customSort) ids.indexOf(song.id) else index] = song
+          }
+
+          // remove no longer exist
+          if (songs.size < it.audioIds.size) {
+            val deleteIds = ArrayList<Long>()
+            val existIds = songs.map { it.id }
+
+            for (audioId in it.audioIds) {
+              if (!existIds.contains(audioId)) {
+                deleteIds.add(audioId)
+              }
+            }
+
+            if (deleteIds.isNotEmpty()) {
+              it.audioIds.removeAll(deleteIds)
+              launch {
+                playListDao.updateSuspend(it)
+              }
+            }
+          }
+
+          result.addAll(
+            tempArray
+              .filter { it.id != Song.EMPTY_SONG.id })
         }
       }
     }
 
-    return songs
+    return result
   }
 }

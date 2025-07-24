@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.clickableWithoutRipple
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.nav.RoutePlayingScreen
@@ -39,6 +38,7 @@ import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
 import remix.myplayer.compose.ui.widget.library.GlideCover
 import remix.myplayer.compose.viewmodel.MusicViewModel
+import remix.myplayer.compose.viewmodel.musicViewModel
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
@@ -48,7 +48,7 @@ import kotlin.math.absoluteValue
 private const val triggerThreshold = 10
 
 @Composable
-fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = activityViewModel()) {
+fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = musicViewModel) {
   val musicState by vm.musicState.collectAsStateWithLifecycle()
 //  if (currentSong.id < 0) {
 //    return

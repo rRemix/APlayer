@@ -7,17 +7,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.dialog.ItemsCallbackSingleChoice
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.libraryViewModel
 
 @Composable
 fun AutoPlayLogic() {
     val state = rememberDialogState(false)
-    val setting = activityViewModel<LibraryViewModel>().settingPrefs
+    val setting = libraryViewModel.settingPrefs
     var autoPlay by remember {
         mutableIntStateOf(setting.autoPlay)
     }

@@ -14,31 +14,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.gson.Gson
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
-import remix.myplayer.compose.viewmodel.SettingViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
+import remix.myplayer.util.Util
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun LyricPriorityLogic() {
-  val vm = activityViewModel<SettingViewModel>()
+  val vm = settingViewModel
   val context = LocalContext.current
-  val hapticFeedback = LocalHapticFeedback.current
   val dialogState = rememberDialogState()
 
   NormalPreference(
@@ -75,7 +72,7 @@ fun LyricPriorityLogic() {
           add(to.index, removeAt(from.index))
         }
 
-        hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+        Util.vibrate(context, 50)
       }
 
       LazyColumn(
@@ -89,10 +86,10 @@ fun LyricPriorityLogic() {
                 .height(48.dp)
                 .draggableHandle(
                   onDragStarted = {
-                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                    Util.vibrate(context, 50)
                   },
                   onDragStopped = {
-                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                    Util.vibrate(context, 50)
                   },
                 ),
               contentAlignment = Alignment.CenterStart

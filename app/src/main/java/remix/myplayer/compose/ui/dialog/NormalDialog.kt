@@ -60,6 +60,7 @@ fun NormalDialog(
     dialogState,
     containerPadding = containerPadding,
     autoDismiss = autoDismiss,
+    cancelOutside = cancelOutside,
     title = if (titleRes != null) stringResource(titleRes) else null,
     titleAlignment = titleAlignment,
     content = if (contentRes != null) stringResource(contentRes) else null,
@@ -99,7 +100,7 @@ fun NormalDialog(
   itemsCallbackSingleChoice: ItemsCallbackSingleChoice? = null,
   itemsCallbackMultiChoice: ItemsCallbackMultiChoice? = null
 ) {
-  BaseDialog(dialogState.isOpen, onDismissRequest = {
+  BaseDialog(dialogState.isOpen, cancelOutside = cancelOutside, onDismissRequest = {
     onDismissRequest?.invoke()
     dialogState.dismiss()
   }) {

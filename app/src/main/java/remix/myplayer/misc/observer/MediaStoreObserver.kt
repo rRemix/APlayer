@@ -22,12 +22,6 @@ class MediaStoreObserver : ContentObserver(null), Runnable {
   private var match = -1
 
   override fun run() {
-    Completable
-        .fromAction {
-//          service.get()?.setAllSong(MediaStoreUtil.getAllSongsId())
-        }
-        .subscribeOn(Schedulers.io())
-        .subscribe()
     sendLocalBroadcast(Intent(MusicService.MEDIA_STORE_CHANGE))
   }
 

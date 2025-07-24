@@ -20,21 +20,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.popup.ScreenPopupButton
 import remix.myplayer.compose.viewmodel.SettingViewModel
-import remix.myplayer.compose.viewmodel.TimerViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
+import remix.myplayer.compose.viewmodel.timerViewModel
 import remix.myplayer.ui.activity.SearchActivity
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun AppBar(
+fun HomeAppBar(
   scrollBehavior: TopAppBarScrollBehavior,
   drawerState: DrawerState
 ) {
@@ -58,7 +59,7 @@ fun AppBar(
 }
 
 @Composable
-private fun AppBarActions(vm: SettingViewModel = activityViewModel()) {
+private fun AppBarActions(vm: SettingViewModel = settingViewModel) {
   val library by vm.currentLibrary.collectAsStateWithLifecycle()
 
   if (library.tag != Library.TAG_FOLDER && library.tag != Library.TAG_REMOTE) {
@@ -82,12 +83,19 @@ private fun AppBarActions(vm: SettingViewModel = activityViewModel()) {
 fun CommonAppBar(
   title: String,
   showBack: Boolean = true,
-  actions: List<AppBarAction> = defaultActions
+  actions: @Composable () -> Unit
 ) {
   val navController = LocalNavController.current
 
   TopAppBar(
-    title = { Text(title, color = Color.White, modifier = Modifier.padding(start = 16.dp)) },
+    title = {
+      Text(
+        title,
+        color = Color.White,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(start = 16.dp)
+      )
+    },
     modifier = Modifier,
     navigationIcon = {
       if (showBack) {
@@ -102,14 +110,7 @@ fun CommonAppBar(
       }
     },
     actions = {
-      actions.map {
-        IconButton(onClick = it.action) {
-          Icon(
-            painter = painterResource(it.icon),
-            contentDescription = it.contentDescription
-          )
-        }
-      }
+      actions()
     },
     colors = TopAppBarDefaults.topAppBarColors(
       containerColor = LocalTheme.current.primary,
@@ -120,12 +121,34 @@ fun CommonAppBar(
   )
 }
 
-private val defaultActions: List<AppBarAction>
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CommonAppBar(
+  title: String,
+  showBack: Boolean = true,
+  actions: List<AppBarAction> = defaultActions
+) {
+  CommonAppBar(
+    title, showBack,
+    actions = {
+      actions.map {
+        IconButton(onClick = it.action) {
+          Icon(
+            painter = painterResource(it.icon),
+            contentDescription = it.contentDescription
+          )
+        }
+      }
+    },
+  )
+}
+
+val defaultActions: List<AppBarAction>
   @Composable
   get() {
     val context = LocalContext.current
 
-    val timerVM = activityViewModel<TimerViewModel>()
+    val timerVM = timerViewModel
 
     return listOf(
       AppBarAction(R.drawable.ic_timer_white_24dp, "Timer") {

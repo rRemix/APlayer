@@ -128,6 +128,12 @@ abstract class AbstractRepository(private val settingPrefs: SettingPrefs) {
   }
 
   companion object {
+    const val CUSTOMSORT = "CUSTOMSORT"
+
+    fun makeInStrQuery(ids: List<Long>): String {
+      return Audio.Media._ID + " in(" + makeInStr(ids) + ")"
+    }
+
     fun makeInStr(audioIds: List<Long>): String {
       val inStrBuilder = StringBuilder(127)
 

@@ -18,7 +18,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -30,15 +29,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.clickableWithoutRipple
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.nav.RouteSongChoose
 import remix.myplayer.compose.ui.dialog.InputDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.viewmodel.LibraryViewModel
-import remix.myplayer.ui.misc.MultipleChoice
+import remix.myplayer.compose.viewmodel.libraryViewModel
+import remix.myplayer.compose.viewmodel.mainViewModel
 
 @SuppressLint("CheckResult")
 @Composable
@@ -53,8 +51,8 @@ fun FAButton(pagerState: PagerState, libraries: List<Library>) {
 
   val navController = LocalNavController.current
   val context = LocalContext.current
-  val scope = rememberCoroutineScope()
-  val vm = activityViewModel<LibraryViewModel>()
+  val libraryVM = libraryViewModel
+  val mainVM = mainViewModel
   var text by rememberSaveable {
     mutableStateOf("")
   }
@@ -72,7 +70,7 @@ fun FAButton(pagerState: PagerState, libraries: List<Library>) {
       text = it
     }
   ) {
-    vm.insertPlayList(it) { id ->
+    libraryVM.insertPlayList(it) { id ->
       if (id > 0) {
         navController.navigate("$RouteSongChoose/${id}/$it")
       }
@@ -90,11 +88,11 @@ fun FAButton(pagerState: PagerState, libraries: List<Library>) {
         .size(48.dp)
         .background(color = LocalTheme.current.secondary, shape = CircleShape)
         .clickableWithoutRipple {
-          if (MultipleChoice.isActiveSomeWhere) {
+          if (mainVM.multiSelectState.value.isShowing()) {
             return@clickableWithoutRipple
           }
 
-          text = "${context.getString(R.string.local_list)}${vm.playLists.value.size}"
+          text = "${context.getString(R.string.local_list)}${libraryVM.playLists.value.size}"
           dialogState.show()
         },
       contentAlignment = Alignment.Center

@@ -11,30 +11,40 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.compose.activityViewModel
+import remix.myplayer.compose.nav.DetailScreenRoute
+import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.spanCount
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.library.ModeHeader
 import remix.myplayer.compose.ui.widget.library.list.GridItem
 import remix.myplayer.compose.ui.widget.library.list.ListItem
-import remix.myplayer.compose.viewmodel.LibraryViewModel
+import remix.myplayer.compose.viewmodel.MultiSelectState
+import remix.myplayer.compose.viewmodel.libraryViewModel
+import remix.myplayer.compose.viewmodel.mainViewModel
 import remix.myplayer.ui.adapter.HeaderAdapter
 
 @Composable
-fun AlbumScreen(vm: LibraryViewModel = activityViewModel()) {
-  val albums by vm.albums.collectAsStateWithLifecycle()
-  val setting = vm.settingPrefs
-
+fun AlbumScreen() {
+  val libraryVM = libraryViewModel
+  val albums by libraryVM.albums.collectAsStateWithLifecycle()
+  val setting = libraryVM.settingPrefs
+  val nav = LocalNavController.current
   var grid by remember { mutableIntStateOf(setting.albumMode) }
+
+  val mainVM = mainViewModel
+  val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
+  val context = LocalContext.current
 
   Column(
     modifier = Modifier.background(LocalTheme.current.libraryBackground)
@@ -47,6 +57,13 @@ fun AlbumScreen(vm: LibraryViewModel = activityViewModel()) {
         if (grid == HeaderAdapter.GRID_MODE) HeaderAdapter.LIST_MODE else HeaderAdapter.GRID_MODE
       setting.albumMode = grid
     }
+
+    val selectedIds by remember {
+      derivedStateOf {
+        multiSelectState.selectedModels(MultiSelectState.Where.Album)
+      }
+    }
+
     if (grid == HeaderAdapter.LIST_MODE) {
       val listState = rememberLazyListState()
       LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
@@ -57,10 +74,21 @@ fun AlbumScreen(vm: LibraryViewModel = activityViewModel()) {
             modifier = Modifier.height(64.dp),
             model = album,
             text1 = album.album,
-            text2 = pluralStringResource(R.plurals.song_num_1, album.count, album.artist,
-              album.count),
-            onClick = {},
-            onLongClick = {})
+            text2 = pluralStringResource(
+              R.plurals.song_num_1, album.count, album.artist,
+              album.count
+            ),
+            selected = selectedIds.contains(album.getKey()),
+            onClick = {
+              if (multiSelectState.where == MultiSelectState.Where.Album) {
+                mainVM.updateMultiSelectModel(album)
+                return@ListItem
+              }
+              nav.navigate(DetailScreenRoute(album = album))
+            },
+            onLongClick = {
+              mainVM.showMultiSelect(context, MultiSelectState.Where.Album, album)
+            })
         }
       }
     } else {
@@ -72,8 +100,20 @@ fun AlbumScreen(vm: LibraryViewModel = activityViewModel()) {
         content = {
           items(albums, key = {
             it.albumID
-          }) {
-            GridItem(it, it.album, it.artist, onClick = {}, onLongClick = {})
+          }) { album ->
+            GridItem(
+              album, album.album, album.artist,
+              selected = selectedIds.contains(album.getKey()),
+              onClick = {
+                if (multiSelectState.where == MultiSelectState.Where.Album) {
+                  mainVM.updateMultiSelectModel(album)
+                  return@GridItem
+                }
+
+                nav.navigate(DetailScreenRoute(album = album))
+              }, onLongClick = {
+                mainVM.showMultiSelect(context, MultiSelectState.Where.Album, album)
+              })
           }
         })
     }

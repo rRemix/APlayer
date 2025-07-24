@@ -14,7 +14,7 @@ import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.activity.base.BaseActivity
 import remix.myplayer.compose.prefs.SettingPrefs
-import remix.myplayer.compose.repo.AbstractRepository.Companion.makeInStr
+import remix.myplayer.compose.repo.AbstractRepository.Companion.makeInStrQuery
 import remix.myplayer.compose.repo.PlayListRepository
 import remix.myplayer.compose.repo.SongRepository
 import remix.myplayer.db.room.model.PlayList
@@ -36,7 +36,8 @@ class DeleteSongUseCase @Inject constructor(
   suspend operator fun invoke(
     activity: BaseActivity?,
     models: List<APlayerModel>,
-    deleteSource: Boolean
+    deleteSource: Boolean,
+    parent : APlayerModel?
   ) =
     withContext(Dispatchers.IO) {
       if (activity == null || models.isEmpty()) {
@@ -45,8 +46,24 @@ class DeleteSongUseCase @Inject constructor(
 
       settingPrefs.deleteSource = deleteSource
 
-      val isAllPlaylist = models.all { it is PlayList }
-      if (isAllPlaylist) {
+
+      if (parent is PlayList) { // delete songs in playlist
+        val audioIds = models.map {
+          if (it is Song.Local) {
+            it.id
+          } else {
+            -1
+          }
+        }
+        parent.audioIds.removeAll(audioIds)
+
+        playListRepo.updatePlayList(parent)
+
+        if (!deleteSource) {
+          activity.contentResolver.notifyChange(Audio.Media.EXTERNAL_CONTENT_URI, null)
+          return@withContext
+        }
+      } else if (models.all { it is PlayList }) { // delete playlists
         for (model in models) {
           val playList = model as PlayList
           if (playList.isFavorite()) {
@@ -66,25 +83,29 @@ class DeleteSongUseCase @Inject constructor(
       val songs = songRepo.getSongsByModels(models)
       val songIds = songs.map { it.id }
 
-      val deleteId: MutableSet<String> = settingPrefs.deleteIds.toMutableSet().apply {
-        addAll(songIds.map { it.toString() })
-      }
+      if (songs.isNotEmpty()) {
+        val deleteId: MutableSet<String> = settingPrefs.deleteIds.toMutableSet().apply {
+          addAll(songIds.map { it.toString() })
+        }
 
-      // save to sp
-      settingPrefs.deleteIds = deleteId
+        // save to sp
+        settingPrefs.deleteIds = deleteId
 
-      // remove from playQueue
-      deleteFromService(songs)
+        // remove from playQueue
+        deleteFromService(songs)
 
-      // remove from all playLists
-      playListRepo.allPlayLists().first().forEach {
-        it.audioIds.removeAll(songIds)
-        playListRepo.updatePlayList(it)
-      }
+        // remove from all playLists
+        playListRepo.allPlayLists().first().forEach {
+          it.audioIds.removeAll(songIds)
+          playListRepo.updatePlayList(it)
+        }
 
-      // delete source if need
-      if (deleteSource) {
-        deleteSource(activity, songs)
+        // delete source if need
+        if (deleteSource) {
+          deleteSource(activity, songs)
+        }
+      } else {
+        ToastUtil.show(activity, R.string.delete_success)
       }
 
       // refresh ui
@@ -104,7 +125,7 @@ class DeleteSongUseCase @Inject constructor(
         try {
           val count = activity.contentResolver.delete(
             Audio.Media.EXTERNAL_CONTENT_URI,
-            Audio.Media._ID + " in(" + makeInStr(songs.map { it.id }) + ")",
+            makeInStrQuery(songs.map { it.id }),
             null
           )
           Timber.v("remove from mediaStore: $count")

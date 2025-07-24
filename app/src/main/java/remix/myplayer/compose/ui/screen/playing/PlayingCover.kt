@@ -26,10 +26,9 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.compose.activityViewModel
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.viewmodel.MusicViewModel
-import remix.myplayer.compose.viewmodel.PlayingViewModel
+import remix.myplayer.compose.viewmodel.musicViewModel
+import remix.myplayer.compose.viewmodel.playingViewModel
 import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.service.Command
 
@@ -39,8 +38,8 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
   val density = LocalDensity.current
   val isPortrait = LocalContext.current.isPortraitOrientation()
 
-  val playingVM = activityViewModel<PlayingViewModel>()
-  val musicVM = activityViewModel<MusicViewModel>()
+  val playingVM = playingViewModel
+  val musicVM = musicViewModel
 
   val offsetBase = with(density) {
     val base = LocalConfiguration.current.screenWidthDp.dp.toPx()
