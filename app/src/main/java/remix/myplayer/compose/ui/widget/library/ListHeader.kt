@@ -80,7 +80,7 @@ fun ModeHeader(grid: Boolean, onClick: (mode: Int) -> Unit) {
       },
       painter = painterResource(R.drawable.ic_apps_white_24dp),
       contentDescription = "ModeGrid",
-      tint = if (grid) LocalTheme.current.secondary else Color(ColorUtil.getColor(R.color.default_model_button_color))
+      tint = Color(if (grid) LocalTheme.current.secondary.toArgb() else ColorUtil.getColor(R.color.default_model_button_color))
     )
     Icon(
       modifier = Modifier
@@ -90,7 +90,7 @@ fun ModeHeader(grid: Boolean, onClick: (mode: Int) -> Unit) {
         } ,
       painter = painterResource(R.drawable.ic_format_list_bulleted_white_24dp),
       contentDescription = "ModeList",
-      tint = if (!grid) LocalTheme.current.secondary else Color(ColorUtil.getColor(R.color.default_model_button_color))
+      tint = Color(if (!grid) LocalTheme.current.secondary.toArgb() else ColorUtil.getColor(R.color.default_model_button_color))
     )
   }
 }

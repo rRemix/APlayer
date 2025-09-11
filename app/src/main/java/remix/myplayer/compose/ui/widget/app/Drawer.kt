@@ -49,6 +49,8 @@ import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.nav.RouteSetting
+import remix.myplayer.compose.nav.RouterHistory
+import remix.myplayer.compose.nav.RouterLastAdded
 import remix.myplayer.compose.ui.theme.AppTheme
 import remix.myplayer.compose.ui.theme.AppTheme.Companion.BLACK
 import remix.myplayer.compose.ui.theme.AppTheme.Companion.DARK
@@ -60,8 +62,6 @@ import remix.myplayer.compose.viewmodel.MusicViewModel
 import remix.myplayer.compose.viewmodel.musicViewModel
 import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.misc.receiver.ExitReceiver
-import remix.myplayer.ui.activity.HistoryActivity
-import remix.myplayer.ui.activity.RecentlyActivity
 import remix.myplayer.ui.activity.SupportActivity
 import remix.myplayer.util.Constants
 
@@ -172,9 +172,9 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = musicViewModel) {
               // 歌曲库
               0 -> scope.launch { drawerState.close() }
               // 历史
-              1 -> context.startActivity(Intent(context, HistoryActivity::class.java))
+              1 -> navController.navigate(RouterHistory)
               // 最近添加
-              2 -> context.startActivity(Intent(context, RecentlyActivity::class.java))
+              2 -> navController.navigate(RouterLastAdded)
               // 捐赠
               3 -> context.startActivity(Intent(context, SupportActivity::class.java))
               // 设置

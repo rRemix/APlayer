@@ -27,6 +27,7 @@ class SettingPrefs @Inject constructor(
   var artistSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.ARTIST_SORT_ORDER, SortOrder.ARTIST_A_Z)
   var playlistSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER, SortOrder.PLAYLIST_DATE)
   var genreSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.GENRE_SORT_ORDER, SortOrder.GENRE_A_Z)
+  var historySortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.HISTORY_SORT_ORDER, SortOrder.PLAY_COUNT_DESC)
 
   var albumDetailSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.TRACK_NUMBER)
   var artistDetailSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, SortOrder.SONG_A_Z)

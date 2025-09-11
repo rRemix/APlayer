@@ -120,6 +120,8 @@ data class MultiSelectState(
 
   fun isShowInDetail() = where == Where.Detail
 
+  fun isShowInLastAdded() = where == Where.LastAdded;
+
   fun selectedModels(target: Where): Set<String> {
     return if (target == where) {
       selectedModels.map { it.getKey() }.toSet()
@@ -136,7 +138,8 @@ data class MultiSelectState(
     Genre,
     PlayList,
     Folder,
-    Detail
+    Detail,
+    LastAdded
   }
 }
 

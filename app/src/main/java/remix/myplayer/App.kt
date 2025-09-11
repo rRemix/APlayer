@@ -53,8 +53,9 @@ class App : MultiDexApplication() {
     }
 
     // 加载第三方库
-    // TODO
-//    loadLibrary()
+    if (!BuildConfig.DEBUG) {
+      loadLibrary()
+    }
 
     // 处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
     RxJavaPlugins.setErrorHandler { throwable: Throwable? ->
@@ -119,7 +120,7 @@ class App : MultiDexApplication() {
     val processName = Util.getProcessName(Process.myPid())
     // 设置是否为上报进程
     val strategy = UserStrategy(context)
-    strategy.setAppChannel(BuildConfig.FLAVOR)
+    strategy.appChannel = BuildConfig.FLAVOR
     strategy.isUploadProcess = processName == null || processName == packageName
     CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG, strategy)
     CrashReport.setIsDevelopmentDevice(this, BuildConfig.DEBUG)

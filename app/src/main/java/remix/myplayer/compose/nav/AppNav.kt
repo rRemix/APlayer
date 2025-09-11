@@ -27,7 +27,9 @@ import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.compose.ui.dialog.DialogContainer
 import remix.myplayer.compose.ui.screen.AboutScreen
 import remix.myplayer.compose.ui.screen.CustomSortScreen
+import remix.myplayer.compose.ui.screen.history.HistoryScreen
 import remix.myplayer.compose.ui.screen.HomeScreen
+import remix.myplayer.compose.ui.screen.LastAddedScreen
 import remix.myplayer.compose.ui.screen.SongChooseScreen
 import remix.myplayer.compose.ui.screen.detail.DetailScreen
 import remix.myplayer.compose.ui.screen.playing.PlayingScreen
@@ -42,6 +44,8 @@ const val RouteSongChoose = "song_choose"
 const val RoutePlayingScreen = "playing_screen"
 const val RouteAbout = "about"
 const val RouteCustomSort = "custom_sort"
+const val RouterLastAdded = "last_added"
+const val RouterHistory = "history"
 
 val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 
@@ -111,6 +115,14 @@ fun AppNav() {
     })) {
       val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
       CustomSortScreen(id)
+    }
+
+    normalAnimatedScreen(RouterLastAdded) {
+      LastAddedScreen()
+    }
+
+    normalAnimatedScreen(RouterHistory) {
+      HistoryScreen()
     }
   }
 }

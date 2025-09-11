@@ -1,6 +1,7 @@
 package remix.myplayer.compose.viewmodel
 
 import android.content.Context
+import android.provider.MediaStore.Audio
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,6 +33,8 @@ import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.ToastUtil
+import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -127,6 +130,16 @@ class LibraryViewModel @Inject constructor(
   }
 
   fun loadSongsByModels(models: List<APlayerModel>) = songRepo.getSongsByModels(models)
+
+  fun loadLastAddedSongs(): List<Song> {
+    val today = Calendar.getInstance()
+    today.time = Date()
+    return songRepo.getSongs(
+      Audio.Media.DATE_ADDED + " >= ?",
+      arrayOf((today.timeInMillis / 1000 - 3600 * 24 * 7).toString()),
+      null
+    )
+  }
 
   fun updatePlayList(playList: PlayList) {
     viewModelScope.launch {

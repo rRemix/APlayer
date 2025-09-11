@@ -28,7 +28,6 @@ import remix.myplayer.bean.misc.Library
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.popup.ScreenPopupButton
-import remix.myplayer.compose.viewmodel.SettingViewModel
 import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.compose.viewmodel.timerViewModel
 import remix.myplayer.ui.activity.SearchActivity
@@ -39,6 +38,7 @@ fun HomeAppBar(
   scrollBehavior: TopAppBarScrollBehavior,
   drawerState: DrawerState
 ) {
+  val library by settingViewModel.currentLibrary.collectAsStateWithLifecycle()
   val scope = rememberCoroutineScope()
 
   TopAppBar(
@@ -55,27 +55,22 @@ fun HomeAppBar(
         Icon(Icons.Filled.Menu, contentDescription = "Menu")
       }
     },
-    actions = { AppBarActions() })
-}
+    actions = {
+      if (library.tag != Library.TAG_FOLDER && library.tag != Library.TAG_REMOTE) {
+        ScreenPopupButton(library)
+      }
 
-@Composable
-private fun AppBarActions(vm: SettingViewModel = settingViewModel) {
-  val library by vm.currentLibrary.collectAsStateWithLifecycle()
-
-  if (library.tag != Library.TAG_FOLDER && library.tag != Library.TAG_REMOTE) {
-    ScreenPopupButton(library)
-  }
-
-  defaultActions.map { it ->
-    IconButton(onClick = {
-      it.action()
-    }) {
-      Icon(
-        painter = painterResource(it.icon),
-        contentDescription = it.contentDescription
-      )
-    }
-  }
+      defaultActions.map { it ->
+        IconButton(onClick = {
+          it.action()
+        }) {
+          Icon(
+            painter = painterResource(it.icon),
+            contentDescription = it.contentDescription
+          )
+        }
+      }
+    })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

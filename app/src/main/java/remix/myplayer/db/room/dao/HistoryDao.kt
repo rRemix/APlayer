@@ -22,7 +22,7 @@ interface HistoryDao {
 
   @Query("""
     SELECT * FROM History ORDER BY
-    CASE :orderBY WHEN 'last_play' THEN last_play  END asc,
+    CASE :orderBY WHEN 'last_play' THEN last_play END asc,
     CASE :orderBY WHEN 'last_play desc' THEN last_play END desc,
     CASE :orderBY WHEN 'play_count' THEN play_count END asc,
     CASE :orderBY WHEN 'play_count desc' THEN play_count END desc
