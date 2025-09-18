@@ -73,12 +73,13 @@ class MusicViewModel @Inject constructor(
     updateMusicState()
   }
 
-  fun setProgress(progress: Int) {
+  fun setProgress(progress: Long) {
     serviceRef?.get()?.setProgress(progress)
   }
 
   fun getProgress(): Int {
-    return serviceRef?.get()?.progress ?: 0
+    val service = serviceRef?.get() ?: return 0
+    return service.progress.coerceAtMost(service.duration)
   }
 
   fun isPlayingSong(songId: Long): Boolean {

@@ -1,5 +1,6 @@
 package remix.myplayer.compose.ui.screen.setting.logic.lyric
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
@@ -14,26 +15,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
+import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
+import remix.myplayer.compose.lyric.LyricsManagerEntryPoint
 import remix.myplayer.compose.ui.screen.setting.SwitchPreference
-import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.misc.floatpermission.FloatWindowManager
-import remix.myplayer.service.Command
-import remix.myplayer.service.MusicService.Companion.EXTRA_DESKTOP_LYRIC
-import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
-import remix.myplayer.util.Util.sendLocalBroadcast
 
 @Composable
 fun DesktopLyricLogic() {
-  val vm = settingViewModel
   val context = LocalContext.current
+
+  val lyricsManager = remember {
+    EntryPointAccessors.fromApplication(
+      context.applicationContext,
+      LyricsManagerEntryPoint::class.java
+    ).lyricsManager()
+  }
 
   // TODO improve?
   val hasPermission = FloatWindowManager.getInstance().checkPermission(context)
   // 用户的选择
-  var userSelect by remember { mutableStateOf(vm.settingPrefs.desktopLyric) }
+  var userSelect by remember { mutableStateOf(lyricsManager.isDesktopLyricEnabled) }
   // 当用户选择改变时执行检查逻辑
   var check by remember { mutableIntStateOf(0) }
   // 是否真正开启桌面歌词
@@ -42,7 +46,8 @@ fun DesktopLyricLogic() {
   val content by remember {
     derivedStateOf {
       context.getString(
-        if (desktopLyricOn) R.string.opened_desktop_lrc else R.string.closed_desktop_lrc)
+        if (desktopLyricOn) R.string.opened_desktop_lrc else R.string.closed_desktop_lrc
+      )
     }
   }
 
@@ -72,14 +77,10 @@ fun DesktopLyricLogic() {
     }
 
     desktopLyricOn = userSelect
-    if (desktopLyricOn == vm.settingPrefs.desktopLyric) {
+    if (desktopLyricOn == lyricsManager.isDesktopLyricEnabled) {
       return@LaunchedEffect
     }
-    sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.TOGGLE_DESKTOP_LYRIC).apply {
-      putExtra(
-        EXTRA_DESKTOP_LYRIC, desktopLyricOn
-      )
-    })
-    vm.settingPrefs.desktopLyric = desktopLyricOn
+
+    lyricsManager.setDesktopLyricEnabled(desktopLyricOn, context as? Activity)
   }
 }

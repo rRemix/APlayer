@@ -89,7 +89,7 @@ private fun Portrait() {
 
     PlayingIndicator(pagerState, swatch)
 
-    PlayingSeekbarWithText(musicState, swatch)
+    PlayingSeekbarWithText(swatch)
 
     val showBottomBar =
       settingViewModel.settingPrefs.playingScreenBottom != SettingPrefs.BOTTOM_SHOW_NONE
@@ -170,7 +170,7 @@ private fun Landscape() {
       }
     }
 
-    PlayingSeekbarWithText(musicState, swatch)
+    PlayingSeekbarWithText(swatch)
 
     PlayingControl(Modifier.weight(1f), musicState, swatch)
   }

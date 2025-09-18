@@ -54,6 +54,12 @@ public class SPUtil {
     editor.putLong(key, value).apply();
   }
 
+  public static void putValue(Context context, String name, String key, float value) {
+    SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE)
+        .edit();
+    editor.putFloat(key, value).apply();
+  }
+
   public static void putValue(Context context, String name, String key, String value) {
     SharedPreferences.Editor editor = context.getSharedPreferences(name, Context.MODE_PRIVATE)
         .edit();
@@ -77,6 +83,10 @@ public class SPUtil {
 
   public static long getValue(Context context, String name, Object key, long dft) {
     return context.getSharedPreferences(name, Context.MODE_PRIVATE).getLong(key.toString(), dft);
+  }
+
+  public static float getValue(Context context, String name, Object key, float dft) {
+    return context.getSharedPreferences(name, Context.MODE_PRIVATE).getFloat(key.toString(), dft);
   }
 
   public static String getValue(Context context, String name, Object key, String dft) {
@@ -133,9 +143,37 @@ public class SPUtil {
     String LYRIC_LOCAL_TIP_SHOWN = "lyric_local_tip_shown";
   }
 
+  public interface LYRICS_KEY {
+
+    String NAME = "Lyrics";
+
+    String DESKTOP_LYRICS_ENABLED = "desktop_lyrics_enabled";
+    String STATUS_BAR_LYRICS_ENABLED = "status_bar_lyrics_enabled";
+    String LOCAL_LYRICS_TIP_SHOWN = "local_lyrics_tip_shown";
+    String ORDER = "order";
+
+    String ORDER_PREFIX = "order";
+    String OFFSET_PREFIX = "offset_"; // offset_$hashKey
+  }
+
   public interface COVER_KEY {
 
     String NAME = "Cover";
+  }
+
+  public interface DESKTOP_LYRICS_KEY {
+
+    String NAME = "DesktopLyrics";
+
+    // 以下所有设置项一般情况下应在 DesktopLyricsView 内部读/写
+
+    String LOCKED = "locked";
+    String Y_POSITION_PREFIX = "y_position_"; // y_position_$orientation
+    String FIRST_LINE_SIZE = "first_line_size";
+    String SECOND_LINE_SIZE = "second_line_size";
+    String SUNG_COLOR = "sung_color";
+    String UNSUNG_COLOR = "unsung_color";
+    String TRANSLATION_COLOR = "translation_color";
   }
 
   public interface SETTING_KEY {

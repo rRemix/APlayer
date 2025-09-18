@@ -5,7 +5,7 @@ data class NSongSearchResponse(val code: Int = 0,
 
   data class SearchActualData(val songs: List<SearchInnerData?>? = null) {
 
-    data class SearchInnerData(val id: Int,
+    data class SearchInnerData(val id: Long,
                                val album: SearchAlbumData? = null,
                                val score: Int) {
 

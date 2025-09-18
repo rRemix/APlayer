@@ -49,7 +49,7 @@ interface ApiService {
 
   @GET("song/lyric")
   @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
-  fun searchNeteaseLyric(@Query("os") os: String?, @Query("id") id: Int,
+  fun searchNeteaseLyric(@Query("os") os: String?, @Query("id") id: Long,
                          @Query("lv") lv: Int, @Query("kv") kv: Int, @Query("tv") tv: Int): Single<NLrcResponse>
 
   @GET("song/detail")

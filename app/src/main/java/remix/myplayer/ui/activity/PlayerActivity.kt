@@ -463,7 +463,7 @@ class PlayerActivity : BaseMusicActivity() {
 //                if(!mIsPlay){
 //                    seekBar.setProgress(0);
 //                }
-        MusicServiceRemote.setProgress(seekBar.progress)
+        MusicServiceRemote.setProgress(seekBar.progress.toLong())
         isDragSeekBarFromUser = false
       }
     })
@@ -664,7 +664,7 @@ class PlayerActivity : BaseMusicActivity() {
       lrcView?.setOnSeekToListener(object : LrcView.OnSeekToListener {
         override fun onSeekTo(progress: Int) {
           if (progress > 0 && progress < getDuration()) {
-            MusicServiceRemote.setProgress(progress)
+            MusicServiceRemote.setProgress(progress.toLong())
             currentTime = progress
             handler.sendEmptyMessage(UPDATE_TIME_ALL)
           }

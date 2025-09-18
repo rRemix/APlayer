@@ -64,9 +64,6 @@ class SettingPrefs @Inject constructor(
   var autoDownloadCover by PrefsDelegate(sp,"auto_download_album_cover_v1", DOWNLOAD_COVER_ALWAYS)
   var downloadSource by PrefsDelegate(sp, SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, DOWNLOAD_LASTFM)
 
-  var desktopLyric by PrefsDelegate(sp, SPUtil.SETTING_KEY.DESKTOP_LYRIC_SHOW, false)
-  var statusBarLyric by PrefsDelegate(sp, SPUtil.SETTING_KEY.STATUSBAR_LYRIC_SHOW, false)
-
   var classicNotify by PrefsDelegate(sp, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, false)
   var notifyUseSystemBackground by PrefsDelegate(sp, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true)
 

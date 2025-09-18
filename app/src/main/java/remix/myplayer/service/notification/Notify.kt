@@ -15,8 +15,11 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.app.TaskStackBuilder
 import com.bumptech.glide.request.target.CustomTarget
+import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
 import remix.myplayer.compose.activity.ComposeActivity
+import remix.myplayer.compose.lyric.LyricsManager
+import remix.myplayer.compose.lyric.LyricsManagerEntryPoint
 import remix.myplayer.compose.nav.playingScreenDeepLink
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
@@ -33,6 +36,19 @@ abstract class Notify internal constructor(internal var service: MusicService) {
   private val FLAG_ONLY_UPDATE_TICKER = 0x2000000
 
   protected var target: CustomTarget<Bitmap>? = null
+
+  protected val lyricsManager: LyricsManager by lazy {
+    EntryPointAccessors.fromApplication(
+      service,
+      LyricsManagerEntryPoint::class.java
+    ).lyricsManager()
+  }
+
+  var isNotifyShowing = false
+    set(value) {
+      field = value
+      lyricsManager.isNotifyShowing = value
+    }
 
   private val notificationManager: NotificationManager by lazy {
     service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -164,8 +180,8 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     /**
      * 通知栏是否显示
      */
-    @JvmStatic
-    var isNotifyShowing = false
+//    @JvmStatic
+
 
     private const val NOTIFY_MODE_FOREGROUND = 1
     private const val NOTIFY_MODE_BACKGROUND = 2

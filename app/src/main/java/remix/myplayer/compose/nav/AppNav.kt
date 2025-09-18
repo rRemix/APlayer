@@ -2,7 +2,20 @@ package remix.myplayer.compose.nav
 
 import android.net.Uri
 import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -24,14 +37,15 @@ import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Folder
 import remix.myplayer.bean.mp3.Genre
+import remix.myplayer.compose.ui.common.ProvideSnackBarHostState
 import remix.myplayer.compose.ui.dialog.DialogContainer
 import remix.myplayer.compose.ui.screen.AboutScreen
 import remix.myplayer.compose.ui.screen.CustomSortScreen
-import remix.myplayer.compose.ui.screen.history.HistoryScreen
 import remix.myplayer.compose.ui.screen.HomeScreen
 import remix.myplayer.compose.ui.screen.LastAddedScreen
 import remix.myplayer.compose.ui.screen.SongChooseScreen
 import remix.myplayer.compose.ui.screen.detail.DetailScreen
+import remix.myplayer.compose.ui.screen.history.HistoryScreen
 import remix.myplayer.compose.ui.screen.playing.PlayingScreen
 import remix.myplayer.compose.ui.screen.setting.SettingScreen
 import remix.myplayer.db.room.model.PlayList
@@ -51,78 +65,92 @@ val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 
 @Composable
 fun AppNav() {
-  DialogContainer()
+  val snackBarHostState = remember { SnackbarHostState() }
+  ProvideSnackBarHostState(snackBarHostState) {
+    Box(modifier = Modifier.fillMaxSize()) {
+      DialogContainer()
+      NavHost(LocalNavController.current, startDestination = RouteHome) {
+        normalAnimatedScreen(
+          RouteHome,
+        ) {
+          HomeScreen()
+        }
 
-  NavHost(LocalNavController.current, startDestination = RouteHome) {
-    normalAnimatedScreen(
-      RouteHome,
-    ) {
-      HomeScreen()
-    }
+        normalAnimatedScreen(RouteSetting) {
+          SettingScreen()
+        }
 
-    normalAnimatedScreen(RouteSetting) {
-      SettingScreen()
-    }
+        normalAnimatedScreen(
+          "${RouteSongChoose}/{id}/{name}",
+          arguments = listOf(navArgument("id") {
+            type = NavType.LongType
+          })
+        ) {
+          val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
+          val name = it.arguments?.getString("name") ?: return@normalAnimatedScreen
+          SongChooseScreen(id, name)
+        }
 
-    normalAnimatedScreen("${RouteSongChoose}/{id}/{name}", arguments = listOf(navArgument("id") {
-      type = NavType.LongType
-    })) {
-      val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
-      val name = it.arguments?.getString("name") ?: return@normalAnimatedScreen
-      SongChooseScreen(id, name)
-    }
+        normalAnimatedScreen(RouteAbout) {
+          AboutScreen()
+        }
 
-    normalAnimatedScreen(RouteAbout) {
-      AboutScreen()
-    }
+        composable<DetailScreenRoute>(
+          typeMap = mapOf(
+            typeOf<Album?>() to DetailScreenRouteType.album,
+            typeOf<Artist?>() to DetailScreenRouteType.artist,
+            typeOf<Genre?>() to DetailScreenRouteType.genre,
+            typeOf<PlayList?>() to DetailScreenRouteType.playList,
+            typeOf<Folder?>() to DetailScreenRouteType.folder,
+          ),
+          enterTransition = enterTransition(),
+          exitTransition = exitTransition(),
+          popEnterTransition = popEnterTransition(),
+          popExitTransition = popExitTransition(),
+        ) {
+          val route = it.toRoute<DetailScreenRoute>()
 
-    composable<DetailScreenRoute>(
-      typeMap = mapOf(
-        typeOf<Album?>() to DetailScreenRouteType.album,
-        typeOf<Artist?>() to DetailScreenRouteType.artist,
-        typeOf<Genre?>() to DetailScreenRouteType.genre,
-        typeOf<PlayList?>() to DetailScreenRouteType.playList,
-        typeOf<Folder?>() to DetailScreenRouteType.folder,
-      ),
-      enterTransition = enterTransition(),
-      exitTransition = exitTransition(),
-      popEnterTransition = popEnterTransition(),
-      popExitTransition = popExitTransition(),
-    ) {
-      val route = it.toRoute<DetailScreenRoute>()
+          DetailScreen(route.findNotNull())
+        }
 
-      DetailScreen(route.findNotNull())
-    }
+        composable(
+          RoutePlayingScreen,
+          deepLinks = listOf(navDeepLink {
+            uriPattern = playingScreenDeepLink.toString()
+          }),
+          // playingScreen has special animation
+          enterTransition = {
+            slideInFromBottom()
+          },
+          popExitTransition = {
+            slideOutToBottom()
 
-    composable(
-      RoutePlayingScreen,
-      deepLinks = listOf(navDeepLink {
-        uriPattern = playingScreenDeepLink.toString()
-      }),
-      // playingScreen has special animation
-      enterTransition = {
-        slideInFromBottom()
-      },
-      popExitTransition = {
-        slideOutToBottom()
+          }) {
+          PlayingScreen()
+        }
 
-      }) {
-      PlayingScreen()
-    }
+        normalAnimatedScreen("${RouteCustomSort}/{id}", arguments = listOf(navArgument("id") {
+          type = NavType.LongType
+        })) {
+          val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
+          CustomSortScreen(id)
+        }
 
-    normalAnimatedScreen("${RouteCustomSort}/{id}", arguments = listOf(navArgument("id") {
-      type = NavType.LongType
-    })) {
-      val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
-      CustomSortScreen(id)
-    }
+        normalAnimatedScreen(RouterLastAdded) {
+          LastAddedScreen()
+        }
 
-    normalAnimatedScreen(RouterLastAdded) {
-      LastAddedScreen()
-    }
+        normalAnimatedScreen(RouterHistory) {
+          HistoryScreen()
+        }
+      }
 
-    normalAnimatedScreen(RouterHistory) {
-      HistoryScreen()
+      SnackbarHost(
+        hostState = snackBarHostState,
+        modifier = Modifier
+          .align(Alignment.BottomCenter)
+          .padding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom).asPaddingValues())
+      )
     }
   }
 }

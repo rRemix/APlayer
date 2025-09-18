@@ -114,6 +114,14 @@
   <dimen name="desktop_lyric_button_size">36dp</dimen>
   <dimen name="desktop_lyric_container_margin_top">88dp</dimen>
 
+  <dimen name="desktop_lyrics_divider_thickness">1dp</dimen>
+  <dimen name="desktop_lyrics_control_button_size">48dp</dimen>
+  <dimen name="desktop_lyrics_control_button_padding">12dp</dimen>
+  <dimen name="desktop_lyrics_lines_margin">4dp</dimen>
+  <dimen name="desktop_lyrics_slider_padding">4dp</dimen>
+  <dimen name="desktop_lyrics_slider_icon_size">28dp</dimen>
+  <dimen name="desktop_lyrics_slider_icon_padding">4dp</dimen>
+
   <dimen name="player_button_size">56dp</dimen>
   <dimen name="player_volume_button_size">48dp</dimen>
   <dimen name="player_seekbar_padding">6dp</dimen>
@@ -128,4 +136,6 @@
   <dimen name="md_colorchooser_circlesize">56dp</dimen>
 
   <dimen name="item_list_btn_size">60dp</dimen>
+
+  <dimen name="lyrics_view_time_indicator_play_button_size">24dp</dimen>
 </resources>

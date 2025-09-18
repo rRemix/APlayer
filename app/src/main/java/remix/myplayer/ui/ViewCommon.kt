@@ -1,11 +1,32 @@
 package remix.myplayer.ui
 
 import android.content.Context
+import androidx.compose.runtime.Composable
 import remix.myplayer.R
+import remix.myplayer.compose.ui.dialog.NormalDialog
+import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.theme.Theme
 import remix.myplayer.util.SPUtil
 
 object ViewCommon {
+  @Composable
+  fun showLyricTipDialog(onPositive: () -> Unit) {
+//    if (lyricPrefs.tipShown) {
+//      onPositive()
+//    } else {
+//
+//    }
+
+    val state = rememberDialogState(true)
+    NormalDialog(
+      dialogState = state,
+      contentRes = R.string.local_lyric_tip,
+      onPositive = {
+        onPositive()
+      }
+    )
+  }
+
   fun showLocalLyricTip(context: Context, action: () -> Unit) {
     if (!SPUtil.getValue(
         context,

@@ -74,6 +74,9 @@
   <color name="desktop_lyric_text_color">#d4d4d4</color>
   <color name="desktop_lyric_control_color">#9f000000</color>
   <color name="desktop_lyric_divider_color">#d4d4d4</color>
+  <color name="desktop_lyrics_window_background">#80000000</color>
+  <color name="desktop_lyrics_control_color">#ffffff</color>
+  <color name="desktop_lyrics_text_shadow_color">#000000</color>
 
   <color name="default_model_button_color">#e2e4e8</color>
   <color name="select_model_button_color">#ffce64</color>

@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 
 abstract class AbstractPref(context: Context, name: String? = null) {
+
   private val name by lazy {
     name ?: this.javaClass.simpleName
   }
@@ -14,5 +15,11 @@ abstract class AbstractPref(context: Context, name: String? = null) {
 
   fun clear() {
     sp.edit { clear() }
+  }
+
+  fun remove(key: String) {
+    sp.edit(commit = true) {
+      remove(key)
+    }
   }
 }

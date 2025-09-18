@@ -19,7 +19,6 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
 import remix.myplayer.util.DensityUtil
-import timber.log.Timber
 
 /**
  * Created by Remix on 2017/11/22.
@@ -27,7 +26,9 @@ import timber.log.Timber
 @TargetApi(Build.VERSION_CODES.O)
 class
 NotifyImpl24(context: MusicService) : Notify(context) {
-  private val defaultBitmap = BitmapFactory.decodeResource(service.resources, R.drawable.album_empty_bg_night)
+
+  private val defaultBitmap =
+    BitmapFactory.decodeResource(service.resources, R.drawable.album_empty_bg_night)
   private val size = DensityUtil.dip2px(service, 128f)
 
   override fun updateForPlaying() {
@@ -69,34 +70,47 @@ NotifyImpl24(context: MusicService) : Notify(context) {
     val deleteIntent = Intent(MusicService.ACTION_CMD)
     deleteIntent.putExtra(EXTRA_CONTROL, Command.CLOSE_NOTIFY)
 
-    val desktopLyricLock = service.isDesktopLyricLocked
+    val desktopLyricLock = lyricsManager.isDesktopLyricLocked
 
     val notification = NotificationCompat.Builder(service, PLAYING_NOTIFICATION_CHANNEL_ID)
-        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-        .setSmallIcon(R.drawable.icon_notifbar)
-        .addAction(R.drawable.ic_skip_previous_black_24dp, service.getString(R.string.previous),
-            buildPendingIntent(service, Command.PREV))
-        .addAction(playPauseIcon, service.getString(R.string.play_pause),
-            buildPendingIntent(service, Command.TOGGLE))
-        .addAction(R.drawable.ic_skip_next_black_24dp, service.getString(R.string.next),
-            buildPendingIntent(service, Command.NEXT))
-        //根据当前桌面歌词的状态判断是显示开关桌面歌词还是解锁桌面歌词
-        //当前显示了桌面歌词并且已经锁定,显示解锁的按钮
-        .addAction(if (desktopLyricLock) R.drawable.ic_lock_open_black_24dp else R.drawable.ic_desktop_lyric_black_24dp,
-            service.getString(if (desktopLyricLock) R.string.desktop_lyric__unlock else R.string.desktop_lyric_lock),
-            buildPendingIntent(service, if (desktopLyricLock) Command.UNLOCK_DESKTOP_LYRIC else Command.TOGGLE_DESKTOP_LYRIC))
-        .setDeleteIntent(buildPendingIntent(service, Command.CLOSE_NOTIFY))
-        .setContentIntent(contentIntent)
-        .setContentTitle(song.title)
-        .setLargeIcon(bitmap)
-        .setShowWhen(false)
-        .setOngoing(service.isPlaying)
-        .setPriority(PRIORITY_MAX)
-        .setContentText(song.artist + " - " + song.album)
-        .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
-            .setShowActionsInCompactView(0, 1, 2, 3)
-            .setMediaSession(service.mediaSession.sessionToken))
-        .build()
+      .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+      .setSmallIcon(R.drawable.icon_notifbar)
+      .addAction(
+        R.drawable.ic_skip_previous_black_24dp, service.getString(R.string.previous),
+        buildPendingIntent(service, Command.PREV)
+      )
+      .addAction(
+        playPauseIcon, service.getString(R.string.play_pause),
+        buildPendingIntent(service, Command.TOGGLE)
+      )
+      .addAction(
+        R.drawable.ic_skip_next_black_24dp, service.getString(R.string.next),
+        buildPendingIntent(service, Command.NEXT)
+      )
+      //根据当前桌面歌词的状态判断是显示开关桌面歌词还是解锁桌面歌词
+      //当前显示了桌面歌词并且已经锁定,显示解锁的按钮
+      .addAction(
+        if (desktopLyricLock) R.drawable.ic_lock_open_black_24dp else R.drawable.ic_desktop_lyric_black_24dp,
+        service.getString(if (desktopLyricLock) R.string.desktop_lyric__unlock else R.string.desktop_lyric_lock),
+        buildPendingIntent(
+          service,
+          if (desktopLyricLock) Command.UNLOCK_DESKTOP_LYRIC else Command.TOGGLE_DESKTOP_LYRIC
+        )
+      )
+      .setDeleteIntent(buildPendingIntent(service, Command.CLOSE_NOTIFY))
+      .setContentIntent(contentIntent)
+      .setContentTitle(song.title)
+      .setLargeIcon(bitmap)
+      .setShowWhen(false)
+      .setOngoing(service.isPlaying)
+      .setPriority(PRIORITY_MAX)
+      .setContentText(song.artist + " - " + song.album)
+      .setStyle(
+        androidx.media.app.NotificationCompat.MediaStyle()
+          .setShowActionsInCompactView(0, 1, 2, 3)
+          .setMediaSession(service.mediaSession.sessionToken)
+      )
+      .build()
     pushNotify(notification)
   }
 }

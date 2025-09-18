@@ -118,7 +118,7 @@ object HttpClient {
     return neteaseApi.searchNeteaseArtist(key, offset, limit, 100)
   }
 
-  fun searchNeteaseLyric(id: Int): Single<NLrcResponse> {
+  fun searchNeteaseLyric(id: Long): Single<NLrcResponse> {
     return neteaseApi.searchNeteaseLyric("pc", id, -1, -1, -1)
   }
 

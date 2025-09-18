@@ -1,0 +1,35 @@
+package remix.myplayer.compose.lyric.provider
+
+import android.net.Uri
+import remix.myplayer.App
+import remix.myplayer.bean.mp3.Song
+import remix.myplayer.compose.lyric.LrcParser
+import remix.myplayer.compose.lyric.LyricsLine
+import timber.log.Timber
+
+class UriProvider(private val uri: Uri) : ILyricsProvider {
+  companion object {
+    private const val TAG = "UriProvider"
+  }
+
+  override val id: String = "uri"
+  override val displayName: String
+    get() = throw RuntimeException() // 不应该用到
+
+  override suspend fun getLyrics(song: Song): List<LyricsLine> {
+    return try {
+      App.context.contentResolver.openInputStream(uri)!!.run {
+        try {
+          LrcParser.parse(readBytes().decodeToString())
+        } catch (t: Throwable) {
+          throw t
+        } finally {
+          close()
+        }
+      }
+    } catch (t: Throwable) {
+      Timber.tag(TAG).w(t, "Failed to get lyrics from URI: $uri")
+      emptyList()
+    }
+  }
+}

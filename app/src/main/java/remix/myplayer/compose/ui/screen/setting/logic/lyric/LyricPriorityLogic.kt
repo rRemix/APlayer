@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
 import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.misc.cache.DiskCache
+import remix.myplayer.ui.ViewCommon.showLyricTipDialog
 import remix.myplayer.util.SPUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
@@ -38,28 +40,40 @@ fun LyricPriorityLogic() {
   val context = LocalContext.current
   val dialogState = rememberDialogState()
 
+  var showLyricTip by rememberSaveable { mutableStateOf(false) }
+  if (showLyricTip) {
+    vm.lyricPrefs.tipShown = true
+    showLyricTipDialog {
+      vm.lyricPrefs.tipShown = true
+      dialogState.show()
+    }
+  }
   NormalPreference(
     stringResource(R.string.lrc_priority),
     stringResource(R.string.lrc_priority_tip)
   ) {
-    dialogState.show()
+    if (vm.lyricPrefs.tipShown) {
+      dialogState.show()
+    } else {
+      showLyricTip = true
+    }
   }
 
   var orderList by remember {
-    mutableStateOf(vm.lyricPrefs.lyricOrderList)
+    mutableStateOf(vm.lyricPrefs.generalLyricOrderList)
   }
   NormalDialog(
     dialogState = dialogState,
     titleRes = R.string.lrc_priority,
     onDismissRequest = {
-      orderList = vm.lyricPrefs.lyricOrderList
+      orderList = vm.lyricPrefs.generalLyricOrderList
     },
     onPositive = {
       try {
         DiskCache.getLrcDiskCache().delete()
         DiskCache.init(context, "lyric")
         SPUtil.deleteFile(context, SPUtil.LYRIC_KEY.NAME)
-        vm.lyricPrefs.lyricOrder = Gson().toJson(orderList)
+        vm.lyricPrefs.generalLyricOrder = Gson().toJson(orderList)
         ToastUtil.show(context, R.string.save_success)
       } catch (e: Exception) {
         ToastUtil.show(context, R.string.save_error_arg, e.message)

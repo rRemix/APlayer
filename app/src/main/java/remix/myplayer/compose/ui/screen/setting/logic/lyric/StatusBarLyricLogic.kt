@@ -7,9 +7,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
+import remix.myplayer.compose.lyric.LyricsManagerEntryPoint
 import remix.myplayer.compose.ui.screen.setting.SwitchPreference
-import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.service.Command
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.Util.isSupportStatusBarLyric
@@ -21,15 +22,22 @@ fun StatusBarLyricLogic() {
   if (!isSupportStatusBarLyric(context)) {
     return
   }
-  val vm = settingViewModel
-  var statusBarLyric by remember { mutableStateOf(vm.settingPrefs.statusBarLyric) }
+
+  val lyricsManager = remember {
+    EntryPointAccessors.fromApplication(
+      context.applicationContext,
+      LyricsManagerEntryPoint::class.java
+    ).lyricsManager()
+  }
+
+  var statusBarLyric by remember { mutableStateOf(lyricsManager.isStatusBarLyricEnabled) }
 
   SwitchPreference(
     stringResource(R.string.statusbar_lrc),
     checked = statusBarLyric
   ) {
     statusBarLyric = it
-    vm.settingPrefs.statusBarLyric = it
+    lyricsManager.isStatusBarLyricEnabled = it
 
     val intent =
       MusicUtil.makeCmdIntent(Command.TOGGLE_STATUS_BAR_LRC)

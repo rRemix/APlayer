@@ -18,11 +18,13 @@ import kotlinx.coroutines.launch
 import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
+import remix.myplayer.compose.lyric.LyricsManager
 import remix.myplayer.helper.LanguageHelper.setLocal
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
+import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
 import java.util.EnumMap
 
