@@ -16,9 +16,10 @@ import timber.log.Timber
 import javax.inject.Inject
 
 interface PlayQueueRepository {
+
   fun getAllSongs(): Flow<List<Song>>
   suspend fun remove(audioIds: List<Long>): Int
-  suspend fun insert(queue: List<Long>): LongArray
+  suspend fun insert(queue: List<Song>): LongArray
 }
 
 class PlayQueueRepoImpl @Inject constructor(
@@ -58,17 +59,35 @@ class PlayQueueRepoImpl @Inject constructor(
       }
   }
 
+  // TODO 大量数据拆分
   override suspend fun remove(audioIds: List<Long>) =
     playQueueDao.deleteSongsSuspend(audioIds)
 
-  override suspend fun insert(queue: List<Long>): LongArray {
+  override suspend fun insert(songs: List<Song>): LongArray {
     val oldQueue = playQueueDao.selectAllSuspend().first()
 
     // 不重复添加
-    val actual = queue.toMutableList()
-    actual.removeAll(oldQueue.map { it.audio_id }.toSet())
+    val actual = songs.toMutableList()
+    val keys = oldQueue.map {
+      if (it.audio_id > 0) it.audio_id.toString() else it.data
+    }
+    //不重复添加
+    actual.removeAll {
+      (it.isLocal() && keys.contains(it.id.toString())) || (it.isRemote() && keys.contains(it.data))
+    }
 
-    return playQueueDao.insertPlayQueueSuspend(actual.map { PlayQueue(it) })
+    return playQueueDao.insertPlayQueueSuspend(actual.map { song ->
+      if (song.isLocal()) {
+        PlayQueue(song.id, song.title, song.data)
+      } else {
+        PlayQueue(song.hashCode().toLong(), song.title, song.data).apply {
+          if (song is Song.Remote) {
+            account = song.account
+            pwd = song.pwd
+          }
+        }
+      }
+    })
   }
 
   private fun getSongsInQueue(queues: List<PlayQueue>): List<Song> {

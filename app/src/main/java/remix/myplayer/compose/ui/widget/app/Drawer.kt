@@ -48,9 +48,9 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.compose.nav.LocalNavController
+import remix.myplayer.compose.nav.RouteHistory
+import remix.myplayer.compose.nav.RouteLastAdded
 import remix.myplayer.compose.nav.RouteSetting
-import remix.myplayer.compose.nav.RouterHistory
-import remix.myplayer.compose.nav.RouterLastAdded
 import remix.myplayer.compose.ui.theme.AppTheme
 import remix.myplayer.compose.ui.theme.AppTheme.Companion.BLACK
 import remix.myplayer.compose.ui.theme.AppTheme.Companion.DARK
@@ -172,9 +172,9 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = musicViewModel) {
               // 歌曲库
               0 -> scope.launch { drawerState.close() }
               // 历史
-              1 -> navController.navigate(RouterHistory)
+              1 -> navController.navigate(RouteHistory)
               // 最近添加
-              2 -> navController.navigate(RouterLastAdded)
+              2 -> navController.navigate(RouteLastAdded)
               // 捐赠
               3 -> context.startActivity(Intent(context, SupportActivity::class.java))
               // 设置

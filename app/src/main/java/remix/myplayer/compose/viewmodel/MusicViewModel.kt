@@ -95,12 +95,12 @@ class MusicViewModel @Inject constructor(
     }
   }
 
-  fun insertToQueue(queue: List<Long>) {
+  fun insertToQueue(queue: List<Song>) {
     viewModelScope.launch {
       val ids = playQueueRepository.insert(queue)
       ToastUtil.show(
         context,
-        context.getString(R.string.add_song_playqueue_success, ids.filter { it > 0 }.size)
+        context.getString(R.string.add_song_playqueue_success, ids.filter { it != 0L }.size)
       )
     }
   }

@@ -27,6 +27,10 @@ val LocalTimerViewModel = compositionLocalOf<TimerViewModel> {
 val LocalHistoryViewModel = compositionLocalOf<HistoryViewModel> {
   error("HistoryViewModel not provided")
 }
+val LocalWebDavViewModel = compositionLocalOf<WebDavViewModel> {
+  error("WebDavViewModel not provided")
+}
+
 
 @Composable
 fun ProvideViewModels(content: @Composable () -> Unit) {
@@ -39,6 +43,7 @@ fun ProvideViewModels(content: @Composable () -> Unit) {
     LocalTimerViewModel provides activityViewModel(),
     LocalTimerViewModel provides activityViewModel(),
     LocalHistoryViewModel provides activityViewModel(),
+    LocalWebDavViewModel provides activityViewModel()
   ) {
     content()
   }
@@ -78,3 +83,8 @@ val historyViewModel: HistoryViewModel
   @Composable
   @ReadOnlyComposable
   get() = LocalHistoryViewModel.current
+
+val webDavViewModel: WebDavViewModel
+  @Composable
+  @ReadOnlyComposable
+  get() = LocalWebDavViewModel.current

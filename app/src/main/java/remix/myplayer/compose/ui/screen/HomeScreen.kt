@@ -12,8 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
@@ -21,18 +26,26 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,13 +53,19 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
+import remix.myplayer.compose.nav.LocalNavController
+import remix.myplayer.compose.nav.RouteSongChoose
+import remix.myplayer.compose.ui.dialog.InputDialog
+import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.app.BottomBar
 import remix.myplayer.compose.ui.widget.app.Drawer
 import remix.myplayer.compose.ui.widget.app.FAButton
-import remix.myplayer.compose.ui.widget.app.HomeAppBar
 import remix.myplayer.compose.ui.widget.app.MultiSelectBar
 import remix.myplayer.compose.ui.widget.app.ViewPager
+import remix.myplayer.compose.ui.widget.common.defaultAppBarActions
+import remix.myplayer.compose.ui.widget.popup.ScreenPopupButton
+import remix.myplayer.compose.viewmodel.libraryViewModel
 import remix.myplayer.compose.viewmodel.mainViewModel
 import remix.myplayer.compose.viewmodel.settingViewModel
 
@@ -54,6 +73,9 @@ import remix.myplayer.compose.viewmodel.settingViewModel
 @Composable
 fun HomeScreen() {
   val mainVM = mainViewModel
+  val libraryVM = libraryViewModel
+  val navController = LocalNavController.current
+  val context = LocalContext.current
 
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -110,7 +132,46 @@ fun HomeScreen() {
         }
       },
       floatingActionButton = {
-        FAButton(pagerState, libraries)
+        val showFb by remember {
+          derivedStateOf {
+            pagerState.currentPage == libraries.indexOfFirst {
+              it.tag == Library.TAG_PLAYLIST
+            }
+          }
+        }
+
+        var text by rememberSaveable {
+          mutableStateOf("")
+        }
+        val dialogState = rememberDialogState(false)
+
+        InputDialog(
+          dialogState = dialogState,
+          title = stringResource(R.string.new_playlist),
+          positive = stringResource(R.string.create),
+          text = text,
+          onDismissRequest = {
+            text = ""
+          },
+          onValueChange = {
+            text = it
+          }
+        ) {
+          libraryVM.insertPlayList(it) { id ->
+            if (id > 0) {
+              navController.navigate("$RouteSongChoose/${id}/$it")
+            }
+          }
+        }
+
+        FAButton(showFb) {
+          if (mainVM.multiSelectState.value.isShowing()) {
+            return@FAButton
+          }
+
+          text = "${context.getString(R.string.local_list)}${libraryVM.playLists.value.size}"
+          dialogState.show()
+        }
       })
     { contentPadding ->
       HomeContent(contentPadding, pagerState, libraries)
@@ -201,4 +262,45 @@ fun BackPressHandler(
       backCallback.remove()
     }
   }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun HomeAppBar(
+  scrollBehavior: TopAppBarScrollBehavior,
+  drawerState: DrawerState
+) {
+  val library by settingViewModel.currentLibrary.collectAsStateWithLifecycle()
+  val scope = rememberCoroutineScope()
+
+  TopAppBar(
+    scrollBehavior = scrollBehavior,
+    colors = TopAppBarDefaults.topAppBarColors(
+      containerColor = LocalTheme.current.primary,
+      scrolledContainerColor = LocalTheme.current.primary,
+      navigationIconContentColor = Color.White,
+      actionIconContentColor = Color.White,
+    ),
+    title = {},
+    navigationIcon = {
+      IconButton(onClick = { scope.launch { drawerState.open() } }) {
+        Icon(Icons.Filled.Menu, contentDescription = "Menu")
+      }
+    },
+    actions = {
+      if (library.tag != Library.TAG_FOLDER && library.tag != Library.TAG_REMOTE) {
+        ScreenPopupButton(library)
+      }
+
+      defaultAppBarActions.map { it ->
+        IconButton(onClick = {
+          it.action()
+        }) {
+          Icon(
+            painter = painterResource(it.icon),
+            contentDescription = it.contentDescription
+          )
+        }
+      }
+    })
 }

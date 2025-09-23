@@ -1,10 +1,11 @@
 package remix.myplayer.db.room.model
 
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
+@kotlinx.serialization.Serializable
 @Entity
 data class WebDav(
   var alias: String,
@@ -14,16 +15,17 @@ data class WebDav(
   var lastUrl: String,
   val createAt: Long = System.currentTimeMillis()
 ) : Serializable {
+
   @PrimaryKey(autoGenerate = true)
   var id: Int = 0
 
   fun base(): String {
-    val uri = Uri.parse(server)
+    val uri = server.toUri()
     var url = "${uri.scheme}://${uri.host}"
     if (uri.port > 0) {
       url = "${url}:${uri.port}"
     }
     return url
   }
-  
+
 }

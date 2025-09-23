@@ -42,10 +42,10 @@ import remix.myplayer.compose.nav.RoutePlayingScreen
 import remix.myplayer.compose.ui.screen.BackPressHandler
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.app.BottomBar
-import remix.myplayer.compose.ui.widget.app.CommonAppBar
 import remix.myplayer.compose.ui.widget.app.MultiSelectBar
-import remix.myplayer.compose.ui.widget.app.defaultActions
+import remix.myplayer.compose.ui.widget.common.CommonAppBar
 import remix.myplayer.compose.ui.widget.common.TextSecondary
+import remix.myplayer.compose.ui.widget.common.defaultAppBarActions
 import remix.myplayer.compose.ui.widget.library.SongListHeader
 import remix.myplayer.compose.ui.widget.library.list.ListSong
 import remix.myplayer.compose.viewmodel.MultiSelectState
@@ -223,7 +223,7 @@ fun DetailScreen(model: APlayerModel) {
 private fun DetailActions(model: APlayerModel, onSortOrderChange: () -> Unit) {
   DetailPopupButton(model, onSortOrderChange)
 
-  defaultActions.map { it ->
+  defaultAppBarActions.map { it ->
     IconButton(onClick = {
       it.action()
     }) {

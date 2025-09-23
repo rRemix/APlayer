@@ -99,7 +99,7 @@ fun FolderItem(folder: Folder, selected: Boolean, onClick: () -> Unit, onLongCli
       .background(if (selected) theme.select else theme.mainBackground)
   ) {
     Icon(
-      painter = painterResource(id = R.drawable.icon_folder),
+      painter = painterResource(id = R.drawable.ic_folder_24dp),
       contentDescription = "Folder Icon",
       tint = theme.icon(),
       modifier = Modifier

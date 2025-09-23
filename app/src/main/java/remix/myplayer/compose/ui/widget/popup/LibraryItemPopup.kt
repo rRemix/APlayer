@@ -128,7 +128,7 @@ fun LibraryItemDropdownMenu(
                   return@launch
                 }
 
-                musicVM.insertToQueue(ids)
+                musicVM.insertToQueue(songs)
               }
               //添加到播放列表
               R.string.add_to_playlist -> {

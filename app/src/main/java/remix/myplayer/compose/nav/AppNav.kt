@@ -43,12 +43,16 @@ import remix.myplayer.compose.ui.screen.AboutScreen
 import remix.myplayer.compose.ui.screen.CustomSortScreen
 import remix.myplayer.compose.ui.screen.HomeScreen
 import remix.myplayer.compose.ui.screen.LastAddedScreen
+import remix.myplayer.compose.ui.screen.SearchScreen
 import remix.myplayer.compose.ui.screen.SongChooseScreen
 import remix.myplayer.compose.ui.screen.detail.DetailScreen
 import remix.myplayer.compose.ui.screen.history.HistoryScreen
 import remix.myplayer.compose.ui.screen.playing.PlayingScreen
 import remix.myplayer.compose.ui.screen.setting.SettingScreen
+import remix.myplayer.compose.ui.screen.webdav.WebDavDetailScreen
+import remix.myplayer.compose.ui.screen.webdav.WebDavScreen
 import remix.myplayer.db.room.model.PlayList
+import remix.myplayer.db.room.model.WebDav
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
@@ -58,8 +62,11 @@ const val RouteSongChoose = "song_choose"
 const val RoutePlayingScreen = "playing_screen"
 const val RouteAbout = "about"
 const val RouteCustomSort = "custom_sort"
-const val RouterLastAdded = "last_added"
-const val RouterHistory = "history"
+const val RouteLastAdded = "last_added"
+const val RouteHistory = "history"
+const val RouteSearch = "search"
+const val RouteWebDav = "webdav"
+const val RouteWebDavDetail = "webdav_detail"
 
 val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 
@@ -136,12 +143,30 @@ fun AppNav() {
           CustomSortScreen(id)
         }
 
-        normalAnimatedScreen(RouterLastAdded) {
+        normalAnimatedScreen(RouteLastAdded) {
           LastAddedScreen()
         }
 
-        normalAnimatedScreen(RouterHistory) {
+        normalAnimatedScreen(RouteHistory) {
           HistoryScreen()
+        }
+
+        normalAnimatedScreen(RouteSearch) {
+          SearchScreen()
+        }
+
+        normalAnimatedScreen(RouteWebDav) {
+          WebDavScreen()
+        }
+
+        composable<WebDav>(
+          enterTransition = enterTransition(),
+          exitTransition = exitTransition(),
+          popEnterTransition = popEnterTransition(),
+          popExitTransition = popExitTransition(),
+        ) {
+          val webDav = it.toRoute<WebDav>()
+          WebDavDetailScreen(webDav)
         }
       }
 

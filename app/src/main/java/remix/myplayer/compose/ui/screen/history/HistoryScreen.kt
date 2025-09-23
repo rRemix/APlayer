@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.ui.widget.app.CommonAppBar
-import remix.myplayer.compose.ui.widget.app.defaultActions
+import remix.myplayer.compose.ui.widget.common.CommonAppBar
+import remix.myplayer.compose.ui.widget.common.defaultAppBarActions
 import remix.myplayer.compose.ui.widget.library.SongListHeader
 import remix.myplayer.compose.ui.widget.library.list.ListSong
 import remix.myplayer.compose.viewmodel.historyViewModel
@@ -86,7 +86,7 @@ fun HistoryScreen() {
 private fun HistoryActions(onSortOrderChange: () -> Unit) {
   HistoryPopup(onSortOrderChange)
 
-  defaultActions.map { it ->
+  defaultAppBarActions.map { it ->
     IconButton(onClick = {
       it.action()
     }) {

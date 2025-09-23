@@ -48,7 +48,7 @@ import remix.myplayer.compose.ui.screen.setting.logic.theme.DarkThemeLogic
 import remix.myplayer.compose.ui.screen.setting.logic.theme.PrimaryColorLogic
 import remix.myplayer.compose.ui.screen.setting.logic.theme.SecondaryColorLogic
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.ui.widget.app.CommonAppBar
+import remix.myplayer.compose.ui.widget.common.CommonAppBar
 import remix.myplayer.compose.viewmodel.mainViewModel
 import remix.myplayer.helper.EQHelper
 

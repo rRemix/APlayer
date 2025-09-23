@@ -28,9 +28,9 @@ import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.ui.widget.app.CommonAppBar
 import remix.myplayer.compose.ui.widget.app.MultiSelectBar
-import remix.myplayer.compose.ui.widget.app.defaultActions
+import remix.myplayer.compose.ui.widget.common.CommonAppBar
+import remix.myplayer.compose.ui.widget.common.defaultAppBarActions
 import remix.myplayer.compose.ui.widget.library.SongListHeader
 import remix.myplayer.compose.ui.widget.library.list.ListSong
 import remix.myplayer.compose.viewmodel.MultiSelectState
@@ -75,7 +75,7 @@ fun LastAddedScreen() {
         }
       ) { isMultiSelect ->
         if (!isMultiSelect) {
-          CommonAppBar(title = stringResource(R.string.recently), actions = defaultActions)
+          CommonAppBar(title = stringResource(R.string.recently), actions = defaultAppBarActions)
         } else {
           MultiSelectBar(
             state = multiSelectState,
@@ -139,5 +139,4 @@ fun LastAddedScreen() {
       songs.addAll(libraryVM.loadLastAddedSongs())
     }
   }
-
 }

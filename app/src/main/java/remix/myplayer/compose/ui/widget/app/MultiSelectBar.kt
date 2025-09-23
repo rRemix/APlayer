@@ -96,7 +96,7 @@ fun MultiSelectBar(
           val songs =
             withContext(Dispatchers.IO) { libraryVM.loadSongsByModels(state.selectedModels) }
           if (songs.isNotEmpty()) {
-            musicVM.insertToQueue(songs.map { it.id })
+            musicVM.insertToQueue(songs)
           }
         }
       }

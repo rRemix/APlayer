@@ -20,6 +20,8 @@ import remix.myplayer.compose.repo.PlayQueueRepoImpl
 import remix.myplayer.compose.repo.PlayQueueRepository
 import remix.myplayer.compose.repo.SongRepoImpl
 import remix.myplayer.compose.repo.SongRepository
+import remix.myplayer.compose.repo.WebDavRepoImpl
+import remix.myplayer.compose.repo.WebDavRepository
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -56,4 +58,8 @@ abstract class RepositoryModule {
   @Singleton
   @Binds
   abstract fun bindHistoryRepo(repo: HistoryRepoImpl): HistoryRepository
+
+  @Singleton
+  @Binds
+  abstract fun bindWebDavRepo(repo: WebDavRepoImpl): WebDavRepository
 }

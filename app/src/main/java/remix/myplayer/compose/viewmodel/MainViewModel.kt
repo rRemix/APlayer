@@ -120,7 +120,9 @@ data class MultiSelectState(
 
   fun isShowInDetail() = where == Where.Detail
 
-  fun isShowInLastAdded() = where == Where.LastAdded;
+  fun isShowInLastAdded() = where == Where.LastAdded
+
+  fun isShowInSearch() = where == Where.Search
 
   fun selectedModels(target: Where): Set<String> {
     return if (target == where) {
@@ -139,7 +141,8 @@ data class MultiSelectState(
     PlayList,
     Folder,
     Detail,
-    LastAdded
+    LastAdded,
+    Search
   }
 }
 

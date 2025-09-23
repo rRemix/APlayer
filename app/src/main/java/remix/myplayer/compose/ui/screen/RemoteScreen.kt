@@ -1,6 +1,5 @@
 package remix.myplayer.compose.ui.screen
 
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,17 +21,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import remix.myplayer.R
 import remix.myplayer.compose.clickWithRipple
+import remix.myplayer.compose.nav.LocalNavController
+import remix.myplayer.compose.nav.RouteWebDav
 import remix.myplayer.compose.ui.theme.APlayerTheme
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.theme.icon
 import remix.myplayer.compose.ui.widget.common.TextPrimary
-import remix.myplayer.ui.activity.WebDavActivity
 
 @Composable
 fun RemoteScreen() {
   val context = LocalContext.current
+  val nav = LocalNavController.current
+
   val items = listOf(Item(R.drawable.icon_webdav, R.string.webdav, {
-    context.startActivity(Intent(context, WebDavActivity::class.java))
+    nav.navigate(RouteWebDav)
   }))
 
   LazyVerticalGrid(
@@ -75,7 +77,7 @@ private fun RemoteItem(item: Item) {
   }
 }
 
-internal data class Item(val icon: Int, val desc: Int, val onClick: () -> Unit)
+private data class Item(val icon: Int, val desc: Int, val onClick: () -> Unit)
 
 @Preview(showBackground = true)
 @Composable

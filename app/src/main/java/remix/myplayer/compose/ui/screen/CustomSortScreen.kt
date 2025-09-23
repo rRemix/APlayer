@@ -35,7 +35,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.clickableWithoutRipple
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.ui.widget.app.CommonAppBar
+import remix.myplayer.compose.ui.widget.common.CommonAppBar
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.common.TextSecondary
 import remix.myplayer.compose.ui.widget.library.GlideCover

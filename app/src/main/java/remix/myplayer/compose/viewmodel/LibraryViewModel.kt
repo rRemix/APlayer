@@ -30,6 +30,7 @@ import remix.myplayer.compose.repo.SongRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.helper.MusicEventCallback
+import remix.myplayer.misc.checkWorkerThread
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.ToastUtil
@@ -132,12 +133,24 @@ class LibraryViewModel @Inject constructor(
   fun loadSongsByModels(models: List<APlayerModel>) = songRepo.getSongsByModels(models)
 
   fun loadLastAddedSongs(): List<Song> {
+    checkWorkerThread()
     val today = Calendar.getInstance()
     today.time = Date()
     return songRepo.getSongs(
       Audio.Media.DATE_ADDED + " >= ?",
       arrayOf((today.timeInMillis / 1000 - 3600 * 24 * 7).toString()),
       null
+    )
+  }
+
+  fun searchSong(key: String): List<Song> {
+    checkWorkerThread()
+    return songRepo.getSongs(
+      Audio.Media.TITLE + " LIKE ? OR " +
+          Audio.ArtistColumns.ARTIST + " LIKE ? OR " +
+          Audio.AlbumColumns.ALBUM + " LIKE ?",
+      arrayOf("%$key%", "%$key%", "%$key%"),
+      settingPrefs.songSortOrder
     )
   }
 

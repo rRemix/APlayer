@@ -123,7 +123,7 @@ private fun SongDropdownMenu(
             }
 
             R.string.add_to_play_queue -> {
-              musicVM.insertToQueue(listOf(song.id))
+              musicVM.insertToQueue(listOf(song))
             }
 
             R.string.song_detail -> {

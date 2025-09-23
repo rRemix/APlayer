@@ -10,75 +10,23 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import remix.myplayer.R
-import remix.myplayer.bean.misc.Library
 import remix.myplayer.compose.clickableWithoutRipple
-import remix.myplayer.compose.nav.LocalNavController
-import remix.myplayer.compose.nav.RouteSongChoose
-import remix.myplayer.compose.ui.dialog.InputDialog
-import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.viewmodel.libraryViewModel
-import remix.myplayer.compose.viewmodel.mainViewModel
 
 @SuppressLint("CheckResult")
 @Composable
-fun FAButton(pagerState: PagerState, libraries: List<Library>) {
-  val showFb by remember {
-    derivedStateOf {
-      pagerState.currentPage == libraries.indexOfFirst {
-        it.tag == Library.TAG_PLAYLIST
-      }
-    }
-  }
-
-  val navController = LocalNavController.current
-  val context = LocalContext.current
-  val libraryVM = libraryViewModel
-  val mainVM = mainViewModel
-  var text by rememberSaveable {
-    mutableStateOf("")
-  }
-  val dialogState = rememberDialogState(false)
-
-  InputDialog(
-    dialogState = dialogState,
-    title = stringResource(R.string.new_playlist),
-    positive = stringResource(R.string.create),
-    text = text,
-    onDismissRequest = {
-      text = ""
-    },
-    onValueChange = {
-      text = it
-    }
-  ) {
-    libraryVM.insertPlayList(it) { id ->
-      if (id > 0) {
-        navController.navigate("$RouteSongChoose/${id}/$it")
-      }
-    }
-  }
-
+fun FAButton(show: Boolean, onClick: () -> Unit) {
   AnimatedVisibility(
-    showFb,
+    show,
     modifier = Modifier.padding(end = 38.dp, bottom = 80.dp),
     enter = scaleIn() + fadeIn(),
     exit = scaleOut() + fadeOut()
@@ -88,12 +36,7 @@ fun FAButton(pagerState: PagerState, libraries: List<Library>) {
         .size(48.dp)
         .background(color = LocalTheme.current.secondary, shape = CircleShape)
         .clickableWithoutRipple {
-          if (mainVM.multiSelectState.value.isShowing()) {
-            return@clickableWithoutRipple
-          }
-
-          text = "${context.getString(R.string.local_list)}${libraryVM.playLists.value.size}"
-          dialogState.show()
+          onClick()
         },
       contentAlignment = Alignment.Center
     ) {

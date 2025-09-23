@@ -22,7 +22,7 @@ import remix.myplayer.R
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.ui.widget.app.CommonAppBar
+import remix.myplayer.compose.ui.widget.common.CommonAppBar
 import remix.myplayer.compose.ui.widget.common.TextSecondary
 import remix.myplayer.misc.AppInfo
 

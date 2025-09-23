@@ -2,7 +2,6 @@ package remix.myplayer.compose.lyric.provider
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.bean.misc.LyricOrder
 import remix.myplayer.bean.mp3.Song
