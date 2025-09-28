@@ -122,6 +122,7 @@ class DeleteSongUseCase @Inject constructor(
           MediaStore.createDeleteRequest(activity.contentResolver, uris).intentSender
         activity.deleteSongLauncher.launch(IntentSenderRequest.Builder(sender).build())
       } else {
+        // TODO 测试低版本
         try {
           val count = activity.contentResolver.delete(
             Audio.Media.EXTERNAL_CONTENT_URI,

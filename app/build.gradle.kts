@@ -246,11 +246,7 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.rxjava2)
 
-    implementation(libs.android.crop) {
-        artifact {
-            type = "aar"
-        }
-    }
+    implementation(libs.image.cropper)
     implementation(libs.bugly)
     implementation(libs.logback.android)
     implementation(libs.material.dialog)
@@ -290,6 +286,7 @@ dependencies {
     implementation(libs.accompanist.drawablepainter)
     implementation(libs.reorderable)
     implementation(libs.kotlinx.serialization)
+    implementation(libs.androidx.work.runtime.ktx)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

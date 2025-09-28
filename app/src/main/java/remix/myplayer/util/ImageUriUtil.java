@@ -1,8 +1,5 @@
 package remix.myplayer.util;
 
-import static remix.myplayer.glide.UriFetcher.TYPE_ALBUM;
-import static remix.myplayer.glide.UriFetcher.TYPE_ARTIST;
-
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
@@ -71,15 +68,7 @@ public class ImageUriUtil {
    * 返回自定义的封面
    */
   public static File getCustomThumbIfExist(long id, int type) {
-    File img = type == TYPE_ALBUM ? new File(
-        DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/album") + "/" + Util
-            .hashKeyForDisk(id + "") + ".jpg")
-        : type == TYPE_ARTIST ? new File(
-            DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/artist") + "/" + Util
-                .hashKeyForDisk(id + "") + ".jpg")
-            : new File(
-                DiskCache.getDiskCacheDir(App.getContext(), "thumbnail/playlist") + "/" + Util
-                    .hashKeyForDisk(id + "") + ".jpg");
+    File img = new File(DiskCache.getDiskCacheDir(App.getContext(), "thumbnail"), type + "-" + id + ".jpg");
     if (img.exists()) {
       return img;
     }

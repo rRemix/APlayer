@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -26,13 +27,15 @@ import remix.myplayer.compose.lyric.CurrentNextLyricsLine
 import remix.myplayer.compose.lyric.LyricsManager
 import remix.myplayer.databinding.ActivityLockscreenBinding
 import remix.myplayer.helper.MusicServiceRemote
-import remix.myplayer.misc.menu.CtrlButtonListener
+import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.blur.StackBlurManager
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.RxUtil
 import remix.myplayer.util.StatusBarUtil
+import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -46,6 +49,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class LockScreenActivity : BaseMusicActivity() {
+
   @Inject
   lateinit var lyricsManager: LyricsManager
 
@@ -97,7 +101,7 @@ class LockScreenActivity : BaseMusicActivity() {
     attr.flags = attr.flags or WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
 
     //初始化按钮
-    val listener = CtrlButtonListener(applicationContext)
+    val listener = CtrlButtonListener()
     binding.lockscreenPrev.setOnClickListener(listener)
     binding.lockscreenNext.setOnClickListener(listener)
     binding.lockscreenPlay.setOnClickListener(listener)
@@ -107,13 +111,13 @@ class LockScreenActivity : BaseMusicActivity() {
     window.decorView.setBackgroundColor(Color.TRANSPARENT)
 
     findViewById<View>(R.id.lockscreen_arrow_container)
-        .startAnimation(AnimationUtils.loadAnimation(this, R.anim.arrow_left_to_right))
+      .startAnimation(AnimationUtils.loadAnimation(this, R.anim.arrow_left_to_right))
 
     lyricsManager.setLockScreenActivity(this)
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
-    val decorView = window.decorView ?: return true
+    val decorView = window.decorView
     when (event.action) {
       MotionEvent.ACTION_DOWN -> scrollX1 = event.x
       MotionEvent.ACTION_MOVE -> {
@@ -125,6 +129,7 @@ class LockScreenActivity : BaseMusicActivity() {
           decorView.scrollBy((-distance).toInt(), 0)
         }
       }
+
       MotionEvent.ACTION_UP -> {
         //判断当前位置是否超过整个屏幕宽度的0.25
         //超过则finish;没有则移动回初始状态
@@ -174,25 +179,36 @@ class LockScreenActivity : BaseMusicActivity() {
     binding.lockscreenArtist.text = song.artist
     //封面
     Glide.with(this)
-        .asBitmap()
-        .load(song)
-        .centerCrop()
-        .dontAnimate()
-        .placeholder(R.drawable.album_empty_bg_night)
-        .error(R.drawable.album_empty_bg_night)
-        .addListener(object : RequestListener<Bitmap> {
-          override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Bitmap>, isFirstResource: Boolean): Boolean {
-            startProcess(DEFAULT_BITMAP)
-            return false
-          }
+      .asBitmap()
+      .load(song)
+      .centerCrop()
+      .dontAnimate()
+      .placeholder(R.drawable.album_empty_bg_night)
+      .error(R.drawable.album_empty_bg_night)
+      .addListener(object : RequestListener<Bitmap> {
+        override fun onLoadFailed(
+          e: GlideException?,
+          model: Any?,
+          target: Target<Bitmap>,
+          isFirstResource: Boolean
+        ): Boolean {
+          startProcess(DEFAULT_BITMAP)
+          return false
+        }
 
-          override fun onResourceReady(resource: Bitmap, model: Any, target: Target<Bitmap>?, dataSource: DataSource, isFirstResource: Boolean): Boolean {
-            startProcess(resource)
-            return false
-          }
+        override fun onResourceReady(
+          resource: Bitmap,
+          model: Any,
+          target: Target<Bitmap>?,
+          dataSource: DataSource,
+          isFirstResource: Boolean
+        ): Boolean {
+          startProcess(resource)
+          return false
+        }
 
-        })
-        .into(binding.iv)
+      })
+      .into(binding.iv)
   }
 
   override fun onPlayStateChange() {
@@ -200,7 +216,8 @@ class LockScreenActivity : BaseMusicActivity() {
     //更新播放按钮
 
     binding.lockscreenPlay.setImageResource(
-        if (MusicServiceRemote.isPlaying()) R.drawable.lock_btn_pause else R.drawable.lock_btn_play)
+      if (MusicServiceRemote.isPlaying()) R.drawable.lock_btn_pause else R.drawable.lock_btn_play
+    )
   }
 
   private fun setResult(result: Palette?) {
@@ -218,13 +235,13 @@ class LockScreenActivity : BaseMusicActivity() {
   private fun startProcess(resource: Bitmap?) {
     disposable?.dispose()
     disposable = Single
-        .fromCallable {
-          blurBitmap(resource ?: DEFAULT_BITMAP)
-        }
-        .compose(RxUtil.applySingleScheduler())
-        .subscribe(Consumer {
-          setResult(it)
-        })
+      .fromCallable {
+        blurBitmap(resource ?: DEFAULT_BITMAP)
+      }
+      .compose(RxUtil.applySingleScheduler())
+      .subscribe(Consumer {
+        setResult(it)
+      })
   }
 
   private fun blurBitmap(raw: Bitmap): Palette? {
@@ -246,4 +263,17 @@ class LockScreenActivity : BaseMusicActivity() {
   fun setLyrics(lyrics: CurrentNextLyricsLine) {
     binding.lockscreenLyric.setTextWithAnimation("${lyrics.currentLine?.content ?: ""}\n${lyrics.nextLine ?: ""}")
   }
+
+  class CtrlButtonListener : View.OnClickListener {
+    override fun onClick(v: View) {
+      val intent = Intent(MusicService.ACTION_CMD)
+      when (v.id) {
+        R.id.lockscreen_prev -> intent.putExtra(EXTRA_CONTROL, Command.PREV)
+        R.id.lockscreen_next -> intent.putExtra(EXTRA_CONTROL, Command.NEXT)
+        R.id.lockscreen_play -> intent.putExtra(EXTRA_CONTROL, Command.TOGGLE)
+      }
+      sendLocalBroadcast(intent)
+    }
+  }
 }
+

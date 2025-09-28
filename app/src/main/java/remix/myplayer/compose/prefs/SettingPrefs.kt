@@ -6,7 +6,6 @@ import remix.myplayer.glide.UriFetcher.DOWNLOAD_LASTFM
 import remix.myplayer.helper.LanguageHelper.AUTO
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
-import remix.myplayer.ui.adapter.HeaderAdapter
 import remix.myplayer.util.Constants
 import remix.myplayer.util.Constants.MB
 import remix.myplayer.util.SPUtil
@@ -35,10 +34,10 @@ class SettingPrefs @Inject constructor(
   var genreDetailSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.CHILD_GENRE_SONG_SORT_ORDER, SortOrder.SONG_A_Z)
   var folderDetailSortOrder by PrefsDelegate(sp, SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, SortOrder.SONG_A_Z)
 
-  var albumMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_ALBUM, HeaderAdapter.GRID_MODE)
-  var artistMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_ARTIST, HeaderAdapter.GRID_MODE)
-  var genreMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_GENRE, HeaderAdapter.GRID_MODE)
-  var playlistMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_PLAYLIST, HeaderAdapter.GRID_MODE)
+  var albumMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_ALBUM, GRID_MODE)
+  var artistMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_ARTIST, GRID_MODE)
+  var genreMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_GENRE, GRID_MODE)
+  var playlistMode by PrefsDelegate(sp, SPUtil.SETTING_KEY.MODE_FOR_PLAYLIST, GRID_MODE)
 
   var manualScanFolder by PrefsDelegate(sp, SPUtil.SETTING_KEY.MANUAL_SCAN_FOLDER, "")
   var deleteIds by PrefsDelegate(sp, SPUtil.SETTING_KEY.BLACKLIST_SONG, emptySet<String>())
@@ -86,5 +85,8 @@ class SettingPrefs @Inject constructor(
     const val DOWNLOAD_COVER_NEVER = 2
 
     const val CLASSIC_NOTIFY_BACKGROUND_SYSTEM = 0
+
+    const val LIST_MODE = 0
+    const val GRID_MODE = 1
   }
 }

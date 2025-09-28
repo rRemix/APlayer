@@ -17,6 +17,7 @@ import remix.myplayer.bean.misc.LyricPriority;
 /**
  * SharedPrefs工具类
  */
+@Deprecated
 public class SPUtil {
 
   private static SPUtil mInstance;

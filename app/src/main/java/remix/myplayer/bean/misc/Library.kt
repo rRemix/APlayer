@@ -4,33 +4,12 @@ import android.content.Context
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.helper.SortOrder
-import remix.myplayer.ui.activity.RemoteFragment
-import remix.myplayer.ui.fragment.AlbumFragment
-import remix.myplayer.ui.fragment.ArtistFragment
-import remix.myplayer.ui.fragment.FolderFragment
-import remix.myplayer.ui.fragment.GenreFragment
-import remix.myplayer.ui.fragment.PlayListFragment
-import remix.myplayer.ui.fragment.SongFragment
 import java.io.Serializable
 
 data class Library(
   val tag: Int,
-  val order: Int = tag,
-  val className: String = when (tag) {
-    TAG_SONG -> SongFragment::class.java.name
-    TAG_ALBUM -> AlbumFragment::class.java.name
-    TAG_ARTIST -> ArtistFragment::class.java.name
-    TAG_PLAYLIST -> PlayListFragment::class.java.name
-    TAG_GENRE -> GenreFragment::class.java.name
-    TAG_FOLDER -> FolderFragment::class.java.name
-    TAG_REMOTE -> RemoteFragment::class.java.name
-    else -> throw IllegalArgumentException("unknown tag: $tag")
-  }
+  val order: Int = tag
 ) : Serializable {
-
-  fun isPlayList(): Boolean {
-    return className == PlayListFragment::class.java.name
-  }
 
   val stringRes: Int
     get() = when (tag) {

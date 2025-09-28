@@ -1,6 +1,5 @@
 package remix.myplayer.compose.ui.widget.popup
 
-import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -21,12 +20,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.soundcloud.android.crop.Crop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
@@ -34,6 +31,8 @@ import remix.myplayer.bean.mp3.Folder
 import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.bean.mp3.type
 import remix.myplayer.compose.clickWithRipple
+import remix.myplayer.compose.nav.LocalNavController
+import remix.myplayer.compose.nav.RouteCrop
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.theme.popupButton
 import remix.myplayer.compose.viewmodel.libraryViewModel
@@ -41,9 +40,9 @@ import remix.myplayer.compose.viewmodel.musicViewModel
 import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
-import remix.myplayer.misc.menu.LibraryListener.Companion.EXTRA_COVER
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
+import remix.myplayer.util.Constants
 import remix.myplayer.util.MusicUtil.makeCmdIntent
 import remix.myplayer.util.ToastUtil
 
@@ -80,6 +79,7 @@ fun LibraryItemDropdownMenu(
   model: APlayerModel,
   onDismissRequest: () -> Unit
 ) {
+  val nav = LocalNavController.current
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
   val libraryVM = libraryViewModel
@@ -147,12 +147,7 @@ fun LibraryItemDropdownMenu(
               }
               //设置封面
               R.string.set_album_cover, R.string.set_artist_cover, R.string.set_playlist_cover -> {
-                // TODO
-                val customCover = CustomCover(model, model.type())
-                val thumbIntent = (context as Activity).intent
-                thumbIntent.putExtra(EXTRA_COVER, customCover)
-                context.intent = thumbIntent
-                Crop.pickImage(context, Crop.REQUEST_PICK)
+                nav.navigate("${RouteCrop}/${model.getKey().toLong()}/${model.type()}")
               }
               //列表重命名
               R.string.rename -> {

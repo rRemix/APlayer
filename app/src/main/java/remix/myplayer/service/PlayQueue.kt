@@ -6,7 +6,6 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.misc.log.LogObserver
-import remix.myplayer.ui.activity.PlayerActivity
 import remix.myplayer.util.*
 import remix.myplayer.util.Constants.MODE_SHUFFLE
 import timber.log.Timber
@@ -291,7 +290,7 @@ class PlayQueue(service: MusicService) {
       nextSong = _playingQueue[nextPosition]
     }
 
-    Util.sendLocalBroadcast(Intent(PlayerActivity.ACTION_UPDATE_NEXT))
+    Util.sendLocalBroadcast(Intent(ACTION_UPDATE_NEXT))
     Timber.v("updateNextSong, curPos: $position nextPos: $nextPosition nextSong=${nextSong.title}\n }")
   }
 
@@ -301,5 +300,9 @@ class PlayQueue(service: MusicService) {
 
   fun isEmpty(): Boolean {
     return _playingQueue.isEmpty()
+  }
+
+  companion object {
+    const val ACTION_UPDATE_NEXT = "remix.myplayer.update.next_song"
   }
 }

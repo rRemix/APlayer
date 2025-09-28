@@ -166,6 +166,7 @@ open class BaseActivity : ComponentActivity(), CoroutineScope by MainScope() {
   }
 
   companion object {
+    const val EXTRA_COVER = "extra_cover"
 
     val NECESSARY_PERMISSIONS =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

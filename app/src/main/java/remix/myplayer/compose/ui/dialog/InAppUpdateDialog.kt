@@ -1,6 +1,5 @@
 package remix.myplayer.compose.ui.dialog
 
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -8,8 +7,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.compose.viewmodel.mainViewModel
-import remix.myplayer.misc.update.DownloadService
-import remix.myplayer.misc.update.DownloadService.Companion.EXTRA_RESPONSE
 
 @Composable
 fun InAppUpdateDialog() {
@@ -18,7 +15,6 @@ fun InAppUpdateDialog() {
 
   val release = state.release ?: return
   val context = LocalContext.current
-
   val force = release.isForceUpdate()
 
   NormalDialog(
@@ -28,10 +24,7 @@ fun InAppUpdateDialog() {
     content = release.body ?: "",
     positive = stringResource(R.string.update),
     onPositive = {
-      context.startService(
-        Intent(context, DownloadService::class.java)
-          .putExtra(EXTRA_RESPONSE, release)
-      )
+      mainVM.startDownload(context, release)
     },
     negative = if (!force) stringResource(R.string.ignore_check_update_forever) else null,
     onNegative = {

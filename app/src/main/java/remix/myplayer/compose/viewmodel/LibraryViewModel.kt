@@ -165,14 +165,26 @@ class LibraryViewModel @Inject constructor(
     }
   }
 
-  fun fetchMedia(clear: Boolean = false) {
+  fun fetchMedia(
+    clear: Boolean = false,
+    updateAlbumVersion: Boolean = false,
+    updateArtistVersion: Boolean = false,
+    updatePlayListVersion: Boolean = false
+  ) {
     if (clear) {
-      UriFetcher.updateAllVersion()
+      if (updateAlbumVersion) {
+        UriFetcher.updateAlbumVersion()
+      } else if (updateArtistVersion) {
+        UriFetcher.updateArtistVersion()
+      } else if (updatePlayListVersion) {
+        UriFetcher.updatePlayListVersion()
+      } else {
+        UriFetcher.updateAllVersion()
+      }
       UriFetcher.clearAllCache()
       Glide.get(context).clearMemory()
     }
 
-    // TODO compare list
     fetchSongs()
     fetchAlbums()
     fetchArtists()

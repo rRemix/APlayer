@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import remix.myplayer.request.network.GithubApi
 import remix.myplayer.request.network.KuGouApi
 import remix.myplayer.request.network.NetEaseApi
 import remix.myplayer.request.network.OkHttpHelper
@@ -54,5 +55,16 @@ object NetworkModule {
       .addConverterFactory(GsonConverterFactory.create())
       .build()
       .create(NetEaseApi::class.java)
+  }
+
+  @Provides
+  @Singleton
+  fun provideGithubApi(okHttpClient: OkHttpClient): GithubApi {
+    return Retrofit.Builder()
+      .baseUrl(GithubApi.BASE_URL)
+      .client(okHttpClient)
+      .addConverterFactory(GsonConverterFactory.create())
+      .build()
+      .create(GithubApi::class.java)
   }
 }

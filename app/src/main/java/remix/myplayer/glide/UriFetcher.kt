@@ -13,6 +13,7 @@ import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.request.network.HttpClient
+import remix.myplayer.util.Constants
 import remix.myplayer.util.ImageUriUtil
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.MediaStoreUtil.getSongs
@@ -34,9 +35,9 @@ object UriFetcher {
   var artistVersion = 0
   var playListVersion = 0
 
-  const val TYPE_ALBUM = 10
-  const val TYPE_ARTIST = 100
-  const val TYPE_PLAYLIST = 1000
+//  const val TYPE_ALBUM = 10
+//  const val TYPE_ARTIST = 100
+//  const val TYPE_PLAYLIST = 1000
 
   const val DOWNLOAD_LASTFM = 0
   const val DOWNLOAD_NETEASE = 1
@@ -147,7 +148,7 @@ object UriFetcher {
   private fun fetch(song: Song): Uri {
     if (song.isLocal()) { // 仅本地歌曲
       // 自定义封面
-      val customArtFile = ImageUriUtil.getCustomThumbIfExist(song.albumId, TYPE_ALBUM)
+      val customArtFile = ImageUriUtil.getCustomThumbIfExist(song.albumId, Constants.ALBUM)
       if (customArtFile != null && customArtFile.exists()) {
         return Uri.fromFile(customArtFile)
       }
@@ -192,7 +193,7 @@ object UriFetcher {
 
   private fun fetch(album: Album): Uri {
     // 自定义封面
-    val customArtFile = ImageUriUtil.getCustomThumbIfExist(album.albumID, TYPE_ALBUM)
+    val customArtFile = ImageUriUtil.getCustomThumbIfExist(album.albumID, Constants.ALBUM)
     if (customArtFile != null && customArtFile.exists()) {
       return Uri.fromFile(customArtFile)
     }
@@ -233,7 +234,7 @@ object UriFetcher {
 
   private fun fetch(artist: Artist): Uri {
     // 自定义封面
-    val customArtFile = ImageUriUtil.getCustomThumbIfExist(artist.artistID, TYPE_ARTIST)
+    val customArtFile = ImageUriUtil.getCustomThumbIfExist(artist.artistID, Constants.ARTIST)
     if (customArtFile != null && customArtFile.exists()) {
       return Uri.fromFile(customArtFile)
     }
@@ -271,7 +272,7 @@ object UriFetcher {
 
   private fun fetch(playList: PlayList): Uri {
     // 自定义封面
-    val customArtFile = ImageUriUtil.getCustomThumbIfExist(playList.id, TYPE_PLAYLIST)
+    val customArtFile = ImageUriUtil.getCustomThumbIfExist(playList.id, Constants.PLAYLIST)
     if (customArtFile != null && customArtFile.exists()) {
       return Uri.fromFile(customArtFile)
     }

@@ -62,6 +62,20 @@ fun CoroutineScope.runWithLoading(
   }
 }
 
+suspend fun <T> runWithLoadingResult(
+  cancelOutside: Boolean = true,
+  loadingText: String = "",
+  func: suspend () -> T
+): T {
+  try {
+    showLoading(cancelOutside, loadingText)
+    return func()
+  } finally {
+    dismissLoading()
+  }
+
+}
+
 @Composable
 fun LoadingDialog(
   progressColor: Color = LocalTheme.current.primary,

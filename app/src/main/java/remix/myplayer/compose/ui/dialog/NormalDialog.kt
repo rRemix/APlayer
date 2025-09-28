@@ -2,11 +2,14 @@ package remix.myplayer.compose.ui.dialog
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Checkbox
@@ -18,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -206,59 +210,74 @@ fun NormalDialog(
           val buttonPadding = 6.dp
           val buttonFontSize = 15.sp
           val buttonWeight = FontWeight.SemiBold
-          if (neutral != null) {
+
+          Box(
+            contentAlignment = Alignment.CenterStart,
+            modifier = Modifier
+              .weight(1f)
+          ) {
             TextPrimary(
-              neutral,
+              neutral ?: "",
               modifier = Modifier
-                .clickable {
-                  if (autoDismiss) {
-                    dialogState.dismiss()
+                .clickable(
+                  enabled = !neutral.isNullOrEmpty(),
+                  onClick = {
+                    if (autoDismiss) {
+                      dialogState.dismiss()
+                    }
+                    onNeutral?.invoke()
                   }
-                  onNeutral?.invoke()
-                }
+                )
                 .padding(buttonPadding),
+              textAlign = TextAlign.Center,
               fontWeight = buttonWeight,
-              fontSize = buttonFontSize)
+              fontSize = buttonFontSize
+            )
           }
 
-          if (positive != null || negative != null) {
-            Row(
-              modifier = Modifier.weight(1f),
-              horizontalArrangement = Arrangement.End,
-              verticalAlignment = Alignment.CenterVertically
-            ) {
-              if (negative != null) {
-                TextPrimary(
-                  negative,
-                  modifier = Modifier
-                    .clickable {
-                      if (autoDismiss) {
-                        dialogState.dismiss()
-                      }
-                      onNegative?.invoke()
+          Spacer(modifier = Modifier.width(4.dp))
+
+          Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            TextPrimary(
+              negative ?: "",
+              textAlign = TextAlign.Center,
+              modifier = Modifier
+                .clickable(
+                  enabled = !negative.isNullOrEmpty(),
+                  onClick = {
+                    if (autoDismiss) {
+                      dialogState.dismiss()
                     }
-                    .padding(buttonPadding),
-                  fontWeight = buttonWeight,
-                  fontSize = buttonFontSize
+                    onNegative?.invoke()
+                  }
                 )
-              }
-              if (positive != null) {
-                TextPrimary(
-                  positive,
-                  modifier = Modifier
-                    .padding(start = 12.dp)
-                    .clickable {
-                      if (autoDismiss) {
-                        dialogState.dismiss()
-                      }
-                      onPositive?.invoke()
+                .padding(buttonPadding)
+                .weight(1f),
+              fontWeight = buttonWeight,
+              fontSize = buttonFontSize
+            )
+            TextPrimary(
+              positive ?: "",
+              textAlign = TextAlign.Center,
+              modifier = Modifier
+                .clickable(
+                  enabled = !positive.isNullOrEmpty(),
+                  onClick = {
+                    if (autoDismiss) {
+                      dialogState.dismiss()
                     }
-                    .padding(buttonPadding),
-                  fontWeight = buttonWeight,
-                  fontSize = buttonFontSize
+                    onPositive?.invoke()
+                  }
                 )
-              }
-            }
+                .padding(buttonPadding)
+                .weight(1f),
+              fontWeight = buttonWeight,
+              fontSize = buttonFontSize
+            )
           }
         }
       }

@@ -2,6 +2,7 @@ package remix.myplayer.bean.github
 
 import java.io.Serializable
 
+@kotlinx.serialization.Serializable
 data class Release(
   var url: String?,
   var assets_url: String?,
@@ -27,6 +28,7 @@ data class Release(
     return split != null && split.size > 3
   }
 
+  @kotlinx.serialization.Serializable
   data class AssetsBean(
     var url: String?,
     var id: Int = 0,

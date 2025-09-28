@@ -1,6 +1,7 @@
 [versions]
 accompanistDrawablepainter = "0.37.3"
 agp = "8.6.1"
+imageCropper = "4.6.0"
 constraintlayoutCompose = "1.1.1"
 hiltAndroid = "2.56.2"
 kotlin = "2.1.21"
@@ -15,7 +16,7 @@ glideCompose = "1.0.0-beta01"
 retrofit = "2.11.0"
 room = "2.7.2"
 xxpermissions = "21.2"
-
+workRuntimeKtx = "2.10.4"
 activityCompose = "1.10.1"
 composeBom = "2025.07.00"
 lifecycleRuntimeKtx = "2.9.2"
@@ -41,6 +42,7 @@ hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", ve
 
 
 # androidx
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version = "1.6.1" }
 cardview = { group = "androidx.cardview", name = "cardview", version = "1.0.0" }
@@ -71,7 +73,7 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-rxjava2 = { group = "androidx.room", name = "room-rxjava2", version.ref = "room" }
 
 # other
-android-crop = { group = "com.soundcloud.android", name = "android-crop", version = "1.0.1" }
+image-cropper = { module = "com.vanniktech:android-image-cropper", version.ref = "imageCropper" }
 bugly = { group = "com.tencent.bugly", name = "crashreport", version = "3.3.3" }
 leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version = "2.13" }
 logback-android = { group = "com.github.tony19", name = "logback-android", version = "3.0.0" }

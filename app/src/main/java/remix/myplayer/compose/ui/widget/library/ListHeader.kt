@@ -23,10 +23,10 @@ import androidx.compose.ui.unit.dp
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.clickableWithoutRipple
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.service.Command
-import remix.myplayer.ui.adapter.HeaderAdapter
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.ToastUtil
@@ -76,7 +76,7 @@ fun ModeHeader(grid: Boolean, onClick: (mode: Int) -> Unit) {
   ) {
     Icon(
       modifier = Modifier.clickableWithoutRipple(interactionSource = remember { MutableInteractionSource() }) {
-        onClick(HeaderAdapter.GRID_MODE)
+        onClick(SettingPrefs.GRID_MODE)
       },
       painter = painterResource(R.drawable.ic_apps_white_24dp),
       contentDescription = "ModeGrid",
@@ -86,7 +86,7 @@ fun ModeHeader(grid: Boolean, onClick: (mode: Int) -> Unit) {
       modifier = Modifier
         .padding(horizontal = 18.dp)
         .clickableWithoutRipple(interactionSource = remember { MutableInteractionSource() }) {
-          onClick(HeaderAdapter.LIST_MODE)
+          onClick(SettingPrefs.LIST_MODE)
         } ,
       painter = painterResource(R.drawable.ic_format_list_bulleted_white_24dp),
       contentDescription = "ModeList",

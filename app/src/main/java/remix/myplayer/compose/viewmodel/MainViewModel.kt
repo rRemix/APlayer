@@ -4,16 +4,24 @@ import android.content.Context
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import remix.myplayer.R
 import remix.myplayer.bean.github.Release
 import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.compose.ui.dialog.DialogState
+import remix.myplayer.compose.ui.dialog.runWithLoadingResult
 import remix.myplayer.compose.updateIf
+import remix.myplayer.misc.update.DownloadWorker
 import remix.myplayer.misc.update.InAppUpdater
 import remix.myplayer.util.Util
 import timber.log.Timber
@@ -24,6 +32,8 @@ class MainViewModel @Inject constructor(
   @ApplicationContext private val context: Context,
   private val inAppUpdater: InAppUpdater
 ) : ViewModel() {
+  private val _snackBar = MutableSharedFlow<String>(extraBufferCapacity = 1)
+  val snackBar = _snackBar.asSharedFlow()
 
   private val _inAppUpdateState = MutableStateFlow(InAppUpdateState())
   val inAppUpdateState = _inAppUpdateState.asStateFlow()
@@ -34,6 +44,7 @@ class MainViewModel @Inject constructor(
     if (inAppUpdateChecked && !force) {
       return
     }
+    inAppUpdater.cancelDownloadWorker()
     inAppUpdateChecked = true
     viewModelScope.launch {
       val release = inAppUpdater.checkUpdate(force)
@@ -42,11 +53,45 @@ class MainViewModel @Inject constructor(
     }
   }
 
-  fun showInAppUpdateDialog(release: Release) {
-    if (!_inAppUpdateState.value.dialogState.isOpen) {
-      _inAppUpdateState.value.dialogState.show()
+  fun startDownload(context: Context, release: Release) {
+    viewModelScope.launch {
+
+      suspend fun awaitWorkerAndGetPath(): String? {
+        return inAppUpdater
+          .startDownloadWorker(release)
+          .onEach {
+            Timber.v("DownloadWorker, state: ${it?.state}")
+          }
+          .first { info ->
+            info?.state == WorkInfo.State.SUCCEEDED
+          }?.outputData?.getString(DownloadWorker.EXTRA_FILE_PATH)
+      }
+
+      _snackBar.tryEmit(context.getString(R.string.downloading))
+
+      val path = if (release.isForceUpdate()) {
+        runWithLoadingResult(false, context.getString(R.string.updating)) {
+          awaitWorkerAndGetPath()
+        }
+      } else {
+        awaitWorkerAndGetPath()
+      }
+
+      if (path.isNullOrEmpty()) {
+        return@launch
+      }
+      Util.installApk(context, path)
     }
-    _inAppUpdateState.value = _inAppUpdateState.value.copy(release = release)
+  }
+
+
+  fun showInAppUpdateDialog(release: Release) {
+    _inAppUpdateState.updateIf(
+      condition = { !_inAppUpdateState.value.dialogState.isOpen },
+      transform = {
+        it.dialogState.show()
+        it.copy(release = release)
+      })
   }
 
   fun ignoreForever() {
@@ -60,9 +105,13 @@ class MainViewModel @Inject constructor(
   private val _multiSelectState = MutableStateFlow(MultiSelectState())
   val multiSelectState = _multiSelectState.asStateFlow()
 
-  fun showMultiSelect(context: Context, where: MultiSelectState.Where, initialSelect: APlayerModel) {
+  fun showMultiSelect(
+    context: Context,
+    where: MultiSelectState.Where,
+    initialSelect: APlayerModel
+  ) {
     _multiSelectState.updateIf(
-      condition = {it.where != where && !it.isShowing()},
+      condition = { it.where != where && !it.isShowing() },
       transform = {
         Util.vibrate(context, 50)
         it.copy(

@@ -97,107 +97,9 @@
       </intent-filter>
     </activity>
 
-    <!-- 主页面 -->
-<!--    <activity-->
-    <!--      android:name=".ui.activity.MainActivity"-->
-    <!--      android:theme="@style/ActivityStyle"-->
-    <!--      android:launchMode="singleTop"-->
-    <!--      android:exported="true">-->
-    <!--      <intent-filter>-->
-    <!--        <action android:name="android.intent.action.MAIN"/>-->
-    <!--        <action android:name="android.intent.action.MUSIC_PLAYER"/>-->
-
-    <!--        <category android:name="android.intent.category.LAUNCHER"/>-->
-    <!--        <category android:name="android.intent.category.APP_MUSIC"/>-->
-    <!--        <category android:name="android.intent.category.DEFAULT"/>-->
-    <!--      </intent-filter>-->
-
-    <!--      <intent-filter>-->
-    <!--        <action android:name="android.intent.action.VIEW"/>-->
-
-    <!--        <category android:name="android.intent.category.DEFAULT"/>-->
-
-    <!--        <data android:scheme="content"/>-->
-    <!--        <data android:mimeType="audio/*"/>-->
-    <!--        <data android:mimeType="application/ogg"/>-->
-    <!--        <data android:mimeType="application/x-ogg"/>-->
-    <!--        <data android:mimeType="application/itunes"/>-->
-    <!--      </intent-filter>-->
-    <!--      <intent-filter>-->
-    <!--        <action android:name="android.intent.action.VIEW"/>-->
-
-    <!--        <category android:name="android.intent.category.DEFAULT"/>-->
-
-    <!--        <data android:scheme="file"/>-->
-    <!--        <data android:mimeType="audio/*"/>-->
-    <!--        <data android:mimeType="application/ogg"/>-->
-    <!--        <data android:mimeType="application/x-ogg"/>-->
-    <!--        <data android:mimeType="application/itunes"/>-->
-    <!--      </intent-filter>-->
-    <!--      <intent-filter>-->
-    <!--        <action android:name="com.cyanogenmod.eleven.AUDIO_PLAYER"/>-->
-
-    <!--        <category android:name="android.intent.category.DEFAULT"/>-->
-    <!--      </intent-filter>-->
-    <!--      <intent-filter>-->
-    <!--        <action android:name="android.intent.action.PICK"/>-->
-
-    <!--        <category android:name="android.intent.category.DEFAULT"/>-->
-    <!--        <category android:name="android.intent.category.OPENABLE"/>-->
-
-    <!--        <data android:mimeType="vnd.android.cursor.dir/audio"/>-->
-    <!--      </intent-filter>-->
-    <!--    </activity>-->
-    <!-- 播放界面 -->
-    <activity
-      android:name=".ui.activity.PlayerActivity"
-      android:parentActivityName=".compose.activity.ComposeActivity"
-      android:theme="@style/PlayerActivityStyle"
-      android:windowSoftInputMode="adjustPan">
-      <meta-data
-        android:name="android.support.PARENT_ACTIVITY"
-        android:value=".compose.activity.ComposeActivity"/>
-    </activity>
-    <!-- 搜索 -->
-    <activity
-      android:name=".ui.activity.SearchActivity"
-      android:theme="@style/ActivityStyle"/>
-    <!-- 子目录列表 -->
-    <activity
-      android:name=".ui.activity.ChildHolderActivity"
-      android:theme="@style/ActivityStyle"/>
-    <!--手动排序-->
-    <activity
-      android:name=".ui.activity.CustomSortActivity"
-      android:theme="@style/ActivityStyle"/>
-    <!-- 海报分享 -->
-    <activity
-      android:name=".ui.activity.RecordShareActivity"
-      android:theme="@style/ActivityStyle"/>
-    <!-- 关于 -->
-    <activity
-      android:name=".ui.activity.AboutActivity"
-      android:theme="@style/ActivityStyle"/>
-    <!-- 最近添加 -->
-    <activity
-      android:name=".ui.activity.RecentlyActivity"
-      android:theme="@style/ActivityStyle"/>
-    <!-- 反馈 -->
-    <!-- 扫描大小设置 -->
     <!-- 均衡器 -->
     <activity
       android:name=".ui.activity.EQActivity"
-      android:theme="@style/ActivityStyle"/>
-    <activity
-      android:name=".ui.activity.SupportActivity"
-      android:theme="@style/ActivityStyle"/>
-    <!-- 设置 -->
-    <activity
-      android:name=".ui.activity.SettingActivity"
-      android:theme="@style/ActivityStyle"/>
-    <!-- 播放列表歌曲选择 -->
-    <activity
-      android:name=".ui.activity.SongChooseActivity"
       android:theme="@style/ActivityStyle"/>
     <!-- 锁屏页 -->
     <activity
@@ -212,17 +114,6 @@
       android:launchMode="singleInstance"
       android:name=".appshortcuts.AppShortcutActivity"
       android:theme="@style/AppShortcut"/>
-    <activity
-      android:name=".ui.activity.HistoryActivity"
-      android:theme="@style/ActivityStyle"/>
-    <!-- 图片裁剪 -->
-    <activity android:name="com.soundcloud.android.crop.CropImageActivity"/>
-
-    <activity android:name=".ui.activity.WebDavActivity"
-      android:theme="@style/ActivityStyle"/>
-
-    <activity android:name=".ui.activity.WebDavDetailActivity"
-      android:theme="@style/ActivityStyle"/>
 
     <!-- 线控 -->
     <receiver android:name=".misc.receiver.MediaButtonReceiver"
@@ -244,9 +135,6 @@
       android:exported="true"
       android:foregroundServiceType="mediaPlayback"
       android:name=".service.MusicService"/>
-    <service
-      android:exported="false"
-      android:name=".misc.update.DownloadService"/>
 
     <!-- 桌面部件 -->
     <receiver

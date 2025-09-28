@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +41,7 @@ import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.compose.ui.common.ProvideSnackBarHostState
 import remix.myplayer.compose.ui.dialog.DialogContainer
 import remix.myplayer.compose.ui.screen.AboutScreen
+import remix.myplayer.compose.ui.screen.crop.CropScreen
 import remix.myplayer.compose.ui.screen.CustomSortScreen
 import remix.myplayer.compose.ui.screen.HomeScreen
 import remix.myplayer.compose.ui.screen.LastAddedScreen
@@ -51,6 +53,7 @@ import remix.myplayer.compose.ui.screen.playing.PlayingScreen
 import remix.myplayer.compose.ui.screen.setting.SettingScreen
 import remix.myplayer.compose.ui.screen.webdav.WebDavDetailScreen
 import remix.myplayer.compose.ui.screen.webdav.WebDavScreen
+import remix.myplayer.compose.viewmodel.mainViewModel
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.db.room.model.WebDav
 import kotlin.reflect.KClass
@@ -66,7 +69,7 @@ const val RouteLastAdded = "last_added"
 const val RouteHistory = "history"
 const val RouteSearch = "search"
 const val RouteWebDav = "webdav"
-const val RouteWebDavDetail = "webdav_detail"
+const val RouteCrop = "crop"
 
 val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 
@@ -104,11 +107,11 @@ fun AppNav() {
 
         composable<DetailScreenRoute>(
           typeMap = mapOf(
-            typeOf<Album?>() to DetailScreenRouteType.album,
-            typeOf<Artist?>() to DetailScreenRouteType.artist,
-            typeOf<Genre?>() to DetailScreenRouteType.genre,
-            typeOf<PlayList?>() to DetailScreenRouteType.playList,
-            typeOf<Folder?>() to DetailScreenRouteType.folder,
+            typeOf<Album?>() to ModelRouteType.album,
+            typeOf<Artist?>() to ModelRouteType.artist,
+            typeOf<Genre?>() to ModelRouteType.genre,
+            typeOf<PlayList?>() to ModelRouteType.playList,
+            typeOf<Folder?>() to ModelRouteType.folder,
           ),
           enterTransition = enterTransition(),
           exitTransition = exitTransition(),
@@ -168,6 +171,17 @@ fun AppNav() {
           val webDav = it.toRoute<WebDav>()
           WebDavDetailScreen(webDav)
         }
+
+        normalAnimatedScreen(
+          "${RouteCrop}/{id}/{type}",
+          arguments = listOf(
+            navArgument("id") { type = NavType.LongType },
+            navArgument("type") { type = NavType.IntType })
+        ) {
+          val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
+          val type = it.arguments?.getInt("type") ?: return@normalAnimatedScreen
+          CropScreen(id, type)
+        }
       }
 
       SnackbarHost(
@@ -176,6 +190,14 @@ fun AppNav() {
           .align(Alignment.BottomCenter)
           .padding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom).asPaddingValues())
       )
+    }
+
+    val mainVM = mainViewModel
+    LaunchedEffect(mainVM) {
+      mainVM.snackBar.collect { message ->
+        snackBarHostState.currentSnackbarData?.dismiss()
+        snackBarHostState.showSnackbar(message)
+      }
     }
   }
 }
@@ -197,7 +219,6 @@ private fun NavGraphBuilder.normalAnimatedScreen(
     content = content
   )
 }
-
 
 @Serializable
 data class DetailScreenRoute(
@@ -221,7 +242,7 @@ data class DetailScreenRoute(
 
 }
 
-private object DetailScreenRouteType {
+private object ModelRouteType {
 
   val album = RouteType(Album::class)
   val artist = RouteType(Artist::class)

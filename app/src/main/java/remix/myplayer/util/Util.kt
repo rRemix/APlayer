@@ -31,6 +31,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.IntentSenderRequest
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -516,26 +517,26 @@ object Util {
     }
   }
 
-  fun installApk(context: Context, path: String?) {
-    if (path == null) {
-      ToastUtil.show(context, context.getString(R.string.empty_path_report_to_developer))
-      return
-    }
-    val installFile = File(path)
-    val intent = Intent(Intent.ACTION_VIEW)
-    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+  fun installApk(context: Context, path: String) {
+    val apkFile = File(path)
+    val apkUri = ("file://${apkFile.absolutePath}").toUri()
+    val intent: Intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       val apkUri = FileProvider.getUriForFile(
         context,
-        context.applicationContext.packageName + ".fileprovider", installFile
+        "${context.packageName}.fileprovider",
+        apkFile
       )
-      intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-      intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
-      context.startActivity(intent)
+      Intent(Intent.ACTION_INSTALL_PACKAGE).setData(apkUri)
+        .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     } else {
-      intent.setDataAndType(Uri.fromFile(installFile), "application/vnd.android.package-archive")
-      context.startActivity(intent)
+      Intent(Intent.ACTION_VIEW).setDataAndType(
+        apkUri,
+        "application/vnd.android.package-archive"
+      )
+        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
+    context.startActivity(intent)
   }
 
   /**

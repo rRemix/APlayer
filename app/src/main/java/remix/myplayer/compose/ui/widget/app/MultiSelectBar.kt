@@ -102,7 +102,7 @@ fun MultiSelectBar(
       }
 
       if (state.where != MultiSelectState.Where.Genre) {
-        TooltipButton(R.string.delete, R.drawable.ic_delete_white_24dp, tintColor) {
+        TooltipButton(R.string.delete, R.drawable.ic_delete_black_24dp, tintColor) {
           mainVM.closeMultiSelect()
           if (state.selectedModels.isNotEmpty()) {
             val title = if (state.selectedModels.all { it is PlayList }) {

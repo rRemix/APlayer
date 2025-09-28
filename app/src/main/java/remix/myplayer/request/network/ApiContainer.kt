@@ -1,14 +1,21 @@
 package remix.myplayer.request.network
 
+import io.reactivex.Single
+import okhttp3.ResponseBody
+import remix.myplayer.bean.github.Release
 import remix.myplayer.bean.kugou.KLrcResponse
 import remix.myplayer.bean.kugou.KSearchResponse
 import remix.myplayer.bean.netease.NLrcResponse
 import remix.myplayer.bean.netease.NSongSearchResponse
 import remix.myplayer.bean.qq.QLrcResponse
 import remix.myplayer.bean.qq.QSearchResponse
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Headers
+import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Streaming
+import retrofit2.http.Url
 
 interface KuGouApi {
 
@@ -75,5 +82,18 @@ interface NetEaseApi {
 
   companion object {
     const val BASE_URL = "http://music.163.com/api/"
+  }
+}
+
+interface GithubApi {
+  @GET("repos/{owner}/{repo}/releases/latest")
+  suspend fun fetchLatestRelease(@Path("owner") owner: String?, @Path("repo") repo: String?): Release
+
+  @Streaming
+  @GET
+  suspend fun downloadFile(@Url fileUrl: String): Response<ResponseBody>
+
+  companion object {
+    const val BASE_URL = "https://api.github.com/"
   }
 }

@@ -20,19 +20,18 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.soundcloud.android.crop.Crop
 import remix.myplayer.R
-import remix.myplayer.bean.misc.CustomCover
 import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.activity.base.BaseActivity
 import remix.myplayer.compose.clickWithRipple
+import remix.myplayer.compose.nav.LocalNavController
+import remix.myplayer.compose.nav.RouteCrop
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.theme.popupButton
 import remix.myplayer.compose.viewmodel.libraryViewModel
 import remix.myplayer.compose.viewmodel.musicViewModel
 import remix.myplayer.compose.viewmodel.settingViewModel
-import remix.myplayer.misc.menu.LibraryListener.Companion.EXTRA_COVER
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.util.Constants
@@ -91,6 +90,7 @@ private fun SongDropdownMenu(
   val settingVM = settingViewModel
   val musicVM = musicViewModel
   val libraryVM = libraryViewModel
+  val nav = LocalNavController.current
 
   DropdownMenu(
     modifier = Modifier.wrapContentSize(Alignment.TopEnd),
@@ -137,11 +137,7 @@ private fun SongDropdownMenu(
             }
 
             R.string.set_album_cover -> {
-              val customCover = CustomCover(song, Constants.ALBUM)
-              val coverIntent = activity.intent
-              coverIntent.putExtra(EXTRA_COVER, customCover)
-              activity.intent = coverIntent
-              Crop.pickImage(activity, Crop.REQUEST_PICK)
+              nav.navigate("${RouteCrop}/${song.albumId}/${Constants.ALBUM}")
             }
 
             R.string.collect -> {

@@ -15,12 +15,12 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.appwidgets.big.AppWidgetBig
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.compose.activity.ComposeActivity
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
-import remix.myplayer.ui.activity.MainActivity
 import remix.myplayer.util.DensityUtil
 import timber.log.Timber
 
@@ -87,7 +87,7 @@ abstract class BaseAppwidget
     views.setOnClickPendingIntent(R.id.appwidget_love, buildServicePendingIntent(context, componentNameForService, Command.LOVE))
     views.setOnClickPendingIntent(R.id.appwidget_timer, buildServicePendingIntent(context, componentNameForService, Command.TOGGLE_TIMER))
 
-    val action = Intent(context, MainActivity::class.java)
+    val action = Intent(context, ComposeActivity::class.java)
     action.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
     views.setOnClickPendingIntent(R.id.appwidget_clickable, PendingIntent.getActivity(context, 0, action, getPendingIntentFlag()))
   }

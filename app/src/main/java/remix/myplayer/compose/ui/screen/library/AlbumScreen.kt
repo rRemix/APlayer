@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.compose.nav.DetailScreenRoute
 import remix.myplayer.compose.nav.LocalNavController
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.compose.spanCount
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.library.ModeHeader
@@ -32,7 +33,6 @@ import remix.myplayer.compose.ui.widget.library.list.ListItem
 import remix.myplayer.compose.viewmodel.MultiSelectState
 import remix.myplayer.compose.viewmodel.libraryViewModel
 import remix.myplayer.compose.viewmodel.mainViewModel
-import remix.myplayer.ui.adapter.HeaderAdapter
 
 @Composable
 fun AlbumScreen() {
@@ -49,12 +49,12 @@ fun AlbumScreen() {
   Column(
     modifier = Modifier.background(LocalTheme.current.libraryBackground)
   ) {
-    ModeHeader(grid == HeaderAdapter.GRID_MODE) {
+    ModeHeader(grid == SettingPrefs.GRID_MODE) {
       if (grid == it) {
         return@ModeHeader
       }
       grid =
-        if (grid == HeaderAdapter.GRID_MODE) HeaderAdapter.LIST_MODE else HeaderAdapter.GRID_MODE
+        if (grid == SettingPrefs.GRID_MODE) SettingPrefs.LIST_MODE else SettingPrefs.GRID_MODE
       setting.albumMode = grid
     }
 
@@ -64,7 +64,7 @@ fun AlbumScreen() {
       }
     }
 
-    if (grid == HeaderAdapter.LIST_MODE) {
+    if (grid == SettingPrefs.LIST_MODE) {
       val listState = rememberLazyListState()
       LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
         itemsIndexed(albums, key = { index, album ->
