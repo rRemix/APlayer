@@ -21,7 +21,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.min
 
-// TODO 配置offset
 @OptIn(ExperimentalSerializationApi::class)
 @Singleton
 class LyricSearcher @Inject constructor(
@@ -30,24 +29,6 @@ class LyricSearcher @Inject constructor(
   val lyricPrefs: LyricPrefs,
   private val providers: Set<@JvmSuppressWildcards ILyricsProvider>
 ) {
-
-  // 同时作为默认顺序
-//  private val PROVIDERS = listOf(
-//    EmbeddedProvider,
-//    IgnoredProvider,
-//  )
-  /*
-   old:
-    DEF(0, App.context.getString(R.string.default_lyric_priority)),
-    IGNORE(1, App.context.getString(R.string.ignore_lrc)),
-    EMBEDDED(2, App.context.getString(R.string.embedded_lyric)),
-    LOCAL(3, App.context.getString(R.string.local)),
-    KUGOU(4, App.context.getString(R.string.kugou)),
-    NETEASE(5, App.context.getString(R.string.netease)),
-    QQ(6, App.context.getString(R.string.qq)),
-    MANUAL(7, App.context.getString(R.string.select_lrc));
-   */
-
   private val ID_TO_PROVIDER: Map<String, ILyricsProvider> = run {
     val map = HashMap<String, ILyricsProvider>()
     providers.forEach {

@@ -33,7 +33,6 @@ class LyricPrefs @Inject constructor(
   var tipShown by PrefsDelegate(sp, KEY_LYRIC_LOCAL_TIP_SHOWN, false)
 
   var desktopLyricEnabled by PrefsDelegate(sp, KEY_DESKTOP_LYRIC_ENABLED, false)
-  var desktopLyricLocked by PrefsDelegate(sp, KEY_DESKTOP_LYRIC_LOCKED, false)
   var statusBarLyricEnabled by PrefsDelegate(sp, KEY_STATUS_BAR_LYRIC_ENABLED, false)
 
   var fontScale by PrefsDelegate(sp, KEY_LYRIC_FONT_SCALE, 1.0f)

@@ -21,8 +21,8 @@ import androidx.core.widget.ImageViewCompat
 import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
 import remix.myplayer.compose.lyric.CurrentNextLyricsLine
-import remix.myplayer.compose.lyric.LyricsManager
-import remix.myplayer.compose.lyric.LyricsManagerEntryPoint
+import remix.myplayer.compose.lyric.LyricManager
+import remix.myplayer.compose.lyric.LyricManagerEntryPoint
 import remix.myplayer.compose.prefs.AbstractPref
 import remix.myplayer.compose.prefs.PrefsDelegate
 import remix.myplayer.compose.prefs.delegate
@@ -60,7 +60,7 @@ class DesktopLyricView @JvmOverloads constructor(
     internal const val DEFAULT_SECOND_LINE_SIZE = 16f
 
     @ColorInt
-    internal const val DEFAULT_SUNG_COLOR = 0xff698cf6.toInt()
+    internal const val DEFAULT_SUNG_COLOR = 0xff698CF6.toInt()
 
     @ColorInt
     internal const val DEFAULT_UNSUNG_COLOR = 0xffd4d4d4.toInt()
@@ -69,11 +69,11 @@ class DesktopLyricView @JvmOverloads constructor(
     internal const val DEFAULT_TRANSLATION_COLOR = 0xffd4d4d4.toInt()
   }
 
-  private val lyricsManager: LyricsManager by lazy {
+  private val lyricManager: LyricManager by lazy {
     EntryPointAccessors.fromApplication(
       context.applicationContext,
-      LyricsManagerEntryPoint::class.java
-    ).lyricsManager()
+      LyricManagerEntryPoint::class.java
+    ).lyricManager()
   }
 
   private val desktopLyricPrefs = DesktopLyricPrefs(context)
@@ -89,7 +89,7 @@ class DesktopLyricView @JvmOverloads constructor(
 
   private var secondLineIsTranslation: Boolean = false
 
-  private var yPosition by lyricsManager.lyricPrefs.sp.delegate(
+  private var yPosition by lyricManager.lyricPrefs.sp.delegate(
     "${DesktopLyricPrefs.Y_POSITION_PREFIX}${resources.configuration.orientation}",
     0
   )
@@ -263,7 +263,7 @@ class DesktopLyricView @JvmOverloads constructor(
     isPanelVisible = false
 
     binding.close.setOnClickListener {
-      lyricsManager.setDesktopLyricEnabled(false)
+      lyricManager.setDesktopLyricEnabled(false)
     }
     binding.prev.setOnClickListener {
       sendLocalBroadcast(makeCmdIntent(Command.PREV))

@@ -42,8 +42,8 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.lyric.LyricsLine
-import remix.myplayer.compose.lyric.LyricsManager
-import remix.myplayer.compose.lyric.LyricsManagerEntryPoint
+import remix.myplayer.compose.lyric.LyricManager
+import remix.myplayer.compose.lyric.LyricManagerEntryPoint
 import remix.myplayer.compose.lyric.provider.ILyricsProvider
 import remix.myplayer.compose.lyric.provider.UriProvider
 import remix.myplayer.compose.ui.common.LocalSnackBarHostState
@@ -70,8 +70,8 @@ internal fun PlayingLyric(song: Song) {
   val lyricsManager = remember {
     EntryPointAccessors.fromApplication(
       context.applicationContext,
-      LyricsManagerEntryPoint::class.java
-    ).lyricsManager()
+      LyricManagerEntryPoint::class.java
+    ).lyricManager()
   }
   val lyricSearcher = lyricsManager.lyricSearcher
 
@@ -217,35 +217,35 @@ internal fun PlayingLyric(song: Song) {
   DisposableEffect(Unit) {
     val receiver = object : BroadcastReceiver() {
       override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == LyricsManager.ACTION_LYRIC) {
-          val extra = intent.getIntExtra(LyricsManager.EXTRA_LYRIC, -1)
+        if (intent.action == LyricManager.ACTION_LYRIC) {
+          val extra = intent.getIntExtra(LyricManager.EXTRA_LYRIC, -1)
 
           when (extra) {
-            LyricsManager.CHANGE_LYRIC -> {
+            LyricManager.CHANGE_LYRIC -> {
               lyricsManager.clearCache(song)
 
               // 如果是手动选择则直接使用UriProvider解析
-              val uri = intent.getParcelableExtra<Uri>(LyricsManager.EXTRA_LYRIC_URI)
+              val uri = intent.getParcelableExtra<Uri>(LyricManager.EXTRA_LYRIC_URI)
               uriProvider = if (uri != null) {
-                UriProvider(uri)
+                UriProvider(context, uri)
               } else {
                 null
               }
               searchTrigger++
             }
 
-            LyricsManager.CHANGE_LYRIC_FONT_SCALE -> {
+            LyricManager.CHANGE_LYRIC_FONT_SCALE -> {
               fontScale = lyricSearcher.lyricPrefs.fontScale
             }
 
-            LyricsManager.SHOW_OFFSET_PANEL -> {
+            LyricManager.SHOW_OFFSET_PANEL -> {
               panelState = panelState.copy(show = true)
             }
           }
         }
       }
     }
-    registerLocalReceiver(receiver, IntentFilter(LyricsManager.ACTION_LYRIC))
+    registerLocalReceiver(receiver, IntentFilter(LyricManager.ACTION_LYRIC))
 
     onDispose {
       unregisterLocalReceiver(receiver)

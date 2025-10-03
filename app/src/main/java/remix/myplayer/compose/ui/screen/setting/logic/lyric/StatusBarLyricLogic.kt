@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
-import remix.myplayer.compose.lyric.LyricsManagerEntryPoint
+import remix.myplayer.compose.lyric.LyricManagerEntryPoint
 import remix.myplayer.compose.ui.screen.setting.SwitchPreference
 import remix.myplayer.service.Command
 import remix.myplayer.util.MusicUtil
@@ -26,8 +26,8 @@ fun StatusBarLyricLogic() {
   val lyricsManager = remember {
     EntryPointAccessors.fromApplication(
       context.applicationContext,
-      LyricsManagerEntryPoint::class.java
-    ).lyricsManager()
+      LyricManagerEntryPoint::class.java
+    ).lyricManager()
   }
 
   var statusBarLyric by remember { mutableStateOf(lyricsManager.isStatusBarLyricEnabled) }

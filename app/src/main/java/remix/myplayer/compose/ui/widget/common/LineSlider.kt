@@ -145,7 +145,7 @@ private fun Track(
   )
   Spacer(
     modifier = Modifier
-      .fillMaxWidth(fraction = sliderState.value / sliderState.valueRange.endInclusive)
+      .fillMaxWidth(fraction = (sliderState.value - sliderState.valueRange.start) / (sliderState.valueRange.endInclusive - sliderState.valueRange.start))
       .height(trackHeight)
       .background(progress)
   )

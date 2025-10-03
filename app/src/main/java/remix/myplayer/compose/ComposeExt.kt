@@ -44,12 +44,17 @@ fun spanCount(): Int {
 }
 
 @Composable
-fun Modifier.clickWithRipple(circle: Boolean = true, onClick: () -> Unit): Modifier {
+fun Modifier.clickWithRipple(
+  circle: Boolean = true,
+  enabled: Boolean = true,
+  onClick: () -> Unit
+): Modifier {
   var modifier = this
   if (circle) {
     modifier = modifier.clip(CircleShape)
   }
   return modifier.clickable(
+    enabled = enabled,
     interactionSource = remember { MutableInteractionSource() },
     indication = ripple(color = LocalTheme.current.ripple), onClick = onClick
   )
@@ -58,8 +63,10 @@ fun Modifier.clickWithRipple(circle: Boolean = true, onClick: () -> Unit): Modif
 @Composable
 fun Modifier.clickableWithoutRipple(
   interactionSource: MutableInteractionSource = MutableInteractionSource(),
+  enabled: Boolean = true,
   onClick: () -> Unit
 ) = this.clickable(
+  enabled = enabled,
   interactionSource = interactionSource,
   indication = null,
 ) {

@@ -1,14 +1,26 @@
 package remix.myplayer.compose.lyric
 
 import android.app.Activity
+import android.app.Service
 import android.content.Context
 import android.graphics.PixelFormat
+import android.hardware.input.InputManager
 import android.os.Build
-import android.view.ContextThemeWrapper
+import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.annotation.UiThread
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.savedstate.SavedStateRegistry
+import androidx.savedstate.SavedStateRegistryController
+import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import dagger.hilt.EntryPoint
@@ -21,6 +33,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -28,31 +41,36 @@ import kotlinx.coroutines.sync.withLock
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.lyric.provider.ILyricsProvider
+import remix.myplayer.compose.prefs.DesktopLyricPrefs
 import remix.myplayer.compose.prefs.LyricPrefs
+import remix.myplayer.compose.prefs.delegate
+import remix.myplayer.compose.ui.widget.lyric.DesktopLyricOverlay
+import remix.myplayer.compose.ui.widget.lyric.DesktopLyricUiState
 import remix.myplayer.helper.MusicServiceRemote
-import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.LockScreenActivity
-import remix.myplayer.ui.widget.desktop.DesktopLyricView
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
-interface LyricsManagerEntryPoint {
+interface LyricManagerEntryPoint {
 
-  fun lyricsManager(): LyricsManager
+  fun lyricManager(): LyricManager
 }
 
 // TODO https://github.com/rRemix/APlayer/issues/298
 @Singleton
-class LyricsManager @Inject constructor(
+class LyricManager @Inject constructor(
   @ApplicationContext
   private val context: Context,
+  val desktopLyricPrefs: DesktopLyricPrefs,
   val lyricPrefs: LyricPrefs,
   val lyricSearcher: LyricSearcher
 ) : CoroutineScope by CoroutineScope(Dispatchers.IO + SupervisorJob()) {
@@ -73,19 +91,18 @@ class LyricsManager @Inject constructor(
     }
   }
 
-  private var desktopLyricView: DesktopLyricView? = null
+  private var desktopLyricView: ComposeView? = null
+  private var overlayOwner: OverlayLifeCycleOwner? = null
+  private val desktopUiState =
+    MutableStateFlow(
+      DesktopLyricUiState(
+        false,
+        desktopLyricPrefs.locked,
+        CurrentNextLyricsLine.SEARCHING
+      )
+    )
 
-  //  private var lyricsFragment: WeakReference<LyricsFragment>? = null
   private var lockScreenActivity: WeakReference<LockScreenActivity>? = null
-
-//  fun setLyricsFragment(fragment: LyricsFragment) {
-//    lyricsFragment = WeakReference(fragment)
-//    lyrics?.let {
-//      fragment.setLyrics(it)
-//    } ?: fragment.setLyricsSearching()
-//    fragment.setProgress(progress, duration)
-//    fragment.setOffset(offset)
-//  }
 
   fun setLockScreenActivity(activity: LockScreenActivity) {
     lockScreenActivity = WeakReference(activity)
@@ -99,23 +116,31 @@ class LyricsManager @Inject constructor(
 
   var isServiceAvailable: Boolean = false
     @UiThread set(value) {
-      field = value
-      ensureDesktopLyric()
+      if (field != value) {
+        field = value
+        ensureDesktopLyric()
+      }
     }
   var isNotifyShowing: Boolean = false
     @UiThread set(value) {
-      field = value
-      ensureDesktopLyric()
+      if (field != value) {
+        field = value
+        ensureDesktopLyric()
+      }
     }
   var isScreenOn: Boolean = true
     @UiThread set(value) {
-      field = value
-      ensureDesktopLyric()
+      if (field != value) {
+        field = value
+        ensureDesktopLyric()
+      }
     }
   var isAppInForeground: Boolean = false
     @UiThread set(value) {
-      field = value
-      ensureDesktopLyric()
+      if (field != value) {
+        field = value
+        ensureDesktopLyric()
+      }
     }
 
   var isDesktopLyricEnabled: Boolean
@@ -169,13 +194,38 @@ class LyricsManager @Inject constructor(
   }
 
   var isDesktopLyricLocked: Boolean
-    get() = desktopLyricView?.isLocked == true
+    get() = desktopLyricPrefs.locked
     @UiThread set(value) {
+      desktopLyricPrefs.locked = value
+
       desktopLyricView?.run {
-        isLocked = value
-      } ?: {
-        // 没有桌面歌词时自己动设置
-        lyricPrefs.desktopLyricLocked = value
+        desktopUiState.value = desktopUiState.value.copy(locked = value)
+
+        ToastUtil.show(
+          this.context,
+          if (value) R.string.desktop_lyric_lock else R.string.desktop_lyric__unlock
+        )
+        (layoutParams as WindowManager.LayoutParams).apply {
+          if (value) {
+            flags = flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+              alpha =
+                (context.getSystemService(Service.INPUT_SERVICE) as InputManager).maximumObscuringOpacityForTouch
+            }
+          } else {
+            flags = flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+              alpha = 1f
+            }
+          }
+
+          windowManager.updateViewLayout(this@run, this)
+        }
+
+        MusicServiceRemote.service?.run {
+          updateNotification()
+          updatePlaybackState()
+        }
       }
     }
 
@@ -206,16 +256,64 @@ class LyricsManager @Inject constructor(
       flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
     }
 
-    desktopLyricView = DesktopLyricView(ContextThemeWrapper(context, ThemeStore.themeRes))
+    val owner = OverlayLifeCycleOwner().apply {
+      performRestore(null)
+      handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+      handleLifecycleEvent(Lifecycle.Event.ON_START)
+      handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    }
+    overlayOwner = owner
+
+    var yPosition by desktopLyricPrefs.sp.delegate(
+      "${DesktopLyricPrefs.Y_POSITION_PREFIX}${context.resources.configuration.orientation}",
+      context.resources.displayMetrics.heightPixels shr 1
+    )
+    desktopLyricView = ComposeView(context).apply {
+      setViewTreeLifecycleOwner(owner)
+      setViewTreeSavedStateRegistryOwner(owner)
+      setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+      setContent {
+        val touchSlop = 1f
+
+        DesktopLyricOverlay(
+          this@LyricManager,
+          desktopUiState,
+          onLock = {
+            val isLocked = !desktopLyricPrefs.locked
+
+            isDesktopLyricLocked = isLocked
+          },
+          onDrag = { change, amount ->
+            // 更新坐标
+            if (amount.absoluteValue < touchSlop) {
+              return@DesktopLyricOverlay
+            }
+            updateDesktopPosition((layoutParams as WindowManager.LayoutParams).y + amount.roundToInt())
+          },
+          onDragEnd = {
+            // 保存坐标
+            yPosition = (layoutParams as WindowManager.LayoutParams).y
+          })
+      }
+    }
     windowManager.addView(desktopLyricView, param)
-    desktopLyricView!!.restoreWindowPosition()
-    desktopLyricView!!.isPlaying = isPlaying
-    desktopLyricView!!.setLyrics(currentNextLyricsLine)
+
+    updateDesktopPosition(yPosition)
+  }
+
+  private fun updateDesktopPosition(newPos: Int) {
+    val params = desktopLyricView?.layoutParams as WindowManager.LayoutParams
+    params.y = newPos
+    windowManager.updateViewLayout(desktopLyricView, params)
   }
 
   @UiThread
   private fun removeDesktopLyric() {
-    Timber.v("Removing desktop lyrics")
+    Timber.tag(TAG).v("Removing desktop lyrics")
+
+    overlayOwner?.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    overlayOwner = null
+
     check(desktopLyricView != null)
     windowManager.removeView(desktopLyricView)
     desktopLyricView = null
@@ -269,7 +367,7 @@ class LyricsManager @Inject constructor(
   var isPlaying: Boolean = false
     @UiThread set(value) {
       field = value
-      desktopLyricView?.isPlaying = value
+      desktopUiState.value = desktopUiState.value.copy(playing = value)
       if (value) {
         launch(Dispatchers.IO) {
           updateProgress()
@@ -280,17 +378,14 @@ class LyricsManager @Inject constructor(
     set(value) {
       field = value
       launch(Dispatchers.Main) {
-//        lyricsFragment?.get()?.setProgress(value, duration)
       }
       currentNextLyricsLine = getCurrentNextLine(lyrics ?: return, offset, value, duration)
     }
   var offset: Long = 0
     @UiThread set(value) {
       field = value
-//      lyricsFragment?.get()?.setOffset(offset)
       launch(Dispatchers.IO) {
         updateProgress()
-        // TODO
         lyricSearcher.saveOffset(MusicServiceRemote.getCurrentSong(), value)
       }
     }
@@ -303,7 +398,7 @@ class LyricsManager @Inject constructor(
         currentLyricsLine = value.currentLine?.content ?: ""
         launch(Dispatchers.Main) {
           lockScreenActivity?.get()?.setLyrics(value)
-          desktopLyricView?.setLyrics(value)
+          desktopUiState.value = desktopUiState.value.copy(currentLyric = value)
         }
       }
     }
@@ -363,7 +458,9 @@ class LyricsManager @Inject constructor(
   }
 
   fun clearCache(song: Song) {
-    lyricSearcher.clearCache(song)
+    launch {
+      lyricSearcher.clearCache(song)
+    }
   }
 
   companion object {
@@ -379,4 +476,32 @@ class LyricsManager @Inject constructor(
     const val CHANGE_LYRIC_FONT_SCALE = 2
     const val SHOW_OFFSET_PANEL = 3
   }
+}
+
+private class OverlayLifeCycleOwner : LifecycleOwner, SavedStateRegistryOwner {
+
+  private val lifeCycleRegistry = LifecycleRegistry(this)
+  private val savedStateRegistryController = SavedStateRegistryController.create(this)
+
+  override val lifecycle: Lifecycle
+    get() = lifeCycleRegistry
+  override val savedStateRegistry: SavedStateRegistry
+    get() = savedStateRegistryController.savedStateRegistry
+
+  fun setCurrentState(state: Lifecycle.State) {
+    lifeCycleRegistry.currentState = state
+  }
+
+  fun handleLifecycleEvent(event: Lifecycle.Event) {
+    lifeCycleRegistry.handleLifecycleEvent(event)
+  }
+
+  fun performRestore(savedState: Bundle?) {
+    savedStateRegistryController.performRestore(savedState)
+  }
+
+  fun performSave(outBundle: Bundle) {
+    savedStateRegistryController.performSave(outBundle)
+  }
+
 }

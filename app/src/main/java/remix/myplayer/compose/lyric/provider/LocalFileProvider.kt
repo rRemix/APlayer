@@ -26,7 +26,7 @@ class LocalFileProvider @Inject constructor(
   override suspend fun getLyrics(song: Song): List<LyricsLine> {
     val path = getLocalLyricPath(song)
     if (path != null && path.isNotEmpty()) {
-      return LrcParser.parse(path.reader().readText())
+      return LrcParser.parse(File(path).readText())
     }
 
     throw Exception("no lyric found by local file")

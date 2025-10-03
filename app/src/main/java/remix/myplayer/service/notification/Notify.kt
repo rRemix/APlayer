@@ -18,8 +18,8 @@ import com.bumptech.glide.request.target.CustomTarget
 import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
 import remix.myplayer.compose.activity.ComposeActivity
-import remix.myplayer.compose.lyric.LyricsManager
-import remix.myplayer.compose.lyric.LyricsManagerEntryPoint
+import remix.myplayer.compose.lyric.LyricManager
+import remix.myplayer.compose.lyric.LyricManagerEntryPoint
 import remix.myplayer.compose.nav.playingScreenDeepLink
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
@@ -37,17 +37,17 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
   protected var target: CustomTarget<Bitmap>? = null
 
-  protected val lyricsManager: LyricsManager by lazy {
+  protected val lyricManager: LyricManager by lazy {
     EntryPointAccessors.fromApplication(
       service,
-      LyricsManagerEntryPoint::class.java
-    ).lyricsManager()
+      LyricManagerEntryPoint::class.java
+    ).lyricManager()
   }
 
   var isNotifyShowing = false
     set(value) {
       field = value
-      lyricsManager.isNotifyShowing = value
+      lyricManager.isNotifyShowing = value
     }
 
   private val notificationManager: NotificationManager by lazy {

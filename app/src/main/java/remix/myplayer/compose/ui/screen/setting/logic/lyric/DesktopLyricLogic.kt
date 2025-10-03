@@ -17,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
-import remix.myplayer.compose.lyric.LyricsManagerEntryPoint
+import remix.myplayer.compose.lyric.LyricManagerEntryPoint
 import remix.myplayer.compose.ui.screen.setting.SwitchPreference
 import remix.myplayer.misc.floatpermission.FloatWindowManager
 import remix.myplayer.util.ToastUtil
@@ -30,8 +30,8 @@ fun DesktopLyricLogic() {
   val lyricsManager = remember {
     EntryPointAccessors.fromApplication(
       context.applicationContext,
-      LyricsManagerEntryPoint::class.java
-    ).lyricsManager()
+      LyricManagerEntryPoint::class.java
+    ).lyricManager()
   }
 
   // TODO improve?

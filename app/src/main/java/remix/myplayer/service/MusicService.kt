@@ -53,7 +53,7 @@ import remix.myplayer.appwidgets.small.AppWidgetSmall
 import remix.myplayer.appwidgets.small.AppWidgetSmallTransparent
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
-import remix.myplayer.compose.lyric.LyricsManager
+import remix.myplayer.compose.lyric.LyricManager
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayQueue
 import remix.myplayer.helper.EQHelper
@@ -118,7 +118,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     MediaPlayer.OnCompletionListener, MediaPlayer.OnBufferingUpdateListener,
     SharedPreferences.OnSharedPreferenceChangeListener, CoroutineScope by MainScope() {
   @Inject
-  lateinit var lyricsManager: LyricsManager
+  lateinit var lyricManager: LyricManager
 
   // 播放队列
   private val playQueue = PlayQueue(this)
@@ -292,7 +292,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   private var screenOn = true
     set(value) {
       field = value
-      lyricsManager.isScreenOn = value
+      lyricManager.isScreenOn = value
     }
 
   /**
@@ -561,7 +561,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
     })
 
-    lyricsManager.isServiceAvailable = true
+    lyricManager.isServiceAvailable = true
 
     setUpPlayer()
     setUpSession()
@@ -618,8 +618,8 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       override fun onCustomAction(action: String?, extras: Bundle?) {
         Timber.v("onCustomAction, ac: $action extra: $extras")
         when (action) {
-          ACTION_UNLOCK_DESKTOP_LYRIC -> lyricsManager.isDesktopLyricLocked = false
-          ACTION_TOGGLE_DESKTOP_LYRIC -> lyricsManager.setDesktopLyricEnabled(!lyricsManager.isDesktopLyricEnabled)
+          ACTION_UNLOCK_DESKTOP_LYRIC -> lyricManager.isDesktopLyricLocked = false
+          ACTION_TOGGLE_DESKTOP_LYRIC -> lyricManager.setDesktopLyricEnabled(!lyricManager.isDesktopLyricEnabled)
         }
       }
     })
@@ -733,7 +733,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     timer.cancel()
     notify.cancelPlayingNotify()
 
-    lyricsManager.isServiceAvailable = false
+    lyricManager.isServiceAvailable = false
 
     uiHandler.removeCallbacksAndMessages(null)
     uiHandler.sendEmptyMessage(UPDATE_NOTIFICATION)
@@ -1165,7 +1165,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     if (playQueue.song == EMPTY_SONG) {
       return
     }
-    lyricsManager.isPlaying = isPlaying
+    lyricManager.isPlaying = isPlaying
     sendLocalBroadcast(Intent(PLAY_STATE_CHANGE))
   }
 
@@ -1262,7 +1262,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       //桌面歌词
       Command.TOGGLE_DESKTOP_LYRIC -> {
-        lyricsManager.setDesktopLyricEnabled(!lyricsManager.isDesktopLyricEnabled)
+        lyricManager.setDesktopLyricEnabled(!lyricManager.isDesktopLyricEnabled)
       }
       //临时播放一首歌曲
       Command.PLAY_TEMP -> {
@@ -1274,7 +1274,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
       }
       //解锁桌面歌词
       Command.UNLOCK_DESKTOP_LYRIC -> {
-        lyricsManager.isDesktopLyricLocked = false
+        lyricManager.isDesktopLyricLocked = false
       }
       //某一首歌曲添加至下一首播放
       Command.ADD_TO_NEXT_SONG -> {
@@ -1375,7 +1375,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
 
   fun updatePlaybackState() {
-    val desktopLyricLock = lyricsManager.isDesktopLyricLocked
+    val desktopLyricLock = lyricManager.isDesktopLyricLocked
 
     val builder = PlaybackStateCompat.Builder()
     builder.setActiveQueueItemId(currentSong.id)
@@ -1402,7 +1402,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     tryLaunch(
         block = {
           Timber.v("prepare start: %s", song)
-          lyricsManager.updateLyrics(song, null)
+          lyricManager.updateLyrics(song, null)
           if (TextUtils.isEmpty(song.data)) {
             ToastUtil.show(service, getString(R.string.path_empty))
             return@tryLaunch
@@ -1505,7 +1505,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         mediaPlayer.seekTo(current.toInt())
       }
       launch(Dispatchers.IO) {
-        lyricsManager.updateProgress()
+        lyricManager.updateProgress()
       }
       updatePlaybackState()
     }

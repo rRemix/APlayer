@@ -24,7 +24,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import remix.myplayer.R
 import remix.myplayer.compose.lyric.CurrentNextLyricsLine
-import remix.myplayer.compose.lyric.LyricsManager
+import remix.myplayer.compose.lyric.LyricManager
 import remix.myplayer.databinding.ActivityLockscreenBinding
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.service.Command
@@ -51,7 +51,7 @@ import javax.inject.Inject
 class LockScreenActivity : BaseMusicActivity() {
 
   @Inject
-  lateinit var lyricsManager: LyricsManager
+  lateinit var lyricManager: LyricManager
 
   private lateinit var binding: ActivityLockscreenBinding
 
@@ -113,7 +113,7 @@ class LockScreenActivity : BaseMusicActivity() {
     findViewById<View>(R.id.lockscreen_arrow_container)
       .startAnimation(AnimationUtils.loadAnimation(this, R.anim.arrow_left_to_right))
 
-    lyricsManager.setLockScreenActivity(this)
+    lyricManager.setLockScreenActivity(this)
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -157,7 +157,7 @@ class LockScreenActivity : BaseMusicActivity() {
 
   override fun onDestroy() {
     super.onDestroy()
-    lyricsManager.clearLockScreenActivity()
+    lyricManager.clearLockScreenActivity()
     disposable?.dispose()
     disposable = null
   }

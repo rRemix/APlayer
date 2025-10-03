@@ -70,7 +70,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
     val deleteIntent = Intent(MusicService.ACTION_CMD)
     deleteIntent.putExtra(EXTRA_CONTROL, Command.CLOSE_NOTIFY)
 
-    val desktopLyricLock = lyricsManager.isDesktopLyricLocked
+    val desktopLyricLock = lyricManager.isDesktopLyricLocked
 
     val notification = NotificationCompat.Builder(service, PLAYING_NOTIFICATION_CHANNEL_ID)
       .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

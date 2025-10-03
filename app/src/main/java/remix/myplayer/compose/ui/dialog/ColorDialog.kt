@@ -128,8 +128,7 @@ fun ColorDialog(
   )
 }
 
-
-private enum class ColorSpace(val text: String) {
+enum class ColorSpace(val text: String) {
   Red("R"),
   Green("G"),
   Blue("B");

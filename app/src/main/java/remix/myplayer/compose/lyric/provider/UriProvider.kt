@@ -1,13 +1,13 @@
 package remix.myplayer.compose.lyric.provider
 
+import android.content.Context
 import android.net.Uri
-import remix.myplayer.App
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.lyric.LrcParser
 import remix.myplayer.compose.lyric.LyricsLine
 import timber.log.Timber
 
-class UriProvider(private val uri: Uri) : ILyricsProvider {
+class UriProvider(private val context: Context, private val uri: Uri) : ILyricsProvider {
   companion object {
     private const val TAG = "UriProvider"
   }
@@ -18,7 +18,7 @@ class UriProvider(private val uri: Uri) : ILyricsProvider {
 
   override suspend fun getLyrics(song: Song): List<LyricsLine> {
     return try {
-      App.context.contentResolver.openInputStream(uri)!!.run {
+      context.contentResolver.openInputStream(uri)!!.run {
         try {
           LrcParser.parse(readBytes().decodeToString())
         } catch (t: Throwable) {

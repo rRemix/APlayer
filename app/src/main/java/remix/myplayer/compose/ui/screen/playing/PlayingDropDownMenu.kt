@@ -12,23 +12,26 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
 import remix.myplayer.bean.misc.LyricOrder
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.activity.base.BaseActivity
+import remix.myplayer.compose.lyric.LyricManager.Companion.ACTION_LYRIC
+import remix.myplayer.compose.lyric.LyricManager.Companion.CHANGE_LYRIC
+import remix.myplayer.compose.lyric.LyricManager.Companion.CHANGE_LYRIC_FONT_SCALE
+import remix.myplayer.compose.lyric.LyricManager.Companion.EXTRA_LYRIC
+import remix.myplayer.compose.lyric.LyricManager.Companion.EXTRA_LYRIC_URI
+import remix.myplayer.compose.lyric.LyricManager.Companion.SHOW_OFFSET_PANEL
+import remix.myplayer.compose.lyric.LyricManagerEntryPoint
 import remix.myplayer.compose.lyric.LyricSearcher
-import remix.myplayer.compose.lyric.LyricsManager.Companion.ACTION_LYRIC
-import remix.myplayer.compose.lyric.LyricsManager.Companion.CHANGE_LYRIC
-import remix.myplayer.compose.lyric.LyricsManager.Companion.CHANGE_LYRIC_FONT_SCALE
-import remix.myplayer.compose.lyric.LyricsManager.Companion.EXTRA_LYRIC
-import remix.myplayer.compose.lyric.LyricsManager.Companion.EXTRA_LYRIC_URI
-import remix.myplayer.compose.lyric.LyricsManager.Companion.SHOW_OFFSET_PANEL
 import remix.myplayer.compose.prefs.LyricPrefs
 import remix.myplayer.compose.prefs.delegate
 import remix.myplayer.compose.ui.dialog.DialogState
@@ -65,6 +68,14 @@ fun PlayingDropDownMenu(
       R.string.delete,
     )
   val activity = LocalActivity.current as? BaseActivity
+  val context = LocalContext.current
+
+  val lyricsManager = remember {
+    EntryPointAccessors.fromApplication(
+      context.applicationContext,
+      LyricManagerEntryPoint::class.java
+    ).lyricManager()
+  }
 
   val timerVM = timerViewModel
 
@@ -116,6 +127,7 @@ fun PlayingDropDownMenu(
         }
       } else {
         order = it.toString()
+        lyricsManager.clearCache(song)
         sendLocalBroadcast(Intent(ACTION_LYRIC).putExtra(EXTRA_LYRIC, CHANGE_LYRIC))
       }
     })
