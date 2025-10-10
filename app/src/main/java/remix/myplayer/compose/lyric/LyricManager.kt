@@ -470,7 +470,7 @@ class LyricManager @Inject constructor(
     const val ACTION_LYRIC = "action_lyric"
 
     const val EXTRA_LYRIC = "extra_lyric"
-    const val EXTRA_LYRIC_URI = "LyricUri"
+    const val EXTRA_LYRIC_URI = "extra_lyric_uri"
 
     const val CHANGE_LYRIC = 1
     const val CHANGE_LYRIC_FONT_SCALE = 2

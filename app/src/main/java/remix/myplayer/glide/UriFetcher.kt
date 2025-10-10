@@ -1,35 +1,54 @@
 package remix.myplayer.glide
 
+import android.content.ContentUris
 import android.net.Uri
 import android.provider.MediaStore.Audio
-import android.text.TextUtils
 import android.util.LruCache
+import androidx.core.net.toUri
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.runBlocking
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
+import remix.myplayer.bean.lastfm.Image
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayList
-import remix.myplayer.request.network.HttpClient
+import remix.myplayer.misc.cache.DiskCache
+import remix.myplayer.request.netease.NetEaseClientEntryPoint
+import remix.myplayer.request.network.LastFMApi
 import remix.myplayer.util.Constants
-import remix.myplayer.util.ImageUriUtil
 import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.MediaStoreUtil.getSongs
 import remix.myplayer.util.SPUtil
+import remix.myplayer.util.SearchKeyUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
+import java.io.File
 
 /**
  * created by Remix on 2021/4/20
  */
 object UriFetcher {
+
   private val BLACKLIST = listOf(
-      Uri.parse("https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png"),
-      Uri.parse("https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png"),
-      Uri.parse("http://p1.music.126.net/l8KRlRa-YLNW0GOBeN6fIA==/17914342951434926.jpg"),
-      Uri.parse("http://p1.music.126.net/RCIIvR7ull5iQWN-awJ-Aw==/109951165555852156.jpg"))
+    Uri.parse("https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png"),
+    Uri.parse("https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png"),
+    Uri.parse("http://p1.music.126.net/l8KRlRa-YLNW0GOBeN6fIA==/17914342951434926.jpg"),
+    Uri.parse("http://p1.music.126.net/RCIIvR7ull5iQWN-awJ-Aw==/109951165555852156.jpg")
+  )
+
+  private val neClient = EntryPointAccessors.fromApplication(
+    context.applicationContext,
+    NetEaseClientEntryPoint::class.java
+  ).netEaseClient()
+
+  private val lastFMApi = EntryPointAccessors.fromApplication(
+    context.applicationContext,
+    LastFMApi.LastFMApiEntryPoint::class.java
+  ).lastFMApi()
 
   var albumVersion = 0
   var artistVersion = 0
@@ -61,18 +80,23 @@ object UriFetcher {
       is Song -> {
         fetch(model)
       }
+
       is Album -> {
         fetch(model)
       }
+
       is Artist -> {
         fetch(model)
       }
+
       is PlayList -> {
         fetch(model)
       }
+
       is Genre -> {
         fetch(model)
       }
+
       else -> {
         throw IllegalArgumentException("unknown model: " + { model::class.java.simpleName })
       }
@@ -89,21 +113,21 @@ object UriFetcher {
     return uri
   }
 
-  fun updateAllVersion(){
+  fun updateAllVersion() {
     updateAlbumVersion()
     updateArtistVersion()
     updatePlayListVersion()
   }
 
-  fun updateAlbumVersion(){
+  fun updateAlbumVersion() {
     albumVersion++
   }
 
-  fun updateArtistVersion(){
+  fun updateArtistVersion() {
     artistVersion++
   }
 
-  fun updatePlayListVersion(){
+  fun updatePlayListVersion() {
     playListVersion++
   }
 
@@ -137,7 +161,7 @@ object UriFetcher {
   private fun getFromSP(key: Int): Uri? {
     val cache = SPUtil.getValue(context, SPUtil.COVER_KEY.NAME, key, "")
     if (cache.isNotEmpty()) {
-      val uri = Uri.parse(cache)
+      val uri = cache.toUri()
       memoryCache.put(key, uri)
 //      Timber.v("get from sp, uri: $uri")
       return uri
@@ -148,7 +172,7 @@ object UriFetcher {
   private fun fetch(song: Song): Uri {
     if (song.isLocal()) { // 仅本地歌曲
       // 自定义封面
-      val customArtFile = ImageUriUtil.getCustomThumbIfExist(song.albumId, Constants.ALBUM)
+      val customArtFile = getCustomThumbIfExist(song.albumId, Constants.ALBUM)
       if (customArtFile != null && customArtFile.exists()) {
         return Uri.fromFile(customArtFile)
       }
@@ -157,9 +181,9 @@ object UriFetcher {
       if (ignoreMediaStore()) {
         val songs = getSongs(Audio.Media._ID + "=" + song.id, null)
         if (songs.isNotEmpty()) {
-          return Uri.parse(PREFIX_EMBEDDED + songs[0].data)
+          return (PREFIX_EMBEDDED + songs[0].data).toUri()
         }
-      } else if (ImageUriUtil.isAlbumThumbExistInMediaCache(song.artUri)) {
+      } else if (isAlbumThumbExistInMediaCache(song.artUri)) {
         return song.artUri
       }
     }
@@ -168,19 +192,16 @@ object UriFetcher {
     if (canDownloadCover()) {
       try {
         if (downloadFromLastFM()) {
-          val lastFMAlbum = HttpClient.searchLastFMAlbum(song.album, song.artist, null).blockingGet()
-          val lastFMUri = ImageUriUtil.getLargestAlbumImageUrl(lastFMAlbum.album?.image)
-          if (!TextUtils.isEmpty(lastFMUri)) {
-            return Uri.parse(lastFMUri)
+          val lastFMAlbum =
+            runBlocking { lastFMApi.searchLastFMAlbum(song.album, song.artist, null) }
+          val lastFMUri = getLargestAlbumImageUrl(lastFMAlbum.album?.image)
+          if (!lastFMUri.isNullOrEmpty()) {
+            return lastFMUri.toUri()
           }
         } else {
-          val neteaseResponse = HttpClient.searchNeteaseSong(ImageUriUtil.getNeteaseSearchKey(song), 0, 1).blockingGet()
-          val song_id = neteaseResponse?.result?.songs?.get(0)?.id
-          val neteaseDetailResponse = HttpClient.searchNeteaseDetail(song_id.toString().toInt(), "[$song_id]").blockingGet()
-          val neteaseUri = neteaseDetailResponse?.songs?.get(0)?.album?.picUrl
-          //val neteaseUri = neteaseResponse?.result?.songs?.get(0)?.album?.picUrl
-          if (!TextUtils.isEmpty(neteaseUri)) {
-            return Uri.parse(neteaseUri)
+          val neSong = neClient.searchSong(SearchKeyUtil.getNetEaseSearchKey(song))
+          if (neSong?.al?.picUrl?.isNotEmpty() == true) {
+            return neSong.al.picUrl.toUri()
           }
         }
       } catch (e: Exception) {
@@ -193,7 +214,7 @@ object UriFetcher {
 
   private fun fetch(album: Album): Uri {
     // 自定义封面
-    val customArtFile = ImageUriUtil.getCustomThumbIfExist(album.albumID, Constants.ALBUM)
+    val customArtFile = getCustomThumbIfExist(album.albumID, Constants.ALBUM)
     if (customArtFile != null && customArtFile.exists()) {
       return Uri.fromFile(customArtFile)
     }
@@ -202,9 +223,9 @@ object UriFetcher {
     if (ignoreMediaStore()) {
       val songs = getSongs(Audio.Media.ALBUM_ID + "=" + album.albumID, null)
       if (songs.isNotEmpty()) {
-        return Uri.parse(PREFIX_EMBEDDED + songs[0].data)
+        return (PREFIX_EMBEDDED + songs[0].data).toUri()
       }
-    } else if (ImageUriUtil.isAlbumThumbExistInMediaCache(album.artUri)) {
+    } else if (isAlbumThumbExistInMediaCache(album.artUri)) {
       return album.artUri
     }
 
@@ -212,16 +233,16 @@ object UriFetcher {
     if (canDownloadCover()) {
       try {
         if (downloadFromLastFM()) {
-          val lastFMAlbum = HttpClient.searchLastFMAlbum(album.album, album.artist, null).blockingGet()
-          val lastFMUri = ImageUriUtil.getLargestAlbumImageUrl(lastFMAlbum.album?.image)
-          if (!TextUtils.isEmpty(lastFMUri)) {
-            return Uri.parse(lastFMUri)
+          val lastFMAlbum =
+            runBlocking { lastFMApi.searchLastFMAlbum(album.album, album.artist, null) }
+          val lastFMUri = getLargestAlbumImageUrl(lastFMAlbum.album?.image)
+          if (!lastFMUri.isNullOrEmpty()) {
+            return lastFMUri.toUri()
           }
         } else {
-          val neteaseResponse = HttpClient.searchNeteaseAlbum(ImageUriUtil.getNeteaseSearchKey(album), 0, 1).blockingGet()
-          val neteaseUri = neteaseResponse?.result?.albums?.get(0)?.picUrl
-          if (!TextUtils.isEmpty(neteaseUri)) {
-            return Uri.parse(neteaseUri)
+          val neAlbum = neClient.searchAlbum(SearchKeyUtil.getNetEaseSearchKey(album))
+          if (neAlbum != null && !neAlbum.picUrl.isNullOrEmpty()) {
+            return neAlbum.picUrl.toUri()
           }
         }
       } catch (e: Exception) {
@@ -234,32 +255,30 @@ object UriFetcher {
 
   private fun fetch(artist: Artist): Uri {
     // 自定义封面
-    val customArtFile = ImageUriUtil.getCustomThumbIfExist(artist.artistID, Constants.ARTIST)
+    val customArtFile = getCustomThumbIfExist(artist.artistID, Constants.ARTIST)
     if (customArtFile != null && customArtFile.exists()) {
       return Uri.fromFile(customArtFile)
     }
 
     // 内置
-    val imageUrl = ImageUriUtil.getArtistArt(artist.artistID)
+    val imageUrl = getArtistArt(artist.artistID)
     if (imageUrl.isNotEmpty()) {
-      return Uri.parse(imageUrl)
+      return imageUrl.toUri()
     }
 
     //网络
     if (canDownloadCover()) {
       try {
         if (downloadFromLastFM()) {
-          val lastFMArtist = HttpClient.searchLastFMArtist(artist.artist, null).blockingGet()
-          val lastFMUri = ImageUriUtil.getLargestArtistImageUrl(lastFMArtist.artist?.image)
-          if (!TextUtils.isEmpty(lastFMUri)) {
-            return Uri.parse(lastFMUri)
+          val lastFMArtist = runBlocking { lastFMApi.searchLastFMArtist(artist.artist, null) }
+          val lastFMUri = getLargestArtistImageUrl(lastFMArtist.artist?.image)
+          if (!lastFMUri.isNullOrEmpty()) {
+            return lastFMUri.toUri()
           }
         } else {
-          val neteaseResponse = HttpClient.searchNeteaseArtist(ImageUriUtil.getNeteaseSearchKey(artist), 0, 1).blockingGet()
-          //      imageUrl = response.getResult().getArtists().get(0).getPicUrl();
-          val neteaseUri = neteaseResponse?.result?.artists?.get(0)?.picUrl
-          if (!TextUtils.isEmpty(neteaseUri)) {
-            return Uri.parse(neteaseUri)
+          val neArtist = neClient.searchArtist(SearchKeyUtil.getNetEaseSearchKey(artist))
+          if (neArtist != null && !neArtist.picUrl.isNullOrEmpty()) {
+            return neArtist.picUrl.toUri()
           }
         }
       } catch (e: Exception) {
@@ -272,18 +291,18 @@ object UriFetcher {
 
   private fun fetch(playList: PlayList): Uri {
     // 自定义封面
-    val customArtFile = ImageUriUtil.getCustomThumbIfExist(playList.id, Constants.PLAYLIST)
+    val customArtFile = getCustomThumbIfExist(playList.id, Constants.PLAYLIST)
     if (customArtFile != null && customArtFile.exists()) {
       return Uri.fromFile(customArtFile)
     }
 
     val songs = DatabaseRepository.getInstance()
-        .getPlayList(playList.id)
-        .flatMap {
-          DatabaseRepository.getInstance()
-              .getPlayListSongs(context, it, true)
-        }
-        .blockingGet()
+      .getPlayList(playList.id)
+      .flatMap {
+        DatabaseRepository.getInstance()
+          .getPlayListSongs(context, it, true)
+      }
+      .blockingGet()
 
     var uri: Uri
     for (song in songs) {
@@ -311,16 +330,157 @@ object UriFetcher {
   }
 
   private fun ignoreMediaStore(): Boolean {
-    return SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE, false)
+    return SPUtil.getValue(
+      context,
+      SPUtil.SETTING_KEY.NAME,
+      SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE,
+      false
+    )
   }
 
   private fun downloadFromLastFM(): Boolean {
-    return SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE, DOWNLOAD_LASTFM) == DOWNLOAD_LASTFM
+    return SPUtil.getValue(
+      context,
+      SPUtil.SETTING_KEY.NAME,
+      SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,
+      DOWNLOAD_LASTFM
+    ) == DOWNLOAD_LASTFM
   }
 
   private fun canDownloadCover(): Boolean {
-    val current = SPUtil.getValue(context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, context.getString(R.string.always))
-    return context.getString(R.string.always) == current || (context.getString(R.string.wifi_only) == current && Util.isWifi(context))
+    val current = SPUtil.getValue(
+      context,
+      SPUtil.SETTING_KEY.NAME,
+      SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
+      context.getString(R.string.always)
+    )
+    return context.getString(R.string.always) == current || (context.getString(R.string.wifi_only) == current && Util.isWifi(
+      context
+    ))
   }
 
+  /**
+   * 根据artistId搜索MediaStore中是否存在封面
+   */
+  fun getArtistArt(artistId: Long): String {
+    val songs = getSongs(Audio.Media.ARTIST_ID + " = " + artistId, null)
+    if (!songs.isEmpty()) {
+      for (song in songs) {
+        val uri = ContentUris
+          .withAppendedId(
+            "content://media/external/audio/albumart/".toUri(),
+            song.albumId
+          )
+        if (isAlbumThumbExistInMediaCache(uri)) {
+          return uri.toString()
+        }
+      }
+    }
+    return ""
+  }
+
+  /**
+   * 判断某专辑在本地数据库是否有封面
+   */
+  fun isAlbumThumbExistInMediaCache(uri: Uri): Boolean {
+    var exist = false
+    try {
+      context.contentResolver.openInputStream(uri).use { ignored ->
+        exist = true
+      }
+    } catch (_: Exception) {
+    }
+    return exist
+  }
+
+  /**
+   * 返回自定义的封面
+   */
+  fun getCustomThumbIfExist(id: Long, type: Int): File? {
+    val img = File(DiskCache.getDiskCacheDir(context, "thumbnail"), "$type-$id.jpg")
+    if (img.exists()) {
+      return img
+    }
+    return null
+  }
+
+  private enum class ImageSize {
+    SMALL, MEDIUM, LARGE, EXTRALARGE, MEGA, UNKNOWN
+  }
+
+  /**
+   * 解析LastFm返回的最大封面
+   */
+  private fun getLargestAlbumImageUrl(images: List<Image>?): String? {
+    val imageUrls = HashMap<ImageSize, String?>()
+    if (images == null || images.isEmpty()) {
+      return ""
+    }
+    for (image in images) {
+      var size: ImageSize? = null
+      val attribute = image.size
+      if (attribute == null) {
+        size = ImageSize.UNKNOWN
+      } else {
+        try {
+          size = ImageSize.valueOf(attribute.uppercase())
+        } catch (_: IllegalArgumentException) {
+          // if they suddenly again introduce a new image size
+        }
+      }
+      if (size != null) {
+        imageUrls.put(size, image.text)
+      }
+    }
+    return getLargestImageUrl(imageUrls)
+  }
+
+  /**
+   * 解析LastFm返回的最大封面
+   */
+  fun getLargestArtistImageUrl(images: List<Image>?): String? {
+    if (images.isNullOrEmpty()) {
+      return null
+    }
+    val imageUrls = HashMap<ImageSize, String?>()
+    for (image in images) {
+      var size: ImageSize? = null
+      val attribute = image.size
+      if (attribute == null) {
+        size = ImageSize.UNKNOWN
+      } else {
+        try {
+          size = ImageSize.valueOf(attribute.uppercase())
+        } catch (_: IllegalArgumentException) {
+          // if they suddenly again introduce a new image size
+        }
+      }
+      if (size != null) {
+        imageUrls.put(size, image.text)
+      }
+    }
+    return getLargestImageUrl(imageUrls)
+  }
+
+  private fun getLargestImageUrl(imageUrls: Map<ImageSize, String?>): String? {
+    if (imageUrls.containsKey(ImageSize.MEGA)) {
+      return imageUrls[ImageSize.MEGA]
+    }
+    if (imageUrls.containsKey(ImageSize.EXTRALARGE)) {
+      return imageUrls[ImageSize.EXTRALARGE]
+    }
+    if (imageUrls.containsKey(ImageSize.LARGE)) {
+      return imageUrls[ImageSize.LARGE]
+    }
+    if (imageUrls.containsKey(ImageSize.MEDIUM)) {
+      return imageUrls[ImageSize.MEDIUM]
+    }
+    if (imageUrls.containsKey(ImageSize.SMALL)) {
+      return imageUrls[ImageSize.SMALL]
+    }
+    if (imageUrls.containsKey(ImageSize.UNKNOWN)) {
+      return imageUrls[ImageSize.UNKNOWN]
+    }
+    return null
+  }
 }

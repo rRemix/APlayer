@@ -4,12 +4,12 @@ import android.content.ContentUris
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.core.net.toUri
 import okhttp3.Credentials
 import remix.myplayer.App
 import remix.myplayer.util.SPUtil
 import timber.log.Timber
 import java.io.Serial
-import androidx.core.net.toUri
 
 /**
  * Created by Remix on 2015/11/30.
@@ -42,6 +42,8 @@ sealed class Song(
   fun isRemote(): Boolean {
     return this is Remote
   }
+
+  fun valid() = (isLocal() && id > 0) || (isRemote() && data.isNotEmpty())
 
   fun updateMetaData(
     title: String,

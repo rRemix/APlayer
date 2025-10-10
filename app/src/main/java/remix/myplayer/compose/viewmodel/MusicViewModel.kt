@@ -17,6 +17,7 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.repo.PlayQueueRepository
 import remix.myplayer.helper.MusicEventCallback
+import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Constants.MODE_LOOP
@@ -34,6 +35,7 @@ class MusicViewModel @Inject constructor(
 ) : ViewModel(), MusicEventCallback {
 
   init {
+    Timber.v("rRemix, init MusicViewModel service: ${MusicServiceRemote.service}")
     viewModelScope.launch {
       playQueueRepository.getAllSongs().collect {
         _playQueueSongs.value = it

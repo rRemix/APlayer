@@ -9,6 +9,7 @@ import timber.log.Timber
 
 class UriProvider(private val context: Context, private val uri: Uri) : ILyricsProvider {
   companion object {
+
     private const val TAG = "UriProvider"
   }
 

@@ -1,12 +1,13 @@
 package remix.myplayer.request.network
 
-import io.reactivex.Single
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.ResponseBody
+import remix.myplayer.BuildConfig
 import remix.myplayer.bean.github.Release
-import remix.myplayer.bean.kugou.KLrcResponse
-import remix.myplayer.bean.kugou.KSearchResponse
-import remix.myplayer.bean.netease.NLrcResponse
-import remix.myplayer.bean.netease.NSongSearchResponse
+import remix.myplayer.bean.lastfm.LastFmAlbum
+import remix.myplayer.bean.lastfm.LastFmArtist
 import remix.myplayer.bean.qq.QLrcResponse
 import remix.myplayer.bean.qq.QSearchResponse
 import retrofit2.Response
@@ -16,29 +17,6 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Streaming
 import retrofit2.http.Url
-
-interface KuGouApi {
-
-  @GET("search")
-  suspend fun searchSong(
-    @Query("ver") ver: Int, @Query("man") man: String?,
-    @Query("client") client: String?,
-    @Query("keyword") keyword: String?, @Query("duration") duration: Long,
-    @Query("hash") hash: String?
-  ): KSearchResponse
-
-  @GET("download")
-  suspend fun searchLyric(
-    @Query("ver") ver: Int, @Query("client") client: String?,
-    @Query("fmt") fmt: String?, @Query("charset") charSet: String?,
-    @Query("id") id: Int, @Query("accesskey") accessKey: String?
-  ): KLrcResponse
-
-  companion object {
-
-    const val BASE_URL = "http://lyrics.kugou.com/"
-  }
-}
 
 interface QQApi {
 
@@ -64,36 +42,47 @@ interface QQApi {
   }
 }
 
-interface NetEaseApi {
-
-  @GET("search/get")
-  @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
-  suspend fun searchSong(
-    @Query("s") key: String?, @Query("offset") offset: Int,
-    @Query("limit") limit: Int, @Query("type") type: Int
-  ): NSongSearchResponse
-
-  @GET("song/lyric")
-  @Headers("User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36")
-  suspend fun searchLyric(
-    @Query("os") os: String?, @Query("id") id: Long,
-    @Query("lv") lv: Int, @Query("kv") kv: Int, @Query("tv") tv: Int
-  ): NLrcResponse
-
-  companion object {
-    const val BASE_URL = "http://music.163.com/api/"
-  }
-}
-
 interface GithubApi {
+
   @GET("repos/{owner}/{repo}/releases/latest")
-  suspend fun fetchLatestRelease(@Path("owner") owner: String?, @Path("repo") repo: String?): Release
+  suspend fun fetchLatestRelease(
+    @Path("owner") owner: String?,
+    @Path("repo") repo: String?
+  ): Release
 
   @Streaming
   @GET
   suspend fun downloadFile(@Url fileUrl: String): Response<ResponseBody>
 
   companion object {
+
     const val BASE_URL = "https://api.github.com/"
+  }
+}
+
+interface LastFMApi {
+  @EntryPoint
+  @InstallIn(SingletonComponent::class)
+  interface LastFMApiEntryPoint {
+
+    fun lastFMApi(): LastFMApi
+  }
+
+  @GET("$BASE_QUERY_PARAMETERS&method=album.getinfo")
+  suspend fun searchLastFMAlbum(
+    @Query("album") albumName: String?,
+    @Query("artist") artistName: String?, @Query("lang") language: String?
+  ): LastFmAlbum
+
+  @GET("$BASE_QUERY_PARAMETERS&method=artist.getinfo")
+  suspend fun searchLastFMArtist(
+    @Query("artist") artistName: String?,
+    @Query("lang") language: String?
+  ): LastFmArtist
+
+  companion object {
+
+    const val BASE_URL = "http://ws.audioscrobbler.com/2.0/"
+    const val BASE_QUERY_PARAMETERS = "?format=json&autocorrect=1&api_key=" + BuildConfig.LASTFM_API_KEY
   }
 }

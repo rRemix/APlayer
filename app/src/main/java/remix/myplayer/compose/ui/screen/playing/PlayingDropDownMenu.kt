@@ -53,6 +53,9 @@ fun PlayingDropDownMenu(
   song: Song,
   onDismissRequest: () -> Unit
 ) {
+  if (!song.valid()) {
+    return
+  }
   val libraryVM = libraryViewModel
   val settingVM = settingViewModel
   val menuItems =

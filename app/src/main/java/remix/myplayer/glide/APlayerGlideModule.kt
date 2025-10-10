@@ -2,6 +2,7 @@ package remix.myplayer.glide
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.bumptech.glide.Glide
 import com.bumptech.glide.GlideBuilder
 import com.bumptech.glide.Registry
@@ -21,6 +22,7 @@ class APlayerGlideModule : AppGlideModule() {
 
   override fun applyOptions(context: Context, builder: GlideBuilder) {
     super.applyOptions(context, builder)
+    builder.setLogLevel(Log.ERROR)
     builder.setDiskCacheExecutor(GlideExecutor.newSourceBuilder()
         .setName("custom-disk-cache")
         .setThreadCount(1)

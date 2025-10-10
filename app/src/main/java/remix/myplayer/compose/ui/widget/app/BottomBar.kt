@@ -50,59 +50,59 @@ private const val triggerThreshold = 10
 @Composable
 fun BottomBar(modifier: Modifier = Modifier, vm: MusicViewModel = musicViewModel) {
   val musicState by vm.musicState.collectAsStateWithLifecycle()
-//  if (currentSong.id < 0) {
-//    return
-//  }
   val nav = LocalNavController.current
-
   val interactionSource = remember { MutableInteractionSource() }
 
   var hasTriggerAct by remember { mutableStateOf(false) }
   var hasTriggerOp by remember { mutableStateOf(false) }
-  Row(
-    modifier = modifier
-      .clickableWithoutRipple(interactionSource) {
-        if (musicState.song.id == 0L) {
-          return@clickableWithoutRipple
-        }
 
+  val baseModifier = modifier
+    .fillMaxWidth()
+    .height(72.dp)
+    .background(LocalTheme.current.dialogBackground)
+
+  val isSongValid = musicState.song.valid()
+  val interactionModifiers = if (isSongValid) {
+    Modifier
+      // 点击跳转播放页
+      .clickableWithoutRipple(interactionSource) {
         nav.navigate(RoutePlayingScreen)
       }
+      // 垂直滑动跳转播放页
       .pointerInput(Unit) {
-        // 向上滑动跳转PlayingScreen
-        detectVerticalDragGestures(onDragStart = {
-          hasTriggerAct = false
-        }) { _, dragAmount ->
+        detectVerticalDragGestures(
+          onDragStart = { hasTriggerAct = false }
+        ) { _, dragAmount ->
           if (dragAmount < -triggerThreshold && !hasTriggerAct) {
             hasTriggerAct = true
-            if (musicState.song.id == 0L) {
-              return@detectVerticalDragGestures
-            }
             nav.navigate(RoutePlayingScreen)
           }
         }
       }
+      // 水平滑动切换歌曲
       .pointerInput(Unit) {
-        // 左右滑动切换歌曲
-        detectHorizontalDragGestures(onDragStart = {
-          hasTriggerOp = false
-        }) { _, dragAmount ->
+        detectHorizontalDragGestures(
+          onDragStart = { hasTriggerOp = false }
+        ) { _, dragAmount ->
           if (dragAmount.absoluteValue > triggerThreshold && !hasTriggerOp) {
             hasTriggerOp = true
             Util.sendLocalBroadcast(
               Intent(MusicService.ACTION_CMD)
                 .putExtra(
-                  EXTRA_CONTROL, if (dragAmount < 0) {
-                    Command.NEXT
-                  } else Command.PREV
+                  EXTRA_CONTROL,
+                  if (dragAmount < 0) Command.NEXT else Command.PREV
                 )
             )
           }
         }
       }
-      .fillMaxWidth()
-      .height(72.dp)
-      .background(LocalTheme.current.dialogBackground),
+  } else {
+    // 歌曲无效时，不响应任何操作
+    Modifier
+  }
+
+  Row(
+    modifier = baseModifier.then(interactionModifiers),
     verticalAlignment = Alignment.CenterVertically,
   ) {
     GlideCover(

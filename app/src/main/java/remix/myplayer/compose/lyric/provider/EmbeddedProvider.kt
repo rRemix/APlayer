@@ -20,9 +20,7 @@ class EmbeddedProvider @Inject constructor(
 ) : ILyricsProvider {
 
   override val id = LyricOrder.Embedded.toString()
-  override val displayName by lazy {
-    context.getString(R.string.embedded_lyric)
-  }
+  override val displayName = context.getString(LyricOrder.Embedded.stringRes)
 
   override suspend fun getLyrics(song: Song): List<LyricsLine> {
     if (song is Song.Local) {

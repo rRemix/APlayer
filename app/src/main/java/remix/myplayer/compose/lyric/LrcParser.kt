@@ -1,5 +1,6 @@
 package remix.myplayer.compose.lyric
 
+import android.annotation.SuppressLint
 import timber.log.Timber
 import kotlin.math.roundToLong
 
@@ -125,5 +126,17 @@ object LrcParser {
     }
 
     return combinedLines
+  }
+
+  /**
+   * 毫秒转 mm:ss.xx（两位小数）
+   */
+  @SuppressLint("DefaultLocale")
+  fun formatMs(ms: Int): String {
+    val totalSeconds = ms / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    val hundredths = (ms % 1000) / 10
+    return String.format("%02d:%02d.%02d", minutes, seconds, hundredths)
   }
 }

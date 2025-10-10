@@ -16,9 +16,7 @@ class IgnoredProvider @Inject constructor(
 ) : ILyricsProvider {
 
   override val id = LyricOrder.Ignore.toString()
-  override val displayName by lazy {
-    context.getString(R.string.ignore_lrc)
-  }
+  override val displayName = context.getString(LyricOrder.Ignore.stringRes)
 
   override suspend fun getLyrics(song: Song): List<LyricsLine> {
     return emptyList()

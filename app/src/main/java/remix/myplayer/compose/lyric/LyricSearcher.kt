@@ -29,33 +29,13 @@ class LyricSearcher @Inject constructor(
   val lyricPrefs: LyricPrefs,
   private val providers: Set<@JvmSuppressWildcards ILyricsProvider>
 ) {
-  private val ID_TO_PROVIDER: Map<String, ILyricsProvider> = run {
-    val map = HashMap<String, ILyricsProvider>()
-    providers.forEach {
-      map[it.id] = it
-    }
-    map
-  }
-
-  var generalProviders: List<ILyricsProvider>
-    get() {
-      val providers = ArrayList<ILyricsProvider>()
-      try {
-        lyricPrefs.generalLyricOrderList.map { it.name }.forEach { id ->
-          ID_TO_PROVIDER[id]?.let {
-            if (!providers.contains(it)) {
-              providers.add(it)
-            }
-          }
-        }
-      } catch (t: Throwable) {
-        Timber.tag(TAG).i(t, "Failed to get search order from preference")
-      }
-      return providers
-    }
-    set(value) {
-      lyricPrefs.generalLyricOrder = Json.encodeToString(value.map { it.id })
-    }
+//  private val ID_TO_PROVIDER: Map<String, ILyricsProvider> = run {
+//    val map = HashMap<String, ILyricsProvider>()
+//    providers.forEach {
+//      map[it.id] = it
+//    }
+//    map
+//  }
 
   private fun getCacheFile(storageKey: String, persistent: Boolean): File {
     val baseDir: File = context.run {
@@ -123,30 +103,25 @@ class LyricSearcher @Inject constructor(
     delegate = offset
   }
 
-  private fun findProvider(lyricOrder: LyricOrder): ILyricsProvider {
-    val provider = ID_TO_PROVIDER[lyricOrder.toString()]
+  private fun findProvider(lyricOrder: String): ILyricsProvider {
+    val provider = providers.first { it.id == lyricOrder }
     requireNotNull(provider)
     return provider
   }
 
   /**
    * 针对某一首歌曲，解析出搜索顺序
-   * 一般情况是默认(内嵌-本地-酷狗-网易-QQ-忽略)
+   * 一般情况是使用默认配置的顺序（通过 DefProvider）
    * 如果用户手动选择了，则只搜索用户选择的
    */
   private fun resolveProviders(song: Song): List<ILyricsProvider> {
     val key = getStorageKey(song)
-    var select by lyricPrefs.sp.delegate(
+    val select by lyricPrefs.sp.delegate(
       "${LyricPrefs.KEY_SONG_PREFIX}${key}",
       LyricOrder.Def.toString()
     )
-    var order = LyricOrder.valueOf(select)
 
-    return if (order == LyricOrder.Def) {
-      generalProviders
-    } else {
-      listOf(findProvider(order))
-    }
+    return listOf(findProvider(select))
   }
 
   /**
@@ -166,13 +141,14 @@ class LyricSearcher @Inject constructor(
       }
     }
     Timber.tag(TAG).v("Searching lyrics for song: $song")
-    (if (provider != StubProvider && provider != null) listOf(provider) else resolveProviders(song)).forEach {
+    val providers = if (provider != null) listOf(provider) else resolveProviders(song)
+    providers.forEach {
       Timber.tag(TAG).v("Trying provider: ${it.id}")
       try {
         return Pair(it.getLyrics(song).let { lyrics ->
           if (provider != null || it !is IgnoredProvider) {
             // Fallback 到 ignored 可能是因为网络等问题，如果缓存将会导致以后需要手动点击才能获取到歌词
-            saveLyrics(song, lyrics, provider != null && provider !is StubProvider)
+            saveLyrics(song, lyrics, provider != null)
           }
           lyrics
         }, 0)

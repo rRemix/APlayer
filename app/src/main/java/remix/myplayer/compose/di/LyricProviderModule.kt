@@ -9,10 +9,10 @@ import remix.myplayer.compose.lyric.provider.DefProvider
 import remix.myplayer.compose.lyric.provider.EmbeddedProvider
 import remix.myplayer.compose.lyric.provider.ILyricsProvider
 import remix.myplayer.compose.lyric.provider.IgnoredProvider
-import remix.myplayer.compose.lyric.provider.KuGouProvider
 import remix.myplayer.compose.lyric.provider.LocalFileProvider
-import remix.myplayer.compose.lyric.provider.NetEaseProvider
-import remix.myplayer.compose.lyric.provider.QQProvider
+import remix.myplayer.compose.lyric.provider.network.KuGouProvider
+import remix.myplayer.compose.lyric.provider.network.NetEaseProvider
+import remix.myplayer.compose.lyric.provider.network.QQProvider
 import javax.inject.Singleton
 
 @Module

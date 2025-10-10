@@ -27,10 +27,12 @@ fun ProgressAware(interval: Long = 100, content: @Composable (Long, Long) -> Uni
 
   val duration = musicState.song.duration
 
-  content(progress, duration)
+  if (musicState.song.valid()) {
+    content(progress, duration)
+  }
 
   LaunchedEffect(musicState.song, musicState.playing) {
-    while (isActive && musicState.playing) {
+    while (isActive && musicState.playing && musicState.song.valid()) {
       delay(interval)
       withFrameMillis {
         progress = musicVM.getProgress().toLong()

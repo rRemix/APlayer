@@ -21,7 +21,7 @@ class LocalFileProvider @Inject constructor(
 
   override val id = LyricOrder.Local.toString()
 
-  override val displayName = context.getString(R.string.local)
+  override val displayName = context.getString(LyricOrder.Local.stringRes)
 
   override suspend fun getLyrics(song: Song): List<LyricsLine> {
     val path = getLocalLyricPath(song)
