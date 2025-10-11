@@ -5,6 +5,7 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -35,7 +36,6 @@ class MusicViewModel @Inject constructor(
 ) : ViewModel(), MusicEventCallback {
 
   init {
-    Timber.v("rRemix, init MusicViewModel service: ${MusicServiceRemote.service}")
     viewModelScope.launch {
       playQueueRepository.getAllSongs().collect {
         _playQueueSongs.value = it
@@ -67,6 +67,13 @@ class MusicViewModel @Inject constructor(
         playing = playing ?: currentState.playing,
         playMode = playModel ?: serviceRef?.get()?.playModel ?: MODE_LOOP
       )
+    }
+
+    val old = _musicState.value.song
+    val new = song ?: old
+    if (new.id != old.id) {
+      // TODO 用glide获取bitmap
+
     }
   }
 

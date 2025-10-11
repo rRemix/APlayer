@@ -34,6 +34,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -41,17 +42,16 @@ import kotlinx.coroutines.sync.withLock
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.lyric.provider.ILyricsProvider
+import remix.myplayer.compose.nav.UiMessageDispatcher
 import remix.myplayer.compose.prefs.DesktopLyricPrefs
 import remix.myplayer.compose.prefs.LyricPrefs
 import remix.myplayer.compose.prefs.delegate
 import remix.myplayer.compose.ui.widget.lyric.DesktopLyricOverlay
 import remix.myplayer.compose.ui.widget.lyric.DesktopLyricUiState
 import remix.myplayer.helper.MusicServiceRemote
-import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.absoluteValue
@@ -89,30 +89,28 @@ class LyricManager @Inject constructor(
         isAppInForeground = Util.isAppOnForeground
       }
     }
+    launch(Dispatchers.Main) {
+      currentNextLyricsLine.collect { line ->
+        _desktopUiState.value = _desktopUiState.value.copy(currentLyricLine = line)
+        currentLyricsLine = line.currentLine?.content ?: ""
+      }
+    }
   }
 
   private var desktopLyricView: ComposeView? = null
   private var overlayOwner: OverlayLifeCycleOwner? = null
-  private val desktopUiState =
-    MutableStateFlow(
-      DesktopLyricUiState(
-        false,
-        desktopLyricPrefs.locked,
-        CurrentNextLyricsLine.SEARCHING
-      )
+
+  private val _currentNextLyricsLine = MutableStateFlow(CurrentNextLyricsLine.SEARCHING)
+  val currentNextLyricsLine = _currentNextLyricsLine.asStateFlow()
+
+  private val _desktopUiState = MutableStateFlow(
+    DesktopLyricUiState(
+      false,
+      desktopLyricPrefs.locked,
+      CurrentNextLyricsLine.SEARCHING
     )
-
-  private var lockScreenActivity: WeakReference<LockScreenActivity>? = null
-
-  fun setLockScreenActivity(activity: LockScreenActivity) {
-    lockScreenActivity = WeakReference(activity)
-    currentNextLyricsLine = currentNextLyricsLine
-  }
-
-  fun clearLockScreenActivity() {
-    lockScreenActivity?.clear()
-    lockScreenActivity = null
-  }
+  )
+  val desktopUiState = _desktopUiState.asStateFlow()
 
   var isServiceAvailable: Boolean = false
     @UiThread set(value) {
@@ -199,12 +197,9 @@ class LyricManager @Inject constructor(
       desktopLyricPrefs.locked = value
 
       desktopLyricView?.run {
-        desktopUiState.value = desktopUiState.value.copy(locked = value)
+        _desktopUiState.value = _desktopUiState.value.copy(locked = value)
 
-        ToastUtil.show(
-          this.context,
-          if (value) R.string.desktop_lyric_lock else R.string.desktop_lyric__unlock
-        )
+        UiMessageDispatcher.show(if (value) R.string.desktop_lyric_lock else R.string.desktop_lyric__unlock)
         (layoutParams as WindowManager.LayoutParams).apply {
           if (value) {
             flags = flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
@@ -277,7 +272,6 @@ class LyricManager @Inject constructor(
 
         DesktopLyricOverlay(
           this@LyricManager,
-          desktopUiState,
           onLock = {
             val isLocked = !desktopLyricPrefs.locked
 
@@ -367,7 +361,7 @@ class LyricManager @Inject constructor(
   var isPlaying: Boolean = false
     @UiThread set(value) {
       field = value
-      desktopUiState.value = desktopUiState.value.copy(playing = value)
+      _desktopUiState.value = _desktopUiState.value.copy(playing = value)
       if (value) {
         launch(Dispatchers.IO) {
           updateProgress()
@@ -379,7 +373,7 @@ class LyricManager @Inject constructor(
       field = value
       launch(Dispatchers.Main) {
       }
-      currentNextLyricsLine = getCurrentNextLine(lyrics ?: return, offset, value, duration)
+      _currentNextLyricsLine.value = getCurrentNextLine(lyrics ?: return, offset, value, duration)
     }
   var offset: Long = 0
     @UiThread set(value) {
@@ -390,18 +384,6 @@ class LyricManager @Inject constructor(
       }
     }
   private var duration: Long = 0
-
-  private var currentNextLyricsLine: CurrentNextLyricsLine = CurrentNextLyricsLine.SEARCHING
-    set(value) {
-      if (value != field) {
-        field = value
-        currentLyricsLine = value.currentLine?.content ?: ""
-        launch(Dispatchers.Main) {
-          lockScreenActivity?.get()?.setLyrics(value)
-          desktopUiState.value = desktopUiState.value.copy(currentLyric = value)
-        }
-      }
-    }
 
   // For status bar lyrics
   private var currentLyricsLine: String = ""
@@ -445,7 +427,7 @@ class LyricManager @Inject constructor(
     updateLyricsJob = launch(Dispatchers.IO) {
       updateMutex.withLock {
         lyrics = null
-        currentNextLyricsLine = CurrentNextLyricsLine.SEARCHING
+        _currentNextLyricsLine.value = CurrentNextLyricsLine.SEARCHING
         val s = lyricSearcher.getLyricsAndOffset(song, provider)
         ensureActive()
         duration = song.duration

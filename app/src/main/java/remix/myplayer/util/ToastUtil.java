@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.StringRes;
 import android.widget.Toast;
+import kotlin.Deprecated;
 
 /**
  * @ClassName
@@ -13,6 +14,7 @@ import android.widget.Toast;
  * @Author Xiaoborui
  * @Date 2016/10/17 14:10
  */
+@Deprecated(message = "use UiMessageDispatcher instead")
 public class ToastUtil {
 
   private ToastUtil() {

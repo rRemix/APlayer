@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.github.Release
 import remix.myplayer.bean.mp3.APlayerModel
+import remix.myplayer.compose.nav.UiMessageDispatcher
 import remix.myplayer.compose.ui.dialog.DialogState
 import remix.myplayer.compose.ui.dialog.runWithLoadingResult
 import remix.myplayer.compose.updateIf
@@ -32,9 +33,6 @@ class MainViewModel @Inject constructor(
   @ApplicationContext private val context: Context,
   private val inAppUpdater: InAppUpdater
 ) : ViewModel() {
-  private val _snackBar = MutableSharedFlow<String>(extraBufferCapacity = 1)
-  val snackBar = _snackBar.asSharedFlow()
-
   private val _inAppUpdateState = MutableStateFlow(InAppUpdateState())
   val inAppUpdateState = _inAppUpdateState.asStateFlow()
 
@@ -67,7 +65,7 @@ class MainViewModel @Inject constructor(
           }?.outputData?.getString(DownloadWorker.EXTRA_FILE_PATH)
       }
 
-      _snackBar.tryEmit(context.getString(R.string.downloading))
+      UiMessageDispatcher.show(R.string.downloading)
 
       val path = if (release.isForceUpdate()) {
         runWithLoadingResult(false, context.getString(R.string.updating)) {
@@ -83,7 +81,6 @@ class MainViewModel @Inject constructor(
       Util.installApk(context, path)
     }
   }
-
 
   fun showInAppUpdateDialog(release: Release) {
     _inAppUpdateState.updateIf(

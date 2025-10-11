@@ -14,7 +14,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,11 +21,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.compose.clickWithRipple
 import remix.myplayer.compose.nav.LocalNavController
-import remix.myplayer.compose.ui.common.LocalSnackBarHostState
+import remix.myplayer.compose.nav.UiMessageDispatcher
 import remix.myplayer.compose.ui.dialog.AddWebDavDialog
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.theme.icon
@@ -44,39 +42,28 @@ fun WebDavScreen() {
   val webdavList by vm.webDavList.collectAsStateWithLifecycle()
   val theme = LocalTheme.current
   val nav = LocalNavController.current
-  val snackBarHostState = LocalSnackBarHostState.current
   val context = LocalContext.current
-  val scope = rememberCoroutineScope()
-
-  val showMessage = { message: String ->
-    scope.launch {
-      snackBarHostState.currentSnackbarData?.dismiss()
-      snackBarHostState.showSnackbar(message)
-    }
-  }
 
   AddWebDavDialog { alias, account, pwd, server, editWebDav ->
     if (alias.isEmpty()) {
-      showMessage(context.getString(R.string.can_t_be_empty, context.getString(R.string.alias)))
+      UiMessageDispatcher.show(R.string.can_t_be_empty, context.getString(R.string.alias))
       return@AddWebDavDialog
     }
 
     if (account.isEmpty()) {
-      showMessage(context.getString(R.string.can_t_be_empty, context.getString(R.string.account)))
+      UiMessageDispatcher.show(R.string.can_t_be_empty, context.getString(R.string.account))
       return@AddWebDavDialog
     }
 
     if (pwd.isEmpty()) {
-      showMessage(context.getString(R.string.can_t_be_empty, context.getString(R.string.pwd)))
+      UiMessageDispatcher.show(R.string.can_t_be_empty, context.getString(R.string.pwd))
       return@AddWebDavDialog
     }
 
     if (server.isEmpty()) {
-      showMessage(
-        context.getString(
-          R.string.can_t_be_empty,
-          context.getString(R.string.webdav_hint_server)
-        )
+      UiMessageDispatcher.show(
+        R.string.can_t_be_empty,
+        context.getString(R.string.webdav_hint_server)
       )
       return@AddWebDavDialog
     }

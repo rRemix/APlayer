@@ -54,6 +54,7 @@ import remix.myplayer.appwidgets.small.AppWidgetSmallTransparent
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
 import remix.myplayer.compose.lyric.LyricManager
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.db.room.DatabaseRepository
 import remix.myplayer.db.room.model.PlayQueue
 import remix.myplayer.helper.EQHelper
@@ -119,6 +120,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     SharedPreferences.OnSharedPreferenceChangeListener, CoroutineScope by MainScope() {
   @Inject
   lateinit var lyricManager: LyricManager
+
+  @Inject
+  lateinit var settingPrefs: SettingPrefs
 
   // 播放队列
   private val playQueue = PlayQueue(this)
@@ -193,7 +197,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * AudioManager
    */
   private val audioManager: AudioManager by lazy {
-    getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    getSystemService(AUDIO_SERVICE) as AudioManager
   }
 
   /**
@@ -264,7 +268,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
    * 电源锁
    */
   private val wakeLock: PowerManager.WakeLock by lazy {
-    (getSystemService(Context.POWER_SERVICE) as PowerManager)
+    (getSystemService(POWER_SERVICE) as PowerManager)
         .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, javaClass.simpleName)
   }
 
@@ -291,6 +295,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   }
   private var screenOn = true
     set(value) {
+      if (field == value) {
+        return
+      }
       field = value
       lyricManager.isScreenOn = value
     }
@@ -749,7 +756,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     Util.unregisterReceiver(this, headSetReceiver)
     Util.unregisterReceiver(this, screenReceiver)
 
-    getSharedPreferences(SETTING_KEY.NAME, Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this)
+    getSharedPreferences(SETTING_KEY.NAME, MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this)
 
     releaseWakeLock()
 

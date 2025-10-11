@@ -22,7 +22,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,16 +36,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.clickWithRipple
-import remix.myplayer.compose.lyric.LyricsLine
 import remix.myplayer.compose.lyric.LyricManager
 import remix.myplayer.compose.lyric.LyricManagerEntryPoint
+import remix.myplayer.compose.lyric.LyricsLine
 import remix.myplayer.compose.lyric.provider.ILyricsProvider
 import remix.myplayer.compose.lyric.provider.UriProvider
-import remix.myplayer.compose.ui.common.LocalSnackBarHostState
+import remix.myplayer.compose.nav.UiMessageDispatcher
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.app.ProgressAware
 import remix.myplayer.compose.ui.widget.common.TextPrimary
@@ -64,8 +62,6 @@ internal fun PlayingLyric(song: Song) {
   val context = LocalContext.current
 
   val musicVM = musicViewModel
-  val snackBarHostState = LocalSnackBarHostState.current
-  val scope = rememberCoroutineScope()
 
   val lyricsManager = remember {
     EntryPointAccessors.fromApplication(
@@ -101,13 +97,6 @@ internal fun PlayingLyric(song: Song) {
 
   var lyricOffset by remember {
     mutableLongStateOf(0L)
-  }
-
-  val showMessage = { message: String ->
-    scope.launch {
-      snackBarHostState.currentSnackbarData?.dismiss()
-      snackBarHostState.showSnackbar(message)
-    }
   }
 
   if (searching || lyrics.isEmpty()) {
@@ -158,7 +147,7 @@ internal fun PlayingLyric(song: Song) {
               lyricOffset = max(0, lyricOffset - 500)
               lyricsManager.offset = lyricOffset
 
-              showMessage(
+              UiMessageDispatcher.show(
                 context.getString(
                   if (lyricOffset > 0) R.string.lyric_advance_x_second else R.string.lyric_delay_x_second,
                   String.format(Locale.getDefault(), "%.1f", lyricOffset / 1000f)
@@ -168,7 +157,7 @@ internal fun PlayingLyric(song: Song) {
             }
 
             OffsetButton(iconRes = R.drawable.ic_refresh_24dp, text = "") {
-              showMessage(context.getString(R.string.lyric_offset_reset))
+              UiMessageDispatcher.show(R.string.lyric_offset_reset)
               panelState = panelState.copy(tick = panelState.tick + 1)
               if (lyricOffset == 0L) {
                 return@OffsetButton
@@ -180,7 +169,7 @@ internal fun PlayingLyric(song: Song) {
             OffsetButton(iconRes = R.drawable.ic_stat_minus_1_24dp, text = "+0.5s") {
               lyricOffset = min(6000L, lyricOffset + 500)
               lyricsManager.offset = lyricOffset
-              showMessage(
+              UiMessageDispatcher.show(
                 context.getString(
                   if (lyricOffset > 0) R.string.lyric_advance_x_second else R.string.lyric_delay_x_second,
                   String.format(Locale.getDefault(), "%.1f", lyricOffset / 1000f)

@@ -38,22 +38,20 @@ import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Folder
 import remix.myplayer.bean.mp3.Genre
-import remix.myplayer.compose.ui.common.ProvideSnackBarHostState
 import remix.myplayer.compose.ui.dialog.DialogContainer
 import remix.myplayer.compose.ui.screen.AboutScreen
-import remix.myplayer.compose.ui.screen.crop.CropScreen
 import remix.myplayer.compose.ui.screen.CustomSortScreen
 import remix.myplayer.compose.ui.screen.HomeScreen
 import remix.myplayer.compose.ui.screen.LastAddedScreen
 import remix.myplayer.compose.ui.screen.SearchScreen
 import remix.myplayer.compose.ui.screen.SongChooseScreen
+import remix.myplayer.compose.ui.screen.crop.CropScreen
 import remix.myplayer.compose.ui.screen.detail.DetailScreen
 import remix.myplayer.compose.ui.screen.history.HistoryScreen
 import remix.myplayer.compose.ui.screen.playing.PlayingScreen
 import remix.myplayer.compose.ui.screen.setting.SettingScreen
 import remix.myplayer.compose.ui.screen.webdav.WebDavDetailScreen
 import remix.myplayer.compose.ui.screen.webdav.WebDavScreen
-import remix.myplayer.compose.viewmodel.mainViewModel
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.db.room.model.WebDav
 import kotlin.reflect.KClass
@@ -192,11 +190,10 @@ fun AppNav() {
       )
     }
 
-    val mainVM = mainViewModel
-    LaunchedEffect(mainVM) {
-      mainVM.snackBar.collect { message ->
+    LaunchedEffect(Unit) {
+      UiMessageDispatcher.messages.collect {
         snackBarHostState.currentSnackbarData?.dismiss()
-        snackBarHostState.showSnackbar(message)
+        snackBarHostState.showSnackbar(it)
       }
     }
   }

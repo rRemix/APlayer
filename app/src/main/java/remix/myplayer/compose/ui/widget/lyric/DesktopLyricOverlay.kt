@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.StateFlow
 import remix.myplayer.R
 import remix.myplayer.compose.CenterInBox
 import remix.myplayer.compose.clickWithRipple
@@ -55,12 +54,11 @@ import remix.myplayer.util.Util.sendLocalBroadcast
 @Composable
 fun DesktopLyricOverlay(
   lyricManager: LyricManager,
-  desktopUiState: StateFlow<DesktopLyricUiState>,
   onLock: () -> Unit,
   onDrag: (PointerInputChange, Float) -> Unit,
   onDragEnd: () -> Unit
 ) {
-  val uiState by desktopUiState.collectAsStateWithLifecycle()
+  val uiState by lyricManager.desktopUiState.collectAsStateWithLifecycle()
 
   var showPanel by remember {
     mutableStateOf(false)
@@ -143,7 +141,7 @@ fun DesktopLyricOverlay(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-      val currentLyric = uiState.currentLyric
+      val currentLyric = uiState.currentLyricLine
       SingleLine(
         sungColor,
         unSungColor,
@@ -320,5 +318,5 @@ private class DesktopLyricControl(
 data class DesktopLyricUiState(
   val playing: Boolean,
   val locked: Boolean,
-  val currentLyric: CurrentNextLyricsLine
+  val currentLyricLine: CurrentNextLyricsLine
 )

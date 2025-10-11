@@ -171,6 +171,9 @@ object UriFetcher {
 
   private fun fetch(song: Song): Uri {
     if (song.isLocal()) { // 仅本地歌曲
+      if (song.albumId <= 0 || song.id <= 0) {
+        return Uri.EMPTY
+      }
       // 自定义封面
       val customArtFile = getCustomThumbIfExist(song.albumId, Constants.ALBUM)
       if (customArtFile != null && customArtFile.exists()) {

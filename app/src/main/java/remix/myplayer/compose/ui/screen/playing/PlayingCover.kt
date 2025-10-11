@@ -1,7 +1,5 @@
 package remix.myplayer.compose.ui.screen.playing
 
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -21,14 +19,11 @@ import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.viewmodel.musicViewModel
 import remix.myplayer.compose.viewmodel.playingViewModel
+import remix.myplayer.glide.addBitmapListener
 import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.service.Command
 
@@ -46,7 +41,7 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
     if (isPortrait) {
       base
     } else {
-      base /  2
+      base / 2
     }
   }
 
@@ -66,29 +61,10 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
       .offset(with(density) { offsetAnimation.value.toDp() })
       .scale(scaleAnimation.value)
       .then(modifier)
-  ) {
-    it.addListener(object : RequestListener<Drawable> {
-      override fun onLoadFailed(
-        e: GlideException?,
-        model: Any?,
-        target: Target<Drawable?>,
-        isFirstResource: Boolean
-      ): Boolean {
-        playingVM.updateSwatch(null)
-        return false
-      }
-
-      override fun onResourceReady(
-        resource: Drawable,
-        model: Any,
-        target: Target<Drawable?>?,
-        dataSource: DataSource,
-        isFirstResource: Boolean
-      ): Boolean {
-        playingVM.updateSwatch(if (resource is BitmapDrawable) resource.bitmap else null)
-        return false
-      }
-    })
+  ) { builder ->
+    builder.addBitmapListener { bitmap ->
+      playingVM.updateSwatch(bitmap)
+    }
   }
 
   var first by remember { mutableStateOf(true) }
