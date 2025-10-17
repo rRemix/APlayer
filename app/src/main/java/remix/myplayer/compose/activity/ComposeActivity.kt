@@ -1,5 +1,6 @@
 package remix.myplayer.compose.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -10,10 +11,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import remix.myplayer.compose.activity.base.BaseMusicActivity
 import remix.myplayer.compose.nav.AppNav
@@ -27,6 +27,7 @@ import remix.myplayer.compose.viewmodel.MainViewModel
 import remix.myplayer.compose.viewmodel.MusicViewModel
 import remix.myplayer.compose.viewmodel.ProvideViewModels
 import remix.myplayer.theme.Theme
+import remix.myplayer.util.MusicUtil
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -78,6 +79,19 @@ class ComposeActivity : BaseMusicActivity() {
     super.onDestroy()
   }
 
+  override fun onResume() {
+    super.onResume()
+    handleIntent()
+  }
+
+  private fun handleIntent() {
+    intent?.data?.let {
+      lifecycleScope.launch(Dispatchers.IO) {
+        MusicUtil.playFromUri(this@ComposeActivity, it)
+        intent = Intent()
+      }
+    }
+  }
 }
 
 @Composable

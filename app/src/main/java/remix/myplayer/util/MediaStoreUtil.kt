@@ -25,10 +25,8 @@ import remix.myplayer.bean.mp3.Folder
 import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
-import remix.myplayer.db.room.DatabaseRepository.Companion.getInstance
 import remix.myplayer.helper.MusicServiceRemote.deleteFromService
 import remix.myplayer.helper.SortOrder
-import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.util.Constants.MB
 import remix.myplayer.util.SPUtil.SETTING_KEY
 import timber.log.Timber
@@ -464,7 +462,7 @@ object MediaStoreUtil {
         deleteId)
     //从播放队列和全部歌曲移除
     deleteFromService(songs)
-    getInstance().deleteFromAllPlayList(songs).subscribe()
+//    getInstance().deleteFromAllPlayList(songs).subscribe()
 
     //删除源文件
     if (deleteSource) {

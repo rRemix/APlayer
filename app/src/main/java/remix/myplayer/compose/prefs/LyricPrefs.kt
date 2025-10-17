@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import remix.myplayer.bean.misc.LyricOrder
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.content.edit
 
 /**
  * 通用的歌词配置，桌面歌词的配置在DesktopLyricPrefs
@@ -37,6 +38,20 @@ class LyricPrefs @Inject constructor(
 
   var fontScale by PrefsDelegate(sp, KEY_LYRIC_FONT_SCALE, 1.0f)
 
+  /**
+   * 清除所有针对单首歌曲的配置
+   */
+  fun clearUserSave() {
+    val keys = sp.all.keys
+    val toRemove = keys.filter {
+      it.startsWith(KEY_SONG_PREFIX) || it.startsWith(KEY_OFFSET_PREFIX)
+    }
+    if (toRemove.isEmpty()) return
+    sp.edit(commit = true) {
+      toRemove.forEach { remove(it) }
+    }
+  }
+
   companion object {
 
     private val defaultLyricOrderList = listOf(
@@ -59,6 +74,7 @@ class LyricPrefs @Inject constructor(
     const val KEY_LYRIC_FONT_SCALE: String = "lyric_font_scale"
     const val KEY_LYRIC_LOCAL_TIP_SHOWN: String = "lyric_local_tip_shown"
     const val KEY_GENERAL_LYRIC_ORDER = "general_lyric_order"
+
     const val KEY_SONG_PREFIX = "lyric_song_"
     const val KEY_OFFSET_PREFIX = "lyric_offset_"
   }

@@ -43,7 +43,7 @@ import remix.myplayer.compose.viewmodel.libraryViewModel
 import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.compose.viewmodel.timerViewModel
 import remix.myplayer.helper.EQHelper
-import remix.myplayer.ui.ViewCommon.showLyricTipDialog
+import remix.myplayer.ui.ViewCommon.ShowLyricTipDialog
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util.sendLocalBroadcast
 
@@ -90,7 +90,7 @@ fun PlayingDropDownMenu(
   var checkLyricTip by rememberSaveable { mutableStateOf(false) }
   if (checkLyricTip) {
     settingVM.lyricPrefs.tipShown = true
-    showLyricTipDialog {
+    ShowLyricTipDialog {
       lyricDialogState.show()
     }
   }

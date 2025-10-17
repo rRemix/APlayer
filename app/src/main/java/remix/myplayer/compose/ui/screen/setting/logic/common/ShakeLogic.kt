@@ -18,6 +18,7 @@ fun ShakeLogic() {
   var shake by remember { mutableStateOf(setting.shake) }
   SwitchPreference(stringResource(R.string.shake), stringResource(R.string.shake_tip), shake) {
     shake = it
+    setting.shake = it
     if (it) {
       ShakeDetector.getInstance().beginListen()
     } else {

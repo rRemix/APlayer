@@ -7,31 +7,31 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
-import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.helper.M3UHelper.exportPlayListToFile
+import remix.myplayer.compose.viewmodel.libraryViewModel
+import remix.myplayer.compose.viewmodel.settingViewModel
+import remix.myplayer.db.room.model.PlayList
 
 @Composable
 fun ExportPlayListLogic() {
-  val context = LocalContext.current
   val scope = rememberCoroutineScope()
+  val libraryVM = libraryViewModel
+  val settingVM = settingViewModel
   val state = rememberDialogState(false)
 
-  var allPlayListName by remember {
-    mutableStateOf(emptyList<String>())
+  var allPlayList by remember {
+    mutableStateOf(emptyList<PlayList>())
   }
   var select by remember {
     mutableStateOf("")
@@ -42,8 +42,7 @@ fun ExportPlayListLogic() {
     stringResource(R.string.export_play_list_tip)
   ) {
     scope.launch {
-      allPlayListName = getAllPlayListName()
-      if (allPlayListName.isEmpty()) {
+      if (allPlayList.isEmpty()) {
         return@launch
       }
 
@@ -51,12 +50,13 @@ fun ExportPlayListLogic() {
     }
   }
 
-  val fileLauncher =
+  val uriLauncher =
     rememberLauncherForActivityResult<Intent, ActivityResult>(
-      contract = ActivityResultContracts.StartActivityForResult()) { result ->
+      contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
       if (result.resultCode == Activity.RESULT_OK) {
         val uri = result.data?.data ?: return@rememberLauncherForActivityResult
-        exportPlayListToFile(context, select, uri)
+        settingVM.exportPlayListToFile(allPlayList.firstOrNull { it.name == select }, uri)
       }
     }
 
@@ -64,10 +64,10 @@ fun ExportPlayListLogic() {
     dialogState = state,
     title = stringResource(R.string.choose_playlist_to_export),
     positive = null,
-    items = allPlayListName,
+    items = allPlayList.map { it.name },
     itemsCallback = { index, text ->
       select = text
-      fileLauncher.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+      uriLauncher.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
         type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("m3u")
         addCategory(Intent.CATEGORY_OPENABLE)
         putExtra(Intent.EXTRA_TITLE, "$text.m3u")
@@ -75,8 +75,9 @@ fun ExportPlayListLogic() {
     }
   )
 
-}
-
-private suspend fun getAllPlayListName(): List<String> = withContext(Dispatchers.IO) {
-  DatabaseRepository.getInstance().getAllPlaylist().blockingGet().map { it.name }
+  LaunchedEffect(Unit) {
+    libraryVM.playLists.collect {
+      allPlayList = it
+    }
+  }
 }

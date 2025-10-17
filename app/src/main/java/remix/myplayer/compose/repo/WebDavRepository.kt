@@ -21,7 +21,7 @@ class WebDavRepoImpl @Inject constructor(
   private val webDavDao: WebDavDao
 ) : WebDavRepository {
 
-  override fun getAll(): Flow<List<WebDav>> = webDavDao.queryAll()
+  override fun getAll(): Flow<List<WebDav>> = webDavDao.selectAll()
 
   override suspend fun insertOrReplace(webDav: WebDav) = webDavDao.insertOrReplace(webDav)
 

@@ -6,6 +6,7 @@ import android.media.MediaPlayer
 import android.os.IBinder
 import androidx.core.content.ContextCompat
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Constants
@@ -68,7 +69,7 @@ object MusicServiceRemote {
 
     override fun onServiceDisconnected(className: ComponentName) {
       mCallback?.onServiceDisconnected(className)
-      MusicServiceRemote.service = null
+      service = null
     }
   }
 
@@ -106,7 +107,7 @@ object MusicServiceRemote {
 
   @JvmStatic
   fun getPlayModel(): Int {
-    return service?.playModel ?: Constants.MODE_LOOP
+    return service?.playModel ?: SettingPrefs.MODE_LOOP
   }
 
   @JvmStatic

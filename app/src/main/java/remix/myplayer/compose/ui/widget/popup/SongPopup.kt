@@ -35,7 +35,6 @@ import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.util.Constants
-import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.Util
 
@@ -148,7 +147,7 @@ private fun SongDropdownMenu(
             }
 
             R.string.ring -> {
-              MediaStoreUtil.setRing(activity, song.id)
+              settingVM.setRing(song.id)
             }
 
             R.string.share -> {

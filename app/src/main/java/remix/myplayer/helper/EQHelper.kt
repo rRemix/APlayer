@@ -9,11 +9,12 @@ import android.media.audiofx.Equalizer
 import android.media.audiofx.Virtualizer
 import android.widget.Toast
 import com.tencent.bugly.crashreport.CrashReport
+import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.App
 import remix.myplayer.R
+import remix.myplayer.compose.prefs.SettingPrefsEntryPoint
+import remix.myplayer.compose.prefs.delegate
 import remix.myplayer.ui.activity.EQActivity
-import remix.myplayer.util.SPUtil
-import remix.myplayer.util.SPUtil.SETTING_KEY.*
 import remix.myplayer.util.Util.isIntentAvailable
 import timber.log.Timber
 
@@ -21,6 +22,10 @@ import timber.log.Timber
  * created by Remix on 2019-05-06
  */
 object EQHelper {
+  private val settingPrefs = EntryPointAccessors.fromApplication(
+    App.context,
+    SettingPrefsEntryPoint::class.java
+  ).settingPrefs()
 
   private var equalizer: Equalizer? = null
   private var bassBoost: BassBoost? = null
@@ -42,9 +47,9 @@ object EQHelper {
     get() = enable && bassBoost?.strengthSupported == true
 
   var bassBoostStrength: Int
-    get() = SPUtil.getValue(App.context, NAME, BASS_BOOST_STRENGTH, 0)
+    get() = settingPrefs.bassBoostStrength
     set(strength) {
-      SPUtil.putValue(App.context, NAME, BASS_BOOST_STRENGTH, strength)
+      settingPrefs.bassBoostStrength = strength
       if (isBassBoostEnabled) {
         tryRun({
           bassBoost?.setStrength(strength.toShort())
@@ -79,7 +84,7 @@ object EQHelper {
     }
 
     //是否启用音效设置
-    enable = SPUtil.getValue(App.context, NAME, ENABLE_EQ, false)
+    enable = settingPrefs.enableEq
     // 不需要初始化
     if (!enable && !force) {
       builtEqualizerInit = false
@@ -106,8 +111,8 @@ object EQHelper {
 
         //得到之前存储的每个频率的db值
         for (i in 0 until bandNumber) {
-          val bangLevel = SPUtil.getValue(App.context, NAME, "band$i", 0)
-          bandLevels.add(bangLevel.toShort())
+          var bandLevel by settingPrefs.sp.delegate("band$i", 0)
+          bandLevels.add(bandLevel.toShort())
         }
 
         Timber.v("init finish")
@@ -135,7 +140,7 @@ object EQHelper {
     } else {
       Timber.v("open built-in")
       //是否启用音效设置
-      enable = SPUtil.getValue(App.context, NAME, ENABLE_EQ, false)
+      enable = settingPrefs.enableEq
       if (!enable) {
         return
       }
@@ -227,12 +232,13 @@ object EQHelper {
       releaseEqualizer()
     })
     bandLevels[band] = level.toShort()
-    SPUtil.putValue(App.context, NAME, "band$band", level)
+    var bandLevel by settingPrefs.sp.delegate("band$${band}", 0)
+    bandLevel = level
   }
 
   fun updateEnable(enable: Boolean) {
     this.enable = enable
-    SPUtil.putValue(App.context, NAME, ENABLE_EQ, enable)
+    settingPrefs.enableEq = enable
 
     tryRun({
       equalizer?.enabled = enable

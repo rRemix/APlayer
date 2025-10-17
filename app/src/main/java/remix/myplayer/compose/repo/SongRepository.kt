@@ -6,7 +6,10 @@ import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio
 import android.provider.MediaStore.Audio.Genres
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -22,19 +25,30 @@ import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.misc.checkWorkerThread
 import remix.myplayer.util.ItemsSorter
-import remix.myplayer.util.MediaStoreUtil.getSongInfo
 import timber.log.Timber
+import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface SongRepositoryEntryPoint {
+  fun songRepository(): SongRepository
+}
 
 interface SongRepository {
 
   fun allSongs(): List<Song>
 
-  fun getSongs(selection: String?, selectionValues: Array<String?>?, sortOrder: String?): List<Song>
+  fun getSongs(selection: String?, selectionValues: Array<String?>?, sortOrder: String? = null): List<Song>
 
   fun song(id: Long): Song?
 
   fun getSongsByModels(models: List<APlayerModel>): List<Song>
+
+  fun getSongsByGenreId(id: Long): List<Song>
+
+  fun getLastAddedSongs(): List<Song>
 
   fun makeSongCursor(
     selection: String?,
@@ -61,6 +75,7 @@ class SongRepoImpl @Inject constructor(
     selection: String?, selectionValues: Array<String?>?,
     sortOrder: String?
   ): List<Song> {
+    checkWorkerThread()
     val songs: MutableList<Song> = ArrayList()
     try {
       makeSongCursor(selection, selectionValues, sortOrder).use { cursor ->
@@ -163,7 +178,7 @@ class SongRepoImpl @Inject constructor(
             settingPrefs.genreDetailSortOrder
           )?.use { songCursor ->
             while (songCursor.moveToNext()) {
-              result.add(getSongInfo(songCursor))
+              result.add(resolveSong(songCursor))
             }
           }
         }
@@ -203,7 +218,7 @@ class SongRepoImpl @Inject constructor(
             if (deleteIds.isNotEmpty()) {
               it.audioIds.removeAll(deleteIds)
               launch {
-                playListDao.updateSuspend(it)
+                playListDao.update(it)
               }
             }
           }
@@ -216,5 +231,33 @@ class SongRepoImpl @Inject constructor(
     }
 
     return result
+  }
+
+  override fun getSongsByGenreId(genreId: Long): List<Song> {
+    checkWorkerThread()
+    val songs = ArrayList<Song>()
+    context.contentResolver.query(
+      Genres.Members.getContentUri("external", genreId),
+      baseProjection,
+      null,
+      null,
+      null
+    )?.use { songCursor ->
+      while (songCursor.moveToNext()) {
+        songs.add(resolveSong(songCursor))
+      }
+    }
+    return songs
+  }
+
+  override fun getLastAddedSongs(): List<Song> {
+    checkWorkerThread()
+    val today = Calendar.getInstance()
+    today.time = Date()
+    return getSongs(
+      Audio.Media.DATE_ADDED + " >= ?",
+      arrayOf((today.timeInMillis / 1000 - 3600 * 24 * 7).toString()),
+      null
+    )
   }
 }

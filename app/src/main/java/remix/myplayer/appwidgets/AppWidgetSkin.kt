@@ -3,6 +3,7 @@ package remix.myplayer.appwidgets
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import remix.myplayer.R
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.Constants
@@ -39,8 +40,8 @@ enum class AppWidgetSkin(@param:ColorInt var titleColor: Int, @param:ColorInt va
   fun getModeRes(service: MusicService): Int {
     val playModel = service.playModel
     return when (playModel) {
-      Constants.MODE_SHUFFLE -> modeShuffleRes
-      Constants.MODE_REPEAT -> modeRepeatRes
+      SettingPrefs.MODE_SHUFFLE -> modeShuffleRes
+      SettingPrefs.MODE_REPEAT -> modeRepeatRes
       else -> modeNormalRes
     }
   }

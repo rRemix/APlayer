@@ -27,10 +27,8 @@ import remix.myplayer.theme.ThemeStore.statusBarColor
 import remix.myplayer.theme.ThemeStore.themeRes
 import remix.myplayer.ui.misc.AudioTag
 import remix.myplayer.util.ColorUtil
-import remix.myplayer.util.MediaStoreUtil
 import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.StatusBarUtil
-import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
 
@@ -185,28 +183,28 @@ open class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
-    when (requestCode) {
-      AudioTag.REQUEST_WRITE_PERMISSION ->
-        if (resultCode == Activity.RESULT_OK) {
-          audioTag?.saveTag()
-          audioTag = null
-        } else {
-          ToastUtil.show(this, R.string.grant_write_permission_tip)
-        }
-
-      MediaStoreUtil.REQUEST_DELETE_PERMISSION ->
-        if (resultCode == Activity.RESULT_OK) {
-          toDeleteSongs?.let {
-            MediaStoreUtil.deleteSource(this, it[0])
-            it.removeAt(0)
-            if (it.isNotEmpty()) {
-              MediaStoreUtil.deleteSource(this, it[0])
-            }
-          }
-        } else {
-          ToastUtil.show(this, R.string.grant_delete_permission_tip)
-        }
-    }
+//    when (requestCode) {
+//      AudioTag.REQUEST_WRITE_PERMISSION ->
+//        if (resultCode == Activity.RESULT_OK) {
+//          audioTag?.saveTag()
+//          audioTag = null
+//        } else {
+//          ToastUtil.show(this, R.string.grant_write_permission_tip)
+//        }
+//
+//      MediaStoreUtil.REQUEST_DELETE_PERMISSION ->
+//        if (resultCode == Activity.RESULT_OK) {
+//          toDeleteSongs?.let {
+//            MediaStoreUtil.deleteSource(this, it[0])
+//            it.removeAt(0)
+//            if (it.isNotEmpty()) {
+//              MediaStoreUtil.deleteSource(this, it[0])
+//            }
+//          }
+//        } else {
+//          ToastUtil.show(this, R.string.grant_delete_permission_tip)
+//        }
+//    }
   }
 
   override fun attachBaseContext(newBase: Context) {

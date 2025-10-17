@@ -18,7 +18,7 @@ interface WebDavDao {
     SELECT * from WebDav ORDER BY createAt DESC
   """
   )
-  fun queryAll() : Flow<List<WebDav>>
+  fun selectAll() : Flow<List<WebDav>>
 
   @Delete
   suspend fun delete(webDav: WebDav): Int

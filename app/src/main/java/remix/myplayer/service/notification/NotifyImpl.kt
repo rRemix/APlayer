@@ -17,7 +17,6 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.DensityUtil
-import remix.myplayer.util.SPUtil
 
 
 /**
@@ -49,7 +48,6 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     val remoteBigView = RemoteViews(service.packageName, R.layout.notification_big)
     val isPlay = service.isPlaying
     val song = service.currentSong
-    val isSystemColor = SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR, true)
 
     buildAction(service, remoteView, remoteBigView)
     val notification = buildNotification(service, remoteView, remoteBigView)
@@ -62,7 +60,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     remoteView.setTextViewText(R.id.notify_artist_album, song.artist + " - " + song.album)
 
     //非系统背景色 即黑色背景
-    if (!isSystemColor) {
+    if (!service.settingPrefs.notifyUseSystemBackground) {
       //字体颜色
       remoteBigView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))
       remoteView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))

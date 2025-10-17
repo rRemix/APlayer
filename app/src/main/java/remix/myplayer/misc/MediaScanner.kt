@@ -5,23 +5,14 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
-import io.reactivex.FlowableOnSubscribe
-import io.reactivex.FlowableSubscriber
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import org.reactivestreams.Subscription
 import remix.myplayer.R
+import remix.myplayer.compose.nav.UiMessageDispatcher
 import remix.myplayer.compose.ui.dialog.dismissLoading
 import remix.myplayer.compose.ui.dialog.showLoading
 import remix.myplayer.compose.ui.dialog.updateLoadingText
-import remix.myplayer.theme.Theme
-import remix.myplayer.util.MediaStoreUtil
-import remix.myplayer.util.ToastUtil
 import timber.log.Timber
 import java.io.File
 import kotlin.coroutines.resume
@@ -50,13 +41,13 @@ class MediaScanner(private val context: Context) {
         Timber.v("MediaScanner scan file: $file uri: $uri")
       }
 
-      ToastUtil.show(context, context.getString(R.string.scanned_finish))
+      UiMessageDispatcher.show(R.string.scanned_finish)
       context.contentResolver.notifyChange(
         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
         null
       )
     } catch (e: Exception) {
-      ToastUtil.show(context, R.string.scan_failed, e.toString())
+      UiMessageDispatcher.show(R.string.scan_failed, e.toString())
     } finally {
       dismissLoading()
     }
@@ -88,8 +79,9 @@ class MediaScanner(private val context: Context) {
 
   private fun getScanFiles(file: File, toScanFiles: ArrayList<File>) {
     if (file.isFile) {
-      if (file.length() >= MediaStoreUtil.SCAN_SIZE && isAudioFile(file))
+      if (isAudioFile(file)) {
         toScanFiles.add(file)
+      }
     } else if (file.isDirectory) {
       file.listFiles()?.forEach {
         getScanFiles(it, toScanFiles)
@@ -112,6 +104,7 @@ class MediaScanner(private val context: Context) {
   }
 
   companion object {
+
     private const val TAG = "MediaScanner"
   }
 }

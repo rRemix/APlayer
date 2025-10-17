@@ -106,8 +106,6 @@ private fun CommonPreferences() {
 
   LanguageLogic()
 
-  BreakPointLogic()
-
   ShakeLogic()
 
   ShowDisplayNameLogic()
@@ -120,6 +118,8 @@ private fun PlayPreferences() {
   SettingTitle(R.string.play)
 
   IgnoreAudioFocusLogic()
+
+  BreakPointLogic()
 
   PlayFadeLogic()
 

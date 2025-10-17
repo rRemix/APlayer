@@ -2,21 +2,31 @@ package remix.myplayer.service
 
 import android.content.Intent
 import androidx.annotation.WorkerThread
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.db.room.DatabaseRepository
-import remix.myplayer.misc.log.LogObserver
-import remix.myplayer.util.*
-import remix.myplayer.util.Constants.MODE_SHUFFLE
+import remix.myplayer.compose.nav.UiMessageDispatcher
+import remix.myplayer.compose.prefs.SettingPrefs
+import remix.myplayer.compose.prefs.SettingPrefs.Companion.MODE_SHUFFLE
+import remix.myplayer.compose.repo.PlayQueueRepository
+import remix.myplayer.compose.repo.SongRepository
+import remix.myplayer.util.Util
 import timber.log.Timber
-import java.lang.ref.WeakReference
+import javax.inject.Inject
 
 /**
  * created by Remix on 2019-09-26
  */
-class PlayQueue(service: MusicService) {
-  private val service = WeakReference(service)
-  private val repository = DatabaseRepository.getInstance()
+
+class PlayQueue @Inject constructor(
+  private val songRepository: SongRepository,
+  private val playQueueRepository: PlayQueueRepository,
+  private val settingPrefs: SettingPrefs,
+) : CoroutineScope by CoroutineScope(Dispatchers.Main + SupervisorJob()) {
 
   private var loaded = false
 
@@ -25,12 +35,10 @@ class PlayQueue(service: MusicService) {
   val playingQueue: List<Song>
     get() = _playingQueue
 
-
   // 原始的队列
   private val _originalQueue = ArrayList<Song>()
   val originalQueue: List<Song>
     get() = _originalQueue
-
 
   // 下一首歌曲的位置
   private var nextPosition = 0
@@ -46,9 +54,8 @@ class PlayQueue(service: MusicService) {
   var nextSong: Song = Song.EMPTY_SONG
 
   fun makeList() {
-    val service = service.get() ?: return
     synchronized(this) {
-      if (service.playModel == MODE_SHUFFLE) {
+      if (settingPrefs.playModel == MODE_SHUFFLE) {
         makeShuffleList()
       } else {
         makeNormalList()
@@ -88,18 +95,16 @@ class PlayQueue(service: MusicService) {
     Timber.v("makeShuffleList, queue: ${_playingQueue.size}")
   }
 
-  @WorkerThread
-  @Synchronized
-  fun restoreIfNecessary() {
+  suspend fun restoreIfNecessary() {
     if (!loaded && _playingQueue.isEmpty()) {
-      val queue = repository.getPlayQueueSongs().blockingGet()
+      val queue = playQueueRepository.getAllSongs().first()
       if (queue.isNotEmpty()) {
         _originalQueue.addAll(queue)
         _playingQueue.addAll(_originalQueue)
         makeList()
       } else {
         //默认全部歌曲为播放列表
-        setPlayQueue(MediaStoreUtil.getAllSong())
+        setPlayQueue(songRepository.allSongs())
       }
 
       restoreLastSong()
@@ -115,12 +120,7 @@ class PlayQueue(service: MusicService) {
       return
     }
     //读取上次退出时正在播放的歌曲的id
-    val service = service.get() ?: return
-    val lastSong = try {
-      SPUtil.getValue(service, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.LAST_SONG, "")
-    } catch (e: Exception) {
-      ""
-    }
+    val lastSong = settingPrefs.lastSong
     //上次退出时正在播放的歌曲是否还存在
     var exist = false
     //上次退出时正在播放的歌曲的pos
@@ -175,7 +175,7 @@ class PlayQueue(service: MusicService) {
   fun addNextSong(nextSong: Song) {
     //添加到播放队列
     if (nextSong == this.nextSong) {
-      ToastUtil.show(service.get() ?: return, R.string.already_add_to_next_song)
+      UiMessageDispatcher.show(R.string.already_add_to_next_song)
       return
     }
 
@@ -235,7 +235,7 @@ class PlayQueue(service: MusicService) {
   fun setPosition(pos: Int) {
     position = pos
     // 随机播放模式重置下随机队列
-    if (service.get()?.playModel == MODE_SHUFFLE) {
+    if (settingPrefs.playModel == MODE_SHUFFLE) {
       makeShuffleList()
     }
     song = _originalQueue[position]
@@ -269,12 +269,10 @@ class PlayQueue(service: MusicService) {
   }
 
   private fun saveQueue() {
-    repository.clearPlayQueue()
-      .flatMap {
-        repository.insertSongsToPlayQueue(_originalQueue)
-      }
-      .compose(RxUtil.applySingleScheduler())
-      .subscribe(LogObserver())
+    launch {
+      playQueueRepository.clear()
+      playQueueRepository.insert(_originalQueue)
+    }
   }
 
   fun updateNextSong() {
@@ -303,6 +301,9 @@ class PlayQueue(service: MusicService) {
   }
 
   companion object {
+
+    private const val TAG = "PlayQueue"
+
     const val ACTION_UPDATE_NEXT = "remix.myplayer.update.next_song"
   }
 }

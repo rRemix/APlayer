@@ -22,7 +22,6 @@ fun ShowDisplayNameLogic() {
     stringResource(R.string.show_displayname_tip),
     displayName
   ) {
-    Song.SHOW_DISPLAYNAME = it
     displayName = it
     setting.showDisplayName = it
     vm.fetchMedia()

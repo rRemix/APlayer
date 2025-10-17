@@ -8,21 +8,22 @@ import androidx.core.net.toUri
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.runBlocking
 import remix.myplayer.App.Companion.context
-import remix.myplayer.R
 import remix.myplayer.bean.lastfm.Image
 import remix.myplayer.bean.mp3.Album
 import remix.myplayer.bean.mp3.Artist
 import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.bean.mp3.Song
-import remix.myplayer.db.room.DatabaseRepository
+import remix.myplayer.compose.prefs.CoverPrefsEntryPoint
+import remix.myplayer.compose.prefs.SettingPrefs.Companion.DOWNLOAD_COVER_ALWAYS
+import remix.myplayer.compose.prefs.SettingPrefs.Companion.DOWNLOAD_COVER_WIFI_ONLY
+import remix.myplayer.compose.prefs.SettingPrefs.Companion.DOWNLOAD_LASTFM
+import remix.myplayer.compose.prefs.SettingPrefsEntryPoint
+import remix.myplayer.compose.repo.SongRepositoryEntryPoint
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.request.netease.NetEaseClientEntryPoint
 import remix.myplayer.request.network.LastFMApi
 import remix.myplayer.util.Constants
-import remix.myplayer.util.MediaStoreUtil
-import remix.myplayer.util.MediaStoreUtil.getSongs
-import remix.myplayer.util.SPUtil
 import remix.myplayer.util.SearchKeyUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
@@ -34,21 +35,36 @@ import java.io.File
 object UriFetcher {
 
   private val BLACKLIST = listOf(
-    Uri.parse("https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png"),
-    Uri.parse("https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png"),
-    Uri.parse("http://p1.music.126.net/l8KRlRa-YLNW0GOBeN6fIA==/17914342951434926.jpg"),
-    Uri.parse("http://p1.music.126.net/RCIIvR7ull5iQWN-awJ-Aw==/109951165555852156.jpg")
+    "https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png".toUri(),
+    "https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png".toUri(),
+    "http://p1.music.126.net/l8KRlRa-YLNW0GOBeN6fIA==/17914342951434926.jpg".toUri(),
+    "http://p1.music.126.net/RCIIvR7ull5iQWN-awJ-Aw==/109951165555852156.jpg".toUri()
   )
 
   private val neClient = EntryPointAccessors.fromApplication(
-    context.applicationContext,
+    context,
     NetEaseClientEntryPoint::class.java
   ).netEaseClient()
 
   private val lastFMApi = EntryPointAccessors.fromApplication(
-    context.applicationContext,
+    context,
     LastFMApi.LastFMApiEntryPoint::class.java
   ).lastFMApi()
+
+  private val settingPrefs = EntryPointAccessors.fromApplication(
+    context,
+    SettingPrefsEntryPoint::class.java
+  ).settingPrefs()
+
+  private val coverPrefs = EntryPointAccessors.fromApplication(
+    context,
+    CoverPrefsEntryPoint::class.java
+  ).coverPrefs()
+
+  private val songRepo = EntryPointAccessors.fromApplication(
+    context,
+    SongRepositoryEntryPoint::class.java
+  ).songRepository()
 
   var albumVersion = 0
   var artistVersion = 0
@@ -57,9 +73,6 @@ object UriFetcher {
 //  const val TYPE_ALBUM = 10
 //  const val TYPE_ARTIST = 100
 //  const val TYPE_PLAYLIST = 1000
-
-  const val DOWNLOAD_LASTFM = 0
-  const val DOWNLOAD_NETEASE = 1
 
   const val PREFIX_EMBEDDED = "embedded://"
 
@@ -108,7 +121,7 @@ object UriFetcher {
 
     Timber.v("uri: $uri")
     memoryCache.put(key, uri)
-    SPUtil.putValue(context, SPUtil.COVER_KEY.NAME, key.toString(), uri.toString())
+    coverPrefs.putCover(key.toString(), uri.toString())
 
     return uri
   }
@@ -133,7 +146,7 @@ object UriFetcher {
 
   fun clearAllCache() {
     memoryCache.evictAll()
-    SPUtil.deleteFile(context, SPUtil.COVER_KEY.NAME)
+    coverPrefs.clearAll()
   }
 
 //  fun clearCache(model: APlayerModel) {
@@ -159,11 +172,10 @@ object UriFetcher {
   }
 
   private fun getFromSP(key: Int): Uri? {
-    val cache = SPUtil.getValue(context, SPUtil.COVER_KEY.NAME, key, "")
+    val cache = coverPrefs.getCover(key.toString(), "")
     if (cache.isNotEmpty()) {
       val uri = cache.toUri()
       memoryCache.put(key, uri)
-//      Timber.v("get from sp, uri: $uri")
       return uri
     }
     return null
@@ -176,13 +188,13 @@ object UriFetcher {
       }
       // 自定义封面
       val customArtFile = getCustomThumbIfExist(song.albumId, Constants.ALBUM)
-      if (customArtFile != null && customArtFile.exists()) {
+      if (customArtFile != null) {
         return Uri.fromFile(customArtFile)
       }
 
       // 内置
       if (ignoreMediaStore()) {
-        val songs = getSongs(Audio.Media._ID + "=" + song.id, null)
+        val songs = songRepo.getSongs(Audio.Media._ID + "=" + song.id, null)
         if (songs.isNotEmpty()) {
           return (PREFIX_EMBEDDED + songs[0].data).toUri()
         }
@@ -218,13 +230,13 @@ object UriFetcher {
   private fun fetch(album: Album): Uri {
     // 自定义封面
     val customArtFile = getCustomThumbIfExist(album.albumID, Constants.ALBUM)
-    if (customArtFile != null && customArtFile.exists()) {
+    if (customArtFile != null) {
       return Uri.fromFile(customArtFile)
     }
 
     // 内置
     if (ignoreMediaStore()) {
-      val songs = getSongs(Audio.Media.ALBUM_ID + "=" + album.albumID, null)
+      val songs = songRepo.getSongs(Audio.Media.ALBUM_ID + "=" + album.albumID, null)
       if (songs.isNotEmpty()) {
         return (PREFIX_EMBEDDED + songs[0].data).toUri()
       }
@@ -259,7 +271,7 @@ object UriFetcher {
   private fun fetch(artist: Artist): Uri {
     // 自定义封面
     val customArtFile = getCustomThumbIfExist(artist.artistID, Constants.ARTIST)
-    if (customArtFile != null && customArtFile.exists()) {
+    if (customArtFile != null) {
       return Uri.fromFile(customArtFile)
     }
 
@@ -295,17 +307,11 @@ object UriFetcher {
   private fun fetch(playList: PlayList): Uri {
     // 自定义封面
     val customArtFile = getCustomThumbIfExist(playList.id, Constants.PLAYLIST)
-    if (customArtFile != null && customArtFile.exists()) {
+    if (customArtFile != null) {
       return Uri.fromFile(customArtFile)
     }
 
-    val songs = DatabaseRepository.getInstance()
-      .getPlayList(playList.id)
-      .flatMap {
-        DatabaseRepository.getInstance()
-          .getPlayListSongs(context, it, true)
-      }
-      .blockingGet()
+    val songs = songRepo.getSongsByModels(listOf(playList))
 
     var uri: Uri
     for (song in songs) {
@@ -319,7 +325,7 @@ object UriFetcher {
   }
 
   private fun fetch(genre: Genre): Uri {
-    val songs = MediaStoreUtil.getSongsByGenreId(genre.id)
+    val songs = songRepo.getSongsByGenreId(genre.id)
 
     var uri: Uri
     for (song in songs) {
@@ -332,41 +338,23 @@ object UriFetcher {
     return Uri.EMPTY
   }
 
-  private fun ignoreMediaStore(): Boolean {
-    return SPUtil.getValue(
-      context,
-      SPUtil.SETTING_KEY.NAME,
-      SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE,
-      false
-    )
-  }
+  private fun ignoreMediaStore() = settingPrefs.ignoreMediaStore
 
-  private fun downloadFromLastFM(): Boolean {
-    return SPUtil.getValue(
-      context,
-      SPUtil.SETTING_KEY.NAME,
-      SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,
-      DOWNLOAD_LASTFM
-    ) == DOWNLOAD_LASTFM
-  }
+  private fun downloadFromLastFM() = settingPrefs.downloadSource == DOWNLOAD_LASTFM
 
   private fun canDownloadCover(): Boolean {
-    val current = SPUtil.getValue(
-      context,
-      SPUtil.SETTING_KEY.NAME,
-      SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
-      context.getString(R.string.always)
-    )
-    return context.getString(R.string.always) == current || (context.getString(R.string.wifi_only) == current && Util.isWifi(
-      context
-    ))
+    return when (settingPrefs.autoDownloadCover) {
+      DOWNLOAD_COVER_ALWAYS -> true
+      DOWNLOAD_COVER_WIFI_ONLY -> Util.isWifi(context)
+      else -> false
+    }
   }
 
   /**
    * 根据artistId搜索MediaStore中是否存在封面
    */
   fun getArtistArt(artistId: Long): String {
-    val songs = getSongs(Audio.Media.ARTIST_ID + " = " + artistId, null)
+    val songs = songRepo.getSongs(Audio.Media.ARTIST_ID + " = " + artistId, null)
     if (!songs.isEmpty()) {
       for (song in songs) {
         val uri = ContentUris

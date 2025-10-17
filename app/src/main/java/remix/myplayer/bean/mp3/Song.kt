@@ -5,8 +5,10 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.core.net.toUri
+import dagger.hilt.android.EntryPointAccessors
 import okhttp3.Credentials
 import remix.myplayer.App
+import remix.myplayer.compose.prefs.SettingPrefsEntryPoint
 import remix.myplayer.util.SPUtil
 import timber.log.Timber
 import java.io.Serial
@@ -114,7 +116,7 @@ sealed class Song(
     get() = ContentUris.withAppendedId("content://media/external/audio/albumart/".toUri(), albumId)
 
   val showName: String
-    get() = if (!SHOW_DISPLAYNAME) title else displayName
+    get() = if (!settingPrefs.showDisplayName) title else displayName
 
   override fun getKey(): String {
     return id.toString()
@@ -297,12 +299,12 @@ sealed class Song(
     @JvmStatic
     val EMPTY_SONG = Local(-1, "", "", "", -1, "", -1, -1, "", -1, "", "", "", -1)
 
-    //所有列表是否显示文件名
-    @JvmStatic
-    var SHOW_DISPLAYNAME = SPUtil
-      .getValue(
-        App.context, SPUtil.SETTING_KEY.NAME, SPUtil.SETTING_KEY.SHOW_DISPLAYNAME,
-        false
-      )
+    // 所有列表是否显示文件名
+    private val settingPrefs by lazy {
+      EntryPointAccessors.fromApplication(
+        App.context.applicationContext,
+        SettingPrefsEntryPoint::class.java
+      ).settingPrefs()
+    }
   }
 }

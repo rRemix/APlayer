@@ -18,6 +18,10 @@ interface PlayListRepository {
   suspend fun insertPlayList(name: String): Long
   suspend fun updatePlayList(playList: PlayList): Int
   suspend fun deletePlayList(id: Long): Int
+  suspend fun isFavorite(id: Long): Boolean
+  suspend fun toggleFavorite(id: Long)
+  suspend fun getFavorite(): PlayList?
+  suspend fun removeAudioIdsFromAll(audioIds: List<Long>): Int
 }
 
 class PlayListRepoImpl @Inject constructor(
@@ -57,21 +61,50 @@ class PlayListRepoImpl @Inject constructor(
   }
 
   override suspend fun addSongsToPlayList(audioIds: List<Long>, playListName: String): Int {
-    val playList = playListDao.selectByNameSuspend(playListName)
+    val playList = playListDao.selectByName(playListName)
       ?: throw IllegalArgumentException("No Playlist Found")
 
-    //不重复添加
+    // 不重复添加
     val old = playList.audioIds.size
     playList.audioIds.addAll(audioIds)
     val count = playList.audioIds.size - old
-    playListDao.updateSuspend(playList)
+    playListDao.update(playList)
     return count
   }
 
   override suspend fun insertPlayList(name: String) =
-    playListDao.insertPlayListSuspend(PlayList(0, name, ArrayList<Long>(), Date().time))
+    playListDao.insert(PlayList(0, name, ArrayList<Long>(), Date().time))
 
-  override suspend fun updatePlayList(playList: PlayList) = playListDao.updateSuspend(playList)
+  override suspend fun updatePlayList(playList: PlayList) = playListDao.update(playList)
 
-  override suspend fun deletePlayList(id: Long) = playListDao.deleteSuspend(id)
+  override suspend fun deletePlayList(id: Long) = playListDao.delete(id)
+
+  override suspend fun isFavorite(id: Long): Boolean {
+    val p = getFavorite()
+    return p?.audioIds?.contains(id) == true
+  }
+
+  override suspend fun toggleFavorite(id: Long) {
+    val p = getFavorite()
+      ?: return // 如果没有收藏夹则返回
+
+    if (p.audioIds.contains(id)) {
+      p.audioIds.remove(id)
+    } else {
+      p.audioIds.add(id)
+    }
+
+    playListDao.update(p)
+
+  }
+
+  override suspend fun getFavorite() = playListDao.getFavorite()
+
+  override suspend fun removeAudioIdsFromAll(audioIds: List<Long>): Int {
+    var totalUpdated = 0
+    audioIds.forEach {
+      totalUpdated += playListDao.removeAudioIdFromAll(it)
+    }
+    return totalUpdated
+  }
 }

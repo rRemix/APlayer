@@ -73,6 +73,7 @@ class DefProvider @Inject constructor(
     getOrderedProviders().forEach {
       try {
         val ret = it.getLyrics(song)
+        Timber.tag("LyricsSearcher").v("Get lyric from: ${it.id}")
         return ret
       } catch (e: Exception) {
         Timber.w(e)

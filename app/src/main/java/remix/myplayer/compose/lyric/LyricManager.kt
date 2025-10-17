@@ -440,7 +440,7 @@ class LyricManager @Inject constructor(
   }
 
   fun clearCache(song: Song) {
-    launch {
+    launch(Dispatchers.IO) {
       lyricSearcher.clearCache(song)
     }
   }

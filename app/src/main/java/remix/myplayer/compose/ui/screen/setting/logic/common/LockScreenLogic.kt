@@ -7,12 +7,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import remix.myplayer.R
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.compose.ui.dialog.ItemsCallbackSingleChoice
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
 import remix.myplayer.compose.viewmodel.libraryViewModel
-import remix.myplayer.util.Constants
 
 private val itemRes = listOf(
   R.string.aplayer_lockscreen,
@@ -31,8 +31,8 @@ fun LockScreenLogic() {
   NormalPreference(
     stringResource(R.string.lockscreen_show), content = stringResource(
       when (select) {
-        Constants.APLAYER_LOCKSCREEN -> R.string.aplayer_lockscreen_tip
-        Constants.SYSTEM_LOCKSCREEN -> R.string.system_lockscreen_tip
+        SettingPrefs.LOCKSCREEN_APLAYER -> R.string.aplayer_lockscreen_tip
+        SettingPrefs.LOCKSCREEN_SYSTEM -> R.string.system_lockscreen_tip
         else -> R.string.lockscreen_off_tip
       }
     )

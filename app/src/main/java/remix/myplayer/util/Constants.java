@@ -20,17 +20,6 @@ public class Constants {
 
   public final static String ACTION_EXIT = "remix.music.EXIT";
 
-  //播放模式
-  public final static int MODE_LOOP = 1;
-  public final static int MODE_SHUFFLE = 2;
-  public final static int MODE_REPEAT = 3;
-
-
-  //0:软件锁屏 1:系统锁屏 2:关闭
-  public final static int APLAYER_LOCKSCREEN = 0;
-  public final static int SYSTEM_LOCKSCREEN = 1;
-  public final static int CLOSE_LOCKSCREEN = 2;
-
   public static final int KB = 1024;
   public static final int MB = 1024 * KB;
 }

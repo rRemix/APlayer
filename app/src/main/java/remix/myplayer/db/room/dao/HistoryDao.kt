@@ -14,27 +14,29 @@ import remix.myplayer.db.room.model.History
  */
 @Dao
 interface HistoryDao {
-  @Insert(onConflict = REPLACE)
-  fun insertHistory(histories: List<History>): LongArray
 
-  @Insert(onConflict = REPLACE)
-  fun insertHistory(history: History): Long
-
-  @Query("""
+  @Query(
+    """
     SELECT * FROM History ORDER BY
     CASE :orderBY WHEN 'last_play' THEN last_play END asc,
     CASE :orderBY WHEN 'last_play desc' THEN last_play END desc,
     CASE :orderBY WHEN 'play_count' THEN play_count END asc,
     CASE :orderBY WHEN 'play_count desc' THEN play_count END desc
-  """)
+  """
+  )
   fun selectAll(orderBY: String): Flow<List<History>>
 
-  @Query("""
+  @Query(
+    """
     SELECT * FROM History
     WHERE audio_id = :audioId
-  """)
-  fun selectByAudioId(audioId: Long): History?
+  """
+  )
+  suspend fun selectByAudioId(audioId: Long): History?
+
+  @Insert(onConflict = REPLACE)
+  suspend fun insertHistory(history: History): Long
 
   @Update
-  fun update(history: History): Int
+  suspend fun update(history: History): Int
 }

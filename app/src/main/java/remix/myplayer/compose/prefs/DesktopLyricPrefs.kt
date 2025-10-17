@@ -3,8 +3,6 @@ package remix.myplayer.compose.prefs
 import android.content.Context
 import androidx.annotation.ColorInt
 import dagger.hilt.android.qualifiers.ApplicationContext
-import remix.myplayer.util.SPUtil.DESKTOP_LYRICS_KEY.TRANSLATION_COLOR
-import remix.myplayer.util.SPUtil.DESKTOP_LYRICS_KEY.UNSUNG_COLOR
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -41,12 +39,13 @@ class DesktopLyricPrefs @Inject constructor(@ApplicationContext context: Context
     @ColorInt
     internal const val DEFAULT_TRANSLATION_COLOR = 0xffffffff.toInt()
 
-    // 以下所有设置项一般情况下应在 LyricManager 内部读/写
-    const val LOCKED: String = "locked"
+    private const val LOCKED: String = "locked"
     const val Y_POSITION_PREFIX: String = "y_position_" // y_position_$orientation
-    const val FIRST_LINE_SIZE: String = "first_line_size"
-    const val SECOND_LINE_SIZE: String = "second_line_size"
-    const val SUNG_COLOR: String = "sung_color"
+    private const val FIRST_LINE_SIZE: String = "first_line_size"
+    private const val SECOND_LINE_SIZE: String = "second_line_size"
+    private const val SUNG_COLOR: String = "sung_color"
+    private const val UNSUNG_COLOR: String = "unsung_color"
+    private const val TRANSLATION_COLOR: String = "translation_color"
 //    const val UNSUNG_COLOR: String = "unsung_color"
 //    const val TRANSLATION_COLOR: String = "translation_color"
   }

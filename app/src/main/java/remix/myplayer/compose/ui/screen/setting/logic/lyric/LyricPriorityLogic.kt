@@ -21,15 +21,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.gson.Gson
+import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
+import remix.myplayer.compose.lyric.LyricManagerEntryPoint
+import remix.myplayer.compose.nav.UiMessageDispatcher
 import remix.myplayer.compose.ui.dialog.NormalDialog
 import remix.myplayer.compose.ui.dialog.rememberDialogState
 import remix.myplayer.compose.ui.screen.setting.NormalPreference
 import remix.myplayer.compose.viewmodel.settingViewModel
 import remix.myplayer.misc.cache.DiskCache
-import remix.myplayer.ui.ViewCommon.showLyricTipDialog
+import remix.myplayer.ui.ViewCommon.ShowLyricTipDialog
 import remix.myplayer.util.SPUtil
-import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -38,12 +40,19 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 fun LyricPriorityLogic() {
   val vm = settingViewModel
   val context = LocalContext.current
+  val lyricsManager = remember {
+    EntryPointAccessors.fromApplication(
+      context,
+      LyricManagerEntryPoint::class.java
+    ).lyricManager()
+  }
+
   val dialogState = rememberDialogState()
 
   var showLyricTip by rememberSaveable { mutableStateOf(false) }
   if (showLyricTip) {
     vm.lyricPrefs.tipShown = true
-    showLyricTipDialog {
+    ShowLyricTipDialog {
       vm.lyricPrefs.tipShown = true
       dialogState.show()
     }
@@ -70,13 +79,15 @@ fun LyricPriorityLogic() {
     },
     onPositive = {
       try {
+        // TODO 和LyricSearch统一缓存目录
         DiskCache.getLrcDiskCache().delete()
         DiskCache.init(context, "lyric")
-        SPUtil.deleteFile(context, SPUtil.LYRIC_KEY.NAME)
+//        lyricsManager.clearAllCache()
+        vm.lyricPrefs.clearUserSave()
         vm.lyricPrefs.generalLyricOrder = Gson().toJson(orderList)
-        ToastUtil.show(context, R.string.save_success)
+        UiMessageDispatcher.show(R.string.save_success)
       } catch (e: Exception) {
-        ToastUtil.show(context, R.string.save_error_arg, e.message)
+        UiMessageDispatcher.show(R.string.save_error_arg, e.message.toString())
       }
     },
     custom = {

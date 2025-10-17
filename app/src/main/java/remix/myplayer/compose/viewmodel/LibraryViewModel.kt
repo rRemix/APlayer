@@ -132,16 +132,10 @@ class LibraryViewModel @Inject constructor(
 
   fun loadSongsByModels(models: List<APlayerModel>) = songRepo.getSongsByModels(models)
 
-  fun loadLastAddedSongs(): List<Song> {
-    checkWorkerThread()
-    val today = Calendar.getInstance()
-    today.time = Date()
-    return songRepo.getSongs(
-      Audio.Media.DATE_ADDED + " >= ?",
-      arrayOf((today.timeInMillis / 1000 - 3600 * 24 * 7).toString()),
-      null
-    )
-  }
+  fun loadSong(selection: String?, selectionValues: Array<String?>?, sortOrder: String? = null) =
+    songRepo.getSongs(selection, selectionValues, sortOrder)
+
+  fun loadLastAddedSongs() = songRepo.getLastAddedSongs()
 
   fun searchSong(key: String): List<Song> {
     checkWorkerThread()

@@ -7,12 +7,12 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Audio
 import androidx.activity.result.IntentSenderRequest
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.APlayerModel
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.activity.base.BaseActivity
+import remix.myplayer.compose.nav.UiMessageDispatcher
 import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.compose.repo.AbstractRepository.Companion.makeInStrQuery
 import remix.myplayer.compose.repo.PlayListRepository
@@ -20,7 +20,6 @@ import remix.myplayer.compose.repo.SongRepository
 import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.helper.MusicServiceRemote.deleteFromService
 import remix.myplayer.misc.checkWorkerThread
-import remix.myplayer.util.ToastUtil
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -37,7 +36,7 @@ class DeleteSongUseCase @Inject constructor(
     activity: BaseActivity?,
     models: List<APlayerModel>,
     deleteSource: Boolean,
-    parent : APlayerModel?
+    parent: APlayerModel?
   ) =
     withContext(Dispatchers.IO) {
       if (activity == null || models.isEmpty()) {
@@ -67,7 +66,7 @@ class DeleteSongUseCase @Inject constructor(
         for (model in models) {
           val playList = model as PlayList
           if (playList.isFavorite()) {
-            ToastUtil.show(activity, R.string.mylove_cant_edit)
+            UiMessageDispatcher.show(R.string.mylove_cant_edit)
             continue
           }
 
@@ -95,17 +94,14 @@ class DeleteSongUseCase @Inject constructor(
         deleteFromService(songs)
 
         // remove from all playLists
-        playListRepo.allPlayLists().first().forEach {
-          it.audioIds.removeAll(songIds)
-          playListRepo.updatePlayList(it)
-        }
+        playListRepo.removeAudioIdsFromAll(songIds)
 
         // delete source if need
         if (deleteSource) {
           deleteSource(activity, songs)
         }
       } else {
-        ToastUtil.show(activity, R.string.delete_success)
+        UiMessageDispatcher.show(R.string.delete_success)
       }
 
       // refresh ui
@@ -138,7 +134,7 @@ class DeleteSongUseCase @Inject constructor(
             }
           }
 
-          ToastUtil.show(activity, R.string.delete_success)
+          UiMessageDispatcher.show(R.string.delete_success)
         } catch (e: SecurityException) {
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && e is RecoverableSecurityException) {
             activity.deleteSongLauncher.launch(
@@ -151,7 +147,7 @@ class DeleteSongUseCase @Inject constructor(
       }
       Timber.v("delete may success")
     } catch (e: Exception) {
-      ToastUtil.show(activity, R.string.delete_error)
+      UiMessageDispatcher.show(R.string.delete_error)
       Timber.v("delete failed: $e")
     }
 

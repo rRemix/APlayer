@@ -141,7 +141,7 @@ abstract class BaseAppwidget
   }
 
   private fun updateLove(service: MusicService, remoteViews: RemoteViews, song: Song) {
-    remoteViews.setImageViewResource(R.id.appwidget_love, if (service.isLove) skin.lovedRes else skin.loveRes)
+    remoteViews.setImageViewResource(R.id.appwidget_love, if (service.isFavorite) skin.lovedRes else skin.loveRes)
   }
 
   private fun updateNextAndPrev(remoteViews: RemoteViews) {

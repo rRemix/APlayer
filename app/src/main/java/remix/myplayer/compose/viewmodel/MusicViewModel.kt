@@ -5,7 +5,6 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -16,13 +15,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
+import remix.myplayer.compose.nav.UiMessageDispatcher
+import remix.myplayer.compose.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.compose.repo.PlayQueueRepository
 import remix.myplayer.helper.MusicEventCallback
 import remix.myplayer.helper.MusicServiceRemote
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.util.Constants.MODE_LOOP
-import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -97,7 +96,7 @@ class MusicViewModel @Inject constructor(
 
   fun removeFromQueue(id: Long) {
     viewModelScope.launch {
-      val count = playQueueRepository.remove(listOf(id))
+      val count = playQueueRepository.removeByAudioIds(listOf(id))
       if (count > 0 && id == _musicState.value.song.id) {
         Util.sendCMDLocalBroadcast(Command.NEXT)
       }
@@ -107,10 +106,7 @@ class MusicViewModel @Inject constructor(
   fun insertToQueue(queue: List<Song>) {
     viewModelScope.launch {
       val ids = playQueueRepository.insert(queue)
-      ToastUtil.show(
-        context,
-        context.getString(R.string.add_song_playqueue_success, ids.filter { it != 0L }.size)
-      )
+      UiMessageDispatcher.show(R.string.add_song_playqueue_success, ids.filter { it != 0L }.size)
     }
   }
 

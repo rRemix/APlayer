@@ -3,6 +3,7 @@ package remix.myplayer.compose.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.withContext
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.compose.repo.HistoryRepository
@@ -32,7 +34,7 @@ class HistoryViewModel @Inject constructor(
     histories.map { history ->
       history.audio_id
     }.mapNotNull { id ->
-      songRepo.song(id)
+      withContext(Dispatchers.IO) { songRepo.song(id) }
     }
   }.stateIn(
     scope = viewModelScope,

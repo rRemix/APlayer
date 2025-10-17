@@ -14,25 +14,24 @@ import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.plugins.RxJavaPlugins
 import remix.myplayer.appshortcuts.DynamicShortcutManager
+import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.compose.ui.screen.hackTabMinWidth
 import remix.myplayer.helper.LanguageHelper.onConfigurationChanged
 import remix.myplayer.helper.LanguageHelper.saveSystemCurrentLanguage
 import remix.myplayer.helper.LanguageHelper.setApplicationLanguage
 import remix.myplayer.helper.LanguageHelper.setLocal
-import remix.myplayer.helper.SortOrder
-import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.misc.manager.APlayerActivityManager
-import remix.myplayer.theme.ThemeStore
-import remix.myplayer.util.SPUtil
-import remix.myplayer.util.SPUtil.SETTING_KEY
 import remix.myplayer.util.Util
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Created by Remix on 16-3-16.
  */
 @HiltAndroidApp
 class App : MultiDexApplication() {
+  @Inject
+  lateinit var settingPrefs: SettingPrefs
 
   override fun attachBaseContext(base: Context) {
     saveSystemCurrentLanguage()
@@ -68,42 +67,33 @@ class App : MultiDexApplication() {
   }
 
   private fun checkMigration() {
-    if (!SPUtil.getValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.LYRIC_RESET_ON_16000, false)) {
-      SPUtil.deleteFile(this, SPUtil.LYRIC_KEY.NAME)
-      SPUtil.putValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.LYRIC_RESET_ON_16000, true)
-      SPUtil.putValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY)
-//      try {
-//        DiskCache.getLrcDiskCache().delete()
-//      } catch (e: Exception) {
-//        Timber.v(e)
+//    if (!SPUtil.getValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.LYRIC_RESET_ON_16000, false)) {
+//      SPUtil.deleteFile(this, SPUtil.LYRIC_KEY.NAME)
+//      SPUtil.putValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.LYRIC_RESET_ON_16000, true)
+//      SPUtil.putValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY)
+////      try {
+////        DiskCache.getLrcDiskCache().delete()
+////      } catch (e: Exception) {
+////        Timber.v(e)
+////      }
+//    }
+//
+//    val oldVersion = SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.VERSION, 1)
+//    if (oldVersion < SETTING_KEY.NEWEST_VERSION) {
+//      if (oldVersion == 1) {
+//        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.LIBRARY, "")
 //      }
-    }
-
-    val oldVersion = SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.VERSION, 1)
-    if (oldVersion < SETTING_KEY.NEWEST_VERSION) {
-      if (oldVersion == 1) {
-        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.LIBRARY, "")
-      }
-      if (oldVersion == 2) {
-        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.GENRE_SORT_ORDER, SortOrder.GENRE_A_Z)
-        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.PLAYLIST_SORT_ORDER, SortOrder.PLAYLIST_DATE)
-      }
-      SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.VERSION, SETTING_KEY.NEWEST_VERSION)
-    }
+//      if (oldVersion == 2) {
+//        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.GENRE_SORT_ORDER, SortOrder.GENRE_A_Z)
+//        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.PLAYLIST_SORT_ORDER, SortOrder.PLAYLIST_DATE)
+//      }
+//      SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.VERSION, SETTING_KEY.NEWEST_VERSION)
+//    }
   }
 
   private fun setUp() {
     XXPermissions.setCheckMode(false)
-    DiskCache.init(this, "lyric")
     setApplicationLanguage(this)
-    Completable
-        .fromAction {
-          ThemeStore.sImmersiveMode = SPUtil
-              .getValue(context, SETTING_KEY.NAME, SETTING_KEY.IMMERSIVE_MODE, false)
-          ThemeStore.sColoredNavigation = SPUtil.getValue(context, SETTING_KEY.NAME,
-              SETTING_KEY.COLOR_NAVIGATION, false)
-        }
-        .subscribe()
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

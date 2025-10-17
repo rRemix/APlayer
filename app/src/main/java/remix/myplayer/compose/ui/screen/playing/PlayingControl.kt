@@ -44,6 +44,9 @@ import remix.myplayer.R
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.CenterInBox
 import remix.myplayer.compose.clickWithRipple
+import remix.myplayer.compose.prefs.SettingPrefs.Companion.MODE_LOOP
+import remix.myplayer.compose.prefs.SettingPrefs.Companion.MODE_REPEAT
+import remix.myplayer.compose.prefs.SettingPrefs.Companion.MODE_SHUFFLE
 import remix.myplayer.compose.ui.dialog.BottomSheetDialog
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
@@ -53,9 +56,6 @@ import remix.myplayer.compose.viewmodel.musicViewModel
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.widget.playpause.PlayPauseView
-import remix.myplayer.util.Constants.MODE_LOOP
-import remix.myplayer.util.Constants.MODE_REPEAT
-import remix.myplayer.util.Constants.MODE_SHUFFLE
 import remix.myplayer.util.ToastUtil
 import remix.myplayer.util.Util
 

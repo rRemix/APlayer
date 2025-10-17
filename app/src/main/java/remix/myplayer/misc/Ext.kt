@@ -6,18 +6,12 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Looper
-import android.provider.MediaStore
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.thegrizzlylabs.sardineandroid.DavResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
-import remix.myplayer.bean.mp3.Album
-import remix.myplayer.bean.mp3.Artist
-import remix.myplayer.bean.mp3.Folder
-import remix.myplayer.bean.mp3.Genre
-import remix.myplayer.util.MediaStoreUtil
 import timber.log.Timber
 import java.io.File
 import java.io.InputStream
@@ -29,22 +23,6 @@ import java.util.zip.ZipOutputStream
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-fun Album.getSongIds(): List<Long> {
-  return MediaStoreUtil.getSongIds(MediaStore.Audio.Media.ALBUM_ID + "=?", arrayOf((albumID.toString())))
-}
-
-fun Artist.getSongIds(): List<Long> {
-  return MediaStoreUtil.getSongIds(MediaStore.Audio.Media.ARTIST_ID + "=?", arrayOf(artistID.toString()))
-}
-
-fun Folder.getSongIds(): List<Long> {
-  return MediaStoreUtil.getSongsByParentPath(path).map { it.id }
-}
-
-fun Genre.getSongIds(): List<Long> {
-  return MediaStoreUtil.getSongsByGenreId(id).map { it.id }
-}
-
 fun Context.isPortraitOrientation(): Boolean {
   val configuration = this.resources.configuration //获取设置的配置信息
   val orientation = configuration.orientation //获取屏幕方向
@@ -52,10 +30,11 @@ fun Context.isPortraitOrientation(): Boolean {
 }
 
 fun CoroutineScope.tryLaunch(
-    context: CoroutineContext = EmptyCoroutineContext,
-    start: CoroutineStart = CoroutineStart.DEFAULT,
-    block: suspend () -> Unit,
-    catch: ((e: Exception) -> Unit)? = { Timber.w(it) }) {
+  context: CoroutineContext = EmptyCoroutineContext,
+  start: CoroutineStart = CoroutineStart.DEFAULT,
+  block: suspend () -> Unit,
+  catch: ((e: Exception) -> Unit)? = { Timber.w(it) }
+) {
   launch(context, start) {
     try {
       block()
@@ -66,15 +45,17 @@ fun CoroutineScope.tryLaunch(
 }
 
 fun CoroutineScope.tryLaunch(
-    context: CoroutineContext = EmptyCoroutineContext,
-    start: CoroutineStart = CoroutineStart.DEFAULT,
-    block: suspend () -> Unit) {
-  tryLaunch(context = context,
-      start = start,
-      block = block,
-      catch = {
-        Timber.w(it)
-      })
+  context: CoroutineContext = EmptyCoroutineContext,
+  start: CoroutineStart = CoroutineStart.DEFAULT,
+  block: suspend () -> Unit
+) {
+  tryLaunch(
+    context = context,
+    start = start,
+    block = block,
+    catch = {
+      Timber.w(it)
+    })
 }
 
 fun Any?.checkMainThread() {
@@ -130,8 +111,10 @@ private fun ZipOutputStream.zip(files: Array<File>, path: String?) {
 /**
  * inputstream内容写入outputstream
  */
-fun InputStream.writeTo(outputStream: OutputStream, bufferSize: Int = 1024 * 2,
-                        closeInput: Boolean = true, closeOutput: Boolean = true) {
+fun InputStream.writeTo(
+  outputStream: OutputStream, bufferSize: Int = 1024 * 2,
+  closeInput: Boolean = true, closeOutput: Boolean = true
+) {
 
   val buffer = ByteArray(bufferSize)
   val br = this.buffered()
@@ -165,7 +148,7 @@ fun getPendingIntentFlag() =
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
 
 
-private val musicExt = setOf("wav","aif","au","mp3","ram","wma","mmf","amr","aac","flac")
+private val musicExt = setOf("wav", "aif", "au", "mp3", "ram", "wma", "mmf", "amr", "aac", "flac")
 fun DavResource.isAudio(): Boolean {
   if (isDirectory || path.isNullOrEmpty()) {
     return false

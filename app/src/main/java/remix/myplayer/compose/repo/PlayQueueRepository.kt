@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.compose.prefs.SettingPrefs
 import remix.myplayer.db.room.dao.PlayQueueDao
@@ -18,8 +19,10 @@ import javax.inject.Inject
 interface PlayQueueRepository {
 
   fun getAllSongs(): Flow<List<Song>>
-  suspend fun remove(audioIds: List<Long>): Int
+  suspend fun removeByAudioIds(audioIds: List<Long>): Int
+  suspend fun remove(playQueues: List<PlayQueue>): Int
   suspend fun insert(queue: List<Song>): LongArray
+  suspend fun clear()
 }
 
 class PlayQueueRepoImpl @Inject constructor(
@@ -30,53 +33,32 @@ class PlayQueueRepoImpl @Inject constructor(
 ) : PlayQueueRepository, AbstractRepository(settingPrefs) {
 
   override fun getAllSongs(): Flow<List<Song>> {
-    return playQueueDao.selectAllSuspend()
-      .map {
-        it to getSongsInQueue(it)
-      }.flowOn(Dispatchers.IO)
-      .map { pair ->
-        val queue = pair.first
-        val songs = pair.second
-        //删除不存在的歌曲
-        if (songs.size < queue.size) {
-          Timber.v("删除播放队列中不存在的歌曲")
-          val deleteIds = ArrayList<Long>()
-          val existIds = songs.map { it.id }
-
-          for (item in queue) {
-            if (!existIds.contains(item.audio_id)) {
-              deleteIds.add(item.audio_id)
-            }
-          }
-
-          Timber.tag(TAG).v("deleteIds: $deleteIds")
-          if (deleteIds.isNotEmpty()) {
-            remove(deleteIds)
-          }
-        }
-
-        songs
+    return playQueueDao.selectAll()
+      .flowOn(Dispatchers.IO)
+      .map { queue ->
+        withContext(Dispatchers.IO) { getSongsInQueue(queue) }
       }
   }
 
   // TODO 大量数据拆分
-  override suspend fun remove(audioIds: List<Long>) =
-    playQueueDao.deleteSongsSuspend(audioIds)
+  override suspend fun removeByAudioIds(audioIds: List<Long>) =
+    playQueueDao.deleteSongs(audioIds)
+
+  override suspend fun remove(playQueues: List<PlayQueue>) = playQueueDao.delete(playQueues)
 
   override suspend fun insert(songs: List<Song>): LongArray {
-    val oldQueue = playQueueDao.selectAllSuspend().first()
+    val oldQueue = playQueueDao.selectAll().first()
 
     // 不重复添加
     val actual = songs.toMutableList()
     val keys = oldQueue.map {
       if (it.audio_id > 0) it.audio_id.toString() else it.data
     }
-    //不重复添加
     actual.removeAll {
       (it.isLocal() && keys.contains(it.id.toString())) || (it.isRemote() && keys.contains(it.data))
     }
 
-    return playQueueDao.insertPlayQueueSuspend(actual.map { song ->
+    return playQueueDao.insert(actual.map { song ->
       if (song.isLocal()) {
         PlayQueue(song.id, song.title, song.data)
       } else {
@@ -90,33 +72,58 @@ class PlayQueueRepoImpl @Inject constructor(
     })
   }
 
-  private fun getSongsInQueue(queues: List<PlayQueue>): List<Song> {
+  override suspend fun clear() {
+    playQueueDao.clear()
+  }
+
+  private suspend fun getSongsInQueue(queues: List<PlayQueue>): List<Song> {
     checkWorkerThread()
     if (queues.isEmpty()) {
       return emptyList()
     }
-    val isLocal = queues.all {
-      it.audio_id > 0
-    }
-    if (isLocal) {
-      val ids = queues.map { it.audio_id }
-      val songs =
-        songRepo.getSongs(makeInStrQuery(ids), null, null)
 
-      // 按照查询顺序返回
-      val tempArray: Array<Song> = Array(ids.size) { Song.EMPTY_SONG }
+    val songs = mutableListOf<Song>()
+    val pendingDelete = mutableListOf<PlayQueue>()
 
-      songs.forEachIndexed { index, song ->
-        tempArray[ids.indexOf(song.id)] = song
+    val local = queues.filter { it.audio_id > 0 }
+    val remote = queues.filter { it.audio_id <= 0 }
+
+    // 处理本地歌曲
+    if (local.isNotEmpty()) {
+      val localSongs = songRepo.getSongs(makeInStrQuery(local.map { it.audio_id }), null, null)
+
+      // 按照 queues 的顺序添加歌曲，保证顺序一致
+      val songMap = localSongs.associateBy { it.id }
+      local.forEach { queue ->
+        songMap.getOrElse(queue.audio_id) { Song.EMPTY_SONG }.let { song ->
+          if (song.valid()) {
+            songs.add(song)
+          } else {
+            pendingDelete.add(queue)
+          }
+        }
       }
+    }
 
-      return tempArray
-        .filter { it.id != Song.EMPTY_SONG.id }
-    } else {
-      return queues.map {
-        Song.Remote(it.title, it.data, it.account ?: "", it.pwd ?: "")
+    // 处理远程歌曲
+    remote.forEach { queue ->
+      val remoteSong = Song.Remote(
+        queue.title,
+        queue.data,
+        queue.account ?: "",
+        queue.pwd ?: ""
+      )
+      if (remoteSong.valid()) {
+        songs.add(remoteSong)
+      } else {
+        pendingDelete.add(queue)
       }
     }
+
+    if (pendingDelete.isNotEmpty()) {
+      Timber.tag(TAG).v("删除不存在歌曲: ${remove(pendingDelete)}")
+    }
+    return songs
   }
 
   companion object {
