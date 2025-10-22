@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import remix.myplayer.compose.prefs.ThemePrefs
-import remix.myplayer.compose.ui.theme.AppTheme.Companion.FOLLOW_SYSTEM
+import remix.myplayer.compose.prefs.ThemePrefs.Companion.FOLLOW_SYSTEM
 import javax.inject.Inject
 
 val LocalThemeController = compositionLocalOf<ThemeController> {
@@ -17,7 +17,7 @@ interface ThemeController {
 
   val appTheme: AppTheme
 
-  var dark: Int
+  var dark: String
 
   var black: Boolean
 
@@ -42,7 +42,7 @@ class ThemeControllerImpl @Inject constructor(private val storage: ThemePrefs) :
   override val appTheme: AppTheme
     get() = _currentTheme.value
 
-  override var dark: Int = FOLLOW_SYSTEM
+  override var dark: String = FOLLOW_SYSTEM
     get() = storage.darkTheme
     set(value) {
       if (field == value) {

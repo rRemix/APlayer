@@ -54,6 +54,9 @@ import remix.myplayer.appwidgets.small.AppWidgetSmall
 import remix.myplayer.appwidgets.small.AppWidgetSmallTransparent
 import remix.myplayer.bean.mp3.Song
 import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
+import remix.myplayer.compose.activity.base.BaseMusicActivity
+import remix.myplayer.compose.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
+import remix.myplayer.compose.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
 import remix.myplayer.compose.lyric.LyricManager
 import remix.myplayer.compose.nav.UiMessageDispatcher
 import remix.myplayer.compose.prefs.PrefKeys
@@ -84,9 +87,6 @@ import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24
 import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.LockScreenActivity
-import remix.myplayer.ui.activity.base.BaseMusicActivity
-import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
-import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
 import remix.myplayer.util.Constants.ACTION_EXIT
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.PermissionUtil

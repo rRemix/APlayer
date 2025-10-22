@@ -67,13 +67,14 @@ val defaultLineSliderProperties
 @Composable
 fun LineSlider(
   modifier: Modifier = Modifier,
+  enabled: Boolean = true,
   value: Float,
   onValueChange: (Float) -> Unit,
   onValueChangeFinished: () -> Unit = {},
   interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
   steps: Int = 0,
   valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-  properties: LineSliderProperties = defaultLineSliderProperties
+  properties: LineSliderProperties = defaultLineSliderProperties,
 ) {
   val theme = LocalTheme.current
 
@@ -84,6 +85,7 @@ fun LineSlider(
     onValueChange = onValueChange,
     onValueChangeFinished = onValueChangeFinished,
     modifier = modifier,
+    enabled = enabled,
     interactionSource = interactionSource,
     steps = steps,
     valueRange = valueRange,

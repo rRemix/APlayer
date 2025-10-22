@@ -84,7 +84,7 @@ internal fun PlayingSeekbarWithText(swatch: Palette.Swatch) {
           uiProgress = it.toLong()
         },
         onValueChangeFinished = {
-          musicVM.setProgress(uiProgress.toLong())
+          musicVM.setProgress(uiProgress)
           dragging = false
         },
         valueRange = 0f..duration.toFloat(),

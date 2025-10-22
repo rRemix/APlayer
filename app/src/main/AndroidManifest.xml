@@ -97,10 +97,6 @@
       </intent-filter>
     </activity>
 
-    <!-- 均衡器 -->
-    <activity
-      android:name=".ui.activity.EQActivity"
-      android:theme="@style/ActivityStyle"/>
     <!-- 锁屏页 -->
     <activity
       android:excludeFromRecents="true"

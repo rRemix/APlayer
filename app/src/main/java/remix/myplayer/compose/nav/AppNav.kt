@@ -41,10 +41,12 @@ import remix.myplayer.bean.mp3.Genre
 import remix.myplayer.compose.ui.dialog.DialogContainer
 import remix.myplayer.compose.ui.screen.AboutScreen
 import remix.myplayer.compose.ui.screen.CustomSortScreen
+import remix.myplayer.compose.ui.screen.EQScreen
 import remix.myplayer.compose.ui.screen.HomeScreen
 import remix.myplayer.compose.ui.screen.LastAddedScreen
 import remix.myplayer.compose.ui.screen.SearchScreen
 import remix.myplayer.compose.ui.screen.SongChooseScreen
+import remix.myplayer.compose.ui.screen.SupportScreen
 import remix.myplayer.compose.ui.screen.crop.CropScreen
 import remix.myplayer.compose.ui.screen.detail.DetailScreen
 import remix.myplayer.compose.ui.screen.history.HistoryScreen
@@ -68,6 +70,8 @@ const val RouteHistory = "history"
 const val RouteSearch = "search"
 const val RouteWebDav = "webdav"
 const val RouteCrop = "crop"
+const val RouteEq = "eq"
+const val RouteSupport = "support"
 
 val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 
@@ -179,6 +183,14 @@ fun AppNav() {
           val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
           val type = it.arguments?.getInt("type") ?: return@normalAnimatedScreen
           CropScreen(id, type)
+        }
+
+        normalAnimatedScreen(RouteEq) {
+          EQScreen()
+        }
+
+        normalAnimatedScreen(RouteSupport) {
+          SupportScreen()
         }
       }
 

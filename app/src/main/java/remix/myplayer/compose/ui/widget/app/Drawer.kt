@@ -46,15 +46,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import kotlinx.coroutines.launch
+import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.nav.RouteHistory
 import remix.myplayer.compose.nav.RouteLastAdded
 import remix.myplayer.compose.nav.RouteSetting
+import remix.myplayer.compose.nav.RouteSupport
+import remix.myplayer.compose.prefs.ThemePrefs.Companion.BLACK
+import remix.myplayer.compose.prefs.ThemePrefs.Companion.DARK
+import remix.myplayer.compose.prefs.ThemePrefs.Companion.LIGHT
 import remix.myplayer.compose.ui.theme.AppTheme
-import remix.myplayer.compose.ui.theme.AppTheme.Companion.BLACK
-import remix.myplayer.compose.ui.theme.AppTheme.Companion.DARK
-import remix.myplayer.compose.ui.theme.AppTheme.Companion.LIGHT
 import remix.myplayer.compose.ui.theme.LocalTheme
 import remix.myplayer.compose.ui.widget.common.TextPrimary
 import remix.myplayer.compose.ui.widget.library.GlideCover
@@ -62,25 +64,28 @@ import remix.myplayer.compose.viewmodel.MusicViewModel
 import remix.myplayer.compose.viewmodel.musicViewModel
 import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.misc.receiver.ExitReceiver
-import remix.myplayer.ui.activity.SupportActivity
 import remix.myplayer.util.Constants
 
-private val drawerTitles = listOf(
+// 非谷歌才展示支持开发者
+private val drawerTitles = mutableListOf(
   R.string.drawer_song,
   R.string.drawer_history,
   R.string.drawer_recently_add,
-  R.string.support_develop,
   R.string.drawer_setting,
   R.string.exit
-)
-private val drawerIcons = listOf(
+).apply {
+  if (!App.IS_GOOGLEPLAY) add(3, R.string.support_develop)
+}
+
+private val drawerIcons = mutableListOf(
   R.drawable.ic_library_music_24dp,
   R.drawable.ic_history_24dp,
   R.drawable.ic_recent_24dp,
-  R.drawable.ic_favorite_24dp,
   R.drawable.ic_settings_24dp,
   R.drawable.ic_exit_to_app_24dp
-)
+).apply {
+  if (!App.IS_GOOGLEPLAY) add(3, R.drawable.ic_favorite_24dp)
+}
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -168,20 +173,19 @@ fun Drawer(drawerState: DrawerState, vm: MusicViewModel = musicViewModel) {
           onClick = {
             selectDrawer = index
 
-            when (index) {
+            when {
               // 歌曲库
-              0 -> scope.launch { drawerState.close() }
+              index == 0 -> scope.launch { drawerState.close() }
               // 历史
-              1 -> navController.navigate(RouteHistory)
+              index == 1 -> navController.navigate(RouteHistory)
               // 最近添加
-              2 -> navController.navigate(RouteLastAdded)
-              // 捐赠
-              3 -> context.startActivity(Intent(context, SupportActivity::class.java))
-              // 设置
-              4 -> navController.navigate(RouteSetting)
-//              4 -> activity.startActivity(Intent(activity, SettingActivity::class.java))
-              // 退出
-              5 -> {
+              index == 2 -> navController.navigate(RouteLastAdded)
+              // 捐赠（仅非 Google 版本）
+              !App.IS_GOOGLEPLAY && index == 3 -> navController.navigate(RouteSupport)
+              // 设置（索引随渠道差异调整）
+              index == (if (!App.IS_GOOGLEPLAY) 4 else 3) -> navController.navigate(RouteSetting)
+              // 退出（索引随渠道差异调整）
+              index == (if (!App.IS_GOOGLEPLAY) 5 else 4) -> {
                 context.sendBroadcast(
                   Intent(Constants.ACTION_EXIT)
                     .setComponent(ComponentName(context, ExitReceiver::class.java))

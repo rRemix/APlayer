@@ -8,6 +8,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import remix.myplayer.compose.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
 import remix.myplayer.db.Migrations.migration3to4
 import remix.myplayer.db.Migrations.migration4to5
 import remix.myplayer.db.room.AppDatabase.Companion.VERSION
@@ -20,7 +21,6 @@ import remix.myplayer.db.room.model.PlayList
 import remix.myplayer.db.room.model.PlayQueue
 import remix.myplayer.db.room.model.WebDav
 import remix.myplayer.service.MusicService
-import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
 

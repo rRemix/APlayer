@@ -3,17 +3,20 @@ package remix.myplayer.compose.activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import remix.myplayer.compose.activity.base.BaseMusicActivity
 import remix.myplayer.compose.nav.AppNav
@@ -26,6 +29,7 @@ import remix.myplayer.compose.viewmodel.LibraryViewModel
 import remix.myplayer.compose.viewmodel.MainViewModel
 import remix.myplayer.compose.viewmodel.MusicViewModel
 import remix.myplayer.compose.viewmodel.ProvideViewModels
+import remix.myplayer.helper.EQHelper
 import remix.myplayer.theme.Theme
 import remix.myplayer.util.MusicUtil
 import javax.inject.Inject
@@ -66,6 +70,13 @@ class ComposeActivity : BaseMusicActivity() {
 
         APlayerTheme {
           AppNav()
+        }
+
+        val act = LocalActivity.current
+        val nav = LocalNavController.current
+        LaunchedEffect(Unit) {
+//          delay(2000)
+//          EQHelper.startEqualizer(act!!, nav)
         }
       }
     }

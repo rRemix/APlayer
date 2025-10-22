@@ -32,6 +32,7 @@ import remix.myplayer.compose.lyric.LyricManager.Companion.EXTRA_LYRIC_URI
 import remix.myplayer.compose.lyric.LyricManager.Companion.SHOW_OFFSET_PANEL
 import remix.myplayer.compose.lyric.LyricManagerEntryPoint
 import remix.myplayer.compose.lyric.LyricSearcher
+import remix.myplayer.compose.nav.LocalNavController
 import remix.myplayer.compose.prefs.LyricPrefs
 import remix.myplayer.compose.prefs.delegate
 import remix.myplayer.compose.ui.dialog.DialogState
@@ -56,6 +57,7 @@ fun PlayingDropDownMenu(
   if (!song.valid()) {
     return
   }
+  val nav = LocalNavController.current
   val libraryVM = libraryViewModel
   val settingVM = settingViewModel
   val menuItems =
@@ -184,7 +186,7 @@ fun PlayingDropDownMenu(
               if (activity == null) {
                 return@DropdownMenuItem
               }
-              EQHelper.startEqualizer(activity)
+              EQHelper.startEqualizer(activity, nav)
             }
 
             R.string.lyric -> {

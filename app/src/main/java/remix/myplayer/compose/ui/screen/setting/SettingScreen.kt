@@ -200,7 +200,7 @@ private fun OtherPreferences() {
   val nav = LocalNavController.current
 
   ArrowPreference(R.string.eq_setting) {
-    EQHelper.startEqualizer(activity ?: return@ArrowPreference)
+    EQHelper.startEqualizer(activity ?: return@ArrowPreference, nav)
   }
 
   FeedbackLogic()

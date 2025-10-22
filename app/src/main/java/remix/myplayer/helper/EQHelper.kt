@@ -8,14 +8,14 @@ import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.Virtualizer
 import android.widget.Toast
+import androidx.navigation.NavHostController
 import com.tencent.bugly.crashreport.CrashReport
 import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.App
 import remix.myplayer.R
+import remix.myplayer.compose.nav.RouteEq
 import remix.myplayer.compose.prefs.SettingPrefsEntryPoint
 import remix.myplayer.compose.prefs.delegate
-import remix.myplayer.ui.activity.EQActivity
-import remix.myplayer.util.Util.isIntentAvailable
 import timber.log.Timber
 
 /**
@@ -232,7 +232,7 @@ object EQHelper {
       releaseEqualizer()
     })
     bandLevels[band] = level.toShort()
-    var bandLevel by settingPrefs.sp.delegate("band$${band}", 0)
+    var bandLevel by settingPrefs.sp.delegate("band${band}", 0)
     bandLevel = level
   }
 
@@ -303,7 +303,7 @@ object EQHelper {
    * 启动均衡器
    */
   @JvmStatic
-  fun startEqualizer(activity: Activity) {
+  fun startEqualizer(activity: Activity, nav: NavHostController) {
     val sessionId = MusicServiceRemote.getMediaPlayer()?.audioSessionId
     if (sessionId == AudioEffect.ERROR_BAD_VALUE) {
       Toast.makeText(activity, activity.resources.getString(R.string.no_audio_ID), Toast.LENGTH_LONG).show()
@@ -315,12 +315,13 @@ object EQHelper {
     if (isSystemEqualizerAvailable(activity)) {
       activity.startActivityForResult(audioEffectIntent, REQUEST_EQ)
     } else {
-      activity.startActivity(Intent(activity, EQActivity::class.java))
+      nav.navigate(RouteEq)
+//      activity.startActivity(Intent(activity, EQActivity::class.java))
     }
   }
 
   private fun isSystemEqualizerAvailable(context: Context): Boolean {
-    return isIntentAvailable(context, Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL))
+    return false
   }
 
   private fun tryRun(block: () -> Unit, error: () -> Unit) {

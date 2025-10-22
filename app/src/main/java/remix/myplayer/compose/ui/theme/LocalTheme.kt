@@ -8,6 +8,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.colorResource
 import androidx.core.graphics.toColorInt
 import remix.myplayer.R
+import remix.myplayer.compose.prefs.ThemePrefs.Companion.BLACK
+import remix.myplayer.compose.prefs.ThemePrefs.Companion.DARK
+import remix.myplayer.compose.prefs.ThemePrefs.Companion.LIGHT
 import remix.myplayer.util.ColorUtil
 
 
@@ -15,7 +18,7 @@ val LocalTheme = compositionLocalOf<AppTheme> {
   return@compositionLocalOf AppTheme(
     primary = Color(0xff698cf6),
     secondary = Color(0xff698cf6),
-    theme = AppTheme.LIGHT
+    theme = LIGHT
   )
 }
 
@@ -120,16 +123,6 @@ data class AppTheme(
     get() = ColorUtil.isColorCloseToBlack(primary.toArgb())
 
   companion object {
-
-    const val LIGHT = "Light"
-    const val DARK = "Dark"
-    const val BLACK = "Black"
-
-    // 不兼容以前的配置
-    const val ALWAYS_OFF = 0
-    const val ALWAYS_ON = 1
-    const val FOLLOW_SYSTEM = 2
-
     var sImmersiveMode: Boolean = false
 
     fun darkenColor(color: Color): Color {
