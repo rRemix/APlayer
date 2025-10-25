@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import remix.myplayer.R
 import remix.myplayer.bean.misc.Library
 import remix.myplayer.bean.mp3.APlayerModel
@@ -65,19 +66,10 @@ class SettingViewModel @Inject constructor(
 
   init {
     // load libraries
-    val libraryJson = settingPrefs.libraryJson
-    val libraries = if (TextUtils.isEmpty(libraryJson))
-      ArrayList()
-    else
-      Gson().fromJson<ArrayList<Library>>(
-        libraryJson,
-        object : TypeToken<List<Library>>() {}.type
-      )
-    if (libraries.isEmpty()) {
-      val defaultLibraries = Library.allLibraries
-      libraries.addAll(defaultLibraries)
-      settingPrefs.libraryJson =
-        Gson().toJson(defaultLibraries, object : TypeToken<List<Library>>() {}.type)
+    val libraries = try {
+      Json.decodeFromString<List<Library>>(settingPrefs.libraryJson)
+    } catch (_: Exception) {
+      Library.allLibraries
     }
 
     setAllLibraries(libraries)
@@ -172,9 +164,6 @@ class SettingViewModel @Inject constructor(
         it.copy(playList = playList)
       }
     )
-    if (!_reNamePlayListState.value.dialogState.isOpen) {
-      _reNamePlayListState.value.dialogState.show()
-    }
   }
 
   private val _songDetailState = MutableStateFlow(SongDetailState(DialogState()))

@@ -71,13 +71,6 @@ class ComposeActivity : BaseMusicActivity() {
         APlayerTheme {
           AppNav()
         }
-
-        val act = LocalActivity.current
-        val nav = LocalNavController.current
-        LaunchedEffect(Unit) {
-//          delay(2000)
-//          EQHelper.startEqualizer(act!!, nav)
-        }
       }
     }
 
