@@ -5,42 +5,15 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.ResponseBody
 import remix.myplayer.BuildConfig
-import remix.myplayer.bean.github.Release
-import remix.myplayer.bean.lastfm.LastFmAlbum
-import remix.myplayer.bean.lastfm.LastFmArtist
-import remix.myplayer.bean.qq.QLrcResponse
-import remix.myplayer.bean.qq.QSearchResponse
+import remix.myplayer.data.bean.github.Release
+import remix.myplayer.data.bean.lastfm.LastFmAlbum
+import remix.myplayer.data.bean.lastfm.LastFmArtist
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Streaming
 import retrofit2.http.Url
-
-interface QQApi {
-
-  @GET("soso/fcgi-bin/client_search_cp")
-  suspend fun searchSong(
-    @Query("n") n: Int,
-    @Query("w") w: String?,
-    @Query("format") format: String?
-  ): QSearchResponse
-
-  @GET("lyric/fcgi-bin/fcg_query_lyric_new.fcg")
-  @Headers("Referer: https://y.qq.com/portal/player.html")
-  suspend fun searchLyric(
-    @Query("songmid") songmid: String?,
-    @Query("g_tk") g_tk: Int,
-    @Query("format") format: String?,
-    @Query("nobase64") nobase64: Int
-  ): QLrcResponse
-
-  companion object {
-
-    const val BASE_URL = "https://c.y.qq.com/"
-  }
-}
 
 interface GithubApi {
 
@@ -83,6 +56,7 @@ interface LastFMApi {
   companion object {
 
     const val BASE_URL = "http://ws.audioscrobbler.com/2.0/"
-    const val BASE_QUERY_PARAMETERS = "?format=json&autocorrect=1&api_key=" + BuildConfig.LASTFM_API_KEY
+    const val BASE_QUERY_PARAMETERS =
+      "?format=json&autocorrect=1&api_key=" + BuildConfig.LASTFM_API_KEY
   }
 }

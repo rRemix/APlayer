@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import dagger.hilt.android.AndroidEntryPoint
-import remix.myplayer.compose.prefs.SettingPrefs
-import remix.myplayer.compose.prefs.SettingPrefs.Companion.HEADSET_PLUG
-import remix.myplayer.helper.MusicServiceRemote
+import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.data.prefs.SettingPrefs.Companion.HEADSET_PLUG
+import remix.myplayer.misc.helper.MusicServiceRemote
 import remix.myplayer.service.Command
 import remix.myplayer.util.Util.sendCMDLocalBroadcast
 import timber.log.Timber

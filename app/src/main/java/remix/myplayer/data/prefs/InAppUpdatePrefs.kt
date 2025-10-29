@@ -1,0 +1,19 @@
+package remix.myplayer.data.prefs
+
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class InAppUpdatePrefs @Inject constructor(
+  @ApplicationContext context: Context
+) : AbstractPref(context, "Update") {
+
+  var ignoreForever by PrefsDelegate(sp, IGNORE_FOREVER, false)
+
+  companion object {
+
+    private const val IGNORE_FOREVER: String = "ignore_forever"
+  }
+}

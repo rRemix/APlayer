@@ -25,11 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.compose.clickWithRipple
-import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.ui.widget.common.CommonAppBar
-import remix.myplayer.compose.ui.widget.common.TextSecondary
-import remix.myplayer.theme.Theme
+import remix.myplayer.misc.clickWithRipple
+import remix.myplayer.ui.dialog.NormalDialog
+import remix.myplayer.ui.dialog.rememberDialogState
+import remix.myplayer.ui.theme.LocalTheme
+import remix.myplayer.ui.widget.common.CommonAppBar
+import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.util.AlipayUtil
 import remix.myplayer.util.Util
 
@@ -41,6 +42,15 @@ fun SupportScreen() {
   val activity = LocalActivity.current ?: return
   val scope = rememberCoroutineScope()
 
+  val dialogState = rememberDialogState()
+  NormalDialog(
+    dialogState, titleRes = R.string.support_develop,
+    positiveRes = R.string.jump_alipay_account,
+    negativeRes = R.string.cancel,
+    contentRes = R.string.donate_tip,
+    onPositive = { AlipayUtil.startAlipayClient(activity) }
+  )
+
   val items = listOf(
     DonationItem(R.drawable.icon_wechat_donate, R.string.wechat) { act ->
       scope.launch {
@@ -48,13 +58,7 @@ fun SupportScreen() {
       }
     },
     DonationItem(R.drawable.icon_alipay_donate, R.string.alipay) { act ->
-      Theme.getBaseDialog(act)
-        .title(R.string.support_develop)
-        .positiveText(R.string.jump_alipay_account)
-        .negativeText(R.string.cancel)
-        .content(R.string.donate_tip)
-        .onPositive { _, _ -> AlipayUtil.startAlipayClient(act) }
-        .show()
+      dialogState.show()
     },
     DonationItem(R.drawable.icon_paypal_donate, R.string.paypal) { act ->
       val intent = Intent("android.intent.action.VIEW")
@@ -86,7 +90,8 @@ fun SupportScreen() {
             .clickWithRipple(false) { item.onClick(activity) },
           color = LocalTheme.current.mainBackground,
           shape = RoundedCornerShape(8.dp),
-          shadowElevation = 8.dp)
+          shadowElevation = 8.dp
+        )
         {
           Column(
             modifier = Modifier.padding(16.dp),

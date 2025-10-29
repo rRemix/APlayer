@@ -43,11 +43,12 @@ import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.App
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
-import remix.myplayer.bean.mp3.Song
-import remix.myplayer.compose.activity.base.BaseActivity
-import remix.myplayer.compose.activity.base.PendingWriteRequest
+import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.misc.floatpermission.rom.RomUtils
 import remix.myplayer.misc.manager.APlayerActivityManager
+import remix.myplayer.ui.activity.base.BaseActivity
+import remix.myplayer.ui.activity.base.PendingWriteRequest
+import remix.myplayer.ui.nav.MessageNotifier
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
@@ -284,7 +285,7 @@ object Util {
     try {
       context.startActivity(intent)
     } catch (e: ActivityNotFoundException) {
-      ToastUtil.show(context, R.string.activity_not_found_tip)
+      MessageNotifier.show(R.string.activity_not_found_tip)
     }
   }
 
@@ -296,7 +297,7 @@ object Util {
     try {
       activity.startActivityForResult(intent, requestCode)
     } catch (e: ActivityNotFoundException) {
-      ToastUtil.show(activity, R.string.activity_not_found_tip)
+      MessageNotifier.show(R.string.activity_not_found_tip)
     }
   }
 
@@ -640,7 +641,7 @@ object Util {
     }
 
     Timber.v("insertUri: $insertUri")
-    ToastUtil.show(context, R.string.save_success)
+    MessageNotifier.show(R.string.save_success)
   }
 
   fun requestSaveAudioTag(
@@ -698,7 +699,7 @@ object Util {
           }
 
           Timber.v("Fail to save tag: $e")
-          ToastUtil.show(activity, R.string.save_error_arg, e.toString())
+          MessageNotifier.show(R.string.save_error_arg)
         }
       }
     }
@@ -727,7 +728,7 @@ object Util {
       }
 
       withContext(Dispatchers.Main) {
-        ToastUtil.show(context, R.string.save_success)
+        MessageNotifier.show(R.string.save_success)
       }
     }
 }

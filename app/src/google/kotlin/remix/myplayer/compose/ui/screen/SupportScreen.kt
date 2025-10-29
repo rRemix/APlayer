@@ -37,12 +37,12 @@ import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsParams.Product
 import remix.myplayer.R
-import remix.myplayer.compose.clickWithRipple
-import remix.myplayer.compose.nav.UiMessageDispatcher
-import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.ui.widget.common.CommonAppBar
-import remix.myplayer.compose.ui.widget.common.TextPrimary
-import remix.myplayer.compose.ui.widget.common.TextSecondary
+import remix.myplayer.misc.clickWithRipple
+import remix.myplayer.ui.nav.UiMessageDispatcher
+import remix.myplayer.ui.theme.LocalTheme
+import remix.myplayer.ui.widget.common.CommonAppBar
+import remix.myplayer.ui.widget.common.TextPrimary
+import remix.myplayer.ui.widget.common.TextSecondary
 import timber.log.Timber
 
 @Composable

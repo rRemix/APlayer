@@ -1,0 +1,83 @@
+package remix.myplayer.ui.dialog
+
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import remix.myplayer.R
+import remix.myplayer.data.bean.mp3.APlayerModel
+import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.ui.theme.LocalTheme
+import timber.log.Timber
+
+@Composable
+internal fun BaseDialog(
+  show: Boolean,
+  onDismissRequest: (() -> Unit)?,
+  cancelOutside: Boolean = true,
+  content: @Composable () -> Unit,
+) {
+  if (!show) {
+    return
+  }
+  Dialog(
+    onDismissRequest = {
+      Timber.v("BaseDialog onDismissRequest")
+      onDismissRequest?.invoke()
+    }, properties = DialogProperties(
+      cancelOutside, cancelOutside
+    )
+  ) {
+    Surface(
+      modifier = Modifier
+        .fillMaxWidth()
+        // TODO
+        .heightIn(max = with(LocalDensity.current) {
+          (LocalConfiguration.current.screenHeightDp * 0.8).dp
+        }),
+      color = LocalTheme.current.dialogBackground,
+      shape = RoundedCornerShape(12.dp),
+      shadowElevation = 8.dp,
+    ) {
+      content()
+    }
+  }
+}
+
+@Stable
+data class SongEditState(val dialogState: DialogState, val song: Song? = null)
+
+@Stable
+data class SongDetailState(val dialogState: DialogState, val song: Song = Song.EMPTY_SONG)
+
+@Stable
+data class ReNamePlayListState(
+  val dialogState: DialogState,
+  val playList: PlayList? = null,
+)
+
+@Stable
+data class DeleteSongState(
+  val dialogState: DialogState = DialogState(),
+  val titleRes: Int = R.string.confirm_delete_from_library,
+  val models: List<APlayerModel> = emptyList(),
+  val deleteSource: Boolean = false,
+  val parent: APlayerModel? = null
+)
+
+@Stable
+data class ImportPlayListState(
+  val rootDialogState: DialogState,
+  val inputDialogState: DialogState,
+  val inputText: String = "",
+  val songIds: List<Long> = emptyList()
+)

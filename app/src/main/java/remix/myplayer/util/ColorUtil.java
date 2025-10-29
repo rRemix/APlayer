@@ -162,11 +162,18 @@ public class ColorUtil {
   }
 
   public static boolean isColorCloseToWhite(@ColorInt int color) {
-    return StatusBarUtil.MeizuStatusbar.toGrey(color) >= 254;
+    return toGrey(color) >= 254;
+  }
+
+  public static int toGrey(int rgb) {
+    int blue = rgb & 0x000000FF;
+    int green = (rgb & 0x0000FF00) >> 8;
+    int red = (rgb & 0x00FF0000) >> 16;
+    return (red * 38 + green * 75 + blue * 15) >> 7;
   }
 
   public static boolean isColorCloseToBlack(@ColorInt int color) {
-    return StatusBarUtil.MeizuStatusbar.toGrey(color) <= 1;
+    return toGrey(color) <= 1;
   }
 
   private static class SwatchComparator implements Comparator<Palette.Swatch> {

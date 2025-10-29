@@ -68,20 +68,20 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.compose.activity.base.BaseMusicActivity
-import remix.myplayer.compose.clickableWithoutRipple
-import remix.myplayer.compose.lyric.CurrentNextLyricsLine
-import remix.myplayer.compose.lyric.LyricManager
-import remix.myplayer.compose.ui.theme.LocalTheme
-import remix.myplayer.compose.viewmodel.MusicState
-import remix.myplayer.compose.viewmodel.MusicViewModel
 import remix.myplayer.glide.addBitmapListener
+import remix.myplayer.lyric.CurrentNextLyricsLine
+import remix.myplayer.lyric.LyricManager
+import remix.myplayer.misc.clickableWithoutRipple
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.blur.StackBlurManager
+import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.Util.sendLocalBroadcast
+import remix.myplayer.viewmodel.PlaybackState
+import remix.myplayer.viewmodel.PlaybackViewModel
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -99,7 +99,7 @@ class LockScreenActivity : BaseMusicActivity() {
   @Inject
   lateinit var lyricManager: LyricManager
 
-  private val vm: MusicViewModel by viewModels()
+  private val vm: PlaybackViewModel by viewModels()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -119,7 +119,7 @@ class LockScreenActivity : BaseMusicActivity() {
     )
 
     setContent {
-      val state by vm.musicState.collectAsStateWithLifecycle()
+      val state by vm.playbackState.collectAsStateWithLifecycle()
       val currentLyricLine by lyricManager.currentNextLyricsLine.collectAsStateWithLifecycle()
       LockScreen(state, currentLyricLine)
     }
@@ -152,7 +152,7 @@ class LockScreenActivity : BaseMusicActivity() {
 }
 
 @Composable
-private fun LockScreen(musicState: MusicState, currentLyric: CurrentNextLyricsLine) {
+private fun LockScreen(playbackState: PlaybackState, currentLyric: CurrentNextLyricsLine) {
   val context = LocalContext.current
   val density = LocalDensity.current
   val screenWidth = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
@@ -227,7 +227,7 @@ private fun LockScreen(musicState: MusicState, currentLyric: CurrentNextLyricsLi
     ) {
 //      Spacer(Modifier.statusBarsPadding())
       GlideImage(
-        model = musicState.song,
+        model = playbackState.song,
         contentDescription = "LockScreenCover",
         failure = placeholder(LocalTheme.current.albumPlaceHolder),
         loading = placeholder(LocalTheme.current.albumPlaceHolder),
@@ -246,7 +246,7 @@ private fun LockScreen(musicState: MusicState, currentLyric: CurrentNextLyricsLi
       }
 
       Text(
-        musicState.song.title,
+        playbackState.song.title,
         modifier = Modifier
           .padding(top = 40.dp)
           .padding(horizontal = 10.dp),
@@ -257,7 +257,7 @@ private fun LockScreen(musicState: MusicState, currentLyric: CurrentNextLyricsLi
       )
 
       Text(
-        musicState.song.artist,
+        playbackState.song.artist,
         modifier = Modifier
           .padding(top = 12.dp)
           .padding(horizontal = 10.dp),
@@ -290,7 +290,7 @@ private fun LockScreen(musicState: MusicState, currentLyric: CurrentNextLyricsLi
                 .putExtra(EXTRA_CONTROL, Command.TOGGLE)
             )
           },
-          painter = painterResource(if (musicState.playing) R.drawable.lock_btn_pause else R.drawable.lock_btn_play),
+          painter = painterResource(if (playbackState.playing) R.drawable.lock_btn_pause else R.drawable.lock_btn_play),
           contentDescription = "LockScreenPlay"
         )
 

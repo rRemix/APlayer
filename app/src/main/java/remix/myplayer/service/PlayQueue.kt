@@ -1,19 +1,18 @@
 package remix.myplayer.service
 
 import android.content.Intent
-import androidx.annotation.WorkerThread
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.bean.mp3.Song
-import remix.myplayer.compose.nav.UiMessageDispatcher
-import remix.myplayer.compose.prefs.SettingPrefs
-import remix.myplayer.compose.prefs.SettingPrefs.Companion.MODE_SHUFFLE
-import remix.myplayer.compose.repo.PlayQueueRepository
-import remix.myplayer.compose.repo.SongRepository
+import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
+import remix.myplayer.repo.PlayQueueRepository
+import remix.myplayer.repo.SongRepository
+import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.util.Util
 import timber.log.Timber
 import javax.inject.Inject
@@ -175,7 +174,7 @@ class PlayQueue @Inject constructor(
   fun addNextSong(nextSong: Song) {
     //添加到播放队列
     if (nextSong == this.nextSong) {
-      UiMessageDispatcher.show(R.string.already_add_to_next_song)
+      MessageNotifier.show(R.string.already_add_to_next_song)
       return
     }
 

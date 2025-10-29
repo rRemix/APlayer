@@ -6,7 +6,8 @@ import java.net.InetAddress
 import java.net.Socket
 import java.net.UnknownHostException
 import java.security.GeneralSecurityException
-import java.util.*
+import java.util.LinkedList
+import java.util.Locale
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory

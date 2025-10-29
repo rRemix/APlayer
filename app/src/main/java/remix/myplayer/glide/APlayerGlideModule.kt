@@ -17,7 +17,7 @@ import com.bumptech.glide.load.engine.executor.GlideExecutor
 import com.bumptech.glide.module.AppGlideModule
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import remix.myplayer.bean.mp3.APlayerModel
+import remix.myplayer.data.bean.mp3.APlayerModel
 import java.io.InputStream
 
 @GlideModule

@@ -4,7 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import java.lang.ref.WeakReference
-import java.util.*
+import java.util.LinkedList
 
 /**
  * <pre>

@@ -3,7 +3,6 @@ package remix.myplayer.ui.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
-import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -13,35 +12,39 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.UiThread
-import remix.myplayer.compose.lyric.LyricsLine
-import remix.myplayer.compose.lyric.PerWordLyricsLine
+import remix.myplayer.R
 import remix.myplayer.databinding.LayoutLyricsLineBinding
 import remix.myplayer.databinding.LayoutLyricsViewBinding
-import remix.myplayer.theme.ThemeStore
+import remix.myplayer.lyric.LyricsLine
+import remix.myplayer.lyric.PerWordLyricsLine
+import remix.myplayer.ui.theme.ThemeController
 import timber.log.Timber
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO 测试增强LRC
-class LyricsView @JvmOverloads constructor(
-  context: Context, attrs: AttributeSet? = null
-) : FrameLayout(context, attrs), View.OnTouchListener {
+@SuppressLint("ViewConstructor")
+class LyricsView(
+  context: Context, themeController: ThemeController
+) : FrameLayout(context), View.OnTouchListener {
+
   companion object {
+
     private const val TAG = "LyricsView"
 
     private val DEACTIVATE_DELAY = 5000.milliseconds
     private val AUTO_SCROLL_DELAY = 200.milliseconds
 
     const val DEFAULT_TEXT_SIZE = 15f
-
-    private val normalTextColor
-      @ColorInt get() = ThemeStore.textColorSecondary
-    private val highlightTextColor
-      @ColorInt get() = ThemeStore.textColorPrimary
   }
 
+  private val normalTextColor =
+    context.resources.getColor(if (themeController.appTheme.isLight) R.color.light_text_color_secondary else R.color.dark_text_color_secondary);
+  private val highlightTextColor =
+    context.resources.getColor(if (themeController.appTheme.isLight) R.color.light_text_color_primary else R.color.dark_text_color_primary);
+
   fun interface OnSeekToListener {
+
     fun onSeekTo(progress: Long)
   }
 
@@ -120,6 +123,7 @@ class LyricsView @JvmOverloads constructor(
     }
 
   private data class ProgressAndDuration(val progress: Long, val duration: Long)
+
   private var rawProgressAndDuration: ProgressAndDuration? = null
 
   /**

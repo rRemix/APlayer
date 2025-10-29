@@ -9,10 +9,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.compose.nav.UiMessageDispatcher
-import remix.myplayer.compose.ui.dialog.dismissLoading
-import remix.myplayer.compose.ui.dialog.showLoading
-import remix.myplayer.compose.ui.dialog.updateLoadingText
+import remix.myplayer.ui.dialog.dismissLoading
+import remix.myplayer.ui.dialog.showLoading
+import remix.myplayer.ui.dialog.updateLoadingText
+import remix.myplayer.ui.nav.MessageNotifier
 import timber.log.Timber
 import java.io.File
 import kotlin.coroutines.resume
@@ -41,13 +41,13 @@ class MediaScanner(private val context: Context) {
         Timber.v("MediaScanner scan file: $file uri: $uri")
       }
 
-      UiMessageDispatcher.show(R.string.scanned_finish)
+      MessageNotifier.show(R.string.scanned_finish)
       context.contentResolver.notifyChange(
         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
         null
       )
     } catch (e: Exception) {
-      UiMessageDispatcher.show(R.string.scan_failed, e.toString())
+      MessageNotifier.show(R.string.scan_failed, e.toString())
     } finally {
       dismissLoading()
     }

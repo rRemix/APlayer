@@ -6,8 +6,6 @@ import android.content.UriMatcher
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Handler
-import io.reactivex.Completable
-import io.reactivex.schedulers.Schedulers
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber

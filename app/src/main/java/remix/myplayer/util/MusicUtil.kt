@@ -1,20 +1,30 @@
 package remix.myplayer.util
 
 import android.content.ContentResolver
+import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.media.RingtoneManager
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
+import android.provider.MediaStore
 import android.provider.MediaStore.Audio
+import android.provider.Settings
+import androidx.core.net.toUri
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import remix.myplayer.App
 import remix.myplayer.R
-import remix.myplayer.bean.mp3.Song
-import remix.myplayer.compose.nav.UiMessageDispatcher
-import remix.myplayer.compose.repo.SongRepositoryEntryPoint
+import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.repo.SongRepositoryEntryPoint
 import remix.myplayer.service.MusicService
+import remix.myplayer.ui.nav.MessageNotifier
 import java.io.File
 
 object MusicUtil {
@@ -96,7 +106,7 @@ object MusicUtil {
 //          .putExtra(MusicService.Companion.EXTRA_POSITION, 0)
 //      )
     } else {
-      UiMessageDispatcher.show(R.string.play_failed)
+      MessageNotifier.show(R.string.play_failed)
     }
   }
 
@@ -127,5 +137,73 @@ object MusicUtil {
   @Suppress("Deprecation")
   private fun getExternalStorageDirectory(): File {
     return Environment.getExternalStorageDirectory()
+  }
+
+  /**
+   * 导出播放列表
+   */
+  suspend fun exportPlayListToFile(context: Context, playList: PlayList?, uri: Uri) = withContext(Dispatchers.IO){
+    if (playList == null) {
+      return@withContext
+    }
+
+    val header = "#EXTM3U"
+    val entry = "#EXTINF:"
+    val sep = ","
+
+    val songs = songRepo.getSongsByModels(listOf(playList))
+    try {
+      context.contentResolver.openOutputStream(uri)?.bufferedWriter().use { bw ->
+        if (bw == null) throw IllegalStateException("openOutputStream failed")
+        bw.write(header)
+        for (song in songs) {
+          bw.newLine()
+          bw.write(entry + song.duration + sep + song.artist + " - " + song.title)
+          bw.newLine()
+          bw.write(song.data)
+        }
+      }
+      MessageNotifier.show(R.string.export_success)
+    } catch (e: Exception) {
+      MessageNotifier.show(R.string.export_fail, e.toString())
+    }
+  }
+
+  /**
+   * 设置铃声
+   */
+  fun setRing(context: Context, audioId: Long) {
+    try {
+      val cv = ContentValues()
+      cv.put(Audio.Media.IS_RINGTONE, true)
+      cv.put(Audio.Media.IS_NOTIFICATION, false)
+      cv.put(Audio.Media.IS_ALARM, false)
+      cv.put(Audio.Media.IS_MUSIC, true)
+      // 把需要设为铃声的歌曲更新铃声库
+      if (context.contentResolver.update(
+          Audio.Media.EXTERNAL_CONTENT_URI, cv,
+          MediaStore.MediaColumns._ID + "=?", arrayOf(audioId.toString() + "")
+        ) > 0
+      ) {
+        val newUri = ContentUris.withAppendedId(Audio.Media.EXTERNAL_CONTENT_URI, audioId)
+        RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, newUri)
+        MessageNotifier.show(R.string.set_ringtone_success)
+      } else {
+        MessageNotifier.show(R.string.set_ringtone_error)
+      }
+    } catch (e: Exception) {
+      // 没有权限
+      if (e is SecurityException) {
+        MessageNotifier.show(R.string.please_give_write_settings_permission)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+          if (!Settings.System.canWrite(context)) {
+            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+            intent.data = ("package:" + context.packageName).toUri()
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            Util.startActivitySafely(context, intent)
+          }
+        }
+      }
+    }
   }
 }

@@ -1,14 +1,14 @@
 package remix.myplayer.misc.receiver
 
-import remix.myplayer.misc.manager.APlayerActivityManager.Companion.finishAll
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
-import timber.log.Timber
+import remix.myplayer.misc.manager.APlayerActivityManager.Companion.finishAll
 import remix.myplayer.misc.manager.ServiceManager
 import remix.myplayer.service.MusicService
+import timber.log.Timber
 import kotlin.system.exitProcess
 
 /**

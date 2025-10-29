@@ -7,7 +7,7 @@ import com.thegrizzlylabs.sardineandroid.Sardine;
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine;
 import java.io.IOException;
 import java.io.InputStream;
-import remix.myplayer.db.room.model.WebDav;
+import remix.myplayer.data.db.room.entity.WebDav;
 import timber.log.Timber;
 
 @RequiresApi(api = Build.VERSION_CODES.M)

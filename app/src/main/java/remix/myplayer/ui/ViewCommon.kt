@@ -2,8 +2,8 @@ package remix.myplayer.ui
 
 import androidx.compose.runtime.Composable
 import remix.myplayer.R
-import remix.myplayer.compose.ui.dialog.NormalDialog
-import remix.myplayer.compose.ui.dialog.rememberDialogState
+import remix.myplayer.ui.dialog.NormalDialog
+import remix.myplayer.ui.dialog.rememberDialogState
 
 object ViewCommon {
 

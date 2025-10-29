@@ -8,8 +8,8 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import org.json.JSONArray
 import org.json.JSONObject
-import remix.myplayer.compose.lyric.LrcParser
-import remix.myplayer.compose.lyric.decrypt.KuGouDecrypt.krcDecrypt
+import remix.myplayer.lyric.LrcParser
+import remix.myplayer.lyric.decrypt.KuGouDecrypt.krcDecrypt
 import timber.log.Timber
 import java.security.MessageDigest
 import javax.inject.Inject
@@ -24,22 +24,6 @@ class KuGouClient @Inject constructor(
 ) {
 
   private val kgSecret = "LnT6xpN3khm36zse0QzvmgTZ3waWdRSA"
-
-  data class KuGouSong(
-    val id: Long,
-    val hash: String,
-    val title: String,
-    val artists: List<String>,
-    val album: String?,
-    val durationMs: Long
-  )
-
-  data class KugouLyricCandidate(
-    val id: Long,
-    val accesskey: String,
-    val durationMs: Long,
-    val score: Int
-  )
 
   /**
    * 搜索歌曲，返回第一条候选
@@ -222,7 +206,8 @@ class KuGouClient @Inject constructor(
 
     val req = if (method.equals("POST", ignoreCase = true)) {
       val bodyStr = data ?: ""
-      reqBuilder.post(RequestBody.Companion.create("application/json".toMediaType(), bodyStr)).build()
+      reqBuilder.post(RequestBody.Companion.create("application/json".toMediaType(), bodyStr))
+        .build()
     } else {
       reqBuilder.get().build()
     }

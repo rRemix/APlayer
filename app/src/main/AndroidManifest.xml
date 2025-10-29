@@ -41,7 +41,7 @@
     android:theme="@style/AppTheme"
     android:networkSecurityConfig="@xml/network_security_config">
 
-    <activity android:name="remix.myplayer.compose.activity.ComposeActivity"
+    <activity android:name="remix.myplayer.ui.activity.ComposeActivity"
         android:theme="@style/AppTheme"
         android:launchMode="singleTop"
         android:exported="true">
@@ -108,7 +108,7 @@
     <activity
       android:excludeFromRecents="true"
       android:launchMode="singleInstance"
-      android:name=".appshortcuts.AppShortcutActivity"
+      android:name=".ui.appshortcuts.AppShortcutActivity"
       android:theme="@style/AppShortcut"/>
 
     <!-- 线控 -->
@@ -135,7 +135,7 @@
     <!-- 桌面部件 -->
     <receiver
       android:label="@string/app_widget_big_name"
-      android:name=".appwidgets.big.AppWidgetBig"
+      android:name=".ui.appwidgets.big.AppWidgetBig"
       android:exported="false">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
@@ -147,7 +147,7 @@
     </receiver>
     <receiver
       android:label="@string/app_widget_medium_name"
-      android:name=".appwidgets.medium.AppWidgetMedium"
+      android:name=".ui.appwidgets.medium.AppWidgetMedium"
       android:exported="false">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
@@ -159,7 +159,7 @@
     </receiver>
     <receiver
       android:label="@string/app_widget_small_name"
-      android:name=".appwidgets.small.AppWidgetSmall"
+      android:name=".ui.appwidgets.small.AppWidgetSmall"
       android:exported="false">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
@@ -172,7 +172,7 @@
     <!--透明桌面部件-->
     <receiver
       android:label="@string/app_widget_medium_transparent_name"
-      android:name=".appwidgets.medium.AppWidgetMediumTransparent"
+      android:name=".ui.appwidgets.medium.AppWidgetMediumTransparent"
       android:exported="false">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
@@ -184,7 +184,7 @@
     </receiver>
     <receiver
       android:label="@string/app_widget_small_transparent_name"
-      android:name=".appwidgets.small.AppWidgetSmallTransparent"
+      android:name=".ui.appwidgets.small.AppWidgetSmallTransparent"
       android:exported="false">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>

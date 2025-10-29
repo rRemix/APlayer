@@ -5,8 +5,12 @@ import com.bumptech.glide.load.Options
 import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
-import remix.myplayer.bean.mp3.*
-import remix.myplayer.db.room.model.PlayList
+import remix.myplayer.data.bean.mp3.APlayerModel
+import remix.myplayer.data.bean.mp3.Album
+import remix.myplayer.data.bean.mp3.Artist
+import remix.myplayer.data.bean.mp3.Genre
+import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.db.room.entity.PlayList
 import java.io.InputStream
 
 class APlayerUriLoader(private val concreteLoader: ModelLoader<Uri, InputStream>) : ModelLoader<APlayerModel, InputStream> {

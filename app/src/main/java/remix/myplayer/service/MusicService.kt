@@ -41,52 +41,51 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.App
 import remix.myplayer.R
-import remix.myplayer.appwidgets.BaseAppwidget
-import remix.myplayer.appwidgets.big.AppWidgetBig
-import remix.myplayer.appwidgets.medium.AppWidgetMedium
-import remix.myplayer.appwidgets.medium.AppWidgetMediumTransparent
-import remix.myplayer.appwidgets.small.AppWidgetSmall
-import remix.myplayer.appwidgets.small.AppWidgetSmallTransparent
-import remix.myplayer.bean.mp3.Song
-import remix.myplayer.bean.mp3.Song.Companion.EMPTY_SONG
-import remix.myplayer.compose.activity.base.BaseMusicActivity
-import remix.myplayer.compose.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
-import remix.myplayer.compose.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
-import remix.myplayer.compose.lyric.LyricManager
-import remix.myplayer.compose.nav.UiMessageDispatcher
-import remix.myplayer.compose.prefs.PrefKeys
-import remix.myplayer.compose.prefs.SettingPrefs
-import remix.myplayer.compose.prefs.SettingPrefs.Companion.LOCKSCREEN_APLAYER
-import remix.myplayer.compose.prefs.SettingPrefs.Companion.LOCKSCREEN_CLOSE
-import remix.myplayer.compose.prefs.SettingPrefs.Companion.LOCKSCREEN_SYSTEM
-import remix.myplayer.compose.prefs.SettingPrefs.Companion.MODE_LOOP
-import remix.myplayer.compose.prefs.SettingPrefs.Companion.MODE_REPEAT
-import remix.myplayer.compose.prefs.SettingPrefs.Companion.MODE_SHUFFLE
-import remix.myplayer.compose.prefs.SettingPrefs.Companion.OPEN_SOFTWARE
-import remix.myplayer.compose.repo.HistoryRepository
-import remix.myplayer.compose.repo.PlayListRepository
-import remix.myplayer.compose.repo.SongRepository
-import remix.myplayer.helper.EQHelper
-import remix.myplayer.helper.LanguageHelper
-import remix.myplayer.helper.MusicEventCallback
-import remix.myplayer.helper.ShakeDetector
-import remix.myplayer.helper.SleepTimer
+import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.bean.mp3.Song.Companion.EMPTY_SONG
+import remix.myplayer.data.prefs.PrefKeys
+import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_APLAYER
+import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_CLOSE
+import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_SYSTEM
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
+import remix.myplayer.data.prefs.SettingPrefs.Companion.OPEN_SOFTWARE
+import remix.myplayer.lyric.LyricManager
 import remix.myplayer.misc.getPendingIntentFlag
+import remix.myplayer.misc.helper.EQHelper
+import remix.myplayer.misc.helper.LanguageHelper
+import remix.myplayer.misc.helper.MusicEventCallback
+import remix.myplayer.misc.helper.ShakeDetector
+import remix.myplayer.misc.helper.SleepTimer
 import remix.myplayer.misc.observer.MediaStoreObserver
 import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
 import remix.myplayer.misc.receiver.MediaButtonReceiver
 import remix.myplayer.misc.tryLaunch
+import remix.myplayer.repo.HistoryRepository
+import remix.myplayer.repo.PlayListRepository
+import remix.myplayer.repo.SongRepository
 import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24
-import remix.myplayer.theme.ThemeStore
 import remix.myplayer.ui.activity.LockScreenActivity
+import remix.myplayer.ui.activity.base.BaseMusicActivity
+import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
+import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
+import remix.myplayer.ui.appwidgets.BaseAppwidget
+import remix.myplayer.ui.appwidgets.big.AppWidgetBig
+import remix.myplayer.ui.appwidgets.medium.AppWidgetMedium
+import remix.myplayer.ui.appwidgets.medium.AppWidgetMediumTransparent
+import remix.myplayer.ui.appwidgets.small.AppWidgetSmall
+import remix.myplayer.ui.appwidgets.small.AppWidgetSmallTransparent
+import remix.myplayer.ui.nav.MessageNotifier
+import remix.myplayer.ui.theme.ThemeController
 import remix.myplayer.util.Constants.ACTION_EXIT
 import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.PermissionUtil
@@ -115,6 +114,9 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   MediaPlayer.OnErrorListener, MediaPlayer.OnPreparedListener,
   MediaPlayer.OnCompletionListener, MediaPlayer.OnBufferingUpdateListener,
   SharedPreferences.OnSharedPreferenceChangeListener, CoroutineScope by MainScope() {
+
+  @Inject
+  lateinit var themeController: ThemeController
 
   @Inject
   lateinit var lyricManager: LyricManager
@@ -694,7 +696,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
   override fun onError(mp: MediaPlayer?, what: Int, extra: Int): Boolean {
     Timber.e("onError, what: $what extra: $extra")
-    UiMessageDispatcher.show(R.string.mediaplayer_error, what, extra)
+    MessageNotifier.show(R.string.mediaplayer_error, what, extra)
     prepared = false
     mediaPlayer.release()
     setUpPlayer()
@@ -778,7 +780,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         mediaSession.setQueue(queue)
       }
     }, catch = {
-      UiMessageDispatcher.show(it.toString())
+      MessageNotifier.show(it.toString())
       Timber.w(it)
     })
   }
@@ -847,7 +849,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
   override fun play(fadeIn: Boolean) {
     Timber.v("play: $fadeIn")
     if (!prepared) {
-      UiMessageDispatcher.show(R.string.buffering_wait)
+      MessageNotifier.show(R.string.buffering_wait)
       return
     }
     audioFocus = AudioManagerCompat.requestAudioFocus(
@@ -927,14 +929,14 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     Timber.v("playSelectSong, $position")
 
     if (position == -1 || position >= playQueue.playingQueue.size) {
-      UiMessageDispatcher.show(R.string.illegal_arg)
+      MessageNotifier.show(R.string.illegal_arg)
       return
     }
 
     playQueue.setPosition(position)
 
     if (playQueue.song.data.isEmpty()) {
-      UiMessageDispatcher.show(R.string.song_lose_effect)
+      MessageNotifier.show(R.string.song_lose_effect)
       return
     }
     prepare(playQueue.song)
@@ -1062,6 +1064,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           setPlayQueue(listOf(song), intent)
         }
       }
+
       ACTION_APPWIDGET_OPERATE -> {
         val appwidgetIntent = Intent(ACTION_CMD)
         val control = commandIntent?.getIntExtra(EXTRA_CONTROL, -1)
@@ -1094,7 +1097,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             withContext(Dispatchers.IO) { songRepository.getSongsByModels(listOf(playlist)) }
 
           if (songs.isEmpty()) {
-            UiMessageDispatcher.show(R.string.list_is_empty)
+            MessageNotifier.show(R.string.list_is_empty)
             return@tryLaunch
           }
 
@@ -1113,7 +1116,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
           }
           Timber.v("rRemix, songs: ${songs.size}")
           if (songs.isEmpty()) {
-            UiMessageDispatcher.show(R.string.list_is_empty)
+            MessageNotifier.show(R.string.list_is_empty)
             return@tryLaunch
           }
           val lastedIntent = Intent(ACTION_CMD)
@@ -1288,12 +1291,12 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         val nextSong = intent.getSerializableExtra(EXTRA_SONG) as Song? ?: return
         //添加到播放队列
         playQueue.addNextSong(nextSong)
-        UiMessageDispatcher.show(R.string.already_add_to_next_song)
+        MessageNotifier.show(R.string.already_add_to_next_song)
       }
       //切换定时器
       Command.TOGGLE_TIMER -> {
         if (!settingPrefs.timerStartAuto) {
-          UiMessageDispatcher.show(R.string.plz_set_default_time)
+          MessageNotifier.show(R.string.plz_set_default_time)
         }
         SleepTimer.toggleTimer((settingPrefs.timerDefaultDuration * 1000).toLong())
       }
@@ -1350,7 +1353,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
 
     if (!updatePlayStateOnly(control)) {
       val placeholder =
-        if (ThemeStore.isLightTheme) R.drawable.album_empty_bg_day else R.drawable.album_empty_bg_night
+        if (themeController.appTheme.isLight) R.drawable.album_empty_bg_day else R.drawable.album_empty_bg_night
       Glide.with(this)
         .asBitmap()
         .load(currentSong)
@@ -1415,7 +1418,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         Timber.v("prepare start: %s", song)
         lyricManager.updateLyrics(song, null)
         if (TextUtils.isEmpty(song.data)) {
-          UiMessageDispatcher.show(R.string.path_empty)
+          MessageNotifier.show(R.string.path_empty)
           return@tryLaunch
         }
 
@@ -1425,7 +1428,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
             focusRequest
           ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
           if (!audioFocus) {
-            UiMessageDispatcher.show(R.string.cant_request_audio_focus)
+            MessageNotifier.show(R.string.cant_request_audio_focus)
             return@tryLaunch
           }
         }
@@ -1444,7 +1447,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
         Timber.v("prepare finish: $song")
       },
       catch = {
-        UiMessageDispatcher.show(getString(R.string.play_failed) + it.toString())
+        MessageNotifier.show(getString(R.string.play_failed) + it.toString())
         prepared = false
       })
   }
@@ -1477,7 +1480,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
     lastSwitchTime = System.currentTimeMillis()
     if (playQueue.size() == 0) {
-      UiMessageDispatcher.show(R.string.list_is_empty)
+      MessageNotifier.show(R.string.list_is_empty)
       return
     }
     Timber.v("播放下一首")
@@ -1488,7 +1491,7 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     }
 
     if (playQueue.song == EMPTY_SONG) {
-      UiMessageDispatcher.show(R.string.song_lose_effect)
+      MessageNotifier.show(R.string.song_lose_effect)
       return
     }
     // 不能在这里设置playing，因为远程的歌曲可能需要缓冲，并且这里需要提前刷新下界面

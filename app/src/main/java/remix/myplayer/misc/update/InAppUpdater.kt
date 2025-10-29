@@ -16,11 +16,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 import remix.myplayer.App
 import remix.myplayer.R
-import remix.myplayer.bean.github.Release
-import remix.myplayer.compose.prefs.InAppUpdatePrefs
-import remix.myplayer.compose.prefs.delegate
+import remix.myplayer.data.bean.github.Release
+import remix.myplayer.data.prefs.InAppUpdatePrefs
+import remix.myplayer.data.prefs.delegate
 import remix.myplayer.request.network.GithubApi
-import remix.myplayer.util.ToastUtil
+import remix.myplayer.ui.nav.MessageNotifier
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,6 +31,7 @@ class InAppUpdater @Inject constructor(
   private val inAppUpdatePrefs: InAppUpdatePrefs,
   private val githubApi: GithubApi
 ) {
+
   private val workManager by lazy {
     WorkManager.getInstance(context)
   }
@@ -93,7 +94,7 @@ class InAppUpdater @Inject constructor(
     if (asset == null) {
 
       if (showToast) {
-        ToastUtil.show(context, R.string.no_update)
+        MessageNotifier.show(R.string.no_update)
       }
       return null
     }
@@ -108,7 +109,7 @@ class InAppUpdater @Inject constructor(
 //      }
 
       if (showToast) {
-        ToastUtil.show(context, R.string.no_update)
+        MessageNotifier.show(R.string.no_update)
       }
       return null
     }
@@ -116,14 +117,14 @@ class InAppUpdater @Inject constructor(
     // ignore this update?
     val ignoreCurrentVersion by inAppUpdatePrefs.sp.delegate(versionCode.toString(), false)
     if (!force && ignoreCurrentVersion) {
-      ToastUtil.show(context, R.string.update_ignore)
+      MessageNotifier.show(R.string.update_ignore)
       return null
     }
 
     // check args
     if (asset.size < 0 || asset.browser_download_url.isNullOrEmpty()) {
       if (showToast) {
-        ToastUtil.show(context, "illegal args")
+        MessageNotifier.show("illegal args")
       }
       return null
     }

@@ -17,14 +17,14 @@ import androidx.core.app.TaskStackBuilder
 import com.bumptech.glide.request.target.CustomTarget
 import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
-import remix.myplayer.compose.activity.ComposeActivity
-import remix.myplayer.compose.lyric.LyricManager
-import remix.myplayer.compose.lyric.LyricManagerEntryPoint
-import remix.myplayer.compose.nav.playingScreenDeepLink
+import remix.myplayer.lyric.LyricManager
+import remix.myplayer.lyric.LyricManagerEntryPoint
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.ui.activity.ComposeActivity
+import remix.myplayer.ui.nav.playingScreenDeepLink
 
 /**
  * Created by Remix on 2017/11/22.

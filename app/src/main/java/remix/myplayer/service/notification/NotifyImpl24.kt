@@ -13,7 +13,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.bumptech.glide.signature.ObjectKey
 import remix.myplayer.R
-import remix.myplayer.bean.mp3.Song
+import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.glide.UriFetcher
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
