@@ -445,12 +445,13 @@ class MusicService : BaseService(), Playback, MusicEventCallback,
     when (key) {
       //通知栏样式
       PrefKeys.Setting.NOTIFY_STYLE_CLASSIC -> {
+        val wasShowing = notify.isNotifyShowing
         notify = if (settingPrefs.classicNotify) {
           NotifyImpl(this@MusicService)
         } else {
           NotifyImpl24(this@MusicService)
         }
-        if (notify.isNotifyShowing) {
+        if (wasShowing) {
           // 先取消再重新显示 让通知栏彻底刷新一次
           notify.cancelPlayingNotify()
           updateNotification()

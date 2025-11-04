@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import remix.myplayer.R
 import remix.myplayer.data.bean.mp3.Song
@@ -50,21 +47,19 @@ import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.util.Util.registerLocalReceiver
 import remix.myplayer.util.Util.unregisterLocalReceiver
-import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
 @Composable
-internal fun PlayingLyric(song: Song) {
+internal fun PlayingLyric(song: Song, seekbarLastDragTime: Long) {
   val context = LocalContext.current
 
-  val playbackVM = playbackViewModel
   val settingVM = settingViewModel
+  val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
 
   val lyricsManager = settingVM.lyricManager
-  val lyricSearcher = lyricsManager.lyricSearcher
 
   var uriProvider by remember {
     mutableStateOf<ILyricsProvider?>(null)
@@ -86,10 +81,6 @@ internal fun PlayingLyric(song: Song) {
     mutableStateOf(PanelState(false, 0))
   }
 
-  var fontScale by remember {
-    mutableFloatStateOf(lyricSearcher.lyricPrefs.fontScale)
-  }
-
   var lyricOffset by remember {
     mutableLongStateOf(0L)
   }
@@ -97,43 +88,22 @@ internal fun PlayingLyric(song: Song) {
   if (searching || lyrics.isEmpty()) {
     val placeholder = stringResource(if (searching) R.string.searching else R.string.no_lrc)
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-      TextSecondary(placeholder, fontSize = (LyricsView.DEFAULT_TEXT_SIZE * fontScale).sp)
+      TextSecondary(
+        placeholder,
+        fontSize = (LyricsView.DEFAULT_TEXT_SIZE * settingState.lyric.fontScale).sp
+      )
     }
   } else {
     ProgressAware { progress, duration ->
       Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
-        AndroidView(
-          factory = { context ->
-            LyricsView(context, settingVM.themeController).apply {
-              layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-              )
-              visibility = View.INVISIBLE
-//              this.lyrics = lyrics
-//              this.offset = lyricOffset
-//              this.scalingFactor = fontScale
-              this.onSeekToListener = object : LyricsView.OnSeekToListener {
-                override fun onSeekTo(progress: Long) {
-                  playbackVM.setProgress(progress)
-                }
-              }
-            }
-          },
-          update = { v ->
-            if (v.lyrics.isEmpty() && !lyrics.isEmpty()) {
-              // 等待layout和scroll
-              v.postDelayed({
-                v.visibility = View.VISIBLE
-              }, 50)
-            }
-            v.lyrics = lyrics
-            v.scalingFactor = fontScale
-            v.offset = lyricOffset
-            if (lyrics.isNotEmpty()) {
-              v.setProgress(progress, song.duration)
-            }
-          }
+        LyricContainer(
+          Modifier.fillMaxSize(),
+          lyrics,
+          progress,
+          duration,
+          lyricOffset,
+          settingState.lyric.fontScale,
+          seekbarLastDragTime
         )
 
         if (panelState.show) {
@@ -216,10 +186,6 @@ internal fun PlayingLyric(song: Song) {
                 null
               }
               searchTrigger++
-            }
-
-            LyricManager.CHANGE_LYRIC_FONT_SCALE -> {
-              fontScale = lyricSearcher.lyricPrefs.fontScale
             }
 
             LyricManager.SHOW_OFFSET_PANEL -> {

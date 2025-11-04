@@ -142,7 +142,7 @@ fun DesktopLyricOverlay(
       verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
       val currentLyric = uiState.currentLyricLine
-      SingleLine(
+      LyricSingleLine(
         sungColor,
         unSungColor,
         firstLineSize.sp,

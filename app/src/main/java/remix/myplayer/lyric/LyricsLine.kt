@@ -3,6 +3,8 @@ package remix.myplayer.lyric
 import kotlinx.serialization.Serializable
 import remix.myplayer.App
 import remix.myplayer.R
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 @Serializable
 sealed class LyricsLine {
@@ -19,6 +21,14 @@ sealed class LyricsLine {
   abstract val translation: String?
 
   abstract fun withTranslation(newTranslation: String?): LyricsLine
+
+  val formattedTime by lazy {
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(time)
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(time) -
+        TimeUnit.MINUTES.toSeconds(minutes)
+    val millis = time % 1000
+    String.format(Locale.getDefault(), "%02d:%02d.%02d", minutes, seconds, millis)
+  }
 
   companion object {
     val LYRICS_LINE_SEARCHING by lazy {

@@ -21,6 +21,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,12 +58,14 @@ private fun Portrait() {
     verticalArrangement = Arrangement.spacedBy(30.dp)
   ) {
     val playbackState by playbackViewModel.playbackState.collectAsStateWithLifecycle()
-    val song = playbackState.song
-
     val playbackVM = playbackViewModel
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
 
-    PlayingTopBar(song, swatch)
+    var seekbarLastDragTime by remember {
+      mutableLongStateOf(0L)
+    }
+
+    PlayingTopBar(playbackState.song, swatch)
 
     val pagerState = rememberPagerState { 2 }
 
@@ -85,14 +90,16 @@ private fun Portrait() {
         }
 
         else -> {
-          PlayingLyric(song)
+          PlayingLyric(playbackState.song, seekbarLastDragTime)
         }
       }
     }
 
     PlayingIndicator(pagerState, swatch)
 
-    PlayingSeekbarWithText(swatch)
+    PlayingSeekbarWithText(swatch) {
+      seekbarLastDragTime = it
+    }
 
     val playingScreenBottom =
       settingViewModel.settingsState.collectAsStateWithLifecycle().value.playingScreen.bottom
@@ -153,11 +160,13 @@ private fun Landscape() {
     verticalArrangement = Arrangement.spacedBy(12.dp)
   ) {
     val playbackState by playbackViewModel.playbackState.collectAsStateWithLifecycle()
-    val song = playbackState.song
-
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
 
-    PlayingTopBar(song, swatch)
+    var seekbarLastDragTime by remember {
+      mutableLongStateOf(0L)
+    }
+
+    PlayingTopBar(playbackState.song, swatch)
 
     Row(modifier = Modifier.weight(3f)) {
       Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
@@ -171,11 +180,13 @@ private fun Landscape() {
         )
       }
       Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-        PlayingLyric(song)
+        PlayingLyric(playbackState.song, seekbarLastDragTime)
       }
     }
 
-    PlayingSeekbarWithText(swatch)
+    PlayingSeekbarWithText(swatch) {
+      seekbarLastDragTime = it
+    }
 
     PlayingControl(Modifier.weight(1f), playbackState, swatch)
   }

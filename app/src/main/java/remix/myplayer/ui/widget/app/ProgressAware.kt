@@ -17,7 +17,7 @@ import remix.myplayer.viewmodel.playbackViewModel
  */
 
 @Composable
-fun ProgressAware(interval: Long = 100, content: @Composable (Long, Long) -> Unit) {
+fun ProgressAware(interval: Long = 50, content: @Composable (Long, Long) -> Unit) {
   val playbackVM = playbackViewModel
   val playbackState by playbackVM.playbackState.collectAsStateWithLifecycle()
 
@@ -31,12 +31,12 @@ fun ProgressAware(interval: Long = 100, content: @Composable (Long, Long) -> Uni
     content(progress, duration)
   }
 
-  LaunchedEffect(playbackState.song, playbackState.playing) {
+  LaunchedEffect(playbackState.song) {
     do {
       delay(interval)
       withFrameMillis {
         progress = playbackVM.getProgress().toLong()
       }
-    } while (isActive && playbackState.playing && playbackState.song.valid())
+    } while (isActive && playbackState.song.valid())
   }
 }

@@ -172,7 +172,7 @@ data class MultiSelectState(
     return if (target == where) {
       selectedModels.map { it.getKey() }.toSet()
     } else {
-      emptySet<String>()
+      emptySet()
     }
   }
 

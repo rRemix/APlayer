@@ -300,7 +300,6 @@ private fun LyricFontScaleDialog(state: DialogState) {
     negative = null,
     itemsCallback = { index, str ->
       settingVM.setLyricFontScale(str.toFloat())
-      sendLocalBroadcast(Intent(ACTION_LYRIC).putExtra(EXTRA_LYRIC, CHANGE_LYRIC_FONT_SCALE))
     }
   )
 }

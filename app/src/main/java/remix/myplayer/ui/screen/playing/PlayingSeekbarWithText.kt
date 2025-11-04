@@ -9,7 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -21,6 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.palette.graphics.Palette
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.sample
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.ProgressAware
 import remix.myplayer.ui.widget.common.LineSlider
@@ -28,8 +33,12 @@ import remix.myplayer.ui.widget.common.defaultLineSliderProperties
 import remix.myplayer.util.Util
 import remix.myplayer.viewmodel.playbackViewModel
 
+@OptIn(FlowPreview::class)
 @Composable
-internal fun PlayingSeekbarWithText(swatch: Palette.Swatch) {
+internal fun PlayingSeekbarWithText(
+  swatch: Palette.Swatch,
+  onSeekbarDraggingChange: (Long) -> Unit
+) {
   val playbackVM = playbackViewModel
 
   ProgressAware { progress, duration ->
@@ -38,11 +47,19 @@ internal fun PlayingSeekbarWithText(swatch: Palette.Swatch) {
     }
 
     var uiProgress by remember {
-      mutableLongStateOf(0)
+      mutableFloatStateOf(0f)
     }
 
     var time by remember {
       mutableStateOf(Time("00:00", "00:00"))
+    }
+
+    val progressChanges = remember {
+      MutableSharedFlow<Float>(
+        replay = 0,
+        extraBufferCapacity = 64,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+      )
     }
 
     val playingTrackBackgroundColor = playingTrackBackgroundColor
@@ -78,17 +95,18 @@ internal fun PlayingSeekbarWithText(swatch: Palette.Swatch) {
       )
 
       LineSlider(
-        value = (if (dragging) uiProgress else progress).toFloat(),
-        onValueChange = {
+        value = if (dragging) uiProgress else progress.toFloat(),
+        onValueChange = { v ->
+          onSeekbarDraggingChange(System.currentTimeMillis())
           dragging = true
-          uiProgress = it.toLong()
+          uiProgress = v
+          progressChanges.tryEmit(v)
         },
         onValueChangeFinished = {
-          playbackVM.setProgress(uiProgress)
+          onSeekbarDraggingChange(System.currentTimeMillis())
           dragging = false
         },
         valueRange = 0f..duration.toFloat(),
-
         modifier = Modifier
           .height(12.dp)
           .weight(1f),
@@ -113,6 +131,15 @@ internal fun PlayingSeekbarWithText(swatch: Palette.Swatch) {
         Time(Util.getTime(elapsed), Util.getTime(remaining))
       }
     }
+
+    LaunchedEffect(Unit) {
+      val seekThrottleMs = 100L
+      progressChanges
+        .sample(seekThrottleMs)
+        .collectLatest { value ->
+          playbackVM.setProgress(value.toLong())
+        }
+    }
   }
 }
 
@@ -125,6 +152,5 @@ internal val playingTrackBackgroundColor: Color
       "#343438"
     }.toColorInt()
   )
-
 
 private data class Time(val elapsed: String, val remaining: String)
