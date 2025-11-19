@@ -14,8 +14,8 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import remix.myplayer.data.prefs.DesktopLyricPrefs.Companion.ELLIPSIS
-import remix.myplayer.lyric.LyricsLine
-import remix.myplayer.lyric.PerWordLyricsLine
+import remix.myplayer.lyric.LyricLine
+import remix.myplayer.lyric.PerWordLyricLine
 import remix.myplayer.ui.widget.lyric.PerWordLyricHelper.drawPerWordOverlay
 
 @Composable
@@ -24,12 +24,12 @@ fun LyricSingleLine(
   unSungColor: Color,
   fontSize: TextUnit,
   progress: Double?,
-  line: LyricsLine?
+  line: LyricLine?
 ) {
   val textMeasurer = rememberTextMeasurer()
   val content = (line?.content ?: "").ifBlank { ELLIPSIS }
   val baseStyle = TextStyle(fontSize = fontSize)
-  val isPerWord = line is PerWordLyricsLine
+  val isPerWord = line is PerWordLyricLine
 
   Layout(
     modifier = Modifier.drawBehind {

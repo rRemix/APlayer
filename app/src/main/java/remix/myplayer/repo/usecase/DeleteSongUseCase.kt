@@ -1,6 +1,7 @@
 package remix.myplayer.repo.usecase
 
 import android.app.RecoverableSecurityException
+import android.content.Intent
 import android.content.IntentSender
 import android.os.Build
 import android.provider.MediaStore
@@ -14,12 +15,16 @@ import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.misc.checkWorkerThread
-import remix.myplayer.misc.helper.MusicServiceRemote.deleteFromService
+import remix.myplayer.misc.helper.MusicServiceRemote
 import remix.myplayer.repo.AbstractRepository.Companion.makeInStrQuery
 import remix.myplayer.repo.PlayListRepository
+import remix.myplayer.repo.PlayQueueRepository
 import remix.myplayer.repo.SongRepository
+import remix.myplayer.service.Command
+import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.nav.MessageNotifier
+import remix.myplayer.util.Util
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -29,7 +34,8 @@ import javax.inject.Singleton
 class DeleteSongUseCase @Inject constructor(
   private val settingPrefs: SettingPrefs,
   private val songRepo: SongRepository,
-  private val playListRepo: PlayListRepository
+  private val playListRepo: PlayListRepository,
+  private val playQueueRepo: PlayQueueRepository
 ) {
 
   suspend operator fun invoke(
@@ -78,7 +84,6 @@ class DeleteSongUseCase @Inject constructor(
         }
       }
 
-      // TODO 删除了正在播放的歌曲
       val songs = songRepo.getSongsByModels(models)
       val songIds = songs.map { it.id }
 
@@ -91,7 +96,7 @@ class DeleteSongUseCase @Inject constructor(
         settingPrefs.deleteIds = deleteId
 
         // remove from playQueue
-        deleteFromService(songs)
+        MusicServiceRemote.removeFromQueue(songIds)
 
         // remove from all playLists
         playListRepo.removeAudioIdsFromAll(songIds)

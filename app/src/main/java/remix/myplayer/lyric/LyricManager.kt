@@ -46,6 +46,7 @@ import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.delegate
 import remix.myplayer.lyric.provider.ILyricsProvider
 import remix.myplayer.misc.helper.MusicServiceRemote
+import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.widget.lyric.DesktopLyricOverlay
 import remix.myplayer.ui.widget.lyric.DesktopLyricUiState
@@ -92,6 +93,11 @@ class LyricManager @Inject constructor(
       currentNextLyricsLine.collect { line ->
         _desktopUiState.value = _desktopUiState.value.copy(currentLyricLine = line)
         currentLyricsLine = line.currentLine?.content ?: ""
+      }
+    }
+    launch(Dispatchers.Main) {
+      MusicStateSource.playbackUiState.collect {
+        isPlaying = it.isPlaying
       }
     }
   }
@@ -213,11 +219,6 @@ class LyricManager @Inject constructor(
 
           windowManager.updateViewLayout(this@run, this)
         }
-
-        MusicServiceRemote.service?.run {
-          updateNotification()
-          updatePlaybackState()
-        }
       }
     }
 
@@ -310,9 +311,15 @@ class LyricManager @Inject constructor(
     desktopLyricView = null
   }
 
-  private fun getProgressOfLine(line: LyricsLine, time: Long, endTime: Long): Double {
-    require(time in line.time..endTime)
-    return if (line is PerWordLyricsLine) {
+  private fun getProgressOfLine(line: LyricLine, time: Long, endTime: Long): Double {
+    // TODO fix crash
+    try {
+      require(time in line.time..endTime)
+    } catch (e: IllegalArgumentException) {
+      Timber.w("time: $time, endTime: $endTime, line: ${line.time}")
+      throw e
+    }
+    return if (line is PerWordLyricLine) {
       line.getProgress(time, endTime)
     } else {
       (time - line.time).toDouble() / (endTime - line.time)
@@ -320,10 +327,10 @@ class LyricManager @Inject constructor(
   }
 
   private fun getCurrentNextLine(
-    lyrics: List<LyricsLine>, offset: Long, progress: Long, duration: Long
+    lyrics: List<LyricLine>, offset: Long, progress: Long, duration: Long
   ): CurrentNextLyricsLine {
     if (lyrics.isEmpty()) {
-      return CurrentNextLyricsLine(LyricsLine.LYRICS_LINE_NO_LRC, null, null)
+      return CurrentNextLyricsLine(LyricLine.LYRICS_LINE_NO_LRC, null, null)
     }
     val progressWithOffset = progress + offset
     val index = lyrics.binarySearchBy(progressWithOffset) { it.time }.let {
@@ -341,7 +348,7 @@ class LyricManager @Inject constructor(
     )
   }
 
-  var lyrics: List<LyricsLine>? = null
+  var lyrics: List<LyricLine>? = null
     private set(value) {
       field = value
 //      launch(Dispatchers.Main) {
@@ -357,6 +364,9 @@ class LyricManager @Inject constructor(
 
   var isPlaying: Boolean = false
     @UiThread set(value) {
+      if (field == value) {
+        return
+      }
       field = value
       _desktopUiState.value = _desktopUiState.value.copy(playing = value)
       if (value) {
@@ -368,8 +378,6 @@ class LyricManager @Inject constructor(
   private var progress: Long = 0
     set(value) {
       field = value
-      launch(Dispatchers.Main) {
-      }
       _currentNextLyricsLine.value = getCurrentNextLine(lyrics ?: return, offset, value, duration)
     }
   var offset: Long = 0
@@ -377,7 +385,7 @@ class LyricManager @Inject constructor(
       field = value
       launch(Dispatchers.IO) {
         updateProgress()
-        lyricSearcher.saveOffset(MusicServiceRemote.getCurrentSong(), value)
+        lyricSearcher.saveOffset(MusicStateSource.currentPlaybackUiState.song, value)
       }
     }
   private var duration: Long = 0
@@ -405,7 +413,7 @@ class LyricManager @Inject constructor(
     try {
 //      Timber.tag(TAG).d("update progress")
       updateProgressJob?.cancel()
-      progress = MusicServiceRemote.getProgress().toLong()
+      progress = MusicStateSource.currentProgressState.position
       if (isPlaying) {
         updateProgressJob = launch(Dispatchers.IO) {
           // TODO: should we consider thread create cost?

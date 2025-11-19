@@ -52,11 +52,11 @@ class MediaButtonReceiver : BroadcastReceiver() {
         val ctrlIntent = Intent(ACTION_CMD)
 
         ctrlIntent.putExtra(EXTRA_CONTROL, when (keyCode) {
-          KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> Command.TOGGLE
-          KeyEvent.KEYCODE_MEDIA_PAUSE -> Command.TOGGLE
-          KeyEvent.KEYCODE_MEDIA_PLAY -> Command.TOGGLE
-          KeyEvent.KEYCODE_MEDIA_NEXT -> Command.NEXT
-          KeyEvent.KEYCODE_MEDIA_PREVIOUS -> Command.PREV
+          KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> Command.PLAY_PAUSE
+          KeyEvent.KEYCODE_MEDIA_PAUSE -> Command.PLAY_PAUSE
+          KeyEvent.KEYCODE_MEDIA_PLAY -> Command.PLAY_PAUSE
+          KeyEvent.KEYCODE_MEDIA_NEXT -> Command.SKIP_TO_NEXT
+          KeyEvent.KEYCODE_MEDIA_PREVIOUS -> Command.SKIP_TO_PREVIOUS
           else -> -1
         })
         Timber.v("sendLocalBroadcast: $ctrlIntent")
@@ -73,9 +73,9 @@ class MediaButtonReceiver : BroadcastReceiver() {
               Thread.sleep(800)
               val action = Intent(MusicService.ACTION_CMD)
               action.putExtra(EXTRA_CONTROL, when (clickCount) {
-                1 -> Command.TOGGLE
-                2 -> Command.NEXT
-                3 -> Command.PREV
+                1 -> Command.PLAY_PAUSE
+                2 -> Command.SKIP_TO_NEXT
+                3 -> Command.SKIP_TO_PREVIOUS
                 else -> -1
               })
               sendLocalBroadcast(action)

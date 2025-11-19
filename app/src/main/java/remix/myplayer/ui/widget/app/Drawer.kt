@@ -129,10 +129,10 @@ fun Drawer(drawerState: DrawerState, vm: PlaybackViewModel = playbackViewModel) 
       Spacer(modifier = Modifier.height(with(LocalDensity.current) {
         WindowInsets.systemBars.getTop(this).toDp()
       }))
-      val musicState by vm.playbackState.collectAsStateWithLifecycle()
+      val playbackState by vm.playbackUiState.collectAsStateWithLifecycle()
       val isPortrait = context.isPortraitOrientation()
       GlideCover(
-        model = musicState.song,
+        model = playbackState.song,
         circle = false,
         modifier = Modifier
           .padding(if (isPortrait) 20.dp else 12.dp)
@@ -146,7 +146,7 @@ fun Drawer(drawerState: DrawerState, vm: PlaybackViewModel = playbackViewModel) 
           )
           .width(170.dp)
           .padding(horizontal = 8.dp, vertical = 6.dp),
-        text = stringResource(R.string.play_now, musicState.song.title),
+        text = stringResource(R.string.play_now, playbackState.song.title),
         textAlign = TextAlign.Center,
         color = theme.primaryReverse,
         fontSize = if (isPortrait) 14.sp else 12.sp,

@@ -7,9 +7,8 @@ hiltAndroid = "2.56.2"
 kotlin = "2.1.21"
 kotlinxSerializationJson = "1.9.0"
 ksp = "2.1.21-2.0.2"
-#kotlin = "2.1.20"
-#ksp = "2.1.21-2.0.1"
 hilt = "2.56.2"
+media3 = "1.8.0"
 nav = "2.9.2"
 glide = "4.16.0"
 glideCompose = "1.0.0-beta01"
@@ -21,6 +20,28 @@ activityCompose = "1.10.1"
 composeBom = "2025.09.00"
 lifecycleRuntimeKtx = "2.9.2"
 lifecycleViewmodelCompose = "2.9.2"
+kotlinxCoroutines = "1.8.0"
+appcompat = "1.6.1"
+cardview = "1.0.0"
+constraintlayout = "2.1.4"
+media = "1.7.0"
+multidex = "2.0.1"
+paletteKtx = "1.0.0"
+swiperefreshlayout = "1.1.0"
+billingclient = "6.2.0"
+material = "1.11.0"
+bugly = "3.3.3"
+leakcanary = "2.13"
+logbackAndroid = "3.0.0"
+rebound = "0.3.8"
+rxandroid = "2.1.1"
+rxjava = "2.2.19"
+sardineAndroid = "0.9"
+slf4j = "2.0.13"
+timber = "5.0.1"
+tinypinyin = "2.0.3.RELEASE"
+hiltNavigationCompose = "1.2.0"
+reorderable = "2.5.1"
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }
@@ -33,28 +54,29 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 
 [libraries]
 # kotlin
-kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.0" }
-kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.9.0"}
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 # hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 
-
 # androidx
+androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
+androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
-appcompat = { group = "androidx.appcompat", name = "appcompat", version = "1.6.1" }
-cardview = { group = "androidx.cardview", name = "cardview", version = "1.0.0" }
-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.1.4" }
-media = { group = "androidx.media", name = "media", version = "1.7.0" }
-multidex = { group = "androidx.multidex", name = "multidex", version = "2.0.1" }
-palette-ktx = { group = "androidx.palette", name = "palette-ktx", version = "1.0.0" }
-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version = "1.1.0" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+cardview = { group = "androidx.cardview", name = "cardview", version.ref = "cardview" }
+constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+media = { group = "androidx.media", name = "media", version.ref = "media" }
+multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidex" }
+palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "paletteKtx" }
+swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 
 # google
-billingclient = { group = "com.android.billingclient", name = "billing", version = "6.2.0" }
-material = { group = "com.google.android.material", name = "material", version = "1.11.0" }
+billingclient = { group = "com.android.billingclient", name = "billing", version.ref = "billingclient" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 # glide
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
@@ -74,22 +96,21 @@ room-rxjava2 = { group = "androidx.room", name = "room-rxjava2", version.ref = "
 
 # other
 image-cropper = { module = "com.vanniktech:android-image-cropper", version.ref = "imageCropper" }
-bugly = { group = "com.tencent.bugly", name = "crashreport", version = "3.3.3" }
-leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version = "2.13" }
-logback-android = { group = "com.github.tony19", name = "logback-android", version = "3.0.0" }
-material-dialog = { group = "com.afollestad.material-dialogs", name = "core", version = "0.9.6.0" }
-rebound = { group = "com.facebook.rebound", name = "rebound", version = "0.3.8" }
-rxandroid = { group = "io.reactivex.rxjava2", name = "rxandroid", version = "2.1.1" }
-rxjava = { group = "io.reactivex.rxjava2", name = "rxjava", version = "2.2.19" }
+bugly = { group = "com.tencent.bugly", name = "crashreport", version.ref = "bugly" }
+leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
+logback-android = { group = "com.github.tony19", name = "logback-android", version.ref = "logbackAndroid" }
+rebound = { group = "com.facebook.rebound", name = "rebound", version.ref = "rebound" }
+rxandroid = { group = "io.reactivex.rxjava2", name = "rxandroid", version.ref = "rxandroid" }
+rxjava = { group = "io.reactivex.rxjava2", name = "rxjava", version.ref = "rxjava" }
 # noinspection GradleDependency
 xxpermissions = { module = "com.github.getActivity:XXPermissions", version.ref = "xxpermissions" }
-sardine-android = { group = "com.github.thegrizzlylabs", name = "sardine-android", version = "0.9" }
-slf4j = { group = "org.slf4j", name = "slf4j-api", version = "2.0.13" }
-timber = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
+sardine-android = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "sardineAndroid" }
+slf4j = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j" }
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 # noinspection GradleDependency
-tinypinyin = { group = "io.github.biezhi", name = "TinyPinyin", version = "2.0.3.RELEASE" }
+tinypinyin = { group = "io.github.biezhi", name = "TinyPinyin", version.ref = "tinypinyin" }
 
-# compsoe
+# compose
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -103,5 +124,5 @@ androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedat
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablepainter" }
 androidx-nav = { module = "androidx.navigation:navigation-compose", version.ref = "nav" }
-androidx-hilt-navi-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0"}
-reorderable = { module = "sh.calvin.reorderable:reorderable", version = "2.5.1" }
+androidx-hilt-navi-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }

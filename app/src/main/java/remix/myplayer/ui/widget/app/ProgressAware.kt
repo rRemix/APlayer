@@ -1,16 +1,9 @@
 package remix.myplayer.ui.widget.app
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameMillis
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import remix.myplayer.viewmodel.playbackViewModel
+import remix.myplayer.service.playback.MusicStateSource
 
 /**
  * 感知进度变化
@@ -18,25 +11,12 @@ import remix.myplayer.viewmodel.playbackViewModel
 
 @Composable
 fun ProgressAware(interval: Long = 50, content: @Composable (Long, Long) -> Unit) {
-  val playbackVM = playbackViewModel
-  val playbackState by playbackVM.playbackState.collectAsStateWithLifecycle()
-
-  var progress by remember {
-    mutableLongStateOf(0)
-  }
-
-  val duration = playbackState.song.duration
+//  val playbackVM = playbackViewModel
+  val playbackState by MusicStateSource.playbackUiState.collectAsStateWithLifecycle()
+  val progressState by MusicStateSource.progressState.collectAsStateWithLifecycle()
 
   if (playbackState.song.valid()) {
-    content(progress, duration)
+    content(progressState.position, progressState.duration)
   }
 
-  LaunchedEffect(playbackState.song) {
-    do {
-      delay(interval)
-      withFrameMillis {
-        progress = playbackVM.getProgress().toLong()
-      }
-    } while (isActive && playbackState.song.valid())
-  }
 }

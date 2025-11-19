@@ -6,7 +6,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import remix.myplayer.data.bean.misc.LyricOrder
 import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.lyric.LrcParser
-import remix.myplayer.lyric.LyricsLine
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -22,16 +21,16 @@ class LocalFileProvider @Inject constructor(
 
   override val displayName = context.getString(LyricOrder.Local.stringRes)
 
-  override suspend fun getLyrics(song: Song): List<LyricsLine> {
+  override suspend fun getLyrics(song: Song): LyricsResult {
     val path = getLocalLyricPath(song)
-    if (path != null && path.isNotEmpty()) {
-      return LrcParser.parse(File(path).readText())
+    if (path.isNotEmpty()) {
+      return LyricsResult(LrcParser.parse(File(path).readText()), id)
     }
 
     throw Exception("no lyric found by local file")
   }
 
-  private fun getLocalLyricPath(song: Song): String? {
+  private fun getLocalLyricPath(song: Song): String {
     var path = ""
     //没有设置歌词路径 搜索所有可能的歌词文件
     context.contentResolver.query(

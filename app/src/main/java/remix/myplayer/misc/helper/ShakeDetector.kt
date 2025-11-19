@@ -84,7 +84,7 @@ class ShakeDetector private constructor() : SensorEventListener, Runnable {
   }
 
   override fun run() {
-    sendCMDLocalBroadcast(Command.NEXT)
+    sendCMDLocalBroadcast(Command.SKIP_TO_NEXT)
   }
 
   companion object {

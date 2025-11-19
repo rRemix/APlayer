@@ -191,11 +191,9 @@ android {
         viewBinding = true
         compose = true
     }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13"
-    }
-
+    // composeOptions {
+    //     kotlinCompilerExtensionVersion = "1.5.13"
+    // }
     dependenciesInfo {
         includeInApk = false
     }
@@ -227,6 +225,8 @@ dependencies {
     implementation(libs.cardview)
     implementation(libs.constraintlayout)
     implementation(libs.media)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
     implementation(libs.multidex)
     implementation(libs.palette.ktx)
     implementation(libs.swiperefreshlayout)
@@ -249,7 +249,6 @@ dependencies {
     implementation(libs.image.cropper)
     implementation(libs.bugly)
     implementation(libs.logback.android)
-    implementation(libs.material.dialog)
     implementation(libs.rebound)
     implementation(libs.rxandroid)
     implementation(libs.rxjava)

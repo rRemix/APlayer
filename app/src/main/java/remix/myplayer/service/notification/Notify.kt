@@ -15,14 +15,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.app.TaskStackBuilder
 import com.bumptech.glide.request.target.CustomTarget
-import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
-import remix.myplayer.lyric.LyricManager
-import remix.myplayer.lyric.LyricManagerEntryPoint
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.activity.ComposeActivity
 import remix.myplayer.ui.nav.playingScreenDeepLink
 
@@ -32,17 +30,17 @@ import remix.myplayer.ui.nav.playingScreenDeepLink
 
 abstract class Notify internal constructor(internal var service: MusicService) {
 
+  protected val progressState
+    get() = MusicStateSource.currentProgressState
+  protected val playbackState
+    get() = MusicStateSource.currentPlaybackUiState
+
   private val FLAG_ALWAYS_SHOW_TICKER = 0x1000000
   private val FLAG_ONLY_UPDATE_TICKER = 0x2000000
 
   protected var target: CustomTarget<Bitmap>? = null
 
-  protected val lyricManager: LyricManager by lazy {
-    EntryPointAccessors.fromApplication(
-      service,
-      LyricManagerEntryPoint::class.java
-    ).lyricManager()
-  }
+  protected val lyricManager = service.lyricManager
 
   var isNotifyShowing = false
     set(value) {
@@ -58,12 +56,14 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
   internal val contentIntent: PendingIntent
     get() = TaskStackBuilder.create(service).run {
-      addNextIntentWithParentStack(Intent(
-        Intent.ACTION_VIEW,
-        playingScreenDeepLink,
-        service,
-        ComposeActivity::class.java
-      ))
+      addNextIntentWithParentStack(
+        Intent(
+          Intent.ACTION_VIEW,
+          playingScreenDeepLink,
+          service,
+          ComposeActivity::class.java
+        )
+      )
       getPendingIntent(0, getPendingIntentFlag())!!
     }
 
@@ -75,21 +75,24 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
   @RequiresApi(api = Build.VERSION_CODES.O)
   private fun createNotificationChannel() {
-    val playingNotificationChannel = NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID,
-      service.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW)
+    val playingNotificationChannel = NotificationChannel(
+      PLAYING_NOTIFICATION_CHANNEL_ID,
+      service.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW
+    )
     playingNotificationChannel.setShowBadge(false)
     playingNotificationChannel.enableLights(false)
     playingNotificationChannel.enableVibration(false)
     playingNotificationChannel.description = service.getString(
-      R.string.playing_notification_description)
+      R.string.playing_notification_description
+    )
     notificationManager.createNotificationChannel(playingNotificationChannel)
   }
 
   abstract fun updateForPlaying()
 
   fun updateWithLyric(lrc: String) {
-    if (!service.isPlaying) return
-    val song = service.currentSong
+    if (!playbackState.isPlaying) return
+    val song = playbackState.song
     val builder = NotificationCompat.Builder(service, PLAYING_NOTIFICATION_CHANNEL_ID)
     builder.setContentText("${song.artist} - ${song.album}")
       .setContentTitle(song.title)
@@ -123,8 +126,10 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     }
     if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        service.startForeground(PLAYING_NOTIFICATION_ID, notification,
-          ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+        service.startForeground(
+          PLAYING_NOTIFICATION_ID, notification,
+          ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+        )
       } else {
         service.startForeground(PLAYING_NOTIFICATION_ID, notification)
       }
@@ -152,7 +157,8 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     intent.component = ComponentName(context, MusicService::class.java)
 
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-      return PendingIntent.getService(context, operation, intent,
+      return PendingIntent.getService(
+        context, operation, intent,
         getPendingIntentFlag()
       )
     } else {
@@ -160,17 +166,20 @@ abstract class Notify internal constructor(internal var service: MusicService) {
         operation != Command.CLOSE_NOTIFY &&
         operation != Command.UNLOCK_DESKTOP_LYRIC
       ) {
-        return PendingIntent.getForegroundService(context, operation, intent,
+        return PendingIntent.getForegroundService(
+          context, operation, intent,
           getPendingIntentFlag()
         )
       } else {
-        PendingIntent.getService(context, operation, intent,
+        PendingIntent.getService(
+          context, operation, intent,
           getPendingIntentFlag()
         )
       }
     }
 
-    return PendingIntent.getService(context, operation, intent,
+    return PendingIntent.getService(
+      context, operation, intent,
       getPendingIntentFlag()
     )
   }
@@ -181,7 +190,6 @@ abstract class Notify internal constructor(internal var service: MusicService) {
      * 通知栏是否显示
      */
 //    @JvmStatic
-
 
     private const val NOTIFY_MODE_FOREGROUND = 1
     private const val NOTIFY_MODE_BACKGROUND = 2

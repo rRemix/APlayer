@@ -48,7 +48,7 @@ fun LastAddedScreen() {
   val libraryVM = libraryViewModel
   val mainVM = mainViewModel
 
-  val playbackState by playbackViewModel.playbackState.collectAsStateWithLifecycle()
+  val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val listState = rememberLazyListState()
   val songs = remember {
@@ -122,7 +122,7 @@ fun LastAddedScreen() {
               }
 
               setPlayQueue(
-                songs, MusicUtil.makeCmdIntent(Command.PLAYSELECTEDSONG)
+                songs, MusicUtil.makeCmdIntent(Command.PLAY_AT)
                   .putExtra(MusicService.EXTRA_POSITION, pos)
               )
             },

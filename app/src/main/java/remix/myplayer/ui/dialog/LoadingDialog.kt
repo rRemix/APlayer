@@ -24,6 +24,7 @@ import remix.myplayer.R
 import remix.myplayer.misc.updateIf
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
+import timber.log.Timber
 
 private val loadingState = MutableStateFlow(LoadingState())
 
@@ -50,12 +51,20 @@ fun dismissLoading() {
 fun CoroutineScope.runWithLoading(
   cancelOutside: Boolean = true,
   loadingText: String = "",
+  onError: ((Exception) -> Unit)? = null,
   func: suspend () -> Unit
 ) {
   launch {
     try {
       showLoading(cancelOutside, loadingText)
       func()
+    } catch (e: Exception) {
+      Timber.e(e)
+      if (onError != null) {
+        onError(e)
+      } else {
+        throw e
+      }
     } finally {
       dismissLoading()
     }
@@ -66,14 +75,16 @@ suspend fun <T> runWithLoadingResult(
   cancelOutside: Boolean = true,
   loadingText: String = "",
   func: suspend () -> T
-): T {
+): T? {
   try {
     showLoading(cancelOutside, loadingText)
     return func()
+  } catch (e: Exception) {
+    Timber.e(e)
+    return null
   } finally {
     dismissLoading()
   }
-
 }
 
 @Composable

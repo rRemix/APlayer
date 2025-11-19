@@ -75,12 +75,12 @@ import remix.myplayer.misc.clickableWithoutRipple
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.blur.StackBlurManager
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.Util.sendLocalBroadcast
-import remix.myplayer.viewmodel.PlaybackState
 import remix.myplayer.viewmodel.PlaybackViewModel
 import timber.log.Timber
 import javax.inject.Inject
@@ -119,7 +119,7 @@ class LockScreenActivity : BaseMusicActivity() {
     )
 
     setContent {
-      val state by vm.playbackState.collectAsStateWithLifecycle()
+      val state by vm.playbackUiState.collectAsStateWithLifecycle()
       val currentLyricLine by lyricManager.currentNextLyricsLine.collectAsStateWithLifecycle()
       LockScreen(state, currentLyricLine)
     }
@@ -152,7 +152,7 @@ class LockScreenActivity : BaseMusicActivity() {
 }
 
 @Composable
-private fun LockScreen(playbackState: PlaybackState, currentLyric: CurrentNextLyricsLine) {
+private fun LockScreen(playbackUiState: PlaybackUiState, currentLyric: CurrentNextLyricsLine) {
   val context = LocalContext.current
   val density = LocalDensity.current
   val screenWidth = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
@@ -227,7 +227,7 @@ private fun LockScreen(playbackState: PlaybackState, currentLyric: CurrentNextLy
     ) {
 //      Spacer(Modifier.statusBarsPadding())
       GlideImage(
-        model = playbackState.song,
+        model = playbackUiState.song,
         contentDescription = "LockScreenCover",
         failure = placeholder(LocalTheme.current.albumPlaceHolder),
         loading = placeholder(LocalTheme.current.albumPlaceHolder),
@@ -246,7 +246,7 @@ private fun LockScreen(playbackState: PlaybackState, currentLyric: CurrentNextLy
       }
 
       Text(
-        playbackState.song.title,
+        playbackUiState.song.title,
         modifier = Modifier
           .padding(top = 40.dp)
           .padding(horizontal = 10.dp),
@@ -257,7 +257,7 @@ private fun LockScreen(playbackState: PlaybackState, currentLyric: CurrentNextLy
       )
 
       Text(
-        playbackState.song.artist,
+        playbackUiState.song.artist,
         modifier = Modifier
           .padding(top = 12.dp)
           .padding(horizontal = 10.dp),
@@ -276,7 +276,7 @@ private fun LockScreen(playbackState: PlaybackState, currentLyric: CurrentNextLy
           modifier = Modifier.clickableWithoutRipple {
             sendLocalBroadcast(
               Intent(MusicService.ACTION_CMD)
-                .putExtra(EXTRA_CONTROL, Command.PREV)
+                .putExtra(EXTRA_CONTROL, Command.SKIP_TO_PREVIOUS)
             )
           },
           painter = painterResource(R.drawable.lock_btn_prev),
@@ -287,10 +287,10 @@ private fun LockScreen(playbackState: PlaybackState, currentLyric: CurrentNextLy
           modifier = Modifier.clickableWithoutRipple {
             sendLocalBroadcast(
               Intent(MusicService.ACTION_CMD)
-                .putExtra(EXTRA_CONTROL, Command.TOGGLE)
+                .putExtra(EXTRA_CONTROL, Command.PLAY_PAUSE)
             )
           },
-          painter = painterResource(if (playbackState.playing) R.drawable.lock_btn_pause else R.drawable.lock_btn_play),
+          painter = painterResource(if (playbackUiState.isPlaying) R.drawable.lock_btn_pause else R.drawable.lock_btn_play),
           contentDescription = "LockScreenPlay"
         )
 
@@ -298,7 +298,7 @@ private fun LockScreen(playbackState: PlaybackState, currentLyric: CurrentNextLy
           modifier = Modifier.clickableWithoutRipple {
             sendLocalBroadcast(
               Intent(MusicService.ACTION_CMD)
-                .putExtra(EXTRA_CONTROL, Command.NEXT)
+                .putExtra(EXTRA_CONTROL, Command.SKIP_TO_NEXT)
             )
           },
           painter = painterResource(R.drawable.lock_btn_next),

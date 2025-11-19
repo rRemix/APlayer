@@ -31,7 +31,7 @@ import remix.myplayer.viewmodel.playbackViewModel
 @Composable
 fun HistoryScreen() {
   val songs by libraryViewModel.historySongs.collectAsStateWithLifecycle()
-  val playbackState by playbackViewModel.playbackState.collectAsStateWithLifecycle()
+  val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
 
   Scaffold(
     topBar = {
@@ -67,7 +67,7 @@ fun HistoryScreen() {
               }
 
               setPlayQueue(
-                songs, MusicUtil.makeCmdIntent(Command.PLAYSELECTEDSONG)
+                songs, MusicUtil.makeCmdIntent(Command.PLAY_AT)
                   .putExtra(MusicService.EXTRA_POSITION, pos)
               )
             },

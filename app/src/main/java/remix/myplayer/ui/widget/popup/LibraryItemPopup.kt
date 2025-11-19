@@ -35,8 +35,8 @@ import remix.myplayer.misc.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.ui.nav.LocalNavController
-import remix.myplayer.ui.nav.RouteCrop
 import remix.myplayer.ui.nav.MessageNotifier
+import remix.myplayer.ui.nav.RouteCrop
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.popupButton
 import remix.myplayer.util.MusicUtil.makeCmdIntent
@@ -114,7 +114,7 @@ fun LibraryItemDropdownMenu(
                   return@launch
                 }
                 setPlayQueue(
-                  songs, makeCmdIntent(Command.PLAYSELECTEDSONG)
+                  songs, makeCmdIntent(Command.PLAY_AT)
                     .putExtra(EXTRA_POSITION, 0)
                 )
               }

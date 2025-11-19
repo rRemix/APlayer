@@ -292,16 +292,16 @@ private fun resolveControls(
     onClickLock()
   },
   DesktopLyricControl(R.drawable.ic_skip_previous_black_24dp, "DkpPrevious") {
-    sendLocalBroadcast(makeCmdIntent(Command.PREV))
+    sendLocalBroadcast(makeCmdIntent(Command.SKIP_TO_PREVIOUS))
   },
   DesktopLyricControl(
     if (playing) R.drawable.ic_pause_black_24dp else R.drawable.ic_play_arrow_black_24dp,
     "DkpPlayPause"
   ) {
-    sendLocalBroadcast(makeCmdIntent(Command.TOGGLE))
+    sendLocalBroadcast(makeCmdIntent(Command.PLAY_PAUSE))
   },
   DesktopLyricControl(R.drawable.ic_skip_next_black_24dp, "DkpNext") {
-    sendLocalBroadcast(makeCmdIntent(Command.NEXT))
+    sendLocalBroadcast(makeCmdIntent(Command.SKIP_TO_NEXT))
   },
   DesktopLyricControl(R.drawable.ic_settings_24dp, "DkpSettings") {
     onClickSetting()

@@ -57,7 +57,7 @@ private fun Portrait() {
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(30.dp)
   ) {
-    val playbackState by playbackViewModel.playbackState.collectAsStateWithLifecycle()
+    val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val playbackVM = playbackViewModel
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
 
@@ -90,16 +90,14 @@ private fun Portrait() {
         }
 
         else -> {
-          PlayingLyric(playbackState.song, seekbarLastDragTime)
+          PlayingLyric(playbackState.song)
         }
       }
     }
 
     PlayingIndicator(pagerState, swatch)
 
-    PlayingSeekbarWithText(swatch) {
-      seekbarLastDragTime = it
-    }
+    PlayingSeekbarWithText(swatch)
 
     val playingScreenBottom =
       settingViewModel.settingsState.collectAsStateWithLifecycle().value.playingScreen.bottom
@@ -159,12 +157,8 @@ private fun Landscape() {
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(12.dp)
   ) {
-    val playbackState by playbackViewModel.playbackState.collectAsStateWithLifecycle()
+    val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
-
-    var seekbarLastDragTime by remember {
-      mutableLongStateOf(0L)
-    }
 
     PlayingTopBar(playbackState.song, swatch)
 
@@ -180,13 +174,11 @@ private fun Landscape() {
         )
       }
       Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-        PlayingLyric(playbackState.song, seekbarLastDragTime)
+        PlayingLyric(playbackState.song)
       }
     }
 
-    PlayingSeekbarWithText(swatch) {
-      seekbarLastDragTime = it
-    }
+    PlayingSeekbarWithText(swatch)
 
     PlayingControl(Modifier.weight(1f), playbackState, swatch)
   }

@@ -47,7 +47,7 @@ fun SongListHeader(songs: List<Song>) {
           MessageNotifier.show(R.string.no_song)
           return@clickableWithoutRipple
         }
-        setPlayQueue(songs, MusicUtil.makeCmdIntent(Command.NEXT, true))
+        setPlayQueue(songs, MusicUtil.makeCmdIntent(Command.SKIP_TO_NEXT, true))
       },
     verticalAlignment = Alignment.CenterVertically
   ) {

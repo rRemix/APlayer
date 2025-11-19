@@ -21,23 +21,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.palette.graphics.Palette
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.sample
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.ProgressAware
 import remix.myplayer.ui.widget.common.LineSlider
 import remix.myplayer.ui.widget.common.defaultLineSliderProperties
 import remix.myplayer.util.Util
 import remix.myplayer.viewmodel.playbackViewModel
+import kotlin.math.roundToLong
 
-@OptIn(FlowPreview::class)
 @Composable
 internal fun PlayingSeekbarWithText(
-  swatch: Palette.Swatch,
-  onSeekbarDraggingChange: (Long) -> Unit
+  swatch: Palette.Swatch
 ) {
   val playbackVM = playbackViewModel
 
@@ -52,14 +46,6 @@ internal fun PlayingSeekbarWithText(
 
     var time by remember {
       mutableStateOf(Time("00:00", "00:00"))
-    }
-
-    val progressChanges = remember {
-      MutableSharedFlow<Float>(
-        replay = 0,
-        extraBufferCapacity = 64,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-      )
     }
 
     val playingTrackBackgroundColor = playingTrackBackgroundColor
@@ -97,14 +83,14 @@ internal fun PlayingSeekbarWithText(
       LineSlider(
         value = if (dragging) uiProgress else progress.toFloat(),
         onValueChange = { v ->
-          onSeekbarDraggingChange(System.currentTimeMillis())
           dragging = true
           uiProgress = v
-          progressChanges.tryEmit(v)
+          playbackVM.setSeekbarUiProgress(v.roundToLong())
         },
         onValueChangeFinished = {
-          onSeekbarDraggingChange(System.currentTimeMillis())
           dragging = false
+          playbackVM.setProgress(uiProgress.roundToLong())
+          playbackVM.setSeekbarUiProgress(-1)
         },
         valueRange = 0f..duration.toFloat(),
         modifier = Modifier
@@ -130,15 +116,6 @@ internal fun PlayingSeekbarWithText(
         val remaining = duration - elapsed
         Time(Util.getTime(elapsed), Util.getTime(remaining))
       }
-    }
-
-    LaunchedEffect(Unit) {
-      val seekThrottleMs = 100L
-      progressChanges
-        .sample(seekThrottleMs)
-        .collectLatest { value ->
-          playbackVM.setProgress(value.toLong())
-        }
     }
   }
 }

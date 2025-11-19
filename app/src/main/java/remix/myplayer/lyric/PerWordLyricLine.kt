@@ -7,9 +7,9 @@ import androidx.core.text.inSpans
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PerWordLyricsLine(
+data class PerWordLyricLine(
   override val time: Long, val words: List<Word>, override val translation: String? = null
-) : LyricsLine() {
+) : LyricLine() {
   init {
     require(words.isNotEmpty() && time <= words[0].time)
   }
@@ -18,8 +18,8 @@ data class PerWordLyricsLine(
     words.joinToString("") { it.content }
   }
 
-  override fun withTranslation(newTranslation: String?): PerWordLyricsLine {
-    return PerWordLyricsLine(time, words, newTranslation)
+  override fun withTranslation(newTranslation: String?): PerWordLyricLine {
+    return PerWordLyricLine(time, words, newTranslation)
   }
 
   /**
@@ -28,7 +28,6 @@ data class PerWordLyricsLine(
   fun getProgress(time: Long, endTime: Long): Double {
     require(time >= this.time && time <= endTime)
     var index = words.binarySearchBy(time) { it.time }
-    // TODO: check
     if (index >= 0) {
       return index.toDouble()
     }

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - compose
   pull_request:
 
 jobs:

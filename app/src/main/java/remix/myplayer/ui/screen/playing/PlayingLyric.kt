@@ -35,7 +35,7 @@ import kotlinx.coroutines.delay
 import remix.myplayer.R
 import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.lyric.LyricManager
-import remix.myplayer.lyric.LyricsLine
+import remix.myplayer.lyric.LyricLine
 import remix.myplayer.lyric.provider.ILyricsProvider
 import remix.myplayer.lyric.provider.UriProvider
 import remix.myplayer.misc.clickWithRipple
@@ -53,7 +53,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 @Composable
-internal fun PlayingLyric(song: Song, seekbarLastDragTime: Long) {
+internal fun PlayingLyric(song: Song) {
   val context = LocalContext.current
 
   val settingVM = settingViewModel
@@ -74,7 +74,7 @@ internal fun PlayingLyric(song: Song, seekbarLastDragTime: Long) {
   }
 
   var lyrics by remember {
-    mutableStateOf<List<LyricsLine>>(emptyList())
+    mutableStateOf<List<LyricLine>>(emptyList())
   }
 
   var panelState by remember {
@@ -103,7 +103,6 @@ internal fun PlayingLyric(song: Song, seekbarLastDragTime: Long) {
           duration,
           lyricOffset,
           settingState.lyric.fontScale,
-          seekbarLastDragTime
         )
 
         if (panelState.show) {

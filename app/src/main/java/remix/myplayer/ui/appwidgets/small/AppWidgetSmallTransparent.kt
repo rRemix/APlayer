@@ -14,8 +14,12 @@ import remix.myplayer.util.Util
 
 class AppWidgetSmallTransparent : BaseAppwidget() {
 
-  override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-    super.onUpdate(context,appWidgetManager,appWidgetIds)
+  override fun onUpdate(
+    context: Context,
+    appWidgetManager: AppWidgetManager,
+    appWidgetIds: IntArray
+  ) {
+    super.onUpdate(context, appWidgetManager, appWidgetIds)
     defaultAppWidget(context, appWidgetIds)
     val intent = Intent(MusicService.ACTION_WIDGET_UPDATE)
     intent.putExtra(EXTRA_WIDGET_NAME, this.javaClass.simpleName)
@@ -30,11 +34,11 @@ class AppWidgetSmallTransparent : BaseAppwidget() {
   }
 
   override fun updateWidget(service: MusicService, appWidgetIds: IntArray?, reloadCover: Boolean) {
-    val song = service.currentSong
-    if(song == Song.EMPTY_SONG){
+    val song = playbackState.song
+    if (song == Song.EMPTY_SONG) {
       return
     }
-    if(!hasInstances(service)){
+    if (!hasInstances(service)) {
       return
     }
     val remoteViews = RemoteViews(service.packageName, R.layout.app_widget_small_transparent)
@@ -46,11 +50,11 @@ class AppWidgetSmallTransparent : BaseAppwidget() {
   }
 
   override fun partiallyUpdateWidget(service: MusicService) {
-    val song = service.currentSong
-    if(song == Song.EMPTY_SONG){
+    val song = playbackState.song
+    if (song == Song.EMPTY_SONG) {
       return
     }
-    if(!hasInstances(service)){
+    if (!hasInstances(service)) {
       return
     }
     val remoteViews = RemoteViews(service.packageName, R.layout.app_widget_small_transparent)
@@ -58,18 +62,20 @@ class AppWidgetSmallTransparent : BaseAppwidget() {
     skin = AppWidgetSkin.TRANSPARENT
     updateRemoteViews(service, remoteViews, song)
 
-    val appIds = AppWidgetManager.getInstance(service).getAppWidgetIds(ComponentName(service, javaClass))
-    pushPartiallyUpdate(service,appIds,remoteViews)
+    val appIds =
+      AppWidgetManager.getInstance(service).getAppWidgetIds(ComponentName(service, javaClass))
+    pushPartiallyUpdate(service, appIds, remoteViews)
   }
 
   companion object {
+
     @Volatile
     private var INSTANCE: AppWidgetSmallTransparent? = null
 
     @JvmStatic
     fun getInstance(): AppWidgetSmallTransparent =
-        INSTANCE ?: synchronized(this) {
-          INSTANCE ?: AppWidgetSmallTransparent()
-        }
+      INSTANCE ?: synchronized(this) {
+        INSTANCE ?: AppWidgetSmallTransparent()
+      }
   }
 }

@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import remix.myplayer.data.DataUiState
 import remix.myplayer.data.db.room.entity.WebDav
+import remix.myplayer.misc.isAudio
 import remix.myplayer.misc.updateIf
 import remix.myplayer.repo.WebDavRepository
 import remix.myplayer.ui.dialog.DialogState
@@ -29,8 +31,8 @@ class WebDavViewModel @Inject constructor(
   private val _webDavList = MutableStateFlow<List<WebDav>>(emptyList())
   val webDavList: StateFlow<List<WebDav>> = _webDavList.asStateFlow()
 
-  private val _webDavResources = MutableStateFlow<List<DavResource>>(emptyList())
-  val webDavResources: StateFlow<List<DavResource>> = _webDavResources.asStateFlow()
+  private val _webDavResState = MutableStateFlow<DataUiState<List<DavResource>>>(DataUiState.Loading())
+  val webDavResState: StateFlow<DataUiState<List<DavResource>>> = _webDavResState.asStateFlow()
 
   init {
     viewModelScope.launch {
@@ -40,19 +42,18 @@ class WebDavViewModel @Inject constructor(
     }
   }
 
-  fun loadDavResources(
-    sardine: OkHttpSardine,
-    url: String,
-    andThen: (() -> Unit)? = null
-  ) {
-    viewModelScope.runWithLoading {
-      val resources = withContext(Dispatchers.IO) {
-        sardine.list(url)
+  fun loadDavRes(sardine: OkHttpSardine, url: String) {
+    _webDavResState.value = DataUiState.Loading()
+    viewModelScope.launch {
+      val resources = try {
+        withContext(Dispatchers.IO) {
+          sardine.list(url)
+        }
+      } catch (e: Exception) {
+        _webDavResState.value = DataUiState.Error(e)
+        return@launch
       }
-
-      _webDavResources.value = resources.takeLast(resources.size - 1)
-
-      andThen?.invoke()
+      _webDavResState.value = DataUiState.Success(resources.drop(1).filter { it.isAudio() || it.isDirectory })
     }
   }
 
@@ -61,7 +62,9 @@ class WebDavViewModel @Inject constructor(
   }
 
   fun updateLastUrl(webDav: WebDav, newUrl: String) = viewModelScope.launch {
-//    val updated = webDav.copy(lastUrl = newUrl).also { it.id = webDav.id }
+    if (webDav.lastUrl == newUrl) {
+      return@launch
+    }
     webDav.lastUrl = newUrl
     webDavRepository.insertOrReplace(webDav)
   }

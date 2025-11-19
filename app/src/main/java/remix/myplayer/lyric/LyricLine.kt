@@ -7,7 +7,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 @Serializable
-sealed class LyricsLine {
+sealed class LyricLine {
   /**
    * 这行歌词的开始时间
    */
@@ -20,7 +20,7 @@ sealed class LyricsLine {
 
   abstract val translation: String?
 
-  abstract fun withTranslation(newTranslation: String?): LyricsLine
+  abstract fun withTranslation(newTranslation: String?): LyricLine
 
   val formattedTime by lazy {
     val minutes = TimeUnit.MILLISECONDS.toMinutes(time)
@@ -32,10 +32,10 @@ sealed class LyricsLine {
 
   companion object {
     val LYRICS_LINE_SEARCHING by lazy {
-      SimpleLyricsLine(0, App.context.getString(R.string.searching))
+      SimpleLyricLine(0, App.context.getString(R.string.searching))
     }
     val LYRICS_LINE_NO_LRC by lazy {
-      SimpleLyricsLine(0, App.context.getString(R.string.no_lrc))
+      SimpleLyricLine(0, App.context.getString(R.string.no_lrc))
     }
   }
 }

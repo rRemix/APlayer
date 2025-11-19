@@ -15,8 +15,8 @@ import androidx.annotation.UiThread
 import remix.myplayer.R
 import remix.myplayer.databinding.LayoutLyricsLineBinding
 import remix.myplayer.databinding.LayoutLyricsViewBinding
-import remix.myplayer.lyric.LyricsLine
-import remix.myplayer.lyric.PerWordLyricsLine
+import remix.myplayer.lyric.LyricLine
+import remix.myplayer.lyric.PerWordLyricLine
 import remix.myplayer.ui.theme.ThemeController
 import timber.log.Timber
 import kotlin.math.roundToInt
@@ -86,11 +86,11 @@ class LyricsView(
     }
   }
 
-  private fun addLayoutForLine(line: LyricsLine) {
+  private fun addLayoutForLine(line: LyricLine) {
     val layout =
       LayoutLyricsLineBinding.inflate(LayoutInflater.from(context), binding.innerContainer, true)
     if (line.content.isNotBlank()) {
-      layout.content.text = if (line is PerWordLyricsLine) {
+      layout.content.text = if (line is PerWordLyricLine) {
         line.getSpannedString(0.0, normalTextColor)
       } else {
         line.content
@@ -106,7 +106,7 @@ class LyricsView(
   /**
    * 修改完后应立刻设置 offset
    */
-  var lyrics: List<LyricsLine> = emptyList()
+  var lyrics: List<LyricLine> = emptyList()
     @UiThread set(value) {
       if (field == value) {
         return
@@ -157,7 +157,7 @@ class LyricsView(
     if (line.content.isBlank()) {
       return
     }
-    if (line is PerWordLyricsLine) {
+    if (line is PerWordLyricLine) {
       view.text = line.getSpannedString(progress, color)
     } else {
       view.setTextColor(color)
@@ -189,7 +189,7 @@ class LyricsView(
     if (index >= 0) {
       val line = lyrics[index]
       setProgressOfLine(
-        index, if (line is PerWordLyricsLine) {
+        index, if (line is PerWordLyricLine) {
           line.getProgress(
             progress, lyrics.getOrNull(index + 1)?.time ?: duration
           )

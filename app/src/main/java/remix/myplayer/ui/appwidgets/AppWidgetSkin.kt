@@ -5,6 +5,7 @@ import androidx.annotation.DrawableRes
 import remix.myplayer.R
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.util.ColorUtil
 
 enum class AppWidgetSkin(
@@ -50,8 +51,7 @@ enum class AppWidgetSkin(
     get() = R.drawable.widget_btn_like_prs
 
   fun getModeRes(service: MusicService): Int {
-    val playModel = service.playModel
-    return when (playModel) {
+    return when (MusicStateSource.currentPlaybackUiState.playMode) {
       SettingPrefs.MODE_SHUFFLE -> modeShuffleRes
       SettingPrefs.MODE_REPEAT -> modeRepeatRes
       else -> modeNormalRes

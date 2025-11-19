@@ -7,7 +7,6 @@ import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.data.bean.misc.LyricOrder
 import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.lyric.LrcParser
-import remix.myplayer.lyric.LyricsLine
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -21,15 +20,15 @@ class EmbeddedProvider @Inject constructor(
   override val id = LyricOrder.Embedded.toString()
   override val displayName = context.getString(LyricOrder.Embedded.stringRes)
 
-  override suspend fun getLyrics(song: Song): List<LyricsLine> {
+  override suspend fun getLyrics(song: Song): LyricsResult {
     if (song is Song.Local) {
       val lrc = AudioFileIO.read(File(song.data)).tag.getFirst(FieldKey.LYRICS)
       if (lrc.isNullOrEmpty()) {
         throw Exception("Field `LYRICS` doesn't exist or is empty")
       }
-      return LrcParser.parse(lrc)
+      return LyricsResult(LrcParser.parse(lrc), id)
     }
 
-    throw Exception("no lyric found by qq")
+    throw Exception("no lyric found by $id")
   }
 }

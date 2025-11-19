@@ -24,11 +24,11 @@ import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.lyric.LyricManager
-import remix.myplayer.misc.helper.MusicServiceRemote
 import remix.myplayer.misc.helper.ShakeDetector
 import remix.myplayer.misc.updateIf
 import remix.myplayer.repo.SongRepository
 import remix.myplayer.repo.usecase.DeleteSongUseCase
+import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.DeleteSongState
 import remix.myplayer.ui.dialog.DialogState
@@ -356,7 +356,7 @@ class SettingViewModel @Inject constructor(
       lyricPrefs.generalLyricOrder = Json.encodeToString(orderList)
       lyricManager.clearAllCache(includePersistent = true)
       // 重新获取歌词
-      lyricManager.updateLyrics(MusicServiceRemote.getCurrentSong())
+      lyricManager.updateLyrics(MusicStateSource.currentPlaybackUiState.song)
     }
     _settingsState.update { it.copy(lyric = it.lyric.copy(generalLyricOrder = orderList)) }
   }

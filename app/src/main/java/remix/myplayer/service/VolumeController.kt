@@ -1,19 +1,17 @@
 package remix.myplayer.service
 
 import android.os.CountDownTimer
-import android.os.DeadSystemException
 import android.os.Handler
 import androidx.annotation.FloatRange
-import timber.log.Timber
 
 /**
  * Created by Remix on 2018/3/13.
  */
 
 class VolumeController(private val service: MusicService) {
+
   private val handler: Handler = Handler()
   private val fadeInRunnable: Runnable = Runnable {
-    val mediaPlayer = service.mediaPlayer
     object : CountDownTimer(DURATION_IN_MS, DURATION_IN_MS / 10) {
       override fun onFinish() {
         directTo(1f)
@@ -21,35 +19,20 @@ class VolumeController(private val service: MusicService) {
 
       override fun onTick(millisUntilFinished: Long) {
         val volume = 1f - millisUntilFinished * 1.0f / DURATION_IN_MS
-        try {
-          mediaPlayer.setVolume(volume, volume)
-        } catch (e: IllegalStateException) {
-          Timber.v(e)
-        }
+        service.playback.setVolume(volume)
       }
     }.start()
   }
   private val fadeOutRunnable: Runnable = Runnable {
-    val mediaPlayer = service.mediaPlayer
     object : CountDownTimer(DURATION_IN_MS, DURATION_IN_MS / 10) {
       override fun onTick(millisUntilFinished: Long) {
         val volume = millisUntilFinished * 1.0f / DURATION_IN_MS
-        try {
-          mediaPlayer.setVolume(volume, volume)
-        } catch (e: IllegalStateException) {
-          Timber.v(e)
-        }
+        service.playback.setVolume(volume)
       }
 
       override fun onFinish() {
-        directTo(0f)
-        try {
-          mediaPlayer.pause()
-        } catch (e: IllegalStateException) {
-          Timber.v(e)
-        } catch (e: DeadSystemException) {
-          Timber.v(e)
-        }
+//        service.playback.setVolume(0f)
+        service.playback.pause()
       }
 
     }.start()
@@ -59,13 +42,11 @@ class VolumeController(private val service: MusicService) {
     directTo(toVolume, toVolume)
   }
 
-  private fun directTo(@FloatRange(from = 0.0, to = 1.0) leftVolume: Float, @FloatRange(from = 0.0, to = 1.0) rightVolume: Float) {
-    val mediaPlayer = service.mediaPlayer
-    try {
-      mediaPlayer.setVolume(leftVolume, rightVolume)
-    } catch (e: IllegalStateException) {
-      Timber.v(e)
-    }
+  private fun directTo(
+    @FloatRange(from = 0.0, to = 1.0) leftVolume: Float,
+    @FloatRange(from = 0.0, to = 1.0) rightVolume: Float
+  ) {
+    service.playback.setVolume(leftVolume)
   }
 
   /**
@@ -87,6 +68,7 @@ class VolumeController(private val service: MusicService) {
   }
 
   companion object {
+
     private const val DURATION_IN_MS = 600L
   }
 }

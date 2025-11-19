@@ -23,6 +23,7 @@ import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.glide.addBitmapListener
 import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.service.Command
+import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.viewmodel.playbackViewModel
 
@@ -68,10 +69,9 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
   var first by remember { mutableStateOf(true) }
   LaunchedEffect(song) {
     if (!first) {
-      val offset = offsetBase
       offsetAnimation.animateTo(
-        targetValue = if (playbackVM.lastOp == Command.PREV) offset else -offset,
-        animationSpec = spring<Float>(
+        targetValue = if (MusicStateSource.currentPlaybackUiState.lastOp == Command.SKIP_TO_PREVIOUS) offsetBase else -offsetBase,
+        animationSpec = spring(
           dampingRatio = Spring.DampingRatioNoBouncy,
           stiffness = Spring.StiffnessMedium
         )
@@ -81,7 +81,7 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
       scaleAnimation.snapTo(0.85f)
       scaleAnimation.animateTo(
         targetValue = 1f,
-        animationSpec = spring<Float>(
+        animationSpec = spring(
           dampingRatio = Spring.DampingRatioMediumBouncy,
           stiffness = Spring.StiffnessMedium * 3
         )

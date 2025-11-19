@@ -6,7 +6,6 @@ import remix.myplayer.data.bean.misc.LyricOrder
 import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.lyric.LyricSearcher
-import remix.myplayer.lyric.LyricsLine
 import remix.myplayer.lyric.provider.network.KuGouProvider
 import remix.myplayer.lyric.provider.network.NetEaseProvider
 import remix.myplayer.lyric.provider.network.QQProvider
@@ -68,7 +67,7 @@ class DefProvider @Inject constructor(
   override val id = LyricOrder.Def.toString()
   override val displayName = context.getString(LyricOrder.Def.stringRes)
 
-  override suspend fun getLyrics(song: Song): List<LyricsLine> {
+  override suspend fun getLyrics(song: Song): LyricsResult {
     getOrderedProviders().forEach {
       try {
         val ret = it.getLyrics(song)
@@ -79,7 +78,7 @@ class DefProvider @Inject constructor(
       }
     }
 
-    throw Exception("no lyric found by def")
+    throw Exception("no lyric found by $id")
   }
 
 }

@@ -47,6 +47,7 @@ import remix.myplayer.misc.CenterInBox
 import remix.myplayer.misc.clickWithRipple
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.dialog.BottomSheetDialog
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
@@ -54,7 +55,6 @@ import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.playpause.PlayPauseView
 import remix.myplayer.util.Util
-import remix.myplayer.viewmodel.PlaybackState
 import remix.myplayer.viewmodel.playbackViewModel
 
 private val itemRes = mapOf(
@@ -67,10 +67,9 @@ private val itemRes = mapOf(
 @Composable
 internal fun PlayingControl(
   modifier: Modifier = Modifier,
-  musicState: PlaybackState,
+  playbackUiState: PlaybackUiState,
   swatch: Palette.Swatch
 ) {
-  val playbackVM = playbackViewModel
   Row(
     modifier = modifier
       .fillMaxSize(),
@@ -78,11 +77,11 @@ internal fun PlayingControl(
     verticalAlignment = Alignment.CenterVertically
   ) {
     val swatchColor = Color(swatch.rgb)
-    val playMode = musicState.playMode
+    val playMode = playbackUiState.playMode
     ControlButton(onClick = {
       val newMode = if (playMode == MODE_REPEAT) MODE_LOOP else playMode + 1
-      playbackVM.setPlayModel(newMode)
       MessageNotifier.show(itemRes[newMode]!!.second)
+      Util.sendCMDLocalBroadcast(Command.CHANGE_MODEL)
     }) {
       Image(
         painter = painterResource(itemRes[playMode]!!.first),
@@ -95,7 +94,7 @@ internal fun PlayingControl(
       Util.sendLocalBroadcast(
         Intent(MusicService.ACTION_CMD).putExtra(
           MusicService.EXTRA_CONTROL,
-          Command.PREV
+          Command.SKIP_TO_PREVIOUS
         )
       )
     }) {
@@ -110,7 +109,7 @@ internal fun PlayingControl(
       Util.sendLocalBroadcast(
         Intent(MusicService.ACTION_CMD).putExtra(
           MusicService.EXTRA_CONTROL,
-          Command.TOGGLE
+          Command.PLAY_PAUSE
         )
       )
     }) {
@@ -124,7 +123,7 @@ internal fun PlayingControl(
         },
         update = {
           it.setBackgroundColor(swatch.rgb)
-          it.updateState(musicState.playing, true)
+          it.updateState(playbackUiState.isPlaying, true)
         }
       )
     }
@@ -133,7 +132,7 @@ internal fun PlayingControl(
       Util.sendLocalBroadcast(
         Intent(MusicService.ACTION_CMD).putExtra(
           MusicService.EXTRA_CONTROL,
-          Command.NEXT
+          Command.SKIP_TO_NEXT
         )
       )
     }) {
@@ -145,7 +144,7 @@ internal fun PlayingControl(
     }
 
     val state = rememberModalBottomSheetState()
-    PlayQueueDialog(state, musicState)
+    PlayQueueDialog(state, playbackUiState)
 
     val scope = rememberCoroutineScope()
     ControlButton(onClick = {
@@ -166,7 +165,7 @@ internal fun PlayingControl(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun PlayQueueDialog(
   state: SheetState,
-  musicState: PlaybackState
+  musicState: PlaybackUiState
 ) {
   val playbackVM = playbackViewModel
   val songs by playbackVM.playQueueSongs.collectAsStateWithLifecycle()

@@ -2,7 +2,6 @@
 <resources>
 
   <style name="Theme.APlayer.Base" parent="Theme.MaterialComponents.Light.NoActionBar">
-    <item name="md_dark_theme">false</item>
 
     <item name="android:windowActionBarOverlay">true</item>
     <item name="windowActionBarOverlay">true</item>
@@ -33,7 +32,6 @@
   </style>
 
   <style name="Theme.APlayer.Base.Dark" parent="Theme.MaterialComponents.NoActionBar">
-    <item name="md_dark_theme">false</item>
 
     <item name="android:windowActionBarOverlay">true</item>
     <item name="windowActionBarOverlay">true</item>

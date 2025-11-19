@@ -19,6 +19,7 @@ import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.activity.ComposeActivity
 import remix.myplayer.ui.appwidgets.big.AppWidgetBig
 import remix.myplayer.util.DensityUtil
@@ -36,11 +37,20 @@ abstract class BaseAppwidget
 
   protected lateinit var skin: AppWidgetSkin
 
+  protected val progressState
+    get() = MusicStateSource.currentProgressState
+  protected val playbackState
+    get() = MusicStateSource.currentPlaybackUiState
+
 //  private val defaultDrawableRes: Int
 //    @DrawableRes
 //    get() = if (skin == WHITE_1F) R.drawable.album_empty_bg_night else R.drawable.album_empty_bg_day
 
-  private fun buildServicePendingIntent(context: Context, componentName: ComponentName, cmd: Int): PendingIntent {
+  private fun buildServicePendingIntent(
+    context: Context,
+    componentName: ComponentName,
+    cmd: Int
+  ): PendingIntent {
     val intent = Intent(MusicService.ACTION_APPWIDGET_OPERATE)
     intent.putExtra(EXTRA_CONTROL, cmd)
     intent.component = componentName
@@ -57,7 +67,8 @@ abstract class BaseAppwidget
 
   protected fun hasInstances(context: Context): Boolean {
     try {
-      val appIds = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, javaClass))
+      val appIds =
+        AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, javaClass))
       return appIds != null && appIds.isNotEmpty()
     } catch (e: Exception) {
       Timber.v(e)
@@ -65,31 +76,67 @@ abstract class BaseAppwidget
     return false
   }
 
-  protected fun updateCover(service: MusicService, remoteViews: RemoteViews, appWidgetIds: IntArray?, reloadCover: Boolean) {
-    val song = service.currentSong
-    val size = if (this.javaClass.simpleName == AppWidgetBig::class.java.simpleName) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
+  protected fun updateCover(
+    service: MusicService,
+    remoteViews: RemoteViews,
+    appWidgetIds: IntArray?,
+    reloadCover: Boolean
+  ) {
+    val song = playbackState.song
+    val size =
+      if (this.javaClass.simpleName == AppWidgetBig::class.java.simpleName) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
 
     Glide.with(service)
-        .asBitmap()
-        .load(song)
-        .centerCrop()
-        .signature(ObjectKey(UriFetcher.albumVersion))
-        .override(size, size)
-        .into(AppWidgetTarget(service, size, size, R.id.appwidget_image, remoteViews, ComponentName(service, javaClass)))
+      .asBitmap()
+      .load(song)
+      .centerCrop()
+      .signature(ObjectKey(UriFetcher.albumVersion))
+      .override(size, size)
+      .into(
+        AppWidgetTarget(
+          service,
+          size,
+          size,
+          R.id.appwidget_image,
+          remoteViews,
+          ComponentName(service, javaClass)
+        )
+      )
   }
 
   protected fun buildAction(context: Context, views: RemoteViews) {
     val componentNameForService = ComponentName(context, MusicService::class.java)
-    views.setOnClickPendingIntent(R.id.appwidget_toggle, buildServicePendingIntent(context, componentNameForService, Command.TOGGLE))
-    views.setOnClickPendingIntent(R.id.appwidget_prev, buildServicePendingIntent(context, componentNameForService, Command.PREV))
-    views.setOnClickPendingIntent(R.id.appwidget_next, buildServicePendingIntent(context, componentNameForService, Command.NEXT))
-    views.setOnClickPendingIntent(R.id.appwidget_model, buildServicePendingIntent(context, componentNameForService, Command.CHANGE_MODEL))
-    views.setOnClickPendingIntent(R.id.appwidget_love, buildServicePendingIntent(context, componentNameForService, Command.LOVE))
-    views.setOnClickPendingIntent(R.id.appwidget_timer, buildServicePendingIntent(context, componentNameForService, Command.TOGGLE_TIMER))
+    views.setOnClickPendingIntent(
+      R.id.appwidget_toggle,
+      buildServicePendingIntent(context, componentNameForService, Command.PLAY_PAUSE)
+    )
+    views.setOnClickPendingIntent(
+      R.id.appwidget_prev,
+      buildServicePendingIntent(context, componentNameForService, Command.SKIP_TO_PREVIOUS)
+    )
+    views.setOnClickPendingIntent(
+      R.id.appwidget_next,
+      buildServicePendingIntent(context, componentNameForService, Command.SKIP_TO_NEXT)
+    )
+    views.setOnClickPendingIntent(
+      R.id.appwidget_model,
+      buildServicePendingIntent(context, componentNameForService, Command.CHANGE_MODEL)
+    )
+    views.setOnClickPendingIntent(
+      R.id.appwidget_love,
+      buildServicePendingIntent(context, componentNameForService, Command.LOVE)
+    )
+    views.setOnClickPendingIntent(
+      R.id.appwidget_timer,
+      buildServicePendingIntent(context, componentNameForService, Command.TOGGLE_TIMER)
+    )
 
     val action = Intent(context, ComposeActivity::class.java)
     action.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-    views.setOnClickPendingIntent(R.id.appwidget_clickable, PendingIntent.getActivity(context, 0, action, getPendingIntentFlag()))
+    views.setOnClickPendingIntent(
+      R.id.appwidget_clickable,
+      PendingIntent.getActivity(context, 0, action, getPendingIntentFlag())
+    )
   }
 
   protected fun pushUpdate(context: Context, appWidgetId: IntArray?, remoteViews: RemoteViews) {
@@ -104,7 +151,11 @@ abstract class BaseAppwidget
     }
   }
 
-  protected fun pushPartiallyUpdate(context: Context, appWidgetId: IntArray?, remoteViews: RemoteViews) {
+  protected fun pushPartiallyUpdate(
+    context: Context,
+    appWidgetId: IntArray?,
+    remoteViews: RemoteViews
+  ) {
     if (!hasInstances(context)) {
       return
     }
@@ -134,40 +185,51 @@ abstract class BaseAppwidget
   }
 
   private fun updateProgress(service: MusicService, remoteViews: RemoteViews, song: Song) {
-    //设置时间
+    // 设置时间
     remoteViews.setTextColor(R.id.appwidget_progress, skin.progressColor)
-    //进度
-    remoteViews.setProgressBar(R.id.appwidget_seekbar, song.duration.toInt(), service.progress, false)
+    // 进度
+    remoteViews.setProgressBar(
+      R.id.appwidget_seekbar,
+      song.duration.toInt(),
+      progressState.position.toInt(),
+      false
+    )
   }
 
   private fun updateLove(service: MusicService, remoteViews: RemoteViews, song: Song) {
-    remoteViews.setImageViewResource(R.id.appwidget_love, if (service.isFavorite) skin.lovedRes else skin.loveRes)
+    remoteViews.setImageViewResource(
+      R.id.appwidget_love,
+      if (playbackState.isFavorite) skin.lovedRes else skin.loveRes
+    )
   }
 
   private fun updateNextAndPrev(remoteViews: RemoteViews) {
-    //上下首歌曲
+    // 上下首歌曲
     remoteViews.setImageViewResource(R.id.appwidget_next, skin.nextRes)
     remoteViews.setImageViewResource(R.id.appwidget_prev, skin.prevRes)
   }
 
   private fun updateModel(service: MusicService, remoteViews: RemoteViews) {
-    //播放模式
+    // 播放模式
     remoteViews.setImageViewResource(R.id.appwidget_model, skin.getModeRes(service))
   }
 
   private fun updatePlayPause(service: MusicService, remoteViews: RemoteViews) {
     //播放暂停按钮
-    remoteViews.setImageViewResource(R.id.appwidget_toggle, if (service.isPlaying) skin.pauseRes else skin.playRes)
+    remoteViews.setImageViewResource(
+      R.id.appwidget_toggle,
+      if (service.isPlaying) skin.pauseRes else skin.playRes
+    )
   }
 
   private fun updateTitle(remoteViews: RemoteViews, song: Song) {
-    //歌曲名
+    // 歌曲名
     remoteViews.setTextColor(R.id.appwidget_title, skin.titleColor)
     remoteViews.setTextViewText(R.id.appwidget_title, song.title)
   }
 
   private fun updateArtist(remoteViews: RemoteViews, song: Song) {
-    //歌手名
+    // 歌手名
     remoteViews.setTextColor(R.id.appwidget_artist, skin.artistColor)
     remoteViews.setTextViewText(R.id.appwidget_artist, song.artist)
   }
@@ -181,9 +243,9 @@ abstract class BaseAppwidget
   abstract fun partiallyUpdateWidget(service: MusicService)
 
   companion object {
+
     const val EXTRA_WIDGET_NAME = "WidgetName"
     const val EXTRA_WIDGET_IDS = "WidgetIds"
-
 
     val SKIN_WHITE_1F = 1//白色不带透明
     val SKIN_TRANSPARENT = 2//透明

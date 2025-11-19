@@ -16,6 +16,7 @@ import remix.myplayer.R
 import remix.myplayer.data.prefs.SettingPrefsEntryPoint
 import remix.myplayer.data.prefs.delegate
 import remix.myplayer.ui.nav.RouteEq
+import remix.myplayer.util.Util.isIntentAvailable
 import timber.log.Timber
 
 /**
@@ -304,9 +305,13 @@ object EQHelper {
    */
   @JvmStatic
   fun startEqualizer(activity: Activity, nav: NavHostController) {
-    val sessionId = MusicServiceRemote.getMediaPlayer()?.audioSessionId
+    val sessionId = MusicServiceRemote.getAudioSessionId() ?: return
     if (sessionId == AudioEffect.ERROR_BAD_VALUE) {
-      Toast.makeText(activity, activity.resources.getString(R.string.no_audio_ID), Toast.LENGTH_LONG).show()
+      Toast.makeText(
+        activity,
+        activity.resources.getString(R.string.no_audio_ID),
+        Toast.LENGTH_LONG
+      ).show()
       return
     }
     val audioEffectIntent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
@@ -316,12 +321,11 @@ object EQHelper {
       activity.startActivityForResult(audioEffectIntent, REQUEST_EQ)
     } else {
       nav.navigate(RouteEq)
-//      activity.startActivity(Intent(activity, EQActivity::class.java))
     }
   }
 
   private fun isSystemEqualizerAvailable(context: Context): Boolean {
-    return false
+    return isIntentAvailable(context, Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL))
   }
 
   private fun tryRun(block: () -> Unit, error: () -> Unit) {

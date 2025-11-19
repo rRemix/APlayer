@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.prefs.SettingPrefs
@@ -94,7 +95,7 @@ class PlayQueue @Inject constructor(
     Timber.v("makeShuffleList, queue: ${_playingQueue.size}")
   }
 
-  suspend fun restoreIfNecessary() {
+  suspend fun restoreIfNecessary() = withContext(Dispatchers.IO) {
     if (!loaded && _playingQueue.isEmpty()) {
       val queue = playQueueRepository.getAllSongs().first()
       if (queue.isNotEmpty()) {
@@ -102,7 +103,7 @@ class PlayQueue @Inject constructor(
         _playingQueue.addAll(_originalQueue)
         makeList()
       } else {
-        //默认全部歌曲为播放列表
+        // 默认全部歌曲为播放列表
         setPlayQueue(songRepository.allSongs())
       }
 
@@ -118,13 +119,13 @@ class PlayQueue @Inject constructor(
     if (_originalQueue.isEmpty()) {
       return
     }
-    //读取上次退出时正在播放的歌曲的id
+    // 读取上次退出时正在播放的歌曲的id
     val lastSong = settingPrefs.lastSong
-    //上次退出时正在播放的歌曲是否还存在
+    // 上次退出时正在播放的歌曲是否还存在
     var exist = false
-    //上次退出时正在播放的歌曲的pos
+    // 上次退出时正在播放的歌曲的pos
     var pos = 0
-    //查找上次退出时的歌曲是否还存在
+    // 查找上次退出时的歌曲是否还存在
     if (lastSong.isNotEmpty()) {
       for (i in _originalQueue.indices) {
         if (lastSong == _originalQueue[i].id.toString() || lastSong == _originalQueue[i].data) {
@@ -135,7 +136,7 @@ class PlayQueue @Inject constructor(
       }
     }
 
-    //上次退出时保存的正在播放的歌曲未失效
+    // 上次退出时保存的正在播放的歌曲未失效
     if (exist) {
       setUpDataSource(_originalQueue[pos], pos)
     } else {
@@ -172,7 +173,7 @@ class PlayQueue @Inject constructor(
    * 添加到下一首播放
    */
   fun addNextSong(nextSong: Song) {
-    //添加到播放队列
+    // 添加到播放队列
     if (nextSong == this.nextSong) {
       MessageNotifier.show(R.string.already_add_to_next_song)
       return
@@ -196,29 +197,14 @@ class PlayQueue @Inject constructor(
     saveQueue()
   }
 
-  fun addSong(song: Song) {
+  fun addSongs(songs: List<Song>) {
     synchronized(this) {
-      _playingQueue.add(song)
-      _originalQueue.add(song)
+      _playingQueue.addAll(songs)
+      _originalQueue.addAll(songs)
     }
     saveQueue()
   }
 
-  fun addSong(position: Int, song: Song) {
-    synchronized(this) {
-      _playingQueue.add(position, song)
-      _originalQueue.add(position, song)
-    }
-    saveQueue()
-  }
-
-  fun remove(song: Song) {
-    synchronized(this) {
-      _playingQueue.remove(song)
-      _originalQueue.remove(song)
-    }
-    saveQueue()
-  }
 
   fun removeAll(deleteSongs: List<Song>) {
     synchronized(this) {
@@ -267,24 +253,22 @@ class PlayQueue @Inject constructor(
     updateNextSong()
   }
 
-  private fun saveQueue() {
-    launch {
-      playQueueRepository.clear()
-      playQueueRepository.insert(_originalQueue)
-    }
+  private fun saveQueue() = launch {
+    playQueueRepository.clear()
+    playQueueRepository.insert(_originalQueue)
   }
 
   fun updateNextSong() {
     if (_playingQueue.isEmpty()) {
-      return
-    }
-
-    synchronized(this) {
-      nextPosition = position + 1
-      if (nextPosition >= _playingQueue.size) {
-        nextPosition = 0
+      nextSong = Song.EMPTY_SONG
+    } else {
+      synchronized(this) {
+        nextPosition = position + 1
+        if (nextPosition >= _playingQueue.size) {
+          nextPosition = 0
+        }
+        nextSong = _playingQueue[nextPosition]
       }
-      nextSong = _playingQueue[nextPosition]
     }
 
     Util.sendLocalBroadcast(Intent(ACTION_UPDATE_NEXT))

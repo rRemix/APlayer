@@ -63,7 +63,7 @@ import remix.myplayer.viewmodel.playbackViewModel
 @Composable
 fun DetailScreen(model: APlayerModel) {
   val libraryVM = libraryViewModel
-  val playbackState by playbackViewModel.playbackState.collectAsStateWithLifecycle()
+  val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
 
   val mainVM = mainViewModel
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
@@ -148,11 +148,11 @@ fun DetailScreen(model: APlayerModel) {
                 return@ListSong
               }
 
-              if (playbackState.playing && isPlayingSong) {
+              if (playbackState.isPlaying && isPlayingSong) {
                 nav.navigate(RoutePlayingScreen)
               } else {
                 setPlayQueue(
-                  songs, MusicUtil.makeCmdIntent(Command.PLAYSELECTEDSONG)
+                  songs, MusicUtil.makeCmdIntent(Command.PLAY_AT)
                     .putExtra(MusicService.EXTRA_POSITION, index)
                 )
               }
@@ -201,10 +201,6 @@ fun DetailScreen(model: APlayerModel) {
         override fun onPlayListChanged(name: String) {}
 
         override fun onServiceConnected(service: MusicService) {}
-
-        override fun onMetaChanged() {}
-
-        override fun onPlayStateChange() {}
 
         override fun onServiceDisConnected() {}
 

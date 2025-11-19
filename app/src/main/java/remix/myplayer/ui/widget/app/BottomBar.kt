@@ -49,7 +49,7 @@ private const val triggerThreshold = 10
 
 @Composable
 fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackViewModel) {
-  val musicState by vm.playbackState.collectAsStateWithLifecycle()
+  val playbackState by vm.playbackUiState.collectAsStateWithLifecycle()
   val nav = LocalNavController.current
   val interactionSource = remember { MutableInteractionSource() }
 
@@ -61,7 +61,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
     .height(72.dp)
     .background(LocalTheme.current.dialogBackground)
 
-  val isSongValid = musicState.song.valid()
+  val isSongValid = playbackState.song.valid()
   val interactionModifiers = if (isSongValid) {
     Modifier
       // 点击跳转播放页
@@ -90,7 +90,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
               Intent(MusicService.ACTION_CMD)
                 .putExtra(
                   EXTRA_CONTROL,
-                  if (dragAmount < 0) Command.NEXT else Command.PREV
+                  if (dragAmount < 0) Command.SKIP_TO_NEXT else Command.SKIP_TO_PREVIOUS
                 )
             )
           }
@@ -106,7 +106,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
     verticalAlignment = Alignment.CenterVertically,
   ) {
     GlideCover(
-      model = musicState.song,
+      model = playbackState.song,
       modifier = Modifier
         .padding(start = 12.dp)
         .size(48.dp)
@@ -118,9 +118,9 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
         .fillMaxHeight()
         .padding(horizontal = 8.dp)
     ) {
-      TextPrimary(musicState.song.title, fontSize = 16.sp)
+      TextPrimary(playbackState.song.title, fontSize = 16.sp)
       Spacer(modifier = Modifier.height(2.dp))
-      TextSecondary(text = musicState.song.artist, fontSize = 14.sp)
+      TextSecondary(text = playbackState.song.artist, fontSize = 14.sp)
     }
 
     Row(
@@ -134,11 +134,11 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
           .clickableWithoutRipple(interactionSource) {
             Util.sendLocalBroadcast(
               Intent(MusicService.ACTION_CMD)
-                .putExtra(EXTRA_CONTROL, Command.TOGGLE)
+                .putExtra(EXTRA_CONTROL, Command.PLAY_PAUSE)
             )
           }
           .padding(end = 16.dp),
-        painter = painterResource(if (musicState.playing) R.drawable.bf_btn_stop else R.drawable.bf_btn_play),
+        painter = painterResource(if (playbackState.isPlaying) R.drawable.bf_btn_stop else R.drawable.bf_btn_play),
         contentDescription = "PlayPause",
         tint = buttonColor
       )
@@ -146,7 +146,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
         modifier = Modifier.clickableWithoutRipple(interactionSource) {
           Util.sendLocalBroadcast(
             Intent(MusicService.ACTION_CMD)
-              .putExtra(EXTRA_CONTROL, Command.NEXT)
+              .putExtra(EXTRA_CONTROL, Command.SKIP_TO_NEXT)
           )
         },
         painter = painterResource(R.drawable.bf_btn_next),

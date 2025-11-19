@@ -28,7 +28,6 @@ import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.delegate
 import remix.myplayer.lyric.LyricManager.Companion.ACTION_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.CHANGE_LYRIC
-import remix.myplayer.lyric.LyricManager.Companion.CHANGE_LYRIC_FONT_SCALE
 import remix.myplayer.lyric.LyricManager.Companion.EXTRA_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.EXTRA_LYRIC_URI
 import remix.myplayer.lyric.LyricManager.Companion.SHOW_OFFSET_PANEL

@@ -12,10 +12,6 @@ interface MusicEventCallback {
 
   fun onServiceConnected(service: MusicService)
 
-  fun onMetaChanged()
-
-  fun onPlayStateChange()
-
   fun onServiceDisConnected()
 
   fun onTagChanged(oldSong: Song, newSong: Song)

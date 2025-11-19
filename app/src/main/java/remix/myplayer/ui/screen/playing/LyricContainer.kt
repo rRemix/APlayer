@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -44,8 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import remix.myplayer.R
-import remix.myplayer.lyric.LyricsLine
-import remix.myplayer.lyric.PerWordLyricsLine
+import remix.myplayer.lyric.LyricLine
+import remix.myplayer.lyric.PerWordLyricLine
 import remix.myplayer.misc.clickWithRipple
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextSecondary
@@ -62,16 +63,16 @@ private val DEFAULT_ANIM_SPEC =
   tween<Float>(durationMillis = 400, easing = FastOutSlowInEasing)
 
 @Composable
-fun LyricContainer(
+internal fun LyricContainer(
   modifier: Modifier,
-  lyrics: List<LyricsLine>,
+  lyrics: List<LyricLine>,
   rawProgress: Long,
   rawDuration: Long,
   offset: Long,
-  fontScale: Float,
-  seekbarLastDragTime: Long
+  fontScale: Float
 ) {
-  val progress = rawProgress + offset
+  val uiProgress by playbackViewModel.seekBarUiProgress.collectAsState()
+  val progress = (if (uiProgress != -1L) uiProgress else rawProgress) + offset
   val duration = rawDuration + offset
 
   val playbackVM = playbackViewModel
@@ -150,7 +151,7 @@ fun LyricContainer(
               LocalTheme.current.textSecondary,
               fontSize = fontSize,
               // 如果是逐行歌词并且允许更新进度则分开绘制，否则只绘制已唱
-              if (allowProgressUpdates && line is PerWordLyricsLine) {
+              if (allowProgressUpdates && line is PerWordLyricLine) {
                 line.getProgress(
                   progress.coerceIn(line.time, endTime),
                   endTime
@@ -229,12 +230,7 @@ fun LyricContainer(
     if (lyrics.isEmpty() || viewportHeightPx == 0) return@LaunchedEffect
     val bound = lineBounds.getOrNull(highlightIndex) ?: return@LaunchedEffect
     val target = ((bound.top + bound.height / 2f) - viewportHeightPx / 2f).roundToInt()
-    // 根据seekbar最后拖拽的时间判断是否需要动画滚动
-    if ((System.currentTimeMillis() - seekbarLastDragTime) > 100) {
-      scrollState.animateScrollTo(target, DEFAULT_ANIM_SPEC)
-    } else {
-      scrollState.scrollTo(target)
-    }
+    scrollState.scrollTo(target)
   }
 
   // 进度更新

@@ -53,16 +53,16 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.BOTTOM_SHOW_VOLUME
 import remix.myplayer.misc.CenterInBox
 import remix.myplayer.misc.clickWithRipple
 import remix.myplayer.misc.clickableWithoutRipple
+import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.LineSlider
 import remix.myplayer.ui.widget.common.defaultLineSliderProperties
-import remix.myplayer.viewmodel.PlaybackState
 
 @Composable
 internal fun PlayingBottomBar(
   modifier: Modifier,
   playingScreenBottom: Int,
-  musicState: PlaybackState,
+  musicState: PlaybackUiState,
   swatch: Palette.Swatch
 ) {
   Box(modifier = modifier, contentAlignment = Alignment.TopCenter) {
@@ -110,7 +110,7 @@ internal fun PlayingBottomBar(
 }
 
 @Composable
-private fun NextSong(musicState: PlaybackState, swatchColor: Color, onClick: (() -> Unit)? = null) {
+private fun NextSong(musicState: PlaybackUiState, swatchColor: Color, onClick: (() -> Unit)? = null) {
   CenterInBox(
     modifier = Modifier
       .padding(horizontal = 36.dp)

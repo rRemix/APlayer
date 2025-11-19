@@ -1,7 +1,7 @@
 package remix.myplayer.lyric.provider
 
 import remix.myplayer.data.bean.mp3.Song
-import remix.myplayer.lyric.LyricsLine
+import remix.myplayer.lyric.LyricLine
 
 interface ILyricsProvider {
 
@@ -13,10 +13,15 @@ interface ILyricsProvider {
    *
    * @throws Throwable
    */
-  suspend fun getLyrics(song: Song): List<LyricsLine>
+  suspend fun getLyrics(song: Song): LyricsResult
 
   companion object {
     // 目前只取最高优先级的
     const val CANDIDATE = 1
   }
 }
+
+data class LyricsResult(
+  val data: List<LyricLine>,
+  val providerId: String
+)

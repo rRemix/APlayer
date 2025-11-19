@@ -13,7 +13,7 @@ class KuGouProvider @Inject constructor(
   @ApplicationContext
   private val context: Context,
   private val kuGouClient: KuGouClient
-) : NetWorkLyricProvider<KuGouSong>() {
+) : NetworkProvider<KuGouSong>() {
 
   override val id = LyricOrder.Kugou.toString()
 

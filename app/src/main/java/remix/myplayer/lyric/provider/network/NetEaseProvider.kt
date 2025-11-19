@@ -13,7 +13,7 @@ class NetEaseProvider @Inject constructor(
   @ApplicationContext
   private val context: Context,
   private val netEaseClient: NetEaseClient
-) : NetWorkLyricProvider<NetEaseSong>() {
+) : NetworkProvider<NetEaseSong>() {
 
   override val id = LyricOrder.Netease.toString()
 

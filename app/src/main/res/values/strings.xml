@@ -18,9 +18,9 @@
 
   <string name="from_aplayer">From APlayer</string>
   <string name="about">About APlayer</string>
-  <string name="model_random">Shuffle mode</string>
-  <string name="model_repeat">Repeat the same song</string>
-  <string name="model_normal">Play next song</string>
+  <string name="model_random">Shuffle</string>
+  <string name="model_repeat">Repeat</string>
+  <string name="model_normal">Loop</string>
   <string name="unknown_song">Unknown song</string>
   <string name="unknown_artist">Unknown artist</string>
   <string name="unknown_album">Unknown album</string>

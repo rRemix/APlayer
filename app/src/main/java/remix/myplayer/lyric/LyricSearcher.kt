@@ -11,7 +11,6 @@ import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.delegate
 import remix.myplayer.lyric.provider.ILyricsProvider
-import remix.myplayer.lyric.provider.IgnoredProvider
 import remix.myplayer.misc.checkWorkerThread
 import timber.log.Timber
 import java.io.File
@@ -29,13 +28,6 @@ class LyricSearcher @Inject constructor(
   val lyricPrefs: LyricPrefs,
   private val providers: Set<@JvmSuppressWildcards ILyricsProvider>
 ) {
-//  private val ID_TO_PROVIDER: Map<String, ILyricsProvider> = run {
-//    val map = HashMap<String, ILyricsProvider>()
-//    providers.forEach {
-//      map[it.id] = it
-//    }
-//    map
-//  }
 
   private fun getCacheFile(storageKey: String, persistent: Boolean): File {
     val dir = getCacheDir(persistent)
@@ -51,12 +43,12 @@ class LyricSearcher @Inject constructor(
     return File(baseDir, CACHE_DIRECTORY_NAME)
   }
 
-  private fun getCachedOrNull(song: Song): Pair<List<LyricsLine>, Long>? {
+  private fun getCachedOrNull(song: Song): Pair<List<LyricLine>, Long>? {
     val key = getStorageKey(song)
     listOf(true, false).map { getCacheFile(key, it) }.forEach {
       try {
         var offset by lyricPrefs.sp.delegate("${LyricPrefs.KEY_OFFSET_PREFIX}${key}", 0L)
-        return Pair(Json.decodeFromStream<List<LyricsLine>>(it.inputStream()), offset)
+        return Pair(Json.decodeFromStream<List<LyricLine>>(it.inputStream()), offset)
       } catch (_: FileNotFoundException) {
       } catch (t: Throwable) {
         Timber.tag(TAG).i(t, "Failed to get lyrics from cache $it")
@@ -80,7 +72,7 @@ class LyricSearcher @Inject constructor(
     }
   }
 
-  private fun saveLyrics(song: Song, lyrics: List<LyricsLine>, persistent: Boolean) {
+  private fun saveLyrics(song: Song, lyrics: List<LyricLine>, persistent: Boolean) {
     if (song == Song.EMPTY_SONG) {
       Timber.tag(TAG).e("Trying to save lyrics for empty song")
       return
@@ -115,59 +107,53 @@ class LyricSearcher @Inject constructor(
     delegate = offset
   }
 
-  private fun findProvider(lyricOrder: String): ILyricsProvider {
-    val provider = providers.first { it.id == lyricOrder }
-    requireNotNull(provider)
-    return provider
-  }
-
   /**
    * 针对某一首歌曲，解析出搜索顺序
    * 一般情况是使用默认配置的顺序（通过 DefProvider）
    * 如果用户手动选择了，则只搜索用户选择的
    */
-  private fun resolveProviders(song: Song): List<ILyricsProvider> {
+  private fun resolveProvider(song: Song): ILyricsProvider {
     val key = getStorageKey(song)
     val select by lyricPrefs.sp.delegate(
       "${LyricPrefs.KEY_SONG_PREFIX}${key}",
       LyricOrder.Def.toString()
     )
 
-    return listOf(findProvider(select))
+    return providers.first { it.id == select }
   }
 
   /**
-   * @param provider 由用户指定的歌词源（包括恢复默认）或 null
+   * @param specifyProvider 由用户指定的歌词源或 null（默认）
    */
   internal suspend fun getLyricsAndOffset(
     song: Song,
-    provider: ILyricsProvider?
-  ): Pair<List<LyricsLine>, Long> {
+    specifyProvider: ILyricsProvider?
+  ): Pair<List<LyricLine>, Long> {
     if (song == Song.EMPTY_SONG) {
       return Pair(listOf(), 0)
     }
-    if (provider == null) {
+    if (specifyProvider == null) {
       getCachedOrNull(song)?.let {
         Timber.tag(TAG).v("Got lyrics from cache, song: $song")
         return it
       }
     }
     Timber.tag(TAG).v("Searching lyrics for song: $song")
-    val providers = if (provider != null) listOf(provider) else resolveProviders(song)
-    providers.forEach {
-      Timber.tag(TAG).v("Trying provider: ${it.id}")
+
+    (specifyProvider ?: resolveProvider(song)).let { p ->
+      Timber.tag(TAG).v("Trying provider: ${p.id}")
       try {
-        return Pair(it.getLyrics(song).let { lyrics ->
-          if (provider != null || it !is IgnoredProvider) {
-            // Fallback 到 ignored 可能是因为网络等问题，如果缓存将会导致以后需要手动点击才能获取到歌词
-            saveLyrics(song, lyrics, provider != null)
-          }
-          lyrics
-        }, 0)
+        val ret = p.getLyrics(song)
+        if (specifyProvider != null || ret.providerId != LyricOrder.Ignore.toString()) {
+          // Fallback 到 ignored 可能是因为网络等问题，如果缓存将会导致以后需要手动点击才能获取到歌词
+          saveLyrics(song, ret.data, specifyProvider != null)
+        }
+        return Pair(ret.data, 0)
       } catch (t: Throwable) {
-        Timber.tag(TAG).v(t, "Failed to get lyrics from provider `${it.id}`")
+        Timber.tag(TAG).v(t, "Failed to get lyrics from provider `${p.id}`")
       }
     }
+
     clearCache(song)
     Timber.tag(TAG).i("Failed to get lyrics from any provider, returning empty list")
     return Pair(listOf(), 0)

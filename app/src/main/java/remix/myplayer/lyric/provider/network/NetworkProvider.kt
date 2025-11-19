@@ -2,13 +2,13 @@ package remix.myplayer.lyric.provider.network
 
 import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.lyric.LrcParser
-import remix.myplayer.lyric.LyricsLine
 import remix.myplayer.lyric.provider.ILyricsProvider
 import remix.myplayer.lyric.provider.ILyricsProvider.Companion.CANDIDATE
+import remix.myplayer.lyric.provider.LyricsResult
 import remix.myplayer.lyric.provider.SearchScorer
 import remix.myplayer.util.SearchKeyUtil.getSearchKeys
 
-abstract class NetWorkLyricProvider<T> : ILyricsProvider {
+abstract class NetworkProvider<T> : ILyricsProvider {
 
   protected data class CandidateSong<T>(
     val raw: T,
@@ -18,7 +18,7 @@ abstract class NetWorkLyricProvider<T> : ILyricsProvider {
     val duration: Long?
   )
 
-  final override suspend fun getLyrics(song: Song): List<LyricsLine> {
+  final override suspend fun getLyrics(song: Song): LyricsResult {
     val searchKeys = getSearchKeys(song)
 
     for (key in searchKeys.take(CANDIDATE)) {
@@ -40,7 +40,7 @@ abstract class NetWorkLyricProvider<T> : ILyricsProvider {
           } else {
             lyric
           }
-          return LrcParser.parse(combined)
+          return LyricsResult(LrcParser.parse(combined), id)
         }
       }
     }

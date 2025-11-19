@@ -135,20 +135,6 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
     }
   }
 
-  override fun onMetaChanged() {
-    Timber.tag(TAG).v("onMetaChange")
-    for (listener in serviceEventListeners) {
-      listener.onMetaChanged()
-    }
-  }
-
-  override fun onPlayStateChange() {
-    Timber.tag(TAG).v("onPlayStateChange")
-    for (listener in serviceEventListeners) {
-      listener.onPlayStateChange()
-    }
-  }
-
   override fun onTagChanged(oldSong: Song, newSong: Song) {
     Timber.tag(TAG).v("onTagChanged")
     for (listener in serviceEventListeners) {
@@ -164,8 +150,6 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
       filter.addAction(MusicService.PLAYLIST_CHANGE)
       filter.addAction(MusicService.PERMISSION_CHANGE)
       filter.addAction(MusicService.MEDIA_STORE_CHANGE)
-      filter.addAction(MusicService.META_CHANGE)
-      filter.addAction(MusicService.PLAY_STATE_CHANGE)
       filter.addAction(MusicService.TAG_CHANGE)
       registerLocalReceiver(musicStateReceiver, filter)
       receiverRegistered = true
@@ -205,12 +189,6 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
           }
           MusicService.PLAYLIST_CHANGE -> {
             activity.onPlayListChanged(msg.data.getString(EXTRA_PLAYLIST) ?: "")
-          }
-          MusicService.META_CHANGE -> {
-            activity.onMetaChanged()
-          }
-          MusicService.PLAY_STATE_CHANGE -> {
-            activity.onPlayStateChange()
           }
           MusicService.TAG_CHANGE -> {
             val newSong = msg.data.getSerializable(EXTRA_NEW_SONG) as Song?

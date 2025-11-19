@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.lyric.LrcParser
-import remix.myplayer.lyric.LyricsLine
 import timber.log.Timber
 
 class UriProvider(private val context: Context, private val uri: Uri) : ILyricsProvider {
@@ -17,11 +16,11 @@ class UriProvider(private val context: Context, private val uri: Uri) : ILyricsP
   override val displayName: String
     get() = throw RuntimeException() // 不应该用到
 
-  override suspend fun getLyrics(song: Song): List<LyricsLine> {
+  override suspend fun getLyrics(song: Song): LyricsResult {
     return try {
       context.contentResolver.openInputStream(uri)!!.run {
         try {
-          LrcParser.parse(readBytes().decodeToString())
+          LyricsResult(LrcParser.parse(readBytes().decodeToString()), id)
         } catch (t: Throwable) {
           throw t
         } finally {
@@ -30,7 +29,7 @@ class UriProvider(private val context: Context, private val uri: Uri) : ILyricsP
       }
     } catch (t: Throwable) {
       Timber.tag(TAG).w(t, "Failed to get lyrics from URI: $uri")
-      emptyList()
+      LyricsResult(emptyList(), id)
     }
   }
 }

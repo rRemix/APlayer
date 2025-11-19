@@ -37,11 +37,11 @@ object LrcParser {
    *
    * @param time 整行的开始时间
    */
-  private fun parseWords(time: Long, offset: Long, content: String): LyricsLine {
+  private fun parseWords(time: Long, offset: Long, content: String): LyricLine {
     val words = ArrayList<Word>()
     var currentTime = time
     var lastStart = 0
-    var match = WORD_TIME_TAG_REGEX.find(content) ?: return SimpleLyricsLine(time, content)
+    var match = WORD_TIME_TAG_REGEX.find(content) ?: return SimpleLyricLine(time, content)
     while (true) {
       words.add(Word(currentTime, content.substring(lastStart, match.range.first)))
       parseTime(match.value.substring(1, match.value.lastIndex), offset)?.let {
@@ -54,11 +54,11 @@ object LrcParser {
       match = match.next() ?: break
     }
     words.add(Word(currentTime, content.substring(lastStart)))
-    return PerWordLyricsLine(time, words)
+    return PerWordLyricLine(time, words)
   }
 
-  fun parse(data: String): ArrayList<LyricsLine> {
-    val lines = ArrayList<LyricsLine>()
+  fun parse(data: String): ArrayList<LyricLine> {
+    val lines = ArrayList<LyricLine>()
     var offset = 0L
 
     data.lines().forEach {
@@ -104,7 +104,7 @@ object LrcParser {
         lines.add(parseWords(times[0], offset, it.substring(index)))
       } else {
         times.forEach { time ->
-          lines.add(SimpleLyricsLine(time, it.substring(index)))
+          lines.add(SimpleLyricLine(time, it.substring(index)))
         }
       }
     }
@@ -112,7 +112,7 @@ object LrcParser {
     // 合并翻译
     // 相同时间戳的两行，认为第二行是第一行的翻译
     lines.sortBy { it.time }
-    val combinedLines = ArrayList<LyricsLine>()
+    val combinedLines = ArrayList<LyricLine>()
     for (line in lines) {
       val lastLine = combinedLines.lastOrNull()
       combinedLines.add(

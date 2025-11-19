@@ -53,7 +53,7 @@ fun EQScreen() {
   val context = LocalContext.current
   val nav = LocalNavController.current
 
-  val sessionId = MusicServiceRemote.getMediaPlayer()?.audioSessionId
+  val sessionId = MusicServiceRemote.getAudioSessionId()
   if (sessionId == AudioEffect.ERROR_BAD_VALUE || sessionId == null) {
     MessageNotifier.show(R.string.no_audio_ID)
     nav.popBackStack()

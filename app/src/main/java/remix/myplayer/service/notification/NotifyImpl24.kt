@@ -32,7 +32,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
   private val size = DensityUtil.dip2px(service, 128f)
 
   override fun updateForPlaying() {
-    val song = service.currentSong
+    val song = playbackState.song
 
     //设置封面
     Glide.with(service).clear(target)
@@ -61,7 +61,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
   }
 
   private fun updateWithBitmap(bitmap: Bitmap?, song: Song) {
-    if (song.id != service.currentSong.id) {
+    if (song.id != playbackState.song.id) {
       return
     }
     val playPauseIcon =
@@ -77,15 +77,15 @@ NotifyImpl24(context: MusicService) : Notify(context) {
       .setSmallIcon(R.drawable.icon_notifbar)
       .addAction(
         R.drawable.ic_skip_previous_black_24dp, service.getString(R.string.previous),
-        buildPendingIntent(service, Command.PREV)
+        buildPendingIntent(service, Command.SKIP_TO_PREVIOUS)
       )
       .addAction(
         playPauseIcon, service.getString(R.string.play_pause),
-        buildPendingIntent(service, Command.TOGGLE)
+        buildPendingIntent(service, Command.PLAY_PAUSE)
       )
       .addAction(
         R.drawable.ic_skip_next_black_24dp, service.getString(R.string.next),
-        buildPendingIntent(service, Command.NEXT)
+        buildPendingIntent(service, Command.SKIP_TO_NEXT)
       )
       //根据当前桌面歌词的状态判断是显示开关桌面歌词还是解锁桌面歌词
       //当前显示了桌面歌词并且已经锁定,显示解锁的按钮

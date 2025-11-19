@@ -13,7 +13,7 @@ class QQProvider @Inject constructor(
   @ApplicationContext
   private val context: Context,
   private val qqClient: QQClient
-) : NetWorkLyricProvider<QQSong>() {
+) : NetworkProvider<QQSong>() {
 
   override val id = LyricOrder.Qq.toString()
   override val displayName = context.getString(LyricOrder.Qq.stringRes)

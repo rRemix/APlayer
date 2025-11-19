@@ -196,12 +196,6 @@ class LibraryViewModel @Inject constructor(
   override fun onServiceConnected(service: MusicService) {
   }
 
-  override fun onMetaChanged() {
-  }
-
-  override fun onPlayStateChange() {
-  }
-
   override fun onServiceDisConnected() {
   }
 

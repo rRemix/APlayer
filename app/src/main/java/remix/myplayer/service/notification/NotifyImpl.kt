@@ -46,8 +46,9 @@ class NotifyImpl(context: MusicService) : Notify(context) {
   override fun updateForPlaying() {
     val remoteView = RemoteViews(service.packageName, R.layout.notification)
     val remoteBigView = RemoteViews(service.packageName, R.layout.notification_big)
-    val isPlay = service.isPlaying
-    val song = service.currentSong
+
+    val isPlay = playbackState.isPlaying
+    val song = playbackState.song
 
     buildAction(service, remoteView, remoteBigView)
     val notification = buildNotification(service, remoteView, remoteBigView)
@@ -101,7 +102,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
       .signature(ObjectKey(UriFetcher.albumVersion))
       .into(object : CustomTarget<Bitmap>() {
         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-          if (song.id == service.currentSong.id) {
+          if (song.id == playbackState.song.id) {
             if (!resource.isRecycled) {
               remoteBigView.setImageViewBitmap(R.id.notify_image, resource)
               remoteView.setImageViewBitmap(R.id.notify_image, resource)
@@ -118,7 +119,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
         }
 
         override fun onLoadFailed(errorDrawable: Drawable?) {
-          if (song.id == service.currentSong.id) {
+          if (song.id == playbackState.song.id) {
             remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             pushNotify(notification)
@@ -126,7 +127,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
         }
 
         override fun onLoadStarted(placeholder: Drawable?) {
-          if (song.id == service.currentSong.id) {
+          if (song.id == playbackState.song.id) {
             remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             pushNotify(notification)
@@ -154,15 +155,15 @@ class NotifyImpl(context: MusicService) : Notify(context) {
   private fun buildAction(context: Context, remoteView: RemoteViews, remoteBigView: RemoteViews) {
     //添加Action
     //切换
-    val playIntent = buildPendingIntent(context, Command.TOGGLE)
+    val playIntent = buildPendingIntent(context, Command.PLAY_PAUSE)
     remoteBigView.setOnClickPendingIntent(R.id.notify_play, playIntent)
     remoteView.setOnClickPendingIntent(R.id.notify_play, playIntent)
     //下一首
-    val nextIntent = buildPendingIntent(context, Command.NEXT)
+    val nextIntent = buildPendingIntent(context, Command.SKIP_TO_NEXT)
     remoteBigView.setOnClickPendingIntent(R.id.notify_next, nextIntent)
     remoteView.setOnClickPendingIntent(R.id.notify_next, nextIntent)
     //上一首
-    val prevIntent = buildPendingIntent(context, Command.PREV)
+    val prevIntent = buildPendingIntent(context, Command.SKIP_TO_PREVIOUS)
     remoteBigView.setOnClickPendingIntent(R.id.notify_prev, prevIntent)
 
     //关闭通知栏

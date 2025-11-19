@@ -7,8 +7,8 @@ import android.media.AudioManager
 import dagger.hilt.android.AndroidEntryPoint
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.data.prefs.SettingPrefs.Companion.HEADSET_PLUG
-import remix.myplayer.misc.helper.MusicServiceRemote
 import remix.myplayer.service.Command
+import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.util.Util.sendCMDLocalBroadcast
 import timber.log.Timber
 import javax.inject.Inject
@@ -45,9 +45,9 @@ class HeadsetPlugReceiver : BroadcastReceiver() {
     if (state == PLUGGED) {
       Timber.v("耳机插入")
       if (settingPrefs.autoPlay == HEADSET_PLUG) {
-        sendCMDLocalBroadcast(Command.START)
+        sendCMDLocalBroadcast(Command.PLAY)
       }
-    } else if (state == UNPLUGGED && MusicServiceRemote.isPlaying()) {
+    } else if (state == UNPLUGGED && MusicStateSource.currentPlaybackUiState.isPlaying) {
       Timber.v("耳机拔出")
       sendCMDLocalBroadcast(Command.PAUSE)
 

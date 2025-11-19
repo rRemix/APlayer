@@ -21,7 +21,11 @@ import remix.myplayer.util.Util
 
 class AppWidgetSmall : BaseAppwidget() {
 
-  override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+  override fun onUpdate(
+    context: Context,
+    appWidgetManager: AppWidgetManager,
+    appWidgetIds: IntArray
+  ) {
     super.onUpdate(context, appWidgetManager, appWidgetIds)
     defaultAppWidget(context, appWidgetIds)
     val intent = Intent(MusicService.ACTION_WIDGET_UPDATE)
@@ -37,7 +41,7 @@ class AppWidgetSmall : BaseAppwidget() {
   }
 
   override fun updateWidget(service: MusicService, appWidgetIds: IntArray?, reloadCover: Boolean) {
-    val song = service.currentSong
+    val song = playbackState.song
     if (song == Song.EMPTY_SONG) {
       return
     }
@@ -53,7 +57,7 @@ class AppWidgetSmall : BaseAppwidget() {
   }
 
   override fun partiallyUpdateWidget(service: MusicService) {
-    val song = service.currentSong
+    val song = playbackState.song
     if (song == Song.EMPTY_SONG) {
       return
     }
@@ -65,18 +69,20 @@ class AppWidgetSmall : BaseAppwidget() {
     skin = AppWidgetSkin.WHITE_1F
     updateRemoteViews(service, remoteViews, song)
 
-    val appIds = AppWidgetManager.getInstance(service).getAppWidgetIds(ComponentName(service, javaClass))
+    val appIds =
+      AppWidgetManager.getInstance(service).getAppWidgetIds(ComponentName(service, javaClass))
     pushPartiallyUpdate(service, appIds, remoteViews)
   }
 
   companion object {
+
     @Volatile
     private var INSTANCE: AppWidgetSmall? = null
 
     @JvmStatic
     fun getInstance(): AppWidgetSmall =
-        INSTANCE ?: synchronized(this) {
-          INSTANCE ?: AppWidgetSmall()
-        }
+      INSTANCE ?: synchronized(this) {
+        INSTANCE ?: AppWidgetSmall()
+      }
   }
 }
