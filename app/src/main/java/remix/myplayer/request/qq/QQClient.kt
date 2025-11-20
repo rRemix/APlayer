@@ -113,7 +113,7 @@ class QQClient @Inject constructor(
   /**
    * 搜索歌曲
    */
-  fun searchSong(keyword: String): QQSong? {
+  fun searchSongList(keyword: String): List<QQSong> {
     val searchId = Random.nextLong(1, 21) * 18014398509481984L +
         Random.nextLong(0, 4194305) * 4294967296L +
         (System.currentTimeMillis() % 86400000)
@@ -122,7 +122,7 @@ class QQClient @Inject constructor(
       "search_id" to searchId.toString(),
       "remoteplace" to "search.android.keyboard",
       "query" to keyword,
-      "search_type" to 0, // 歌曲搜索
+      "search_type" to 0,
       "num_per_page" to 20,
       "page_num" to 1,
       "highlight" to 0,
@@ -132,31 +132,31 @@ class QQClient @Inject constructor(
     )
 
     val data = request("DoSearchForQQMusicLite", "music.search.SearchCgiService", param)
-    val itemSong = data.getJSONObject("body").optJSONArray("item_song") ?: return null
-
-    if (itemSong.length() == 0) return null
-
-    val first = itemSong.getJSONObject(0)
-    val singers = first.optJSONArray("singer") ?: JSONArray()
-    val artists = mutableListOf<String>()
-    for (i in 0 until singers.length()) {
-      val singer = singers.getJSONObject(i)
-      val name = singer.optString("name", "")
-      if (name.isNotEmpty()) {
-        artists.add(name)
+    val itemSong = data.getJSONObject("body").optJSONArray("item_song") ?: JSONArray()
+    val result = ArrayList<QQSong>()
+    for (i in 0 until itemSong.length()) {
+      val obj = itemSong.getJSONObject(i)
+      val singers = obj.optJSONArray("singer") ?: JSONArray()
+      val artists = mutableListOf<String>()
+      for (j in 0 until singers.length()) {
+        val singer = singers.getJSONObject(j)
+        val name = singer.optString("name", "")
+        if (name.isNotEmpty()) artists.add(name)
       }
+      result.add(
+        QQSong(
+          id = obj.optLong("id"),
+          mid = obj.optString("mid"),
+          title = obj.optString("title"),
+          subtitle = obj.optString("subtitle"),
+          artist = artists,
+          album = obj.optJSONObject("album")?.optString("name") ?: "",
+          duration = obj.optLong("interval") * 1000,
+          language = obj.optInt("language")
+        )
+      )
     }
-
-    return QQSong(
-      id = first.optLong("id"),
-      mid = first.optString("mid"),
-      title = first.optString("title"),
-      subtitle = first.optString("subtitle"),
-      artist = artists,
-      album = first.getJSONObject("album").optString("name"),
-      duration = first.optLong("interval") * 1000,
-      language = first.optInt("language")
-    )
+    return result
   }
 
   /**
@@ -216,7 +216,6 @@ class QQClient @Inject constructor(
 
     return Pair(originalLyric, translationLyric)
   }
-
 
   /**
    * 将QRC格式转换为LRC格式

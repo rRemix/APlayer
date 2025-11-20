@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
@@ -39,7 +39,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
 import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
@@ -47,6 +46,7 @@ import remix.myplayer.misc.CenterInBox
 import remix.myplayer.misc.clickWithRipple
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.dialog.BottomSheetDialog
 import remix.myplayer.ui.nav.MessageNotifier
@@ -54,7 +54,9 @@ import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.playpause.PlayPauseView
+import remix.myplayer.util.MusicUtil.makeCmdIntent
 import remix.myplayer.util.Util
+import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.viewmodel.playbackViewModel
 
 private val itemRes = mapOf(
@@ -167,6 +169,7 @@ private fun PlayQueueDialog(
   state: SheetState,
   musicState: PlaybackUiState
 ) {
+  val scope = rememberCoroutineScope()
   val playbackVM = playbackViewModel
   val songs by playbackVM.playQueueSongs.collectAsStateWithLifecycle()
 
@@ -187,16 +190,25 @@ private fun PlayQueueDialog(
 
     val lazyState = rememberLazyListState()
     LazyColumn(state = lazyState) {
-      items(songs, key = { it.id }) { song ->
-        val valid = song != Song.EMPTY_SONG
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(50.dp)) {
+      itemsIndexed(songs, key = { _, song -> song.id }) { pos, song ->
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          modifier = Modifier
+            .height(50.dp)
+            .clickWithRipple(false) {
+              sendLocalBroadcast(
+                makeCmdIntent(Command.PLAY_AT)
+                  .putExtra(EXTRA_POSITION, pos)
+              )
+              scope.launch { state.hide() }
+            }) {
           Column(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
               .padding(horizontal = 16.dp)
               .weight(1f)
           ) {
-            if (!valid) {
+            if (!song.valid()) {
               TextPrimary(stringResource(R.string.song_lose_effect))
             } else {
               TextPrimary(
@@ -207,7 +219,7 @@ private fun PlayQueueDialog(
             }
           }
 
-          if (valid) {
+          if (song.valid()) {
             CenterInBox(
               modifier = Modifier
                 .clickWithRipple {

@@ -19,15 +19,17 @@ class KuGouProvider @Inject constructor(
 
   override val displayName = context.getString(LyricOrder.Kugou.stringRes)
 
-  override suspend fun searchSong(searchKey: String): CandidateSong<KuGouSong>? {
-    val kgSong = kuGouClient.searchSong(searchKey) ?: return null
-    return CandidateSong(
-      raw = kgSong,
-      title = kgSong.title,
-      artist = kgSong.artists.joinToString(", "),
-      album = kgSong.album,
-      duration = kgSong.durationMs
-    )
+  override suspend fun searchCandidates(searchKey: String): List<CandidateSong<KuGouSong>> {
+    val list = kuGouClient.searchSongList(searchKey)
+    return list.map { s ->
+      CandidateSong(
+        raw = s,
+        title = s.title,
+        artist = s.artists.joinToString(", "),
+        album = s.album,
+        duration = s.durationMs
+      )
+    }
   }
 
   override suspend fun searchLyric(candidateSong: CandidateSong<KuGouSong>): Pair<String?, String?> {

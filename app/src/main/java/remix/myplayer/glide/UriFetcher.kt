@@ -19,6 +19,7 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.DOWNLOAD_COVER_ALWAYS
 import remix.myplayer.data.prefs.SettingPrefs.Companion.DOWNLOAD_COVER_WIFI_ONLY
 import remix.myplayer.data.prefs.SettingPrefs.Companion.DOWNLOAD_LASTFM
 import remix.myplayer.data.prefs.SettingPrefsEntryPoint
+import remix.myplayer.lyric.provider.SearchScorer
 import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.repo.SongRepositoryEntryPoint
 import remix.myplayer.request.netease.NetEaseClientEntryPoint
@@ -33,6 +34,8 @@ import java.io.File
  * created by Remix on 2021/4/20
  */
 object UriFetcher {
+
+  private const val CANDIDATE_KEY_NUMBER = 1
 
   private val BLACKLIST = listOf(
     "https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png".toUri(),
@@ -214,9 +217,28 @@ object UriFetcher {
             return lastFMUri.toUri()
           }
         } else {
-          val neSong = neClient.searchSong(SearchKeyUtil.getNetEaseSearchKey(song))
-          if (neSong?.al?.picUrl?.isNotEmpty() == true) {
-            return neSong.al.picUrl.toUri()
+          val searchKeys = SearchKeyUtil.getSearchKeys(song)
+          for (key in searchKeys.take(CANDIDATE_KEY_NUMBER)) {
+            val candidates = neClient.searchSongList(key.value)
+            val best = candidates
+              .map { ne ->
+                ne to SearchScorer.calculateSongScoreWithKeyKind(
+                  targetSong = song,
+                  candidateTitle = ne.name,
+                  candidateArtist = ne.ar?.joinToString(", ") { it.name ?: "" },
+                  candidateAlbum = ne.al?.name,
+                  candidateDuration = ne.dt,
+                  keyword = key.value,
+                  keyKind = key.kind
+                )
+              }
+              .filter { it.second.isValid }
+              .maxByOrNull { it.second.score }
+              ?.first
+
+            if (best?.al?.picUrl?.isNotEmpty() == true) {
+              return best.al.picUrl.toUri()
+            }
           }
         }
       } catch (e: Exception) {
@@ -255,9 +277,24 @@ object UriFetcher {
             return lastFMUri.toUri()
           }
         } else {
-          val neAlbum = neClient.searchAlbum(SearchKeyUtil.getNetEaseSearchKey(album))
-          if (neAlbum != null && !neAlbum.picUrl.isNullOrEmpty()) {
-            return neAlbum.picUrl.toUri()
+          val searchKeys = SearchKeyUtil.getSearchKeys(album)
+          for (key in searchKeys.take(CANDIDATE_KEY_NUMBER)) {
+            val candidates = neClient.searchAlbumList(key.value)
+            val best = candidates
+              .map { ne ->
+                ne to SearchScorer.calculateAlbumScore(
+                  album,
+                  ne.name,
+                  null,
+                )
+              }
+              .filter { it.second.isValid }
+              .maxByOrNull { it.second.score }
+              ?.first
+
+            if (best?.picUrl?.isNotEmpty() == true) {
+              return best.picUrl.toUri()
+            }
           }
         }
       } catch (e: Exception) {
@@ -291,9 +328,23 @@ object UriFetcher {
             return lastFMUri.toUri()
           }
         } else {
-          val neArtist = neClient.searchArtist(SearchKeyUtil.getNetEaseSearchKey(artist))
-          if (neArtist != null && !neArtist.picUrl.isNullOrEmpty()) {
-            return neArtist.picUrl.toUri()
+          val searchKeys = SearchKeyUtil.getSearchKeys(artist)
+          for (key in searchKeys.take(CANDIDATE_KEY_NUMBER)) {
+            val candidates = neClient.searchArtistList(key.value)
+            val best = candidates
+              .map { ne ->
+                ne to SearchScorer.calculateArtistScore(
+                  artist,
+                  ne.name,
+                )
+              }
+              .filter { it.second.isValid }
+              .maxByOrNull { it.second.score }
+              ?.first
+
+            if (best?.picUrl?.isNotEmpty() == true) {
+              return best.picUrl.toUri()
+            }
           }
         }
       } catch (e: Exception) {
@@ -353,7 +404,7 @@ object UriFetcher {
   /**
    * 根据artistId搜索MediaStore中是否存在封面
    */
-  fun getArtistArt(artistId: Long): String {
+  private fun getArtistArt(artistId: Long): String {
     val songs = songRepo.getSongs(Audio.Media.ARTIST_ID + " = " + artistId, null)
     if (!songs.isEmpty()) {
       for (song in songs) {
@@ -373,7 +424,7 @@ object UriFetcher {
   /**
    * 判断某专辑在本地数据库是否有封面
    */
-  fun isAlbumThumbExistInMediaCache(uri: Uri): Boolean {
+  private fun isAlbumThumbExistInMediaCache(uri: Uri): Boolean {
     var exist = false
     try {
       context.contentResolver.openInputStream(uri).use { ignored ->
@@ -387,12 +438,16 @@ object UriFetcher {
   /**
    * 返回自定义的封面
    */
-  fun getCustomThumbIfExist(id: Long, type: Int): File? {
+  private fun getCustomThumbIfExist(id: Long, type: Int): File? {
     val img = File(DiskCache.getDiskCacheDir(context, "thumbnail"), "$type-$id.jpg")
     if (img.exists()) {
       return img
     }
     return null
+  }
+
+  private fun getSearchKey(model: Any): String? {
+    return SearchKeyUtil.getSearchKeys(model).firstOrNull()?.value
   }
 
   private enum class ImageSize {

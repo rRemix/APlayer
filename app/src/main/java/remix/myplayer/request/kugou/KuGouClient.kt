@@ -26,9 +26,9 @@ class KuGouClient @Inject constructor(
   private val kgSecret = "LnT6xpN3khm36zse0QzvmgTZ3waWdRSA"
 
   /**
-   * 搜索歌曲，返回第一条候选
+   * 搜索歌曲
    */
-  fun searchSong(keyword: String, page: Int = 1): KuGouSong? {
+  fun searchSongList(keyword: String, page: Int = 1): List<KuGouSong> {
     val url = "http://complexsearch.kugou.com/v2/search/song"
     val params = mutableMapOf<String, Any>(
       "sorttype" to "0",
@@ -37,24 +37,28 @@ class KuGouClient @Inject constructor(
       "page" to page
     )
     val headers = mutableMapOf("x-router" to "complexsearch.kugou.com")
-
     val resp =
       kgRequest(url, params, module = "SearchSong", method = "GET", data = null, headers = headers)
     val lists = resp.optJSONObject("data")?.optJSONArray("lists") ?: JSONArray()
-    if (lists.length() == 0) return null
-    val first = lists.getJSONObject(0)
-    val singersArr = first.optJSONArray("Singers") ?: JSONArray()
-    val artists = (0 until singersArr.length())
-      .mapNotNull { i -> singersArr.optJSONObject(i)?.optString("name") }
-      .filter { it.isNotBlank() }
-    return KuGouSong(
-      id = first.optLong("ID"),
-      hash = first.optString("FileHash"),
-      title = first.optString("SongName"),
-      artists = artists,
-      album = first.optString("AlbumName"),
-      durationMs = first.optLong("Duration") * 1000
-    )
+    val result = ArrayList<KuGouSong>()
+    for (i in 0 until lists.length()) {
+      val obj = lists.getJSONObject(i)
+      val singersArr = obj.optJSONArray("Singers") ?: JSONArray()
+      val artists = (0 until singersArr.length()).mapNotNull { ii ->
+        singersArr.optJSONObject(ii)?.optString("name")
+      }.filter { it.isNotBlank() }
+      result.add(
+        KuGouSong(
+          id = obj.optLong("ID"),
+          hash = obj.optString("FileHash"),
+          title = obj.optString("SongName"),
+          artists = artists,
+          album = obj.optString("AlbumName"),
+          durationMs = obj.optLong("Duration") * 1000
+        )
+      )
+    }
+    return result
   }
 
   /**

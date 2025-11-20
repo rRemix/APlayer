@@ -17,7 +17,7 @@ interface ILyricsProvider {
 
   companion object {
     // 目前只取最高优先级的
-    const val CANDIDATE = 1
+    const val CANDIDATE_KEY_NUMBER = 1
   }
 }
 

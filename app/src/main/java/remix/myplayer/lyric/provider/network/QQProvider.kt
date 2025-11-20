@@ -18,15 +18,17 @@ class QQProvider @Inject constructor(
   override val id = LyricOrder.Qq.toString()
   override val displayName = context.getString(LyricOrder.Qq.stringRes)
 
-  override suspend fun searchSong(searchKey: String): CandidateSong<QQSong>? {
-    val qqSong = qqClient.searchSong(searchKey) ?: return null
-    return CandidateSong(
-      raw = qqSong,
-      title = qqSong.title,
-      artist = qqSong.artist.joinToString(", "),
-      album = qqSong.album,
-      duration = qqSong.duration
-    )
+  override suspend fun searchCandidates(searchKey: String): List<CandidateSong<QQSong>> {
+    val list = qqClient.searchSongList(searchKey)
+    return list.map { s ->
+      CandidateSong(
+        raw = s,
+        title = s.title,
+        artist = s.artist.joinToString(", "),
+        album = s.album,
+        duration = s.duration
+      )
+    }
   }
 
   override suspend fun searchLyric(candidateSong: CandidateSong<QQSong>): Pair<String?, String?> {

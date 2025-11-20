@@ -246,7 +246,6 @@ class NetEaseClient @Inject constructor(
     }
   }
 
-
   /**
    * 将 yrc/ytlrc（每字时间格式）转换为常见增强型 LRC 文本：
    * 行格式：[mm:ss.xx]，词内时间标签：<mm:ss.xx>
@@ -286,7 +285,7 @@ class NetEaseClient @Inject constructor(
   /**
    * 搜索歌曲
    */
-  fun searchSong(keyword: String): NetEaseSong? {
+  fun searchSongList(keyword: String): List<NetEaseSong> {
     val params = JSONObject().apply {
       put("limit", "20")
       put("offset", "0")
@@ -295,25 +294,28 @@ class NetEaseClient @Inject constructor(
       put("needCorrect", "true")
     }
     val obj = eapiRequest("/eapi/search/song/list/page", params)
-    val data = obj.optJSONObject("data") ?: return null
+    val data = obj.optJSONObject("data") ?: return emptyList()
     val resources = data.optJSONArray("resources") ?: JSONArray()
-    if (resources.length() == 0) return null
-    val first = resources.optJSONObject(0)
-    val baseInfo = first?.optJSONObject("baseInfo")
-    val simple = baseInfo?.optJSONObject("simpleSongData")
-
-    return try {
-      json.decodeFromString<NetEaseSong>(simple?.toString()!!)
-    } catch (e: Exception) {
-      Timber.w("searchSong: $e")
-      throw e
+    if (resources.length() == 0) return emptyList()
+    val result = mutableListOf<NetEaseSong>()
+    for (i in 0 until resources.length()) {
+      val baseInfo = resources.optJSONObject(i)?.optJSONObject("baseInfo")
+      val simple = baseInfo?.optJSONObject("simpleSongData")
+      if (simple != null) {
+        try {
+          result.add(json.decodeFromString<NetEaseSong>(simple.toString()))
+        } catch (e: Exception) {
+          Timber.w("searchSongList: $e")
+        }
+      }
     }
+    return result
   }
 
   /**
    * 搜索专辑
    */
-  fun searchAlbum(keyword: String): NetEaseAlbum? {
+  fun searchAlbumList(keyword: String): List<NetEaseAlbum> {
     val params = JSONObject().apply {
       put("limit", "20")
       put("offset", "0")
@@ -321,24 +323,23 @@ class NetEaseClient @Inject constructor(
       put("queryCorrect", "true")
     }
     val obj = eapiRequest("/eapi/v1/search/album/get", params)
-    val albums = obj.optJSONObject("result")?.optJSONArray("albums") ?: return null
-
-    if (albums.length() == 0) {
-      return null
+    val albums = obj.optJSONObject("result")?.optJSONArray("albums") ?: return emptyList()
+    val result = mutableListOf<NetEaseAlbum>()
+    for (i in 0 until albums.length()) {
+      val item = albums.optJSONObject(i) ?: continue
+      try {
+        result.add(json.decodeFromString<NetEaseAlbum>(item.toString()))
+      } catch (e: Exception) {
+        Timber.w("searchAlbumList: $e")
+      }
     }
-
-    return try {
-      json.decodeFromString<NetEaseAlbum>(albums.get(0).toString())
-    } catch (e: Exception) {
-      Timber.w("searchAlbum: $e")
-      throw e
-    }
+    return result
   }
 
   /**
    * 搜索艺术家
    */
-  fun searchArtist(keyword: String): NetEaseArtist? {
+  fun searchArtistList(keyword: String): List<NetEaseArtist> {
     val params = JSONObject().apply {
       put("limit", "20")
       put("offset", "0")
@@ -346,18 +347,17 @@ class NetEaseClient @Inject constructor(
       put("queryCorrect", "true")
     }
     val obj = eapiRequest("/eapi/v1/search/artist/get", params)
-    val artists = obj.optJSONObject("result")?.optJSONArray("artists") ?: return null
-
-    if (artists.length() == 0) {
-      return null
+    val artists = obj.optJSONObject("result")?.optJSONArray("artists") ?: return emptyList()
+    val result = mutableListOf<NetEaseArtist>()
+    for (i in 0 until artists.length()) {
+      val item = artists.optJSONObject(i) ?: continue
+      try {
+        result.add(json.decodeFromString<NetEaseArtist>(item.toString()))
+      } catch (e: Exception) {
+        Timber.w("searchArtistList: $e")
+      }
     }
-
-    return try {
-      json.decodeFromString<NetEaseArtist>(artists.get(0).toString())
-    } catch (e: Exception) {
-      Timber.w("searchAlbum: $e")
-      throw e
-    }
+    return result
   }
 
   /**

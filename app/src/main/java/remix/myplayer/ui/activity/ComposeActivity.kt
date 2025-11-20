@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.nav.AppNav
 import remix.myplayer.ui.nav.LocalNavController
+import remix.myplayer.ui.nav.playingScreenDeepLink
 import remix.myplayer.ui.theme.APlayerTheme
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.LocalThemeController
@@ -28,6 +29,7 @@ import remix.myplayer.viewmodel.LibraryViewModel
 import remix.myplayer.viewmodel.MainViewModel
 import remix.myplayer.viewmodel.PlaybackViewModel
 import remix.myplayer.viewmodel.ProvideViewModels
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -86,9 +88,16 @@ class ComposeActivity : BaseMusicActivity() {
 
   private fun handleIntent() {
     intent?.data?.let {
-      lifecycleScope.launch(Dispatchers.IO) {
-        MusicUtil.playFromUri(this@ComposeActivity, it)
-        intent = Intent()
+      when (it.scheme) {
+        playingScreenDeepLink.scheme -> {
+          Timber.v("deepLink")
+        }
+        else -> {
+          lifecycleScope.launch(Dispatchers.IO) {
+            MusicUtil.playFromUri(this@ComposeActivity, it)
+            intent = Intent()
+          }
+        }
       }
     }
   }

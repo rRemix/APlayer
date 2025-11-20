@@ -1,6 +1,9 @@
 package remix.myplayer.lyric.provider
 
 import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.bean.mp3.Album
+import remix.myplayer.data.bean.mp3.Artist
+import remix.myplayer.util.SearchKeyUtil
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -10,8 +13,8 @@ import kotlin.math.max
  */
 object SearchScorer {
 
-  private const val MIN_SCORE_THRESHOLD = 60f
-  private const val DURATION_TOLERANCE_MS = 5000L // 5秒容差
+  private const val MIN_SCORE_THRESHOLD = 55f
+  private const val DURATION_TOLERANCE_MS = 4000L
 
   /**
    * 评分结果
@@ -34,7 +37,7 @@ object SearchScorer {
    * @param candidateDuration 候选歌曲时长（毫秒，可选）
    * @return 评分结果
    */
-  fun calculateScore(
+  fun calculateSongScore(
     targetSong: Song,
     candidateTitle: String?,
     candidateArtist: String?,
@@ -63,6 +66,61 @@ object SearchScorer {
       albumScore = albumScore,
       durationMatch = true
     )
+  }
+
+  /**
+   * 计算歌曲匹配评分
+   * @param targetSong 目标歌曲
+   * @param candidateTitle 候选歌曲标题
+   * @param candidateArtist 候选歌曲艺术家
+   * @param candidateAlbum 候选歌曲专辑（可选）
+   * @param candidateDuration 候选歌曲时长（毫秒，可选）
+   * @param keyword 搜索时的关键字
+   * @param keyKind 关键字的类型
+   * @return 评分结果
+   */
+  fun calculateSongScoreWithKeyKind(
+    targetSong: Song,
+    candidateTitle: String?,
+    candidateArtist: String?,
+    candidateAlbum: String? = null,
+    candidateDuration: Long? = null,
+    keyword: String,
+    keyKind: SearchKeyUtil.KeyKind
+  ): ScoreResult {
+    if (targetSong is Song.Local) {
+      if (!checkDurationMatch(targetSong.duration, candidateDuration)) {
+        return ScoreResult(score = 0f, durationMatch = false)
+      }
+    }
+    return if (keyKind == SearchKeyUtil.KeyKind.FILE_NAME) {
+      val s1 = textDifference(keyword, candidateTitle ?: "")
+      val s2 = textDifference(keyword, "${candidateArtist ?: ""} - ${candidateTitle ?: ""}")
+      val s3 = textDifference(keyword, "${candidateTitle ?: ""} - ${candidateArtist ?: ""}")
+      val score = (maxOf(s1, s2, s3) * 100f)
+      ScoreResult(score = score, titleScore = score, artistScore = 0f, albumScore = null, durationMatch = true)
+    } else {
+      calculateSongScore(targetSong, candidateTitle, candidateArtist, candidateAlbum, candidateDuration)
+    }
+  }
+
+  fun calculateAlbumScore(
+    targetAlbum: Album,
+    candidateAlbum: String?,
+    candidateArtist: String? = null,
+  ): ScoreResult {
+    val aScore = calculateAlbumScore(targetAlbum.album, candidateAlbum) ?: 0f
+    val artScore = if (candidateArtist.isNullOrBlank()) 0f else calculateArtistScore(targetAlbum.artist, candidateArtist)
+    val final = if (artScore > 0f) max(aScore * 0.7f + artScore * 0.3f, aScore) else aScore
+    return ScoreResult(score = final, titleScore = aScore, artistScore = artScore, albumScore = null, durationMatch = true)
+  }
+
+  fun calculateArtistScore(
+    targetArtist: Artist,
+    candidateArtist: String?,
+  ): ScoreResult {
+    val artScore = calculateArtistScore(targetArtist.artist, candidateArtist)
+    return ScoreResult(score = artScore, titleScore = 0f, artistScore = artScore, albumScore = null, durationMatch = true)
   }
 
   /**
@@ -217,6 +275,31 @@ object SearchScorer {
     if (longer.isEmpty()) return 1.0f
 
     return (longer.length - editDistance(longer, shorter)) / longer.length.toFloat()
+  }
+
+  private fun textDifference(text1: String, text2: String): Float {
+    val a = text1.replace("\\s+".toRegex(), " ")
+    val b = text2.replace("\\s+".toRegex(), " ")
+    if (a == b) return 1.0f
+    val lcs = lcsLength(a, b)
+    val denom = a.length + b.length
+    if (denom == 0) return 1.0f
+    return (2f * lcs) / denom.toFloat()
+  }
+
+  private fun lcsLength(s1: String, s2: String): Int {
+    val m = s1.length
+    val n = s2.length
+    val dp = IntArray(n + 1)
+    for (i in 1..m) {
+      var prev = 0
+      for (j in 1..n) {
+        val tmp = dp[j]
+        dp[j] = if (s1[i - 1] == s2[j - 1]) prev + 1 else maxOf(dp[j], dp[j - 1])
+        prev = tmp
+      }
+    }
+    return dp[n]
   }
 
   /**

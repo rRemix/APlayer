@@ -312,7 +312,6 @@ class LyricManager @Inject constructor(
   }
 
   private fun getProgressOfLine(line: LyricLine, time: Long, endTime: Long): Double {
-    // TODO fix crash
     try {
       require(time in line.time..endTime)
     } catch (e: IllegalArgumentException) {
@@ -414,6 +413,7 @@ class LyricManager @Inject constructor(
 //      Timber.tag(TAG).d("update progress")
       updateProgressJob?.cancel()
       progress = MusicStateSource.currentProgressState.position
+      duration = MusicStateSource.currentProgressState.duration
       if (isPlaying) {
         updateProgressJob = launch(Dispatchers.IO) {
           // TODO: should we consider thread create cost?
@@ -435,7 +435,6 @@ class LyricManager @Inject constructor(
         _currentNextLyricsLine.value = CurrentNextLyricsLine.SEARCHING
         val s = lyricSearcher.getLyricsAndOffset(song, provider)
         ensureActive()
-        duration = song.duration
         lyrics = s.first
         offset = s.second
       }

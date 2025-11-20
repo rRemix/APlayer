@@ -38,7 +38,7 @@ import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsParams.Product
 import remix.myplayer.R
 import remix.myplayer.misc.clickWithRipple
-import remix.myplayer.ui.nav.UiMessageDispatcher
+import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.TextPrimary
@@ -186,9 +186,9 @@ private fun handlePurchase(activity: Activity, billingClient: BillingClient, pur
   ) { result, _ ->
     Timber.v("handlePurchase, result: $result")
     if (result.responseCode == BillingResponseCode.OK) {
-      UiMessageDispatcher.show(R.string.thank_you)
+      MessageNotifier.show(R.string.thank_you)
     } else {
-      UiMessageDispatcher.show(R.string.payment_failure)
+      MessageNotifier.show(R.string.payment_failure)
     }
   }
 }

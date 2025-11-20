@@ -19,15 +19,17 @@ class NetEaseProvider @Inject constructor(
 
   override val displayName = context.getString(LyricOrder.Netease.stringRes)
 
-  override suspend fun searchSong(searchKey: String): CandidateSong<NetEaseSong>? {
-    val neSong = netEaseClient.searchSong(searchKey) ?: return null
-    return CandidateSong(
-      raw = neSong,
-      title = neSong.name,
-      artist = neSong.ar?.joinToString(", ") { it.name ?: "" },
-      album = neSong.al?.name,
-      duration = neSong.dt
-    )
+  override suspend fun searchCandidates(searchKey: String): List<CandidateSong<NetEaseSong>> {
+    val list = netEaseClient.searchSongList(searchKey)
+    return list.map { neSong ->
+      CandidateSong(
+        raw = neSong,
+        title = neSong.name,
+        artist = neSong.ar?.joinToString(", ") { it.name ?: "" },
+        album = neSong.al?.name,
+        duration = neSong.dt
+      )
+    }
   }
 
   override suspend fun searchLyric(candidateSong: CandidateSong<NetEaseSong>): Pair<String?, String?> {

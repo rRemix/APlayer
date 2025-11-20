@@ -56,8 +56,6 @@ import timber.log.Timber
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-private const val TAG = "LyricContainer"
-
 private const val DEFAULT_TEXT_SIZE = 15f
 private val DEFAULT_ANIM_SPEC =
   tween<Float>(durationMillis = 400, easing = FastOutSlowInEasing)
@@ -282,8 +280,6 @@ internal fun LyricContainer(
     }
     check(targetLine != -1)
 
-    Timber.tag(TAG)
-      .v("highlightIndex: $highlightIndex targetLine: $targetLine y: $y mid: ${targetBound?.mid}")
     // 如果高亮行改变直接滑动，否则计算下滑动距离
     if (highlightIndex != targetLine) {
       highlightIndex = targetLine
