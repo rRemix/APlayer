@@ -222,14 +222,10 @@ dependencies {
 //    implementation(libs.kotlinx.serialization)
 
     implementation(libs.appcompat)
-    implementation(libs.cardview)
-    implementation(libs.constraintlayout)
     implementation(libs.media)
     implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.media3.ui)
     implementation(libs.multidex)
     implementation(libs.palette.ktx)
-    implementation(libs.swiperefreshlayout)
 
     implementation(libs.material)
 
@@ -239,19 +235,14 @@ dependencies {
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
-    implementation(libs.retrofit.adapter.rxjava2)
 
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)
-    implementation(libs.room.rxjava2)
 
     implementation(libs.image.cropper)
     implementation(libs.bugly)
     implementation(libs.logback.android)
-    implementation(libs.rebound)
-    implementation(libs.rxandroid)
-    implementation(libs.rxjava)
     implementation(libs.xxpermissions)
     implementation(libs.sardine.android) {
         // https://github.com/thegrizzlylabs/sardine-android/issues/70
@@ -272,17 +263,13 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.runtime.livedata)
-    implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.nav)
     implementation(libs.androidx.hilt.navi.compose)
-    implementation(libs.accompanist.drawablepainter)
     implementation(libs.reorderable)
     implementation(libs.kotlinx.serialization)
     implementation(libs.androidx.work.runtime.ktx)

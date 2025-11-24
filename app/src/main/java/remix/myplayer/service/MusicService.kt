@@ -639,7 +639,7 @@ class MusicService : BaseService(),
 
   override fun onError(error: PlaybackException) {
     Timber.e("onPlayerError, code: ${error.errorCode} name: ${error.errorCodeName} cause: ${error.cause}")
-
+    // TODO 尝试播放下一首?
     playback.release()
     setUpPlayback()
 //    when (error.errorCode) {

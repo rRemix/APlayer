@@ -81,59 +81,60 @@ class ExoPlayback(private val context: Context) : Playback {
   private val scope = CoroutineScope(Dispatchers.Main)
   private var progressTickerJob: Job? = null
 
-  private val player: ExoPlayer = ExoPlayer.Builder(context).build().apply {
-    playWhenReady = false
-    val attrs = AudioAttributes.Builder()
-      .setUsage(C.USAGE_MEDIA)
-      .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-      .build()
-    setAudioAttributes(attrs, /* handleAudioFocus= */ false)
-    setWakeMode(C.WAKE_MODE_LOCAL)
-    addListener(object : Player.Listener {
-      override fun onIsPlayingChanged(isPlaying: Boolean) {
-        callback?.onIsPlayingChanged(isPlaying)
-        if (isPlaying) startProgressTicker() else stopProgressTicker()
-      }
+  private val player: ExoPlayer =
+    ExoPlayer.Builder(context).setUseLazyPreparation(false).build().apply {
+      playWhenReady = false
+      val attrs = AudioAttributes.Builder()
+        .setUsage(C.USAGE_MEDIA)
+        .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+        .build()
+      setAudioAttributes(attrs, /* handleAudioFocus= */ false)
+      setWakeMode(C.WAKE_MODE_LOCAL)
+      addListener(object : Player.Listener {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+          callback?.onIsPlayingChanged(isPlaying)
+          if (isPlaying) startProgressTicker() else stopProgressTicker()
+        }
 
-      override fun onPlaybackStateChanged(state: Int) {
-        when (state) {
-          Player.STATE_READY -> {
-            Timber.tag(TAG).v("STATE_READY")
+        override fun onPlaybackStateChanged(state: Int) {
+          when (state) {
+            Player.STATE_READY -> {
+              Timber.tag(TAG).v("STATE_READY")
+            }
+
+            Player.STATE_BUFFERING -> {
+              callback?.onPositionChange()
+            }
+
+            Player.STATE_ENDED -> {
+              callback?.onEnded()
+            }
+
+            Player.STATE_IDLE -> {
+              isPrepared = false
+            }
           }
+        }
 
-          Player.STATE_BUFFERING -> {
+        override fun onPlayerError(error: PlaybackException) {
+          callback?.onError(error)
+        }
+
+        override fun onPositionDiscontinuity(
+          oldPosition: Player.PositionInfo,
+          newPosition: Player.PositionInfo,
+          reason: Int
+        ) {
+          if (reason == Player.DISCONTINUITY_REASON_SEEK) {
             callback?.onPositionChange()
           }
-
-          Player.STATE_ENDED -> {
-            callback?.onEnded()
-          }
-
-          Player.STATE_IDLE -> {
-            isPrepared = false
-          }
         }
-      }
 
-      override fun onPlayerError(error: PlaybackException) {
-        callback?.onError(error)
-      }
-
-      override fun onPositionDiscontinuity(
-        oldPosition: Player.PositionInfo,
-        newPosition: Player.PositionInfo,
-        reason: Int
-      ) {
-        if (reason == Player.DISCONTINUITY_REASON_SEEK) {
-          callback?.onPositionChange()
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+          callback?.onItemTransition(mediaItem, reason)
         }
-      }
-
-      override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-        callback?.onItemTransition(mediaItem, reason)
-      }
-    })
-  }
+      })
+    }
 
   private fun startProgressTicker() {
     if (progressTickerJob != null) return
@@ -151,7 +152,8 @@ class ExoPlayback(private val context: Context) : Playback {
   }
 
   private fun buildSource(song: Song): MediaSource {
-    val mediaItem = MediaItem.fromUri(song.contentUri)
+    val mediaItem =
+      MediaItem.Builder().setUri(song.contentUri).setMediaId(song.id.toString()).build()
     return if (song is Song.Remote) {
       val httpFactory = DefaultHttpDataSource.Factory()
         .setDefaultRequestProperties(song.headers)
@@ -172,15 +174,10 @@ class ExoPlayback(private val context: Context) : Playback {
   override suspend fun prepare(song: Song, nextSong: Song, offset: Long) {
     isPrepared = false
 
-    val sources = mutableListOf<MediaSource>()
-    sources.add(buildSource(song))
+    player.setMediaSource(buildSource(song),/* startPositionMs = */ offset)
 
     // 添加下一首歌曲实现无缝播放
-    if (nextSong.valid()) {
-      sources.add(buildSource(nextSong))
-    }
-
-    player.setMediaSources(sources, /* startMediaItemIndex = */ 0, /* startPositionMs = */ offset)
+    appendNext(nextSong)
 
     val prepared = try {
       withTimeout(10_000L) { prepareInternal() }
@@ -207,11 +204,11 @@ class ExoPlayback(private val context: Context) : Playback {
 
     val nextIndex = player.currentMediaItemIndex + 1
     if (nextIndex < player.mediaItemCount) {
-      player.removeMediaItem(nextIndex)
-      player.addMediaSource(nextIndex, buildSource(next))
-    } else {
-      player.addMediaSource(buildSource(next))
+      player.removeMediaItems(nextIndex, player.mediaItemCount)
     }
+    player.addMediaSource(buildSource(next))
+
+    trim()
   }
 
   override fun appendNext(next: Song) {
@@ -220,6 +217,15 @@ class ExoPlayback(private val context: Context) : Playback {
       return
     }
     player.addMediaSource(buildSource(next))
+    trim()
+  }
+
+  // 清除已经播放过的mediaItem
+  private fun trim() {
+    val idx = player.currentMediaItemIndex
+    if (idx > 0) {
+      player.removeMediaItems(0, idx)
+    }
   }
 
   private suspend fun prepareInternal() = suspendCancellableCoroutine { cont ->

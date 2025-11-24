@@ -4,9 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.RawQuery
 import androidx.room.Update
-import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 import remix.myplayer.data.db.room.entity.PlayList
 
@@ -38,27 +36,22 @@ interface PlayListDao {
 
   @Query(
     """
-    UPDATE PlayList 
-    SET audioIds = REPLACE(
-      REPLACE(
-        REPLACE(audioIds, ',' || :audioId || ',', ','),
-        '[' || :audioId || ',', '['),
-      ',' || :audioId || ']', ']')
-    WHERE audioIds LIKE '%' || :audioId || '%'
-  """
-  )
-  suspend fun removeAudioIdFromAll(audioId: Long): Int
-
-  @Query(
-    """
     DELETE FROM PlayList
     WHERE id = :id
   """
   )
   suspend fun delete(id: Long): Int
 
-  @RawQuery(observedEntities = [PlayList::class])
-  fun selectAllOrderBy(query: SupportSQLiteQuery): Flow<List<PlayList>>
+  @Query(
+    """
+    SELECT * FROM PlayList ORDER BY
+    CASE :orderBY WHEN 'name' THEN name END asc,
+    CASE :orderBY WHEN 'name desc' THEN name END desc,
+    CASE :orderBY WHEN 'date' THEN date END asc,
+    CASE :orderBY WHEN 'date desc' THEN date END desc
+    """
+  )
+  fun selectAll(orderBY: String): Flow<List<PlayList>>
 
   @Query(
     """

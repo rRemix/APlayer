@@ -10,9 +10,10 @@ import com.hjq.permissions.XXPermissions
 import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy
 import dagger.hilt.android.HiltAndroidApp
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import remix.myplayer.data.db.room.AppDatabase
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.misc.helper.LanguageHelper.onConfigurationChanged
 import remix.myplayer.misc.helper.LanguageHelper.saveSystemCurrentLanguage
@@ -30,8 +31,12 @@ import javax.inject.Inject
  */
 @HiltAndroidApp
 class App : MultiDexApplication() {
+
   @Inject
   lateinit var settingPrefs: SettingPrefs
+
+  @Inject
+  lateinit var database: AppDatabase
 
   override fun attachBaseContext(base: Context) {
     saveSystemCurrentLanguage()
@@ -56,39 +61,18 @@ class App : MultiDexApplication() {
       loadLibrary()
     }
 
-    // 处理 RxJava2 取消订阅后，抛出的异常无法捕获，导致程序崩溃
-    RxJavaPlugins.setErrorHandler { throwable: Throwable? ->
-      Timber.v(throwable)
-      CrashReport.postCatchedException(throwable)
-    }
     registerActivityLifecycleCallbacks(APlayerActivityManager())
 
     hackTabMinWidth()
   }
 
   private fun checkMigration() {
-//    if (!SPUtil.getValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.LYRIC_RESET_ON_16000, false)) {
-//      SPUtil.deleteFile(this, SPUtil.LYRIC_KEY.NAME)
-//      SPUtil.putValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.LYRIC_RESET_ON_16000, true)
-//      SPUtil.putValue(context, SPUtil.LYRIC_KEY.NAME, SPUtil.LYRIC_KEY.PRIORITY_LYRIC, SPUtil.LYRIC_KEY.DEFAULT_PRIORITY)
-////      try {
-////        DiskCache.getLrcDiskCache().delete()
-////      } catch (e: Exception) {
-////        Timber.v(e)
-////      }
-//    }
-//
-//    val oldVersion = SPUtil.getValue(context, SETTING_KEY.NAME, SETTING_KEY.VERSION, 1)
-//    if (oldVersion < SETTING_KEY.NEWEST_VERSION) {
-//      if (oldVersion == 1) {
-//        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.LIBRARY, "")
-//      }
-//      if (oldVersion == 2) {
-//        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.GENRE_SORT_ORDER, SortOrder.GENRE_A_Z)
-//        SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.PLAYLIST_SORT_ORDER, SortOrder.PLAYLIST_DATE)
-//      }
-//      SPUtil.putValue(context, SETTING_KEY.NAME, SETTING_KEY.VERSION, SETTING_KEY.NEWEST_VERSION)
-//    }
+    if (!settingPrefs.checkMigration16600) {
+      settingPrefs.checkMigration16600 = true
+      CoroutineScope(Dispatchers.Main).launch {
+        database.playQueueDao().clear()
+      }
+    }
   }
 
   private fun setUp() {
@@ -120,33 +104,15 @@ class App : MultiDexApplication() {
   override fun onLowMemory() {
     super.onLowMemory()
     Timber.v("onLowMemory")
-//    Completable
-//        .fromAction { Fresco.getImagePipeline().clearMemoryCaches() }
-//        .subscribeOn(AndroidSchedulers.mainThread())
-//        .subscribe()
   }
 
   override fun onTrimMemory(level: Int) {
     super.onTrimMemory(level)
     Timber.v("onTrimMemory, %s", level)
-    Completable
-        .fromAction {
-          when (level) {
-            TRIM_MEMORY_UI_HIDDEN -> {
-            }
-            TRIM_MEMORY_RUNNING_MODERATE, TRIM_MEMORY_RUNNING_LOW, TRIM_MEMORY_RUNNING_CRITICAL -> {
-            }
-            TRIM_MEMORY_BACKGROUND, TRIM_MEMORY_MODERATE, TRIM_MEMORY_COMPLETE -> {
-            }
-            else -> {
-            }
-          }
-        }
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .subscribe()
   }
 
   companion object {
+
     @JvmStatic
     lateinit var context: App
       private set

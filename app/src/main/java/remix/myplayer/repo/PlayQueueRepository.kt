@@ -40,7 +40,6 @@ class PlayQueueRepoImpl @Inject constructor(
       }
   }
 
-  // TODO 大量数据拆分
   override suspend fun removeByAudioIds(audioIds: List<Long>) =
     playQueueDao.deleteSongs(audioIds)
 
@@ -50,26 +49,18 @@ class PlayQueueRepoImpl @Inject constructor(
     val oldQueue = playQueueDao.selectAll().first()
 
     // 不重复添加
-    val actual = queue.toMutableList()
-    val keys = oldQueue.map {
-      if (it.audio_id > 0) it.audio_id.toString() else it.data
-    }
-    actual.removeAll {
-      (it.isLocal() && keys.contains(it.id.toString())) || (it.isRemote() && keys.contains(it.data))
-    }
-
-    return playQueueDao.insert(actual.map { song ->
-      if (song.isLocal()) {
-        PlayQueue(song.id, song.title, song.data)
-      } else {
-        PlayQueue(song.hashCode().toLong(), song.title, song.data).apply {
-          if (song is Song.Remote) {
-            account = song.account
-            pwd = song.pwd
+    val oldAudioIds = oldQueue.map { it.audio_id }.toSet()
+    return playQueueDao.insert(
+      queue
+        .filter { it.id !in oldAudioIds }
+        .map { song ->
+          PlayQueue(song.id, song.title, song.data).apply {
+            if (song is Song.Remote) {
+              account = song.account
+              pwd = song.pwd
+            }
           }
-        }
-      }
-    })
+        })
   }
 
   override suspend fun clear() {

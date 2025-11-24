@@ -56,7 +56,7 @@ import timber.log.Timber
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-private const val DEFAULT_TEXT_SIZE = 15f
+const val DEFAULT_TEXT_SIZE = 15f
 private val DEFAULT_ANIM_SPEC =
   tween<Float>(durationMillis = 400, easing = FastOutSlowInEasing)
 

@@ -41,7 +41,6 @@ import remix.myplayer.lyric.provider.UriProvider
 import remix.myplayer.misc.clickWithRipple
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
-import remix.myplayer.ui.widget.LyricsView
 import remix.myplayer.ui.widget.app.ProgressAware
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
@@ -90,7 +89,7 @@ internal fun PlayingLyric(song: Song) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
       TextSecondary(
         placeholder,
-        fontSize = (LyricsView.DEFAULT_TEXT_SIZE * settingState.lyric.fontScale).sp
+        fontSize = (DEFAULT_TEXT_SIZE * settingState.lyric.fontScale).sp
       )
     }
   } else {

@@ -1,9 +1,10 @@
 package remix.myplayer.repo
 
 import android.content.Context
-import androidx.sqlite.db.SimpleSQLiteQuery
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import remix.myplayer.data.db.room.dao.PlayListDao
@@ -34,22 +35,19 @@ class PlayListRepoImpl @Inject constructor(
   private val settingPrefs: SettingPrefs
 ) : PlayListRepository, AbstractRepository(settingPrefs) {
 
+  @OptIn(ExperimentalCoroutinesApi::class)
   override fun allPlayLists(): Flow<List<PlayList>> {
     return settingPrefs
       .playlistSortOrderFlow()
       .flatMapLatest { sortOrder ->
-        val orderBySql = when (sortOrder) {
-          SortOrder.PLAYLIST_A_Z -> "name COLLATE NOCASE ASC"
-          SortOrder.PLAYLIST_Z_A -> "name COLLATE NOCASE DESC"
-          SortOrder.PLAYLIST_DATE -> "date ASC"
-          else -> "name COLLATE NOCASE ASC"
+        val orderByKey = when (sortOrder) {
+          SortOrder.PLAYLIST_A_Z -> "name"
+          SortOrder.PLAYLIST_Z_A -> "name desc"
+          SortOrder.PLAYLIST_DATE -> "date"
+          else -> "name"
         }
 
-        val query = SimpleSQLiteQuery(
-          "SELECT * FROM PlayList ORDER BY $orderBySql"
-        )
-
-        playListDao.selectAllOrderBy(query)
+        playListDao.selectAll(orderByKey)
           .map { list ->
             if (settingPrefs.forceSort) {
               ItemsSorter.sortedPlayLists(list, sortOrder)
@@ -101,10 +99,12 @@ class PlayListRepoImpl @Inject constructor(
   override suspend fun getFavorite() = playListDao.getFavorite()
 
   override suspend fun removeAudioIdsFromAll(audioIds: List<Long>): Int {
-    var totalUpdated = 0
-    audioIds.forEach {
-      totalUpdated += playListDao.removeAudioIdFromAll(it)
+    if (audioIds.isEmpty()) return 0
+    val toRemove = audioIds.toSet()
+    val updated = playListDao.selectAll("name").first().mapNotNull { pl ->
+      val filtered = pl.audioIds.filterNot { it in toRemove }
+      if (filtered.size != pl.audioIds.size) pl.copy(audioIds = ArrayList(filtered)) else null
     }
-    return totalUpdated
+    return if (updated.isEmpty()) 0 else playListDao.update(updated)
   }
 }

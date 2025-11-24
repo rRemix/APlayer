@@ -40,6 +40,7 @@ import remix.myplayer.repo.SongRepository
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.util.PermissionUtil
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -76,8 +77,7 @@ class LibraryViewModel @Inject constructor(
   private val _folders = MutableStateFlow<List<Folder>>(emptyList())
   val folders: StateFlow<List<Folder>> = _folders.asStateFlow()
 
-  val historySongs = historyRepo.allHistories()
-    .map { histories ->
+  val historySongs = historyRepo.allHistories().map { histories ->
       histories.map { history ->
         history.audio_id
       }.mapNotNull { id ->
@@ -129,9 +129,7 @@ class LibraryViewModel @Inject constructor(
   fun searchSong(key: String): List<Song> {
     checkWorkerThread()
     return songRepo.getSongs(
-      Audio.Media.TITLE + " LIKE ? OR " +
-          Audio.ArtistColumns.ARTIST + " LIKE ? OR " +
-          Audio.AlbumColumns.ALBUM + " LIKE ?",
+      Audio.Media.TITLE + " LIKE ? OR " + Audio.ArtistColumns.ARTIST + " LIKE ? OR " + Audio.AlbumColumns.ALBUM + " LIKE ?",
       arrayOf("%$key%", "%$key%", "%$key%"),
       settingPrefs.songSortOrder
     )
@@ -174,6 +172,7 @@ class LibraryViewModel @Inject constructor(
       _artists.value = async(Dispatchers.IO) { artistRepo.allArtists() }.await()
       _genres.value = async(Dispatchers.IO) { genreRepo.allGenres() }.await()
       _folders.value = async(Dispatchers.IO) { folderRepo.allFolders() }.await()
+      Timber.v("songCount: ${_songs.value.size} albumCount: ${_albums.value.size} artistCount: ${_artists.value.size} genreCount: ${_genres.value.size} folderCount: ${_folders.value.size}")
     }
   }
 
@@ -200,8 +199,7 @@ class LibraryViewModel @Inject constructor(
   }
 
   override fun onTagChanged(
-    oldSong: Song,
-    newSong: Song
+    oldSong: Song, newSong: Song
   ) {
   }
 }

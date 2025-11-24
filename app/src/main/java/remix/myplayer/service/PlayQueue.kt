@@ -119,7 +119,7 @@ class PlayQueue @Inject constructor(
     if (_originalQueue.isEmpty()) {
       return
     }
-    // 读取上次退出时正在播放的歌曲的id
+    // 读取上次退出时正在播放的歌曲的id或者是路径
     val lastSong = settingPrefs.lastSong
     // 上次退出时正在播放的歌曲是否还存在
     var exist = false
@@ -202,14 +202,14 @@ class PlayQueue @Inject constructor(
       _playingQueue.addAll(songs)
       _originalQueue.addAll(songs)
     }
-    saveQueue()
+    saveQueue(clear = false)
   }
-
 
   fun removeAll(deleteSongs: List<Song>) {
     synchronized(this) {
-      _playingQueue.removeAll(deleteSongs)
-      _originalQueue.removeAll(deleteSongs)
+      val toRemove = deleteSongs.toSet()
+      _playingQueue.removeAll(toRemove)
+      _originalQueue.removeAll(toRemove)
     }
     saveQueue()
   }
@@ -253,9 +253,13 @@ class PlayQueue @Inject constructor(
     updateNextSong()
   }
 
-  private fun saveQueue() = launch {
-    playQueueRepository.clear()
-    playQueueRepository.insert(_originalQueue)
+  private fun saveQueue(clear: Boolean = true) = launch {
+    if (clear) {
+      playQueueRepository.clear()
+    }
+    if (!_originalQueue.isEmpty()) {
+      playQueueRepository.insert(_originalQueue)
+    }
   }
 
   fun updateNextSong() {

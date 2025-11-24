@@ -6,6 +6,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,9 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import remix.myplayer.data.bean.mp3.APlayerModel
 import remix.myplayer.data.bean.mp3.Song
@@ -45,19 +46,19 @@ fun ListSong(
 ) {
   val theme = LocalTheme.current
 
-  ConstraintLayout(
+  Box(
     modifier = modifier
       .fillMaxWidth()
+      .height(IntrinsicSize.Min)
       .combinedClickable(
         interactionSource = remember { MutableInteractionSource() },
         indication = ripple(color = theme.ripple),
         onClick = { onClickSong() },
         onLongClick = { onLongClickSong() }
       )
-      .background(if (selected) theme.select else theme.mainBackground)
+      .background(if (selected) theme.select else theme.mainBackground),
+    contentAlignment = Alignment.CenterStart
   ) {
-    val (indicator, count, cover, popButton, column) = createRefs()
-
     if (playing) {
       Box(
         modifier = Modifier
@@ -65,59 +66,50 @@ fun ListSong(
           .fillMaxHeight()
           .padding(vertical = 8.dp)
           .background(theme.highLightText())
-          .constrainAs(indicator) {
-            top.linkTo(parent.top)
-            bottom.linkTo(parent.bottom)
-            start.linkTo(parent.start)
-          }
       )
     }
 
-    if (num != null) {
-      TextPrimary(
-        num.toString(),
-        modifier = Modifier
-          .width(28.dp)
-          .constrainAs(count) {
-            top.linkTo(parent.top)
-            bottom.linkTo(parent.bottom)
-          })
-    }
-
-    GlideCover(
-      model = song,
-      modifier = Modifier
-        .size(40.dp)
-        .constrainAs(cover) {
-          start.linkTo(count.end, 12.dp, goneMargin = 16.dp)
-          top.linkTo(parent.top)
-          bottom.linkTo(parent.bottom)
-        })
-
-    Column(
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.Start,
-      modifier = Modifier.constrainAs(column) {
-        start.linkTo(cover.end, 16.dp)
-        top.linkTo(parent.top)
-        bottom.linkTo(parent.bottom)
-        end.linkTo(popButton.start, 8.dp)
-        width = Dimension.fillToConstraints
-      }
+    Row(
+      modifier = modifier
+        .fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically
     ) {
-      TextPrimary(song.showName)
-      Spacer(modifier = Modifier.height(4.dp))
-      TextSecondary(String.format("%s-%s", song.artist, song.album))
-    }
+      if (num != null) {
+        TextPrimary(
+          if (num > 99) "99+" else num.toString(),
+          textAlign = TextAlign.Center,
+          modifier = Modifier
+            .width(36.dp)
+            .padding(start = 4.dp)
+        )
+      } else {
+        Spacer(modifier = Modifier.width(16.dp))
+      }
 
-    SongPopupButton(
-      modifier = Modifier.constrainAs(popButton) {
-        top.linkTo(parent.top)
-        bottom.linkTo(parent.bottom)
-        end.linkTo(parent.end)
-      },
-      song = song,
-      parent = modelParent
-    )
+      GlideCover(
+        model = song,
+        modifier = Modifier
+          .size(40.dp)
+      )
+
+      Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.Start,
+        modifier = Modifier
+          .weight(1f)
+          .padding(start = 16.dp, end = 8.dp)
+      ) {
+        TextPrimary(song.showName)
+        Spacer(modifier = Modifier.height(4.dp))
+        TextSecondary(String.format("%s-%s", song.artist, song.album))
+      }
+
+      SongPopupButton(
+        modifier = Modifier,
+        song = song,
+        parent = modelParent
+      )
+    }
   }
+
 }

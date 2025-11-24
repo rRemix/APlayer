@@ -11,6 +11,7 @@ import remix.myplayer.App
 import remix.myplayer.data.prefs.SettingPrefsEntryPoint
 import timber.log.Timber
 import java.io.Serial
+import kotlin.math.abs
 
 /**
  * Created by Remix on 2015/11/30.
@@ -241,7 +242,7 @@ sealed class Song(
     val account: String,
     val pwd: String
   ) : Song(
-    data.hashCode().toLong(), title, title, album, 0L, artist, 0L, duration, data, size, year, genre, track, dateModified
+    -abs(data.hashCode().toLong()), title, title, album, 0L, artist, 0L, duration, data, size, year, genre, track, dateModified
   ) {
     val headers by lazy {
       mapOf(
@@ -268,18 +269,18 @@ sealed class Song(
       pwd
     )
 
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (javaClass != other?.javaClass) return false
-
-      other as Song
-
-      return data == other.data
-    }
-
-    override fun hashCode(): Int {
-      return data.hashCode()
-    }
+//    override fun equals(other: Any?): Boolean {
+//      if (this === other) return true
+//      if (javaClass != other?.javaClass) return false
+//
+//      other as Song
+//
+//      return data == other.data
+//    }
+//
+//    override fun hashCode(): Int {
+//      return data.hashCode()
+//    }
 
     override fun toString(): String {
       return "RemoteSong(data='$data')"

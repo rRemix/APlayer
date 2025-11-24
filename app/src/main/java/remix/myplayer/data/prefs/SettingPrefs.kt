@@ -135,6 +135,8 @@ class SettingPrefs @Inject constructor(
   var bassBoostStrength by PrefsDelegate(sp, PrefKeys.Setting.BASS_BOOST_STRENGTH, 0)
   var enableEq by PrefsDelegate(sp, PrefKeys.Setting.ENABLE_EQ, false)
 
+  var checkMigration16600 by PrefsDelegate(sp, "check_migration_16600", false)
+
   companion object {
 
     // 播放界面底部
