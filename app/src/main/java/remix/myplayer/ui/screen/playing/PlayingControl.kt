@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,6 +45,7 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
 import remix.myplayer.misc.CenterInBox
 import remix.myplayer.misc.clickWithRipple
+import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
@@ -93,7 +95,7 @@ internal fun PlayingControl(
     }
 
     ControlButton(onClick = {
-      Util.sendLocalBroadcast(
+      sendLocalBroadcast(
         Intent(MusicService.ACTION_CMD).putExtra(
           MusicService.EXTRA_CONTROL,
           Command.SKIP_TO_PREVIOUS
@@ -108,7 +110,7 @@ internal fun PlayingControl(
     }
 
     ControlButton(onClick = {
-      Util.sendLocalBroadcast(
+      sendLocalBroadcast(
         Intent(MusicService.ACTION_CMD).putExtra(
           MusicService.EXTRA_CONTROL,
           Command.PLAY_PAUSE
@@ -131,7 +133,7 @@ internal fun PlayingControl(
     }
 
     ControlButton(onClick = {
-      Util.sendLocalBroadcast(
+      sendLocalBroadcast(
         Intent(MusicService.ACTION_CMD).putExtra(
           MusicService.EXTRA_CONTROL,
           Command.SKIP_TO_NEXT
@@ -246,7 +248,7 @@ private fun RowScope.ControlButton(
 ) {
   Box(
     modifier = Modifier
-      .weight(1f)
+      .weight(1f, LocalContext.current.isPortraitOrientation())
       .aspectRatio(1f)
       .clickWithRipple { onClick() },
     contentAlignment = Alignment.Center

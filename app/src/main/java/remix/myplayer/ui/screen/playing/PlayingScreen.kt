@@ -61,10 +61,6 @@ private fun Portrait() {
     val playbackVM = playbackViewModel
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
 
-    var seekbarLastDragTime by remember {
-      mutableLongStateOf(0L)
-    }
-
     PlayingTopBar(playbackState.song, swatch)
 
     val pagerState = rememberPagerState { 2 }
