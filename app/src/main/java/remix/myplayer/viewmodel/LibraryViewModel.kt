@@ -78,10 +78,9 @@ class LibraryViewModel @Inject constructor(
   val folders: StateFlow<List<Folder>> = _folders.asStateFlow()
 
   val historySongs = historyRepo.allHistories().map { histories ->
-      histories.map { history ->
-        history.audio_id
-      }.mapNotNull { id ->
-        withContext(Dispatchers.IO) { songRepo.song(id) }
+      histories.mapNotNull { history ->
+        val song = withContext(Dispatchers.IO) { songRepo.song(history.audio_id) }
+        song?.let { it to history.play_count }
       }
     }.stateIn(
       scope = viewModelScope,

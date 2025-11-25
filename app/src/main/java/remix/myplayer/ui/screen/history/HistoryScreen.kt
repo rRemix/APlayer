@@ -31,7 +31,8 @@ import kotlin.random.Random
 
 @Composable
 fun HistoryScreen() {
-  val songs by libraryViewModel.historySongs.collectAsStateWithLifecycle()
+  val items by libraryViewModel.historySongs.collectAsStateWithLifecycle()
+  val songs = items.map { it.first }
   val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
 
   Scaffold(
@@ -51,9 +52,10 @@ fun HistoryScreen() {
       }
 
       LazyColumn(modifier = Modifier.weight(1f)) {
-        itemsIndexed(songs, key = { _, song ->
-          song.id
-        }) { pos, song ->
+        itemsIndexed(items, key = { _, item ->
+          item.first.id
+        }) { pos, item ->
+          val song = item.first
           val isPlayingSong = playbackState.song.id == song.id
 
           ListSong(
@@ -62,7 +64,7 @@ fun HistoryScreen() {
             modelParent = song,
             selected = false,
             playing = isPlayingSong,
-            num = Random.nextInt(200),
+            num = item.second,
             onClickSong = {
               if (songs.isEmpty()) {
                 return@ListSong
