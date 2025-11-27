@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.room)
     alias(libs.plugins.hilt)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.baselineprofile)
 }
 
 fun readProperties(file: File): Properties {
@@ -217,6 +218,16 @@ androidComponents {
     }
 }
 
+baselineProfile {
+    saveInSrc = true
+
+//  variants {
+//    maybeCreate("nonGoogleWithUpdaterRelease").apply {
+//      from(project(":baselineprofile"))
+//    }
+//  }
+}
+
 dependencies {
     implementation(libs.kotlinx.coroutines)
 //    implementation(libs.kotlinx.serialization)
@@ -276,6 +287,9 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    implementation(libs.androidx.profileinstaller)
+    "baselineProfile"(project(":baselineprofile"))
 }
 
 // 上传mapping文件

@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
@@ -102,7 +104,9 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
   }
 
   Row(
-    modifier = baseModifier.then(interactionModifiers),
+    modifier = baseModifier
+      .semantics{ contentDescription = "BottomBar" }
+      .then(interactionModifiers),
     verticalAlignment = Alignment.CenterVertically,
   ) {
     GlideCover(

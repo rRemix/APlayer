@@ -34,6 +34,13 @@ timber = "5.0.1"
 tinypinyin = "2.0.3.RELEASE"
 hiltNavigationCompose = "1.2.0"
 reorderable = "2.5.1"
+junit = "1.3.0"
+espressoCore = "3.7.0"
+uiautomator = "2.3.0"
+benchmarkMacroJunit4 = "1.4.1"
+baselineprofile = "1.4.1"
+profileinstaller = "1.4.1"
+rules = "1.7.0"
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }
@@ -43,6 +50,8 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+android-test = { id = "com.android.test", version.ref = "agp" }
+baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprofile" }
 
 [libraries]
 # kotlin
@@ -105,3 +114,11 @@ androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-
 androidx-nav = { module = "androidx.navigation:navigation-compose", version.ref = "nav" }
 androidx-hilt-navi-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
+
+# test
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
+androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacroJunit4" }
+androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }
+androidx-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
