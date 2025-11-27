@@ -1,14 +1,13 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/rRemix/APlayer/blob/master/LICENSE)
 [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0.svg?logo=telegram&style=flat-square)](https://t.me/joinchat/PqrPPBbM4poRPDH7qnXxLw "Join Telegram Group")
 
-# Base成都找工作中...
 
 # [中文](/README_CN.md)
 
 # APlayer - Android Music Player
 
 ## Intro
-- A beautiful and powerful music player
+- A beautiful and powerful music player built with Compose
 
 ## Download
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
@@ -21,28 +20,22 @@
 <img src="/pictures/Screenshot_20180112-113637.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113707.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113820.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113855.png" alt="screenshot" title="screenshot" width="270" height="486" />  
 
 ## Feature
-- Configurable tabs,include song,artist,album,folder,playlist
+- Configurable tabs,include song,artist,album,folder,playlist,remote(webdav)
 - Auto download album&artist cover
-- Online,local,embedded lyric,and you can set priority for lyrics search
-- Line control
+- Online, local, embedded and enhanced word-by-word lyrics and you can set priority for lyrics search
 - Desktop lyric and Widget
-- Android oreo notification
+- Android media notification
 - Screen lock
 - Custom theme
 - Auto scan media library,or you can scan folder manually
 - Other useful features you would expect from a music player,such as sleep timer,song editor,equalizer and so on
 
 ## Thanks
-- [RxJava](https://github.com/ReactiveX/RxJava)
-- [RxAndroid](https://github.com/ReactiveX/RxAndroid)
-- [Rxpermissions](https://github.com/tbruyelle/RxPermissions)
+- [XXPermissions](https://github.com/getActivity/XXPermissions)
 - [Retrofit](https://github.com/square/retrofit)
-- [Butter Knife](https://github.com/JakeWharton/butterknife) (No longer used)
 - [Timber](https://github.com/JakeWharton/timber)
 - [Leakcanary](https://github.com/square/leakcanary)
-- [Rebound](https://github.com/facebook/rebound)
-- [Material-dialogs](https://github.com/afollestad/material-dialogs)
-- [Android-crop](https://github.com/jdamcd/android-crop)
+- [ImageCropper](https://github.com/CanHub/Android-Image-Cropper)
 - [TinyPinyin](https://github.com/promeG/TinyPinyin)
 - [Jaudiotagger for Android](https://github.com/hexise/jaudiotagger-android)
 
@@ -50,5 +43,3 @@
 - Pull request is welcome
 - I'll be appreciate if you star
 - If you have any question,you can send email to rRemix.me@gmail.com,open an issue or join [tg group](https://t.me/joinchat/PqrPPBbM4poRPDH7qnXxLw)
-
-## [Change Log](/UPDATE.md)
