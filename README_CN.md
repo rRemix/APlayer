@@ -6,7 +6,7 @@
 # APlayer - 安卓本地音乐播放器
 
 ## 简介
-- 一款简洁、功能强大的的音乐播放器
+- 基于Compose一款简洁、功能强大的的音乐播放器
 
 ## 下载
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
@@ -20,30 +20,24 @@
 
 
 ## 特点
-- 首页Tab可配置，最多支持五个,包括歌曲、艺术家、专辑、文件夹、播放列表
+- 首页Tab可配置，最多支持五个,包括歌曲、艺术家、专辑、文件夹、播放列表、远程(webdav)
 - 专辑、艺术家封面自动补全(网易、LastFM)
-- 支持显示本地和在线歌词(网易、酷狗)，可设置歌词搜索的优先级；本地歌词可以自由选择，或者忽略歌词
+- 支持显示本地和在线歌词(网易、酷狗、qq)，支持逐词歌词，可设置歌词搜索的优先级；本地歌词可以自由选择，或者忽略歌词
 - 支持耳机线控操作,拔出耳机自动暂停
 - 支持桌面歌词、桌面部件
 - 适配Android8.0通知栏
 - 锁屏控制,可选择原生或者软件实现
-- 心情可生成海报分享
 - 动态主题颜色
 - 监测媒体库变化自动刷新，或者手动扫描指定目录
 - 其他必备和便捷操作如歌曲信息编辑、睡眠定时、均衡器等
 
 
 ## 感谢
-- [RxJava](https://github.com/ReactiveX/RxJava)
-- [RxAndroid](https://github.com/ReactiveX/RxAndroid)
-- [Rxpermissions](https://github.com/tbruyelle/RxPermissions)
+- [XXPermissions](https://github.com/getActivity/XXPermissions)
 - [Retrofit](https://github.com/square/retrofit)
-- [Butter Knife](https://github.com/JakeWharton/butterknife) （已不使用）
 - [Timber](https://github.com/JakeWharton/timber)
 - [Leakcanary](https://github.com/square/leakcanary)
-- [Rebound](https://github.com/facebook/rebound)
-- [Material-dialogs](https://github.com/afollestad/material-dialogs)
-- [Android-crop](https://github.com/jdamcd/android-crop)
+- [ImageCropper](https://github.com/CanHub/Android-Image-Cropper)
 - [TinyPinyin](https://github.com/promeG/TinyPinyin)
 - [Jaudiotagger for Android](https://github.com/hexise/jaudiotagger-android)
 
@@ -52,7 +46,3 @@
 - 如果喜欢或者能给你提供帮助，欢迎Star
 - 因为是刚学安卓的时候就开始做了，很多代码待完善或者重构，还有一些待开发的功能，欢迎Pull Request
 - 有任何问题可以发邮件到我的邮箱: rRemix.me@gmail.com,或者加[tg群](https://t.me/joinchat/PqrPPBbM4poRPDH7qnXxLw)
-
-
-
-## [更新日志](/UPDATE.md)
