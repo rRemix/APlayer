@@ -640,31 +640,17 @@ class MusicService : BaseService(),
   override fun onError(error: PlaybackException) {
     Timber.e("onPlayerError, code: ${error.errorCode} name: ${error.errorCodeName} cause: ${error.cause}")
     // TODO 尝试播放下一首?
-    playback.release()
-    setUpPlayback()
-//    when (error.errorCode) {
-//      // 网络/IO类错误
-//      PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
-//      PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT,
-//      PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS,
-//      PlaybackException.ERROR_CODE_IO_INVALID_HTTP_CONTENT_TYPE,
-//      PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND -> {
-//        playback.start(false)
-//      }
-//
-//      // 解码
-//      PlaybackException.ERROR_CODE_DECODER_INIT_FAILED,
-//      PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED -> {
-//        skipToNext()
-//      }
-//
-//      // 释放重建并跳下一首
-//      PlaybackException.ERROR_CODE_UNSPECIFIED -> {
-//        playback.release()
-//        setUpPlayer()
-//        skipTo(true)
-//      }
-//    }
+    when (error.errorCode) {
+      // fatal error
+      PlaybackException.ERROR_CODE_DECODER_INIT_FAILED,
+      PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED,
+      PlaybackException.ERROR_CODE_AUDIO_TRACK_INIT_FAILED,
+      PlaybackException.ERROR_CODE_AUDIO_TRACK_WRITE_FAILED -> {
+        prepareJob?.cancel()
+        playback.release()
+        setUpPlayback()
+      }
+    }
   }
 
   override fun onPositionChange() {
@@ -843,6 +829,11 @@ class MusicService : BaseService(),
    */
   private fun start(crossFade: Boolean) {
     Timber.v("play: $crossFade")
+
+    if (playback.hasError) {
+      MessageNotifier.show(R.string.load_failed)
+      return
+    }
     if (!playback.isPrepared) {
       MessageNotifier.show(R.string.buffering_wait)
       return
@@ -861,10 +852,6 @@ class MusicService : BaseService(),
     } else {
       volumeController.directTo(1f)
     }
-
-    // 保存当前播放歌曲
-    val song = playQueue.song
-    settingPrefs.lastSong = if (song.isLocal()) song.id.toString() else song.data
   }
 
   /**
@@ -1126,6 +1113,9 @@ class MusicService : BaseService(),
     if (settingPrefs.playAtBreakPoint) {
       startSaveProgress()
     }
+    // 保存当前播放歌曲
+    val song = playQueue.song
+    settingPrefs.lastSong = if (song.isLocal()) song.id.toString() else song.data
   }
 
   fun updateNotification() {
@@ -1400,7 +1390,7 @@ class MusicService : BaseService(),
             song.id
           )
         )
-        lyricManager.updateLyrics(song, null)
+//        lyricManager.updateLyrics(song, null)
 
         Timber.v("prepare finish: $song")
         if (song is Song.Remote) {

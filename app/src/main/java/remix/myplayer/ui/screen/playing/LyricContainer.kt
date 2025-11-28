@@ -19,7 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -43,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import remix.myplayer.R
 import remix.myplayer.lyric.LyricLine
@@ -52,7 +52,6 @@ import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.lyric.LyricMultiLine
 import remix.myplayer.viewmodel.playbackViewModel
-import timber.log.Timber
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -69,8 +68,8 @@ internal fun LyricContainer(
   offset: Long,
   fontScale: Float
 ) {
-  val uiProgress by playbackViewModel.seekBarUiProgress.collectAsState()
-  val progress = (if (uiProgress != -1L) uiProgress else rawProgress) + offset
+  val seekBarUiState by playbackViewModel.seekBarUiState.collectAsStateWithLifecycle()
+  val progress = (seekBarUiState.uiProgress ?: rawProgress) + offset
   val duration = rawDuration + offset
 
   val playbackVM = playbackViewModel
@@ -228,7 +227,12 @@ internal fun LyricContainer(
     if (lyrics.isEmpty() || viewportHeightPx == 0) return@LaunchedEffect
     val bound = lineBounds.getOrNull(highlightIndex) ?: return@LaunchedEffect
     val target = ((bound.top + bound.height / 2f) - viewportHeightPx / 2f).roundToInt()
-    scrollState.scrollTo(target)
+    // 根据seekbar状态决定是否需要动画滚动
+    if (!seekBarUiState.interacting) {
+      scrollState.animateScrollTo(target, DEFAULT_ANIM_SPEC)
+    } else {
+      scrollState.scrollTo(target)
+    }
   }
 
   // 进度更新

@@ -9,7 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -20,6 +19,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.ProgressAware
@@ -36,13 +36,7 @@ internal fun PlayingSeekbarWithText(
   val playbackVM = playbackViewModel
 
   ProgressAware { progress, duration ->
-    var dragging by remember {
-      mutableStateOf(false)
-    }
-
-    var uiProgress by remember {
-      mutableFloatStateOf(0f)
-    }
+    val seekBarUiState by playbackVM.seekBarUiState.collectAsStateWithLifecycle()
 
     var time by remember {
       mutableStateOf(Time("00:00", "00:00"))
@@ -81,16 +75,17 @@ internal fun PlayingSeekbarWithText(
       )
 
       LineSlider(
-        value = if (dragging) uiProgress else progress.toFloat(),
+        value = if (seekBarUiState.interacting && seekBarUiState.uiProgress != null) {
+          seekBarUiState.uiProgress!!.toFloat()
+        } else {
+          progress.toFloat()
+        },
         onValueChange = { v ->
-          dragging = true
-          uiProgress = v
-          playbackVM.setSeekbarUiProgress(v.roundToLong())
+          playbackVM.setSeekbarUiState(v.roundToLong(), true)
         },
         onValueChangeFinished = {
-          dragging = false
-          playbackVM.setProgress(uiProgress.roundToLong())
-          playbackVM.setSeekbarUiProgress(-1)
+          playbackVM.setProgress(playbackVM.seekBarUiState.value.uiProgress ?: progress)
+          playbackVM.setSeekbarUiState(null, false)
         },
         valueRange = 0f..duration.toFloat(),
         modifier = Modifier
@@ -108,11 +103,11 @@ internal fun PlayingSeekbarWithText(
       )
     }
 
-    LaunchedEffect(uiProgress, progress) {
+    LaunchedEffect(seekBarUiState, progress) {
       time = if (duration <= 0) {
         Time("00:00", "00:00")
       } else {
-        val elapsed = if (dragging) uiProgress.toLong() else progress
+        val elapsed = seekBarUiState.uiProgress ?: progress
         val remaining = duration - elapsed
         Time(Util.getTime(elapsed), Util.getTime(remaining))
       }

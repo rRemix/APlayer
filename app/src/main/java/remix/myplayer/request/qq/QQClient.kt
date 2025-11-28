@@ -25,8 +25,8 @@ class QQClient @Inject constructor(
   // 通用参数
   private val comm = mutableMapOf<String, Any>(
     "ct" to 11,
-    "cv" to "1003006",
-    "v" to "1003006",
+    "cv" to "2111",
+    "v" to "2111",
     "os_ver" to "15",
     "phonetype" to "24122RKC7C", // REDMI K80 Pro
     "rom" to "Redmi/miro/miro:15/AE3A.240806.005/OS2.0.10${
@@ -35,7 +35,7 @@ class QQClient @Inject constructor(
         6
       )
     }.0.VOMCNXM:user/release-keys",
-    "tmeAppID" to "qqmusiclight",
+    "tmeAppID" to "qqmusic",
     "nettype" to "NETWORK_WIFI",
     "udid" to "0"
   )
@@ -131,8 +131,8 @@ class QQClient @Inject constructor(
       "grp" to 1
     )
 
-    val data = request("DoSearchForQQMusicLite", "music.search.SearchCgiService", param)
-    val itemSong = data.getJSONObject("body").optJSONArray("item_song") ?: JSONArray()
+    val data = request("DoSearchForQQMusicDesktop", "music.search.SearchCgiService", param)
+    val itemSong = data.getJSONObject("body").getJSONObject("song").optJSONArray("list") ?: JSONArray()
     val result = ArrayList<QQSong>()
     for (i in 0 until itemSong.length()) {
       val obj = itemSong.getJSONObject(i)

@@ -122,7 +122,7 @@ class SettingPrefs @Inject constructor(
   var downloadSource by PrefsDelegate(
     sp,
     PrefKeys.Setting.ALBUM_COVER_DOWNLOAD_SOURCE,
-    DOWNLOAD_LASTFM
+    DOWNLOAD_NETEASE
   )
 
   var classicNotify by PrefsDelegate(sp, PrefKeys.Setting.NOTIFY_STYLE_CLASSIC, false)

@@ -39,6 +39,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.prefs.DesktopLyricPrefs
@@ -82,11 +83,15 @@ class LyricManager @Inject constructor(
   }
 
   init {
-    launch(Dispatchers.Main) {
-      // 每秒检查一次
+    launch(Dispatchers.Default) {
+      // 每 500ms 检查一次
+      var inForeground: Boolean
       while (isActive) {
+        inForeground = Util.isAppOnForeground
+        withContext(Dispatchers.Main) {
+          isAppInForeground = inForeground
+        }
         delay(CHECK_FOREGROUND_INTERVAL)
-        isAppInForeground = Util.isAppOnForeground
       }
     }
     launch(Dispatchers.Main) {
@@ -96,8 +101,15 @@ class LyricManager @Inject constructor(
       }
     }
     launch(Dispatchers.Main) {
-      MusicStateSource.playbackUiState.collect {
-        isPlaying = it.isPlaying
+      var lastSong: Song? = null
+      MusicStateSource.playbackUiState.collect { state ->
+        if (isPlaying != state.isPlaying) {
+          isPlaying = state.isPlaying
+        }
+        if (state.song != lastSong) {
+          lastSong = state.song
+          updateLyrics(state.song, null)
+        }
       }
     }
   }
@@ -427,6 +439,9 @@ class LyricManager @Inject constructor(
   }
 
   fun updateLyrics(song: Song, provider: ILyricsProvider? = null): Job? {
+    if (!song.valid()) {
+      return null
+    }
     updateProgressJob?.cancel()
     updateLyricsJob?.cancel()
     updateLyricsJob = launch(Dispatchers.IO) {

@@ -236,11 +236,3 @@ private data class PanelState(
   val show: Boolean,
   val tick: Int = 0
 )
-
-@Composable
-@Preview(showBackground = true)
-fun OffsetButtonPreview() {
-  OffsetButton(iconRes = R.drawable.ic_stat_1_24dp, text = "+0.5s") {
-
-  }
-}

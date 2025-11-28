@@ -69,11 +69,11 @@ class PlaybackViewModel @Inject constructor(
     )
   }
 
-  private val _seekBarUiProgress = MutableStateFlow(-1L)
-  val seekBarUiProgress = _seekBarUiProgress.asStateFlow()
+  private val _seekBarUiState = MutableStateFlow(SeekBarUiState())
+  val seekBarUiState = _seekBarUiState.asStateFlow()
 
-  fun setSeekbarUiProgress(progress: Long) {
-    _seekBarUiProgress.value = progress
+  fun setSeekbarUiState(overrideProgress: Long?, interacting: Boolean) {
+    _seekBarUiState.value = SeekBarUiState(overrideProgress, interacting)
   }
 
   fun removeFromQueue(id: Long) {
@@ -140,3 +140,8 @@ class PlaybackViewModel @Inject constructor(
     val defaultSwatch = Swatch(Color.GRAY, 100)
   }
 }
+
+data class SeekBarUiState(
+  val uiProgress: Long? = null,
+  val interacting: Boolean = false,
+)

@@ -24,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -50,6 +51,9 @@ class ExoPlayback(private val context: Context) : Playback {
     get() = player.isPlaying
 
   override var isPrepared: Boolean = false
+    private set
+
+  override var hasError: Boolean = false
     private set
 
   override val audioSessionId: Int
@@ -97,9 +101,10 @@ class ExoPlayback(private val context: Context) : Playback {
         }
 
         override fun onPlaybackStateChanged(state: Int) {
+          Timber.tag(TAG).v("onPlaybackStateChanged: $state")
           when (state) {
             Player.STATE_READY -> {
-              Timber.tag(TAG).v("STATE_READY")
+//              Timber.tag(TAG).v("STATE_READY")
             }
 
             Player.STATE_BUFFERING -> {
@@ -112,11 +117,13 @@ class ExoPlayback(private val context: Context) : Playback {
 
             Player.STATE_IDLE -> {
               isPrepared = false
+              stopProgressTicker()
             }
           }
         }
 
         override fun onPlayerError(error: PlaybackException) {
+          hasError = true
           callback?.onError(error)
         }
 
@@ -172,6 +179,7 @@ class ExoPlayback(private val context: Context) : Playback {
   }
 
   override suspend fun prepare(song: Song, nextSong: Song, offset: Long) {
+    hasError = false
     isPrepared = false
 
     player.setMediaSource(buildSource(song),/* startPositionMs = */ offset)
@@ -232,7 +240,7 @@ class ExoPlayback(private val context: Context) : Playback {
     val listener = object : Player.Listener {
       override fun onPlaybackStateChanged(playbackState: Int) {
         Timber.tag(TAG)
-          .v("onPlaybackStateChanged, state: $playbackState isActive: ${cont.isActive}")
+          .v("prepareInternal onPlaybackStateChanged, state: $playbackState isActive: ${cont.isActive}")
         if (playbackState == Player.STATE_READY && cont.isActive) {
           cont.resume(true)
           player.removeListener(this)

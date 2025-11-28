@@ -12,6 +12,8 @@ interface Playback {
 
   val isPrepared: Boolean
 
+  val hasError: Boolean
+
   val audioSessionId: Int
 
   suspend fun prepare(song: Song, nextSong: Song, offset: Long = 0)
