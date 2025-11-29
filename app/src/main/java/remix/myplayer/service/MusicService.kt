@@ -610,7 +610,7 @@ class MusicService : BaseService(),
   override fun onEnded() {
     Timber.v("onEnded")
     // 理论上应该不会到这?
-    throw IllegalStateException("onEnded")
+//    throw IllegalStateException("onEnded")
   }
 
   override fun onItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -1499,7 +1499,7 @@ class MusicService : BaseService(),
     if (!isPlaying) {
       // 暂停后不再更新
       // 所以需要在停止前更新一次 保证桌面部件控件的播放|暂停按钮状态是对的
-      partiallyUpdateWidget()
+      partiallyUpdateWidget(true)
       stopUpdateAppWidget()
     } else {
       if (screenOn) {
@@ -1524,16 +1524,15 @@ class MusicService : BaseService(),
     desktopWidgetJob = launch {
       while (isActive) {
         partiallyUpdateWidget()
-
         delay(INTERVAL_UPDATE_APPWIDGET)
       }
 
     }
   }
 
-  private fun partiallyUpdateWidget() {
+  private fun partiallyUpdateWidget(force: Boolean = false) {
     // app在前台不用更新
-    if (!isAppOnForeground) {
+    if (!isAppOnForeground || force) {
       appWidgets.forEach {
         it.value.partiallyUpdateWidget(service)
       }

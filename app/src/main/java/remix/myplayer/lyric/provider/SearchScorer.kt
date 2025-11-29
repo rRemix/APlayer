@@ -210,17 +210,11 @@ object SearchScorer {
     artistScore: Float,
     albumScore: Float?
   ): Float {
-    // 标题得分过低时降低总分
+    // 固定权重避免因 max 过早饱和导致区分度丢失
     var finalScore = when {
-      artistScore > 0 && albumScore != null -> {
-        max(
-          titleScore * 0.5f + artistScore * 0.5f,
-          titleScore * 0.5f + artistScore * 0.35f + albumScore * 0.15f
-        )
-      }
-
-      artistScore > 0 -> titleScore * 0.5f + artistScore * 0.5f
-      albumScore != null -> max(titleScore * 0.7f + albumScore * 0.3f, titleScore * 0.8f)
+      artistScore > 0 && albumScore != null -> titleScore * 0.5f + artistScore * 0.35f + albumScore * 0.15f
+      artistScore > 0 -> titleScore * 0.6f + artistScore * 0.4f
+      albumScore != null -> titleScore * 0.75f + albumScore * 0.25f
       else -> titleScore
     }
 

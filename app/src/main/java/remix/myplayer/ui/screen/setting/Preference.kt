@@ -104,7 +104,7 @@ fun Preference(
     ) {
       TextPrimary(title, modifier = Modifier.padding(bottom = 4.dp), fontSize = 16.sp)
       if (content != null) {
-        TextSecondary(content, fontSize = 14.sp)
+        TextSecondary(content, fontSize = 14.sp, maxLine = Int.MAX_VALUE)
       }
     }
 
