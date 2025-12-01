@@ -1,6 +1,7 @@
 package remix.myplayer.data.prefs
 
 import android.content.Context
+import android.graphics.Color
 import androidx.annotation.ColorInt
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -31,7 +32,7 @@ class DesktopLyricPrefs @Inject constructor(@ApplicationContext context: Context
     internal const val DEFAULT_SECOND_LINE_SIZE = 16f
 
     @ColorInt
-    internal const val DEFAULT_SUNG_COLOR = 0xff698CF6.toInt()
+    internal const val DEFAULT_SUNG_COLOR = Color.TRANSPARENT
 
     @ColorInt
     internal const val DEFAULT_UNSUNG_COLOR = 0xffffffff.toInt()
