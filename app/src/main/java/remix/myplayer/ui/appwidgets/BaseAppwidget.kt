@@ -6,8 +6,11 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Build
 import android.widget.RemoteViews
+import androidx.compose.ui.graphics.toArgb
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.AppWidgetTarget
 import com.bumptech.glide.signature.ObjectKey
@@ -194,6 +197,11 @@ abstract class BaseAppwidget
       progressState.position.toInt(),
       false
     )
+    // 轨道颜色
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      val tint = ColorStateList.valueOf(service.themeController.appTheme.primary.toArgb())
+      remoteViews.setColorStateList(R.id.appwidget_seekbar, "setProgressTintList", tint)
+    }
   }
 
   private fun updateLove(service: MusicService, remoteViews: RemoteViews, song: Song) {

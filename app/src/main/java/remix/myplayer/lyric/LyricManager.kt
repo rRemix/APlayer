@@ -216,20 +216,13 @@ class LyricManager @Inject constructor(
 
         MessageNotifier.show(if (value) R.string.desktop_lyric_lock else R.string.desktop_lyric__unlock)
         (layoutParams as WindowManager.LayoutParams).apply {
-          if (value) {
-            flags = flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-              alpha =
-                (context.getSystemService(Service.INPUT_SERVICE) as InputManager).maximumObscuringOpacityForTouch
-            }
-          } else {
-            flags = flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-              alpha = 1f
-            }
-          }
-
+          applyLockState(this, value)
           windowManager.updateViewLayout(this@run, this)
+        }
+
+        MusicServiceRemote.service?.run {
+          updateNotification()
+          updatePlaybackState()
         }
       }
     }
@@ -259,6 +252,7 @@ class LyricManager @Inject constructor(
       x = 0
       y = 0
       flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+      applyLockState(this, desktopLyricPrefs.locked)
     }
 
     val owner = OverlayLifeCycleOwner().apply {
@@ -283,9 +277,8 @@ class LyricManager @Inject constructor(
         DesktopLyricOverlay(
           this@LyricManager,
           onLock = {
-            val isLocked = !desktopLyricPrefs.locked
-
-            isDesktopLyricLocked = isLocked
+            Timber.v("rRemix, oldLock: ${desktopLyricPrefs.locked}")
+            isDesktopLyricLocked = !desktopLyricPrefs.locked
           },
           onDrag = { change, amount ->
             // 更新坐标
@@ -309,6 +302,21 @@ class LyricManager @Inject constructor(
     val params = desktopLyricView?.layoutParams as WindowManager.LayoutParams
     params.y = newPos
     windowManager.updateViewLayout(desktopLyricView, params)
+  }
+
+  private fun applyLockState(params: WindowManager.LayoutParams, locked: Boolean) {
+    if (locked) {
+      params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        params.alpha =
+          (context.getSystemService(Service.INPUT_SERVICE) as InputManager).maximumObscuringOpacityForTouch
+      }
+    } else {
+      params.flags = params.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        params.alpha = 1f
+      }
+    }
   }
 
   @UiThread

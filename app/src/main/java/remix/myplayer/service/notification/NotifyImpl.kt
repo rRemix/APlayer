@@ -58,7 +58,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     remoteBigView.setTextViewText(R.id.notify_artist_album, song.artist + " - " + song.album)
 
     remoteView.setTextViewText(R.id.notify_song, song.title)
-    remoteView.setTextViewText(R.id.notify_artist_album, song.artist + " - " + song.album)
+    remoteView.setTextViewText(R.id.notify_artist_album, song.artist)
 
     //非系统背景色 即黑色背景
     if (!service.settingPrefs.notifyUseSystemBackground) {

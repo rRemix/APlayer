@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,6 +59,8 @@ import kotlin.math.roundToInt
 const val DEFAULT_TEXT_SIZE = 15f
 private val DEFAULT_ANIM_SPEC =
   tween<Float>(durationMillis = 400, easing = FastOutSlowInEasing)
+private const val HIGHLIGHT_SCALE = 1.2f
+private const val LYRIC_WIDTH_FRACTION = 1f / HIGHLIGHT_SCALE
 
 @Composable
 internal fun LyricContainer(
@@ -126,11 +129,13 @@ internal fun LyricContainer(
       lyrics.forEachIndexed { index, line ->
         val isHighLight = index == highlightIndex
         val scale by animateFloatAsState(
-          targetValue = if (isHighLight) 1.2f else 1.0f,
+          targetValue = if (isHighLight) HIGHLIGHT_SCALE else 1.0f,
           animationSpec = DEFAULT_ANIM_SPEC
         )
         Column(
           modifier = Modifier
+            // 预留缩放后的空间，避免高亮时长句被裁切
+            .fillMaxWidth(LYRIC_WIDTH_FRACTION)
             .onGloballyPositioned { c ->
               lineBounds[index] = LineBounds(
                 c.positionInParent().y,
@@ -160,7 +165,8 @@ internal fun LyricContainer(
             TextSecondary(
               line.content,
               fontSize = fontSize,
-              maxLine = Int.MAX_VALUE
+              maxLine = Int.MAX_VALUE,
+              textAlign = TextAlign.Center
             )
           }
 
@@ -168,7 +174,8 @@ internal fun LyricContainer(
             TextSecondary(
               line.translation ?: "",
               fontSize = 15.sp,
-              maxLine = Int.MAX_VALUE
+              maxLine = Int.MAX_VALUE,
+              textAlign = TextAlign.Center
             )
           }
         }

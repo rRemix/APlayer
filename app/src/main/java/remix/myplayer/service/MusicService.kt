@@ -1035,11 +1035,7 @@ class MusicService : BaseService(),
 
       ACTION_SHORTCUT_MYLOVE -> {
         tryLaunch {
-          val playlist = playListRepository.getFavorite()
-
-          if (playlist == null) {
-            return@tryLaunch
-          }
+          val playlist = playListRepository.getFavorite() ?: return@tryLaunch
 
           val songs =
             withContext(Dispatchers.IO) { songRepository.getSongsByModels(listOf(playlist)) }

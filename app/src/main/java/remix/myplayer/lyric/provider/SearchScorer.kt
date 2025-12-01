@@ -420,3 +420,4 @@ object SearchScorer {
     return totalScore / maxOf(list1.size, list2.size)
   }
 }
+

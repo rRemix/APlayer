@@ -25,8 +25,10 @@
       android:layout_gravity="center_vertical"/>
 
     <LinearLayout
+      android:id="@+id/notify_text"
       android:layout_marginStart="@dimen/d12_size"
-      android:layout_width="@dimen/d120_size"
+      android:layout_width="0dp"
+      android:layout_weight="1"
       android:layout_height="match_parent"
       android:orientation="vertical"
       android:gravity="center_vertical">
@@ -36,6 +38,7 @@
         android:layout_height="wrap_content"
         android:lines="1"
         android:ellipsize="end"
+        android:gravity="start|center_vertical"
         android:textAppearance="@style/Theme.APlayer.Notification.Title"
         android:layout_marginBottom="@dimen/d5_szie"/>
       <TextView
@@ -44,44 +47,40 @@
         android:layout_height="wrap_content"
         android:lines="1"
         android:ellipsize="end"
+        android:gravity="start|center_vertical"
         android:textAppearance="@style/Theme.APlayer.Notification"/>
     </LinearLayout>
 
     <LinearLayout
-      android:layout_width="match_parent"
+      android:layout_width="wrap_content"
       android:layout_height="match_parent"
-      android:gravity="center"
-      android:weightSum="4"
+      android:gravity="center_vertical"
       android:paddingTop="@dimen/d4_size"
       android:paddingBottom="@dimen/d4_size">
       <ImageButton
         android:id="@+id/notify_play"
-        android:layout_weight="1"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/d40_size"
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
         android:src="@drawable/icon_notify_play"
         android:tint="@color/ate_secondary_text_light"/>
       <ImageButton
         android:id="@+id/notify_next"
-        android:layout_weight="1"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/d32_size"
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
         android:src="@drawable/icon_notify_next"
         android:tint="@color/ate_secondary_text_light"/>
       <ImageButton
         android:id="@+id/notify_lyric"
-        android:layout_weight="1"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/d32_size"
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
         android:src="@drawable/icon_notify_lyric"
         android:tint="@color/ate_secondary_text_light"/>
 
       <ImageButton
-        android:layout_weight="1"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/d32_size"
         android:layout_height="match_parent"
         android:id="@+id/notify_close"
         android:src="@drawable/icon_notify_btn_close_white"

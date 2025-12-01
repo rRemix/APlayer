@@ -1,6 +1,7 @@
 package remix.myplayer.lyric
 
 import android.annotation.SuppressLint
+import androidx.core.text.HtmlCompat
 import timber.log.Timber
 import kotlin.math.roundToLong
 
@@ -41,9 +42,15 @@ object LrcParser {
     val words = ArrayList<Word>()
     var currentTime = time
     var lastStart = 0
-    var match = WORD_TIME_TAG_REGEX.find(content) ?: return SimpleLyricLine(time, content)
+    var match =
+      WORD_TIME_TAG_REGEX.find(content) ?: return SimpleLyricLine(time, decodeEntities(content))
     while (true) {
-      words.add(Word(currentTime, content.substring(lastStart, match.range.first)))
+      words.add(
+        Word(
+          currentTime,
+          decodeEntities(content.substring(lastStart, match.range.first))
+        )
+      )
       parseTime(match.value.substring(1, match.value.lastIndex), offset)?.let {
         // 确保同一 LyricsLine 内 time 单调不减
         if (it > currentTime) {
@@ -53,7 +60,7 @@ object LrcParser {
       lastStart = match.range.last + 1
       match = match.next() ?: break
     }
-    words.add(Word(currentTime, content.substring(lastStart)))
+    words.add(Word(currentTime, decodeEntities(content.substring(lastStart))))
     return PerWordLyricLine(time, words)
   }
 
@@ -100,11 +107,12 @@ object LrcParser {
         index = closing + 1
       }
 
+      val lineContent = decodeEntities(it.substring(index))
       if (times.size == 1) {
         lines.add(parseWords(times[0], offset, it.substring(index)))
       } else {
         times.forEach { time ->
-          lines.add(SimpleLyricLine(time, it.substring(index)))
+          lines.add(SimpleLyricLine(time, lineContent))
         }
       }
     }
@@ -138,5 +146,13 @@ object LrcParser {
     val seconds = totalSeconds % 60
     val hundredths = (ms % 1000) / 10
     return String.format("%02d:%02d.%02d", minutes, seconds, hundredths)
+  }
+
+  /**
+   * 处理歌词中的 HTML 转义字符（如 &apos;），保证逐词歌词显示正常
+   */
+  private fun decodeEntities(text: String): String {
+    if (!text.contains('&')) return text
+    return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
   }
 }

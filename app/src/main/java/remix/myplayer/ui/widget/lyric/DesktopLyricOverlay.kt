@@ -251,6 +251,7 @@ fun DesktopLyricOverlay(
                   markInteraction()
                 }
               }) { space, value ->
+                markInteraction()
                 sungColor = when (space) {
                   ColorSpace.Red -> {
                     sungColor.copy(red = value)
