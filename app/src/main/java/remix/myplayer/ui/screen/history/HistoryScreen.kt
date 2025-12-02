@@ -27,7 +27,6 @@ import remix.myplayer.ui.widget.library.list.ListSong
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.playbackViewModel
-import kotlin.random.Random
 
 @Composable
 fun HistoryScreen() {

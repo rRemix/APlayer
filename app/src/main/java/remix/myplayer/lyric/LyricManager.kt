@@ -216,7 +216,7 @@ class LyricManager @Inject constructor(
       desktopLyricView?.run {
         _desktopUiState.value = _desktopUiState.value.copy(locked = value)
 
-        MessageNotifier.show(if (value) R.string.desktop_lyric_lock else R.string.desktop_lyric__unlock)
+        MessageNotifier.show(if (value) R.string.desktop_lyric__lock_ticker else R.string.desktop_lyric__unlock)
         (layoutParams as WindowManager.LayoutParams).apply {
           applyLockState(this, value)
           windowManager.updateViewLayout(this@run, this)

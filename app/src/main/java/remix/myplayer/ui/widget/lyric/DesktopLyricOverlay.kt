@@ -233,6 +233,7 @@ fun DesktopLyricOverlay(
               FontSizeContainer(
                 firstLineSize,
                 secondLineSize,
+                sungColor,
                 onInteractingStatusChange = {
                   if (it) {
                     markInteraction()

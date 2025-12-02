@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -31,6 +32,7 @@ import remix.myplayer.ui.widget.common.defaultLineSliderProperties
 internal fun FontSizeContainer(
   firstLineSize: Float,
   secondLineSize: Float,
+  sliderTintColor: Color,
   onInteractingStatusChange: (Boolean) -> Unit,
   onValueChange: (Int, Float) -> Unit
 ) {
@@ -53,6 +55,7 @@ internal fun FontSizeContainer(
       icon = R.drawable.ic_looks_one_24dp,
       desc = "DkpFirstLineFontSize",
       value = firstLineSize,
+      sliderTintColor = sliderTintColor,
       interactionSource = firstSliderSource,
       onValueChange = {
         onValueChange(0, it)
@@ -62,6 +65,7 @@ internal fun FontSizeContainer(
       icon = R.drawable.ic_looks_two_24dp,
       desc = "DkpSecondLineFontSize",
       value = secondLineSize,
+      sliderTintColor = sliderTintColor,
       interactionSource = secondSliderSource,
       onValueChange = {
         onValueChange(1, it)
@@ -75,6 +79,7 @@ private fun FontSizeSetting(
   @DrawableRes icon: Int,
   desc: String,
   value: Float,
+  sliderTintColor: Color,
   interactionSource: MutableInteractionSource,
   onValueChange: (Float) -> Unit
 ) {
@@ -96,7 +101,10 @@ private fun FontSizeSetting(
       value = value,
       onValueChange = onValueChange,
       valueRange = range,
-      properties = defaultLineSliderProperties.copy()
+      properties = defaultLineSliderProperties.copy(
+        trackProgressColor = sliderTintColor,
+        thumbColor = sliderTintColor
+      )
     )
 
     SliderIcon(R.drawable.ic_text_increase_24dp, "${desc}_increase") {

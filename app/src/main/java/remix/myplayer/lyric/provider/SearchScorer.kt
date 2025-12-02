@@ -1,8 +1,8 @@
 package remix.myplayer.lyric.provider
 
-import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.bean.mp3.Album
 import remix.myplayer.data.bean.mp3.Artist
+import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.util.SearchKeyUtil
 import kotlin.math.abs
 import kotlin.math.max

@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.flow.SharedFlow
 import remix.myplayer.data.bean.misc.Library
 import remix.myplayer.ui.screen.RemoteScreen
 import remix.myplayer.ui.screen.library.AlbumScreen
@@ -31,6 +32,7 @@ fun ViewPager(
   modifier: Modifier = Modifier,
   libraries: List<Library>,
   pagerState: PagerState,
+  scrollToTopEvent: SharedFlow<Unit>? = null,
   vm: SettingViewModel = settingViewModel
 ) {
   HorizontalPager(
@@ -39,7 +41,7 @@ fun ViewPager(
     beyondViewportPageCount = 1
   ) { page ->
     when (libraries[page].tag) {
-      Library.TAG_SONG -> SongScreen()
+      Library.TAG_SONG -> SongScreen(scrollToTopEvent)
       Library.TAG_ALBUM -> AlbumScreen()
       Library.TAG_ARTIST -> ArtistScreen()
       Library.TAG_GENRE -> GenreScreen()

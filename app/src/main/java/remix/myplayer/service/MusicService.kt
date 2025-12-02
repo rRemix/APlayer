@@ -634,6 +634,8 @@ class MusicService : BaseService(),
         playback.appendNext(playQueue.nextSong)
         lastOp = Command.SKIP_TO_NEXT
       }
+
+      updatePlayHistory()
     }
   }
 
@@ -931,8 +933,11 @@ class MusicService : BaseService(),
       MessageNotifier.show(R.string.song_lose_effect)
       return
     }
-    prepare(playQueue.song)
+
+    // 必须先更新下一首，否则 prepare 中获取到的 nextSong 是旧的
     playQueue.updateNextSong()
+
+    prepare(playQueue.song)
   }
 
   override fun onMediaStoreChanged() {
@@ -1231,6 +1236,8 @@ class MusicService : BaseService(),
         val nextSong = intent.getSerializableExtra(EXTRA_SONG) as Song? ?: return
         //添加到播放队列
         playQueue.addNextSong(nextSong)
+        // 同步更新播放器中的下一首
+        playback.replaceNext(playQueue.nextSong)
         MessageNotifier.show(R.string.already_add_to_next_song)
       }
       // 切换定时器

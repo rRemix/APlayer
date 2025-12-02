@@ -145,14 +145,11 @@ class PlayQueue @Inject constructor(
     }
   }
 
-  /**
-   * 初始化mediaplayer
-   */
   private fun setUpDataSource(lastSong: Song?, pos: Int) {
     if (lastSong == null) {
       return
     }
-    //初始化当前播放歌曲
+    // 初始化当前播放歌曲
     Timber.v("当前歌曲:%s", lastSong.title)
     song = lastSong
     position = pos

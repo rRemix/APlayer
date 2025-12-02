@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.SharedFlow
 import remix.myplayer.misc.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -25,7 +27,7 @@ import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 
 @Composable
-fun SongScreen() {
+fun SongScreen(scrollToTopEvent: SharedFlow<Unit>? = null) {
   val libraryVM = libraryViewModel
   val mainVM = mainViewModel
 
@@ -34,6 +36,15 @@ fun SongScreen() {
   val listState = rememberLazyListState()
   val songs by libraryVM.songs.collectAsStateWithLifecycle()
   val context = LocalContext.current
+
+  LaunchedEffect(scrollToTopEvent) {
+    scrollToTopEvent?.collect {
+      val index = libraryVM.songs.value.indexOfFirst { it.id == playbackState.song.id }
+      if (index != -1) {
+        listState.scrollToItem(index)
+      }
+    }
+  }
 
   Column {
     if (songs.isNotEmpty()) {

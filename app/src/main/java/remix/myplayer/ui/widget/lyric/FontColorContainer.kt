@@ -74,7 +74,10 @@ private fun ColorSlider(
       interactionSource = interactionSource,
       value = space.value(color),
       onValueChange = onValueChange,
-      properties = defaultLineSliderProperties
+      properties = defaultLineSliderProperties.copy(
+        trackProgressColor = color,
+        thumbColor = color
+      )
     )
   }
 }

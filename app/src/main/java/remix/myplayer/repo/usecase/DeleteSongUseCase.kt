@@ -1,7 +1,6 @@
 package remix.myplayer.repo.usecase
 
 import android.app.RecoverableSecurityException
-import android.content.Intent
 import android.content.IntentSender
 import android.os.Build
 import android.provider.MediaStore
@@ -20,11 +19,8 @@ import remix.myplayer.repo.AbstractRepository.Companion.makeInStrQuery
 import remix.myplayer.repo.PlayListRepository
 import remix.myplayer.repo.PlayQueueRepository
 import remix.myplayer.repo.SongRepository
-import remix.myplayer.service.Command
-import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.nav.MessageNotifier
-import remix.myplayer.util.Util
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject

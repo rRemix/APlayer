@@ -33,8 +33,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import remix.myplayer.R
 import remix.myplayer.data.bean.mp3.Song
-import remix.myplayer.lyric.LyricManager
 import remix.myplayer.lyric.LyricLine
+import remix.myplayer.lyric.LyricManager
 import remix.myplayer.lyric.provider.ILyricsProvider
 import remix.myplayer.lyric.provider.UriProvider
 import remix.myplayer.misc.clickWithRipple

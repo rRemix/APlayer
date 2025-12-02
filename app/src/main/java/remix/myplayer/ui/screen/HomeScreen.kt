@@ -35,6 +35,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,6 +51,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.bean.misc.Library
@@ -186,6 +188,7 @@ private fun HomeContent(
   libraries: List<Library>,
 ) {
   val scope = rememberCoroutineScope()
+  val scrollToTopEvent = remember { MutableSharedFlow<Unit>() }
 
   Column(modifier = Modifier.padding(contentPadding)) {
     ScrollableTabRow(
@@ -202,9 +205,21 @@ private fun HomeContent(
     ) {
       libraries.forEachIndexed { index, library ->
         val theme = LocalTheme.current
+        var lastClickTime by remember { mutableLongStateOf(0L) }
+
         Tab(
           selected = pagerState.currentPage == index,
-          onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+          onClick = {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastClickTime < 300) {
+              if (library.tag == Library.TAG_SONG) {
+                scope.launch { scrollToTopEvent.emit(Unit) }
+              }
+              return@Tab
+            }
+            lastClickTime = currentTime
+            scope.launch { pagerState.animateScrollToPage(index) }
+          },
           text = { Text(stringResource(library.stringRes), maxLines = 1) },
           selectedContentColor = theme.primaryReverse,
           unselectedContentColor = colorResource(
@@ -217,7 +232,8 @@ private fun HomeContent(
     ViewPager(
       modifier = Modifier.weight(1f),
       libraries = libraries,
-      pagerState = pagerState
+      pagerState = pagerState,
+      scrollToTopEvent = scrollToTopEvent
     )
 
     BottomBar()

@@ -24,7 +24,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -182,10 +181,13 @@ class ExoPlayback(private val context: Context) : Playback {
     hasError = false
     isPrepared = false
 
-    player.setMediaSource(buildSource(song),/* startPositionMs = */ offset)
+    val sources = mutableListOf<MediaSource>()
+    sources.add(buildSource(song))
+    if (nextSong.valid()) {
+      sources.add(buildSource(nextSong))
+    }
 
-    // 添加下一首歌曲实现无缝播放
-    appendNext(nextSong)
+    player.setMediaSources(sources, 0, offset)
 
     val prepared = try {
       withTimeout(10_000L) { prepareInternal() }
@@ -231,8 +233,8 @@ class ExoPlayback(private val context: Context) : Playback {
   // 清除已经播放过的mediaItem
   private fun trim() {
     val idx = player.currentMediaItemIndex
-    if (idx > 0) {
-      player.removeMediaItems(0, idx)
+    if (idx > 1) {
+      player.removeMediaItems(0, idx - 1)
     }
   }
 
