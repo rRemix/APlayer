@@ -3,7 +3,6 @@ name: Android CI
 on:
   push:
     branches:
-      - master
       - compose
   pull_request:
 
@@ -21,7 +20,7 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Build with Gradle
-        run: ./gradlew app:assembleDebug app:assembleCiRelease
+        run: ./gradlew app:assembleDebug
       - name: Upload outputs
         uses: actions/upload-artifact@v4
         with:

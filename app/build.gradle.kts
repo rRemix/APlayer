@@ -129,14 +129,6 @@ android {
                 )
             )
         }
-
-        // For CI builds only
-        create("ciRelease") {
-            initWith(getByName("release"))
-            signingConfig = signingConfigs["debugConfig"]
-            applicationIdSuffix = ".ci"
-            versionNameSuffix = "-CI"
-        }
     }
 
     sourceSets {
@@ -221,10 +213,13 @@ androidComponents {
 baselineProfile {
     saveInSrc = true
 
+    warnings {
+        disabledVariants = false
+    }
 //  variants {
-//    maybeCreate("nonGoogleWithUpdaterRelease").apply {
-//      from(project(":baselineprofile"))
-//    }
+//      maybeCreate("nonGoogleWithUpdaterRelease").apply {
+//          from(project(":baselineprofile"))
+//      }
 //  }
 }
 

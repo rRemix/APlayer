@@ -1,0 +1,95 @@
+name: Android Nightly
+
+on:
+  schedule:
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: nightly-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  nightly:
+    if: github.ref_name == 'compose'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: 'gradle'
+
+      - name: Prepare keystore & local.properties
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+          GOOGLE_PLAY_LICENSE_KEY: ${{ secrets.GOOGLE_PLAY_LICENSE_KEY }}
+          BUGLY_APPID: ${{ secrets.BUGLY_APPID }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > app/release.keystore
+          cat > local.properties <<EOF
+          keystore.storeFile=${GITHUB_WORKSPACE}/app/release.keystore
+          keystore.storePassword=$KEYSTORE_STORE_PASSWORD
+          keystore.keyAlias=$KEYSTORE_KEY_ALIAS
+          keystore.keyPassword=$KEYSTORE_KEY_PASSWORD
+          LASTFM_API_KEY=${LASTFM_API_KEY:-""}
+          GOOGLE_PLAY_LICENSE_KEY=${GOOGLE_PLAY_LICENSE_KEY:-""}
+          BUGLY_APPID=${BUGLY_APPID:-""}
+          EOF
+
+      - name: Generate Build Info
+        id: info
+        run: |
+          echo "build_date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Read commit message
+        id: commit_msg
+        run: |
+          MSG=$(git show -s --format=%s "$GITHUB_SHA")
+          echo "message=$MSG" >> "$GITHUB_OUTPUT"
+
+      - name: Build nightly
+        run: ./gradlew :app:assembleNonGoogleWithUpdaterRelease
+
+      - name: Delete Old Nightly Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete nightly --cleanup-tag --yes || true
+          git push origin :refs/tags/nightly || true
+
+      - name: Release Nightly
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: nightly
+          name: Nightly Build ${{ steps.info.outputs.build_date }}
+          files: app/build/outputs/apk/nonGoogleWithUpdater/release/*.apk
+          prerelease: true
+          body: |
+            Automated Nightly Build
+            Date: ${{ steps.info.outputs.build_date }}
+            Commit: ${{ steps.commit_msg.outputs.message }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+#      - name: Upload nightly artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: nightly-${{ github.run_number }}
+#          path: app/build/outputs/apk/nonGoogleWithUpdater/release/*.apk
+#          retention-days: 14

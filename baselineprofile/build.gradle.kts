@@ -28,14 +28,6 @@ android {
 
     targetProjectPath = ":app"
 
-    buildTypes {
-        maybeCreate("release")
-        create("ciRelease") {
-            initWith(getByName("release"))
-            matchingFallbacks += listOf("release")
-        }
-    }
-
     flavorDimensions += listOf("channel", "updater")
     productFlavors {
         create("nonGoogle") { dimension = "channel" }
@@ -76,7 +68,7 @@ androidComponents {
         val artifactsLoader = v.artifacts.getBuiltArtifactsLoader()
         v.instrumentationRunnerArguments.put(
             "targetAppId",
-            v.testedApks.map { artifactsLoader.load(it)?.applicationId }
+            v.testedApks.map { artifactsLoader.load(it)?.applicationId ?: "remix.myplayer"}
         )
     }
 }
