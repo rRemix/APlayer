@@ -5,11 +5,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
@@ -28,7 +30,15 @@ fun LyricSingleLine(
 ) {
   val textMeasurer = rememberTextMeasurer()
   val content = (line?.content ?: "").ifBlank { ELLIPSIS }
-  val baseStyle = TextStyle(fontSize = fontSize)
+  val baseStyle = TextStyle(
+    fontSize = fontSize,
+    fontWeight = FontWeight.Bold,
+    shadow = Shadow(
+      color = Color.Black,
+      offset = Offset(1f, 1f),
+      blurRadius = 2f
+    )
+  )
   val isPerWord = line is PerWordLyricLine
 
   Layout(
@@ -36,7 +46,7 @@ fun LyricSingleLine(
       if (content.isEmpty()) return@drawBehind
 
       // 外层整体裁剪，防止越界到父容器
-      clipRect(left = 0f, top = 0f, right = size.width.toFloat(), bottom = size.height.toFloat()) {
+      clipRect(left = 0f, top = 0f, right = size.width, bottom = size.height) {
 
         val layoutUnsung = textMeasurer.measure(
           text = content,

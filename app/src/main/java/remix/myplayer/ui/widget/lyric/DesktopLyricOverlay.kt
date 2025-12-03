@@ -26,13 +26,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -161,8 +165,15 @@ fun DesktopLyricOverlay(
           // 翻译和下一行歌词都没有时显示省略号
           (currentLyric.nextLine?.content ?: "").ifBlank { ELLIPSIS }
         },
-        color = if (isTranslation) translationColor else unSungColor,
-        fontSize = secondLineSize.sp,
+        style = TextStyle(
+          color = if (isTranslation) translationColor else unSungColor,
+          fontSize = secondLineSize.sp,
+          shadow = Shadow(
+            color = Color.Black,
+            offset = Offset(1f, 1f),
+            blurRadius = 2f
+          )
+        ),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         softWrap = false
