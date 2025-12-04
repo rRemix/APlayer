@@ -40,13 +40,12 @@ class DeleteSongUseCase @Inject constructor(
     deleteSource: Boolean,
     parent: APlayerModel?
   ) =
-    withContext(Dispatchers.IO) {
+    withContext(Dispatchers.Main) {
       if (activity == null || models.isEmpty()) {
         return@withContext
       }
 
       settingPrefs.deleteSource = deleteSource
-
 
       if (parent is PlayList) { // delete songs in playlist
         val audioIds = models.map {
@@ -80,7 +79,9 @@ class DeleteSongUseCase @Inject constructor(
         }
       }
 
-      val songs = songRepo.getSongsByModels(models)
+      val songs = withContext(Dispatchers.IO) {
+        songRepo.getSongsByModels(models)
+      }
       val songIds = songs.map { it.id }
 
       if (songs.isNotEmpty()) {

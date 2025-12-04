@@ -10,6 +10,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultDataSource
@@ -23,18 +24,19 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeout
 import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
+import remix.myplayer.misc.checkMainThread
 import remix.myplayer.service.playback.Playback.PlayerCallback
 import remix.myplayer.util.Constants.MB
 import timber.log.Timber
 import java.io.File
-import kotlin.coroutines.resume
 
 @OptIn(UnstableApi::class)
 class ExoPlayback(private val context: Context) : Playback {
@@ -49,6 +51,25 @@ class ExoPlayback(private val context: Context) : Playback {
   override val isPlaying: Boolean
     get() = player.isPlaying
 
+  override val currentSong: Song?
+    get() = player.currentMediaItem?.localConfiguration?.tag as? Song
+
+  override val currentIndex: Int
+    get() = player.currentMediaItemIndex
+
+  override val mediaItemCount: Int
+    get() = player.mediaItemCount
+
+  override val nextSong: Song?
+    get() {
+      val index = getNextSongIndex()
+      if (index == C.INDEX_UNSET) return null
+      val timeline = player.currentTimeline
+      val window = androidx.media3.common.Timeline.Window()
+      timeline.getWindow(index, window)
+      return window.mediaItem.localConfiguration?.tag as? Song
+    }
+
   override var isPrepared: Boolean = false
     private set
 
@@ -60,32 +81,13 @@ class ExoPlayback(private val context: Context) : Playback {
 
   private var callback: PlayerCallback? = null
 
-  private val cache by lazy {
-    val base = context.externalCacheDir ?: context.cacheDir
-    val dir = File(base, "media3-cache")
-    // 后续考虑做成配置
-    val availableBytes = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val sm = context.getSystemService(Context.STORAGE_SERVICE) as? StorageManager
-      sm?.getAllocatableBytes(StorageManager.UUID_DEFAULT) ?: dir.usableSpace
-    } else {
-      dir.usableSpace
-    }
-    val size = (availableBytes / 10).coerceIn(128L * MB, 1024L * MB)
-    SimpleCache(
-      dir,
-      LeastRecentlyUsedCacheEvictor(size),
-      StandaloneDatabaseProvider(context),
-      null,
-      false,
-      false
-    )
-  }
-
   private val scope = CoroutineScope(Dispatchers.Main)
   private var progressTickerJob: Job? = null
 
+  private val localDataSourceFactory = DefaultDataSource.Factory(context)
+
   private val player: ExoPlayer =
-    ExoPlayer.Builder(context).setUseLazyPreparation(false).build().apply {
+    ExoPlayer.Builder(context).build().apply {
       playWhenReady = false
       val attrs = AudioAttributes.Builder()
         .setUsage(C.USAGE_MEDIA)
@@ -103,7 +105,10 @@ class ExoPlayback(private val context: Context) : Playback {
           Timber.tag(TAG).v("onPlaybackStateChanged: $state")
           when (state) {
             Player.STATE_READY -> {
-//              Timber.tag(TAG).v("STATE_READY")
+              if (!isPrepared) {
+                isPrepared = true
+                callback?.onPrepare()
+              }
             }
 
             Player.STATE_BUFFERING -> {
@@ -157,114 +162,146 @@ class ExoPlayback(private val context: Context) : Playback {
     progressTickerJob = null
   }
 
+  // 构建MediaSource
   private fun buildSource(song: Song): MediaSource {
     val mediaItem =
-      MediaItem.Builder().setUri(song.contentUri).setMediaId(song.id.toString()).build()
+      MediaItem.Builder().setUri(song.contentUri).setMediaId(song.id.toString()).setTag(song)
+        .build()
     return if (song is Song.Remote) {
       val httpFactory = DefaultHttpDataSource.Factory()
         .setDefaultRequestProperties(song.headers)
       // 缓存
       val cacheFactory = CacheDataSource.Factory()
-        .setCache(cache)
+        .setCache(MediaCache.get(context))
         .setUpstreamDataSourceFactory(httpFactory)
         .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
       ProgressiveMediaSource.Factory(cacheFactory)
         .createMediaSource(mediaItem)
     } else {
-      val dataSourceFactory = DefaultDataSource.Factory(context)
-      ProgressiveMediaSource.Factory(dataSourceFactory)
+      ProgressiveMediaSource.Factory(localDataSourceFactory)
         .createMediaSource(mediaItem)
     }
   }
 
-  override suspend fun prepare(song: Song, nextSong: Song, offset: Long) {
+  override fun setPlaylist(songs: List<Song>, index: Int, offset: Long) {
+    checkMainThread()
     hasError = false
     isPrepared = false
 
-    val sources = mutableListOf<MediaSource>()
-    sources.add(buildSource(song))
-    if (nextSong.valid()) {
-      sources.add(buildSource(nextSong))
-    }
-
-    player.setMediaSources(sources, 0, offset)
-
-    val prepared = try {
-      withTimeout(10_000L) { prepareInternal() }
-    } catch (e: TimeoutCancellationException) {
-      Timber.tag(TAG).w(e)
-      false
-    }
-    if (prepared) {
-      isPrepared = true
-      callback?.onPrepare()
-    } else {
-      isPrepared = false
-    }
-  }
-
-  override fun replaceNext(next: Song) {
-    if (!next.valid()) {
-      Timber.tag(TAG).w("ignore replaceNext")
-      return
-    }
-    if (player.mediaItemCount == 0) {
-      throw IllegalArgumentException("use prepare first")
-    }
-
-    val nextIndex = player.currentMediaItemIndex + 1
-    if (nextIndex < player.mediaItemCount) {
-      player.removeMediaItems(nextIndex, player.mediaItemCount)
-    }
-    player.addMediaSource(buildSource(next))
-
-    trim()
-  }
-
-  override fun appendNext(next: Song) {
-    if (!next.valid()) {
-      Timber.tag(TAG).w("ignore appendNext")
-      return
-    }
-    player.addMediaSource(buildSource(next))
-    trim()
-  }
-
-  // 清除已经播放过的mediaItem
-  private fun trim() {
-    val idx = player.currentMediaItemIndex
-    if (idx > 1) {
-      player.removeMediaItems(0, idx - 1)
-    }
-  }
-
-  private suspend fun prepareInternal() = suspendCancellableCoroutine { cont ->
-    val listener = object : Player.Listener {
-      override fun onPlaybackStateChanged(playbackState: Int) {
-        Timber.tag(TAG)
-          .v("prepareInternal onPlaybackStateChanged, state: $playbackState isActive: ${cont.isActive}")
-        if (playbackState == Player.STATE_READY && cont.isActive) {
-          cont.resume(true)
-          player.removeListener(this)
-        }
-      }
-
-      override fun onPlayerError(error: PlaybackException) {
-        Timber.tag(TAG).v("onPlayerError")
-        player.removeListener(this)
-        cont.resume(false)
-      }
-    }
-
-    cont.invokeOnCancellation {
-      player.removeListener(listener)
-    }
-
-    player.addListener(listener)
+    val sources = songs.map { buildSource(it) }
+    player.setMediaSources(sources, index, offset)
     player.prepare()
   }
 
-  override fun start(crossFade: Boolean) {
+  override fun addSongs(songs: List<Song>, index: Int) {
+    checkMainThread()
+    val sources = songs.map { buildSource(it) }
+    if (index == -1) {
+      player.addMediaSources(sources)
+    } else {
+      val safeIndex = index.coerceIn(0, player.mediaItemCount)
+      player.addMediaSources(safeIndex, sources)
+    }
+  }
+
+  override fun removeSong(index: Int) {
+    checkMainThread()
+    if (index in 0 until player.mediaItemCount) {
+      player.removeMediaItem(index)
+    }
+  }
+
+  override fun setMode(mode: Int) {
+    checkMainThread()
+    when (mode) {
+      MODE_LOOP -> {
+        player.repeatMode = Player.REPEAT_MODE_ALL
+        player.shuffleModeEnabled = false
+      }
+
+      MODE_REPEAT -> {
+        player.repeatMode = Player.REPEAT_MODE_ONE
+        player.shuffleModeEnabled = false
+      }
+
+      MODE_SHUFFLE -> {
+        player.repeatMode = Player.REPEAT_MODE_ALL
+        player.shuffleModeEnabled = true
+      }
+
+      else -> {
+        player.repeatMode = Player.REPEAT_MODE_OFF
+        player.shuffleModeEnabled = false
+      }
+    }
+  }
+
+  override fun skipToNext() {
+    checkMainThread()
+    val timeline = player.currentTimeline
+    if (timeline.isEmpty) return
+
+    // 无论什么模式，手动切歌都应该跳到下一首（在单曲循环下需要强制切到下一首）
+    val nextIndex = timeline.getNextWindowIndex(
+      player.currentMediaItemIndex,
+      Player.REPEAT_MODE_ALL,
+      player.shuffleModeEnabled
+    )
+
+    if (nextIndex != C.INDEX_UNSET) {
+      player.seekToDefaultPosition(nextIndex)
+    }
+  }
+
+  override fun skipToPrevious() {
+    checkMainThread()
+    val timeline = player.currentTimeline
+    if (timeline.isEmpty) return
+
+    // 类似 skipToNext，单曲循环下也需要切到上一首
+    val previousIndex = timeline.getPreviousWindowIndex(
+      player.currentMediaItemIndex,
+      Player.REPEAT_MODE_ALL,
+      player.shuffleModeEnabled
+    )
+    if (previousIndex != C.INDEX_UNSET) {
+      player.seekToDefaultPosition(previousIndex)
+    }
+  }
+
+  override fun skipTo(index: Int) {
+    checkMainThread()
+    player.seekTo(index, C.TIME_UNSET)
+  }
+
+  // 根据播放模式获取下一首索引
+  private fun getNextSongIndex(): Int {
+    val timeline = player.currentTimeline
+    if (timeline.isEmpty) return C.INDEX_UNSET
+
+    return timeline.getNextWindowIndex(
+      player.currentMediaItemIndex,
+      player.repeatMode,
+      player.shuffleModeEnabled
+    )
+  }
+
+  // 从Timeline获取当前播放列表
+  override fun getPlaylist(): List<Song> {
+    val timeline = player.currentTimeline
+    val list = ArrayList<Song>()
+    val window = Timeline.Window()
+    for (i in 0 until timeline.windowCount) {
+      timeline.getWindow(i, window)
+      val mediaItem = window.mediaItem
+      (mediaItem.localConfiguration?.tag as? Song)?.let {
+        list.add(it)
+      }
+    }
+    return list
+  }
+
+  override fun start() {
     player.play()
   }
 
@@ -277,26 +314,26 @@ class ExoPlayback(private val context: Context) : Playback {
     player.release()
     isPrepared = false
     callback = null
-    // TODO release?
-    scope.launch(Dispatchers.IO) {
-      cache.release()
+    scope.cancel()
+  }
+
+  override val duration: Long
+    get() {
+      val d = player.duration
+      return if (d == C.TIME_UNSET) 0 else d
     }
-  }
 
-  override fun duration(): Long {
-    val d = player.duration
-    return if (d == C.TIME_UNSET) 0 else d
-  }
+  override val position: Long
+    get() {
+      val p = player.currentPosition
+      return p.coerceIn(0, duration)
+    }
 
-  override fun position(): Long {
-    val p = player.currentPosition
-    return p.coerceIn(0, duration())
-  }
-
-  override fun bufferedPosition(): Long {
-    val b = player.bufferedPosition
-    return b.coerceIn(0, duration())
-  }
+  override val bufferedPosition: Long
+    get() {
+      val b = player.bufferedPosition
+      return b.coerceIn(0, duration)
+    }
 
   override fun seek(pos: Long) {
     player.seekTo(pos)
@@ -311,7 +348,44 @@ class ExoPlayback(private val context: Context) : Playback {
   }
 
   companion object {
-
     private const val TAG = "ExoPlayback"
+  }
+}
+
+@OptIn(UnstableApi::class)
+private object MediaCache {
+  @Volatile
+  private var cache: SimpleCache? = null
+
+  fun get(context: Context): SimpleCache {
+    return cache ?: synchronized(this) {
+      cache ?: buildCache(context).also { cache = it }
+    }
+  }
+
+  private fun buildCache(context: Context): SimpleCache {
+    val appContext = context.applicationContext
+    val base = appContext.externalCacheDir ?: appContext.cacheDir
+    val dir = File(base, "media3-cache")
+    val availableBytes = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      val sm = appContext.getSystemService(Context.STORAGE_SERVICE) as? StorageManager
+      try {
+        sm?.getAllocatableBytes(StorageManager.UUID_DEFAULT) ?: dir.usableSpace
+      } catch (e: Exception) {
+        dir.usableSpace
+      }
+    } else {
+      dir.usableSpace
+    }
+    val size = (availableBytes / 10).coerceIn(128L * MB, 1024L * MB)
+    Timber.tag("ExoPlayback").v("cacheSize: $size")
+    return SimpleCache(
+      dir,
+      LeastRecentlyUsedCacheEvictor(size),
+      StandaloneDatabaseProvider(appContext),
+      null,
+      false,
+      false
+    )
   }
 }

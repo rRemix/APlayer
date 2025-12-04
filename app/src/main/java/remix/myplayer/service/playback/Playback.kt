@@ -6,36 +6,79 @@ import remix.myplayer.data.bean.mp3.Song
 
 interface Playback {
 
+  /** 播放速度 */
   var speed: Float
 
+  /** 是否正在播放 */
   val isPlaying: Boolean
 
+  /** 当前播放的歌曲 */
+  val currentSong: Song?
+
+  /** 当前播放索引 */
+  val currentIndex: Int
+
+  /** 播放列表大小 */
+  val mediaItemCount: Int
+
+  /** 下一首歌曲 */
+  val nextSong: Song?
+
+  /** 是否准备完成 */
   val isPrepared: Boolean
 
+  /** 是否发生错误 */
   val hasError: Boolean
 
+  /** AudioSessionId */
   val audioSessionId: Int
 
-  suspend fun prepare(song: Song, nextSong: Song, offset: Long = 0)
+  /** 设置播放列表 */
+  fun setPlaylist(songs: List<Song>, index: Int = 0, offset: Long = 0)
 
-  fun replaceNext(next: Song)
+  /** 添加歌曲 (index = -1 表示添加到末尾) */
+  fun addSongs(songs: List<Song>, index: Int = -1)
 
-  fun appendNext(next: Song)
+  /** 移除指定位置的歌曲 */
+  fun removeSong(index: Int)
 
-  fun start(crossFade: Boolean = false)
+  /** 设置播放模式 */
+  fun setMode(mode: Int)
 
+  /** 切换下一首 */
+  fun skipToNext()
+
+  /** 切换上一首 */
+  fun skipToPrevious()
+
+  /** 跳至指定位置 */
+  fun skipTo(index: Int)
+
+  /** 获取当前播放列表 */
+  fun getPlaylist(): List<Song>
+
+  /** 开始播放 */
+  fun start()
+
+  /** 暂停 */
   fun pause()
 
+  /** 释放资源 */
   fun release()
 
-  fun duration(): Long
+  /** 歌曲总时长 */
+  val duration: Long
 
-  fun position(): Long
+  /** 当前播放进度 */
+  val position: Long
 
-  fun bufferedPosition(): Long
+  /** 缓冲进度 */
+  val bufferedPosition: Long
 
+  /** 拖动进度 */
   fun seek(pos: Long)
 
+  /** 设置音量 */
   fun setVolume(volume: Float)
 
   interface PlayerCallback {

@@ -21,7 +21,6 @@ import android.provider.MediaStore
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.text.TextUtils
 import androidx.annotation.WorkerThread
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -31,7 +30,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -165,20 +163,9 @@ class MusicService : BaseService(),
       Timber.v("修改播放模式: $value")
       settingPrefs.playModel = value
 
-      val fromShuffleToNone = field == MODE_SHUFFLE
       field = value
+      playback.setMode(value)
       partiallyUpdateWidget()
-
-      // 从随机播放切换到非随机播放 需要根据当前播放的歌曲 重新确定position
-      if (fromShuffleToNone) {
-        playQueue.rePosition()
-      }
-      playQueue.makeList()
-      playQueue.updateNextSong()
-
-      if (playback.isPrepared) {
-        playback.replaceNext(if (value == MODE_REPEAT) playQueue.song else playQueue.nextSong)
-      }
 
       updateQueueItem()
 
@@ -346,7 +333,7 @@ class MusicService : BaseService(),
     setUp()
   }
 
-  override fun onBind(intent: Intent): IBinder? {
+  override fun onBind(intent: Intent): IBinder {
     return musicBinder
   }
 
@@ -366,9 +353,7 @@ class MusicService : BaseService(),
 
     tryLaunch {
       hasPermission = PermissionUtil.hasNecessaryPermission()
-      withContext(Dispatchers.IO) {
-        load()
-      }
+      load()
       delay(200)
       handleStartCommandIntent(commandIntent, action)
     }
@@ -616,6 +601,16 @@ class MusicService : BaseService(),
   override fun onItemTransition(mediaItem: MediaItem?, reason: Int) {
     Timber.v("onItemTransition, id: ${mediaItem?.mediaId} reason: $reason")
 
+    val song = mediaItem?.localConfiguration?.tag as? Song
+    if (song is Song.Remote) {
+      launch {
+        withContext(Dispatchers.IO) {
+          retrieveRemoteSong(song, song)
+        }
+        pushPlaybackUiState()
+      }
+    }
+
     if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
       if (pendingClose) {
         Timber.v("发送Exit广播")
@@ -627,16 +622,14 @@ class MusicService : BaseService(),
       }
 
       if (playModel == MODE_REPEAT) {
-        playback.appendNext(playQueue.song)
         lastOp = Command.PLAY
       } else {
-        playQueue.next()
-        playback.appendNext(playQueue.nextSong)
         lastOp = Command.SKIP_TO_NEXT
       }
-
       updatePlayHistory()
     }
+
+    pushPlaybackUiState()
   }
 
   override fun onError(error: PlaybackException) {
@@ -651,6 +644,9 @@ class MusicService : BaseService(),
         prepareJob?.cancel()
         playback.release()
         setUpPlayback()
+        launch {
+          restorePlayList()
+        }
       }
     }
   }
@@ -663,9 +659,10 @@ class MusicService : BaseService(),
    * 更新播放历史
    */
   private fun updatePlayHistory() {
-    if (playQueue.song.isLocal()) {
+    val song = playback.currentSong ?: return
+    if (song.isLocal()) {
       launch {
-        historyRepository.update(playQueue.song.id)
+        historyRepository.update(song.id)
       }
     }
   }
@@ -713,9 +710,11 @@ class MusicService : BaseService(),
 
   private fun updateQueueItem() {
     Timber.v("updateQueueItem")
+    val playlist = playback.getPlaylist()
+    val title = playback.currentSong?.title
     tryLaunch(block = {
-      withContext(Dispatchers.IO) {
-        val queue = ArrayList(playQueue.playingQueue)
+      val queue = withContext(Dispatchers.Default) {
+        ArrayList(playlist)
           .map { song ->
             return@map MediaSessionCompat.QueueItem(
               MediaMetadataCompat.Builder()
@@ -725,10 +724,10 @@ class MusicService : BaseService(),
                 .build().description, song.id
             )
           }
-        Timber.v("updateQueueItem, queue: ${queue.size}")
-        mediaSession.setQueueTitle(playQueue.song.title)
-        mediaSession.setQueue(queue)
       }
+      Timber.v("updateQueueItem, queue: ${queue.size}")
+      mediaSession.setQueueTitle(title)
+      mediaSession.setQueue(queue)
     }, catch = {
       MessageNotifier.show(it.toString())
       Timber.w(it)
@@ -743,12 +742,13 @@ class MusicService : BaseService(),
     if (newQueue.isNullOrEmpty()) {
       return
     }
-    if (newQueue == playQueue.originalQueue) {
+    if (newQueue == playback.getPlaylist()) {
       return
     }
 
-    playQueue.setPlayQueue(newQueue)
+    playback.setPlaylist(newQueue)
     updateQueueItem()
+    launch { playQueue.save(newQueue) }
   }
 
   /**
@@ -763,13 +763,13 @@ class MusicService : BaseService(),
     }
 
     //设置的播放队列相等
-    val equals = newQueue == playQueue.originalQueue
+    val equals = newQueue == playback.getPlaylist()
     if (!equals) {
-      playQueue.setPlayQueue(newQueue)
+      playback.setPlaylist(newQueue)
+      launch { playQueue.save(newQueue) }
     }
     if (shuffle) {
       playModel = MODE_SHUFFLE
-      playQueue.updateNextSong()
     }
     handleCommand(intent)
 
@@ -785,20 +785,23 @@ class MusicService : BaseService(),
   fun removeFromQueue(ids: List<Long>) {
     if (ids.isNotEmpty()) {
       val idSet = ids.toSet()
-      val toDelete = playQueue.playingQueue.filter { idSet.contains(it.id) }
-      if (toDelete.isNotEmpty()) {
-        playQueue.removeAll(toDelete)
-
-        // 移除了正在播放的歌曲
-        if (toDelete.contains(playbackState.song)) {
-          // 同时还移除了下一首
-          if (toDelete.contains(playQueue.nextSong)) {
-            playQueue.updateNextSong()
-          }
-          skipToNext()
+      val playlist = playback.getPlaylist()
+      val indices = ArrayList<Int>()
+      playlist.forEachIndexed { index, song ->
+        if (idSet.contains(song.id)) {
+          indices.add(index)
         }
+      }
+
+      if (indices.isNotEmpty()) {
+        indices.sortDescending()
+        indices.forEach { index ->
+          playback.removeSong(index)
+        }
+        launch { playQueue.save(playback.getPlaylist()) }
 
         updateQueueItem()
+        pushPlaybackUiState()
       }
     }
   }
@@ -808,7 +811,9 @@ class MusicService : BaseService(),
    */
   fun insertToQueue(songs: List<Song>) {
     if (songs.isNotEmpty()) {
-      playQueue.addSongs(songs)
+      playback.addSongs(songs)
+      launch { playQueue.save(playback.getPlaylist()) }
+      pushPlaybackUiState()
     }
   }
 
@@ -816,14 +821,20 @@ class MusicService : BaseService(),
    * 播放下一首
    */
   private fun skipToNext() {
-    skipTo(true)
+    playback.skipToNext()
+    if (!playback.isPlaying) {
+      playback.start()
+    }
   }
 
   /**
    * 播放上一首
    */
   private fun skipToPrevious() {
-    skipTo(false)
+    playback.skipToPrevious()
+    if (!playback.isPlaying) {
+      playback.start()
+    }
   }
 
   /**
@@ -861,8 +872,8 @@ class MusicService : BaseService(),
    */
   private fun pushPlaybackUiState(isFavorite: Boolean? = null) {
     MusicStateSource.updatePlaybackUiState(
-      song = playQueue.song,
-      nextSong = playQueue.nextSong,
+      song = playback.currentSong ?: EMPTY_SONG,
+      nextSong = playback.nextSong ?: EMPTY_SONG,
       isPlaying = playback.isPlaying,
       isFavorite = isFavorite,
       speed = settingPrefs.speedValue,
@@ -876,9 +887,9 @@ class MusicService : BaseService(),
    * 推送进度更新
    */
   private fun pushProgressUiState() {
-    val position = playback.position()
-    val duration = playback.duration()
-    val buffered = playback.bufferedPosition()
+    val position = playback.position
+    val duration = playback.duration
+    val buffered = playback.bufferedPosition
     stateSource.updateProgressUiState(
       position = if (position == C.TIME_UNSET) 0 else position,
       duration = if (duration == C.TIME_UNSET) 0 else duration,
@@ -920,24 +931,17 @@ class MusicService : BaseService(),
    * @param position 播放位置
    */
   private fun playAt(position: Int) {
-    Timber.v("playSelectSong, $position")
+    Timber.v("playAt, $position")
 
-    if (position == -1 || position >= playQueue.playingQueue.size) {
+    if (position == -1 || position >= playback.mediaItemCount) {
       MessageNotifier.show(R.string.illegal_arg)
       return
     }
 
-    playQueue.setPosition(position)
-
-    if (playQueue.song.data.isEmpty()) {
-      MessageNotifier.show(R.string.song_lose_effect)
-      return
+    playback.skipTo(position)
+    if (!playback.isPlaying) {
+      playback.start()
     }
-
-    // 必须先更新下一首，否则 prepare 中获取到的 nextSong 是旧的
-    playQueue.updateNextSong()
-
-    prepare(playQueue.song)
   }
 
   override fun onMediaStoreChanged() {
@@ -946,7 +950,9 @@ class MusicService : BaseService(),
   override fun onPermissionChanged(has: Boolean) {
     if (has != hasPermission && has) {
       hasPermission = true
-      loadSync()
+      launch {
+        load()
+      }
     }
   }
 
@@ -1100,7 +1106,8 @@ class MusicService : BaseService(),
   }
 
   private fun handleMetaChange() {
-    if (playQueue.song == EMPTY_SONG) {
+    val song = playback.currentSong ?: EMPTY_SONG
+    if (song == EMPTY_SONG) {
       return
     }
     updateAppwidget()
@@ -1115,7 +1122,6 @@ class MusicService : BaseService(),
       startSaveProgress()
     }
     // 保存当前播放歌曲
-    val song = playQueue.song
     settingPrefs.lastSong = if (song.isLocal()) song.id.toString() else song.data
   }
 
@@ -1158,11 +1164,11 @@ class MusicService : BaseService(),
       }
       // 保存控制命令,用于播放界面判断动画
       lastOp = control
-      if (playQueue.originalQueue.isEmpty()) {
-        //列表为空，尝试读取
+      if (playback.mediaItemCount == 0) {
+        // 列表为空，尝试读取
         Timber.v("列表为空，尝试读取")
-        launch {
-          playQueue.restoreIfNecessary()
+        tryLaunch {
+          load()
         }
         return
       }
@@ -1210,9 +1216,11 @@ class MusicService : BaseService(),
       // 取消或者添加收藏
       Command.LOVE -> {
         launch {
-          playListRepository.toggleFavorite(playQueue.song.id)
-          MusicStateSource.updatePlaybackUiState(isFavorite = !playbackState.isFavorite)
-          updateAppwidget()
+          playback.currentSong?.let {
+            playListRepository.toggleFavorite(it.id)
+            MusicStateSource.updatePlaybackUiState(isFavorite = !playbackState.isFavorite)
+            updateAppwidget()
+          }
         }
       }
       // 桌面歌词
@@ -1223,8 +1231,10 @@ class MusicService : BaseService(),
       Command.PLAY_TEMP -> {
         intent.getSerializableExtra(EXTRA_SONG)?.let {
           lastOp = Command.PLAY_TEMP
-          playQueue.song = it as Song.Local
-          prepare(playQueue.song)
+          val song = it as Song.Local
+          playback.setPlaylist(listOf(song))
+          launch { playQueue.save(playback.getPlaylist()) }
+          start(true)
         }
       }
       // 解锁桌面歌词
@@ -1234,10 +1244,10 @@ class MusicService : BaseService(),
       // 某一首歌曲添加至下一首播放
       Command.ADD_TO_NEXT_SONG -> {
         val nextSong = intent.getSerializableExtra(EXTRA_SONG) as Song? ?: return
-        //添加到播放队列
-        playQueue.addNextSong(nextSong)
-        // 同步更新播放器中的下一首
-        playback.replaceNext(playQueue.nextSong)
+        playback.addSongs(listOf(nextSong), playback.currentIndex + 1)
+        // 同步更新
+        launch { playQueue.save(playback.getPlaylist()) }
+        pushPlaybackUiState()
         MessageNotifier.show(R.string.already_add_to_next_song)
       }
       // 切换定时器
@@ -1282,7 +1292,7 @@ class MusicService : BaseService(),
    * 更新锁屏
    */
   private fun updateMediaSession(control: Int) {
-    val currentSong = playQueue.song
+    val currentSong = playback.currentSong ?: EMPTY_SONG
     if (currentSong == EMPTY_SONG || settingPrefs.lockScreen == LOCKSCREEN_CLOSE) {
       return
     }
@@ -1293,9 +1303,9 @@ class MusicService : BaseService(),
       .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentSong.artist)
       .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentSong.artist)
       .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.duration)
-      .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (playQueue.position + 1).toLong())
+      .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (playback.currentIndex + 1).toLong())
       .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.title)
-    builder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playQueue.size().toLong())
+    builder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playback.mediaItemCount.toLong())
 
     mediaSession.setMetadata(builder.build())
 
@@ -1355,95 +1365,6 @@ class MusicService : BaseService(),
   }
 
   /**
-   * 准备播放
-   *
-   * @param song 播放歌曲的路径
-   */
-  private fun prepare(song: Song, requestFocus: Boolean = true) {
-    prepareJob?.cancel()
-    prepareJob = launch {
-      try {
-        Timber.v("prepare start: %s", song)
-        if (TextUtils.isEmpty(song.data)) {
-          MessageNotifier.show(R.string.path_empty)
-          return@launch
-        }
-
-        if (requestFocus) {
-          if (!audioFocusManager.requestFocus()) {
-            MessageNotifier.show(R.string.cant_request_audio_focus)
-            return@launch
-          }
-        }
-
-//        if (isPlaying) {
-//          playback.pause()
-//        }
-
-        val offset = if (firstPrepared && settingPrefs.lastProgress > 0) {
-          settingPrefs.lastProgress.toLong()
-        } else {
-          0L
-        }
-
-        playback.prepare(song, if (playModel == MODE_REPEAT) song else playQueue.nextSong, offset)
-
-        pushPlaybackUiState(
-          isFavorite = song.isLocal() && playListRepository.isFavorite(
-            song.id
-          )
-        )
-//        lyricManager.updateLyrics(song, null)
-
-        Timber.v("prepare finish: $song")
-        if (song is Song.Remote) {
-          // 可能会特别耗时
-          launch {
-            withContext(Dispatchers.IO) {
-              retrieveRemoteSong(song, playQueue.song as Song.Remote)
-            }
-            pushPlaybackUiState()
-          }
-        }
-      } catch (e: Exception) {
-        Timber.w(e)
-        if (e !is CancellationException) {
-          MessageNotifier.show(getString(R.string.play_failed) + e.toString())
-        }
-      }
-    }
-  }
-
-  /**
-   * 根据当前播放模式，切换到上一首或者下一首
-   *
-   * @param next 是否是播放下一首
-   */
-  private fun skipTo(next: Boolean) {
-    if (playQueue.size() == 0) {
-      MessageNotifier.show(R.string.list_is_empty)
-      return
-    }
-    Timber.v("播放下一首")
-    if (next) {
-      playQueue.next()
-    } else {
-      playQueue.previous()
-    }
-
-    if (playQueue.song == EMPTY_SONG) {
-      MessageNotifier.show(R.string.song_lose_effect)
-      return
-    }
-    // 不能在这里设置playing，因为远程的歌曲可能需要缓冲，并且这里需要提前刷新下界面
-//    if (playQueue.song.isRemote()) {
-//      uiHandler.sendEmptyMessage(UPDATE_META_DATA)
-//    }
-
-    prepare(playQueue.song)
-  }
-
-  /**
    * 设置播放进度
    */
   private fun seekTo(current: Long) {
@@ -1456,16 +1377,6 @@ class MusicService : BaseService(),
     }
   }
 
-  /**
-   * 读取歌曲id列表与播放队列
-   */
-  private fun loadSync() {
-    launch(context = Dispatchers.IO) {
-      load()
-    }
-  }
-
-  @WorkerThread
   private suspend fun load() {
     if (load >= LOADING || !hasPermission) {
       return
@@ -1487,11 +1398,25 @@ class MusicService : BaseService(),
       ShakeDetector.getInstance().beginListen()
     }
 
-    // 读取播放列表
-    playQueue.restoreIfNecessary()
-    prepare(playQueue.song, false)
+    restorePlayList()
 
     load = LOAD_SUCCESS
+  }
+
+  private suspend fun restorePlayList() {
+    // 读取播放列表
+    val (queue, pos) = withContext(Dispatchers.IO) {
+      playQueue.restore()
+    }
+
+    if (queue.isNotEmpty()) {
+      playback.setPlaylist(
+        queue,
+        pos,
+        if (firstPrepared && settingPrefs.lastProgress > 0) settingPrefs.lastProgress.toLong() else 0L
+      )
+      playback.setMode(playModel)
+    }
   }
 
   /**
@@ -1697,11 +1622,15 @@ class MusicService : BaseService(),
         e.printStackTrace()
         null
       }
-
     }
 
     fun retrieveRemoteSong(song: Song.Remote, targetSong: Song.Remote) {
       Timber.v("retrieveRemoteSong: ${song.data}")
+
+      if (!targetSong.metaFetchState.compareAndSet(0, 1)){
+        return
+      }
+
       val start = System.currentTimeMillis()
       val metadataRetriever = MediaMetadataRetriever()
       try {
@@ -1746,8 +1675,10 @@ class MusicService : BaseService(),
           track,
           dateModified
         )
+        targetSong.metaFetchState.set(2)
       } catch (e: Exception) {
         Timber.v("fail to retrieveRemoteSong data: ${song.data} detail: $e")
+        targetSong.metaFetchState.set(3)
       } finally {
         Timber.v("retrieveRemoteSong spend:${System.currentTimeMillis() - start} ${song.data}")
         metadataRetriever.release()
@@ -1755,4 +1686,3 @@ class MusicService : BaseService(),
     }
   }
 }
-

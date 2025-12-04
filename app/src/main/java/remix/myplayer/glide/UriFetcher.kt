@@ -24,6 +24,7 @@ import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.repo.SongRepositoryEntryPoint
 import remix.myplayer.request.netease.NetEaseClientEntryPoint
 import remix.myplayer.request.network.LastFMApi
+import remix.myplayer.glide.RemoteSongMetaFetcher
 import remix.myplayer.util.Constants
 import remix.myplayer.util.SearchKeyUtil
 import remix.myplayer.util.Util
@@ -185,6 +186,9 @@ object UriFetcher {
   }
 
   private fun fetch(song: Song): Uri {
+    if (song is Song.Remote) {
+      RemoteSongMetaFetcher.fetchBlocking(song)
+    }
     if (song.isLocal()) { // 仅本地歌曲
       if (song.albumId <= 0 || song.id <= 0) {
         return Uri.EMPTY

@@ -11,6 +11,7 @@ import remix.myplayer.App
 import remix.myplayer.data.prefs.SettingPrefsEntryPoint
 import timber.log.Timber
 import java.io.Serial
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.abs
 
 /**
@@ -251,6 +252,13 @@ sealed class Song(
     }
     var bitRate: String = ""
     var sampleRate: String = ""
+
+    // 0: 未获取
+    // 1: 获取中
+    // 2: 已完成
+    // 3: 失败(不再重试)
+    @Transient
+    val metaFetchState = AtomicInteger(0)
 
     constructor(title: String, data: String, account: String, pwd: String): this(title, data, 0L, 0L, account, pwd)
 
