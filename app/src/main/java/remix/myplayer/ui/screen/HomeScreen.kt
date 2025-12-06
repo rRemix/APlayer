@@ -36,10 +36,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,10 +53,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.bean.misc.Library
-import remix.myplayer.ui.dialog.InputDialog
-import remix.myplayer.ui.dialog.rememberDialogState
+import remix.myplayer.ui.dialog.CreatePlayListDialog
 import remix.myplayer.ui.nav.LocalNavController
-import remix.myplayer.ui.nav.RouteSongChoose
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.BottomBar
 import remix.myplayer.ui.widget.app.Drawer
@@ -70,6 +66,7 @@ import remix.myplayer.ui.widget.popup.ScreenPopupButton
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.settingViewModel
+import remix.myplayer.viewmodel.webDavViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
@@ -134,46 +131,27 @@ fun HomeScreen() {
         }
       },
       floatingActionButton = {
-        val showFb by remember {
+        val selectLibrary by remember {
           derivedStateOf {
-            pagerState.currentPage == libraries.indexOfFirst {
-              it.tag == Library.TAG_PLAYLIST
-            }
+            libraries[pagerState.currentPage]
           }
         }
 
-        var text by rememberSaveable {
-          mutableStateOf("")
-        }
-        val dialogState = rememberDialogState(false)
+        CreatePlayListDialog()
 
-        InputDialog(
-          dialogState = dialogState,
-          title = stringResource(R.string.new_playlist),
-          positive = stringResource(R.string.create),
-          text = text,
-          onDismissRequest = {
-            text = ""
-          },
-          onValueChange = {
-            text = it
-          }
-        ) {
-          libraryVM.insertPlayList(it) { id ->
-            if (id > 0) {
-              navController.navigate("$RouteSongChoose/${id}/$it")
-            }
-          }
-        }
-
-        FAButton(showFb) {
+        val webDavVM = webDavViewModel
+        FAButton(selectLibrary.tag == Library.TAG_PLAYLIST || selectLibrary.tag == Library.TAG_REMOTE) {
           if (mainVM.multiSelectState.value.isShowing()) {
             return@FAButton
           }
 
-          text = "${context.getString(R.string.local_list)}${libraryVM.playLists.value.size}"
-          dialogState.show()
+          if (selectLibrary.tag == Library.TAG_PLAYLIST) {
+            libraryVM.showCreatePlaylistDialog()
+          } else if (selectLibrary.tag == Library.TAG_REMOTE) {
+            webDavVM.showAddWebDavDialog()
+          }
         }
+
       })
     { contentPadding ->
       HomeContent(contentPadding, pagerState, libraries)

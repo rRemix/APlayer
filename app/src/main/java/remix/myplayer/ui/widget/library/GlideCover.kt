@@ -12,9 +12,7 @@ import com.bumptech.glide.signature.ObjectKey
 import remix.myplayer.data.bean.mp3.APlayerModel
 import remix.myplayer.data.bean.mp3.Artist
 import remix.myplayer.data.db.room.entity.PlayList
-import remix.myplayer.glide.UriFetcher.albumVersion
-import remix.myplayer.glide.UriFetcher.artistVersion
-import remix.myplayer.glide.UriFetcher.playListVersion
+import remix.myplayer.glide.UriFetcher
 import remix.myplayer.ui.theme.LocalTheme
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -39,10 +37,10 @@ fun GlideCover(
     modifier = coverModifier
   ) {
     return@GlideImage when (model) {
-      is Artist -> it.signature(ObjectKey(artistVersion))
-      is PlayList -> it.signature(ObjectKey(playListVersion))
+      is Artist -> it.signature(ObjectKey(UriFetcher.artistVersion))
+      is PlayList -> it.signature(ObjectKey(UriFetcher.playListVersion))
       else -> it
-        .signature(ObjectKey(albumVersion))
+        .signature(ObjectKey(UriFetcher.albumVersion))
     }
   }
 }

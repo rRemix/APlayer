@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
@@ -38,6 +39,7 @@ import remix.myplayer.repo.HistoryRepository
 import remix.myplayer.repo.PlayListRepository
 import remix.myplayer.repo.SongRepository
 import remix.myplayer.service.MusicService
+import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.util.PermissionUtil
 import timber.log.Timber
@@ -87,6 +89,21 @@ class LibraryViewModel @Inject constructor(
       started = SharingStarted.WhileSubscribed(5000),
       initialValue = emptyList()
     )
+
+  private val _createPlaylistState = MutableStateFlow(CreatePlaylistState())
+  val createPlaylistState = _createPlaylistState.asStateFlow()
+
+  fun showCreatePlaylistDialog() {
+    val defaultName = "${context.getString(R.string.local_list)}${playLists.value.size}"
+    _createPlaylistState.update {
+      it.dialogState.show()
+      it.copy(name = defaultName)
+    }
+  }
+
+  fun updateNewPlaylistName(name: String) {
+    _createPlaylistState.update { it.copy(name = name) }
+  }
 
   init {
     // load all media
@@ -202,3 +219,8 @@ class LibraryViewModel @Inject constructor(
   ) {
   }
 }
+
+data class CreatePlaylistState(
+  val dialogState: DialogState = DialogState(),
+  val name: String = ""
+)

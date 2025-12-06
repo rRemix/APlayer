@@ -21,8 +21,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -30,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.thegrizzlylabs.sardineandroid.DavResource
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine
+import com.thegrizzlylabs.sardineandroid.impl.SardineException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -68,11 +71,28 @@ fun WebDavDetailScreen(webDav: WebDav) {
   val playbackVM = playbackViewModel
   val settingVM = settingViewModel
   val scope = rememberCoroutineScope()
-
   val resourceState by webDavVM.webDavResState.collectAsStateWithLifecycle()
-  var url by rememberSaveable {
-    mutableStateOf(webDav.lastUrl)
+
+  val pathStack = rememberSaveable(
+    saver = listSaver(
+      save = { it.toList() },
+      restore = { it.toMutableStateList() })
+  ) {
+    val root = webDav.server.removeSuffix("/")
+    val current = webDav.lastUrl.removeSuffix("/")
+    val initial = if (current.startsWith(root)) {
+      current.removePrefix(root)
+        .trimStart('/')
+        .split('/')
+        .filter { it.isNotEmpty() }
+        .runningFold(root) { acc, part -> "$acc/$part" }
+    } else {
+      listOf(webDav.lastUrl)
+    }
+    initial.toMutableStateList()
   }
+  val currentUrl = pathStack.last()
+
   var davResources by remember {
     mutableStateOf<List<DavResource>>(emptyList())
   }
@@ -93,14 +113,11 @@ fun WebDavDetailScreen(webDav: WebDav) {
   }
 
   fun handleBack() {
-    if (webDav.server == url) { // 根路径
+    if (pathStack.size <= 1) {
       nav.popBackStack()
       return
     }
-
-    var newUrl = url.removeSuffix("/")
-    newUrl = newUrl.take(newUrl.lastIndexOf('/'))
-    url = newUrl
+    pathStack.removeAt(pathStack.lastIndex)
   }
 
   BackPressHandler {
@@ -127,12 +144,23 @@ fun WebDavDetailScreen(webDav: WebDav) {
       when (resourceState) {
         is DataUiState.Success -> {
           davResources = resourceState.get()
-          webDavVM.updateLastUrl(webDav, url)
+          webDavVM.updateLastUrl(webDav, currentUrl)
         }
 
         is DataUiState.Error -> {
-          nav.popBackStack()
-          MessageNotifier.show(R.string.load_failed)
+          val ex = (resourceState as DataUiState.Error).throwable
+          if (ex is SardineException && ex.statusCode == 404) {
+            if (pathStack.size <= 1) {
+              nav.popBackStack()
+              MessageNotifier.show(R.string.load_failed)
+            } else {
+              pathStack.removeRange(1, pathStack.size)
+              MessageNotifier.show(R.string.file_not_exist)
+            }
+          } else {
+            nav.popBackStack()
+            MessageNotifier.show(R.string.load_failed)
+          }
         }
 
         else -> {}
@@ -146,9 +174,11 @@ fun WebDavDetailScreen(webDav: WebDav) {
             WebDavDetailItem(
               resource,
               onClick = {
+                if (showLoading) return@WebDavDetailItem
+
                 if (resource.isDirectory) {
                   // 进入下级目录
-                  url = webDav.base().plus(resource.path)
+                  pathStack.add(webDav.base().plus(resource.path))
                 } else {
                   // 过滤列表内所有音乐并设置为播放列表
                   if (davResources.isEmpty()) {
@@ -203,9 +233,7 @@ fun WebDavDetailScreen(webDav: WebDav) {
 
                   R.string.song_detail -> {
                     scope.runWithLoading {
-                      withContext(Dispatchers.IO) {
-                        MusicService.retrieveRemoteSong(song, song)
-                      }
+                      webDavVM.fetchMeta(song)
                       settingVM.showSongDetailDialog(song)
                     }
                   }
@@ -236,8 +264,8 @@ fun WebDavDetailScreen(webDav: WebDav) {
     }
   }
 
-  LaunchedEffect(url, refreshTrigger) {
-    webDavVM.loadDavRes(sardine, url)
+  LaunchedEffect(currentUrl, refreshTrigger) {
+    webDavVM.loadDavRes(sardine, currentUrl)
   }
 }
 

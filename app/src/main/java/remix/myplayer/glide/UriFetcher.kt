@@ -1,42 +1,57 @@
 package remix.myplayer.glide
 
 import android.content.ContentUris
+import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore.Audio
 import android.util.LruCache
 import androidx.core.net.toUri
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.runBlocking
-import remix.myplayer.App.Companion.context
+import remix.myplayer.App
 import remix.myplayer.data.bean.lastfm.Image
 import remix.myplayer.data.bean.mp3.Album
 import remix.myplayer.data.bean.mp3.Artist
 import remix.myplayer.data.bean.mp3.Genre
 import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.PlayList
-import remix.myplayer.data.prefs.CoverPrefsEntryPoint
+import remix.myplayer.data.prefs.CoverPrefs
+import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.data.prefs.SettingPrefs.Companion.DOWNLOAD_COVER_ALWAYS
 import remix.myplayer.data.prefs.SettingPrefs.Companion.DOWNLOAD_COVER_WIFI_ONLY
 import remix.myplayer.data.prefs.SettingPrefs.Companion.DOWNLOAD_LASTFM
-import remix.myplayer.data.prefs.SettingPrefsEntryPoint
 import remix.myplayer.lyric.provider.SearchScorer
 import remix.myplayer.misc.cache.DiskCache
-import remix.myplayer.repo.SongRepositoryEntryPoint
-import remix.myplayer.request.netease.NetEaseClientEntryPoint
+import remix.myplayer.misc.checkWorkerThread
+import remix.myplayer.repo.SongRepository
+import remix.myplayer.repo.usecase.FetchMetaDataUseCase
+import remix.myplayer.request.netease.NetEaseClient
 import remix.myplayer.request.network.LastFMApi
-import remix.myplayer.glide.RemoteSongMetaFetcher
 import remix.myplayer.util.Constants
 import remix.myplayer.util.SearchKeyUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * created by Remix on 2021/4/20
  */
-object UriFetcher {
-
-  private const val CANDIDATE_KEY_NUMBER = 1
+@Singleton
+class UriFetcher @Inject constructor(
+  @ApplicationContext private val context: Context,
+  private val neClient: NetEaseClient,
+  private val lastFMApi: LastFMApi,
+  private val settingPrefs: SettingPrefs,
+  private val coverPrefs: CoverPrefs,
+  private val songRepo: SongRepository,
+  private val fetchMetaDataUseCase: FetchMetaDataUseCase
+) {
 
   private val BLACKLIST = listOf(
     "https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png".toUri(),
@@ -45,44 +60,11 @@ object UriFetcher {
     "http://p1.music.126.net/RCIIvR7ull5iQWN-awJ-Aw==/109951165555852156.jpg".toUri()
   )
 
-  private val neClient = EntryPointAccessors.fromApplication(
-    context,
-    NetEaseClientEntryPoint::class.java
-  ).netEaseClient()
-
-  private val lastFMApi = EntryPointAccessors.fromApplication(
-    context,
-    LastFMApi.LastFMApiEntryPoint::class.java
-  ).lastFMApi()
-
-  private val settingPrefs = EntryPointAccessors.fromApplication(
-    context,
-    SettingPrefsEntryPoint::class.java
-  ).settingPrefs()
-
-  private val coverPrefs = EntryPointAccessors.fromApplication(
-    context,
-    CoverPrefsEntryPoint::class.java
-  ).coverPrefs()
-
-  private val songRepo = EntryPointAccessors.fromApplication(
-    context,
-    SongRepositoryEntryPoint::class.java
-  ).songRepository()
-
-  var albumVersion = 0
-  var artistVersion = 0
-  var playListVersion = 0
-
-//  const val TYPE_ALBUM = 10
-//  const val TYPE_ARTIST = 100
-//  const val TYPE_PLAYLIST = 1000
-
-  const val PREFIX_EMBEDDED = "embedded://"
-
-  const val SCHEME_EMBEDDED = "embedded"
-
   private val memoryCache: LruCache<Int, Uri> = LruCache(200)
+
+  private var albumVersion = 0
+  private var artistVersion = 0
+  private var playListVersion = 0
 
   fun fetch(model: Any): Uri {
     val key = model.hashCode()
@@ -115,7 +97,7 @@ object UriFetcher {
       }
 
       else -> {
-        throw IllegalArgumentException("unknown model: " + { model::class.java.simpleName })
+        throw IllegalArgumentException("unknown model: ${model::class.java.simpleName}")
       }
     }
 
@@ -186,8 +168,11 @@ object UriFetcher {
   }
 
   private fun fetch(song: Song): Uri {
+    checkWorkerThread()
     if (song is Song.Remote) {
-      RemoteSongMetaFetcher.fetchBlocking(song)
+      runBlocking {
+        fetchMetaDataUseCase(song)
+      }
     }
     if (song.isLocal()) { // 仅本地歌曲
       if (song.albumId <= 0 || song.id <= 0) {
@@ -216,7 +201,7 @@ object UriFetcher {
         if (downloadFromLastFM()) {
           val lastFMAlbum =
             runBlocking { lastFMApi.searchLastFMAlbum(song.album, song.artist, null) }
-          val lastFMUri = getLargestAlbumImageUrl(lastFMAlbum.album?.image)
+          val lastFMUri = getLargestImageUrl(lastFMAlbum.album?.image)
           if (!lastFMUri.isNullOrEmpty()) {
             return lastFMUri.toUri()
           }
@@ -276,7 +261,7 @@ object UriFetcher {
         if (downloadFromLastFM()) {
           val lastFMAlbum =
             runBlocking { lastFMApi.searchLastFMAlbum(album.album, album.artist, null) }
-          val lastFMUri = getLargestAlbumImageUrl(lastFMAlbum.album?.image)
+          val lastFMUri = getLargestImageUrl(lastFMAlbum.album?.image)
           if (!lastFMUri.isNullOrEmpty()) {
             return lastFMUri.toUri()
           }
@@ -327,7 +312,7 @@ object UriFetcher {
       try {
         if (downloadFromLastFM()) {
           val lastFMArtist = runBlocking { lastFMApi.searchLastFMArtist(artist.artist, null) }
-          val lastFMUri = getLargestArtistImageUrl(lastFMArtist.artist?.image)
+          val lastFMUri = getLargestImageUrl(lastFMArtist.artist?.image)
           if (!lastFMUri.isNullOrEmpty()) {
             return lastFMUri.toUri()
           }
@@ -458,37 +443,7 @@ object UriFetcher {
     SMALL, MEDIUM, LARGE, EXTRALARGE, MEGA, UNKNOWN
   }
 
-  /**
-   * 解析LastFm返回的最大封面
-   */
-  private fun getLargestAlbumImageUrl(images: List<Image>?): String? {
-    val imageUrls = HashMap<ImageSize, String?>()
-    if (images == null || images.isEmpty()) {
-      return ""
-    }
-    for (image in images) {
-      var size: ImageSize? = null
-      val attribute = image.size
-      if (attribute == null) {
-        size = ImageSize.UNKNOWN
-      } else {
-        try {
-          size = ImageSize.valueOf(attribute.uppercase())
-        } catch (_: IllegalArgumentException) {
-          // if they suddenly again introduce a new image size
-        }
-      }
-      if (size != null) {
-        imageUrls.put(size, image.text)
-      }
-    }
-    return getLargestImageUrl(imageUrls)
-  }
-
-  /**
-   * 解析LastFm返回的最大封面
-   */
-  fun getLargestArtistImageUrl(images: List<Image>?): String? {
+  private fun getLargestImageUrl(images: List<Image>?): String? {
     if (images.isNullOrEmpty()) {
       return null
     }
@@ -533,4 +488,56 @@ object UriFetcher {
     }
     return null
   }
+
+  companion object {
+    private const val CANDIDATE_KEY_NUMBER = 1
+
+    const val PREFIX_EMBEDDED = "embedded://"
+
+    const val SCHEME_EMBEDDED = "embedded"
+
+    private val entryPoint: UriFetcherEntryPoint by lazy {
+      EntryPointAccessors.fromApplication(App.context, UriFetcherEntryPoint::class.java)
+    }
+
+    private val fetcher: UriFetcher
+      get() = entryPoint.uriFetcher()
+
+    var albumVersion: Int
+      get() = fetcher.albumVersion
+      set(value) {
+        fetcher.albumVersion = value
+      }
+
+    var artistVersion: Int
+      get() = fetcher.artistVersion
+      set(value) {
+        fetcher.artistVersion = value
+      }
+
+    var playListVersion: Int
+      get() = fetcher.playListVersion
+      set(value) {
+        fetcher.playListVersion = value
+      }
+
+    fun fetch(model: Any): Uri = fetcher.fetch(model)
+
+    fun updateAllVersion() = fetcher.updateAllVersion()
+
+    fun updateAlbumVersion() = fetcher.updateAlbumVersion()
+
+    fun updateArtistVersion() = fetcher.updateArtistVersion()
+
+    fun updatePlayListVersion() = fetcher.updatePlayListVersion()
+
+    fun clearAllCache() = fetcher.clearAllCache()
+  }
+}
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface UriFetcherEntryPoint {
+
+  fun uriFetcher(): UriFetcher
 }

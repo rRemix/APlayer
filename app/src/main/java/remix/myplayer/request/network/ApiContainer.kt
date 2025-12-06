@@ -1,8 +1,5 @@
 package remix.myplayer.request.network
 
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import okhttp3.ResponseBody
 import remix.myplayer.BuildConfig
 import remix.myplayer.data.bean.github.Release
@@ -34,13 +31,6 @@ interface GithubApi {
 }
 
 interface LastFMApi {
-  @EntryPoint
-  @InstallIn(SingletonComponent::class)
-  interface LastFMApiEntryPoint {
-
-    fun lastFMApi(): LastFMApi
-  }
-
   @GET("$BASE_QUERY_PARAMETERS&method=album.getinfo")
   suspend fun searchLastFMAlbum(
     @Query("album") albumName: String?,

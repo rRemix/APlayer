@@ -8,17 +8,18 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import remix.myplayer.data.db.room.entity.WebDav
 
 object Migrations {
+
   val migration3to4 = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {
       db.execSQL("ALTER TABLE `PlayQueue` ADD COLUMN `title` TEXT NOT NULL DEFAULT ''")
       db.execSQL("ALTER TABLE `PlayQueue` ADD COLUMN `data` TEXT NOT NULL DEFAULT ''")
       db.execSQL("ALTER TABLE `PlayQueue` ADD COLUMN `account` TEXT")
       db.execSQL("ALTER TABLE `PlayQueue` ADD COLUMN `pwd` TEXT")
-      
+
       db.execSQL("CREATE TABLE IF NOT EXISTS `WebDav` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `alias` TEXT NOT NULL, `account` TEXT, `pwd` TEXT, `server` TEXT NOT NULL, `lastPath` TEXT, `createAt` INTEGER NOT NULL)")
     }
   }
-  
+
   val migration4to5 = object : Migration(4, 5) {
     @SuppressLint("Range")
     override fun migrate(db: SupportSQLiteDatabase) {
@@ -51,6 +52,12 @@ object Migrations {
           put("id", webDav.id)
         })
       }
+    }
+  }
+
+  val migration5to6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+      db.execSQL("CREATE TABLE IF NOT EXISTS `MetaDataCache` (`url` TEXT NOT NULL, `title` TEXT NOT NULL, `artist` TEXT NOT NULL, `album` TEXT NOT NULL, `duration` INTEGER NOT NULL, `fileSize` INTEGER NOT NULL, `lastModified` INTEGER NOT NULL, `year` TEXT NOT NULL, `genre` TEXT NOT NULL, `track` TEXT NOT NULL, `updateTime` INTEGER NOT NULL, PRIMARY KEY (`url`))")
     }
   }
 }

@@ -10,11 +10,14 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import remix.myplayer.data.db.Migrations.migration3to4
 import remix.myplayer.data.db.Migrations.migration4to5
+import remix.myplayer.data.db.Migrations.migration5to6
 import remix.myplayer.data.db.room.dao.HistoryDao
+import remix.myplayer.data.db.room.dao.MetaDataCacheDao
 import remix.myplayer.data.db.room.dao.PlayListDao
 import remix.myplayer.data.db.room.dao.PlayQueueDao
 import remix.myplayer.data.db.room.dao.WebDavDao
 import remix.myplayer.data.db.room.entity.History
+import remix.myplayer.data.db.room.entity.MetaDataCache
 import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.db.room.entity.PlayQueue
 import remix.myplayer.data.db.room.entity.WebDav
@@ -31,7 +34,8 @@ import timber.log.Timber
     PlayList::class,
     PlayQueue::class,
     History::class,
-    WebDav::class
+    WebDav::class,
+    MetaDataCache::class
   ], version = AppDatabase.VERSION, exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -44,12 +48,15 @@ abstract class AppDatabase : RoomDatabase() {
 
   abstract fun webDavDao(): WebDavDao
 
+  abstract fun metaDataCacheDao(): MetaDataCacheDao
+
   companion object {
-    const val VERSION = 5
-    
+
+    const val VERSION = 6
+
     @Volatile
     private var INSTANCE: AppDatabase? = null
-    
+
     @JvmStatic
     fun getInstance(context: Context): AppDatabase =
       INSTANCE ?: synchronized(this) {
@@ -62,12 +69,13 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
       }
-      
+
       val database =
         Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "aplayer.db")
           .addMigrations(migration1to3)
           .addMigrations(migration3to4)
           .addMigrations(migration4to5)
+          .addMigrations(migration5to6)
           .build()
       database.invalidationTracker.addObserver(object :
         InvalidationTracker.Observer(PlayList.TABLE_NAME, PlayQueue.TABLE_NAME) {

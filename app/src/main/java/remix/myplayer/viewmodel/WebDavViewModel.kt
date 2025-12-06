@@ -14,10 +14,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.data.DataUiState
+import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.WebDav
 import remix.myplayer.misc.isAudio
 import remix.myplayer.misc.updateIf
 import remix.myplayer.repo.WebDavRepository
+import remix.myplayer.repo.usecase.FetchMetaDataUseCase
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.runWithLoading
 import timber.log.Timber
@@ -25,7 +27,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WebDavViewModel @Inject constructor(
-  private val webDavRepository: WebDavRepository
+  private val webDavRepository: WebDavRepository,
+  private val fetchMetaDataUseCase: FetchMetaDataUseCase
 ) : ViewModel() {
 
   private val _webDavList = MutableStateFlow<List<WebDav>>(emptyList())
@@ -118,6 +121,8 @@ class WebDavViewModel @Inject constructor(
       }
     )
   }
+
+  suspend fun fetchMeta(song: Song.Remote) = fetchMetaDataUseCase(song)
 }
 
 @Stable

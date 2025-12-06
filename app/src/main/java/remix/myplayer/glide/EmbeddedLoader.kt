@@ -6,7 +6,6 @@ import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.signature.ObjectKey
-import remix.myplayer.glide.UriFetcher.SCHEME_EMBEDDED
 import java.io.InputStream
 
 /**
@@ -18,7 +17,7 @@ class EmbeddedLoader : ModelLoader<Uri, InputStream> {
   }
 
   override fun handles(uri: Uri): Boolean {
-    return SCHEME_EMBEDDED == uri.scheme
+    return UriFetcher.SCHEME_EMBEDDED == uri.scheme
   }
 
   class Factory : ModelLoaderFactory<Uri, InputStream> {
