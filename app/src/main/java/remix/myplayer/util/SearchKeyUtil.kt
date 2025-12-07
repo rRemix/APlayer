@@ -1,8 +1,8 @@
 package remix.myplayer.util
 
-import remix.myplayer.data.bean.mp3.Album
-import remix.myplayer.data.bean.mp3.Artist
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Album
+import remix.myplayer.data.model.audio.Artist
+import remix.myplayer.data.model.audio.Song
 
 /**
  * 统一的搜索关键词生成工具类

@@ -20,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import remix.myplayer.R
-import remix.myplayer.data.bean.github.Release
+import remix.myplayer.data.model.github.Release
 import remix.myplayer.request.network.GithubApi
 import timber.log.Timber
 import java.io.File

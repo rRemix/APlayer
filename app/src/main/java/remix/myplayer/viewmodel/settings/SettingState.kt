@@ -2,7 +2,7 @@ package remix.myplayer.viewmodel.settings
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
-import remix.myplayer.data.bean.misc.LyricOrder
+import remix.myplayer.data.model.misc.LyricOrder
 
 @Stable
 data class CommonSettings(

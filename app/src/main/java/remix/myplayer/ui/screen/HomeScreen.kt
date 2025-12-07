@@ -52,7 +52,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.data.bean.misc.Library
+import remix.myplayer.data.model.misc.Library
 import remix.myplayer.ui.dialog.CreatePlayListDialog
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.theme.LocalTheme

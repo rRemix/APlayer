@@ -2,9 +2,9 @@ package remix.myplayer.request.network
 
 import okhttp3.ResponseBody
 import remix.myplayer.BuildConfig
-import remix.myplayer.data.bean.github.Release
-import remix.myplayer.data.bean.lastfm.LastFmAlbum
-import remix.myplayer.data.bean.lastfm.LastFmArtist
+import remix.myplayer.data.model.github.Release
+import remix.myplayer.data.model.lastfm.LastFmAlbum
+import remix.myplayer.data.model.lastfm.LastFmArtist
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

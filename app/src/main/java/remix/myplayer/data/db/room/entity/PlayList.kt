@@ -7,7 +7,7 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import remix.myplayer.data.bean.mp3.APlayerModel
+import remix.myplayer.data.model.audio.APlayerModel
 import java.io.Serial
 
 /**

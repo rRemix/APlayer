@@ -1,4 +1,4 @@
-package remix.myplayer.data.bean.misc
+package remix.myplayer.data.model.misc
 
 data class Purchase(
     val id: String,

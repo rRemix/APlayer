@@ -41,7 +41,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.DesktopLyricPrefs
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.delegate

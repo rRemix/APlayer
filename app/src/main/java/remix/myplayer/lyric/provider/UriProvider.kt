@@ -2,7 +2,7 @@ package remix.myplayer.lyric.provider
 
 import android.content.Context
 import android.net.Uri
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.lyric.LrcParser
 import timber.log.Timber
 

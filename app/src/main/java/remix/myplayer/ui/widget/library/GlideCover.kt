@@ -8,7 +8,7 @@ import androidx.compose.ui.layout.ContentScale
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
-import remix.myplayer.data.bean.mp3.APlayerModel
+import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.ui.theme.LocalTheme
 
 @OptIn(ExperimentalGlideComposeApi::class)

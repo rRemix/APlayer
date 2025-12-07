@@ -6,8 +6,8 @@ import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.id3.AbstractID3v2Frame
 import org.jaudiotagger.tag.id3.framebody.FrameBodyTXXX
-import remix.myplayer.data.bean.misc.LyricOrder
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.model.misc.LyricOrder
 import remix.myplayer.lyric.LrcParser
 import java.io.File
 import javax.inject.Inject

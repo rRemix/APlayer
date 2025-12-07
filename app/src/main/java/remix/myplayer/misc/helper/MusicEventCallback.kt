@@ -1,6 +1,6 @@
 package remix.myplayer.misc.helper
 
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.service.MusicService
 
 interface MusicEventCallback {

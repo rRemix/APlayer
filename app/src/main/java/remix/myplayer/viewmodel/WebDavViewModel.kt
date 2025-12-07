@@ -13,15 +13,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import remix.myplayer.data.DataUiState
-import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.WebDav
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.isAudio
 import remix.myplayer.misc.updateIf
 import remix.myplayer.repo.WebDavRepository
 import remix.myplayer.repo.usecase.FetchMetaDataUseCase
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.runWithLoading
+import remix.myplayer.ui.state.DataUiState
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import remix.myplayer.R
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.appwidgets.AppWidgetSkin
 import remix.myplayer.ui.appwidgets.BaseAppwidget

@@ -3,8 +3,8 @@ package remix.myplayer.lyric.provider
 import android.content.Context
 import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
-import remix.myplayer.data.bean.misc.LyricOrder
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.model.misc.LyricOrder
 import remix.myplayer.lyric.LrcParser
 import timber.log.Timber
 import java.io.File

@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.data.bean.github.Release
-import remix.myplayer.data.bean.mp3.APlayerModel
+import remix.myplayer.data.model.audio.APlayerModel
+import remix.myplayer.data.model.github.Release
 import remix.myplayer.misc.update.DownloadWorker
 import remix.myplayer.misc.update.InAppUpdater
 import remix.myplayer.misc.updateIf

@@ -10,12 +10,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.runBlocking
-import remix.myplayer.data.bean.lastfm.Image
-import remix.myplayer.data.bean.mp3.Album
-import remix.myplayer.data.bean.mp3.Artist
-import remix.myplayer.data.bean.mp3.Genre
-import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.Album
+import remix.myplayer.data.model.audio.Artist
+import remix.myplayer.data.model.audio.Genre
+import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.model.lastfm.Image
 import remix.myplayer.data.prefs.CoverPrefs
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.data.prefs.SettingPrefs.Companion.DOWNLOAD_COVER_ALWAYS

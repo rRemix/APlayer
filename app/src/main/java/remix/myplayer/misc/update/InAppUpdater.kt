@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 import remix.myplayer.App
 import remix.myplayer.R
-import remix.myplayer.data.bean.github.Release
+import remix.myplayer.data.model.github.Release
 import remix.myplayer.data.prefs.InAppUpdatePrefs
 import remix.myplayer.data.prefs.delegate
 import remix.myplayer.request.network.GithubApi

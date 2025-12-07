@@ -1,4 +1,4 @@
-package remix.myplayer.data.bean.github
+package remix.myplayer.data.model.github
 
 import java.io.Serializable
 

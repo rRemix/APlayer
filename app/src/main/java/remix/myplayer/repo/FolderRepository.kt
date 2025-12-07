@@ -2,8 +2,8 @@ package remix.myplayer.repo
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import remix.myplayer.data.bean.mp3.Folder
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Folder
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.util.PermissionUtil
 import timber.log.Timber

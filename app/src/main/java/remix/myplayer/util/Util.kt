@@ -43,7 +43,7 @@ import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.App
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.floatpermission.rom.RomUtils
 import remix.myplayer.misc.manager.APlayerActivityManager
 import remix.myplayer.ui.activity.base.BaseActivity

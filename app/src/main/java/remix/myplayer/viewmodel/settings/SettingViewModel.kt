@@ -16,11 +16,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import remix.myplayer.R
-import remix.myplayer.data.bean.misc.Library
-import remix.myplayer.data.bean.misc.LyricOrder
-import remix.myplayer.data.bean.mp3.APlayerModel
-import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.APlayerModel
+import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.model.misc.Library
+import remix.myplayer.data.model.misc.LyricOrder
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.lyric.LyricManager

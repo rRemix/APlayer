@@ -1,4 +1,4 @@
-package remix.myplayer.data
+package remix.myplayer.ui.state
 
 sealed class DataUiState<out T> {
 

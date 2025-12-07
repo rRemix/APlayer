@@ -1,6 +1,6 @@
 package remix.myplayer.lyric.provider.network
 
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.lyric.LrcParser
 import remix.myplayer.lyric.provider.ILyricsProvider
 import remix.myplayer.lyric.provider.ILyricsProvider.Companion.CANDIDATE_KEY_NUMBER

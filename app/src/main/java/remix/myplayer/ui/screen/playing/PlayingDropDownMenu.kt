@@ -22,8 +22,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
-import remix.myplayer.data.bean.misc.LyricOrder
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.model.misc.LyricOrder
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.delegate
 import remix.myplayer.lyric.LyricManager.Companion.ACTION_LYRIC

@@ -1,4 +1,4 @@
-package remix.myplayer.data.bean.mp3
+package remix.myplayer.data.model.audio
 
 import android.content.ContentUris
 import android.net.Uri

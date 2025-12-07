@@ -25,12 +25,12 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.data.bean.mp3.APlayerModel
-import remix.myplayer.data.bean.mp3.Album
-import remix.myplayer.data.bean.mp3.Artist
-import remix.myplayer.data.bean.mp3.Folder
-import remix.myplayer.data.bean.mp3.Genre
 import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.APlayerModel
+import remix.myplayer.data.model.audio.Album
+import remix.myplayer.data.model.audio.Artist
+import remix.myplayer.data.model.audio.Folder
+import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.misc.helper.SortOrder
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteCustomSort

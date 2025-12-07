@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.SharedFlow
-import remix.myplayer.data.bean.misc.Library
+import remix.myplayer.data.model.misc.Library
 import remix.myplayer.ui.screen.RemoteScreen
 import remix.myplayer.ui.screen.library.AlbumScreen
 import remix.myplayer.ui.screen.library.ArtistScreen

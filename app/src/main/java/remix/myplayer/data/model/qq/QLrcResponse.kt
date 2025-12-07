@@ -1,4 +1,4 @@
-package remix.myplayer.data.bean.qq
+package remix.myplayer.data.model.qq
 
 data class QLrcResponse(val retcode: Int = 0,
                         val code: Int = 0,

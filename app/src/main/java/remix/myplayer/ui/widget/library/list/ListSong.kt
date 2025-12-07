@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import remix.myplayer.data.bean.mp3.APlayerModel
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.APlayerModel
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.highLightText
 import remix.myplayer.ui.widget.common.TextPrimary

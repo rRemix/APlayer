@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.clickableWithoutRipple
 import remix.myplayer.misc.helper.SortOrder
 import remix.myplayer.ui.nav.LocalNavController

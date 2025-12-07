@@ -13,9 +13,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import remix.myplayer.R
-import remix.myplayer.data.bean.mp3.APlayerModel
-import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.APlayerModel
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.ui.theme.LocalTheme
 import timber.log.Timber
 

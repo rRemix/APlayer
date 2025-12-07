@@ -37,9 +37,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import remix.myplayer.R
-import remix.myplayer.data.DataUiState
-import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.WebDav
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.clickWithRipple
 import remix.myplayer.misc.helper.MusicServiceRemote
 import remix.myplayer.misc.isAudio
@@ -49,6 +48,7 @@ import remix.myplayer.ui.dialog.runWithLoading
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.screen.BackPressHandler
+import remix.myplayer.ui.state.DataUiState
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.icon
 import remix.myplayer.ui.widget.app.BottomBar

@@ -1,10 +1,10 @@
 package remix.myplayer.util
 
 import com.github.promeg.pinyinhelper.Pinyin
-import remix.myplayer.data.bean.mp3.Album
-import remix.myplayer.data.bean.mp3.Artist
-import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.Album
+import remix.myplayer.data.model.audio.Artist
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.helper.SortOrder
 import kotlin.math.min
 

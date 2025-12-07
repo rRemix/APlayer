@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.data.bean.misc.Library
+import remix.myplayer.data.model.misc.Library
 import remix.myplayer.misc.rememberMutableStateSetOf
 import remix.myplayer.ui.dialog.ItemsCallbackMultiChoice
 import remix.myplayer.ui.dialog.NormalDialog

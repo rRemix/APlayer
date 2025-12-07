@@ -1,4 +1,4 @@
-package remix.myplayer.data.bean.lastfm
+package remix.myplayer.data.model.lastfm
 
 import com.google.gson.annotations.Expose
 import kotlinx.serialization.Serializable

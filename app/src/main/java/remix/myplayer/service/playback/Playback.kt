@@ -2,7 +2,7 @@ package remix.myplayer.service.playback
 
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
 
 interface Playback {
 

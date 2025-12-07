@@ -11,12 +11,12 @@ import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import dagger.hilt.android.EntryPointAccessors
-import remix.myplayer.data.bean.mp3.APlayerModel
-import remix.myplayer.data.bean.mp3.Album
-import remix.myplayer.data.bean.mp3.Artist
-import remix.myplayer.data.bean.mp3.Genre
-import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.APlayerModel
+import remix.myplayer.data.model.audio.Album
+import remix.myplayer.data.model.audio.Artist
+import remix.myplayer.data.model.audio.Genre
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.CoverPrefs
 import remix.myplayer.data.prefs.CoverPrefsEntryPoint
 import java.io.InputStream

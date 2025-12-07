@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.Json
-import remix.myplayer.data.bean.misc.LyricOrder
+import remix.myplayer.data.model.misc.LyricOrder
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -11,7 +11,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Message
 import kotlinx.coroutines.cancel
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.helper.MusicEventCallback
 import remix.myplayer.misc.helper.MusicServiceRemote
 import remix.myplayer.service.MusicService

@@ -2,7 +2,7 @@ package remix.myplayer.data.db.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Song
 
 @Entity
 data class MetaDataCache(

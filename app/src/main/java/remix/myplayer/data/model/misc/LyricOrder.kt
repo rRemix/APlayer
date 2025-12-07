@@ -1,4 +1,4 @@
-package remix.myplayer.data.bean.misc
+package remix.myplayer.data.model.misc
 
 import remix.myplayer.R
 

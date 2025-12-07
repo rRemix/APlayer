@@ -20,8 +20,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import remix.myplayer.App
 import remix.myplayer.R
-import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.repo.SongRepositoryEntryPoint
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.nav.MessageNotifier

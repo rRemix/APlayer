@@ -4,8 +4,8 @@ import android.content.Context
 import android.provider.MediaStore.Audio.Genres
 import com.tencent.bugly.crashreport.CrashReport
 import dagger.hilt.android.qualifiers.ApplicationContext
-import remix.myplayer.data.bean.mp3.Genre
-import remix.myplayer.data.bean.mp3.Song
+import remix.myplayer.data.model.audio.Genre
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.util.PermissionUtil
 import javax.inject.Inject
