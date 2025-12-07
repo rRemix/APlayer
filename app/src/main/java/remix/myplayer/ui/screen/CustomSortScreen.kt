@@ -33,7 +33,6 @@ import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.PlayList
-import remix.myplayer.glide.UriFetcher
 import remix.myplayer.misc.clickableWithoutRipple
 import remix.myplayer.misc.helper.SortOrder
 import remix.myplayer.ui.nav.LocalNavController
@@ -79,9 +78,6 @@ fun CustomSortScreen(id: Long) {
 
               libraryVM.updatePlayList(playList.copy(audioIds = ArrayList(newIds)))
 
-              UriFetcher.updatePlayListVersion()
-              UriFetcher.clearAllCache()
-
 //              val previousEntry = nav.previousBackStackEntry
 //              previousEntry?.savedStateHandle["update"] = newIds
             }
@@ -103,7 +99,12 @@ fun CustomSortScreen(id: Long) {
       songs.add(to.index, songs.removeAt(from.index))
     }
 
-    LazyColumn(modifier = Modifier.padding(padding), state = lazyListState) {
+    LazyColumn(
+      modifier = Modifier
+        .padding(padding)
+        .background(LocalTheme.current.libraryBackground),
+      state = lazyListState
+    ) {
       itemsIndexed(songs, key = { _, song -> song.id }) { index, song ->
         ReorderableItem(reorderableLazyListState, key = song.id) {
           Row(

@@ -1,24 +1,33 @@
 package remix.myplayer.glide
 
+import android.content.Context
 import android.net.Uri
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.Key
 import com.bumptech.glide.load.Options
 import com.bumptech.glide.load.data.DataFetcher
 import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
-import com.bumptech.glide.signature.ObjectKey
+import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.data.bean.mp3.APlayerModel
 import remix.myplayer.data.bean.mp3.Album
 import remix.myplayer.data.bean.mp3.Artist
 import remix.myplayer.data.bean.mp3.Genre
 import remix.myplayer.data.bean.mp3.Song
 import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.prefs.CoverPrefs
+import remix.myplayer.data.prefs.CoverPrefsEntryPoint
 import java.io.InputStream
+import java.nio.ByteBuffer
+import java.security.MessageDigest
 
-class APlayerUriLoader(private val concreteLoader: ModelLoader<Uri, InputStream>) :
-  ModelLoader<APlayerModel, InputStream> {
+class APlayerUriLoader(
+  private val concreteLoader: ModelLoader<Uri, InputStream>,
+  private val coverPrefs: CoverPrefs,
+  private val uriFetcher: UriFetcher
+) : ModelLoader<APlayerModel, InputStream> {
 
   override fun buildLoadData(
     model: APlayerModel,
@@ -26,9 +35,16 @@ class APlayerUriLoader(private val concreteLoader: ModelLoader<Uri, InputStream>
     height: Int,
     options: Options
   ): ModelLoader.LoadData<InputStream> {
+    val version = when (model) {
+      is Song, is Album -> coverPrefs.getAlbumVersion()
+      is Artist -> coverPrefs.getArtistVersion()
+      is PlayList -> coverPrefs.getPlayListVersion()
+      else -> 0
+    }
+    val key = uriFetcher.cacheKey(model)
     return ModelLoader.LoadData(
-      ObjectKey(model),
-      APlayerFetcher(model, concreteLoader, width, height, options)
+      APlayerSignature(key, version),
+      APlayerFetcher(model, concreteLoader, width, height, options, uriFetcher)
     )
   }
 
@@ -36,9 +52,19 @@ class APlayerUriLoader(private val concreteLoader: ModelLoader<Uri, InputStream>
     return model is Song || model is Album || model is Artist || model is PlayList || model is Genre
   }
 
-  class Factory : ModelLoaderFactory<APlayerModel, InputStream> {
+  class Factory(private val context: Context) : ModelLoaderFactory<APlayerModel, InputStream> {
     override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<APlayerModel, InputStream> {
-      return APlayerUriLoader(multiFactory.build(Uri::class.java, InputStream::class.java))
+      val coverPrefs =
+        EntryPointAccessors.fromApplication(context, CoverPrefsEntryPoint::class.java).coverPrefs()
+
+      val uriFetcher =
+        EntryPointAccessors.fromApplication(context, UriFetcherEntryPoint::class.java).uriFetcher()
+
+      return APlayerUriLoader(
+        multiFactory.build(Uri::class.java, InputStream::class.java),
+        coverPrefs,
+        uriFetcher
+      )
     }
 
     override fun teardown() {
@@ -50,15 +76,19 @@ class APlayerUriLoader(private val concreteLoader: ModelLoader<Uri, InputStream>
     private val concreteLoader: ModelLoader<Uri, InputStream>,
     private val width: Int,
     private val height: Int,
-    private val options: Options
+    private val options: Options,
+    private val uriFetcher: UriFetcher
   ) : DataFetcher<InputStream> {
 
     @Volatile
     private var delegateFetcher: DataFetcher<InputStream>? = null
 
+    @Volatile
+    private var resolvedDataSource: DataSource? = null
+
     override fun loadData(priority: Priority, callback: DataFetcher.DataCallback<in InputStream>) {
       try {
-        val uri = UriFetcher.fetch(model)
+        val uri = uriFetcher.fetch(model)
         if (uri == Uri.EMPTY) {
           callback.onLoadFailed(Exception("Empty URI for model: $model"))
           return
@@ -71,6 +101,7 @@ class APlayerUriLoader(private val concreteLoader: ModelLoader<Uri, InputStream>
         }
 
         delegateFetcher = loadData.fetcher
+        resolvedDataSource = delegateFetcher?.dataSource
         delegateFetcher?.loadData(priority, callback)
       } catch (e: Exception) {
         callback.onLoadFailed(e)
@@ -87,6 +118,32 @@ class APlayerUriLoader(private val concreteLoader: ModelLoader<Uri, InputStream>
 
     override fun getDataClass(): Class<InputStream> = InputStream::class.java
 
-    override fun getDataSource(): DataSource = DataSource.REMOTE
+    override fun getDataSource(): DataSource = resolvedDataSource ?: delegateFetcher?.dataSource ?: DataSource.REMOTE
+  }
+}
+
+private class APlayerSignature(
+  private val key: String,
+  private val version: Int
+) : Key {
+  override fun updateDiskCacheKey(messageDigest: MessageDigest) {
+    messageDigest.update(key.toByteArray(Key.CHARSET))
+    messageDigest.update(ByteBuffer.allocate(4).putInt(version).array())
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is APlayerSignature) return false
+
+    if (key != other.key) return false
+    if (version != other.version) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = key.hashCode()
+    result = 31 * result + version
+    return result
   }
 }

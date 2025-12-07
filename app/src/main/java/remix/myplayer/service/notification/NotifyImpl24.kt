@@ -40,7 +40,6 @@ NotifyImpl24(context: MusicService) : Notify(context) {
       .asBitmap()
       .load(song)
       .centerCrop()
-      .signature(ObjectKey(UriFetcher.albumVersion))
       .override(size, size)
       .into(object : CustomTarget<Bitmap>() {
         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {

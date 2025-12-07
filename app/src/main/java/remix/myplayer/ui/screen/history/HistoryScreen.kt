@@ -27,6 +27,8 @@ import remix.myplayer.ui.widget.library.list.ListSong
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.playbackViewModel
+import kotlin.math.abs
+import kotlin.random.Random
 
 @Composable
 fun HistoryScreen() {
@@ -63,7 +65,7 @@ fun HistoryScreen() {
             modelParent = song,
             selected = false,
             playing = isPlayingSong,
-            num = item.second,
+            num = abs(Random.nextInt(9999)),
             onClickSong = {
               if (songs.isEmpty()) {
                 return@ListSong

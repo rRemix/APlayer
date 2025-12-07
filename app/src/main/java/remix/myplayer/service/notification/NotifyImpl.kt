@@ -99,7 +99,6 @@ class NotifyImpl(context: MusicService) : Notify(context) {
       .load(song)
       .override(size, size)
       .centerCrop()
-      .signature(ObjectKey(UriFetcher.albumVersion))
       .into(object : CustomTarget<Bitmap>() {
         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
           if (song.id == playbackState.song.id) {

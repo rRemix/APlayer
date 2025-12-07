@@ -20,6 +20,24 @@ class CoverPrefs @Inject constructor(
   @ApplicationContext context: Context
 ) : AbstractPref(context, name = "Cover") {
 
+  fun getAlbumVersion(): Int = sp.getInt(KEY_ALBUM_VERSION, 0)
+
+  fun putAlbumVersion(value: Int) {
+    sp.edit { putInt(KEY_ALBUM_VERSION, value) }
+  }
+
+  fun getArtistVersion(): Int = sp.getInt(KEY_ARTIST_VERSION, 0)
+
+  fun putArtistVersion(value: Int) {
+    sp.edit { putInt(KEY_ARTIST_VERSION, value) }
+  }
+
+  fun getPlayListVersion(): Int = sp.getInt(KEY_PLAYLIST_VERSION, 0)
+
+  fun putPlayListVersion(value: Int) {
+    sp.edit { putInt(KEY_PLAYLIST_VERSION, value) }
+  }
+
   fun putCover(key: String, value: String) {
     sp.edit { putString(key, value) }
   }
@@ -28,7 +46,20 @@ class CoverPrefs @Inject constructor(
     return sp.getString(key, default) ?: default
   }
 
+  fun clearCoverUris() {
+    val versionKeys = setOf(KEY_ALBUM_VERSION, KEY_ARTIST_VERSION, KEY_PLAYLIST_VERSION)
+    sp.edit {
+      sp.all.keys.filterNot { versionKeys.contains(it) }.forEach { remove(it) }
+    }
+  }
+
   fun clearAll() {
     clear()
+  }
+
+  companion object {
+    private const val KEY_ALBUM_VERSION = "album_version"
+    private const val KEY_ARTIST_VERSION = "artist_version"
+    private const val KEY_PLAYLIST_VERSION = "playlist_version"
   }
 }

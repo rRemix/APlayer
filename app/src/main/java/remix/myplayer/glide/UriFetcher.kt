@@ -4,15 +4,12 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore.Audio
-import android.util.LruCache
 import androidx.core.net.toUri
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.runBlocking
-import remix.myplayer.App
 import remix.myplayer.data.bean.lastfm.Image
 import remix.myplayer.data.bean.mp3.Album
 import remix.myplayer.data.bean.mp3.Artist
@@ -53,26 +50,38 @@ class UriFetcher @Inject constructor(
   private val fetchMetaDataUseCase: FetchMetaDataUseCase
 ) {
 
-  private val BLACKLIST = listOf(
-    "https://lastfm-img2.akamaized.net/i/u/300x300/7c58a2e3b889af6f923669cc7744c3de.png".toUri(),
-    "https://lastfm-img2.akamaized.net/i/u/300x300/e1d60ddbcaaa6acdcbba960786f11360.png".toUri(),
-    "http://p1.music.126.net/l8KRlRa-YLNW0GOBeN6fIA==/17914342951434926.jpg".toUri(),
-    "http://p1.music.126.net/RCIIvR7ull5iQWN-awJ-Aw==/109951165555852156.jpg".toUri()
-  )
+  private var albumVersion = coverPrefs.getAlbumVersion()
+    set(value) {
+      field = value
+      coverPrefs.putAlbumVersion(value)
+    }
+  private var artistVersion = coverPrefs.getArtistVersion()
+    set(value) {
+      field = value
+      coverPrefs.putArtistVersion(value)
+    }
+  private var playListVersion = coverPrefs.getPlayListVersion()
+    set(value) {
+      field = value
+      coverPrefs.putPlayListVersion(value)
+    }
 
-  private val memoryCache: LruCache<Int, Uri> = LruCache(200)
-
-  private var albumVersion = 0
-  private var artistVersion = 0
-  private var playListVersion = 0
+  fun cacheKey(model: Any): String = when (model) {
+    is Song -> if (model.id > 0) "song:${model.id}" else "song-data:${model.data}"
+    is Album -> "album:${model.albumID}"
+    is Artist -> "artist:${model.artistID}"
+    is PlayList -> "playlist:${model.id}"
+    is Genre -> "genre:${model.id}"
+    else -> error("unknown model")
+  }
 
   fun fetch(model: Any): Uri {
-    val key = model.hashCode()
+    val key = cacheKey(model)
 
-    val fromCache = getFromCache(key)
-    if (fromCache != null) {
+    val fromCache = coverPrefs.getCover(key)
+    if (fromCache.isNotEmpty()) {
       Timber.v("from cache: $fromCache")
-      return fromCache
+      return fromCache.toUri()
     }
 
     val uri = when (model) {
@@ -101,13 +110,12 @@ class UriFetcher @Inject constructor(
       }
     }
 
-    if (BLACKLIST.contains(uri) || uri == Uri.EMPTY) {
+    if (uri == Uri.EMPTY) {
       return Uri.EMPTY
     }
 
     Timber.v("uri: $uri")
-    memoryCache.put(key, uri)
-    coverPrefs.putCover(key.toString(), uri.toString())
+    coverPrefs.putCover(key, uri.toString())
 
     return uri
   }
@@ -131,40 +139,7 @@ class UriFetcher @Inject constructor(
   }
 
   fun clearAllCache() {
-    memoryCache.evictAll()
-    coverPrefs.clearAll()
-  }
-
-//  fun clearCache(model: APlayerModel) {
-//    memoryCache.remove(model.hashCode())
-//    SPUtil.putValue(context, SPUtil.COVER_KEY.NAME, model.hashCode().toString(), "")
-//  }
-
-  private fun getFromCache(key: Int): Uri? {
-    val uri: Uri? = getFromMemory(key)
-    if (uri != null) {
-      return uri
-    }
-
-    return getFromSP(key)
-  }
-
-  private fun getFromMemory(key: Int): Uri? {
-    val cache = memoryCache.get(key)
-    if (cache != null) {
-//      Timber.v("get from memory, uri: $cache")
-    }
-    return cache
-  }
-
-  private fun getFromSP(key: Int): Uri? {
-    val cache = coverPrefs.getCover(key.toString(), "")
-    if (cache.isNotEmpty()) {
-      val uri = cache.toUri()
-      memoryCache.put(key, uri)
-      return uri
-    }
-    return null
+    coverPrefs.clearCoverUris()
   }
 
   private fun fetch(song: Song): Uri {
@@ -495,43 +470,6 @@ class UriFetcher @Inject constructor(
     const val PREFIX_EMBEDDED = "embedded://"
 
     const val SCHEME_EMBEDDED = "embedded"
-
-    private val entryPoint: UriFetcherEntryPoint by lazy {
-      EntryPointAccessors.fromApplication(App.context, UriFetcherEntryPoint::class.java)
-    }
-
-    private val fetcher: UriFetcher
-      get() = entryPoint.uriFetcher()
-
-    var albumVersion: Int
-      get() = fetcher.albumVersion
-      set(value) {
-        fetcher.albumVersion = value
-      }
-
-    var artistVersion: Int
-      get() = fetcher.artistVersion
-      set(value) {
-        fetcher.artistVersion = value
-      }
-
-    var playListVersion: Int
-      get() = fetcher.playListVersion
-      set(value) {
-        fetcher.playListVersion = value
-      }
-
-    fun fetch(model: Any): Uri = fetcher.fetch(model)
-
-    fun updateAllVersion() = fetcher.updateAllVersion()
-
-    fun updateAlbumVersion() = fetcher.updateAlbumVersion()
-
-    fun updateArtistVersion() = fetcher.updateArtistVersion()
-
-    fun updatePlayListVersion() = fetcher.updatePlayListVersion()
-
-    fun clearAllCache() = fetcher.clearAllCache()
   }
 }
 

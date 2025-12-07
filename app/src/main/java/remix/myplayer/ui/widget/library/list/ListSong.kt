@@ -76,11 +76,11 @@ fun ListSong(
     ) {
       if (num != null) {
         TextPrimary(
-          if (num > 99) "99+" else num.toString(),
+          if (num > 999) "999+" else num.toString(),
           textAlign = TextAlign.Center,
           modifier = Modifier
-            .width(36.dp)
-            .padding(start = 4.dp)
+            .width(40.dp)
+            .padding(horizontal = 4.dp)
         )
       } else {
         Spacer(modifier = Modifier.width(16.dp))

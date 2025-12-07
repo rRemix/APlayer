@@ -55,6 +55,7 @@ class LibraryViewModel @Inject constructor(
   private val genreRepo: GenreRepository,
   private val playListRepo: PlayListRepository,
   private val folderRepo: FolderRepository,
+  private val uriFetcher: UriFetcher,
   historyRepo: HistoryRepository,
   val settingPrefs: SettingPrefs,
 ) : ViewModel(), MusicEventCallback {
@@ -155,6 +156,9 @@ class LibraryViewModel @Inject constructor(
     viewModelScope.launch {
       try {
         playListRepo.updatePlayList(playList)
+        uriFetcher.updatePlayListVersion()
+        uriFetcher.clearAllCache()
+        Glide.get(context).clearMemory()
         MessageNotifier.show(R.string.save_success)
       } catch (e: Exception) {
         MessageNotifier.show(R.string.save_error)
@@ -171,15 +175,15 @@ class LibraryViewModel @Inject constructor(
     viewModelScope.launch {
       if (clear) {
         if (updateAlbumVersion) {
-          UriFetcher.updateAlbumVersion()
+          uriFetcher.updateAlbumVersion()
         } else if (updateArtistVersion) {
-          UriFetcher.updateArtistVersion()
+          uriFetcher.updateArtistVersion()
         } else if (updatePlayListVersion) {
-          UriFetcher.updatePlayListVersion()
+          uriFetcher.updatePlayListVersion()
         } else {
-          UriFetcher.updateAllVersion()
+          uriFetcher.updateAllVersion()
         }
-        UriFetcher.clearAllCache()
+        uriFetcher.clearAllCache()
         Glide.get(context).clearMemory()
       }
 

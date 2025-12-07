@@ -92,7 +92,6 @@ abstract class BaseAppwidget
       .asBitmap()
       .load(song)
       .centerCrop()
-      .signature(ObjectKey(UriFetcher.albumVersion))
       .override(size, size)
       .into(
         AppWidgetTarget(
