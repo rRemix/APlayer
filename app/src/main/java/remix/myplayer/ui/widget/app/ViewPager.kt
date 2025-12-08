@@ -32,7 +32,7 @@ fun ViewPager(
   modifier: Modifier = Modifier,
   libraries: List<Library>,
   pagerState: PagerState,
-  scrollToTopEvent: SharedFlow<Unit>? = null,
+  scrollToCurrentEvent: SharedFlow<Unit>? = null,
   vm: SettingViewModel = settingViewModel
 ) {
   HorizontalPager(
@@ -41,7 +41,7 @@ fun ViewPager(
     beyondViewportPageCount = 1
   ) { page ->
     when (libraries[page].tag) {
-      Library.TAG_SONG -> SongScreen(scrollToTopEvent)
+      Library.TAG_SONG -> SongScreen(scrollToCurrentEvent)
       Library.TAG_ALBUM -> AlbumScreen()
       Library.TAG_ARTIST -> ArtistScreen()
       Library.TAG_GENRE -> GenreScreen()

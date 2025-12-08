@@ -1,5 +1,6 @@
 package remix.myplayer.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,9 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -28,12 +31,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.clickWithRipple
@@ -46,21 +50,40 @@ import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.library.GlideCover
 import remix.myplayer.viewmodel.LibraryViewModel
 import remix.myplayer.viewmodel.libraryViewModel
+import remix.myplayer.viewmodel.playbackViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SongChooseScreen(id: Long, name: String, vm: LibraryViewModel = libraryViewModel) {
-  val context = LocalContext.current
+fun SongChooserScreen(id: Long, name: String, vm: LibraryViewModel = libraryViewModel) {
   val scope = rememberCoroutineScope()
   val theme = LocalTheme.current
-  val songs by vm.songs.collectAsStateWithLifecycle()
   val nav = LocalNavController.current
+  val songs by vm.songs.collectAsStateWithLifecycle()
+  val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
 
   val selectedIds = remember {
     mutableStateSetOf<Long>()
   }
 
+  val listState = rememberLazyListState()
   Scaffold(
+    floatingActionButton = {
+      Icon(
+        modifier = Modifier
+          .padding(end = 56.dp, bottom = 32.dp)
+          .clickable {
+            val index = songs.indexOfFirst { it.id == playbackState.song.id }
+            if (index != -1) {
+              scope.launch {
+                listState.scrollToItem(index)
+              }
+            }
+          },
+        painter = painterResource(R.drawable.ic_my_location_24dp),
+        contentDescription = "SongChooseLocation",
+        tint = theme.primary
+      )
+    },
     topBar = {
       CenterAlignedTopAppBar(
         expandedHeight = 56.dp,
@@ -124,7 +147,8 @@ fun SongChooseScreen(id: Long, name: String, vm: LibraryViewModel = libraryViewM
     LazyColumn(
       modifier = Modifier
         .fillMaxSize()
-        .padding(padding)
+        .padding(padding),
+      state = listState
     ) {
       itemsIndexed(songs, key = { _, song ->
         song.id
@@ -164,7 +188,11 @@ private fun ListSong(song: Song, checked: Boolean, onCheckedChange: (Boolean) ->
       TextSecondary(song.artist)
     }
 
-    Checkbox(modifier = Modifier.padding(horizontal = 16.dp), checked = checked, onCheckedChange = onCheckedChange)
+    Checkbox(
+      modifier = Modifier.padding(horizontal = 16.dp),
+      checked = checked,
+      onCheckedChange = onCheckedChange
+    )
   }
 }
 
@@ -172,6 +200,6 @@ private fun ListSong(song: Song, checked: Boolean, onCheckedChange: (Boolean) ->
 @Composable
 fun SongChooseScreenPreview() {
   APlayerTheme {
-    SongChooseScreen(0, "")
+    SongChooserScreen(0, "")
   }
 }

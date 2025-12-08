@@ -27,7 +27,7 @@ import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 
 @Composable
-fun SongScreen(scrollToTopEvent: SharedFlow<Unit>? = null) {
+fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
   val libraryVM = libraryViewModel
   val mainVM = mainViewModel
 
@@ -37,8 +37,8 @@ fun SongScreen(scrollToTopEvent: SharedFlow<Unit>? = null) {
   val songs by libraryVM.songs.collectAsStateWithLifecycle()
   val context = LocalContext.current
 
-  LaunchedEffect(scrollToTopEvent) {
-    scrollToTopEvent?.collect {
+  LaunchedEffect(scrollToCurrentEvent) {
+    scrollToCurrentEvent?.collect {
       val index = libraryVM.songs.value.indexOfFirst { it.id == playbackState.song.id }
       if (index != -1) {
         listState.scrollToItem(index)

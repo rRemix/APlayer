@@ -166,7 +166,7 @@ private fun HomeContent(
   libraries: List<Library>,
 ) {
   val scope = rememberCoroutineScope()
-  val scrollToTopEvent = remember { MutableSharedFlow<Unit>() }
+  val scrollToCurrentEvent = remember { MutableSharedFlow<Unit>() }
 
   Column(modifier = Modifier.padding(contentPadding)) {
     ScrollableTabRow(
@@ -191,7 +191,7 @@ private fun HomeContent(
             val currentTime = System.currentTimeMillis()
             if (currentTime - lastClickTime < 300) {
               if (library.tag == Library.TAG_SONG) {
-                scope.launch { scrollToTopEvent.emit(Unit) }
+                scope.launch { scrollToCurrentEvent.emit(Unit) }
               }
               return@Tab
             }
@@ -211,7 +211,7 @@ private fun HomeContent(
       modifier = Modifier.weight(1f),
       libraries = libraries,
       pagerState = pagerState,
-      scrollToTopEvent = scrollToTopEvent
+      scrollToCurrentEvent = scrollToCurrentEvent
     )
 
     BottomBar()

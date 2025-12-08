@@ -48,7 +48,7 @@ import remix.myplayer.ui.screen.EQScreen
 import remix.myplayer.ui.screen.HomeScreen
 import remix.myplayer.ui.screen.LastAddedScreen
 import remix.myplayer.ui.screen.SearchScreen
-import remix.myplayer.ui.screen.SongChooseScreen
+import remix.myplayer.ui.screen.SongChooserScreen
 import remix.myplayer.ui.screen.crop.CropScreen
 import remix.myplayer.ui.screen.detail.DetailScreen
 import remix.myplayer.ui.screen.history.HistoryScreen
@@ -101,7 +101,7 @@ fun AppNav() {
         ) {
           val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
           val name = it.arguments?.getString("name") ?: return@normalAnimatedScreen
-          SongChooseScreen(id, name)
+          SongChooserScreen(id, name)
         }
 
         normalAnimatedScreen(RouteAbout) {
