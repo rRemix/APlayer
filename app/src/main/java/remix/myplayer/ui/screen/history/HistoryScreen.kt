@@ -20,15 +20,14 @@ import remix.myplayer.misc.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.theme.LocalTheme
+import remix.myplayer.ui.widget.common.AppBarAction
 import remix.myplayer.ui.widget.common.CommonAppBar
-import remix.myplayer.ui.widget.common.defaultAppBarActions
 import remix.myplayer.ui.widget.library.SongListHeader
 import remix.myplayer.ui.widget.library.list.ListSong
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.playbackViewModel
-import kotlin.math.abs
-import kotlin.random.Random
+import remix.myplayer.viewmodel.timerViewModel
 
 @Composable
 fun HistoryScreen() {
@@ -65,7 +64,7 @@ fun HistoryScreen() {
             modelParent = song,
             selected = false,
             playing = isPlayingSong,
-            num = abs(Random.nextInt(9999)),
+            num = item.second,
             onClickSong = {
               if (songs.isEmpty()) {
                 return@ListSong
@@ -88,7 +87,16 @@ fun HistoryScreen() {
 private fun HistoryActions() {
   HistoryPopup()
 
-  defaultAppBarActions.map { it ->
+  val timerVM = timerViewModel
+  val libraryVM = libraryViewModel
+
+  listOf(
+    AppBarAction(R.drawable.ic_timer_white_24dp, "Timer") {
+      timerVM.showTimerDialog()
+    },
+    AppBarAction(R.drawable.ic_delete_black_24dp, "ClearHistory") {
+      libraryVM.clearHistory()
+    }).map {
     IconButton(onClick = {
       it.action()
     }) {

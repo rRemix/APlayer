@@ -222,7 +222,7 @@ abstract class BaseAppwidget
     //播放暂停按钮
     remoteViews.setImageViewResource(
       R.id.appwidget_toggle,
-      if (service.isPlaying) skin.pauseRes else skin.playRes
+      if (playbackState.isPlaying) skin.pauseRes else skin.playRes
     )
   }
 

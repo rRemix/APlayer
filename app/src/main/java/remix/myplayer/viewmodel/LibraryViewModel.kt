@@ -56,7 +56,7 @@ class LibraryViewModel @Inject constructor(
   private val playListRepo: PlayListRepository,
   private val folderRepo: FolderRepository,
   private val uriFetcher: UriFetcher,
-  historyRepo: HistoryRepository,
+  private val historyRepo: HistoryRepository,
   val settingPrefs: SettingPrefs,
 ) : ViewModel(), MusicEventCallback {
 
@@ -194,6 +194,10 @@ class LibraryViewModel @Inject constructor(
       _folders.value = async(Dispatchers.IO) { folderRepo.allFolders() }.await()
       Timber.v("songCount: ${_songs.value.size} albumCount: ${_albums.value.size} artistCount: ${_artists.value.size} genreCount: ${_genres.value.size} folderCount: ${_folders.value.size}")
     }
+  }
+
+  fun clearHistory() = viewModelScope.launch {
+    historyRepo.clear()
   }
 
   override fun onMediaStoreChanged() {

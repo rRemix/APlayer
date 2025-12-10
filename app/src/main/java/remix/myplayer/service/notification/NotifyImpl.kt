@@ -141,7 +141,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
         .setContentTitle("")
         .setShowWhen(false)
         .setPriority(NotificationCompat.PRIORITY_MAX)
-        .setOngoing(service.isPlaying)
+        .setOngoing(playbackState.isPlaying)
         .setContentIntent(contentIntent)
         .setSmallIcon(R.drawable.icon_notifbar)
     builder.setCustomBigContentView(remoteBigView)

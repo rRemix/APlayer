@@ -38,6 +38,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.App
+import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.audio.Song.Companion.EMPTY_SONG
@@ -51,6 +52,7 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
 import remix.myplayer.data.prefs.SettingPrefs.Companion.OPEN_SOFTWARE
 import remix.myplayer.lyric.LyricManager
+import remix.myplayer.misc.checkMainThread
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.misc.helper.EQHelper
 import remix.myplayer.misc.helper.LanguageHelper
@@ -306,7 +308,7 @@ class MusicService : BaseService(),
   /**
    * 当前是否正在播放
    */
-  val isPlaying: Boolean
+  private val isPlaying: Boolean
     get() = playbackState.isPlaying
 
   override fun onTaskRemoved(rootIntent: Intent) {
@@ -571,6 +573,9 @@ class MusicService : BaseService(),
   override fun onIsPlayingChanged(isPlaying: Boolean) {
     Timber.v("onIsPlayingChanged: $isPlaying")
     stateSource.updatePlaybackUiState(isPlaying = isPlaying)
+    if (isPlaying) {
+      updatePlayHistory()
+    }
   }
 
   override fun onPrepare() {
@@ -588,8 +593,6 @@ class MusicService : BaseService(),
     }
 
     Timber.v("开始播放")
-    // 记录播放历史
-    updatePlayHistory()
     // 开始播放
     start(false)
   }
@@ -597,11 +600,13 @@ class MusicService : BaseService(),
   override fun onEnded() {
     Timber.v("onEnded")
     // 理论上应该不会到这?
-//    throw IllegalStateException("onEnded")
+    if (BuildConfig.DEBUG) {
+      throw IllegalStateException("onEnded")
+    }
   }
 
   override fun onItemTransition(mediaItem: MediaItem?, reason: Int) {
-    Timber.v("onItemTransition, id: ${mediaItem?.mediaId} reason: $reason")
+    Timber.v("onItemTransition, id: ${mediaItem?.mediaId} reason: $reason playing: ${isPlaying} currentSong: ${playback.currentSong?.title}")
 
     val song = mediaItem?.localConfiguration?.tag as? Song
     if (song is Song.Remote) {
@@ -628,7 +633,10 @@ class MusicService : BaseService(),
       } else {
         lastOp = Command.SKIP_TO_NEXT
       }
-      updatePlayHistory()
+    }
+
+    if (isPlaying && reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
+      updatePlayHistory(song, checkDuplicate = false)
     }
 
     pushPlaybackUiState()
@@ -658,14 +666,14 @@ class MusicService : BaseService(),
   }
 
   /**
-   * 更新播放历史
+   * 更新播放历史：只在歌曲真实开始播放时写入
    */
-  private fun updatePlayHistory() {
-    val song = playback.currentSong ?: return
-    if (song.isLocal()) {
-      launch {
-        historyRepository.update(song.id)
-      }
+  private fun updatePlayHistory(song: Song? = playback.currentSong, checkDuplicate: Boolean = true) {
+    checkMainThread()
+    Timber.v("updatePlayHistory, song: ${song?.title}")
+    val songId = song?.takeIf { it.isLocal() }?.id ?: return
+    launch {
+      historyRepository.update(songId, checkDuplicate)
     }
   }
 

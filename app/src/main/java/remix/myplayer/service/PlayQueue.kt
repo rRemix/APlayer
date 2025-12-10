@@ -8,10 +8,6 @@ import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.repo.PlayQueueRepository
 import remix.myplayer.repo.SongRepository
 import javax.inject.Inject
-import kotlin.collections.indices
-import kotlin.collections.isNotEmpty
-import kotlin.text.isNotEmpty
-import kotlin.to
 
 /**
  * created by Remix on 2019-09-26

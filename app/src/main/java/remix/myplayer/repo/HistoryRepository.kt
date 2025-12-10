@@ -14,7 +14,9 @@ interface HistoryRepository {
 
   fun allHistories(): Flow<List<History>>
 
-  suspend fun update(audioId: Long): Int
+  suspend fun update(audioId: Long, checkDuplicate: Boolean = true): Int
+
+  suspend fun clear()
 }
 
 class HistoryRepoImpl @Inject constructor(
@@ -30,7 +32,14 @@ class HistoryRepoImpl @Inject constructor(
       }
   }
 
-  override suspend fun update(audioId: Long): Int {
+  private var lastHistoryAudioId: Long? = null
+
+  override suspend fun update(audioId: Long, checkDuplicate: Boolean): Int {
+    if (checkDuplicate && audioId == lastHistoryAudioId) {
+      return 0
+    }
+    lastHistoryAudioId = audioId
+
     val currentTime = System.currentTimeMillis()
     
     // 先判断是否存在
@@ -54,4 +63,6 @@ class HistoryRepoImpl @Inject constructor(
       historyDao.insertHistory(newHistory).toInt()
     }
   }
+
+  override suspend fun clear() = historyDao.clear()
 }

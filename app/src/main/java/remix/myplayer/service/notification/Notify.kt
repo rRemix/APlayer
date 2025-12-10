@@ -98,7 +98,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
       .setContentTitle(song.title)
       .setShowWhen(false)
       .setTicker(lrc)
-      .setOngoing(service.isPlaying)
+      .setOngoing(playbackState.isPlaying)
       .setContentIntent(contentIntent)
       .setSmallIcon(R.drawable.icon_notifbar)
 
@@ -113,7 +113,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
   internal fun pushNotify(notification: Notification) {
     if (service.stop)
       return
-    val newNotifyMode: Int = if (service.isPlaying) {
+    val newNotifyMode: Int = if (playbackState.isPlaying) {
       NOTIFY_MODE_FOREGROUND
     } else {
       NOTIFY_MODE_BACKGROUND

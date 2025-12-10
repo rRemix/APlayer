@@ -62,7 +62,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
       return
     }
     val playPauseIcon =
-      if (service.isPlaying) R.drawable.ic_pause_black_24dp else R.drawable.ic_play_arrow_black_24dp
+      if (playbackState.isPlaying) R.drawable.ic_pause_black_24dp else R.drawable.ic_play_arrow_black_24dp
 
     val deleteIntent = Intent(MusicService.ACTION_CMD)
     deleteIntent.putExtra(EXTRA_CONTROL, Command.CLOSE_NOTIFY)
@@ -99,7 +99,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
       .setContentTitle(song.title)
       .setLargeIcon(bitmap)
       .setShowWhen(false)
-      .setOngoing(service.isPlaying)
+      .setOngoing(playbackState.isPlaying)
       .setPriority(PRIORITY_MAX)
       .setContentText(song.artist + " - " + song.album)
       .setStyle(
