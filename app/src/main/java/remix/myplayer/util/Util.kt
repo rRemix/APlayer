@@ -677,7 +677,7 @@ object Util {
           saveAudioTag(activity, request)
         } catch (e: Exception) {
           try {
-            var songFD =
+            val songFD =
               activity.contentResolver.openFileDescriptor(
                 song.contentUri,
                 "w"

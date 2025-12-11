@@ -55,7 +55,7 @@ class DeleteSongUseCase @Inject constructor(
             -1
           }
         }
-        parent.audioIds.removeAll(audioIds)
+        parent.audioIds.removeAll(audioIds.toSet())
 
         playListRepo.updatePlayList(parent)
 
@@ -110,9 +110,7 @@ class DeleteSongUseCase @Inject constructor(
       activity.contentResolver.notifyChange(Audio.Media.EXTERNAL_CONTENT_URI, null)
     }
 
-  private fun deleteSource(activity: BaseActivity, songs: List<Song>) {
-    checkWorkerThread()
-
+  private suspend fun deleteSource(activity: BaseActivity, songs: List<Song>) = withContext(Dispatchers.IO){
     try {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         val uris = songs.map { it.contentUri }
@@ -142,7 +140,7 @@ class DeleteSongUseCase @Inject constructor(
             activity.deleteSongLauncher.launch(
               IntentSenderRequest.Builder(e.userAction.actionIntent.intentSender).build()
             )
-            return
+            return@withContext
           }
           throw e
         }
@@ -152,6 +150,5 @@ class DeleteSongUseCase @Inject constructor(
       MessageNotifier.show(R.string.delete_error)
       Timber.v("delete failed: $e")
     }
-
   }
 }

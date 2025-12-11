@@ -668,7 +668,10 @@ class MusicService : BaseService(),
   /**
    * 更新播放历史：只在歌曲真实开始播放时写入
    */
-  private fun updatePlayHistory(song: Song? = playback.currentSong, checkDuplicate: Boolean = true) {
+  private fun updatePlayHistory(
+    song: Song? = playback.currentSong,
+    checkDuplicate: Boolean = true
+  ) {
     checkMainThread()
     Timber.v("updatePlayHistory, song: ${song?.title}")
     val songId = song?.takeIf { it.isLocal() }?.id ?: return
@@ -1254,6 +1257,14 @@ class MusicService : BaseService(),
       // 某一首歌曲添加至下一首播放
       Command.ADD_TO_NEXT_SONG -> {
         val nextSong = intent.getSerializableExtra(EXTRA_SONG) as Song? ?: return
+        if (playbackState.song.id == nextSong.id) {
+          return
+        }
+        val playlist = playback.getPlaylist()
+        val index = playlist.indexOfFirst { it.id == nextSong.id }
+        if (index != -1 && index != playback.currentIndex) {
+          playback.removeSong(index)
+        }
         playback.addSongs(listOf(nextSong), playback.currentIndex + 1)
         // 同步更新
         launch { playQueue.save(playback.getPlaylist()) }

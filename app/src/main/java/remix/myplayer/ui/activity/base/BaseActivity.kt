@@ -53,7 +53,11 @@ open class BaseActivity : ComponentActivity(), CoroutineScope by MainScope() {
     registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
       Timber.v("writeSongLauncher resultCode: ${it.resultCode} data: ${it.data}")
       lifecycleScope.launch {
-        Util.saveAudioTag(this@BaseActivity, pendingWriteRequest ?: return@launch)
+        try {
+          Util.saveAudioTag(this@BaseActivity, pendingWriteRequest ?: return@launch)
+        } catch (e: Exception) {
+          Timber.w("Fail to save tag: $e")
+        }
       }
     }
 
@@ -166,6 +170,7 @@ open class BaseActivity : ComponentActivity(), CoroutineScope by MainScope() {
   }
 
   companion object {
+
     const val EXTRA_COVER = "extra_cover"
 
     val NECESSARY_PERMISSIONS =
