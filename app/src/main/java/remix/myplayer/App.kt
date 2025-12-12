@@ -3,12 +3,9 @@ package remix.myplayer
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
-import android.os.Process
 import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication
 import com.hjq.permissions.XXPermissions
-import com.tencent.bugly.crashreport.CrashReport
-import com.tencent.bugly.crashreport.CrashReport.UserStrategy
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,10 +16,10 @@ import remix.myplayer.misc.helper.LanguageHelper.onConfigurationChanged
 import remix.myplayer.misc.helper.LanguageHelper.saveSystemCurrentLanguage
 import remix.myplayer.misc.helper.LanguageHelper.setApplicationLanguage
 import remix.myplayer.misc.helper.LanguageHelper.setLocal
+import remix.myplayer.misc.helper.ThirdPartyInitializer
 import remix.myplayer.misc.manager.APlayerActivityManager
 import remix.myplayer.ui.appshortcuts.DynamicShortcutManager
 import remix.myplayer.ui.screen.hackTabMinWidth
-import remix.myplayer.util.Util
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,9 +54,7 @@ class App : MultiDexApplication() {
     }
 
     // 加载第三方库
-    if (!BuildConfig.DEBUG) {
-      loadLibrary()
-    }
+    ThirdPartyInitializer.init(this@App)
 
     registerActivityLifecycleCallbacks(APlayerActivityManager())
 
@@ -83,22 +78,6 @@ class App : MultiDexApplication() {
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
     onConfigurationChanged(applicationContext)
-  }
-
-  private fun loadLibrary() {
-    // bugly
-    val context = applicationContext
-    // 获取当前包名
-    val packageName = context.packageName
-    // 获取当前进程名
-    val processName = Util.getProcessName(Process.myPid())
-    // 设置是否为上报进程
-    val strategy = UserStrategy(context)
-    strategy.appChannel = BuildConfig.FLAVOR
-    strategy.isUploadProcess = processName == null || processName == packageName
-    CrashReport.initCrashReport(this, BuildConfig.BUGLY_APPID, BuildConfig.DEBUG, strategy)
-    CrashReport.setIsDevelopmentDevice(this, BuildConfig.DEBUG)
-
   }
 
   override fun onLowMemory() {

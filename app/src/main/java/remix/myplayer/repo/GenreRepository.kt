@@ -2,12 +2,12 @@ package remix.myplayer.repo
 
 import android.content.Context
 import android.provider.MediaStore.Audio.Genres
-import com.tencent.bugly.crashreport.CrashReport
 import dagger.hilt.android.qualifiers.ApplicationContext
 import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.util.PermissionUtil
+import timber.log.Timber
 import javax.inject.Inject
 
 interface GenreRepository {
@@ -42,7 +42,7 @@ class GenreRepoImpl @Inject constructor(
         }
       }
     } catch (e: Exception) {
-      CrashReport.postCatchedException(e)
+      Timber.w(e)
     }
     return genres
   }

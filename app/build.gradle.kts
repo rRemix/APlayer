@@ -36,7 +36,7 @@ android {
     namespace = "remix.myplayer"
 
     compileSdk = 35
-    buildToolsVersion = "34.0.0"
+    buildToolsVersion = "35.0.0"
     ndkVersion = "25.2.9519653"
 
     defaultConfig {
@@ -61,9 +61,9 @@ android {
             "\"${properties.getProperty("GOOGLE_PLAY_LICENSE_KEY")}\""
         )
         buildConfigField(
-            "String",
-            "BUGLY_APPID",
-            "\"${properties.getProperty("BUGLY_APPID")}\""
+          "String",
+          "BUGLY_APP_ID",
+          "\"${properties.getProperty("BUGLY_APP_ID")}\""
         )
         buildConfigField(
             "String",
@@ -296,8 +296,8 @@ if (properties.getProperty("BUGLY_UPLOAD") == "1") {
             return@registering
         }
 
-        val appId = properties.getProperty("BUGLY_APPID")
-        val appKey = properties.getProperty("BUGLY_APPKEY")
+        val appId = properties.getProperty("BUGLY_APP_ID")
+        val appKey = properties.getProperty("BUGLY_APP_KEY")
         if (appId.isNullOrEmpty() || appKey.isNullOrEmpty()) {
             logger.warn("appId or appKey for bugly is invalid")
             return@registering

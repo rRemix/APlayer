@@ -39,7 +39,8 @@ jobs:
           KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
           LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
           GOOGLE_PLAY_LICENSE_KEY: ${{ secrets.GOOGLE_PLAY_LICENSE_KEY }}
-          BUGLY_APPID: ${{ secrets.BUGLY_APPID }}
+          BUGLY_APP_ID: ${{ secrets.BUGLY_APP_ID }}
+          BUGLY_APP_KEY: ${{ secrets.BUGLY_APP_KEY }}
         run: |
           echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > app/release.keystore
           cat > local.properties <<EOF
@@ -49,19 +50,25 @@ jobs:
           keystore.keyPassword=$KEYSTORE_KEY_PASSWORD
           LASTFM_API_KEY=${LASTFM_API_KEY:-""}
           GOOGLE_PLAY_LICENSE_KEY=${GOOGLE_PLAY_LICENSE_KEY:-""}
-          BUGLY_APPID=${BUGLY_APPID:-""}
+          BUGLY_APP_ID=${BUGLY_APP_ID:-""}
+          BUGLY_APP_KEY=${BUGLY_APP_KEY:-""}
           EOF
 
       - name: Generate Build Info
         id: info
         run: |
           echo "build_date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "version_date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
 
       - name: Read commit message
         id: commit_msg
         run: |
           MSG=$(git show -s --format=%s "$GITHUB_SHA")
           echo "message=$MSG" >> "$GITHUB_OUTPUT"
+
+      - name: Update Version Name
+        run: |
+          sed -i 's/versionName = "\(.*\)"/versionName = "\1_${{ steps.info.outputs.version_date }}"/' app/build.gradle.kts
 
       - name: Build nightly
         run: ./gradlew :app:assembleNonGoogleWithUpdaterRelease
@@ -86,6 +93,21 @@ jobs:
             Commit: ${{ steps.commit_msg.outputs.message }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        if: success()
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Upload Mapping to Bugly
+        if: success()
+        env:
+          BUGLY_APP_ID: ${{ secrets.BUGLY_APP_ID }}
+          BUGLY_APP_KEY: ${{ secrets.BUGLY_APP_KEY }}
+        run: |
+          pip install requests
+          python .github/scripts/upload_mapping.py    
 
 #      - name: Upload nightly artifact
 #        uses: actions/upload-artifact@v4

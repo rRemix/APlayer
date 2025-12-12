@@ -108,7 +108,7 @@ class FetchMetaDataUseCase @Inject constructor(
       }
       song.bitRate =
         metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE) ?: ""
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         song.sampleRate =
           metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_SAMPLERATE)
             ?: ""

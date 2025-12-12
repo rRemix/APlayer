@@ -9,7 +9,6 @@ import android.media.audiofx.Equalizer
 import android.media.audiofx.Virtualizer
 import android.widget.Toast
 import androidx.navigation.NavHostController
-import com.tencent.bugly.crashreport.CrashReport
 import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.App
 import remix.myplayer.R
@@ -334,8 +333,6 @@ object EQHelper {
     } catch (e: Exception) {
       Timber.w(e)
       error()
-      CrashReport.postCatchedException(e)
-    } finally {
     }
   }
 
