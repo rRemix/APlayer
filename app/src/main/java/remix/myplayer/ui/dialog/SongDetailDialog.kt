@@ -85,8 +85,11 @@ fun SongDetailDialog() {
 
   LaunchedEffect(song) {
     if (song.id > 0 && song.isLocal()) {
-      audioHeader = withContext(Dispatchers.IO) {
-        AudioFileIO.read(File(song.data)).audioHeader
+      try {
+        audioHeader = withContext(Dispatchers.IO) {
+          AudioFileIO.read(File(song.data)).audioHeader
+        }
+      } catch (ignore: Exception) {
       }
     }
   }

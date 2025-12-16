@@ -73,9 +73,6 @@ class ExoPlayback(private val context: Context) : Playback {
   override var isPrepared: Boolean = false
     private set
 
-  override var hasError: Boolean = false
-    private set
-
   override val audioSessionId: Int
     get() = player.audioSessionId
 
@@ -127,7 +124,6 @@ class ExoPlayback(private val context: Context) : Playback {
         }
 
         override fun onPlayerError(error: PlaybackException) {
-          hasError = true
           callback?.onError(error)
         }
 
@@ -185,12 +181,26 @@ class ExoPlayback(private val context: Context) : Playback {
 
   override fun setPlaylist(songs: List<Song>, index: Int, offset: Long) {
     checkMainThread()
-    hasError = false
     isPrepared = false
 
     val sources = songs.map { buildSource(it) }
     player.setMediaSources(sources, index, offset)
     player.prepare()
+  }
+
+  // 从Timeline获取当前播放列表
+  override fun getPlaylist(): List<Song> {
+    val timeline = player.currentTimeline
+    val list = ArrayList<Song>()
+    val window = Timeline.Window()
+    for (i in 0 until timeline.windowCount) {
+      timeline.getWindow(i, window)
+      val mediaItem = window.mediaItem
+      (mediaItem.localConfiguration?.tag as? Song)?.let {
+        list.add(it)
+      }
+    }
+    return list
   }
 
   override fun addSongs(songs: List<Song>, index: Int) {
@@ -250,6 +260,7 @@ class ExoPlayback(private val context: Context) : Playback {
 
     if (nextIndex != C.INDEX_UNSET) {
       player.seekToDefaultPosition(nextIndex)
+      ensurePrepared()
     }
   }
 
@@ -266,12 +277,20 @@ class ExoPlayback(private val context: Context) : Playback {
     )
     if (previousIndex != C.INDEX_UNSET) {
       player.seekToDefaultPosition(previousIndex)
+      ensurePrepared()
     }
   }
 
   override fun skipTo(index: Int) {
     checkMainThread()
     player.seekTo(index, C.TIME_UNSET)
+    ensurePrepared()
+  }
+
+  private fun ensurePrepared() {
+    if (!isPrepared) {
+      player.prepare()
+    }
   }
 
   // 根据播放模式获取下一首索引
@@ -284,21 +303,6 @@ class ExoPlayback(private val context: Context) : Playback {
       player.repeatMode,
       player.shuffleModeEnabled
     )
-  }
-
-  // 从Timeline获取当前播放列表
-  override fun getPlaylist(): List<Song> {
-    val timeline = player.currentTimeline
-    val list = ArrayList<Song>()
-    val window = Timeline.Window()
-    for (i in 0 until timeline.windowCount) {
-      timeline.getWindow(i, window)
-      val mediaItem = window.mediaItem
-      (mediaItem.localConfiguration?.tag as? Song)?.let {
-        list.add(it)
-      }
-    }
-    return list
   }
 
   override fun start() {

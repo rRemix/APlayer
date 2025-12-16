@@ -212,7 +212,7 @@
 
   <string name="write_something">每当想起这首歌的时候</string>
   <string name="song_sheet">歌单</string>
-  <string name="play_failed">播放失败:</string>
+  <string name="play_failed">播放失败: %s</string>
   <string name="cant_request_audio_focus">无法获得音频焦点</string>
   <string name="float_lrc">桌面歌词</string>
   <string name="closed_desktop_lrc">已关闭桌面歌词</string>

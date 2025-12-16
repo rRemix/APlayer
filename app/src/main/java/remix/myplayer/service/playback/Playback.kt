@@ -27,9 +27,6 @@ interface Playback {
   /** 是否准备完成 */
   val isPrepared: Boolean
 
-  /** 是否发生错误 */
-  val hasError: Boolean
-
   /** AudioSessionId */
   val audioSessionId: Int
 

@@ -644,7 +644,7 @@ class MusicService : BaseService(),
 
   override fun onError(error: PlaybackException) {
     Timber.e("onPlayerError, code: ${error.errorCode} name: ${error.errorCodeName} cause: ${error.cause}")
-    // TODO 尝试播放下一首?
+    MessageNotifier.show(R.string.play_failed, error.errorCodeName)
     when (error.errorCode) {
       // fatal error
       PlaybackException.ERROR_CODE_DECODER_INIT_FAILED,
@@ -855,11 +855,6 @@ class MusicService : BaseService(),
    */
   private fun start(crossFade: Boolean) {
     Timber.v("play: $crossFade")
-
-    if (playback.hasError) {
-      MessageNotifier.show(R.string.load_failed)
-      return
-    }
     if (!playback.isPrepared) {
       MessageNotifier.show(R.string.buffering_wait)
       return
@@ -1293,13 +1288,6 @@ class MusicService : BaseService(),
   }
 
   /**
-   * 是否只需要更新播放状态,比如暂停
-   */
-  private fun updatePlayStateOnly(cmd: Int): Boolean {
-    return cmd == Command.PAUSE || cmd == Command.PLAY || cmd == Command.PLAY_PAUSE
-  }
-
-  /**
    * 清除锁屏显示的内容
    */
   private fun clearMediaSession() {
@@ -1329,37 +1317,34 @@ class MusicService : BaseService(),
     builder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playback.mediaItemCount.toLong())
 
     mediaSession.setMetadata(builder.build())
-
-    if (!updatePlayStateOnly(control)) {
-      val placeholder =
-        if (themeController.appTheme.isLight) R.drawable.album_empty_bg_day else R.drawable.album_empty_bg_night
-      Glide.with(this)
-        .asBitmap()
-        .load(currentSong)
-        .error(placeholder)
-        .centerCrop()
-        .override(DensityUtil.dip2px(160f), DensityUtil.dip2px(160f))
-        .into(object : CustomTarget<Bitmap>() {
-          override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-            setMediaSessionData(resource)
-          }
-
-          override fun onLoadFailed(errorDrawable: Drawable?) {
-            setMediaSessionData((errorDrawable as? BitmapDrawable)?.bitmap)
-          }
-
-          private fun setMediaSessionData(result: Bitmap?) {
-            val bitmap = copy(result)
-            builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
-            mediaSession.setMetadata(builder.build())
-          }
-
-          override fun onLoadCleared(placeholder: Drawable?) {
-
-          }
-        })
-    }
     updatePlaybackState()
+
+    val placeholder =
+      if (themeController.appTheme.isLight) R.drawable.album_empty_bg_day else R.drawable.album_empty_bg_night
+    Glide.with(this)
+      .asBitmap()
+      .load(currentSong)
+      .error(placeholder)
+      .centerCrop()
+      .override(DensityUtil.dip2px(160f), DensityUtil.dip2px(160f))
+      .into(object : CustomTarget<Bitmap>() {
+        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+          setMediaSessionData(resource)
+        }
+
+        override fun onLoadFailed(errorDrawable: Drawable?) {
+          setMediaSessionData((errorDrawable as? BitmapDrawable)?.bitmap)
+        }
+
+        private fun setMediaSessionData(result: Bitmap?) {
+          builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, copy(result))
+          mediaSession.setMetadata(builder.build())
+        }
+
+        override fun onLoadCleared(placeholder: Drawable?) {
+
+        }
+      })
   }
 
   fun updatePlaybackState() {

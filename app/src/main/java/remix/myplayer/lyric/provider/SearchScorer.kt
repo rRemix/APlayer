@@ -23,7 +23,7 @@ object SearchScorer {
     val score: Float,
     val isValid: Boolean = score >= MIN_SCORE_THRESHOLD,
     val titleScore: Float = 0f,
-    val artistScore: Float = 0f,
+    val artistScore: Float? = null,
     val albumScore: Float? = null,
     val durationMatch: Boolean = true
   )
@@ -98,9 +98,21 @@ object SearchScorer {
       val s2 = textDifference(keyword, "${candidateArtist ?: ""} - ${candidateTitle ?: ""}")
       val s3 = textDifference(keyword, "${candidateTitle ?: ""} - ${candidateArtist ?: ""}")
       val score = (maxOf(s1, s2, s3) * 100f)
-      ScoreResult(score = score, titleScore = score, artistScore = 0f, albumScore = null, durationMatch = true)
+      ScoreResult(
+        score = score,
+        titleScore = score,
+        artistScore = null,
+        albumScore = null,
+        durationMatch = true
+      )
     } else {
-      calculateSongScore(targetSong, candidateTitle, candidateArtist, candidateAlbum, candidateDuration)
+      calculateSongScore(
+        targetSong,
+        candidateTitle,
+        candidateArtist,
+        candidateAlbum,
+        candidateDuration
+      )
     }
   }
 
@@ -109,10 +121,22 @@ object SearchScorer {
     candidateAlbum: String?,
     candidateArtist: String? = null,
   ): ScoreResult {
-    val aScore = calculateAlbumScore(targetAlbum.album, candidateAlbum) ?: 0f
-    val artScore = if (candidateArtist.isNullOrBlank()) 0f else calculateArtistScore(targetAlbum.artist, candidateArtist)
-    val final = if (artScore > 0f) max(aScore * 0.7f + artScore * 0.3f, aScore) else aScore
-    return ScoreResult(score = final, titleScore = aScore, artistScore = artScore, albumScore = null, durationMatch = true)
+    val albumScore = calculateAlbumScore(targetAlbum.album, candidateAlbum)
+    val artScore = calculateArtistScore(targetAlbum.artist, candidateArtist)
+
+    val score = when {
+      albumScore != null && artScore != null -> albumScore * 0.7f + artScore * 0.3f
+      albumScore != null -> albumScore
+      artScore != null -> artScore * 0.6f
+      else -> 0f
+    }
+
+    return ScoreResult(
+      score = score,
+      artistScore = artScore,
+      albumScore = albumScore,
+      durationMatch = true
+    )
   }
 
   fun calculateArtistScore(
@@ -120,7 +144,7 @@ object SearchScorer {
     candidateArtist: String?,
   ): ScoreResult {
     val artScore = calculateArtistScore(targetArtist.artist, candidateArtist)
-    return ScoreResult(score = artScore, titleScore = 0f, artistScore = artScore, albumScore = null, durationMatch = true)
+    return ScoreResult(score = artScore ?: 0f, artistScore = artScore)
   }
 
   /**
@@ -174,8 +198,11 @@ object SearchScorer {
   /**
    * 计算艺术家得分
    */
-  private fun calculateArtistScore(localArtist: String?, remoteArtist: String?): Float {
-    if (localArtist.isNullOrBlank() || remoteArtist.isNullOrBlank()) return 0f
+  private fun calculateArtistScore(localArtist: String?, remoteArtist: String?): Float? {
+    // 本地无歌手信息，不参与评分
+    if (localArtist.isNullOrBlank()) return null
+    // 本地有但网络无，判为0分
+    if (remoteArtist.isNullOrBlank()) return 0f
 
     val artist1 = unifiedSymbol(localArtist.lowercase())
     val artist2 = unifiedSymbol(remoteArtist.lowercase())
@@ -194,7 +221,10 @@ object SearchScorer {
    * 计算专辑得分
    */
   private fun calculateAlbumScore(localAlbum: String?, remoteAlbum: String?): Float? {
-    if (localAlbum.isNullOrBlank() || remoteAlbum.isNullOrBlank()) return null
+    // 本地无专辑信息，不参与评分
+    if (localAlbum.isNullOrBlank()) return null
+    // 本地有但网络无（或无效），判为0分
+    if (remoteAlbum.isNullOrBlank()) return 0f
 
     val album1 = unifiedSymbol(localAlbum.lowercase())
     val album2 = unifiedSymbol(remoteAlbum.lowercase())
@@ -207,13 +237,13 @@ object SearchScorer {
    */
   private fun calculateFinalScore(
     titleScore: Float,
-    artistScore: Float,
+    artistScore: Float?,
     albumScore: Float?
   ): Float {
     // 固定权重避免因 max 过早饱和导致区分度丢失
     var finalScore = when {
-      artistScore > 0 && albumScore != null -> titleScore * 0.5f + artistScore * 0.35f + albumScore * 0.15f
-      artistScore > 0 -> titleScore * 0.6f + artistScore * 0.4f
+      artistScore != null && albumScore != null -> titleScore * 0.5f + artistScore * 0.35f + albumScore * 0.15f
+      artistScore != null -> titleScore * 0.6f + artistScore * 0.4f
       albumScore != null -> titleScore * 0.75f + albumScore * 0.25f
       else -> titleScore
     }
