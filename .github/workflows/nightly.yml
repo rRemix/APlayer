@@ -58,17 +58,12 @@ jobs:
         id: info
         run: |
           echo "build_date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-          echo "version_date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
 
       - name: Read commit message
         id: commit_msg
         run: |
           MSG=$(git show -s --format=%s "$GITHUB_SHA")
           echo "message=$MSG" >> "$GITHUB_OUTPUT"
-
-      - name: Update Version Name
-        run: |
-          sed -i 's/versionName = "\(.*\)"/versionName = "\1_${{ steps.info.outputs.version_date }}"/' app/build.gradle.kts
 
       - name: Build nightly
         run: ./gradlew :app:assembleNonGoogleWithUpdaterRelease
