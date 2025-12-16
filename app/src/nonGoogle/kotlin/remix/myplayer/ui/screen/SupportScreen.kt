@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.misc.clickWithRipple
+import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.theme.LocalTheme

@@ -71,13 +71,13 @@ import remix.myplayer.R
 import remix.myplayer.glide.addBitmapListener
 import remix.myplayer.lyric.CurrentNextLyricsLine
 import remix.myplayer.lyric.LyricManager
-import remix.myplayer.misc.clickableWithoutRipple
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
 import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.blur.StackBlurManager
+import remix.myplayer.ui.clickableWithoutRipple
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.Util.sendLocalBroadcast

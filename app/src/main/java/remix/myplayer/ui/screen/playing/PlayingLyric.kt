@@ -37,7 +37,7 @@ import remix.myplayer.lyric.LyricLine
 import remix.myplayer.lyric.LyricManager
 import remix.myplayer.lyric.provider.ILyricsProvider
 import remix.myplayer.lyric.provider.UriProvider
-import remix.myplayer.misc.clickWithRipple
+import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.ProgressAware

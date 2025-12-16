@@ -51,9 +51,9 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.BOTTOM_SHOW_NEXT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.BOTTOM_SHOW_NONE
 import remix.myplayer.data.prefs.SettingPrefs.Companion.BOTTOM_SHOW_VOLUME
 import remix.myplayer.misc.CenterInBox
-import remix.myplayer.misc.clickWithRipple
-import remix.myplayer.misc.clickableWithoutRipple
 import remix.myplayer.service.playback.PlaybackUiState
+import remix.myplayer.ui.clickWithRipple
+import remix.myplayer.ui.clickableWithoutRipple
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.LineSlider
 import remix.myplayer.ui.widget.common.defaultLineSliderProperties

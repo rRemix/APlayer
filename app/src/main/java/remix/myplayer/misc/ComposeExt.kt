@@ -1,13 +1,8 @@
 package remix.myplayer.misc
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.runtime.saveable.listSaver
@@ -17,7 +12,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -25,7 +19,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import remix.myplayer.ui.theme.LocalTheme
+import remix.myplayer.R
+import remix.myplayer.ui.dialog.NormalDialog
+import remix.myplayer.ui.dialog.rememberDialogState
+
+@Composable
+fun ShowLyricTipDialog(onPositive: () -> Unit) {
+//    if (lyricPrefs.tipShown) {
+//      onPositive()
+//    } else {
+//
+//    }
+
+  val state = rememberDialogState(true)
+  NormalDialog(
+    dialogState = state,
+    contentRes = R.string.local_lyric_tip,
+    onPositive = {
+      onPositive()
+    }
+  )
+}
 
 private const val PORTRAIT_SPAN_COUNT = 2
 private const val GRID_MAX_SPAN_COUNT = 6
@@ -40,36 +54,6 @@ fun spanCount(): Int {
     val count = LocalConfiguration.current.screenWidthDp / 180
     count.coerceAtMost(GRID_MAX_SPAN_COUNT)
   }
-}
-
-@Composable
-fun Modifier.clickWithRipple(
-  circle: Boolean = true,
-  enabled: Boolean = true,
-  onClick: () -> Unit
-): Modifier {
-  var modifier = this
-  if (circle) {
-    modifier = modifier.clip(CircleShape)
-  }
-  return modifier.clickable(
-    enabled = enabled,
-    interactionSource = remember { MutableInteractionSource() },
-    indication = ripple(color = LocalTheme.current.ripple), onClick = onClick
-  )
-}
-
-@Composable
-fun Modifier.clickableWithoutRipple(
-  interactionSource: MutableInteractionSource = MutableInteractionSource(),
-  enabled: Boolean = true,
-  onClick: () -> Unit
-) = this.clickable(
-  enabled = enabled,
-  interactionSource = interactionSource,
-  indication = null,
-) {
-  onClick()
 }
 
 @Composable

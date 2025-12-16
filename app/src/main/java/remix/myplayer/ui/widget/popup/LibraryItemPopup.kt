@@ -30,10 +30,10 @@ import remix.myplayer.data.model.audio.Artist
 import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.data.model.audio.type
-import remix.myplayer.misc.clickWithRipple
 import remix.myplayer.misc.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
+import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.nav.RouteCrop

@@ -32,10 +32,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.misc.clickableWithoutRipple
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.ui.clickableWithoutRipple
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RoutePlayingScreen
 import remix.myplayer.ui.theme.LocalTheme

@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import remix.myplayer.R
-import remix.myplayer.misc.clickableWithoutRipple
+import remix.myplayer.ui.clickableWithoutRipple
 import remix.myplayer.ui.theme.LocalTheme
 
 @SuppressLint("CheckResult")

@@ -33,8 +33,8 @@ import remix.myplayer.lyric.LyricManager.Companion.EXTRA_LYRIC_URI
 import remix.myplayer.lyric.LyricManager.Companion.SHOW_OFFSET_PANEL
 import remix.myplayer.lyric.LyricManagerEntryPoint
 import remix.myplayer.lyric.LyricSearcher
+import remix.myplayer.misc.ShowLyricTipDialog
 import remix.myplayer.misc.helper.EQHelper
-import remix.myplayer.ui.ViewCommon.ShowLyricTipDialog
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.InputDialog

@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import remix.myplayer.misc.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.ui.verticalScrollbar
 import remix.myplayer.ui.widget.library.SongListHeader
 import remix.myplayer.ui.widget.library.list.ListSong
 import remix.myplayer.util.MusicUtil
@@ -57,8 +58,12 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
       }
     }
 
-    // TODO LocationRecyclerView
-    LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
+    LazyColumn(
+      state = listState,
+      modifier = Modifier
+        .weight(1f)
+        .verticalScrollbar(listState)
+    ) {
       itemsIndexed(songs, key = { _, song ->
         song.id
       }) { pos, song ->

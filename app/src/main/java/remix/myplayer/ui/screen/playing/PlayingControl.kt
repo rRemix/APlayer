@@ -44,12 +44,12 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
 import remix.myplayer.misc.CenterInBox
-import remix.myplayer.misc.clickWithRipple
 import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.service.playback.PlaybackUiState
+import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.dialog.BottomSheetDialog
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme

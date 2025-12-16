@@ -48,7 +48,7 @@ import kotlinx.coroutines.delay
 import remix.myplayer.R
 import remix.myplayer.lyric.LyricLine
 import remix.myplayer.lyric.PerWordLyricLine
-import remix.myplayer.misc.clickWithRipple
+import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.lyric.LyricMultiLine

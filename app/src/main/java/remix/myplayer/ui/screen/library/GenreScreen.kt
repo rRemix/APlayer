@@ -24,6 +24,7 @@ import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.misc.spanCount
 import remix.myplayer.ui.nav.DetailScreenRoute
 import remix.myplayer.ui.nav.LocalNavController
+import remix.myplayer.ui.verticalScrollbar
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.library.ModeHeader
 import remix.myplayer.ui.widget.library.list.GridItem
@@ -65,10 +66,15 @@ fun GenreScreen() {
 
     if (mode == SettingPrefs.LIST_MODE) {
       val listState = rememberLazyListState()
-      LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
-        itemsIndexed(genres, key = { index, genre ->
+      LazyColumn(
+        state = listState,
+        modifier = Modifier
+          .weight(1f)
+          .verticalScrollbar(listState)
+      ) {
+        itemsIndexed(genres, key = { _, genre ->
           genre.id
-        }) { pos, genre ->
+        }) { _, genre ->
           ListItem(
             modifier = Modifier.height(64.dp),
             model = genre,
@@ -91,7 +97,9 @@ fun GenreScreen() {
     } else {
       val gridState = rememberLazyGridState()
       LazyVerticalGrid(
-        modifier = Modifier.weight(1f),
+        modifier = Modifier
+          .weight(1f)
+          .verticalScrollbar(gridState),
         state = gridState,
         columns = GridCells.Fixed(spanCount()),
         content = {

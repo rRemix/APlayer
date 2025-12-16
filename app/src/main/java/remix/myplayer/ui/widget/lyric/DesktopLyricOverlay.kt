@@ -47,9 +47,9 @@ import remix.myplayer.data.prefs.DesktopLyricPrefs.Companion.HIDE_PANEL_DELAY
 import remix.myplayer.lyric.CurrentNextLyricsLine
 import remix.myplayer.lyric.LyricManager
 import remix.myplayer.misc.CenterInBox
-import remix.myplayer.misc.clickWithRipple
-import remix.myplayer.misc.clickableWithoutRipple
 import remix.myplayer.service.Command
+import remix.myplayer.ui.clickWithRipple
+import remix.myplayer.ui.clickableWithoutRipple
 import remix.myplayer.ui.dialog.ColorSpace
 import remix.myplayer.ui.theme.ThemeController
 import remix.myplayer.util.MusicUtil.makeCmdIntent

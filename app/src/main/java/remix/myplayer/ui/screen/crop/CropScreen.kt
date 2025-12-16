@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.misc.CenterInBox
 import remix.myplayer.misc.cache.DiskCache
-import remix.myplayer.misc.clickWithRipple
+import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.CommonAppBar
