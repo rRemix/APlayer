@@ -56,6 +56,7 @@ fun NormalDialog(
   neutralRes: Int? = null, onNeutral: (() -> Unit)? = null,
   negativeRes: Int? = R.string.cancel, onNegative: (() -> Unit)? = null,
   onDismissRequest: (() -> Unit)? = null,
+  onDismiss: (() -> Unit)? = null,
   itemsCallback: ItemsCallback? = null,
   itemsCallbackSingleChoice: ItemsCallbackSingleChoice? = null,
   itemsCallbackMultiChoice: ItemsCallbackMultiChoice? = null
@@ -77,6 +78,7 @@ fun NormalDialog(
     negative = if (negativeRes != null) stringResource(negativeRes) else null,
     onNegative = onNegative,
     onDismissRequest = onDismissRequest,
+    onDismiss = onDismiss,
     itemsCallback = itemsCallback,
     itemsCallbackSingleChoice = itemsCallbackSingleChoice,
     itemsCallbackMultiChoice = itemsCallbackMultiChoice
@@ -100,14 +102,22 @@ fun NormalDialog(
   neutral: String? = null, onNeutral: (() -> Unit)? = null,
   negative: String? = stringResource(R.string.cancel), onNegative: (() -> Unit)? = null,
   onDismissRequest: (() -> Unit)? = null,
+  onDismiss: (() -> Unit)? = null,
   itemsCallback: ItemsCallback? = null,
   itemsCallbackSingleChoice: ItemsCallbackSingleChoice? = null,
   itemsCallbackMultiChoice: ItemsCallbackMultiChoice? = null
 ) {
-  BaseDialog(dialogState.isOpen, cancelOutside = cancelOutside, onDismissRequest = {
-    onDismissRequest?.invoke()
-    dialogState.dismiss()
-  }) {
+  BaseDialog(
+    show = dialogState.isOpen,
+    cancelOutside = cancelOutside,
+    onDismissRequest = {
+      onDismissRequest?.invoke()
+      dialogState.dismiss()
+    },
+    onDismiss = {
+      onDismiss?.invoke()
+    }
+  ) {
     Column(
       modifier = Modifier.padding(containerPadding),
       verticalArrangement = Arrangement.spacedBy(contentSpacer)

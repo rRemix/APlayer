@@ -39,13 +39,20 @@ fun InputDialog(
   neutral: String? = null, onNeutral: (() -> Unit)? = null,
   negative: String? = stringResource(R.string.cancel), onNegative: (() -> Unit)? = null,
   onDismissRequest: (() -> Unit)? = null,
+  onDismiss: (() -> Unit)? = null,
   onValueChange: (String) -> Unit,
   onInput: (String) -> Unit
 ) {
-  BaseDialog(dialogState.isOpen, onDismissRequest = {
-    onDismissRequest?.invoke()
-    dialogState.dismiss()
-  }) {
+  BaseDialog(
+    show = dialogState.isOpen,
+    onDismissRequest = {
+      onDismissRequest?.invoke()
+      dialogState.dismiss()
+    },
+    onDismiss = {
+      onDismiss?.invoke()
+    }
+  ) {
     Column(
       modifier = Modifier.padding(16.dp)
     ) {

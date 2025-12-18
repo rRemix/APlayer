@@ -95,6 +95,8 @@ class TimerViewModel @Inject constructor(
     positiveButtonText: Int = _timerState.value.positiveButtonText,
     timerDefaultDuration: Int = _timerState.value.timerDefaultDuration
   ) {
+    settingPrefs.timerStartAuto = timerStartAuto && timerDefaultDuration > 0
+    settingPrefs.timerDefaultDuration = timerDefaultDuration
     _timerState.value = _timerState.value.copy(
       durationInSec,
       progress,

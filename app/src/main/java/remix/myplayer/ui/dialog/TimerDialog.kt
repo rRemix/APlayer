@@ -205,7 +205,7 @@ fun TimerDialog() {
         }
       }
     },
-    onDismissRequest = {
+    onDismiss = {
       timerVM.cancelUpdateProgress()
     }
   )

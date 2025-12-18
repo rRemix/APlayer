@@ -1,14 +1,15 @@
 package remix.myplayer.ui.dialog
 
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -23,12 +24,15 @@ import timber.log.Timber
 internal fun BaseDialog(
   show: Boolean,
   onDismissRequest: (() -> Unit)?,
+  onDismiss: (() -> Unit)? = null,
   cancelOutside: Boolean = true,
   content: @Composable () -> Unit,
 ) {
   if (!show) {
     return
   }
+  val currentOnDismiss = rememberUpdatedState(onDismiss)
+
   Dialog(
     onDismissRequest = {
       Timber.v("BaseDialog onDismissRequest")
@@ -37,18 +41,23 @@ internal fun BaseDialog(
       cancelOutside, cancelOutside
     )
   ) {
-    Surface(
-      modifier = Modifier
-        .fillMaxWidth()
-        // TODO
-        .heightIn(max = with(LocalDensity.current) {
-          (LocalConfiguration.current.screenHeightDp * 0.8).dp
-        }),
-      color = LocalTheme.current.dialogBackground,
-      shape = RoundedCornerShape(12.dp),
-      shadowElevation = 8.dp,
-    ) {
-      content()
+    BoxWithConstraints {
+      Surface(
+        modifier = Modifier
+          .fillMaxWidth()
+          .heightIn(max = maxHeight * 0.8f),
+        color = LocalTheme.current.dialogBackground,
+        shape = RoundedCornerShape(12.dp),
+        shadowElevation = 8.dp,
+      ) {
+        content()
+      }
+    }
+  }
+
+  DisposableEffect(Unit) {
+    onDispose {
+      currentOnDismiss.value?.invoke()
     }
   }
 }
