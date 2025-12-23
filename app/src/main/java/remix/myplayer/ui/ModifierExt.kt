@@ -3,7 +3,9 @@ package remix.myplayer.ui
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -14,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,9 +25,14 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import remix.myplayer.ui.theme.LocalTheme
 
 /**
@@ -38,57 +46,43 @@ fun Modifier.verticalScrollbar(
   cornerRadius: Dp = width / 2,
   color: Color = LocalTheme.current.primary,
 ): Modifier {
-  var isVisible by remember { mutableStateOf(false) }
+  val coroutineScope = rememberCoroutineScope()
 
-  LaunchedEffect(state.isScrollInProgress) {
-    if (state.isScrollInProgress) {
-      isVisible = true
-    } else {
-      delay(500)
-      isVisible = false
-    }
-  }
-
-  val alpha by animateFloatAsState(
-    targetValue = if (isVisible) 1f else 0f,
-    animationSpec = tween(durationMillis = 300),
-    label = "ScrollbarAlpha"
-  )
-
-  return drawWithContent {
-    drawContent()
-
-    if (alpha > 0f) {
+  return verticalScrollbarImpl(
+    isScrollInProgress = state.isScrollInProgress,
+    width = width,
+    height = height,
+    cornerRadius = cornerRadius,
+    color = color,
+    onDrag = { dragAmount, viewportSize, indicatorHeightPx ->
       val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
       val totalItemsCount = state.layoutInfo.totalItemsCount
-      val viewportHeight = this.size.height
 
       if (visibleItemsInfo.isNotEmpty() && totalItemsCount > 0) {
-        // 假定所有item的高度都一样
         val estimatedItemSize = visibleItemsInfo.sumOf { it.size } / visibleItemsInfo.size.toFloat()
         val totalContentHeight = estimatedItemSize * totalItemsCount
+        val maxScrollOffset = (totalContentHeight - viewportSize.height).coerceAtLeast(1f)
+        val maxScrollbarOffset = (viewportSize.height - indicatorHeightPx).coerceAtLeast(1f)
+        val scrollDelta = dragAmount * (maxScrollOffset / maxScrollbarOffset)
 
-        if (totalContentHeight <= viewportHeight) return@drawWithContent
+        coroutineScope.launch {
+          state.scrollBy(scrollDelta)
+        }
+      }
+    },
+    calculateScrollMetrics = { viewportSize ->
+      val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
+      val totalItemsCount = state.layoutInfo.totalItemsCount
 
-        // 计算当前和总的偏移
+      if (visibleItemsInfo.isNotEmpty() && totalItemsCount > 0) {
+        val estimatedItemSize = visibleItemsInfo.sumOf { it.size } / visibleItemsInfo.size.toFloat()
+        val totalContentHeight = estimatedItemSize * totalItemsCount
         val currentScrollOffset =
           state.firstVisibleItemIndex * estimatedItemSize + state.firstVisibleItemScrollOffset
-        val maxScrollOffset = (totalContentHeight - viewportHeight).coerceAtLeast(1f)
-
-        // 计算indicator偏移
-        val fraction = (currentScrollOffset / maxScrollOffset).coerceIn(0f, 1f)
-        val indicatorOffsetY = fraction * (viewportHeight - height.toPx())
-
-        drawRoundRect(
-          color = color,
-          topLeft = Offset(this.size.width - width.toPx(), indicatorOffsetY),
-          size = Size(width.toPx(), height.toPx()),
-          cornerRadius = CornerRadius(cornerRadius.toPx()),
-          alpha = alpha
-        )
-      }
+        totalContentHeight to currentScrollOffset
+      } else null
     }
-  }
+  )
 }
 
 /**
@@ -102,10 +96,79 @@ fun Modifier.verticalScrollbar(
   cornerRadius: Dp = width / 2,
   color: Color = LocalTheme.current.primary,
 ): Modifier {
-  var isVisible by remember { mutableStateOf(false) }
+  val coroutineScope = rememberCoroutineScope()
 
-  LaunchedEffect(state.isScrollInProgress) {
-    if (state.isScrollInProgress) {
+  return verticalScrollbarImpl(
+    isScrollInProgress = state.isScrollInProgress,
+    width = width,
+    height = height,
+    cornerRadius = cornerRadius,
+    color = color,
+    onDrag = { dragAmount, viewportSize, indicatorHeightPx ->
+      val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
+      val totalItemsCount = state.layoutInfo.totalItemsCount
+
+      if (visibleItemsInfo.isNotEmpty() && totalItemsCount > 0) {
+        val estimatedItemHeight =
+          visibleItemsInfo.sumOf { it.size.height } / visibleItemsInfo.size.toFloat()
+        val estimatedItemWidth =
+          visibleItemsInfo.sumOf { it.size.width } / visibleItemsInfo.size.toFloat()
+
+        if (estimatedItemHeight > 0 && estimatedItemWidth > 0) {
+          val spanCount = (viewportSize.width / estimatedItemWidth).toInt().coerceAtLeast(1)
+          val totalRows = (totalItemsCount + spanCount - 1) / spanCount
+          val totalContentHeight = totalRows * estimatedItemHeight
+
+          val maxScrollOffset = (totalContentHeight - viewportSize.height).coerceAtLeast(1f)
+          val maxScrollbarOffset = (viewportSize.height - indicatorHeightPx).coerceAtLeast(1f)
+          val scrollDelta = dragAmount * (maxScrollOffset / maxScrollbarOffset)
+
+          coroutineScope.launch {
+            state.scrollBy(scrollDelta)
+          }
+        }
+      }
+    },
+    calculateScrollMetrics = { viewportSize ->
+      val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
+      val totalItemsCount = state.layoutInfo.totalItemsCount
+
+      if (visibleItemsInfo.isNotEmpty() && totalItemsCount > 0) {
+        val estimatedItemHeight =
+          visibleItemsInfo.sumOf { it.size.height } / visibleItemsInfo.size.toFloat()
+        val estimatedItemWidth =
+          visibleItemsInfo.sumOf { it.size.width } / visibleItemsInfo.size.toFloat()
+
+        if (estimatedItemHeight > 0 && estimatedItemWidth > 0) {
+          val spanCount = (viewportSize.width / estimatedItemWidth).toInt().coerceAtLeast(1)
+          val totalRows = (totalItemsCount + spanCount - 1) / spanCount
+          val totalContentHeight = totalRows * estimatedItemHeight
+
+          val currentScrollOffset =
+            (state.firstVisibleItemIndex / spanCount) * estimatedItemHeight + state.firstVisibleItemScrollOffset
+          totalContentHeight to currentScrollOffset
+        } else null
+      } else null
+    }
+  )
+}
+
+@Composable
+private fun Modifier.verticalScrollbarImpl(
+  isScrollInProgress: Boolean,
+  width: Dp,
+  height: Dp,
+  cornerRadius: Dp,
+  color: Color,
+  onDrag: (dragAmount: Float, viewportSize: Size, indicatorHeightPx: Float) -> Unit,
+  calculateScrollMetrics: (viewportSize: Size) -> Pair<Float, Float>?
+): Modifier {
+  var isVisible by remember { mutableStateOf(false) }
+  var isDragging by remember { mutableStateOf(false) }
+  val density = LocalDensity.current
+
+  LaunchedEffect(isScrollInProgress, isDragging) {
+    if (isScrollInProgress || isDragging) {
       isVisible = true
     } else {
       delay(500)
@@ -119,47 +182,64 @@ fun Modifier.verticalScrollbar(
     label = "ScrollbarAlpha"
   )
 
-  return drawWithContent {
-    drawContent()
+  return this
+    .pointerInput(Unit) {
+      awaitEachGesture {
+        // 拦截down事件
+        val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
 
-    if (alpha > 0f) {
-      val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
-      val totalItemsCount = state.layoutInfo.totalItemsCount
-      val viewportHeight = this.size.height
+        // 加一点padding扩大点击区域
+        if (down.position.x >= size.width - (with(density) { width.toPx() } + with(density) { 16.dp.toPx() })) {
+          down.consume()
+          isDragging = true
 
-      if (visibleItemsInfo.isNotEmpty() && totalItemsCount > 0) {
-        // 假定所有item的大小都一样
-        val estimatedItemHeight = visibleItemsInfo.sumOf { it.size.height } / visibleItemsInfo.size.toFloat()
-        val estimatedItemWidth = visibleItemsInfo.sumOf { it.size.width } / visibleItemsInfo.size.toFloat()
+          val currentPointerId = down.id
+          do {
+            // 拦截move事件
+            val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+            val change = event.changes.firstOrNull { it.id == currentPointerId }
 
-        if (estimatedItemHeight > 0 && estimatedItemWidth > 0) {
-          // 计算列数、总行数和总内容高度
-          val spanCount = (this.size.width / estimatedItemWidth).toInt().coerceAtLeast(1)
-          val totalRows = (totalItemsCount + spanCount - 1) / spanCount
-          val totalContentHeight = totalRows * estimatedItemHeight
+            if (change == null || !change.pressed) {
+              isDragging = false
+              break
+            }
 
-          if (totalContentHeight <= viewportHeight) return@drawWithContent
-
-          // 计算当前和总的偏移
-          val currentScrollOffset =
-            (state.firstVisibleItemIndex / spanCount) * estimatedItemHeight + state.firstVisibleItemScrollOffset
-          val maxScrollOffset = (totalContentHeight - viewportHeight).coerceAtLeast(1f)
-
-          // 计算indicator偏移
-          val fraction = (currentScrollOffset / maxScrollOffset).coerceIn(0f, 1f)
-          val indicatorOffsetY = fraction * (viewportHeight - height.toPx())
-
-          drawRoundRect(
-            color = color,
-            topLeft = Offset(this.size.width - width.toPx(), indicatorOffsetY),
-            size = Size(width.toPx(), height.toPx()),
-            cornerRadius = CornerRadius(cornerRadius.toPx()),
-            alpha = alpha
-          )
+            val dragAmount = change.positionChange().y
+            if (dragAmount != 0f) {
+              change.consume()
+              val viewportSize = Size(size.width.toFloat(), size.height.toFloat())
+              val indicatorHeightPx = with(density) { height.toPx() }
+              onDrag(dragAmount, viewportSize, indicatorHeightPx)
+            }
+          } while (true)
         }
       }
     }
-  }
+    .drawWithContent {
+      drawContent()
+
+      if (alpha > 0f) {
+        val metrics = calculateScrollMetrics(this.size)
+        if (metrics != null) {
+          val (totalContentHeight, currentScrollOffset) = metrics
+          val viewportHeight = this.size.height
+
+          if (totalContentHeight > viewportHeight) {
+            val maxScrollOffset = (totalContentHeight - viewportHeight).coerceAtLeast(1f)
+            val fraction = (currentScrollOffset / maxScrollOffset).coerceIn(0f, 1f)
+            val indicatorOffsetY = fraction * (viewportHeight - height.toPx())
+
+            drawRoundRect(
+              color = color,
+              topLeft = Offset(this.size.width - width.toPx(), indicatorOffsetY),
+              size = Size(width.toPx(), height.toPx()),
+              cornerRadius = CornerRadius(cornerRadius.toPx()),
+              alpha = alpha
+            )
+          }
+        }
+      }
+    }
 }
 
 
