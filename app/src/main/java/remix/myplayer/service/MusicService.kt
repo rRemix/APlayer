@@ -1252,19 +1252,13 @@ class MusicService : BaseService(),
       // 某一首歌曲添加至下一首播放
       Command.ADD_TO_NEXT_SONG -> {
         val nextSong = intent.getSerializableExtra(EXTRA_SONG) as Song? ?: return
-        if (playbackState.song.id == nextSong.id) {
-          return
+
+        if (playback.addToNextSong(nextSong)) {
+          // 同步更新
+          launch { playQueue.save(playback.getPlaylist()) }
+          pushPlaybackUiState()
+          MessageNotifier.show(R.string.already_add_to_next_song)
         }
-        val playlist = playback.getPlaylist()
-        val index = playlist.indexOfFirst { it.id == nextSong.id }
-        if (index != -1 && index != playback.currentIndex) {
-          playback.removeSong(index)
-        }
-        playback.addSongs(listOf(nextSong), playback.currentIndex + 1)
-        // 同步更新
-        launch { playQueue.save(playback.getPlaylist()) }
-        pushPlaybackUiState()
-        MessageNotifier.show(R.string.already_add_to_next_song)
       }
       // 切换定时器
       Command.TOGGLE_TIMER -> {

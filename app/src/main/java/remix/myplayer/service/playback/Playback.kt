@@ -36,6 +36,9 @@ interface Playback {
   /** 添加歌曲 (index = -1 表示添加到末尾) */
   fun addSongs(songs: List<Song>, index: Int = -1)
 
+  /** 添加到下一首播放*/
+  fun addToNextSong(nextSong: Song): Boolean
+
   /** 移除指定位置的歌曲 */
   fun removeSong(index: Int)
 

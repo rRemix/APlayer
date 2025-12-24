@@ -21,6 +21,7 @@ import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.source.ShuffleOrder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -65,7 +66,7 @@ class ExoPlayback(private val context: Context) : Playback {
       val index = getNextSongIndex()
       if (index == C.INDEX_UNSET) return null
       val timeline = player.currentTimeline
-      val window = androidx.media3.common.Timeline.Window()
+      val window = Timeline.Window()
       timeline.getWindow(index, window)
       return window.mediaItem.localConfiguration?.tag as? Song
     }
@@ -209,9 +210,66 @@ class ExoPlayback(private val context: Context) : Playback {
     if (index == -1) {
       player.addMediaSources(sources)
     } else {
-      val safeIndex = index.coerceIn(0, player.mediaItemCount)
-      player.addMediaSources(safeIndex, sources)
+      player.addMediaSources(index.coerceIn(0, player.mediaItemCount), sources)
     }
+  }
+
+  override fun addToNextSong(nextSong: Song): Boolean {
+    checkMainThread()
+    if (currentSong?.id == nextSong.id || this.nextSong?.id == nextSong.id) {
+      return false
+    }
+
+    var existIndex = findIndexOfSong(nextSong.id)
+    // 没有则添加
+    if (existIndex == C.INDEX_UNSET) {
+      addSongs(listOf(nextSong), -1)
+      existIndex = player.mediaItemCount - 1
+    }
+
+    // 根据模式调整位置
+    if (!player.shuffleModeEnabled) {
+      player.moveMediaItem(
+        existIndex,
+        if (existIndex < currentIndex) currentIndex else currentIndex + 1
+      )
+    } else {
+      // 生成随机队列并将目标移到当前歌曲后面
+      val indices = buildShuffledIndices(player.shuffleOrder, player.mediaItemCount).toMutableList()
+      indices.remove(existIndex)
+      indices.add(indices.indexOf(currentIndex) + 1, existIndex)
+
+      player.shuffleOrder = ShuffleOrder.DefaultShuffleOrder(
+        indices.toIntArray(),
+        System.currentTimeMillis()
+      )
+    }
+
+    return true
+  }
+
+  private fun findIndexOfSong(songId: Long): Int {
+    val timeline = player.currentTimeline
+    val window = Timeline.Window()
+    for (i in 0 until timeline.windowCount) {
+      timeline.getWindow(i, window)
+      val song = window.mediaItem.localConfiguration?.tag as? Song
+      if (song?.id == songId) {
+        return i
+      }
+    }
+    return C.INDEX_UNSET
+  }
+
+  private fun buildShuffledIndices(order: ShuffleOrder, length: Int): IntArray {
+    val result = IntArray(length)
+    var i = 0
+    var index = order.firstIndex
+    while (index != C.INDEX_UNSET && i < length) {
+      result[i++] = index
+      index = order.getNextIndex(index)
+    }
+    return if (i == length) result else IntArray(length) { it }
   }
 
   override fun removeSong(index: Int) {
