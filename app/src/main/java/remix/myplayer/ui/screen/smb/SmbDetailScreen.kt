@@ -164,13 +164,8 @@ fun SmbDetailScreen(smb: Smb) {
                   
                   var select: Song.Remote? = null
                   val remotes = smbFiles
-                    .filter { isAudio(it.name) } // Helper? Need to verify isAudio extension or logic
-                     // I can check file extension.
-                     // WebDav uses DavResource.isAudio() which checks content type or extension.
-                     // I will implement simple check.
+                    .filter { isAudio(it.name) } 
                     .map {
-                        // Construct URI
-                        // smb://[domain;]username[:password]@server/share/path
                         var userInfo = ""
                         if (!smb.domain.isNullOrEmpty()) {
                             userInfo += "${smb.domain};"
@@ -180,9 +175,6 @@ fun SmbDetailScreen(smb: Smb) {
                             userInfo += ":${smb.pwd}"
                         }
                         
-                        // Need to encode userInfo if it contains special chars?
-                        // For simplicity, assume basic chars for now. 
-                        // URI construction:
                         val uriStr = "smb://$userInfo@${smb.server}/${smb.share}/${it.path.replace("\\", "/")}"
 
                         val remote = Song.Remote(
@@ -211,7 +203,42 @@ fun SmbDetailScreen(smb: Smb) {
                 }
               },
               onMenuClick = {
-                  // Similar menu to WebDav
+                  var userInfo = ""
+                  if (!smb.domain.isNullOrEmpty()) {
+                      userInfo += "${smb.domain};"
+                  }
+                  userInfo += smb.account
+                  if (smb.pwd.isNotEmpty()) {
+                      userInfo += ":${smb.pwd}"
+                  }
+                  val uriStr = "smb://$userInfo@${smb.server}/${smb.share}/${resource.path.replace("\\", "/")}"
+
+                  val song = Song.Remote(
+                      title = resource.name.substringBeforeLast('.'),
+                      data = uriStr,
+                      size = resource.size,
+                      dateModified = resource.lastModified,
+                      account = smb.account,
+                      pwd = smb.pwd
+                  )
+
+                  when(it) {
+                      R.string.add_to_next_song -> {
+                          Util.sendLocalBroadcast(
+                              MusicUtil.makeCmdIntent(Command.ADD_TO_NEXT_SONG)
+                                  .putExtra(MusicService.EXTRA_SONG, song)
+                          )
+                      }
+                      R.string.add_to_play_queue -> {
+                          playbackVM.insertToQueue(listOf(song))
+                      }
+                      R.string.song_detail -> {
+                          scope.runWithLoading {
+                              smbVM.fetchMeta(song)
+                              settingVM.showSongDetailDialog(song)
+                          }
+                      }
+                  }
               })
           }
         }
@@ -284,19 +311,22 @@ private fun SmbDetailItem(
       TextSecondary(smbFile.path)
     }
 
-    val list = arrayListOf<Int>() // R.string.delete
-    // Keep it simple for now, maybe add delete later if implemented in VM
+    val list = arrayListOf<Int>()
+    if (smbFile.isDirectory) {
+        list.add(R.string.delete)
+    }
     
     if (isAudio) {
       list.addAll(
+        0,
         listOf(
-          // R.string.add_to_next_song,
-          // R.string.add_to_play_queue, 
-          // R.string.song_detail,
-          // TODO: Implement these action handlers if needed
+          R.string.add_to_next_song,
+          R.string.add_to_play_queue, 
+          R.string.song_detail,
+          R.string.delete
         )
       )
     }
-    // PopupButton(list, contentDescription = "SmbDetailPopupButton", onMenuClick = onMenuClick)
+    PopupButton(list, contentDescription = "SmbDetailPopupButton", onMenuClick = onMenuClick)
   }
 }

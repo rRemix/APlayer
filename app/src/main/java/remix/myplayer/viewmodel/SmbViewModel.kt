@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.data.db.room.entity.Smb
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.repo.SmbRepository
+import remix.myplayer.repo.usecase.FetchMetaDataUseCase
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.runWithLoading
 import remix.myplayer.ui.state.DataUiState
@@ -26,7 +28,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SmbViewModel @Inject constructor(
-  private val smbRepository: SmbRepository
+  private val smbRepository: SmbRepository,
+  private val fetchMetaDataUseCase: FetchMetaDataUseCase
 ) : ViewModel() {
 
   private val _smbList = MutableStateFlow<List<Smb>>(emptyList())
@@ -167,6 +170,8 @@ class SmbViewModel @Inject constructor(
     if (state.server.isEmpty()) return
     remix.myplayer.ui.nav.MessageNotifier.show("此版本不支持自动检测共享。请手动输入共享名称。")
   }
+
+  suspend fun fetchMeta(song: Song.Remote) = fetchMetaDataUseCase(song)
 }
 
 @Stable
