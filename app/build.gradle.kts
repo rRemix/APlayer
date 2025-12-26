@@ -256,6 +256,7 @@ dependencies {
         // https://github.com/thegrizzlylabs/sardine-android/blob/d0af7ae8e7ee0654a763c4c6f638a5e98b1782e9/build.gradle#L46
         exclude(group = "xpp3", module = "xpp3")
     }
+    implementation(libs.smbj)
     implementation(libs.slf4j)
     implementation(libs.timber)
     implementation(libs.tinypinyin)

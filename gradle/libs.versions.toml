@@ -41,6 +41,7 @@ benchmarkMacroJunit4 = "1.4.1"
 baselineprofile = "1.4.1"
 profileinstaller = "1.4.1"
 rules = "1.7.0"
+smbj = "0.13.0"
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }
@@ -97,6 +98,7 @@ logback-android = { group = "com.github.tony19", name = "logback-android", versi
 # noinspection GradleDependency
 xxpermissions = { module = "com.github.getActivity:XXPermissions", version.ref = "xxpermissions" }
 sardine-android = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "sardineAndroid" }
+smbj = { group = "com.hierynomus", name = "smbj", version.ref = "smbj" }
 slf4j = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 # noinspection GradleDependency

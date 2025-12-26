@@ -165,15 +165,25 @@ class ExoPlayback(private val context: Context) : Playback {
       MediaItem.Builder().setUri(song.contentUri).setMediaId(song.id.toString()).setTag(song)
         .build()
     return if (song is Song.Remote) {
-      val httpFactory = DefaultHttpDataSource.Factory()
-        .setDefaultRequestProperties(song.headers)
-      // 缓存
-      val cacheFactory = CacheDataSource.Factory()
-        .setCache(MediaCache.get(context))
-        .setUpstreamDataSourceFactory(httpFactory)
-        .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-      ProgressiveMediaSource.Factory(cacheFactory)
-        .createMediaSource(mediaItem)
+      if (song.contentUri.scheme == "smb") {
+        val smbFactory = SmbDataSourceFactory()
+        val cacheFactory = CacheDataSource.Factory()
+          .setCache(MediaCache.get(context))
+          .setUpstreamDataSourceFactory(smbFactory)
+          .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+        ProgressiveMediaSource.Factory(cacheFactory)
+          .createMediaSource(mediaItem)
+      } else {
+        val httpFactory = DefaultHttpDataSource.Factory()
+          .setDefaultRequestProperties(song.headers)
+        // 缓存
+        val cacheFactory = CacheDataSource.Factory()
+          .setCache(MediaCache.get(context))
+          .setUpstreamDataSourceFactory(httpFactory)
+          .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+        ProgressiveMediaSource.Factory(cacheFactory)
+          .createMediaSource(mediaItem)
+      }
     } else {
       ProgressiveMediaSource.Factory(localDataSourceFactory)
         .createMediaSource(mediaItem)

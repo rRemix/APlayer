@@ -67,6 +67,7 @@ import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.webDavViewModel
+import remix.myplayer.viewmodel.smbViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
@@ -140,7 +141,12 @@ fun HomeScreen() {
         CreatePlayListDialog()
 
         val webDavVM = webDavViewModel
-        FAButton(selectLibrary.tag == Library.TAG_PLAYLIST || selectLibrary.tag == Library.TAG_REMOTE) {
+        val smbVM = smbViewModel
+        FAButton(
+          selectLibrary.tag == Library.TAG_PLAYLIST || 
+          selectLibrary.tag == Library.TAG_REMOTE || 
+          selectLibrary.tag == Library.TAG_SMB
+        ) {
           if (mainVM.multiSelectState.value.isShowing()) {
             return@FAButton
           }
@@ -149,6 +155,8 @@ fun HomeScreen() {
             libraryVM.showCreatePlaylistDialog()
           } else if (selectLibrary.tag == Library.TAG_REMOTE) {
             webDavVM.showAddWebDavDialog()
+          } else if (selectLibrary.tag == Library.TAG_SMB) {
+            smbVM.showAddSmbDialog()
           }
         }
 
