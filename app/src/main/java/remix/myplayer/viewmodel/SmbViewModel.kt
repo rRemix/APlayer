@@ -63,7 +63,7 @@ class SmbViewModel @Inject constructor(
           SmbFile(
             name = it.fileName,
             isDirectory = it.fileAttributes_Long and 16L != 0L, // Directory attribute
-            path = if (path.endsWith("\\")) path + it.fileName else "$path\\${it.fileName}",
+            path = if (path.isEmpty()) it.fileName else "$path\\${it.fileName}",
             size = it.endOfFile,
             lastModified = it.changeTime.toEpochMillis()
           )
