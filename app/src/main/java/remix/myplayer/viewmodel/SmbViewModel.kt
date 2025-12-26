@@ -112,7 +112,7 @@ class SmbViewModel @Inject constructor(
       smbRepository.insertOrReplace(smb)
     } catch (e: Exception) {
       Timber.e(e)
-      // Signal error to UI? For now just log
+      remix.myplayer.ui.nav.MessageNotifier.show(e.localizedMessage ?: "Save failed")
     }
   }
 
