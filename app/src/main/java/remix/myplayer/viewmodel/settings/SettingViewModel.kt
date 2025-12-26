@@ -135,7 +135,7 @@ class SettingViewModel @Inject constructor(
       Json.decodeFromString<List<Library>>(settingPrefs.libraryJson)
     } catch (_: Exception) {
       Library.allLibraries
-    }
+    }.filter { it.tag != Library.TAG_SMB }
 
     setAllLibraries(libraries)
 

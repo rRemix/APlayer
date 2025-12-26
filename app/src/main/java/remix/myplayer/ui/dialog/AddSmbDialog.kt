@@ -11,6 +11,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import remix.myplayer.R
 import remix.myplayer.data.db.room.entity.Smb
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import remix.myplayer.viewmodel.SmbViewModel
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -52,8 +65,43 @@ fun AddSmbDialog(
         EditField(server, R.string.webdav_hint_server, isError = server.isEmpty()) {
           vm.updateAddSmbState(server = it)
         }
-        EditField(share, R.string.share, isError = share.isEmpty()) { // Need string for "Share"
-          vm.updateAddSmbState(share = it)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Box(modifier = Modifier.weight(1f)) {
+            EditField(share, R.string.share, isError = share.isEmpty()) {
+              vm.updateAddSmbState(share = it)
+            }
+          }
+          Spacer(modifier = Modifier.width(8.dp))
+          Box {
+            TextButton(
+              onClick = { vm.listShares() },
+              enabled = !state.isLoadingShares && server.isNotEmpty()
+            ) {
+              if (state.isLoadingShares) {
+                 CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+              } else {
+                 Text("List") // TODO: use string resource
+              }
+            }
+            DropdownMenu(
+              expanded = state.showShareSelection,
+              onDismissRequest = { vm.dismissShareSelection() }
+            ) {
+              if (state.availableShares.isEmpty()) {
+                 DropdownMenuItem(text = { Text("No shares found") }, onClick = { vm.dismissShareSelection() })
+              } else {
+                 state.availableShares.forEach { shareName ->
+                   DropdownMenuItem(
+                     text = { Text(shareName) },
+                     onClick = {
+                        vm.updateAddSmbState(share = shareName)
+                        vm.dismissShareSelection()
+                     }
+                   )
+                 }
+              }
+            }
+          }
         }
         EditField(domain, R.string.domain, isError = false) { // Need string for "Domain"
           vm.updateAddSmbState(domain = it)

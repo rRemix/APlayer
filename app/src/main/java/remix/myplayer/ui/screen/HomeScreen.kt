@@ -35,10 +35,13 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -140,24 +143,51 @@ fun HomeScreen() {
 
         CreatePlayListDialog()
 
+        var showAddRemoteMenu by remember { mutableStateOf(false) }
+
         val webDavVM = webDavViewModel
         val smbVM = smbViewModel
-        FAButton(
-          selectLibrary.tag == Library.TAG_PLAYLIST || 
-          selectLibrary.tag == Library.TAG_REMOTE || 
-          selectLibrary.tag == Library.TAG_SMB
-        ) {
-          if (mainVM.multiSelectState.value.isShowing()) {
-            return@FAButton
-          }
+        
+        Column {
+           if (showAddRemoteMenu) {
+              DropdownMenu(
+                 expanded = showAddRemoteMenu,
+                 onDismissRequest = { showAddRemoteMenu = false }
+              ) {
+                 DropdownMenuItem(
+                    text = { Text(stringResource(R.string.webdav)) },
+                    onClick = {
+                       showAddRemoteMenu = false
+                       webDavVM.showAddWebDavDialog()
+                    }
+                 )
+                 DropdownMenuItem(
+                    text = { Text(stringResource(R.string.smb)) },
+                    onClick = {
+                       showAddRemoteMenu = false
+                       smbVM.showAddSmbDialog()
+                    }
+                 )
+              }
+           }
 
-          if (selectLibrary.tag == Library.TAG_PLAYLIST) {
-            libraryVM.showCreatePlaylistDialog()
-          } else if (selectLibrary.tag == Library.TAG_REMOTE) {
-            webDavVM.showAddWebDavDialog()
-          } else if (selectLibrary.tag == Library.TAG_SMB) {
-            smbVM.showAddSmbDialog()
-          }
+           FAButton(
+             selectLibrary.tag == Library.TAG_PLAYLIST || 
+             selectLibrary.tag == Library.TAG_REMOTE || 
+             selectLibrary.tag == Library.TAG_SMB
+           ) {
+             if (mainVM.multiSelectState.value.isShowing()) {
+               return@FAButton
+             }
+ 
+             if (selectLibrary.tag == Library.TAG_PLAYLIST) {
+               libraryVM.showCreatePlaylistDialog()
+             } else if (selectLibrary.tag == Library.TAG_REMOTE) {
+               showAddRemoteMenu = true
+             } else if (selectLibrary.tag == Library.TAG_SMB) {
+               smbVM.showAddSmbDialog()
+             }
+           }
         }
 
       })

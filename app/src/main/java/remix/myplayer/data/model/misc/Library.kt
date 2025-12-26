@@ -145,8 +145,7 @@ data class Library(
       Library(TAG_GENRE),
       Library(TAG_PLAYLIST),
       Library(TAG_FOLDER),
-      Library(TAG_REMOTE),
-      Library(TAG_SMB)
+      Library(TAG_REMOTE)
     )
 
     val defaultLibrary = Library(TAG_SONG, 0)
