@@ -65,45 +65,10 @@ fun AddSmbDialog(
         EditField(server, R.string.webdav_hint_server, isError = server.isEmpty()) {
           vm.updateAddSmbState(server = it)
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Box(modifier = Modifier.weight(1f)) {
-            EditField(share, R.string.share, isError = share.isEmpty()) {
-              vm.updateAddSmbState(share = it)
-            }
-          }
-          Spacer(modifier = Modifier.width(8.dp))
-          Box {
-            TextButton(
-              onClick = { vm.listShares() },
-              enabled = !state.isLoadingShares && server.isNotEmpty()
-            ) {
-              if (state.isLoadingShares) {
-                 CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-              } else {
-                 Text("List") // TODO: use string resource
-              }
-            }
-            DropdownMenu(
-              expanded = state.showShareSelection,
-              onDismissRequest = { vm.dismissShareSelection() }
-            ) {
-              if (state.availableShares.isEmpty()) {
-                 DropdownMenuItem(text = { Text("No shares found") }, onClick = { vm.dismissShareSelection() })
-              } else {
-                 state.availableShares.forEach { shareName ->
-                   DropdownMenuItem(
-                     text = { Text(shareName) },
-                     onClick = {
-                        vm.updateAddSmbState(share = shareName)
-                        vm.dismissShareSelection()
-                     }
-                   )
-                 }
-              }
-            }
-          }
+        EditField(share, R.string.share, isError = share.isEmpty()) {
+          vm.updateAddSmbState(share = it)
         }
-        EditField(domain, R.string.domain, isError = false) { // Need string for "Domain"
+        EditField(domain, R.string.domain, isError = false) {
           vm.updateAddSmbState(domain = it)
         }
         EditField(

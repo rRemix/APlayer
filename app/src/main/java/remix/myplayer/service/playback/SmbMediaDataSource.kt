@@ -72,7 +72,7 @@ class SmbMediaDataSource(private val uriString: String) : MediaDataSource() {
             .withMultiProtocolNegotiate(true)
             .withSigningRequired(false) // 禁用签名
             .withDfsEnabled(false)
-            .withTimeout(60, TimeUnit.SECONDS) // 解析元数据不需要太长超时
+            .withTimeout(60, TimeUnit.SECONDS)
             .withSoTimeout(60, TimeUnit.SECONDS)
             .build()
 

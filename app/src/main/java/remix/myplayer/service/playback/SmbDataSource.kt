@@ -28,10 +28,7 @@ class SmbDataSource : BaseDataSource(true) {
     private var session: Session? = null
     private var diskShare: DiskShare? = null
     private var file: File? = null
-
-    // 使用缓冲流来减少网络 IO 次数
     private var bufferedInputStream: InputStream? = null
-
     private var dataSpec: DataSpec? = null
     private var bytesRemaining: Long = 0
     private var opened: Boolean = false
@@ -188,7 +185,6 @@ class SmbDataSource : BaseDataSource(true) {
     private fun cleanup() {
         try { bufferedInputStream?.close() } catch (e: Exception) {}
         bufferedInputStream = null
-
         try { file?.close() } catch (e: Exception) {}
         file = null
         try { diskShare?.close() } catch (e: Exception) {}

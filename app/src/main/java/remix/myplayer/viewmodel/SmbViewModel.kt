@@ -165,12 +165,6 @@ class SmbViewModel @Inject constructor(
     _addSmbState.update { it.copy(showShareSelection = false) }
   }
 
-  fun listShares() {
-    val state = _addSmbState.value
-    if (state.server.isEmpty()) return
-    remix.myplayer.ui.nav.MessageNotifier.show("此版本不支持自动检测共享。请手动输入共享名称。")
-  }
-
   suspend fun fetchMeta(song: Song.Remote) = fetchMetaDataUseCase(song)
 }
 
