@@ -42,7 +42,8 @@ import remix.myplayer.viewmodel.settingViewModel
 fun MultiSelectBar(
   state: MultiSelectState,
   scrollBehavior: TopAppBarScrollBehavior?,
-  parent: APlayerModel? = null
+  parent: APlayerModel? = null,
+  onSelectAll: (() -> Unit)? = null
 ) {
   val libraryVM = libraryViewModel
   val mainVM = mainViewModel
@@ -144,6 +145,11 @@ fun MultiSelectBar(
                   MultiSelectState.Where.Genre -> libraryVM.genres.value
                   MultiSelectState.Where.PlayList -> libraryVM.playLists.value
                   MultiSelectState.Where.Folder -> libraryVM.folders.value
+                  MultiSelectState.Where.LastAdded, MultiSelectState.Where.Search -> {
+                    onSelectAll?.invoke()
+                    return@launch
+                  }
+
                   MultiSelectState.Where.Detail -> withContext(Dispatchers.IO) {
                     libraryVM.loadSongsByModels(
                       listOf(parent!!)

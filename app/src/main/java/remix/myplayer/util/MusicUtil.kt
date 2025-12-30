@@ -106,7 +106,7 @@ object MusicUtil {
 //          .putExtra(MusicService.Companion.EXTRA_POSITION, 0)
 //      )
     } else {
-      MessageNotifier.show(R.string.play_failed)
+      MessageNotifier.show(R.string.play_failed, "")
     }
   }
 

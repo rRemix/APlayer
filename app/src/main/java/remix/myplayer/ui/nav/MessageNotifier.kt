@@ -41,7 +41,11 @@ object MessageNotifier {
 
 
   fun show(@StringRes resId: Int, vararg formatArgs: Any) {
-    val msg = App.context.getString(resId, *formatArgs)
+    val msg = if (formatArgs.isNotEmpty()) {
+      App.context.getString(resId, *formatArgs)
+    } else {
+      App.context.getString(resId)
+    }
     show(msg)
   }
 

@@ -1259,6 +1259,7 @@ class MusicService : BaseService(),
           pushPlaybackUiState()
           MessageNotifier.show(R.string.already_add_to_next_song)
         }
+
       }
       // 切换定时器
       Command.TOGGLE_TIMER -> {
