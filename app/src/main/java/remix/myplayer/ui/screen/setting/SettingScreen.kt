@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.misc.helper.EQHelper
 import remix.myplayer.ui.nav.LocalNavController
@@ -209,9 +210,11 @@ private fun OtherPreferences() {
     nav.navigate(RouteAbout)
   }
 
-  Preference(onClick = {
-    mainViewModel.checkInAppUpdate(true)
-  }, title = stringResource(R.string.check_update))
+  if (BuildConfig.ENABLE_UPDATER) {
+    Preference(onClick = {
+      mainViewModel.checkInAppUpdate(true)
+    }, title = stringResource(R.string.check_update))
+  }
 
   ClearCacheLogic()
 }

@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import remix.myplayer.BuildConfig
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.nav.AppNav
 import remix.myplayer.ui.nav.LocalNavController
@@ -72,8 +73,10 @@ class ComposeActivity : BaseMusicActivity() {
       }
     }
 
-    lifecycleScope.launch {
-      mainViewModel.checkInAppUpdate()
+    if (BuildConfig.ENABLE_UPDATER) {
+      lifecycleScope.launch {
+        mainViewModel.checkInAppUpdate()
+      }
     }
   }
 
