@@ -65,11 +65,11 @@ android {
           "BUGLY_APP_ID",
           "\"${properties.getProperty("BUGLY_APP_ID")}\""
         )
-        buildConfigField(
-            "String",
-            "GITHUB_SHA",
-            "\"${System.getenv("GITHUB_SHA")}\""
-        )
+//        buildConfigField(
+//            "String",
+//            "GITHUB_SHA",
+//            "\"${System.getenv("GITHUB_SHA")}\""
+//        )
 
         ndk {
             abiFilters += listOf(

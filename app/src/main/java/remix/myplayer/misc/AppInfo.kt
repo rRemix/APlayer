@@ -10,7 +10,6 @@ object AppInfo {
             VERSION_NAME: ${BuildConfig.VERSION_NAME}
             FLAVOR: ${BuildConfig.FLAVOR}
             BUILD_TYPE: ${BuildConfig.BUILD_TYPE}
-            GITHUB_SHA: ${BuildConfig.GITHUB_SHA}
         """.trimIndent()
     }
 }
