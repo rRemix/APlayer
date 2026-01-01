@@ -37,12 +37,15 @@ object AudioFileCoverUtils {
     }
 
     // Method 2: look for album art in external files
-    val parent = File(path).parentFile
-    for (fallback in FALLBACKS) {
-      val cover = File(parent, fallback)
-      if (cover.exists()) {
-        return FileInputStream(cover)
+    try {
+      val parent = File(path).parentFile
+      for (fallback in FALLBACKS) {
+        val cover = File(parent, fallback)
+        if (cover.exists()) {
+          return FileInputStream(cover)
+        }
       }
+    } catch (ignore: Exception) {
     }
     return null
   }

@@ -25,7 +25,7 @@ object PermissionUtil {
 
   fun hasNecessaryPermission(): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      has(Permission.READ_MEDIA_IMAGES, Permission.READ_MEDIA_IMAGES)
+      has(Permission.READ_MEDIA_AUDIO)
     } else {
       has(Permission.READ_EXTERNAL_STORAGE)
     }

@@ -175,7 +175,7 @@ open class BaseActivity : ComponentActivity(), CoroutineScope by MainScope() {
 
     val NECESSARY_PERMISSIONS =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        arrayOf(Permission.READ_MEDIA_AUDIO, Permission.READ_MEDIA_IMAGES)
+        arrayOf(Permission.READ_MEDIA_AUDIO)
       } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
         arrayOf(
           Permission.READ_EXTERNAL_STORAGE,

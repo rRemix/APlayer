@@ -128,7 +128,6 @@ private fun MacrobenchmarkScope.grantPermissions(packageName: String) {
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
       listOf(
         Manifest.permission.READ_MEDIA_AUDIO,
-        Manifest.permission.READ_MEDIA_IMAGES,
         Manifest.permission.POST_NOTIFICATIONS,
       )
     }
