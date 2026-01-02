@@ -133,6 +133,7 @@ class SettingViewModel @Inject constructor(
     // load libraries
     val libraries = try {
       Json.decodeFromString<List<Library>>(settingPrefs.libraryJson)
+        .ifEmpty { Library.allLibraries }
     } catch (_: Exception) {
       Library.allLibraries
     }

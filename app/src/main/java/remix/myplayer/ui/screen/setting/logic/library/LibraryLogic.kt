@@ -38,6 +38,9 @@ fun LibraryLogic() {
     itemRes = Library.allLibraries.map { it.stringRes },
     onPositive = {
       val newLibraries = selectedIndicates.toSortedSet().map { Library(it) }
+      if (newLibraries.isEmpty()) {
+        return@NormalDialog
+      }
       if (libraries == newLibraries) {
         return@NormalDialog
       }
