@@ -40,7 +40,8 @@ fun ViewPager(
     state = pagerState,
     beyondViewportPageCount = 1
   ) { page ->
-    when (libraries[page].tag) {
+    val library = libraries.getOrNull(page) ?: return@HorizontalPager
+    when (library.tag) {
       Library.TAG_SONG -> SongScreen(scrollToCurrentEvent)
       Library.TAG_ALBUM -> AlbumScreen()
       Library.TAG_ARTIST -> ArtistScreen()
@@ -53,7 +54,9 @@ fun ViewPager(
   }
 
   LaunchedEffect(pagerState.currentPage) {
-    vm.changeLibrary(libraries[pagerState.currentPage])
+    libraries.getOrNull(pagerState.currentPage)?.let {
+      vm.changeLibrary(it)
+    }
   }
 }
 

@@ -131,9 +131,9 @@ fun HomeScreen() {
         }
       },
       floatingActionButton = {
-        val selectLibrary by remember {
+        val selectLibrary by remember(libraries) {
           derivedStateOf {
-            libraries[pagerState.currentPage]
+            libraries.getOrElse(pagerState.currentPage) { libraries.first() }
           }
         }
 
