@@ -14,6 +14,8 @@ fun FolderDialog(
   onPositive: (String) -> Unit,
 ) {
   val folderState = FolderState(File(initialFolder))
+  val contents = folderState.contents
+  val canGoUp = folderState.canGoUp
   NormalDialog(
     dialogState = dialogState,
     autoDismiss = false,
@@ -21,8 +23,8 @@ fun FolderDialog(
     positive = stringResource(R.string.choose_folder),
     onPositive = { onPositive(folderState.currentFolder.absolutePath) },
     onNegative = { dialogState.dismiss() },
-    items = folderState.contents.map { it.name }.toMutableList().apply {
-      if (folderState.canGoUp) {
+    items = contents.map { it.name }.toMutableList().apply {
+      if (canGoUp) {
         add(0, "..")
       }
     },
@@ -30,7 +32,7 @@ fun FolderDialog(
       val newFolder = if (str == "..") {
         folderState.parentFolder ?: return@NormalDialog
       } else {
-        folderState.contents[if (folderState.canGoUp) index - 1 else index]
+        contents.getOrNull(if (canGoUp) index - 1 else index) ?: return@NormalDialog
       }
       onFolderSelection(newFolder)
     }
