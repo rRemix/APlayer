@@ -53,6 +53,8 @@ class PlayQueueRepoImpl @Inject constructor(
     return playQueueDao.insert(
       queue
         .filter { it.id !in oldAudioIds }
+        // 某一首歌曲可能同时存在于列表A、B，然后添加到播放队列
+        .distinctBy { it.id }
         .map { song ->
           PlayQueue(song.id, song.title, song.data).apply {
             if (song is Song.Remote) {
