@@ -334,16 +334,23 @@ class LyricManager @Inject constructor(
   }
 
   private fun getProgressOfLine(line: LyricLine, time: Long, endTime: Long): Double {
-    try {
-      require(time in line.time..endTime)
-    } catch (e: IllegalArgumentException) {
-      Timber.w("time: $time, endTime: $endTime, line: ${line.time}")
-      throw e
+    if (endTime <= line.time) {
+      Timber.tag(TAG).w("Invalid line range, time=$time, lineTime=${line.time}, endTime=$endTime")
+      return when (line) {
+        is PerWordLyricLine -> if (time > line.time) line.words.size.toDouble() else 0.0
+        else -> if (time > line.time) 1.0 else 0.0
+      }
     }
+
+    val clampedTime = time.coerceIn(line.time, endTime)
+    if (clampedTime != time) {
+      Timber.tag(TAG).w("Clamped time, time=$time, lineTime=${line.time}, endTime=$endTime")
+    }
+
     return if (line is PerWordLyricLine) {
-      line.getProgress(time, endTime)
+      line.getProgress(clampedTime, endTime)
     } else {
-      (time - line.time).toDouble() / (endTime - line.time)
+      (clampedTime - line.time).toDouble() / (endTime - line.time)
     }
   }
 
@@ -434,8 +441,9 @@ class LyricManager @Inject constructor(
     try {
 //      Timber.tag(TAG).d("update progress")
       updateProgressJob?.cancel()
-      progress = MusicStateSource.currentProgressState.position
-      duration = MusicStateSource.currentProgressState.duration
+      val state = MusicStateSource.currentProgressState
+      duration = state.duration
+      progress = state.position
       if (isPlaying) {
         updateProgressJob = launch(Dispatchers.IO) {
           // TODO: should we consider thread create cost?

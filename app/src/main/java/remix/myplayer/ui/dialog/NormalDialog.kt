@@ -148,7 +148,9 @@ fun NormalDialog(
                     if (autoDismiss) {
                       dialogState.dismiss()
                     }
-                    itemsCallback(index, items[index])
+                    if (index in items.indices) {
+                      itemsCallback(index, items[index])
+                    }
                   }
                   .fillMaxWidth()
                   .padding(vertical = 12.dp)
