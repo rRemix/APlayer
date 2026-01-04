@@ -27,6 +27,7 @@ interface PlayListRepository {
   suspend fun toggleFavorite(id: Long)
   suspend fun getFavorite(): PlayList?
   suspend fun removeAudioIdsFromAll(audioIds: List<Long>): Int
+  suspend fun checkPlayListExist(name: String): Boolean
 }
 
 class PlayListRepoImpl @Inject constructor(
@@ -106,5 +107,9 @@ class PlayListRepoImpl @Inject constructor(
       if (filtered.size != pl.audioIds.size) pl.copy(audioIds = ArrayList(filtered)) else null
     }
     return if (updated.isEmpty()) 0 else playListDao.update(updated)
+  }
+
+  override suspend fun checkPlayListExist(name: String): Boolean {
+    return playListDao.exists(name)
   }
 }

@@ -136,6 +136,7 @@ class SettingPrefs @Inject constructor(
   var enableEq by PrefsDelegate(sp, PrefKeys.Setting.ENABLE_EQ, false)
 
   var checkMigration16600 by PrefsDelegate(sp, "check_migration_16600", false)
+  var checkMigration20100 by PrefsDelegate(sp, "check_migration_20100", false)
 
   companion object {
 

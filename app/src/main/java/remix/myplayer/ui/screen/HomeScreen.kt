@@ -73,8 +73,6 @@ import remix.myplayer.viewmodel.webDavViewModel
 fun HomeScreen() {
   val mainVM = mainViewModel
   val libraryVM = libraryViewModel
-  val navController = LocalNavController.current
-  val context = LocalContext.current
 
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val drawerState = rememberDrawerState(DrawerValue.Closed)

@@ -7,11 +7,7 @@ import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication
 import com.hjq.permissions.XXPermissions
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import remix.myplayer.data.db.room.AppDatabase
-import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.misc.helper.AppMigration
 import remix.myplayer.misc.helper.LanguageHelper.onConfigurationChanged
 import remix.myplayer.misc.helper.LanguageHelper.saveSystemCurrentLanguage
 import remix.myplayer.misc.helper.LanguageHelper.setApplicationLanguage
@@ -30,10 +26,7 @@ import javax.inject.Inject
 class App : MultiDexApplication() {
 
   @Inject
-  lateinit var settingPrefs: SettingPrefs
-
-  @Inject
-  lateinit var database: AppDatabase
+  lateinit var appMigration: AppMigration
 
   override fun attachBaseContext(base: Context) {
     saveSystemCurrentLanguage()
@@ -45,7 +38,7 @@ class App : MultiDexApplication() {
     super.onCreate()
     context = this
 
-    checkMigration()
+    appMigration.check()
     setUp()
 
     // AppShortcut
@@ -59,15 +52,6 @@ class App : MultiDexApplication() {
     registerActivityLifecycleCallbacks(APlayerActivityManager())
 
     hackTabMinWidth()
-  }
-
-  private fun checkMigration() {
-    if (!settingPrefs.checkMigration16600) {
-      settingPrefs.checkMigration16600 = true
-      CoroutineScope(Dispatchers.Main).launch {
-        database.playQueueDao().clear()
-      }
-    }
   }
 
   private fun setUp() {

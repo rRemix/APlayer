@@ -17,6 +17,9 @@ interface PlayListDao {
   @Query("SELECT * FROM PlayList WHERE id = 1 LIMIT 1")
   suspend fun getFavorite(): PlayList?
 
+  @Query("SELECT EXISTS(SELECT * FROM PlayList WHERE name = :name)")
+  suspend fun exists(name: String): Boolean
+
   @Insert(onConflict = OnConflictStrategy.ABORT)
   suspend fun insert(playlist: PlayList): Long
 

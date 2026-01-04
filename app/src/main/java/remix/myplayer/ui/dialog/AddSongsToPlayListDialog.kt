@@ -49,9 +49,7 @@ fun AddSongsToPlayListDialog() {
       settingVM.updateImportPlayListState(it)
     }
   ) { input ->
-    if (allPlaylists.any { it.name == input }) {
-      MessageNotifier.show(R.string.playlist_already_exist)
-    } else if (input.isNotBlank()) {
+    if (input.isNotBlank()) {
       scope.runWithLoading {
         libraryVM.addSongsToPlayList(state.songIds, input, true)
       }

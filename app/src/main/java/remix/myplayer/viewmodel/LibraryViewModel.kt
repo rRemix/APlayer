@@ -116,6 +116,11 @@ class LibraryViewModel @Inject constructor(
 
   fun insertPlayList(name: String, onSuccess: (Long) -> Unit) {
     viewModelScope.launch {
+      if (playListRepo.checkPlayListExist(name)) {
+        MessageNotifier.show(R.string.playlist_already_exist)
+        return@launch
+      }
+
       val id = playListRepo.insertPlayList(name)
       onSuccess(id)
     }
@@ -125,6 +130,11 @@ class LibraryViewModel @Inject constructor(
     viewModelScope.launch {
       try {
         if (createNew) {
+          if (playListRepo.checkPlayListExist(playListName)) {
+            MessageNotifier.show(R.string.playlist_already_exist)
+            return@launch
+          }
+
           playListRepo.insertPlayList(playListName)
         }
 
@@ -155,6 +165,12 @@ class LibraryViewModel @Inject constructor(
   fun updatePlayList(playList: PlayList) {
     viewModelScope.launch {
       try {
+        val duplicate = playLists.value.find { it.name == playList.name && it.id != playList.id }
+        if (duplicate != null) {
+          MessageNotifier.show(R.string.playlist_already_exist)
+          return@launch
+        }
+
         playListRepo.updatePlayList(playList)
         uriFetcher.updatePlayListVersion()
         uriFetcher.clearAllCache()
