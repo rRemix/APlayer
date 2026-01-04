@@ -89,20 +89,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Python
-        if: success()
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Upload Mapping to Bugly
-        if: success()
-        env:
-          BUGLY_APP_ID: ${{ secrets.BUGLY_APP_ID }}
-          BUGLY_APP_KEY: ${{ secrets.BUGLY_APP_KEY }}
-        run: |
-          pip install requests
-          python .github/scripts/upload_mapping.py    
+#      - name: Setup Python
+#        if: success()
+#        uses: actions/setup-python@v5
+#        with:
+#          python-version: '3.x'
+#
+#      - name: Upload Mapping to Bugly
+#        if: success()
+#        env:
+#          BUGLY_APP_ID: ${{ secrets.BUGLY_APP_ID }}
+#          BUGLY_APP_KEY: ${{ secrets.BUGLY_APP_KEY }}
+#        run: |
+#          pip install requests
+#          python .github/scripts/upload_mapping.py
 
 #      - name: Upload nightly artifact
 #        uses: actions/upload-artifact@v4
