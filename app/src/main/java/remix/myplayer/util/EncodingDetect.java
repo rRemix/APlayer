@@ -34,6 +34,16 @@ public class EncodingDetect {
     return BytesEncodingDetect.javaname[s.detectEncoding(new File(filePath))];
   }
 
+  /**
+   * 获取字节数组编码
+   * @param data
+   * @return
+   */
+  public static String getJavaEncode(byte[] data) {
+    BytesEncodingDetect s = new BytesEncodingDetect();
+    return BytesEncodingDetect.javaname[s.detectEncoding(data)];
+  }
+
   static class BytesEncodingDetect extends Encoding {
 
     // Frequency tables to hold the GB, Big5, and EUC-TW character

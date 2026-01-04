@@ -2,7 +2,9 @@ package remix.myplayer.lyric
 
 import android.annotation.SuppressLint
 import androidx.core.text.HtmlCompat
+import remix.myplayer.util.EncodingDetect
 import timber.log.Timber
+import java.nio.charset.Charset
 import kotlin.math.roundToLong
 
 object LrcParser {
@@ -62,6 +64,16 @@ object LrcParser {
     }
     words.add(Word(currentTime, decodeEntities(content.substring(lastStart))))
     return PerWordLyricLine(time, words)
+  }
+
+  fun parse(data: ByteArray): ArrayList<LyricLine> {
+    val encoding = runCatching { EncodingDetect.getJavaEncode(data) }.getOrDefault("UTF-8")
+    val content = runCatching { String(data, Charset.forName(encoding)) }
+      .getOrElse {
+        Timber.tag(TAG).w(it, "Failed to decode lyrics with detected encoding: $encoding")
+        String(data)
+      }
+    return parse(content)
   }
 
   fun parse(data: String): ArrayList<LyricLine> {

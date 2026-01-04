@@ -20,7 +20,7 @@ class UriProvider(private val context: Context, private val uri: Uri) : ILyricsP
     return try {
       context.contentResolver.openInputStream(uri)!!.run {
         try {
-          LyricsResult(LrcParser.parse(readBytes().decodeToString()), id)
+          LyricsResult(LrcParser.parse(readBytes()), id)
         } catch (t: Throwable) {
           throw t
         } finally {
