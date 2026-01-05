@@ -56,6 +56,9 @@ import remix.myplayer.ui.screen.playing.PlayingScreen
 import remix.myplayer.ui.screen.setting.SettingScreen
 import remix.myplayer.ui.screen.webdav.WebDavDetailScreen
 import remix.myplayer.ui.screen.webdav.WebDavScreen
+import remix.myplayer.ui.screen.smb.SmbDetailScreen
+import remix.myplayer.ui.screen.smb.SmbScreen
+import remix.myplayer.data.db.room.entity.Smb
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
@@ -69,6 +72,7 @@ const val RouteLastAdded = "last_added"
 const val RouteHistory = "history"
 const val RouteSearch = "search"
 const val RouteWebDav = "webdav"
+const val RouteSmb = "smb"
 const val RouteCrop = "crop"
 const val RouteEq = "eq"
 const val RouteSupport = "support"
@@ -173,6 +177,20 @@ fun AppNav() {
         ) {
           val webDav = it.toRoute<WebDav>()
           WebDavDetailScreen(webDav)
+        }
+
+        normalAnimatedScreen(RouteSmb) {
+          SmbScreen()
+        }
+
+        composable<Smb>(
+          enterTransition = enterTransition(),
+          exitTransition = exitTransition(),
+          popEnterTransition = popEnterTransition(),
+          popExitTransition = popExitTransition(),
+        ) {
+          val smb = it.toRoute<Smb>()
+          SmbDetailScreen(smb)
         }
 
         normalAnimatedScreen(

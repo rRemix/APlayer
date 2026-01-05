@@ -136,7 +136,7 @@ class SettingViewModel @Inject constructor(
         .ifEmpty { Library.allLibraries }
     } catch (_: Exception) {
       Library.allLibraries
-    }
+    }.filter { it.tag != Library.TAG_SMB }
 
     setAllLibraries(libraries)
 

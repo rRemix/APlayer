@@ -84,3 +84,26 @@
 
 # With R8 full mode generic signatures are stripped for classes that are not kept.
 -keep,allowobfuscation,allowshrinking class retrofit2.Response
+
+
+-dontwarn org.ietf.jgss.**
+-dontwarn javax.el.**
+
+-keep class com.hierynomus.** { *; }
+-keep interface com.hierynomus.** { *; }
+
+-keep class com.rapid7.** { *; }
+
+-keep class org.bouncycastle.** { *; }
+-dontwarn org.bouncycastle.**
+-dontwarn net.engio.mbassy.**
+
+-dontwarn javax.el.**
+-dontwarn net.engio.mbassy.**
+
+-keep class net.engio.mbassy.** { *; }
+-keep interface net.engio.mbassy.** { *; }
+
+-keepclassmembers class * {
+    @**.Handler <methods>;
+}

@@ -13,6 +13,7 @@ import kotlinx.coroutines.withContext
 import remix.myplayer.data.db.room.dao.MetaDataCacheDao
 import remix.myplayer.data.db.room.entity.MetaDataCache
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.service.playback.SmbMediaDataSource
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -83,7 +84,12 @@ class FetchMetaDataUseCase @Inject constructor(
     val start = System.currentTimeMillis()
     val metadataRetriever = MediaMetadataRetriever()
     try {
-      metadataRetriever.setDataSource(song.data, song.headers)
+      if (song.data.startsWith("smb://") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val smbDataSource = SmbMediaDataSource(song.data)
+        metadataRetriever.setDataSource(smbDataSource)
+      } else {
+        metadataRetriever.setDataSource(song.data, song.headers)
+      }
       val title =
         metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
           ?: song.title

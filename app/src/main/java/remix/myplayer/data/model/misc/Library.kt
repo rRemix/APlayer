@@ -21,6 +21,7 @@ data class Library(
       TAG_GENRE -> R.string.tab_genre
       TAG_FOLDER -> R.string.tab_folder
       TAG_REMOTE -> R.string.tab_remote
+      TAG_SMB -> R.string.tab_smb
       else -> throw IllegalArgumentException("unknown tag: $tag")
     }
 
@@ -61,6 +62,8 @@ data class Library(
         R.string.genre,
         R.string.genre_desc
       )
+
+      TAG_SMB -> emptyList()
 
       else -> throw IllegalArgumentException("unknown tag: $tag")
     }
@@ -103,6 +106,8 @@ data class Library(
         SortOrder.GENRE_Z_A
       )
 
+      TAG_SMB -> emptyList()
+
       else -> throw IllegalArgumentException("unknown tag: $tag")
     }
 
@@ -116,6 +121,7 @@ data class Library(
         TAG_GENRE -> R.string.tab_genre
         TAG_FOLDER -> R.string.tab_folder
         TAG_REMOTE -> R.string.tab_remote
+        TAG_SMB -> R.string.tab_smb
         else -> throw IllegalArgumentException("unknown tag: $tag")
       }
     )
@@ -130,6 +136,7 @@ data class Library(
     const val TAG_PLAYLIST = 4
     const val TAG_FOLDER = 5
     const val TAG_REMOTE = 6
+    const val TAG_SMB = 7
 
     val allLibraries = listOf(
       Library(TAG_SONG),
@@ -152,6 +159,7 @@ data class Library(
         context.resources.getString(R.string.tab_playlist),
         context.resources.getString(R.string.tab_folder),
         context.resources.getString(R.string.tab_remote),
+        context.resources.getString(R.string.tab_smb),
       )
     }
   }

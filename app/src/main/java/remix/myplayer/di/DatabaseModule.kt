@@ -48,4 +48,9 @@ object DatabaseModule {
   fun provideMetaDataCacheDao(database: AppDatabase): MetaDataCacheDao {
     return database.metaDataCacheDao()
   }
+
+  @Provides
+  fun provideSmbDao(database: AppDatabase): remix.myplayer.data.db.room.dao.SmbDao {
+    return database.smbDao()
+  }
 }

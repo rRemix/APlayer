@@ -18,11 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
+import remix.myplayer.data.db.room.entity.Smb
 import remix.myplayer.data.db.room.entity.WebDav
 import remix.myplayer.ui.clickWithRipple
+import remix.myplayer.ui.dialog.AddSmbDialog
 import remix.myplayer.ui.dialog.AddWebDavDialog
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
@@ -31,7 +34,9 @@ import remix.myplayer.ui.theme.icon
 import remix.myplayer.ui.widget.common.PopupButton
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
+import remix.myplayer.viewmodel.SmbViewModel
 import remix.myplayer.viewmodel.WebDavViewModel
+import remix.myplayer.viewmodel.smbViewModel
 import remix.myplayer.viewmodel.webDavViewModel
 
 @Composable
@@ -39,33 +44,72 @@ fun RemoteScreen() {
   val nav = LocalNavController.current
 
   val webDavVM = webDavViewModel
+  val smbVM = smbViewModel
   val webdavList by webDavVM.webDavList.collectAsStateWithLifecycle()
+  val smbList by smbVM.smbList.collectAsStateWithLifecycle()
 
   LazyColumn(modifier = Modifier.fillMaxSize()) {
-    items(webdavList, key = { it.id }) { webDav ->
-      WebDavItem(webDav) { res ->
-        when (res) {
-          R.string.connect -> {
-            nav.navigate(webDav)
-          }
+    if (webdavList.isNotEmpty()) {
+      item {
+        ListHeader(R.string.webdav)
+      }
+      items(webdavList, key = { "webdav_${it.id}" }) { webDav ->
+        WebDavItem(webDav) { res ->
+          when (res) {
+            R.string.connect -> {
+              nav.navigate(webDav)
+            }
 
-          R.string.edit -> {
-            webDavVM.showAddWebDavDialog(webDav)
-          }
+            R.string.edit -> {
+              webDavVM.showAddWebDavDialog(webDav)
+            }
 
-          R.string.delete -> {
-            webDavVM.deleteWebDav(webDav)
+            R.string.delete -> {
+              webDavVM.deleteWebDav(webDav)
+            }
+          }
+        }
+      }
+    }
+
+    if (smbList.isNotEmpty()) {
+      item {
+        ListHeader(R.string.smb)
+      }
+      items(smbList, key = { "smb_${it.id}" }) { smb ->
+        SmbItem(smb) { res ->
+          when (res) {
+            R.string.connect -> {
+              nav.navigate(smb)
+            }
+
+            R.string.edit -> {
+              smbVM.showAddSmbDialog(smb)
+            }
+
+            R.string.delete -> {
+              smbVM.deleteSmb(smb)
+            }
           }
         }
       }
     }
   }
 
-  Dialogs(webDavVM)
+  Dialogs(webDavVM, smbVM)
 }
 
 @Composable
-private fun Dialogs(webDavVM: WebDavViewModel) {
+private fun ListHeader(p: Int) {
+  TextPrimary(
+    stringResource(p), modifier = Modifier
+      .padding(horizontal = 16.dp)
+      .padding(top = 16.dp, bottom = 8.dp)
+  )
+}
+
+@Composable
+private fun Dialogs(webDavVM: WebDavViewModel, smbVM: SmbViewModel) {
   val context = LocalContext.current
 
   AddWebDavDialog { alias, account, pwd, server, editWebDav ->
@@ -103,6 +147,54 @@ private fun Dialogs(webDavVM: WebDavViewModel) {
       webDavVM.insertOrReplaceWebDav(updated)
     } else {
       webDavVM.insertOrReplaceWebDav(WebDav(alias, account, pwd, server.removeSuffix("/"), server))
+    }
+  }
+
+  AddSmbDialog(smbVM) { alias, domain, account, pwd, server, share, editSmb ->
+    if (alias.isEmpty()) {
+      MessageNotifier.show(R.string.can_t_be_empty, context.getString(R.string.alias))
+      return@AddSmbDialog
+    }
+
+    if (account.isEmpty()) {
+      MessageNotifier.show(R.string.can_t_be_empty, context.getString(R.string.account))
+      return@AddSmbDialog
+    }
+
+    if (pwd.isEmpty()) {
+      MessageNotifier.show(R.string.can_t_be_empty, context.getString(R.string.pwd))
+      return@AddSmbDialog
+    }
+
+    if (server.isEmpty()) {
+      MessageNotifier.show(
+        R.string.can_t_be_empty,
+        context.getString(R.string.webdav_hint_server)
+      )
+      return@AddSmbDialog
+    }
+
+    if (share.isEmpty()) {
+      MessageNotifier.show(
+        R.string.can_t_be_empty,
+        context.getString(R.string.share)
+      )
+      return@AddSmbDialog
+    }
+
+    if (editSmb != null) {
+      val updated = editSmb.copy(
+        alias = alias,
+        domain = if (domain.isEmpty()) null else domain,
+        account = account,
+        pwd = pwd,
+        server = server,
+        share = share,
+        lastPath = "",
+      ).also { it.id = editSmb.id }
+      smbVM.insertOrReplaceSmb(updated)
+    } else {
+      smbVM.insertOrReplaceSmb(Smb(alias, if (domain.isEmpty()) null else domain, account, pwd, server, share, ""))
     }
   }
 }
@@ -143,6 +235,47 @@ private fun WebDavItem(webDav: WebDav, onMenuClick: (Int) -> Unit) {
     PopupButton(
       listOf(R.string.connect, R.string.edit, R.string.delete),
       contentDescription = "WebDavPopupButton",
+      onMenuClick = onMenuClick
+    )
+  }
+}
+
+@Composable
+private fun SmbItem(smb: Smb, onMenuClick: (Int) -> Unit) {
+  val theme = LocalTheme.current
+  val nav = LocalNavController.current
+
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .height(56.dp)
+      .clickWithRipple(false) {
+        nav.navigate(smb)
+      }
+      .background(theme.mainBackground),
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    Icon(
+      modifier = Modifier.padding(start = 12.dp),
+      painter = painterResource(R.drawable.icon_webdav),
+      contentDescription = "IconSmbItem",
+      tint = theme.icon()
+    )
+
+    Column(
+      modifier = Modifier
+        .padding(horizontal = 12.dp)
+        .weight(1f),
+      horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Center
+    ) {
+      TextPrimary(smb.alias)
+      Spacer(Modifier.height(4.dp))
+      TextSecondary(smb.account)
+    }
+
+    PopupButton(
+      listOf(R.string.connect, R.string.edit, R.string.delete),
+      contentDescription = "SmbPopupButton",
       onMenuClick = onMenuClick
     )
   }
