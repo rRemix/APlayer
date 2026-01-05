@@ -44,8 +44,8 @@ android {
         minSdk = 21
         targetSdk = 33
 
-        versionCode = 20100
-        versionName = "2.0.1.0"
+        versionCode = 20200
+        versionName = "2.0.2.0"
 
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled = true
