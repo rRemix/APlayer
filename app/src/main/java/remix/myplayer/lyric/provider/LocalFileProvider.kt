@@ -32,16 +32,20 @@ class LocalFileProvider @Inject constructor(
 
   private fun getLocalLyricPath(song: Song): String {
     var path = ""
+    val searchKeys = getLocalSearchKey(song)
+    val selection = StringBuilder()
+    for (i in searchKeys.indices) {
+      if (i != 0) {
+        selection.append(" or ")
+      }
+      selection.append(MediaStore.Files.FileColumns.DATA).append(" like ?")
+    }
+
     //没有设置歌词路径 搜索所有可能的歌词文件
     context.contentResolver.query(
       MediaStore.Files.getContentUri("external"), null,
-      MediaStore.Files.FileColumns.DATA + " like ? or " +
-          MediaStore.Files.FileColumns.DATA + " like ? or " +
-          MediaStore.Files.FileColumns.DATA + " like ? or " +
-          MediaStore.Files.FileColumns.DATA + " like ? or " +
-          MediaStore.Files.FileColumns.DATA + " like ? or " +
-          MediaStore.Files.FileColumns.DATA + " like ?",
-      getLocalSearchKey(song),
+      selection.toString(),
+      searchKeys,
       null
     )
       .use { filesCursor ->
@@ -68,18 +72,25 @@ class LocalFileProvider @Inject constructor(
    * displayName.lrc
    * title.lrc
    * title-artist.lrc
-   * displayname-artist.lrc
+   * displayName-artist.lrc
    * artist-title.lrc
+   * filename.lrc
    */
-  private fun getLocalSearchKey(song: Song, searchPath: String? = null): Array<String> {
-    return arrayOf(
-      "%${song.artist}%$displayName$SUFFIX_LYRIC",
-      "%$displayName$SUFFIX_LYRIC",
-      "%${song.title}$SUFFIX_LYRIC",
-      "%${song.title}%${song.artist}$SUFFIX_LYRIC",
-      "%${song.displayName}%${song.artist}$SUFFIX_LYRIC",
-      "%${song.artist}%${song.title}$SUFFIX_LYRIC"
-    )
+  private fun getLocalSearchKey(song: Song): Array<String> {
+    val keys = ArrayList<String>()
+    keys.add("%${song.artist}%${song.displayName}$SUFFIX_LYRIC")
+    keys.add("%${song.displayName}$SUFFIX_LYRIC")
+    keys.add("%${song.title}$SUFFIX_LYRIC")
+    keys.add("%${song.title}%${song.artist}$SUFFIX_LYRIC")
+    keys.add("%${song.displayName}%${song.artist}$SUFFIX_LYRIC")
+    keys.add("%${song.artist}%${song.title}$SUFFIX_LYRIC")
+
+    // 文件名匹配
+    val filename = song.data.substringAfterLast(File.separatorChar).substringBeforeLast('.')
+    if (filename.isNotEmpty()) {
+      keys.add("%$filename$SUFFIX_LYRIC")
+    }
+    return keys.toTypedArray()
   }
 
   companion object {
