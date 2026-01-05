@@ -16,6 +16,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,17 +37,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,7 +56,6 @@ import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.model.misc.Library
 import remix.myplayer.ui.dialog.CreatePlayListDialog
-import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.BottomBar
 import remix.myplayer.ui.widget.app.Drawer
@@ -69,8 +67,8 @@ import remix.myplayer.ui.widget.popup.ScreenPopupButton
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.settingViewModel
-import remix.myplayer.viewmodel.webDavViewModel
 import remix.myplayer.viewmodel.smbViewModel
+import remix.myplayer.viewmodel.webDavViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
@@ -145,47 +143,54 @@ fun HomeScreen() {
 
         val webDavVM = webDavViewModel
         val smbVM = smbViewModel
-        
-        Column {
-           if (showAddRemoteMenu) {
-              DropdownMenu(
-                 expanded = showAddRemoteMenu,
-                 onDismissRequest = { showAddRemoteMenu = false }
-              ) {
-                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.webdav)) },
-                    onClick = {
-                       showAddRemoteMenu = false
-                       webDavVM.showAddWebDavDialog()
-                    }
-                 )
-                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.smb)) },
-                    onClick = {
-                       showAddRemoteMenu = false
-                       smbVM.showAddSmbDialog()
-                    }
-                 )
-              }
-           }
 
-           FAButton(
-             selectLibrary.tag == Library.TAG_PLAYLIST || 
-             selectLibrary.tag == Library.TAG_REMOTE || 
-             selectLibrary.tag == Library.TAG_SMB
-           ) {
-             if (mainVM.multiSelectState.value.isShowing()) {
-               return@FAButton
-             }
- 
-             if (selectLibrary.tag == Library.TAG_PLAYLIST) {
-               libraryVM.showCreatePlaylistDialog()
-             } else if (selectLibrary.tag == Library.TAG_REMOTE) {
-               showAddRemoteMenu = true
-             } else if (selectLibrary.tag == Library.TAG_SMB) {
-               smbVM.showAddSmbDialog()
-             }
-           }
+        Column {
+          if (showAddRemoteMenu) {
+            DropdownMenu(
+              expanded = showAddRemoteMenu,
+              containerColor = LocalTheme.current.dialogBackground,
+              onDismissRequest = { showAddRemoteMenu = false }
+            ) {
+              DropdownMenuItem(
+                text = {
+                  Text(
+                    stringResource(R.string.webdav),
+                    color = LocalTheme.current.textPrimary
+                  )
+                },
+                onClick = {
+                  showAddRemoteMenu = false
+                  webDavVM.showAddWebDavDialog()
+                }
+              )
+              DropdownMenuItem(
+                text = {
+                  Text(
+                    stringResource(R.string.smb),
+                    color = LocalTheme.current.textPrimary
+                  )
+                },
+                onClick = {
+                  showAddRemoteMenu = false
+                  smbVM.showAddSmbDialog()
+                }
+              )
+            }
+          }
+
+          FAButton(
+            selectLibrary.tag == Library.TAG_PLAYLIST || selectLibrary.tag == Library.TAG_REMOTE
+          ) {
+            if (mainVM.multiSelectState.value.isShowing()) {
+              return@FAButton
+            }
+
+            if (selectLibrary.tag == Library.TAG_PLAYLIST) {
+              libraryVM.showCreatePlaylistDialog()
+            } else if (selectLibrary.tag == Library.TAG_REMOTE) {
+              showAddRemoteMenu = true
+            }
+          }
         }
 
       })

@@ -78,18 +78,7 @@ fun WebDavDetailScreen(webDav: WebDav) {
       save = { it.toList() },
       restore = { it.toMutableStateList() })
   ) {
-    val root = webDav.server.removeSuffix("/")
-    val current = webDav.lastUrl.removeSuffix("/")
-    val initial = if (current.startsWith(root)) {
-      current.removePrefix(root)
-        .trimStart('/')
-        .split('/')
-        .filter { it.isNotEmpty() }
-        .runningFold(root) { acc, part -> "$acc/$part" }
-    } else {
-      listOf(webDav.lastUrl)
-    }
-    initial.toMutableStateList()
+    webDav.buildPathStack(webDav.lastUrl).toMutableStateList()
   }
   val currentUrl = pathStack.last()
 
@@ -178,7 +167,7 @@ fun WebDavDetailScreen(webDav: WebDav) {
 
                 if (resource.isDirectory) {
                   // 进入下级目录
-                  pathStack.add(webDav.base().plus(resource.path))
+                  pathStack.add(webDav.generateUrl(resource.path))
                 } else {
                   // 过滤列表内所有音乐并设置为播放列表
                   if (davResources.isEmpty()) {
@@ -190,7 +179,7 @@ fun WebDavDetailScreen(webDav: WebDav) {
                     .map {
                       val remote = Song.Remote(
                         title = it.name.substringBeforeLast('.'),
-                        data = webDav.base().plus(it.path),
+                        data = webDav.generateUrl(it.path),
                         size = it.contentLength,
                         dateModified = it.creation?.time ?: 0,
                         account = webDav.account,
@@ -213,7 +202,7 @@ fun WebDavDetailScreen(webDav: WebDav) {
               onMenuClick = {
                 val song = Song.Remote(
                   title = resource.name.substringBeforeLast('.'),
-                  data = webDav.base().plus(resource.path),
+                  data = webDav.generateUrl(resource.path),
                   size = resource.contentLength,
                   dateModified = resource.creation?.time ?: 0,
                   account = webDav.account,
@@ -241,7 +230,7 @@ fun WebDavDetailScreen(webDav: WebDav) {
                   R.string.delete -> {
                     scope.runWithLoading {
                       withContext(Dispatchers.IO) {
-                        sardine.delete(webDav.base().plus(resource.path))
+                        sardine.delete(webDav.generateUrl(resource.path))
                       }
                       refreshTrigger++
                     }

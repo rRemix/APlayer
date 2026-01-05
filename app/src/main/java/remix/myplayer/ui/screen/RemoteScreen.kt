@@ -182,19 +182,30 @@ private fun Dialogs(webDavVM: WebDavViewModel, smbVM: SmbViewModel) {
       return@AddSmbDialog
     }
 
+    val lastUrl = server.removeSuffix("/") + "/" + share
     if (editSmb != null) {
       val updated = editSmb.copy(
         alias = alias,
-        domain = if (domain.isEmpty()) null else domain,
+        domain = domain.ifEmpty { null },
         account = account,
         pwd = pwd,
         server = server,
         share = share,
-        lastPath = "",
+        lastUrl = lastUrl,
       ).also { it.id = editSmb.id }
       smbVM.insertOrReplaceSmb(updated)
     } else {
-      smbVM.insertOrReplaceSmb(Smb(alias, if (domain.isEmpty()) null else domain, account, pwd, server, share, ""))
+      smbVM.insertOrReplaceSmb(
+        Smb(
+          alias,
+          domain.ifEmpty { null },
+          account,
+          pwd,
+          server,
+          share,
+          lastUrl
+        )
+      )
     }
   }
 }

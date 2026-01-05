@@ -28,4 +28,25 @@ data class WebDav(
     return url
   }
 
+  fun getRoot(): String {
+    return server.removeSuffix("/")
+  }
+
+  fun generateUrl(path: String): String {
+    return base() + path
+  }
+
+  fun buildPathStack(currentUrl: String): List<String> {
+    val root = getRoot()
+    val current = currentUrl.removeSuffix("/")
+    return if (current.startsWith(root)) {
+      current.removePrefix(root)
+        .trimStart('/')
+        .split('/')
+        .filter { it.isNotEmpty() }
+        .runningFold(root) { acc, part -> "$acc/$part" }
+    } else {
+      listOf(currentUrl)
+    }
+  }
 }

@@ -1,5 +1,6 @@
 package remix.myplayer.ui.screen.smb
-
+ 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,15 +30,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.hierynomus.mserref.NtStatus
+import com.hierynomus.mssmb2.SMBApiException
+import com.thegrizzlylabs.sardineandroid.impl.SardineException
 import remix.myplayer.R
 import remix.myplayer.data.db.room.entity.Smb
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.helper.MusicServiceRemote
-import remix.myplayer.misc.isAudio
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.clickWithRipple
@@ -57,10 +57,10 @@ import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.Util
 import remix.myplayer.viewmodel.SmbFile
-import remix.myplayer.viewmodel.SmbViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.smbViewModel
+import timber.log.Timber
 
 @Composable
 fun SmbDetailScreen(smb: Smb) {
@@ -76,21 +76,9 @@ fun SmbDetailScreen(smb: Smb) {
       save = { it.toList() },
       restore = { it.toMutableStateList() })
   ) {
-    val initial = if (smb.lastPath.isNotEmpty()) {
-        val parts = smb.lastPath.split("\\").filter { it.isNotEmpty() }
-        val list = mutableListOf<String>()
-        var current = ""
-        parts.forEach { part ->
-            current = if (current.isEmpty()) part else "$current\\$part"
-            list.add(current)
-        }
-        list
-    } else {
-        listOf("")
-    }
-    initial.toMutableStateList()
+    smb.buildPathStack(smb.lastUrl).toMutableStateList()
   }
-  val currentPath = if (pathStack.isEmpty()) "" else pathStack.last()
+  val currentUrl = pathStack.last()
 
   var smbFiles by remember {
     mutableStateOf<List<SmbFile>>(emptyList())
@@ -100,7 +88,7 @@ fun SmbDetailScreen(smb: Smb) {
   }
 
   fun handleBack() {
-    if (pathStack.isEmpty() || (pathStack.size == 1 && pathStack.first() == "")) {
+    if (pathStack.size <= 1) {
       nav.popBackStack()
       return
     }
@@ -131,13 +119,24 @@ fun SmbDetailScreen(smb: Smb) {
       when (resourceState) {
         is DataUiState.Success -> {
           smbFiles = resourceState.get()
-          smbVM.updateLastPath(smb, currentPath)
+          smbVM.updateLastUrl(smb, currentUrl)
         }
 
         is DataUiState.Error -> {
-           val ex = (resourceState as DataUiState.Error).throwable
-           MessageNotifier.show(ex.message ?: "Load failed")
-           // TODO: Handle more specific errors, like disconnected or auth failed, maybe pop back
+          val ex = (resourceState as DataUiState.Error).throwable
+          if (ex is SMBApiException && ex.status == NtStatus.STATUS_OBJECT_NAME_NOT_FOUND) {
+            Timber.v("rRemix, pathStack: $pathStack")
+            if (pathStack.size <= 1) {
+              nav.popBackStack()
+              MessageNotifier.show(R.string.load_failed)
+            } else {
+              pathStack.removeRange(1, pathStack.size)
+              MessageNotifier.show(R.string.file_not_exist)
+            }
+          } else {
+            nav.popBackStack()
+            MessageNotifier.show(R.string.load_failed)
+          }
         }
 
         else -> {}
@@ -155,90 +154,77 @@ fun SmbDetailScreen(smb: Smb) {
 
                 if (resource.isDirectory) {
                   // Enter directory
-                  pathStack.add(resource.path)
+                  val nextPath = smb.getRoot().removeSuffix("/") + "/" + resource.path.trimStart('/')
+                  Timber.v("nextPath: $nextPath")
+                  pathStack.add(nextPath)
                 } else {
                   // Filter music and play
                   if (smbFiles.isEmpty()) {
                     return@SmbDetailItem
                   }
-                  
+
                   var select: Song.Remote? = null
                   val remotes = smbFiles
-                    .filter { isAudio(it.name) } 
+                    .filter { it.isAudio }
                     .map {
-                        var userInfo = ""
-                        if (!smb.domain.isNullOrEmpty()) {
-                            userInfo += "${smb.domain};"
-                        }
-                        userInfo += smb.account
-                        if (smb.pwd.isNotEmpty()) {
-                            userInfo += ":${smb.pwd}"
-                        }
-                        
-                        val uriStr = "smb://$userInfo@${smb.server}/${smb.share}/${it.path.replace("\\", "/")}"
+                      val uriStr = smb.generateUri(it.path)
 
-                        val remote = Song.Remote(
-                            title = it.name.substringBeforeLast('.'),
-                            data = uriStr,
-                            size = it.size,
-                            dateModified = it.lastModified,
-                            account = smb.account,
-                            pwd = smb.pwd
+                      val remote = Song.Remote(
+                        title = it.name.substringBeforeLast('.'),
+                        data = uriStr,
+                        size = it.size,
+                        dateModified = it.lastModified,
+                        account = smb.account,
+                        pwd = smb.pwd
                       )
                       if (it == resource) {
                         select = remote
                       }
                       remote
                     }
-                    
+
                   if (remotes.isNotEmpty()) {
-                      MusicServiceRemote.setPlayQueue(
-                        remotes,
-                        MusicUtil.makeCmdIntent(Command.PLAY_AT)
-                          .putExtra(MusicService.EXTRA_POSITION, remotes.indexOfFirst {
-                            it.data == select?.data
-                          })
-                      )
+                    MusicServiceRemote.setPlayQueue(
+                      remotes,
+                      MusicUtil.makeCmdIntent(Command.PLAY_AT)
+                        .putExtra(MusicService.EXTRA_POSITION, remotes.indexOfFirst {
+                          it.data == select?.data
+                        })
+                    )
                   }
                 }
               },
               onMenuClick = {
-                  var userInfo = ""
-                  if (!smb.domain.isNullOrEmpty()) {
-                      userInfo += "${smb.domain};"
-                  }
-                  userInfo += smb.account
-                  if (smb.pwd.isNotEmpty()) {
-                      userInfo += ":${smb.pwd}"
-                  }
-                  val uriStr = "smb://$userInfo@${smb.server}/${smb.share}/${resource.path.replace("\\", "/")}"
+                val uriStr = smb.generateUri(resource.path)
 
-                  val song = Song.Remote(
-                      title = resource.name.substringBeforeLast('.'),
-                      data = uriStr,
-                      size = resource.size,
-                      dateModified = resource.lastModified,
-                      account = smb.account,
-                      pwd = smb.pwd
-                  )
+                val song = Song.Remote(
+                  title = resource.name.substringBeforeLast('.'),
+                  data = uriStr,
+                  size = resource.size,
+                  dateModified = resource.lastModified,
+                  account = smb.account,
+                  pwd = smb.pwd
+                )
 
-                  when(it) {
-                      R.string.add_to_next_song -> {
-                          Util.sendLocalBroadcast(
-                              MusicUtil.makeCmdIntent(Command.ADD_TO_NEXT_SONG)
-                                  .putExtra(MusicService.EXTRA_SONG, song)
-                          )
-                      }
-                      R.string.add_to_play_queue -> {
-                          playbackVM.insertToQueue(listOf(song))
-                      }
-                      R.string.song_detail -> {
-                          scope.runWithLoading {
-                              smbVM.fetchMeta(song)
-                              settingVM.showSongDetailDialog(song)
-                          }
-                      }
+                when (it) {
+                  R.string.add_to_next_song -> {
+                    Util.sendLocalBroadcast(
+                      MusicUtil.makeCmdIntent(Command.ADD_TO_NEXT_SONG)
+                        .putExtra(MusicService.EXTRA_SONG, song)
+                    )
                   }
+
+                  R.string.add_to_play_queue -> {
+                    playbackVM.insertToQueue(listOf(song))
+                  }
+
+                  R.string.song_detail -> {
+                    scope.runWithLoading {
+                      smbVM.fetchMeta(song)
+                      settingVM.showSongDetailDialog(song)
+                    }
+                  }
+                }
               })
           }
         }
@@ -256,14 +242,9 @@ fun SmbDetailScreen(smb: Smb) {
     }
   }
 
-  LaunchedEffect(currentPath, refreshTrigger) {
-    smbVM.loadSmbRes(smb, currentPath)
+  LaunchedEffect(currentUrl, refreshTrigger) {
+    smbVM.loadSmbRes(smb, currentUrl)
   }
-}
-
-private fun isAudio(name: String): Boolean {
-    val lower = name.lowercase()
-    return lower.endsWith(".mp3") || lower.endsWith(".flac") || lower.endsWith(".wav") || lower.endsWith(".m4a") || lower.endsWith(".ogg")
 }
 
 @Composable
@@ -283,7 +264,7 @@ private fun SmbDetailItem(
       },
     verticalAlignment = Alignment.CenterVertically
   ) {
-    val isAudio = isAudio(smbFile.name)
+    val isAudio = smbFile.isAudio
     val icon = if (smbFile.isDirectory) {
       R.drawable.ic_folder_24dp
     } else if (isAudio) {
@@ -313,15 +294,15 @@ private fun SmbDetailItem(
 
     val list = arrayListOf<Int>()
     if (smbFile.isDirectory) {
-        list.add(R.string.delete)
+      list.add(R.string.delete)
     }
-    
+
     if (isAudio) {
       list.addAll(
         0,
         listOf(
           R.string.add_to_next_song,
-          R.string.add_to_play_queue, 
+          R.string.add_to_play_queue,
           R.string.song_detail,
           R.string.delete
         )

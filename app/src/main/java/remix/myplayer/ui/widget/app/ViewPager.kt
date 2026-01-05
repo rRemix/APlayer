@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.SharedFlow
 import remix.myplayer.data.model.misc.Library
 import remix.myplayer.ui.screen.RemoteScreen
-import remix.myplayer.ui.screen.smb.SmbScreen
 import remix.myplayer.ui.screen.library.AlbumScreen
 import remix.myplayer.ui.screen.library.ArtistScreen
 import remix.myplayer.ui.screen.library.FolderScreen
@@ -50,7 +49,6 @@ fun ViewPager(
       Library.TAG_PLAYLIST -> PlayListScreen()
       Library.TAG_FOLDER -> FolderScreen()
       Library.TAG_REMOTE -> RemoteScreen()
-      Library.TAG_SMB -> SmbScreen()
       else -> PageContent("Page: ${libraries[page]}")
     }
   }

@@ -3,11 +3,9 @@ package remix.myplayer.viewmodel
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hierynomus.mssmb2.SMB2ShareAccess
 import com.hierynomus.smbj.SMBClient
 import com.hierynomus.smbj.auth.AuthenticationContext
 import com.hierynomus.smbj.share.DiskShare
-import com.hierynomus.smbj.session.Session
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +20,7 @@ import remix.myplayer.repo.SmbRepository
 import remix.myplayer.repo.usecase.FetchMetaDataUseCase
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.runWithLoading
+import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.state.DataUiState
 import timber.log.Timber
 import javax.inject.Inject
@@ -46,40 +45,46 @@ class SmbViewModel @Inject constructor(
     }
   }
 
-  fun loadSmbRes(smb: Smb, path: String) {
+  fun loadSmbRes(smb: Smb, url: String) {
     _smbResState.value = DataUiState.Loading()
     viewModelScope.launch {
-      apiCall(smb, path)
+      apiCall(smb, url)
     }
   }
 
-  private suspend fun apiCall(smb: Smb, path: String) {
+  private suspend fun apiCall(smb: Smb, url: String) {
     try {
       withContext(Dispatchers.IO) {
-        val client = SMBClient()
-        val connection = client.connect(smb.server)
-        val authContext = AuthenticationContext(smb.account, smb.pwd.toCharArray(), smb.domain)
-        val session = connection.authenticate(authContext)
-        val diskShare = session.connectShare(smb.share) as DiskShare
+        SMBClient().use { client ->
+          val (host, port) = Smb.parseServerAddress(smb.server)
+          val connection = if (port != null) client.connect(host, port) else client.connect(host)
+          connection.use {
+            val authContext = AuthenticationContext(smb.account, smb.pwd.toCharArray(), smb.domain)
+            val session = connection.authenticate(authContext)
+            session.use {
+              val diskShare = session.connectShare(smb.share) as DiskShare
+              diskShare.use { share ->
+                val relativePath = smb.getRelativePath(url).replace('/', '\\')
 
-        val fileInfos = diskShare.list(path)
-        val files = fileInfos.map {
-          SmbFile(
-            name = it.fileName,
-            isDirectory = (it.fileAttributes.toLong() and 16L) != 0L,
-            path = if (path.isEmpty()) it.fileName else "$path\\${it.fileName}",
-            size = it.endOfFile,
-            lastModified = it.changeTime.toEpochMillis()
-          )
-        }.filter { it.name != "." && it.name != ".." }
-
-        // Close resources
-        diskShare.close()
-        session.close()
-        connection.close()
-        client.close()
-
-        _smbResState.value = DataUiState.Success(files)
+                val fileInfos = share.list(relativePath)
+                val files = fileInfos.map {
+                  val fileName = it.fileName
+                  val fileRelativePath = if (relativePath.isEmpty()) fileName else "$relativePath\\$fileName"
+                  SmbFile(
+                    name = fileName,
+                    isDirectory = (it.fileAttributes and 16L) != 0L,
+                    path = fileRelativePath.replace('\\', '/'),
+                    size = it.endOfFile,
+                    lastModified = it.changeTime.toEpochMillis()
+                  )
+                }.filter { it.name != "." && it.name != ".." }.filter {
+                  it.isDirectory || it.isAudio
+                }
+                _smbResState.value = DataUiState.Success(files)
+              }
+            }
+          }
+        }
       }
     } catch (e: Exception) {
       Timber.e(e)
@@ -91,32 +96,36 @@ class SmbViewModel @Inject constructor(
     smbRepository.delete(smb)
   }
 
-  fun updateLastPath(smb: Smb, newPath: String) = viewModelScope.launch {
-    if (smb.lastPath == newPath) {
+  fun updateLastUrl(smb: Smb, newUrl: String) = viewModelScope.launch {
+    if (smb.lastUrl == newUrl) {
       return@launch
     }
-    smb.lastPath = newPath
+    smb.lastUrl = newUrl
     smbRepository.insertOrReplace(smb)
   }
 
   fun insertOrReplaceSmb(smb: Smb) = viewModelScope.runWithLoading {
     try {
       withContext(Dispatchers.IO) {
-        val client = SMBClient()
-        val connection = client.connect(smb.server)
-        val authContext = AuthenticationContext(smb.account, smb.pwd.toCharArray(), smb.domain)
-        val session = connection.authenticate(authContext)
-        val diskShare = session.connectShare(smb.share) as DiskShare
-        // If successful
-        diskShare.close()
-        session.close()
-        connection.close()
-        client.close()
+        SMBClient().use { client ->
+          val (host, port) = Smb.parseServerAddress(smb.server)
+          val connection = if (port != null) client.connect(host, port) else client.connect(host)
+          connection.use {
+            val authContext = AuthenticationContext(smb.account, smb.pwd.toCharArray(), smb.domain)
+            val session = connection.authenticate(authContext)
+            session.use {
+              val diskShare = session.connectShare(smb.share) as DiskShare
+              diskShare.use {
+                // Just to check if connection works
+              }
+            }
+          }
+        }
       }
       smbRepository.insertOrReplace(smb)
     } catch (e: Exception) {
       Timber.e(e)
-      remix.myplayer.ui.nav.MessageNotifier.show(e.localizedMessage ?: "Save failed")
+      MessageNotifier.show(e.localizedMessage ?: "Save failed")
     }
   }
 
@@ -189,4 +198,13 @@ data class SmbFile(
   val path: String,
   val size: Long,
   val lastModified: Long
-)
+) {
+
+  val isAudio: Boolean
+    get() {
+      val lower = name.lowercase()
+      return lower.endsWith(".mp3") || lower.endsWith(".flac") || lower.endsWith(".wav") || lower.endsWith(
+        ".m4a"
+      ) || lower.endsWith(".ogg")
+    }
+}
