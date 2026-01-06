@@ -198,7 +198,8 @@ class LyricManager @Inject constructor(
   @UiThread
   private fun ensureDesktopLyric() {
     val shouldShow =
-      isServiceAvailable && isNotifyShowing && isScreenOn && !isAppInForeground && isDesktopLyricEnabled
+      isServiceAvailable && isNotifyShowing && isScreenOn && !isAppInForeground && isDesktopLyricEnabled &&
+          (!isDesktopLyricLocked || isPlaying)
     if (shouldShow != (desktopLyricView != null)) {
       if (shouldShow) {
         createDesktopLyric()
@@ -211,22 +212,24 @@ class LyricManager @Inject constructor(
   var isDesktopLyricLocked: Boolean
     get() = desktopLyricPrefs.locked
     @UiThread set(value) {
+      MessageNotifier.show(if (value) R.string.desktop_lyric__lock_ticker else R.string.desktop_lyric__unlock)
+
       desktopLyricPrefs.locked = value
+      _desktopUiState.value = _desktopUiState.value.copy(locked = value)
 
       desktopLyricView?.run {
-        _desktopUiState.value = _desktopUiState.value.copy(locked = value)
-
-        MessageNotifier.show(if (value) R.string.desktop_lyric__lock_ticker else R.string.desktop_lyric__unlock)
         (layoutParams as WindowManager.LayoutParams).apply {
           applyLockState(this, value)
           windowManager.updateViewLayout(this@run, this)
         }
-
-        MusicServiceRemote.service?.run {
-          updateNotification()
-          updatePlaybackState()
-        }
       }
+
+      MusicServiceRemote.service?.run {
+        updateNotification()
+        updatePlaybackState()
+      }
+
+      ensureDesktopLyric()
     }
 
   @UiThread
@@ -402,6 +405,7 @@ class LyricManager @Inject constructor(
           updateProgress()
         }
       }
+      ensureDesktopLyric()
     }
   private var progress: Long = 0
     set(value) {
