@@ -46,7 +46,9 @@ import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.floatpermission.rom.RomUtils
 import remix.myplayer.misc.manager.APlayerActivityManager
+import remix.myplayer.service.MusicService
 import remix.myplayer.ui.activity.base.BaseActivity
+import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.PendingWriteRequest
 import remix.myplayer.ui.nav.MessageNotifier
 import timber.log.Timber
@@ -658,7 +660,7 @@ object Util {
     fieldMap[FieldKey.YEAR] = newYear
     fieldMap[FieldKey.TRACK] = newTrackNum
 
-    val request = PendingWriteRequest(song.data, fieldMap)
+    val request = PendingWriteRequest(song, fieldMap)
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
       activity.pendingWriteRequest = request
@@ -707,7 +709,7 @@ object Util {
 
   suspend fun saveAudioTag(context: Context, request: PendingWriteRequest) =
     withContext(Dispatchers.IO) {
-      val audioFile = AudioFileIO.read(File(request.path))
+      val audioFile = AudioFileIO.read(File(request.song.data))
 
       val tag = audioFile.tagOrCreateAndSetDefault
       for ((key, value) in request.fieldMap) {
@@ -721,10 +723,24 @@ object Util {
       audioFile.commit()
       MediaScannerConnection.scanFile(
         context,
-        arrayOf(request.path), null
+        arrayOf(request.song.data), null
       ) { _, uri ->
-//        context.contentResolver.notifyChange(Audio.Media.EXTERNAL_CONTENT_URI, null)
         context.contentResolver.notifyChange(uri, null)
+        sendLocalBroadcast(
+          Intent(MusicService.TAG_CHANGE)
+            .putExtra(BaseMusicActivity.EXTRA_OLD_SONG, request.song)
+            .putExtra(
+              BaseMusicActivity.EXTRA_NEW_SONG,
+              request.song.copy(
+                title = request.fieldMap[FieldKey.TITLE],
+                album = request.fieldMap[FieldKey.ALBUM],
+                artist = request.fieldMap[FieldKey.ARTIST],
+                genre = request.fieldMap[FieldKey.GENRE],
+                year = request.fieldMap[FieldKey.YEAR],
+                track = request.fieldMap[FieldKey.TRACK]
+              )
+            )
+        )
       }
 
       withContext(Dispatchers.Main) {

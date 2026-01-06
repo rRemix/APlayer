@@ -964,7 +964,19 @@ class MusicService : BaseService(),
     }
   }
 
-  override fun onTagChanged(oldSong: Song, newSong: Song) {
+  /**
+   * 标签改变，比如编辑了标题等信息
+   */
+  override fun onTagChanged(oldSong: Song?, newSong: Song) {
+    if (!newSong.isLocal() || !newSong.valid()) {
+      return
+    }
+
+    playback.replaceSong(newSong)
+    lyricManager.clearCache(newSong)
+    lyricManager.updateLyrics(newSong)
+    updateQueueItem()
+    pushPlaybackUiState()
   }
 
   override fun onPlayListChanged(name: String) {
@@ -1106,7 +1118,7 @@ class MusicService : BaseService(),
       TAG_CHANGE -> {
         val newSong = intent.getSerializableExtra(BaseMusicActivity.EXTRA_NEW_SONG) as Song?
         val oldSong = intent.getSerializableExtra(BaseMusicActivity.EXTRA_OLD_SONG) as Song?
-        if (newSong != null && oldSong != null) {
+        if (newSong != null) {
           onTagChanged(oldSong, newSong)
         }
       }

@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.helper.LanguageHelper.setLocal
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.nav.MessageNotifier
@@ -188,6 +189,6 @@ open class BaseActivity : ComponentActivity(), CoroutineScope by MainScope() {
 }
 
 data class PendingWriteRequest(
-  val path: String,
+  val song: Song,
   val fieldMap: EnumMap<FieldKey, String>
 )

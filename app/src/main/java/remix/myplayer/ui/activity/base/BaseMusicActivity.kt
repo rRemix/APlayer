@@ -135,7 +135,7 @@ open class BaseMusicActivity : BaseActivity(), MusicEventCallback {
     }
   }
 
-  override fun onTagChanged(oldSong: Song, newSong: Song) {
+  override fun onTagChanged(oldSong: Song?, newSong: Song) {
     Timber.tag(TAG).v("onTagChanged")
     for (listener in serviceEventListeners) {
       listener.onTagChanged(oldSong, newSong)

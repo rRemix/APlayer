@@ -35,8 +35,8 @@ object MusicUtil {
   ).songRepository()
 
   fun makeCmdIntent(cmd: Int, shuffle: Boolean): Intent {
-    return Intent(MusicService.ACTION_CMD).putExtra(MusicService.Companion.EXTRA_CONTROL, cmd)
-      .putExtra(MusicService.Companion.EXTRA_SHUFFLE, shuffle)
+    return Intent(MusicService.ACTION_CMD).putExtra(MusicService.EXTRA_CONTROL, cmd)
+      .putExtra(MusicService.EXTRA_SHUFFLE, shuffle)
   }
 
   fun makeCmdIntent(cmd: Int): Intent {

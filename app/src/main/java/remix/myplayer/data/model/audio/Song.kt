@@ -123,29 +123,49 @@ sealed class Song(
     return id.toString()
   }
 
-  fun copy(): Song {
+  fun copy(
+    title: String? = null,
+    album: String? = null,
+    artist: String? = null,
+    genre: String? = null,
+    year: String? = null,
+    track: String? = null
+  ): Song {
     return when (this) {
       is Local -> {
         Local(
           id,
           displayName,
-          title,
-          album,
+          title ?: this.title,
+          album ?: this.album,
           albumId,
-          artist,
+          artist ?: this.artist,
           artistId,
           _duration,
           data,
           size,
-          year,
-          _genre,
-          track,
+          year ?: this.year,
+          genre ?: this._genre,
+          track ?: this.track,
           dateModified
         )
       }
 
       is Remote -> {
-        Remote(title, album, artist, _duration, data, size, year, _genre ?: "", track, dateModified, account, pwd)
+        Remote(
+          title ?: this.title,
+          album ?: this.album,
+          artist ?: this.artist,
+          _duration,
+          data,
+          size,
+          year ?: this.year,
+          genre ?: (this._genre ?: ""),
+          track ?: this.track,
+          dateModified,
+          account,
+          pwd
+        )
       }
 
     }
@@ -220,7 +240,7 @@ sealed class Song(
     dateModified
   ) {
     override fun toString(): String {
-      return "LocalSong(id='$id', data='$data')"
+      return "LocalSong(id='$id', data='$data', title='$title')"
     }
 
     companion object {

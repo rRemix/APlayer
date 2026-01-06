@@ -14,5 +14,5 @@ interface MusicEventCallback {
 
   fun onServiceDisConnected()
 
-  fun onTagChanged(oldSong: Song, newSong: Song)
+  fun onTagChanged(oldSong: Song?, newSong: Song)
 }

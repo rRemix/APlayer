@@ -42,6 +42,9 @@ interface Playback {
   /** 移除指定位置的歌曲 */
   fun removeSong(index: Int)
 
+  /** 替换歌曲 */
+  fun replaceSong(song: Song)
+
   /** 设置播放模式 */
   fun setMode(mode: Int)
 

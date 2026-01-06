@@ -289,6 +289,17 @@ class ExoPlayback(private val context: Context) : Playback {
     }
   }
 
+  override fun replaceSong(song: Song) {
+    checkMainThread()
+
+    val index = findIndexOfSong(song.id)
+    if (index != C.INDEX_UNSET) {
+      val mediaItem = player.getMediaItemAt(index)
+//      mediaItem.localConfiguration?.tag = song
+      player.replaceMediaItem(index, mediaItem.buildUpon().setTag(song).build())
+    }
+  }
+
   override fun setMode(mode: Int) {
     checkMainThread()
     when (mode) {

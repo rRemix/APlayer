@@ -125,7 +125,6 @@ fun SmbDetailScreen(smb: Smb) {
         is DataUiState.Error -> {
           val ex = (resourceState as DataUiState.Error).throwable
           if (ex is SMBApiException && ex.status == NtStatus.STATUS_OBJECT_NAME_NOT_FOUND) {
-            Timber.v("rRemix, pathStack: $pathStack")
             if (pathStack.size <= 1) {
               nav.popBackStack()
               MessageNotifier.show(R.string.load_failed)

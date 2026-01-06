@@ -132,7 +132,7 @@ class PlaybackViewModel @Inject constructor(
   override fun onPlayListChanged(name: String) {
   }
 
-  override fun onTagChanged(oldSong: Song, newSong: Song) {
+  override fun onTagChanged(oldSong: Song?, newSong: Song) {
   }
 
   companion object {

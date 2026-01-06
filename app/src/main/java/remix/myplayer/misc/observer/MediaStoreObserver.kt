@@ -6,6 +6,7 @@ import android.content.UriMatcher
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Handler
+import android.os.Looper
 import remix.myplayer.service.MusicService
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
@@ -16,7 +17,7 @@ import timber.log.Timber
  * @param handler The handler to run [.onChange] on, or null if none.
  */
 class MediaStoreObserver : ContentObserver(null), Runnable {
-  private val handler = Handler()
+  private val handler = Handler(Looper.getMainLooper())
   private var match = -1
 
   override fun run() {
