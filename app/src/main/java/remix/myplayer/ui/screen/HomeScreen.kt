@@ -145,38 +145,38 @@ fun HomeScreen() {
         val smbVM = smbViewModel
 
         Column {
-          if (showAddRemoteMenu) {
-            DropdownMenu(
-              expanded = showAddRemoteMenu,
-              containerColor = LocalTheme.current.dialogBackground,
-              onDismissRequest = { showAddRemoteMenu = false }
-            ) {
-              DropdownMenuItem(
-                text = {
-                  Text(
-                    stringResource(R.string.webdav),
-                    color = LocalTheme.current.textPrimary
-                  )
-                },
-                onClick = {
-                  showAddRemoteMenu = false
-                  webDavVM.showAddWebDavDialog()
-                }
-              )
-              DropdownMenuItem(
-                text = {
-                  Text(
-                    stringResource(R.string.smb),
-                    color = LocalTheme.current.textPrimary
-                  )
-                },
-                onClick = {
-                  showAddRemoteMenu = false
-                  smbVM.showAddSmbDialog()
-                }
-              )
-            }
-          }
+//          if (showAddRemoteMenu) {
+//            DropdownMenu(
+//              expanded = showAddRemoteMenu,
+//              containerColor = LocalTheme.current.dialogBackground,
+//              onDismissRequest = { showAddRemoteMenu = false }
+//            ) {
+//              DropdownMenuItem(
+//                text = {
+//                  Text(
+//                    stringResource(R.string.webdav),
+//                    color = LocalTheme.current.textPrimary
+//                  )
+//                },
+//                onClick = {
+//                  showAddRemoteMenu = false
+//                  webDavVM.showAddWebDavDialog()
+//                }
+//              )
+//              DropdownMenuItem(
+//                text = {
+//                  Text(
+//                    stringResource(R.string.smb),
+//                    color = LocalTheme.current.textPrimary
+//                  )
+//                },
+//                onClick = {
+//                  showAddRemoteMenu = false
+//                  smbVM.showAddSmbDialog()
+//                }
+//              )
+//            }
+//          }
 
           FAButton(
             selectLibrary.tag == Library.TAG_PLAYLIST || selectLibrary.tag == Library.TAG_REMOTE
@@ -188,7 +188,8 @@ fun HomeScreen() {
             if (selectLibrary.tag == Library.TAG_PLAYLIST) {
               libraryVM.showCreatePlaylistDialog()
             } else if (selectLibrary.tag == Library.TAG_REMOTE) {
-              showAddRemoteMenu = true
+//              showAddRemoteMenu = true
+              webDavVM.showAddWebDavDialog()
             }
           }
         }

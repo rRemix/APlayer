@@ -41,7 +41,7 @@ benchmarkMacroJunit4 = "1.4.1"
 baselineprofile = "1.4.1"
 profileinstaller = "1.4.1"
 rules = "1.7.0"
-smbj = "0.13.0"
+smbj = "0.14.0"
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }

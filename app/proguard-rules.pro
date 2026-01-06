@@ -5,7 +5,7 @@
     <methods>;
 }
 
--keep class remix.myplayer.bean.** { *; }
+-keep class remix.myplayer.data.model.** { *; }
 
 # bugly
 # https://bugly.qq.com/docs/user-guide/instruction-manual-android/
@@ -84,26 +84,29 @@
 
 # With R8 full mode generic signatures are stripped for classes that are not kept.
 -keep,allowobfuscation,allowshrinking class retrofit2.Response
+-keep class androidx.profileinstaller.ProfileInstallReceiver { *; }
+-keep class androidx.profileinstaller.ProfileInstallerInitializer { *; }
+-keep class androidx.profileinstaller.** { *; }
+-keep class androidx.startup.AppInitializer { *; }
+-keep class androidx.startup.InitializationProvider { *; }
+-keep class androidx.startup.Initializer { *; }
 
-
--dontwarn org.ietf.jgss.**
--dontwarn javax.el.**
-
--keep class com.hierynomus.** { *; }
--keep interface com.hierynomus.** { *; }
-
--keep class com.rapid7.** { *; }
-
--keep class org.bouncycastle.** { *; }
+# smbj
+-dontwarn com.hierynomus.**
 -dontwarn org.bouncycastle.**
+-dontwarn org.slf4j.**
 -dontwarn net.engio.mbassy.**
-
 -dontwarn javax.el.**
--dontwarn net.engio.mbassy.**
-
--keep class net.engio.mbassy.** { *; }
--keep interface net.engio.mbassy.** { *; }
 
 -keepclassmembers class * {
-    @**.Handler <methods>;
+    @net.engio.mbassy.listener.Handler <methods>;
 }
+
+-keep class net.engio.mbassy.dispatch.HandlerInvocation { *; }
+-keep class net.engio.mbassy.dispatch.ReflectiveHandlerInvocation { *; }
+-keep class net.engio.mbassy.subscription.SubscriptionContext { *; }
+-keepclassmembers class * extends net.engio.mbassy.dispatch.HandlerInvocation {
+    <init>(net.engio.mbassy.subscription.SubscriptionContext);
+}
+
+-keep class org.bouncycastle.jce.provider.BouncyCastleProvider { *; }
