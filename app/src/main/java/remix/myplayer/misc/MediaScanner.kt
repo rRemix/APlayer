@@ -54,7 +54,7 @@ class MediaScanner(private val context: Context) {
   }
 
   // scan single file
-  private suspend fun scanSingleFile(context: Context, file: File) =
+  suspend fun scanSingleFile(context: Context, file: File) =
     suspendCancellableCoroutine { continuation ->
       var connection: MediaScannerConnection? = null
       connection = MediaScannerConnection(

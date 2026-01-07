@@ -1038,16 +1038,6 @@ class MusicService : BaseService(),
     }
     firstPrepared = false
     when (action) {
-      ACTION_PLAY_FROM_URI -> {
-        val song = commandIntent?.getSerializableExtra(EXTRA_SONG) as? Song ?: return
-        if (song.valid()) {
-          val intent = Intent(ACTION_CMD)
-          intent.putExtra(EXTRA_CONTROL, Command.PLAY_AT)
-          intent.putExtra(EXTRA_POSITION, 0)
-          setPlayQueue(listOf(song), intent)
-        }
-      }
-
       ACTION_APPWIDGET_OPERATE -> {
         handleCommand(
           Intent(ACTION_CMD).putExtra(
@@ -1603,7 +1593,6 @@ class MusicService : BaseService(),
     const val EXTRA_SHUFFLE = "shuffle"
     const val EXTRA_PROGRESS = "progress"
     const val ACTION_APPWIDGET_OPERATE = "$APLAYER_PACKAGE_NAME.appwidget.operate"
-    const val ACTION_PLAY_FROM_URI = "$APLAYER_PACKAGE_NAME.play_from_uri"
     const val ACTION_SHORTCUT_SHUFFLE = "$APLAYER_PACKAGE_NAME.shortcut.shuffle"
     const val ACTION_SHORTCUT_MYLOVE = "$APLAYER_PACKAGE_NAME.shortcut.my_love"
     const val ACTION_SHORTCUT_LASTADDED = "$APLAYER_PACKAGE_NAME.shortcut.last_added"

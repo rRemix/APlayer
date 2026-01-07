@@ -25,7 +25,7 @@ multidex = "2.0.1"
 paletteKtx = "1.0.0"
 billingclient = "6.2.0"
 material = "1.11.0"
-bugly = "4.1.9.2"
+bugly = "3.3.9"
 leakcanary = "2.14"
 logbackAndroid = "3.0.0"
 sardineAndroid = "0.9"
@@ -41,7 +41,7 @@ benchmarkMacroJunit4 = "1.4.1"
 baselineprofile = "1.4.1"
 profileinstaller = "1.4.1"
 rules = "1.7.0"
-smbj = "0.14.0"
+smbj = "0.13.0"
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }
