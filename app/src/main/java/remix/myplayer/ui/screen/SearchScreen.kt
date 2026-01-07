@@ -56,7 +56,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.misc.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.theme.LocalTheme
@@ -66,6 +65,7 @@ import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.library.list.ListSong
 import remix.myplayer.util.MusicUtil
+import remix.myplayer.util.Util
 import remix.myplayer.viewmodel.MultiSelectState
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
@@ -166,9 +166,9 @@ fun SearchScreen() {
                   return@ListSong
                 }
 
-                setPlayQueue(
-                  songs, MusicUtil.makeCmdIntent(Command.PLAY_AT)
-                    .putExtra(MusicService.EXTRA_POSITION, pos)
+                Util.sendLocalBroadcast(
+                  MusicUtil.makeCmdIntent(Command.PLAY_TEMP)
+                    .putExtra(MusicService.EXTRA_SONG, song)
                 )
               },
               onLongClickSong = {

@@ -1252,7 +1252,17 @@ class MusicService : BaseService(),
         intent.getSerializableExtra(EXTRA_SONG)?.let {
           lastOp = Command.PLAY_TEMP
           val song = it as Song.Local
-          playback.setPlaylist(listOf(song))
+
+          if (playback.getPlaylist().isEmpty()) {
+            playback.setPlaylist(listOf(song))
+          } else if (playback.currentSong?.id != song.id) {
+            playback.addToNextSong(song)
+            skipToNext()
+          } else {
+            // 如果是当前歌曲，从头播放
+            seekTo(0)
+          }
+
           launch { playQueue.save(playback.getPlaylist()) }
           start(true)
         }

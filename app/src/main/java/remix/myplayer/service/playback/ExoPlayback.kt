@@ -226,25 +226,25 @@ class ExoPlayback(private val context: Context) : Playback {
 
   override fun addToNextSong(nextSong: Song): Boolean {
     checkMainThread()
-    if (currentSong?.id == nextSong.id || this.nextSong?.id == nextSong.id) {
+    if (currentSong?.id == nextSong.id) {
       return false
     }
 
     var existIndex = findIndexOfSong(nextSong.id)
-    // 没有则添加
+
+    // 无论什么模式，物理上都移动/插入到 currentIndex + 1
+    val targetIndex = if (existIndex != C.INDEX_UNSET && existIndex < currentIndex) currentIndex else currentIndex + 1
+
     if (existIndex == C.INDEX_UNSET) {
-      addSongs(listOf(nextSong), -1)
-      existIndex = player.mediaItemCount - 1
+      addSongs(listOf(nextSong), targetIndex)
+      existIndex = targetIndex
+    } else {
+      player.moveMediaItem(existIndex, targetIndex)
+      existIndex = if (existIndex < targetIndex) targetIndex - 1 else targetIndex
     }
 
-    // 根据模式调整位置
-    if (!player.shuffleModeEnabled) {
-      player.moveMediaItem(
-        existIndex,
-        if (existIndex < currentIndex) currentIndex else currentIndex + 1
-      )
-    } else {
-      // 生成随机队列并将目标移到当前歌曲后面
+    // 如果是随机模式，还需要调整 ShuffleOrder 确保逻辑上也是下一首
+    if (player.shuffleModeEnabled) {
       val indices = buildShuffledIndices(player.shuffleOrder, player.mediaItemCount).toMutableList()
       indices.remove(existIndex)
       indices.add(indices.indexOf(currentIndex) + 1, existIndex)
