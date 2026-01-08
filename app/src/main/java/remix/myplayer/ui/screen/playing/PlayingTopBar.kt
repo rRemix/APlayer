@@ -28,12 +28,16 @@ import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.nav.LocalNavController
+import remix.myplayer.ui.theme.LocalTheme
+import remix.myplayer.ui.theme.popupButton
 
 @Composable
 @Stable
 internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
-  val titleColor = Color(swatch.titleTextColor)
-  val bodyColor = Color(swatch.bodyTextColor)
+  val theme = LocalTheme.current
+  val titleColor = if (theme.isLight) Color(swatch.titleTextColor) else theme.textPrimary
+  val bodyColor = if (theme.isLight) Color(swatch.bodyTextColor) else theme.textSecondary
+  val tintColor = if (theme.isLight) titleColor else theme.popupButton()
   val nav = LocalNavController.current
 
   Row(modifier = Modifier.height(56.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -48,7 +52,7 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
     ) {
       Image(
         painter = painterResource(R.drawable.icon_player_back),
-        colorFilter = ColorFilter.tint(titleColor),
+        colorFilter = ColorFilter.tint(tintColor),
         contentDescription = "PlayingBack"
       )
     }
@@ -78,7 +82,7 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
       }
 
       Text(
-        if (title.isEmpty()) stringResource(R.string.unknown_song) else title,
+        title.ifEmpty { stringResource(R.string.unknown_song) },
         color = titleColor,
         fontSize = 16.sp,
         maxLines = 1
@@ -99,7 +103,7 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
     ) {
       Image(
         painter = painterResource(R.drawable.icon_player_more),
-        colorFilter = ColorFilter.tint(titleColor),
+        colorFilter = ColorFilter.tint(tintColor),
         contentDescription = "PlayingMore"
       )
 

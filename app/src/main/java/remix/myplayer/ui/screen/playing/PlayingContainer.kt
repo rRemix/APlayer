@@ -28,46 +28,61 @@ import remix.myplayer.viewmodel.settingViewModel
 @Composable
 fun PlayingContainer(content: @Composable () -> Unit) {
   val settingState by settingViewModel.settingsState.collectAsStateWithLifecycle()
-
+  val context = LocalContext.current
   val theme = LocalTheme.current
-  if (settingState.playingScreen.background == SettingPrefs.BACKGROUND_ADAPTIVE_COLOR) {
-    val context = LocalContext.current
-    val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
-
-    val initialColor = Color(
-      ThemeUtil.resolveColor(
-        context,
-        R.attr.colorSurface,
-        if (theme.isLight) Color.White.value.toInt() else Color.Black.value.toInt()
-      )
+  val initialColor = Color(
+    ThemeUtil.resolveColor(
+      context,
+      R.attr.colorSurface,
+      if (theme.isLight) Color.White.value.toInt() else Color.Black.value.toInt()
     )
-    val color = remember { Animatable(initialValue = initialColor) }
+  )
 
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .navigationBarsPadding()
-        .background(
-          brush = Brush.verticalGradient(colors = listOf(color.value, initialColor)),
-          shape = RectangleShape
-        )
-    ) {
-      Spacer(Modifier.statusBarsPadding())
-      content()
-    }
+  if (!theme.isLight) {
+    val background = theme.mainBackground
+    val brush = Brush.verticalGradient(colors = listOf(background, background))
+    Container(brush = brush, content = content)
+    return
+  }
 
-    LaunchedEffect(swatch) {
-      color.snapTo(initialColor)
-      color.animateTo(Color(swatch.rgb), animationSpec = tween(1000))
+  when (settingState.playingScreen.background) {
+    SettingPrefs.BACKGROUND_ADAPTIVE_COLOR -> {
+      val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
+      val color = remember(initialColor) { Animatable(initialValue = initialColor) }
+      val brush = Brush.verticalGradient(colors = listOf(color.value, initialColor))
+      Container(brush = brush, content = content)
+
+      LaunchedEffect(swatch, initialColor) {
+        color.snapTo(initialColor)
+        color.animateTo(Color(swatch.rgb), animationSpec = tween(1000))
+      }
     }
+    SettingPrefs.BACKGROUND_THEME -> {
+      val brush = Brush.verticalGradient(colors = listOf(theme.primary, initialColor))
+      Container(brush = brush, content = content)
+    }
+    else -> {
+      Container(brush = null, content = content)
+    }
+  }
+}
+
+@Composable
+private fun Container(
+  brush: Brush?,
+  content: @Composable () -> Unit
+) {
+  val baseModifier = Modifier
+    .fillMaxSize()
+    .navigationBarsPadding()
+  val modifier = if (brush != null) {
+    baseModifier.background(brush = brush, shape = RectangleShape)
   } else {
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .navigationBarsPadding()
-    ) {
-      Spacer(Modifier.statusBarsPadding())
-      content()
-    }
+    baseModifier
+  }
+
+  Column(modifier = modifier) {
+    Spacer(Modifier.statusBarsPadding())
+    content()
   }
 }
