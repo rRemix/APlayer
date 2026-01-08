@@ -649,7 +649,8 @@ object Util {
   fun requestSaveAudioTag(
     activity: BaseActivity, song: Song,
     newTitle: String, newAlbum: String, newArtist: String,
-    newGenre: String, newYear: String, newTrackNum: String
+    newGenre: String, newYear: String, newTrackNum: String,
+    newLyrics: String
   ) {
     val fieldMap = EnumMap<FieldKey, String>(FieldKey::class.java)
 
@@ -659,6 +660,7 @@ object Util {
     fieldMap[FieldKey.GENRE] = newGenre
     fieldMap[FieldKey.YEAR] = newYear
     fieldMap[FieldKey.TRACK] = newTrackNum
+    fieldMap[FieldKey.LYRICS] = newLyrics
 
     val request = PendingWriteRequest(song, fieldMap)
 

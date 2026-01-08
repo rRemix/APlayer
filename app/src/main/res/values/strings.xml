@@ -209,6 +209,7 @@
   <string name="year_input_hint">Year</string>
   <string name="track_number_input_hint">Track number</string>
   <string name="genre_input_hint">Genre</string>
+  <string name="lyrics_input_hint">Lyrics</string>
   <string name="grant_write_permission_tip">Please grant permission to write the media file</string>
 
   <string name="write_something">Every time i think of this song,i ...</string>

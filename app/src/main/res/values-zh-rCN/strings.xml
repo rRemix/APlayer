@@ -208,6 +208,7 @@
   <string name="year_input_hint">年代</string>
   <string name="track_number_input_hint">音轨号</string>
   <string name="genre_input_hint">流派</string>
+  <string name="lyrics_input_hint">歌词</string>
   <string name="grant_write_permission_tip">请授予修改音乐文件的权限</string>
 
   <string name="write_something">每当想起这首歌的时候</string>

@@ -208,6 +208,7 @@
   <string name="year_input_hint">年</string>
   <string name="track_number_input_hint">トラックナンバー</string>
   <string name="genre_input_hint">ジャンル</string>
+  <string name="lyrics_input_hint">歌詞</string>
   <string name="grant_write_permission_tip">メディアファイルに書き込むために権限を許可してください</string>
 
   <string name="write_something">この曲を聴くたびにこう思うんだ ...</string>
