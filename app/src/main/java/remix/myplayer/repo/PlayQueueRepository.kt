@@ -22,6 +22,7 @@ interface PlayQueueRepository {
   suspend fun removeByAudioIds(audioIds: List<Long>): Int
   suspend fun remove(playQueues: List<PlayQueue>): Int
   suspend fun insert(queue: List<Song>): LongArray
+  suspend fun replace(queue: List<Song>)
   suspend fun clear()
 }
 
@@ -56,13 +57,27 @@ class PlayQueueRepoImpl @Inject constructor(
         // 某一首歌曲可能同时存在于列表A、B，然后添加到播放队列
         .distinctBy { it.id }
         .map { song ->
-          PlayQueue(song.id, song.title, song.data).apply {
-            if (song is Song.Remote) {
-              account = song.account
-              pwd = song.pwd
-            }
-          }
+          toPlayQueueEntity(song)
         })
+  }
+
+  override suspend fun replace(queue: List<Song>) {
+    playQueueDao.replace(
+      queue
+        .distinctBy { it.id }
+        .map { song ->
+          toPlayQueueEntity(song)
+        }
+    )
+  }
+
+  private fun toPlayQueueEntity(song: Song): PlayQueue {
+    return PlayQueue(song.id, song.title, song.data).apply {
+      if (song is Song.Remote) {
+        account = song.account
+        pwd = song.pwd
+      }
+    }
   }
 
   override suspend fun clear() {

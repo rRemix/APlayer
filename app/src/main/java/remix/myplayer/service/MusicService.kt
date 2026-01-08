@@ -125,7 +125,7 @@ class MusicService : BaseService(),
   lateinit var settingPrefs: SettingPrefs
 
   @Inject
-  lateinit var playQueue: PlayQueue
+  lateinit var playQueueStore: PlayQueueStore
 
   @Inject
   lateinit var playListRepository: PlayListRepository
@@ -761,7 +761,7 @@ class MusicService : BaseService(),
 
     playback.setPlaylist(newQueue)
     updateQueueItem()
-    launch { playQueue.save(newQueue) }
+    launch { playQueueStore.save(newQueue) }
   }
 
   /**
@@ -779,7 +779,7 @@ class MusicService : BaseService(),
     val equals = newQueue == playback.getPlaylist()
     if (!equals) {
       playback.setPlaylist(newQueue)
-      launch { playQueue.save(newQueue) }
+      launch { playQueueStore.save(newQueue) }
     }
     if (shuffle) {
       playModel = MODE_SHUFFLE
@@ -811,7 +811,7 @@ class MusicService : BaseService(),
         indices.forEach { index ->
           playback.removeSong(index)
         }
-        launch { playQueue.save(playback.getPlaylist()) }
+        launch { playQueueStore.save(playback.getPlaylist()) }
 
         updateQueueItem()
         pushPlaybackUiState()
@@ -825,7 +825,7 @@ class MusicService : BaseService(),
   fun insertToQueue(songs: List<Song>) {
     if (songs.isNotEmpty()) {
       playback.addSongs(songs)
-      launch { playQueue.save(playback.getPlaylist()) }
+      launch { playQueueStore.save(playback.getPlaylist()) }
       pushPlaybackUiState()
     }
   }
@@ -1253,7 +1253,7 @@ class MusicService : BaseService(),
             seekTo(0)
           }
 
-          launch { playQueue.save(playback.getPlaylist()) }
+          launch { playQueueStore.save(playback.getPlaylist()) }
           start(true)
         }
       }
@@ -1267,7 +1267,7 @@ class MusicService : BaseService(),
 
         if (playback.addToNextSong(nextSong)) {
           // 同步更新
-          launch { playQueue.save(playback.getPlaylist()) }
+          launch { playQueueStore.save(playback.getPlaylist()) }
           pushPlaybackUiState()
           MessageNotifier.show(R.string.already_add_to_next_song)
         }
@@ -1419,7 +1419,7 @@ class MusicService : BaseService(),
   private suspend fun restorePlayList() {
     // 读取播放列表
     val (queue, pos) = withContext(Dispatchers.IO) {
-      playQueue.restore()
+      playQueueStore.restore()
     }
 
     if (queue.isNotEmpty()) {

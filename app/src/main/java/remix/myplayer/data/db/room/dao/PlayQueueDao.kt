@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 import remix.myplayer.data.db.room.entity.PlayQueue
 
@@ -42,4 +43,9 @@ interface PlayQueueDao {
   )
   suspend fun clear(): Int
 
+  @Transaction
+  suspend fun replace(playQueue: List<PlayQueue>) {
+    clear()
+    insert(playQueue)
+  }
 }

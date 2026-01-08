@@ -1,8 +1,6 @@
 package remix.myplayer.service
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.repo.PlayQueueRepository
@@ -13,7 +11,7 @@ import javax.inject.Inject
  * created by Remix on 2019-09-26
  */
 
-class PlayQueue @Inject constructor(
+class PlayQueueStore @Inject constructor(
   private val songRepository: SongRepository,
   private val playQueueRepository: PlayQueueRepository,
   private val settingPrefs: SettingPrefs,
@@ -54,14 +52,16 @@ class PlayQueue @Inject constructor(
     return pos
   }
 
-  suspend fun save(queue: List<Song>) = withContext(Dispatchers.IO) {
-    playQueueRepository.clear()
+  suspend fun save(queue: List<Song>) {
     if (queue.isNotEmpty()) {
-      playQueueRepository.insert(queue)
+      playQueueRepository.replace(queue)
+    } else {
+      playQueueRepository.clear()
     }
   }
 
   companion object {
+
     private const val TAG = "PlayQueue"
   }
 }

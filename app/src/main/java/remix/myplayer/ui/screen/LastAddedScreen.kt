@@ -138,8 +138,10 @@ fun LastAddedScreen() {
   }
 
   LaunchedEffect(Unit) {
-    withContext(Dispatchers.IO) {
-      songs.addAll(libraryVM.loadLastAddedSongs())
+    val result = withContext(Dispatchers.IO) {
+      libraryVM.loadLastAddedSongs()
     }
+    songs.clear()
+    songs.addAll(result)
   }
 }

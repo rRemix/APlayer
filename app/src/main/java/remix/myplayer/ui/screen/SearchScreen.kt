@@ -182,12 +182,15 @@ fun SearchScreen() {
   }
 
   LaunchedEffect(searchKey) {
-    withContext(Dispatchers.IO) {
-      songs.clear()
+    val result = withContext(Dispatchers.IO) {
       if (searchKey.isNotEmpty()) {
-        songs.addAll(libraryVM.searchSong(searchKey))
+        libraryVM.searchSong(searchKey)
+      } else {
+        emptyList()
       }
     }
+    songs.clear()
+    songs.addAll(result)
   }
 }
 
