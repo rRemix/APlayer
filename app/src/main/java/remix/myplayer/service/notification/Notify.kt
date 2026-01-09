@@ -17,12 +17,12 @@ import androidx.core.app.TaskStackBuilder
 import com.bumptech.glide.request.target.CustomTarget
 import remix.myplayer.R
 import remix.myplayer.misc.getPendingIntentFlag
-import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
 import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.activity.ComposeActivity
 import remix.myplayer.ui.nav.playingScreenDeepLink
+import timber.log.Timber
 
 /**
  * Created by Remix on 2017/11/22.
@@ -30,8 +30,6 @@ import remix.myplayer.ui.nav.playingScreenDeepLink
 
 abstract class Notify internal constructor(internal var service: MusicService) {
 
-  protected val progressState
-    get() = MusicStateSource.currentProgressState
   protected val playbackState
     get() = MusicStateSource.currentPlaybackUiState
 
@@ -51,8 +49,6 @@ abstract class Notify internal constructor(internal var service: MusicService) {
   private val notificationManager: NotificationManager by lazy {
     service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
   }
-
-  private var notifyMode = NOTIFY_MODE_BACKGROUND
 
   internal val contentIntent: PendingIntent
     get() = TaskStackBuilder.create(service).run {
@@ -88,7 +84,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     notificationManager.createNotificationChannel(playingNotificationChannel)
   }
 
-  abstract fun updateForPlaying()
+  abstract fun updateAndNotify()
 
   fun updateWithLyric(lrc: String) {
     if (!playbackState.isPlaying) return
@@ -110,21 +106,27 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     notificationManager.notify(STATUS_BAR_LYRIC_NOTIFICATION_ID, notification)
   }
 
-  internal fun pushNotify(notification: Notification) {
-    if (service.stop)
+  var isForeground = false
+    private set
+
+  fun startForegroundOrNotify(notification: Notification) {
+    val song = playbackState.song
+    val playing = playbackState.isPlaying
+
+    Timber.v("startForegroundOrNotify, song: $song playing: $playing")
+
+    if (service.stop || !song.valid()) {
       return
-    val newNotifyMode: Int = if (playbackState.isPlaying) {
-      NOTIFY_MODE_FOREGROUND
-    } else {
-      NOTIFY_MODE_BACKGROUND
     }
 
-    if (notifyMode != newNotifyMode && newNotifyMode == NOTIFY_MODE_BACKGROUND) {
+    if (isForeground && !playing) {
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-        ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_DETACH)
+        isForeground = false
       }
     }
-    if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
+
+    if (!isForeground && playing) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         service.startForeground(
           PLAYING_NOTIFICATION_ID, notification,
@@ -133,66 +135,37 @@ abstract class Notify internal constructor(internal var service: MusicService) {
       } else {
         service.startForeground(PLAYING_NOTIFICATION_ID, notification)
       }
+      isForeground = true
     } else {
       notificationManager.notify(PLAYING_NOTIFICATION_ID, notification)
     }
 
-    notifyMode = newNotifyMode
     isNotifyShowing = true
   }
 
   /**
    * 取消通知栏
    */
-  fun cancelPlayingNotify() {
+  fun stopForegroundAndNotification() {
+    Timber.v("stopForegroundAndNotification")
     ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
     notificationManager.cancel(PLAYING_NOTIFICATION_ID)
+    isForeground = false
     isNotifyShowing = false
-    //        notifyMode = NOTIFY_MODE_NONE;
   }
 
-  internal fun buildPendingIntent(context: Context, operation: Int): PendingIntent {
+  internal fun buildPendingIntent(context: Context, cmd: Int): PendingIntent {
     val intent = Intent(MusicService.ACTION_CMD)
-    intent.putExtra(EXTRA_CONTROL, operation)
+    intent.putExtra(EXTRA_COMMAND, cmd)
     intent.component = ComponentName(context, MusicService::class.java)
 
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-      return PendingIntent.getService(
-        context, operation, intent,
-        getPendingIntentFlag()
-      )
-    } else {
-      if (operation != Command.TOGGLE_DESKTOP_LYRIC &&
-        operation != Command.CLOSE_NOTIFY &&
-        operation != Command.UNLOCK_DESKTOP_LYRIC
-      ) {
-        return PendingIntent.getForegroundService(
-          context, operation, intent,
-          getPendingIntentFlag()
-        )
-      } else {
-        PendingIntent.getService(
-          context, operation, intent,
-          getPendingIntentFlag()
-        )
-      }
-    }
-
     return PendingIntent.getService(
-      context, operation, intent,
+      context, cmd, intent,
       getPendingIntentFlag()
     )
   }
 
   companion object {
-
-    /**
-     * 通知栏是否显示
-     */
-//    @JvmStatic
-
-    private const val NOTIFY_MODE_FOREGROUND = 1
-    private const val NOTIFY_MODE_BACKGROUND = 2
 
     internal const val PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification"
     private const val PLAYING_NOTIFICATION_ID = 1

@@ -15,7 +15,7 @@ import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
 import remix.myplayer.util.DensityUtil
 
 /**
@@ -29,7 +29,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
     BitmapFactory.decodeResource(service.resources, R.drawable.album_empty_bg_night)
   private val size = DensityUtil.dip2px(service, 128f)
 
-  override fun updateForPlaying() {
+  override fun updateAndNotify() {
     val song = playbackState.song
 
     //设置封面
@@ -65,7 +65,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
       if (playbackState.isPlaying) R.drawable.ic_pause_black_24dp else R.drawable.ic_play_arrow_black_24dp
 
     val deleteIntent = Intent(MusicService.ACTION_CMD)
-    deleteIntent.putExtra(EXTRA_CONTROL, Command.CLOSE_NOTIFY)
+    deleteIntent.putExtra(EXTRA_COMMAND, Command.CLOSE_NOTIFY)
 
     val desktopLyricLock = lyricManager.isDesktopLyricLocked
 
@@ -84,8 +84,8 @@ NotifyImpl24(context: MusicService) : Notify(context) {
         R.drawable.ic_skip_next_black_24dp, service.getString(R.string.next),
         buildPendingIntent(service, Command.SKIP_TO_NEXT)
       )
-      //根据当前桌面歌词的状态判断是显示开关桌面歌词还是解锁桌面歌词
-      //当前显示了桌面歌词并且已经锁定,显示解锁的按钮
+      // 根据当前桌面歌词的状态判断是显示开关桌面歌词还是解锁桌面歌词
+      // 当前显示了桌面歌词并且已经锁定,显示解锁的按钮
       .addAction(
         if (desktopLyricLock) R.drawable.ic_lock_open_black_24dp else R.drawable.ic_desktop_lyric_black_24dp,
         service.getString(if (desktopLyricLock) R.string.desktop_lyric__unlock else R.string.desktop_lyric_lock),
@@ -108,6 +108,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
           .setMediaSession(service.mediaSession.sessionToken)
       )
       .build()
-    pushNotify(notification)
+
+    startForegroundOrNotify(notification)
   }
 }

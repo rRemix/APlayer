@@ -64,7 +64,7 @@ class PlaybackViewModel @Inject constructor(
   fun setProgress(progress: Long) {
     Util.sendLocalBroadcast(
       Intent(MusicService.ACTION_CMD)
-        .putExtra(MusicService.EXTRA_CONTROL, Command.SEEK_TO)
+        .putExtra(MusicService.EXTRA_COMMAND, Command.SEEK_TO)
         .putExtra(MusicService.EXTRA_PROGRESS, progress)
     )
   }

@@ -18,7 +18,7 @@ import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
 import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.activity.ComposeActivity
 import remix.myplayer.ui.appwidgets.big.AppWidgetBig
@@ -52,17 +52,15 @@ abstract class BaseAppwidget
     cmd: Int
   ): PendingIntent {
     val intent = Intent(MusicService.ACTION_APPWIDGET_OPERATE)
-    intent.putExtra(EXTRA_CONTROL, cmd)
+    intent.putExtra(EXTRA_COMMAND, cmd)
     intent.component = componentName
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isAllowForForegroundService(cmd)) {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+      && Command.isAllowForForegroundService(cmd)
+    ) {
       PendingIntent.getForegroundService(context, cmd, intent, getPendingIntentFlag())
     } else {
       PendingIntent.getService(context, cmd, intent, getPendingIntentFlag())
     }
-  }
-
-  private fun isAllowForForegroundService(cmd: Int): Boolean {
-    return cmd != Command.CHANGE_MODEL && cmd != Command.LOVE && cmd != Command.TOGGLE_TIMER
   }
 
   protected fun hasInstances(context: Context): Boolean {

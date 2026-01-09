@@ -19,7 +19,7 @@ interface Playback {
   val currentIndex: Int
 
   /** 播放列表大小 */
-  val mediaItemCount: Int
+  val itemCount: Int
 
   /** 下一首歌曲 */
   val nextSong: Song?

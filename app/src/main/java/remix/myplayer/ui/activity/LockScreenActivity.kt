@@ -73,7 +73,7 @@ import remix.myplayer.lyric.CurrentNextLyricsLine
 import remix.myplayer.lyric.LyricManager
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
 import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.blur.StackBlurManager
@@ -276,7 +276,7 @@ private fun LockScreen(playbackUiState: PlaybackUiState, currentLyric: CurrentNe
           modifier = Modifier.clickableWithoutRipple {
             sendLocalBroadcast(
               Intent(MusicService.ACTION_CMD)
-                .putExtra(EXTRA_CONTROL, Command.SKIP_TO_PREVIOUS)
+                .putExtra(EXTRA_COMMAND, Command.SKIP_TO_PREVIOUS)
             )
           },
           painter = painterResource(R.drawable.lock_btn_prev),
@@ -287,7 +287,7 @@ private fun LockScreen(playbackUiState: PlaybackUiState, currentLyric: CurrentNe
           modifier = Modifier.clickableWithoutRipple {
             sendLocalBroadcast(
               Intent(MusicService.ACTION_CMD)
-                .putExtra(EXTRA_CONTROL, Command.PLAY_PAUSE)
+                .putExtra(EXTRA_COMMAND, Command.PLAY_PAUSE)
             )
           },
           painter = painterResource(if (playbackUiState.isPlaying) R.drawable.lock_btn_pause else R.drawable.lock_btn_play),
@@ -298,7 +298,7 @@ private fun LockScreen(playbackUiState: PlaybackUiState, currentLyric: CurrentNe
           modifier = Modifier.clickableWithoutRipple {
             sendLocalBroadcast(
               Intent(MusicService.ACTION_CMD)
-                .putExtra(EXTRA_CONTROL, Command.SKIP_TO_NEXT)
+                .putExtra(EXTRA_COMMAND, Command.SKIP_TO_NEXT)
             )
           },
           painter = painterResource(R.drawable.lock_btn_next),

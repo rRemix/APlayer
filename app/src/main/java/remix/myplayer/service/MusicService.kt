@@ -233,11 +233,6 @@ class MusicService : BaseService(),
   private lateinit var notify: Notify
 
   /**
-   * 当前控制命令
-   */
-  private var control: Int = 0
-
-  /**
    * service是否停止运行
    */
   var stop = true
@@ -282,7 +277,7 @@ class MusicService : BaseService(),
   /**
    * 操作类型
    */
-  private var lastOp: Int = -1
+  private var lastCommand: Int = -1
     set(value) {
       field = value
       pushPlaybackUiState()
@@ -349,16 +344,15 @@ class MusicService : BaseService(),
 
   @SuppressLint("CheckResult")
   override fun onStartCommand(commandIntent: Intent?, flags: Int, startId: Int): Int {
-    val control = commandIntent?.getIntExtra(EXTRA_CONTROL, -1)
+    val command = commandIntent?.getIntExtra(EXTRA_COMMAND, -1)
     val action = commandIntent?.action
 
-    Timber.v("onStartCommand, control: $control action: $action flags: $flags startId: $startId")
+    Timber.v("onStartCommand, action: $action command: $command flags: $flags startId: $startId")
     stop = false
 
     tryLaunch {
       hasPermission = PermissionUtil.hasNecessaryPermission()
       load()
-      delay(200)
       handleStartCommandIntent(commandIntent, action)
     }
     return START_NOT_STICKY
@@ -377,7 +371,7 @@ class MusicService : BaseService(),
         }
         if (wasShowing) {
           // 先取消再重新显示 让通知栏彻底刷新一次
-          notify.cancelPlayingNotify()
+          notify.stopForegroundAndNotification()
           updateNotification()
         }
       }
@@ -537,7 +531,7 @@ class MusicService : BaseService(),
 
       override fun onStop() {
         pause()
-        notify.cancelPlayingNotify()
+        notify.stopForegroundAndNotification()
         stopSelf()
       }
 
@@ -599,14 +593,13 @@ class MusicService : BaseService(),
 
   override fun onEnded() {
     Timber.v("onEnded")
-    // 理论上应该不会到这?
-    if (BuildConfig.DEBUG) {
-      throw IllegalStateException("onEnded")
+    if (playback.itemCount == 0) {
+      notify.stopForegroundAndNotification()
     }
   }
 
   override fun onItemTransition(mediaItem: MediaItem?, reason: Int) {
-    Timber.v("onItemTransition, id: ${mediaItem?.mediaId} reason: $reason playing: ${isPlaying} currentSong: ${playback.currentSong?.title}")
+    Timber.v("onItemTransition, id: ${mediaItem?.mediaId} reason: $reason playing: $isPlaying currentSong: ${playback.currentSong?.title}")
 
     val song = mediaItem?.localConfiguration?.tag as? Song
     if (song is Song.Remote) {
@@ -629,9 +622,9 @@ class MusicService : BaseService(),
       }
 
       if (playModel == MODE_REPEAT) {
-        lastOp = Command.PLAY
+        lastCommand = Command.PLAY
       } else {
-        lastOp = Command.SKIP_TO_NEXT
+        lastCommand = Command.SKIP_TO_NEXT
       }
     }
 
@@ -694,7 +687,7 @@ class MusicService : BaseService(),
     playback.release()
     load = 0
 
-    notify.cancelPlayingNotify()
+    notify.stopForegroundAndNotification()
 
     lyricManager.isServiceAvailable = false
 
@@ -886,7 +879,7 @@ class MusicService : BaseService(),
       isFavorite = isFavorite,
       speed = settingPrefs.speedValue,
       playModel = playModel,
-      lastOp = lastOp
+      lastOp = lastCommand
     )
     onPositionChange()
   }
@@ -941,7 +934,7 @@ class MusicService : BaseService(),
   private fun playAt(position: Int) {
     Timber.v("playAt, $position")
 
-    if (position == -1 || position >= playback.mediaItemCount) {
+    if (position == -1 || position >= playback.itemCount) {
       MessageNotifier.show(R.string.illegal_arg)
       return
     }
@@ -1041,8 +1034,8 @@ class MusicService : BaseService(),
       ACTION_APPWIDGET_OPERATE -> {
         handleCommand(
           Intent(ACTION_CMD).putExtra(
-            EXTRA_CONTROL,
-            commandIntent?.getIntExtra(EXTRA_CONTROL, -1)
+            EXTRA_COMMAND,
+            commandIntent?.getIntExtra(EXTRA_COMMAND, -1)
           )
         )
       }
@@ -1051,7 +1044,7 @@ class MusicService : BaseService(),
         if (playModel != MODE_SHUFFLE) {
           playModel = MODE_SHUFFLE
         }
-        handleCommand(Intent(ACTION_CMD).putExtra(EXTRA_CONTROL, Command.SKIP_TO_NEXT))
+        handleCommand(Intent(ACTION_CMD).putExtra(EXTRA_COMMAND, Command.SKIP_TO_NEXT))
       }
 
       ACTION_SHORTCUT_MYLOVE -> {
@@ -1067,7 +1060,7 @@ class MusicService : BaseService(),
           }
 
           setPlayQueue(songs, Intent(ACTION_CMD).apply {
-            putExtra(EXTRA_CONTROL, Command.PLAY_AT)
+            putExtra(EXTRA_COMMAND, Command.PLAY_AT)
             putExtra(EXTRA_POSITION, 0)
           })
         }
@@ -1084,7 +1077,7 @@ class MusicService : BaseService(),
             return@tryLaunch
           }
           val lastedIntent = Intent(ACTION_CMD)
-          lastedIntent.putExtra(EXTRA_CONTROL, Command.PLAY_AT)
+          lastedIntent.putExtra(EXTRA_COMMAND, Command.PLAY_AT)
           lastedIntent.putExtra(EXTRA_POSITION, 0)
           setPlayQueue(songs, lastedIntent)
         }
@@ -1123,10 +1116,10 @@ class MusicService : BaseService(),
     updateAppwidget()
 
     // 正在播放、已有通知在显示、用户操作过
-    if (isPlaying || notify.isNotifyShowing || lastOp != -1) {
+    if (isPlaying || notify.isNotifyShowing || lastCommand != -1) {
       updateNotification()
     }
-    updateMediaSession(lastOp)
+    updateMediaSession(lastCommand)
     // 是否需要保存进度
     if (settingPrefs.playAtBreakPoint) {
       startSaveProgress()
@@ -1136,7 +1129,7 @@ class MusicService : BaseService(),
   }
 
   fun updateNotification() {
-    notify.updateForPlaying()
+    notify.updateAndNotify()
   }
 
   fun updateNotificationWithLrc(lrc: String) {
@@ -1155,45 +1148,39 @@ class MusicService : BaseService(),
     }
   }
 
-  private fun handleCommand(intent: Intent?) {
-    Timber.v("handleCommand: %s", intent)
+  private fun handleCommand(intent: Intent?) = launch {
     if (intent == null || intent.extras == null) {
-      return
+      return@launch
     }
-    val control = intent.getIntExtra(EXTRA_CONTROL, -1)
-    this@MusicService.control = control
-    Timber.v("control: $control")
+    val command = intent.getIntExtra(EXTRA_COMMAND, -1)
+    Timber.v("handleCommand, command: $command")
 
-    if (control == Command.PLAY_AT || control == Command.SKIP_TO_PREVIOUS || control == Command.SKIP_TO_NEXT
-      || control == Command.PLAY_PAUSE || control == Command.PAUSE || control == Command.PLAY
-    ) {
-      // 判断下间隔时间
-      if ((control == Command.SKIP_TO_PREVIOUS || control == Command.SKIP_TO_NEXT) && System.currentTimeMillis() - lastCommandTime < INTERVAL_CONTROL) {
-        Timber.v("间隔小于500ms")
-        return
-      }
-      // 保存控制命令,用于播放界面判断动画
-      lastOp = control
-      if (playback.mediaItemCount == 0) {
-        // 列表为空，尝试读取
-        Timber.v("列表为空，尝试读取")
-        tryLaunch {
-          load()
-        }
-        return
-      }
+    val now = System.currentTimeMillis()
+    if (now - lastCommandTime < INTERVAL_CONTROL) {
+      Timber.w("ignore command")
+      return@launch
     }
-    lastCommandTime = System.currentTimeMillis()
+    lastCommandTime = now
 
-    when (control) {
+    val requiresQueue = command == Command.PLAY_AT
+        || command == Command.SKIP_TO_PREVIOUS
+        || command == Command.SKIP_TO_NEXT
+        || command == Command.PLAY_PAUSE
+        || command == Command.PAUSE
+        || command == Command.PLAY
+
+    if (requiresQueue && playback.itemCount == 0) {
+      load()
+      if (playback.itemCount == 0) return@launch
+    }
+
+    lastCommand = command
+    when (command) {
       // 关闭通知栏
       Command.CLOSE_NOTIFY -> {
-        notify.isNotifyShowing = false
         pause()
-        launch {
-          delay(300)
-          notify.cancelPlayingNotify()
-        }
+        delay(300)
+        notify.stopForegroundAndNotification()
       }
       // 播放选中的歌曲
       Command.PLAY_AT -> {
@@ -1225,12 +1212,10 @@ class MusicService : BaseService(),
       }
       // 取消或者添加收藏
       Command.LOVE -> {
-        launch {
-          playback.currentSong?.let {
-            playListRepository.toggleFavorite(it.id)
-            MusicStateSource.updatePlaybackUiState(isFavorite = !playbackState.isFavorite)
-            updateAppwidget()
-          }
+        playback.currentSong?.let {
+          playListRepository.toggleFavorite(it.id)
+          MusicStateSource.updatePlaybackUiState(isFavorite = !playbackState.isFavorite)
+          updateAppwidget()
         }
       }
       // 桌面歌词
@@ -1240,7 +1225,7 @@ class MusicService : BaseService(),
       // 临时播放一首歌曲
       Command.PLAY_TEMP -> {
         intent.getSerializableExtra(EXTRA_SONG)?.let {
-          lastOp = Command.PLAY_TEMP
+          lastCommand = Command.PLAY_TEMP
           val song = it as Song.Local
 
           if (playback.getPlaylist().isEmpty()) {
@@ -1253,7 +1238,7 @@ class MusicService : BaseService(),
             seekTo(0)
           }
 
-          launch { playQueueStore.save(playback.getPlaylist()) }
+          playQueueStore.save(playback.getPlaylist())
           start(true)
         }
       }
@@ -1263,11 +1248,11 @@ class MusicService : BaseService(),
       }
       // 某一首歌曲添加至下一首播放
       Command.ADD_TO_NEXT_SONG -> {
-        val nextSong = intent.getSerializableExtra(EXTRA_SONG) as Song? ?: return
+        val nextSong = intent.getSerializableExtra(EXTRA_SONG) as Song? ?: return@launch
 
         if (playback.addToNextSong(nextSong)) {
           // 同步更新
-          launch { playQueueStore.save(playback.getPlaylist()) }
+          playQueueStore.save(playback.getPlaylist())
           pushPlaybackUiState()
           MessageNotifier.show(R.string.already_add_to_next_song)
         }
@@ -1321,7 +1306,7 @@ class MusicService : BaseService(),
       .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.duration)
       .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (playback.currentIndex + 1).toLong())
       .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.title)
-    builder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playback.mediaItemCount.toLong())
+    builder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playback.itemCount.toLong())
 
     mediaSession.setMetadata(builder.build())
     updatePlaybackState()
@@ -1506,7 +1491,7 @@ class MusicService : BaseService(),
     if (wasPlaying) {
       start(true)
       wasPlaying = false
-      lastOp = Command.PLAY_PAUSE
+      lastCommand = Command.PLAY_PAUSE
     }
     volumeController.directTo(1f)
   }
@@ -1519,7 +1504,7 @@ class MusicService : BaseService(),
       return
     }
     if (isPlaying) {
-      lastOp = Command.PLAY_PAUSE
+      lastCommand = Command.PLAY_PAUSE
       pause()
     }
   }
@@ -1529,7 +1514,7 @@ class MusicService : BaseService(),
     Timber.v("onFocusLostTransient")
     wasPlaying = isPlaying
     if (isPlaying) {
-      lastOp = Command.PLAY_PAUSE
+      lastCommand = Command.PLAY_PAUSE
       pause()
     }
   }
@@ -1589,7 +1574,7 @@ class MusicService : BaseService(),
     // 歌曲标签变化
     const val TAG_CHANGE = "$APLAYER_PACKAGE_NAME.tag_change"
 
-    const val EXTRA_CONTROL = "control"
+    const val EXTRA_COMMAND = "command"
     const val EXTRA_SHUFFLE = "shuffle"
     const val EXTRA_PROGRESS = "progress"
     const val ACTION_APPWIDGET_OPERATE = "$APLAYER_PACKAGE_NAME.appwidget.operate"
@@ -1617,7 +1602,7 @@ class MusicService : BaseService(),
 
     private const val INTERVAL_UPDATE_APPWIDGET = 1000L
     private const val INTERVAL_SAVE_PROGRESS = 1000L
-    private const val INTERVAL_CONTROL = 1000
+    private const val INTERVAL_CONTROL = 500
 
     /**
      * 复制bitmap

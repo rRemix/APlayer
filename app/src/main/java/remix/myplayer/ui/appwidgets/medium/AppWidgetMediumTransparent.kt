@@ -47,7 +47,7 @@ class AppWidgetMediumTransparent : BaseAppwidget() {
     skin = AppWidgetSkin.TRANSPARENT
     updateRemoteViews(service, remoteViews, song)
     //设置时间
-    val currentTime = progressState.position.toLong()
+    val currentTime = progressState.position
     val remainTime = song.duration - progressState.position
     if (currentTime > 0 && remainTime > 0) {
       remoteViews.setTextViewText(

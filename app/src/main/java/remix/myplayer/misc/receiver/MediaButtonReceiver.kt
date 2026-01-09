@@ -7,7 +7,7 @@ import android.view.KeyEvent
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.ACTION_CMD
-import remix.myplayer.service.MusicService.Companion.EXTRA_CONTROL
+import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
 import remix.myplayer.util.Util.sendLocalBroadcast
 import timber.log.Timber
 
@@ -51,7 +51,7 @@ class MediaButtonReceiver : BroadcastReceiver() {
           keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
         val ctrlIntent = Intent(ACTION_CMD)
 
-        ctrlIntent.putExtra(EXTRA_CONTROL, when (keyCode) {
+        ctrlIntent.putExtra(EXTRA_COMMAND, when (keyCode) {
           KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> Command.PLAY_PAUSE
           KeyEvent.KEYCODE_MEDIA_PAUSE -> Command.PLAY_PAUSE
           KeyEvent.KEYCODE_MEDIA_PLAY -> Command.PLAY_PAUSE
@@ -72,7 +72,7 @@ class MediaButtonReceiver : BroadcastReceiver() {
             try {
               Thread.sleep(800)
               val action = Intent(MusicService.ACTION_CMD)
-              action.putExtra(EXTRA_CONTROL, when (clickCount) {
+              action.putExtra(EXTRA_COMMAND, when (clickCount) {
                 1 -> Command.PLAY_PAUSE
                 2 -> Command.SKIP_TO_NEXT
                 3 -> Command.SKIP_TO_PREVIOUS

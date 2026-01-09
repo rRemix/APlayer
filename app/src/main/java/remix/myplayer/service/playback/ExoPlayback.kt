@@ -58,7 +58,7 @@ class ExoPlayback(private val context: Context) : Playback {
   override val currentIndex: Int
     get() = player.currentMediaItemIndex
 
-  override val mediaItemCount: Int
+  override val itemCount: Int
     get() = player.mediaItemCount
 
   override val nextSong: Song?

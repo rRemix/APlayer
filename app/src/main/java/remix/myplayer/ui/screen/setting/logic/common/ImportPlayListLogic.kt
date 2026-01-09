@@ -15,6 +15,7 @@ import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import remix.myplayer.R
+import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.screen.setting.NormalPreference
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.settingViewModel
@@ -35,7 +36,12 @@ fun ImportPlayListLogic() {
         val uri = result.data?.data ?: return@rememberLauncherForActivityResult
 
         scope.launch(Dispatchers.IO) {
-          val stream = context.contentResolver.openInputStream(uri) ?: return@launch
+          val stream = try {
+            context.contentResolver.openInputStream(uri)
+          } catch (e: SecurityException) {
+            MessageNotifier.show(R.string.import_fail, e.message ?: e.toString())
+            null
+          } ?: return@launch
           stream.use { input ->
             BufferedReader(InputStreamReader(input)).use { reader ->
               val audioIds = ArrayList<Long>()

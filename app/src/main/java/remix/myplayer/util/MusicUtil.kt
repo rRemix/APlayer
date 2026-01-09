@@ -39,7 +39,7 @@ object MusicUtil {
   ).songRepository()
 
   fun makeCmdIntent(cmd: Int, shuffle: Boolean): Intent {
-    return Intent(MusicService.ACTION_CMD).putExtra(MusicService.EXTRA_CONTROL, cmd)
+    return Intent(MusicService.ACTION_CMD).putExtra(MusicService.EXTRA_COMMAND, cmd)
       .putExtra(MusicService.EXTRA_SHUFFLE, shuffle)
   }
 
@@ -111,7 +111,7 @@ object MusicUtil {
       context.startService(
         Intent(context, MusicService::class.java).run {
           action = MusicService.ACTION_CMD
-          putExtra(MusicService.EXTRA_CONTROL, Command.PLAY_TEMP)
+          putExtra(MusicService.EXTRA_COMMAND, Command.PLAY_TEMP)
           putExtra(
             MusicService.EXTRA_SONG,
             songs.first()

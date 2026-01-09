@@ -23,25 +23,7 @@ import remix.myplayer.util.DensityUtil
 
 class NotifyImpl(context: MusicService) : Notify(context) {
 
-//  private var titleColor: Int? = null
-//  private var textColor: Int? = null
-
-//  init {
-//    try {
-//      val linearLayout = LayoutInflater.from(context).inflate(R.layout.notification_big, null)
-//
-//      val titleView = linearLayout.findViewById<TextView>(R.id.notify_song)
-//      val textView = linearLayout.findViewById<TextView>(R.id.notify_artist_album)
-//
-//      titleColor = titleView.textColors.defaultColor
-//      textColor = textView.textColors.defaultColor
-//    } catch (e: Exception) {
-//      Timber.w(e)
-//    }
-//  }
-
-
-  override fun updateForPlaying() {
+  override fun updateAndNotify() {
     val remoteView = RemoteViews(service.packageName, R.layout.notification)
     val remoteBigView = RemoteViews(service.packageName, R.layout.notification_big)
 
@@ -61,10 +43,19 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     //非系统背景色 即黑色背景
     if (!service.settingPrefs.notifyUseSystemBackground) {
       //字体颜色
-      remoteBigView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))
+      remoteBigView.setTextColor(
+        R.id.notify_song,
+        ColorUtil.getColor(R.color.dark_text_color_primary)
+      )
       remoteView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.dark_text_color_primary))
-      remoteBigView.setTextColor(R.id.notify_artist_album, ColorUtil.getColor(R.color.dark_text_color_secondary))
-      remoteView.setTextColor(R.id.notify_artist_album, ColorUtil.getColor(R.color.dark_text_color_secondary))
+      remoteBigView.setTextColor(
+        R.id.notify_artist_album,
+        ColorUtil.getColor(R.color.dark_text_color_secondary)
+      )
+      remoteView.setTextColor(
+        R.id.notify_artist_album,
+        ColorUtil.getColor(R.color.dark_text_color_secondary)
+      )
       //背景
       remoteBigView.setImageViewResource(R.id.notify_bg, R.drawable.bg_notification_black)
       remoteBigView.setViewVisibility(R.id.notify_bg, View.VISIBLE)
@@ -73,10 +64,14 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     }
 
     //桌面歌词
-    remoteBigView.setImageViewResource(R.id.notify_lyric,
-        if (lyricManager.isDesktopLyricEnabled) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)
-    remoteView.setImageViewResource(R.id.notify_lyric,
-        if (lyricManager.isDesktopLyricEnabled) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric)
+    remoteBigView.setImageViewResource(
+      R.id.notify_lyric,
+      if (lyricManager.isDesktopLyricEnabled) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric
+    )
+    remoteView.setImageViewResource(
+      R.id.notify_lyric,
+      if (lyricManager.isDesktopLyricEnabled) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric
+    )
 
     //设置播放按钮
     if (!isPlay) {
@@ -89,7 +84,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
 
     //设置封面
     val size = DensityUtil.dip2px(service, 128f)
-    pushNotify(notification)
+    startForegroundOrNotify(notification)
 
     Glide.with(service).clear(target)
     target = Glide.with(service)
@@ -108,7 +103,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
               remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             }
 
-            pushNotify(notification)
+            startForegroundOrNotify(notification)
           }
         }
 
@@ -119,7 +114,7 @@ class NotifyImpl(context: MusicService) : Notify(context) {
           if (song.id == playbackState.song.id) {
             remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            pushNotify(notification)
+            startForegroundOrNotify(notification)
           }
         }
 
@@ -127,23 +122,27 @@ class NotifyImpl(context: MusicService) : Notify(context) {
           if (song.id == playbackState.song.id) {
             remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
             remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            pushNotify(notification)
+            startForegroundOrNotify(notification)
           }
         }
       })
   }
 
-  private fun buildNotification(context: Context, remoteView: RemoteViews, remoteBigView: RemoteViews): Notification {
+  private fun buildNotification(
+    context: Context,
+    remoteView: RemoteViews,
+    remoteBigView: RemoteViews
+  ): Notification {
     val builder = NotificationCompat.Builder(context, PLAYING_NOTIFICATION_CHANNEL_ID)
     builder.setContent(remoteView)
-        .setCustomBigContentView(remoteBigView)
-        .setContentText("")
-        .setContentTitle("")
-        .setShowWhen(false)
-        .setPriority(NotificationCompat.PRIORITY_MAX)
-        .setOngoing(playbackState.isPlaying)
-        .setContentIntent(contentIntent)
-        .setSmallIcon(R.drawable.icon_notifbar)
+      .setCustomBigContentView(remoteBigView)
+      .setContentText("")
+      .setContentTitle("")
+      .setShowWhen(false)
+      .setPriority(NotificationCompat.PRIORITY_MAX)
+      .setOngoing(playbackState.isPlaying)
+      .setContentIntent(contentIntent)
+      .setSmallIcon(R.drawable.icon_notifbar)
     builder.setCustomBigContentView(remoteBigView)
     builder.setCustomContentView(remoteView)
     return builder.build()
@@ -169,31 +168,11 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     remoteView.setOnClickPendingIntent(R.id.notify_close, closeIntent)
 
     //桌面歌词
-    val lyricIntent = buildPendingIntent(context,
-        if (lyricManager.isDesktopLyricLocked) Command.UNLOCK_DESKTOP_LYRIC else Command.TOGGLE_DESKTOP_LYRIC)
+    val lyricIntent = buildPendingIntent(
+      context,
+      if (lyricManager.isDesktopLyricLocked) Command.UNLOCK_DESKTOP_LYRIC else Command.TOGGLE_DESKTOP_LYRIC
+    )
     remoteBigView.setOnClickPendingIntent(R.id.notify_lyric, lyricIntent)
     remoteView.setOnClickPendingIntent(R.id.notify_lyric, lyricIntent)
   }
-
-//  private fun tintBitmap(resId: Int, color: Int?): Bitmap {
-//    val bitmap = BitmapFactory.decodeResource(service.resources, resId)
-//    return replaceBitmapColor(bitmap, color ?: return bitmap)
-//  }
-//
-//  private fun replaceBitmapColor(oldBitmap: Bitmap, newColor: Int): Bitmap {
-//    val copy = oldBitmap.copy(Bitmap.Config.ARGB_8888, true)
-//    //循环获得bitmap所有像素点
-//    val width = copy.width
-//    val height = copy.height
-//    for (i in 0 until height) {
-//      for (j in 0 until width) {
-//        val color = copy.getPixel(j, i)
-//        if (color != Color.TRANSPARENT) {
-//          copy.setPixel(j, i, newColor)  //替换
-//        }
-//      }
-//    }
-//    return copy
-//  }
-
 }

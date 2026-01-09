@@ -49,7 +49,7 @@ class AppWidgetBig : BaseAppwidget() {
     skin = AppWidgetSkin.WHITE_1F
     updateRemoteViews(service, remoteViews, song)
     //设置时间
-    val currentTime = progressState.position.toLong()
+    val currentTime = progressState.position
     if (currentTime > 0) {
       remoteViews.setTextViewText(R.id.appwidget_progress, Util.getTime(currentTime))
     }
@@ -70,7 +70,7 @@ class AppWidgetBig : BaseAppwidget() {
     skin = AppWidgetSkin.WHITE_1F
     updateRemoteViews(service, remoteViews, song)
     //设置时间
-    val currentTime = progressState.position.toLong()
+    val currentTime = progressState.position
     if (currentTime > 0) {
       remoteViews.setTextViewText(R.id.appwidget_progress, Util.getTime(currentTime))
     }
