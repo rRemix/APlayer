@@ -32,6 +32,7 @@ kotlin {
     jvmToolchain(17)
 }
 
+val useSmb = false
 android {
     namespace = "remix.myplayer"
 
@@ -70,6 +71,7 @@ android {
 //            "GITHUB_SHA",
 //            "\"${System.getenv("GITHUB_SHA")}\""
 //        )
+        buildConfigField("boolean", "SUPPORT_SMB", useSmb.toString())
 
         ndk {
             abiFilters += listOf(
@@ -256,7 +258,11 @@ dependencies {
         // https://github.com/thegrizzlylabs/sardine-android/blob/d0af7ae8e7ee0654a763c4c6f638a5e98b1782e9/build.gradle#L46
         exclude(group = "xpp3", module = "xpp3")
     }
-    compileOnly(libs.smbj)
+    if (useSmb) {
+        implementation(libs.smbj)
+    } else {
+        compileOnly(libs.smbj)
+    }
     implementation(libs.slf4j)
     implementation(libs.timber)
     implementation(libs.tinypinyin)

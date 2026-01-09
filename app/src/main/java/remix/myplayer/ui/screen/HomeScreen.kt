@@ -53,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.data.model.misc.Library
 import remix.myplayer.ui.dialog.CreatePlayListDialog
@@ -145,38 +146,38 @@ fun HomeScreen() {
         val smbVM = smbViewModel
 
         Column {
-//          if (showAddRemoteMenu) {
-//            DropdownMenu(
-//              expanded = showAddRemoteMenu,
-//              containerColor = LocalTheme.current.dialogBackground,
-//              onDismissRequest = { showAddRemoteMenu = false }
-//            ) {
-//              DropdownMenuItem(
-//                text = {
-//                  Text(
-//                    stringResource(R.string.webdav),
-//                    color = LocalTheme.current.textPrimary
-//                  )
-//                },
-//                onClick = {
-//                  showAddRemoteMenu = false
-//                  webDavVM.showAddWebDavDialog()
-//                }
-//              )
-//              DropdownMenuItem(
-//                text = {
-//                  Text(
-//                    stringResource(R.string.smb),
-//                    color = LocalTheme.current.textPrimary
-//                  )
-//                },
-//                onClick = {
-//                  showAddRemoteMenu = false
-//                  smbVM.showAddSmbDialog()
-//                }
-//              )
-//            }
-//          }
+          if (BuildConfig.SUPPORT_SMB && showAddRemoteMenu) {
+            DropdownMenu(
+              expanded = true,
+              containerColor = LocalTheme.current.dialogBackground,
+              onDismissRequest = { showAddRemoteMenu = false }
+            ) {
+              DropdownMenuItem(
+                text = {
+                  Text(
+                    stringResource(R.string.webdav),
+                    color = LocalTheme.current.textPrimary
+                  )
+                },
+                onClick = {
+                  showAddRemoteMenu = false
+                  webDavVM.showAddWebDavDialog()
+                }
+              )
+              DropdownMenuItem(
+                text = {
+                  Text(
+                    stringResource(R.string.smb),
+                    color = LocalTheme.current.textPrimary
+                  )
+                },
+                onClick = {
+                  showAddRemoteMenu = false
+                  smbVM.showAddSmbDialog()
+                }
+              )
+            }
+          }
 
           FAButton(
             selectLibrary.tag == Library.TAG_PLAYLIST || selectLibrary.tag == Library.TAG_REMOTE
@@ -188,8 +189,11 @@ fun HomeScreen() {
             if (selectLibrary.tag == Library.TAG_PLAYLIST) {
               libraryVM.showCreatePlaylistDialog()
             } else if (selectLibrary.tag == Library.TAG_REMOTE) {
-//              showAddRemoteMenu = true
-              webDavVM.showAddWebDavDialog()
+              if (BuildConfig.SUPPORT_SMB) {
+                showAddRemoteMenu = true
+              } else {
+                webDavVM.showAddWebDavDialog()
+              }
             }
           }
         }
