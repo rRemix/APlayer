@@ -43,7 +43,8 @@
     <activity android:name="remix.myplayer.ui.activity.ComposeActivity"
         android:theme="@style/AppTheme"
         android:launchMode="singleTop"
-        android:exported="true">
+        android:exported="true"
+        android:configChanges="uiMode|colorMode">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <action android:name="android.intent.action.MUSIC_PLAYER"/>

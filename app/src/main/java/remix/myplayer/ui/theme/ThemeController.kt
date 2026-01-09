@@ -21,6 +21,8 @@ interface ThemeController {
 
   var black: Boolean
 
+  fun onSystemThemeChanged()
+
   fun setColoredNaviBar(colored: Boolean)
 
   fun setPrimary(color: Color)
@@ -51,7 +53,8 @@ class ThemeControllerImpl @Inject constructor(private val storage: ThemePrefs) :
       field = value
       storage.darkTheme = value
       _currentTheme.value = _currentTheme.value.copy(
-        theme = storage.resolveTheme(value, storage.blackTheme))
+        theme = storage.resolveTheme(value, storage.blackTheme)
+      )
     }
 
   override var black: Boolean = false
@@ -63,8 +66,20 @@ class ThemeControllerImpl @Inject constructor(private val storage: ThemePrefs) :
       field = value
       storage.blackTheme = value
       _currentTheme.value = _currentTheme.value.copy(
-        theme = storage.resolveTheme(storage.darkTheme, value))
+        theme = storage.resolveTheme(storage.darkTheme, value)
+      )
     }
+
+  override fun onSystemThemeChanged() {
+    if (storage.darkTheme != FOLLOW_SYSTEM) {
+      return
+    }
+    val resolved = storage.resolveTheme(storage.darkTheme, storage.blackTheme)
+    if (_currentTheme.value.theme == resolved) {
+      return
+    }
+    _currentTheme.value = _currentTheme.value.copy(theme = resolved)
+  }
 
   override fun setColoredNaviBar(colored: Boolean) {
     storage.coloredNaviBar = colored

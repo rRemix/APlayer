@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -86,6 +87,11 @@ class ComposeActivity : BaseMusicActivity() {
   override fun onResume() {
     super.onResume()
     handleIntent()
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    themeController.onSystemThemeChanged()
   }
 
   private fun handleIntent() {

@@ -2,6 +2,7 @@ package remix.myplayer.data.prefs
 
 import android.content.Context
 import android.content.res.Configuration
+import android.content.res.Resources
 import androidx.core.graphics.toColorInt
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -18,13 +19,21 @@ class ThemePrefs @Inject constructor(
   var secondaryColor by PrefsDelegate(sp, PrefKeys.Theme.SECONDARY_COLOR, "#698cf6".toColorInt())
 
   // 从settingPrefs迁移
-  var darkTheme by PrefsDelegate(sp, PrefKeys.Theme.DARK_THEME, settingPrefs.sp.getString(PrefKeys.Theme.DARK_THEME, FOLLOW_SYSTEM)!!)
-  var blackTheme by PrefsDelegate(sp, PrefKeys.Theme.BLACK_THEME, settingPrefs.sp.getBoolean(PrefKeys.Theme.BLACK_THEME, false))
+  var darkTheme by PrefsDelegate(
+    sp,
+    PrefKeys.Theme.DARK_THEME,
+    settingPrefs.sp.getString(PrefKeys.Theme.DARK_THEME, FOLLOW_SYSTEM)!!
+  )
+  var blackTheme by PrefsDelegate(
+    sp,
+    PrefKeys.Theme.BLACK_THEME,
+    settingPrefs.sp.getBoolean(PrefKeys.Theme.BLACK_THEME, false)
+  )
 
   var coloredNaviBar by PrefsDelegate(sp, PrefKeys.Theme.COLOR_NAVIGATION, false)
 
   fun resolveTheme(darkTheme: String, blackTheme: Boolean): String {
-    return if (darkTheme == ALWAYS_ON || (darkTheme == FOLLOW_SYSTEM && (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)) {
+    return if (darkTheme == ALWAYS_ON || (darkTheme == FOLLOW_SYSTEM && (Resources.getSystem().configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)) {
       if (blackTheme) {
         BLACK
       } else {
