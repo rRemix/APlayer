@@ -506,6 +506,7 @@ class MusicService : BaseService(),
     )
     mediaSession.setCallback(object : MediaSessionCompat.Callback() {
       override fun onMediaButtonEvent(event: Intent): Boolean {
+        Timber.v("onMediaButtonEvent")
         return MediaButtonReceiver.handleMediaButtonIntent(this@MusicService, event)
       }
 
