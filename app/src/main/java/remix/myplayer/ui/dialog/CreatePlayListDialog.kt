@@ -1,5 +1,6 @@
 package remix.myplayer.ui.dialog
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
@@ -29,7 +30,7 @@ fun CreatePlayListDialog() {
   ) {
     libraryVM.insertPlayList(it) { id ->
       if (id > 0) {
-        navController.navigate("$RouteSongChoose/${id}/$it")
+        navController.navigate("$RouteSongChoose/${id}/${Uri.encode(it)}")
       }
     }
   }

@@ -102,7 +102,7 @@ fun AppNav() {
           })
         ) {
           val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
-          val name = it.arguments?.getString("name") ?: return@normalAnimatedScreen
+          val name = Uri.decode(it.arguments?.getString("name") ?: return@normalAnimatedScreen)
           SongChooserScreen(id, name)
         }
 

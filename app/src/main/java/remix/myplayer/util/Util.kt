@@ -699,7 +699,6 @@ object Util {
               return@launch
             }
 
-            throw securityException
           }
 
           Timber.v("Fail to save tag: $e")
