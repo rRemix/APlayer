@@ -44,6 +44,7 @@ class FolderRepoImpl @Inject constructor(
     } catch (e: Exception) {
       Timber.v(e)
     }
+    folders.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name ?: it.path })
     return folders
   }
 }
