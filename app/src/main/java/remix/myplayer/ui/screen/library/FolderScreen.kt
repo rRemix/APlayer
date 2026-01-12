@@ -109,10 +109,8 @@ fun FolderItem(folder: Folder, selected: Boolean, onClick: () -> Unit, onLongCli
 
     LibraryItemPopupButton(modifier = Modifier.align(Alignment.CenterEnd), model = folder)
 
-    Text(
+    TextSecondary(
       text = pluralStringResource(R.plurals.song_num, folder.count, folder.count),
-      fontSize = 12.sp,
-      color = Color.Black,
       modifier = Modifier
         .align(Alignment.CenterEnd)
         .padding(end = 78.dp)
