@@ -205,11 +205,11 @@ class SongRepoImpl @Inject constructor(
           }
 
           // remove no longer exist
-          if (songs.size < it.audioIds.size) {
+          if (songs.size < ids.size) {
             val deleteIds = ArrayList<Long>()
             val existIds = songs.map { it.id }
 
-            for (audioId in it.audioIds) {
+            for (audioId in ids) {
               if (!existIds.contains(audioId)) {
                 deleteIds.add(audioId)
               }

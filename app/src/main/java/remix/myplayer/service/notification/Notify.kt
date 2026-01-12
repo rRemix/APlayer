@@ -15,6 +15,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.app.TaskStackBuilder
 import com.bumptech.glide.request.target.CustomTarget
+import com.tencent.bugly.crashreport.CrashReport
 import remix.myplayer.R
 import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.MusicService
@@ -127,15 +128,21 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     }
 
     if (!isForeground && playing) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        service.startForeground(
-          PLAYING_NOTIFICATION_ID, notification,
-          ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-        )
-      } else {
-        service.startForeground(PLAYING_NOTIFICATION_ID, notification)
+      try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+          service.startForeground(
+            PLAYING_NOTIFICATION_ID, notification,
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+          )
+        } else {
+          service.startForeground(PLAYING_NOTIFICATION_ID, notification)
+        }
+        isForeground = true
+      } catch (e: Exception) {
+        notificationManager.notify(PLAYING_NOTIFICATION_ID, notification)
+        Timber.w(e, "startForeground failed, fallback to notify")
+        CrashReport.postCatchedException(e)
       }
-      isForeground = true
     } else {
       notificationManager.notify(PLAYING_NOTIFICATION_ID, notification)
     }

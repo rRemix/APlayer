@@ -1026,7 +1026,7 @@ class MusicService : BaseService(),
   }
 
   private fun handleStartCommandIntent(commandIntent: Intent?, action: String?) {
-    Timber.v("handleStartCommandIntent")
+    Timber.v("handleStartCommandIntent: $commandIntent")
     if (action == null) {
       return
     }
@@ -1307,6 +1307,8 @@ class MusicService : BaseService(),
       .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.duration)
       .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (playback.currentIndex + 1).toLong())
       .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.title)
+      .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currentSong.title)
+      .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currentSong.artist)
     builder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playback.itemCount.toLong())
 
     mediaSession.setMetadata(builder.build())

@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import remix.myplayer.BuildConfig
 import remix.myplayer.ui.activity.base.BaseMusicActivity
@@ -103,6 +104,7 @@ class ComposeActivity : BaseMusicActivity() {
 
         else -> {
           lifecycleScope.launch {
+            delay(500)
             MusicUtil.playFromUri(this@ComposeActivity, it)
           }
           intent = Intent()

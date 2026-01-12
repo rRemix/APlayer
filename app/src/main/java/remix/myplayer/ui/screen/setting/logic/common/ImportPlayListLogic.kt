@@ -78,10 +78,15 @@ fun ImportPlayListLogic() {
     stringResource(R.string.playlist_import),
     stringResource(R.string.playlist_import_tip)
   ) {
-    chooseM3ULauncher.launch(Intent(Intent.ACTION_GET_CONTENT).apply {
+    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
       putExtra(EXTRA_ALLOW_MULTIPLE, true)
       type = MimeTypeMap.getSingleton().getMimeTypeFromExtension("m3u")
       addCategory(Intent.CATEGORY_OPENABLE)
-    })
+    }
+    if (intent.resolveActivity(context.packageManager) == null) {
+      MessageNotifier.show(R.string.activity_not_found_tip)
+      return@NormalPreference
+    }
+    chooseM3ULauncher.launch(intent)
   }
 }
