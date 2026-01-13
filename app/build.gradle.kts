@@ -61,11 +61,6 @@ android {
             "GOOGLE_PLAY_LICENSE_KEY",
             "\"${properties.getProperty("GOOGLE_PLAY_LICENSE_KEY")}\""
         )
-        buildConfigField(
-            "String",
-            "BUGLY_APP_ID",
-            "\"${properties.getProperty("BUGLY_APP_ID")}\""
-        )
 //        buildConfigField(
 //            "String",
 //            "GITHUB_SHA",
@@ -145,24 +140,22 @@ android {
         }
     }
 
-    flavorDimensions += listOf("channel", "updater")
+    flavorDimensions += "distribution"
     productFlavors {
-        create("nonGoogle") {
-            dimension = "channel"
+        create("normal") {
+            dimension = "distribution"
             isDefault = true
+            buildConfigField(
+                "String",
+                "BUGLY_APP_ID",
+                "\"${properties.getProperty("BUGLY_APP_ID")}\""
+            )
+        }
+        create("foss") {
+            dimension = "distribution"
         }
         create("google") {
-            dimension = "channel"
-        }
-
-        create("withUpdater") {
-            dimension = "updater"
-            isDefault = true
-            buildConfigField("boolean", "ENABLE_UPDATER", "true")
-        }
-        create("withoutUpdater") {
-            dimension = "updater"
-            buildConfigField("boolean", "ENABLE_UPDATER", "false")
+            dimension = "distribution"
         }
     }
 
@@ -198,20 +191,6 @@ android {
     }
 }
 
-androidComponents {
-    beforeVariants { variantBuilder ->
-        if (variantBuilder.productFlavors.containsAll(
-                listOf(
-                    "channel" to "google",
-                    "updater" to "withUpdater"
-                )
-            )
-        ) {
-            variantBuilder.enable = false
-        }
-    }
-}
-
 baselineProfile {
     saveInSrc = true
 
@@ -219,7 +198,7 @@ baselineProfile {
         disabledVariants = false
     }
 //  variants {
-//      maybeCreate("nonGoogleWithUpdaterRelease").apply {
+//      maybeCreate("normalRelease").apply {
 //          from(project(":baselineprofile"))
 //      }
 //  }
@@ -249,7 +228,6 @@ dependencies {
     implementation(libs.room.runtime)
 
     implementation(libs.image.cropper)
-    implementation(libs.bugly)
     implementation(libs.logback.android)
     implementation(libs.xxpermissions)
     implementation(libs.sardine.android) {
@@ -268,6 +246,9 @@ dependencies {
     implementation(libs.tinypinyin)
 
     debugImplementation(libs.leakcanary)
+
+    val normalImplementation by configurations
+    normalImplementation(libs.bugly)
 
     val googleImplementation by configurations
     googleImplementation(libs.billingclient)
@@ -311,7 +292,7 @@ if (properties.getProperty("BUGLY_UPLOAD") == "1") {
         }
 
         val mappingFile =
-            file("${project.layout.buildDirectory.asFile.get()}/outputs/mapping/nonGoogleWithUpdaterRelease/mapping.txt")
+            file("${project.layout.buildDirectory.asFile.get()}/outputs/mapping/normalRelease/mapping.txt")
         val args = listOf(
             "-appid",
             appId,
@@ -335,7 +316,7 @@ if (properties.getProperty("BUGLY_UPLOAD") == "1") {
     }
 
     tasks.whenTaskAdded {
-        if (name == "assembleNonGoogleWithUpdaterRelease") {
+        if (name == "assembleNormalRelease") {
             finalizedBy(uploadMapping)
         }
     }

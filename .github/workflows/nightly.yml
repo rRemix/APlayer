@@ -66,7 +66,7 @@ jobs:
           echo "message=$MSG" >> "$GITHUB_OUTPUT"
 
       - name: Build nightly
-        run: ./gradlew :app:assembleNonGoogleWithUpdaterRelease
+        run: ./gradlew :app:assembleNormalRelease
 
       - name: Delete Old Nightly Release
         env:

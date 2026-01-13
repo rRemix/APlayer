@@ -210,7 +210,7 @@ private fun OtherPreferences() {
     nav.navigate(RouteAbout)
   }
 
-  if (BuildConfig.ENABLE_UPDATER) {
+  if (BuildConfig.FLAVOR == "normal") {
     Preference(onClick = {
       mainViewModel.checkInAppUpdate(true)
     }, title = stringResource(R.string.check_update))

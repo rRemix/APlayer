@@ -20,7 +20,7 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Build with Gradle
-        run: ./gradlew app:assembleDebug
+        run: ./gradlew app:assembleNormalDebug
       - name: Upload outputs
         uses: actions/upload-artifact@v4
         with:

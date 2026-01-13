@@ -28,12 +28,11 @@ android {
 
     targetProjectPath = ":app"
 
-    flavorDimensions += listOf("channel", "updater")
+    flavorDimensions += "distribution"
     productFlavors {
-        create("nonGoogle") { dimension = "channel" }
-        create("google") { dimension = "channel" }
-        create("withUpdater") { dimension = "updater" }
-        create("withoutUpdater") { dimension = "updater" }
+        create("normal") { dimension = "distribution" }
+        create("foss") { dimension = "distribution" }
+        create("google") { dimension = "distribution" }
     }
 
     // This code creates the gradle managed device used to generate baseline profiles.

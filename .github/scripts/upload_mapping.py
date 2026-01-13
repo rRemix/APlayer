@@ -92,7 +92,7 @@ def main():
     print(f"App Version: {version_name} (Code: {version_code})")
 
     # 2. Locate Mapping File
-    mapping_file = "app/build/outputs/mapping/nonGoogleWithUpdaterRelease/mapping.txt"
+    mapping_file = "app/build/outputs/mapping/normalRelease/mapping.txt"
     if not os.path.exists(mapping_file):
         print(f"Mapping file not found at default path: {mapping_file}")
         # Fallback search

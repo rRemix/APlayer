@@ -74,7 +74,7 @@ class ComposeActivity : BaseMusicActivity() {
       }
     }
 
-    if (BuildConfig.ENABLE_UPDATER) {
+    if (BuildConfig.FLAVOR == "normal") {
       lifecycleScope.launch {
         mainViewModel.checkInAppUpdate()
       }
