@@ -252,8 +252,11 @@ class SettingViewModel @Inject constructor(
   }
 
   // 统一设置排序
-  fun setSortOrder(category: SortCategory, order: String): Boolean {
-    if (category.saveOrder(order, settingPrefs)) {
+  fun setSortOrder(category: SortCategory, order: String, playlistId: Long? = null): Boolean {
+    if (category.saveOrder(order, settingPrefs, playlistId)) {
+      if (category == SortCategory.PLAYLIST_DETAIL && playlistId != null) {
+        return true
+      }
       _settingsState.update {
         val lib = it.library
         it.copy(

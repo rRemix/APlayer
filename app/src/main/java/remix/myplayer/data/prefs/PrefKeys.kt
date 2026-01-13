@@ -72,6 +72,7 @@ object PrefKeys {
 
     /** 播放列表内歌曲排序顺序 */
     const val CHILD_PLAYLIST_SONG_SORT_ORDER = "child_playlist_song_sort_order"
+    const val CHILD_PLAYLIST_SONG_SORT_ORDER_PREFIX = "child_playlist_song_sort_order_"
 
     /** 流派内歌曲排序顺序 */
     const val CHILD_GENRE_SONG_SORT_ORDER = "child_genre_song_sort_order"

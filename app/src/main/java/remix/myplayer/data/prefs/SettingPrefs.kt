@@ -2,6 +2,7 @@ package remix.myplayer.data.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -60,6 +61,7 @@ class SettingPrefs @Inject constructor(
     PrefKeys.Setting.CHILD_ARTIST_SONG_SORT_ORDER,
     SortOrder.SONG_A_Z
   )
+  @Deprecated("use getPlayListDetailSortOrder(playlistId) / setPlayListDetailSortOrder(playlistId, order) instead")
   var playListDetailSortOrder by PrefsDelegate(
     sp,
     PrefKeys.Setting.CHILD_PLAYLIST_SONG_SORT_ORDER,
@@ -75,6 +77,27 @@ class SettingPrefs @Inject constructor(
     PrefKeys.Setting.CHILD_FOLDER_SONG_SORT_ORDER,
     SortOrder.SONG_A_Z
   )
+
+  fun getPlayListDetailSortOrder(playlistId: Long): String {
+    val key = playListDetailSortKey(playlistId)
+    return sp.getString(key, null) ?: playListDetailSortOrder
+  }
+
+  fun setPlayListDetailSortOrder(playlistId: Long, sortOrder: String): Boolean {
+    val key = playListDetailSortKey(playlistId)
+    val current = sp.getString(key, null) ?: playListDetailSortOrder
+    if (current == sortOrder) {
+      return false
+    }
+    sp.edit(commit = true) {
+      putString(key, sortOrder)
+    }
+    return true
+  }
+
+  private fun playListDetailSortKey(playlistId: Long): String {
+    return PrefKeys.Setting.CHILD_PLAYLIST_SONG_SORT_ORDER_PREFIX + playlistId
+  }
 
   var albumMode by PrefsDelegate(sp, PrefKeys.Setting.MODE_FOR_ALBUM, GRID_MODE)
   var artistMode by PrefsDelegate(sp, PrefKeys.Setting.MODE_FOR_ARTIST, GRID_MODE)

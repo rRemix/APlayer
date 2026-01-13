@@ -190,13 +190,14 @@ class SongRepoImpl @Inject constructor(
         }
 
         is PlayList -> {
-          val customSort = settingPrefs.playListDetailSortOrder == SortOrder.PLAYLIST_SONG_CUSTOM
+          val playListSortOrder = settingPrefs.getPlayListDetailSortOrder(it.id)
+          val customSort = playListSortOrder == SortOrder.PLAYLIST_SONG_CUSTOM
           val ids = it.audioIds.toList()
 
           val songs = getSongs(
             makeInStrQuery(ids),
             null,
-            if (customSort) null else settingPrefs.playListDetailSortOrder
+            if (customSort) null else playListSortOrder
           )
 
           val tempArray: Array<Song> = Array(ids.size) { Song.EMPTY_SONG }

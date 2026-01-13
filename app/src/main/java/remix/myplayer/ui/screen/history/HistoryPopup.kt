@@ -53,8 +53,8 @@ fun HistoryPopup() {
   val sortOrderItems = listOf(
     Pair(R.string.count, SortOrder.PLAY_COUNT),
     Pair(R.string.count_desc, SortOrder.PLAY_COUNT_DESC),
-    Pair(R.string.last_play, SortOrder.LASTPLAY),
-    Pair(R.string.last_play_desc, SortOrder.LASTPLAY_DESC),
+    Pair(R.string.last_play, SortOrder.LAST_PLAY),
+    Pair(R.string.last_play_desc, SortOrder.LAST_PLAY_DESC),
 
     )
   val selectedIndex = sortOrderItems.indexOfFirst {

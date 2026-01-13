@@ -45,6 +45,7 @@ data class LibrarySettings(
   val historySortOrder: String,
   val albumDetailSortOrder: String,
   val artistDetailSortOrder: String,
+  @Deprecated("use SettingPrefs.getPlayListDetailSortOrder(playlistId) instead")
   val playListDetailSortOrder: String,
   val genreDetailSortOrder: String,
   val folderDetailSortOrder: String,

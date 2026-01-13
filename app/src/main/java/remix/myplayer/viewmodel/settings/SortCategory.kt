@@ -7,7 +7,7 @@ enum class SortCategory {
   SONG, ALBUM, ARTIST, PLAYLIST, GENRE, HISTORY,
   ALBUM_DETAIL, ARTIST_DETAIL, PLAYLIST_DETAIL, GENRE_DETAIL, FOLDER_DETAIL;
 
-  fun getOrder(settingPrefs: SettingPrefs): String {
+  fun getOrder(settingPrefs: SettingPrefs, playlistId: Long? = null): String {
     return when (this) {
       SONG -> settingPrefs.songSortOrder
       ALBUM -> settingPrefs.albumSortOrder
@@ -17,14 +17,20 @@ enum class SortCategory {
       HISTORY -> settingPrefs.historySortOrder
       ALBUM_DETAIL -> settingPrefs.albumDetailSortOrder
       ARTIST_DETAIL -> settingPrefs.artistDetailSortOrder
-      PLAYLIST_DETAIL -> settingPrefs.playListDetailSortOrder
+      PLAYLIST_DETAIL -> {
+        if (playlistId != null) {
+          settingPrefs.getPlayListDetailSortOrder(playlistId)
+        } else {
+          settingPrefs.playListDetailSortOrder
+        }
+      }
       GENRE_DETAIL -> settingPrefs.genreDetailSortOrder
       FOLDER_DETAIL -> settingPrefs.folderDetailSortOrder
     }
   }
 
-  fun saveOrder(newOrder: String, settingPrefs: SettingPrefs): Boolean {
-    val old = getOrder(settingPrefs)
+  fun saveOrder(newOrder: String, settingPrefs: SettingPrefs, playlistId: Long? = null): Boolean {
+    val old = getOrder(settingPrefs, playlistId)
     if (old != newOrder) {
       when (this) {
         SONG -> settingPrefs.songSortOrder = newOrder
@@ -35,7 +41,13 @@ enum class SortCategory {
         HISTORY -> settingPrefs.historySortOrder = newOrder
         ALBUM_DETAIL -> settingPrefs.albumDetailSortOrder = newOrder
         ARTIST_DETAIL -> settingPrefs.artistDetailSortOrder = newOrder
-        PLAYLIST_DETAIL -> settingPrefs.playListDetailSortOrder = newOrder
+        PLAYLIST_DETAIL -> {
+          if (playlistId != null) {
+            settingPrefs.setPlayListDetailSortOrder(playlistId, newOrder)
+          } else {
+            settingPrefs.playListDetailSortOrder = newOrder
+          }
+        }
         GENRE_DETAIL -> settingPrefs.genreDetailSortOrder = newOrder
         FOLDER_DETAIL -> settingPrefs.folderDetailSortOrder = newOrder
       }

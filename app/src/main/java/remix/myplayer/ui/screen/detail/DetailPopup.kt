@@ -63,7 +63,7 @@ fun DetailPopupButton(model: APlayerModel, onSortOrderChange: () -> Unit) {
     )
   }
 
-  val sortOrder = model.detailSortOrder(settingsState)
+  val sortOrder = model.detailSortOrder(settingsState, settingVM)
   val sortOrderItems = model.sortOrderItems()
   val selectedIndex = sortOrderItems.indexOfFirst {
     it.second == sortOrder
@@ -113,11 +113,14 @@ fun DetailPopupButton(model: APlayerModel, onSortOrderChange: () -> Unit) {
   }
 }
 
-private fun APlayerModel.detailSortOrder(settingsState: SettingsState): String {
+private fun APlayerModel.detailSortOrder(
+  settingsState: SettingsState,
+  settingVM: SettingViewModel
+): String {
   return when (this) {
     is Album -> settingsState.library.albumDetailSortOrder
     is Artist -> settingsState.library.artistDetailSortOrder
-    is PlayList -> settingsState.library.playListDetailSortOrder
+    is PlayList -> settingVM.settingPrefs.getPlayListDetailSortOrder(id)
     is Genre -> settingsState.library.genreDetailSortOrder
     is Folder -> settingsState.library.folderDetailSortOrder
     else -> throw Exception("unknown model: $this")
@@ -138,7 +141,7 @@ private fun APlayerModel.saveDetailSortOrder(
     }
 
     is PlayList -> {
-      return vm.setSortOrder(SortCategory.PLAYLIST_DETAIL, newSortOrder)
+      return vm.setSortOrder(SortCategory.PLAYLIST_DETAIL, newSortOrder, id)
     }
 
     is Genre -> {
