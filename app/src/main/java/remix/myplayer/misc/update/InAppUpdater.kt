@@ -91,7 +91,6 @@ class InAppUpdater @Inject constructor(
 
     val asset = release.assets?.firstOrNull()
     if (asset == null) {
-
       if (showToast) {
         MessageNotifier.show(R.string.no_update)
       }

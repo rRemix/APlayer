@@ -1,7 +1,9 @@
 package remix.myplayer.service
 
-import android.os.CountDownTimer
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.os.Handler
+import android.os.Looper
 import androidx.annotation.FloatRange
 
 /**
@@ -10,33 +12,9 @@ import androidx.annotation.FloatRange
 
 class VolumeController(private val service: MusicService) {
 
-  private val handler: Handler = Handler()
-  private val fadeInRunnable: Runnable = Runnable {
-    object : CountDownTimer(DURATION_IN_MS, DURATION_IN_MS / 10) {
-      override fun onFinish() {
-        directTo(1f)
-      }
-
-      override fun onTick(millisUntilFinished: Long) {
-        val volume = 1f - millisUntilFinished * 1.0f / DURATION_IN_MS
-        service.playback.setVolume(volume)
-      }
-    }.start()
-  }
-  private val fadeOutRunnable: Runnable = Runnable {
-    object : CountDownTimer(DURATION_IN_MS, DURATION_IN_MS / 10) {
-      override fun onTick(millisUntilFinished: Long) {
-        val volume = millisUntilFinished * 1.0f / DURATION_IN_MS
-        service.playback.setVolume(volume)
-      }
-
-      override fun onFinish() {
-//        service.playback.setVolume(0f)
-        service.playback.pause()
-      }
-
-    }.start()
-  }
+  private val handler = Handler(Looper.getMainLooper())
+  private var animator: ValueAnimator? = null
+  private var lastVolume = 1f
 
   fun directTo(@FloatRange(from = 0.0, to = 1.0) toVolume: Float) {
     directTo(toVolume, toVolume)
@@ -46,29 +24,60 @@ class VolumeController(private val service: MusicService) {
     @FloatRange(from = 0.0, to = 1.0) leftVolume: Float,
     @FloatRange(from = 0.0, to = 1.0) rightVolume: Float
   ) {
-    service.playback.setVolume(leftVolume)
+    val volume = leftVolume.coerceIn(0f, 1f)
+    cancelAnimator()
+    service.playback.setVolume(volume)
+    lastVolume = volume
   }
 
   /**
    * 淡入
    */
   fun fadeIn() {
-    handler.removeCallbacks(fadeInRunnable)
-    handler.removeCallbacks(fadeOutRunnable)
-    handler.post(fadeInRunnable)
+    fadeTo(1f)
   }
 
   /**
    * 淡出
    */
   fun fadeOut() {
-    handler.removeCallbacks(fadeInRunnable)
-    handler.removeCallbacks(fadeOutRunnable)
-    handler.post(fadeOutRunnable)
+    fadeTo(0f, onEnd = { service.playback.pause() })
+  }
+
+  private fun fadeTo(
+    @FloatRange(from = 0.0, to = 1.0) targetVolume: Float,
+    onEnd: (() -> Unit)? = null
+  ) {
+    val target = targetVolume.coerceIn(0f, 1f)
+    handler.post {
+      cancelAnimator()
+      animator = ValueAnimator.ofFloat(lastVolume, target).apply {
+        duration = DURATION_IN_MS
+        addUpdateListener {
+          val volume = it.animatedValue as Float
+          service.playback.setVolume(volume)
+          lastVolume = volume
+        }
+        if (onEnd != null) {
+          addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) = Unit
+            override fun onAnimationEnd(animation: Animator) = onEnd()
+            override fun onAnimationCancel(animation: Animator) = Unit
+            override fun onAnimationRepeat(animation: Animator) = Unit
+          })
+        }
+      }
+      animator?.start()
+    }
+  }
+
+  private fun cancelAnimator() {
+    animator?.cancel()
+    animator = null
   }
 
   companion object {
 
-    private const val DURATION_IN_MS = 600L
+    private const val DURATION_IN_MS = 400L
   }
 }
