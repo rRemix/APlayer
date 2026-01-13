@@ -89,7 +89,6 @@ class InAppUpdater @Inject constructor(
       return null
     }
 
-    // no assets
     val asset = release.assets?.firstOrNull()
     if (asset == null) {
 
@@ -102,12 +101,6 @@ class InAppUpdater @Inject constructor(
     // compare versionCode
     val versionCode = getOnlineVersionCode(release)
     if (versionCode <= getLocalVersionCode()) {
-      // remove old apks
-//      val downloadDir = File(context.externalCacheDir, "download")
-//      if (downloadDir.exists() && downloadDir.listFiles()?.isNotEmpty() == true) {
-//        Util.deleteFilesByDirectory(downloadDir)
-//      }
-
       if (showToast) {
         MessageNotifier.show(R.string.no_update)
       }
@@ -115,9 +108,7 @@ class InAppUpdater @Inject constructor(
     }
 
     // ignore this update?
-    val ignoreCurrentVersion by inAppUpdatePrefs.sp.delegate(versionCode.toString(), false)
-    if (!force && ignoreCurrentVersion) {
-      MessageNotifier.show(R.string.update_ignore)
+    if (!force && inAppUpdatePrefs.isVersionIgnored(versionCode)) {
       return null
     }
 
@@ -133,8 +124,7 @@ class InAppUpdater @Inject constructor(
   }
 
   fun ignoreVersion(versionCode: Int) {
-    var ignoreThisVersion by inAppUpdatePrefs.sp.delegate(versionCode.toString(), false)
-    ignoreThisVersion = true
+    inAppUpdatePrefs.setIgnoreVersion(versionCode, true)
   }
 
   fun ignoreForever() {
