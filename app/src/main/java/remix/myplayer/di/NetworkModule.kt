@@ -6,6 +6,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import remix.myplayer.request.kugou.KuGouClient
 import remix.myplayer.request.netease.NetEaseClient
@@ -14,12 +18,15 @@ import remix.myplayer.request.network.LastFMApi
 import remix.myplayer.request.network.OkHttpHelper
 import remix.myplayer.request.qq.QQClient
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
+@OptIn(ExperimentalSerializationApi::class)
 object NetworkModule {
+
+  private val json = Json { ignoreUnknownKeys = true }
+  private val jsonContentType = "application/json".toMediaType()
 
   @Provides
   @Singleton
@@ -33,7 +40,7 @@ object NetworkModule {
     return Retrofit.Builder()
       .baseUrl(GithubApi.BASE_URL)
       .client(okHttpClient)
-      .addConverterFactory(GsonConverterFactory.create())
+      .addConverterFactory(json.asConverterFactory(jsonContentType))
       .build()
       .create(GithubApi::class.java)
   }
@@ -71,7 +78,7 @@ object NetworkModule {
     return Retrofit.Builder()
       .baseUrl(LastFMApi.BASE_URL)
       .client(okHttpClient)
-      .addConverterFactory(GsonConverterFactory.create())
+      .addConverterFactory(json.asConverterFactory(jsonContentType))
       .build()
       .create(LastFMApi::class.java)
   }

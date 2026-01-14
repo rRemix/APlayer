@@ -1,14 +1,11 @@
 package remix.myplayer.data.model.lastfm
 
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Image(
-    @SerializedName("#text")
-    @Expose
+    @SerialName("#text")
     var text: String? = null,
-    @Expose
     var size: String? = null
 )

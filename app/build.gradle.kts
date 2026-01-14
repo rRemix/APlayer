@@ -221,7 +221,7 @@ dependencies {
     implementation(libs.glide.compose)
 
     implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
 
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)

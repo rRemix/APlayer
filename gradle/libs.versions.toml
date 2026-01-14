@@ -11,6 +11,7 @@ nav = "2.9.2"
 glide = "4.16.0"
 glideCompose = "1.0.0-beta01"
 retrofit = "2.11.0"
+retrofitKotlinxSerialization = "1.0.0"
 room = "2.7.2"
 xxpermissions = "21.2"
 workRuntimeKtx = "2.10.4"
@@ -83,7 +84,7 @@ glide-compose = { module = "com.github.bumptech.glide:compose", version.ref = "g
 
 # retrofit
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+retrofit-converter-kotlinx-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerialization" }
 
 # room
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
