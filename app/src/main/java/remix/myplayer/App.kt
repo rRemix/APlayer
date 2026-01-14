@@ -79,8 +79,5 @@ class App : MultiDexApplication() {
     @JvmStatic
     lateinit var context: App
       private set
-
-    //是否是googlePlay版本
-    val IS_GOOGLEPLAY = BuildConfig.FLAVOR.contains("google")
   }
 }

@@ -27,10 +27,7 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -71,21 +68,19 @@ private val drawerTitles = mutableListOf(
   R.string.drawer_song,
   R.string.drawer_history,
   R.string.drawer_recently_add,
+  R.string.support_develop,
   R.string.drawer_setting,
   R.string.exit
-).apply {
-  if (!App.IS_GOOGLEPLAY) add(3, R.string.support_develop)
-}
+)
 
 private val drawerIcons = mutableListOf(
   R.drawable.ic_library_music_24dp,
   R.drawable.ic_history_24dp,
   R.drawable.ic_recent_24dp,
+  R.drawable.ic_favorite_24dp,
   R.drawable.ic_settings_24dp,
   R.drawable.ic_exit_to_app_24dp
-).apply {
-  if (!App.IS_GOOGLEPLAY) add(3, R.drawable.ic_favorite_24dp)
-}
+)
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -156,7 +151,6 @@ fun Drawer(drawerState: DrawerState, vm: PlaybackViewModel = playbackViewModel) 
       Spacer(modifier = Modifier.height(if (isPortrait) 20.dp else 12.dp))
     }
 
-    var selectDrawer by remember { mutableIntStateOf(0) }
     val scope = rememberCoroutineScope()
     LazyColumn(modifier = Modifier.background(drawerDefault)) {
       itemsIndexed(drawerTitles) { index, item ->
@@ -169,23 +163,21 @@ fun Drawer(drawerState: DrawerState, vm: PlaybackViewModel = playbackViewModel) 
               fontSize = 16.sp
             )
           },
-          selected = selectDrawer == index,
+          selected = index == 0,
           onClick = {
-            selectDrawer = index
-
-            when {
+            when (index) {
               // 歌曲库
-              index == 0 -> scope.launch { drawerState.close() }
+              0 -> scope.launch { drawerState.close() }
               // 历史
-              index == 1 -> navController.navigate(RouteHistory)
+              1 -> navController.navigate(RouteHistory)
               // 最近添加
-              index == 2 -> navController.navigate(RouteLastAdded)
-              // 捐赠（仅非 Google 版本）
-              !App.IS_GOOGLEPLAY && index == 3 -> navController.navigate(RouteSupport)
-              // 设置（索引随渠道差异调整）
-              index == (if (!App.IS_GOOGLEPLAY) 4 else 3) -> navController.navigate(RouteSetting)
+              2 -> navController.navigate(RouteLastAdded)
+              // 捐赠
+              3 -> navController.navigate(RouteSupport)
+              // 设置
+              4 -> navController.navigate(RouteSetting)
               // 退出（索引随渠道差异调整）
-              index == (if (!App.IS_GOOGLEPLAY) 5 else 4) -> {
+              5 -> {
                 context.sendBroadcast(
                   Intent(Constants.ACTION_EXIT)
                     .setComponent(ComponentName(context, ExitReceiver::class.java))

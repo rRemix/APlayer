@@ -88,9 +88,12 @@ class InAppUpdater @Inject constructor(
       Timber.tag(TAG).v("e: $e")
       return null
     }
+    Timber.v("assets: ${release.assets?.map { "asset: ${it.name}" }}")
 
+    // no assets
     val asset = release.assets?.firstOrNull()
     if (asset == null) {
+
       if (showToast) {
         MessageNotifier.show(R.string.no_update)
       }

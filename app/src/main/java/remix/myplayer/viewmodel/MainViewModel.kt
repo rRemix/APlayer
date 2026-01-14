@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.github.Release
@@ -37,6 +38,9 @@ class MainViewModel @Inject constructor(
   private var inAppUpdateChecked = false
 
   fun checkInAppUpdate(force: Boolean = false) {
+    if (!BuildConfig.ENABLE_UPDATE) {
+      return
+    }
     if (inAppUpdateChecked && !force) {
       return
     }
@@ -50,6 +54,9 @@ class MainViewModel @Inject constructor(
   }
 
   fun startDownload(context: Context, release: Release) {
+    if (!BuildConfig.ENABLE_UPDATE) {
+      return
+    }
     viewModelScope.launch {
 
       suspend fun awaitWorkerAndGetPath(): String? {

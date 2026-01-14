@@ -107,3 +107,6 @@
 }
 
 -keep class org.bouncycastle.jce.provider.BouncyCastleProvider { *; }
+
+# 修复Android5.0 VerifyError
+-keepclassmembers class androidx.compose.ui.platform.** { *; }

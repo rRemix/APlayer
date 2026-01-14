@@ -3,6 +3,7 @@ package remix.myplayer.misc.update
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Environment
 import androidx.annotation.RequiresApi
@@ -165,7 +166,17 @@ class DownloadWorker(private val context: Context, params: WorkerParameters) :
       builder.setTicker(context.getString(R.string.downloading))
     }
 
-    return ForegroundInfo(UPDATE_NOTIFICATION_ID, builder.build())
+    val notification = builder.build()
+
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      ForegroundInfo(
+        UPDATE_NOTIFICATION_ID,
+        notification,
+        ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+      )
+    } else {
+      ForegroundInfo(UPDATE_NOTIFICATION_ID, notification)
+    }
   }
 
 

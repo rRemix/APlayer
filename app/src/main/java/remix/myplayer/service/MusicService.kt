@@ -37,8 +37,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import remix.myplayer.App
-import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.audio.Song.Companion.EMPTY_SONG
@@ -379,7 +377,7 @@ class MusicService : BaseService(),
       PrefKeys.Setting.LOCKSCREEN -> {
         when (settingPrefs.lockScreen) {
           LOCKSCREEN_CLOSE -> clearMediaSession()
-          LOCKSCREEN_SYSTEM, LOCKSCREEN_APLAYER -> updateMediaSession(Command.SKIP_TO_NEXT)
+          LOCKSCREEN_SYSTEM, LOCKSCREEN_APLAYER -> updateMediaSession()
         }
       }
       // 断点播放
@@ -431,14 +429,21 @@ class MusicService : BaseService(),
     val noisyFilter = IntentFilter()
     noisyFilter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
     noisyFilter.addAction(Intent.ACTION_HEADSET_PLUG)
-    registerReceiver(headSetReceiver, noisyFilter)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      registerReceiver(headSetReceiver, noisyFilter, RECEIVER_NOT_EXPORTED)
+    } else {
+      registerReceiver(headSetReceiver, noisyFilter)
+    }
 
     registerLocalReceiver(widgetReceiver, IntentFilter(ACTION_WIDGET_UPDATE))
-
     val screenFilter = IntentFilter()
     screenFilter.addAction(Intent.ACTION_SCREEN_ON)
     screenFilter.addAction(Intent.ACTION_SCREEN_OFF)
-    App.context.registerReceiver(screenReceiver, screenFilter)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      registerReceiver(screenReceiver, screenFilter, RECEIVER_NOT_EXPORTED)
+    } else {
+      registerReceiver(screenReceiver, screenFilter)
+    }
 
     // 监听数据库变化
     contentResolver.registerContentObserver(
@@ -1120,7 +1125,7 @@ class MusicService : BaseService(),
     if (isPlaying || notify.isNotifyShowing || lastCommand != -1) {
       updateNotification()
     }
-    updateMediaSession(lastCommand)
+    updateMediaSession()
     // 是否需要保存进度
     if (settingPrefs.playAtBreakPoint) {
       startSaveProgress()
@@ -1293,7 +1298,7 @@ class MusicService : BaseService(),
   /**
    * 更新锁屏
    */
-  private fun updateMediaSession(control: Int) {
+  private fun updateMediaSession() {
     val currentSong = playback.currentSong ?: EMPTY_SONG
     if (currentSong == EMPTY_SONG || settingPrefs.lockScreen == LOCKSCREEN_CLOSE) {
       return

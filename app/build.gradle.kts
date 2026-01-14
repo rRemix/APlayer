@@ -43,7 +43,7 @@ android {
     defaultConfig {
         applicationId = "remix.myplayer"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 35
 
         versionCode = 20300
         versionName = "2.0.3.0"
@@ -150,12 +150,15 @@ android {
                 "BUGLY_APP_ID",
                 "\"${properties.getProperty("BUGLY_APP_ID")}\""
             )
+            buildConfigField("boolean", "ENABLE_UPDATE", "true")
         }
         create("foss") {
             dimension = "distribution"
+            buildConfigField("boolean", "ENABLE_UPDATE", "false")
         }
         create("google") {
             dimension = "distribution"
+            buildConfigField("boolean", "ENABLE_UPDATE", "false")
         }
     }
 

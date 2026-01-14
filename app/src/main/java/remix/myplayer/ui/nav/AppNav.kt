@@ -33,7 +33,6 @@ import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
-import remix.myplayer.compose.ui.screen.SupportScreen
 import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.db.room.entity.WebDav
 import remix.myplayer.data.model.audio.APlayerModel
@@ -57,6 +56,7 @@ import remix.myplayer.ui.screen.setting.SettingScreen
 import remix.myplayer.ui.screen.webdav.WebDavDetailScreen
 import remix.myplayer.ui.screen.smb.SmbDetailScreen
 import remix.myplayer.data.db.room.entity.Smb
+import remix.myplayer.ui.screen.SupportScreen
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
@@ -69,8 +69,6 @@ const val RouteCustomSort = "custom_sort"
 const val RouteLastAdded = "last_added"
 const val RouteHistory = "history"
 const val RouteSearch = "search"
-const val RouteWebDav = "webdav"
-const val RouteSmb = "smb"
 const val RouteCrop = "crop"
 const val RouteEq = "eq"
 const val RouteSupport = "support"

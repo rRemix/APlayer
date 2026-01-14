@@ -1,4 +1,4 @@
-package remix.myplayer.compose.ui.screen
+package remix.myplayer.ui.screen
 
 import android.app.Activity
 import android.content.Intent

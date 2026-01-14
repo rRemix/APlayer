@@ -12,7 +12,6 @@ import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import remix.myplayer.App.Companion.IS_GOOGLEPLAY
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.misc.AppInfo
@@ -93,7 +92,7 @@ fun send(context: Context, scope: CoroutineScope, sendLog: Boolean) {
             emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
             emailIntent.putExtra(
               Intent.EXTRA_EMAIL,
-              arrayOf(if (!IS_GOOGLEPLAY) "568920427@qq.com" else "rRemix.me@gmail.com")
+              arrayOf("568920427@qq.com")
             )
           }
         } catch (e: Exception) {
