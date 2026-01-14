@@ -80,7 +80,7 @@ jobs:
         with:
           tag_name: nightly
           name: Nightly Build ${{ steps.info.outputs.build_date }}
-          files: app/build/outputs/apk/nonGoogleWithUpdater/release/*.apk
+          files: app/build/outputs/apk/normal/release/*.apk
           prerelease: true
           body: |
             Automated Nightly Build
