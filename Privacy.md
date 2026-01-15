@@ -2,97 +2,45 @@
 
 # Privacy Policy
 
-This privacy policy document is to provide information on what, how, and why personal data or information is collected, used, and disclosed, when this software is utilized, and the choices you have associated with that data. The objective of this policy document is to provide an open environment between developer and users of this software by openly stating what information the developer collects or not. By utilizing this software, it means you accept all the terms and conditions of the developer peculiar to only APlayer software. This Policy applies to this software only, and the developer would not be held responsible for the content or privacy practices on any third party app not operated by the developer to which this software links or that links to this software, therefore it is advisable to read up the privacy policies of third party services that may be linked to this software.
+**Effective Date:** 2026-01-15
 
+This privacy policy applies to the APlayer app (hereby referred to as "Application") for mobile devices that was created by Remix (hereby referred to as "Service Provider") as a Free service. This service is provided for use "AS IS".
 
-## Permission and Access
+## Information Collection and Use
 
-For better and enhanced utilization of APlayer, the software is designed to request the provision of certain personally identifiable information. This permission needs to be enabled for the software to work properly on the device on which the software's services are intended.
+**The Application does not collect or transmit any personally identifiable information about you.** 
 
-The permission is;
+The Application does not collect any usage data, crash logs (except those automatically collected by Google Play Store which are anonymized), or other analytics data.
 
-- Storage
+## Permissions
 
+To provide its functionality, the Application requires certain permissions. These permissions are used solely for the purpose of the app's functionality on your device and no data is transmitted to the Service Provider.
 
-With the storage permission enabled, the app can;
+*   **Storage (Read/Write External Storage / Read Media Audio):** Required to read audio files from your device and manage playlists/files as requested by you.
+*   **Foreground Service / Notification:** Required to play music in the background and show playback controls in the notification area.
+*   **Network:** Required only for fetching album art/lyrics if you choose to, or for streaming if you add network sources (e.g., SMB/WebDAV). The Application does not upload your listening history or personal files to any external server managed by the Service Provider.
 
-- modify or delete the contents of your SD card.
-- read the contents of your SD card. 
+## Third-Party Service Providers
 
+The Application may use third-party services that may collect information used to identify you.
 
-APlayer has some other capabilities, which are functions the software can remotely effect on its own. They include; 
+Link to privacy policy of third-party service providers used by the app:
 
-- **send sticky broadcast**: this allows the app to send sticky broadcasts which remain after the broadcast ends. 
-- **have full network access**: The app is capable of creating network sockets and can use customized network protocols. This capability does not require the software to send data to the internet.
-- **view network connections**: This is the capability of the app to view information about network connections such as which networks exist and are connected.
-- **view Wi-Fi connections**: This capability allows the app to view information about wifi networking such as whether wifi is enabled and the name of connected wifi devices.
-- **control vibration**: Allows the app to control the vibrator.
-- **prevent phone from sleeping**: Allows the app to prevent the phone from going to sleep.
-- **Google Play billing service**: Allows you to purchase items through Google Play from within this app. 
+*   [Google Play Services](https://www.google.com/policies/privacy/)
 
-The information that may be collected with these permissions are stored locally on the device and the developer has no access to that information. These permissions can be revoked when they are not needed, this is privy to only devices running Android 6.0 upward.
+## Security
 
-## Types of Data Collected
+We value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and we cannot guarantee its absolute security.
 
-### Personal Data
-The developer doesn't collect personally identifiable data. Only except when you send crash logs. 
+## Children’s Privacy
 
-### Usage Data
-The developer doesn't collect usage data.
+These Services do not address anyone under the age of 13. We do not knowingly collect personally identifiable information from children under 13.
 
-### Installation Data
-The developer distributes this software via google play store where download counts are maintained. But, the developer has no knowledge or way to acquire knowledge about a user that has installed or is using this software. 
+## Changes to This Privacy Policy
 
-## Crash reports
-The application allows you to send logs to the developer to help with the diagnosis of sync problems and bugs. The logs contain no personal or identifying information, however, your identity may be revealed through your email address. The developer guarantees that no part of the logs nor the email address of the sender nor any other information about the sender will be shared with a 3rd party, and the email and the logs will be deleted by the developer as soon as they are not needed anymore.
+We may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. We will notify you of any changes by posting the new Privacy Policy on this page.
 
-APlayer is a project under active development and the developer needs to get information when it doesn't work, to make it work. If you encounter any error while using the software, please open an issue on GitHub and it will be fixed. In a case where the app crashes, try to include logcats in your reports, when possible.
+## Contact Us
 
-## Service Providers
-
-APlayer depends on the services of third-party libraries to facilitate its utilization, and to perform service-related services, or, to assist in analyzing how the services of the software are used. These third parties don't have access to your Personal Data but are used only to perform some tasks on the developer's behalf. 
-
-These are the third-party libraries utilized;
-
-- [RxJava](https://github.com/ReactiveX/RxJava)
-- [RxAndroid](https://github.com/ReactiveX/RxAndroid)
-- [Rxpermissions](https://github.com/tbruyelle/RxPermissions)
-- [Retrofit](https://github.com/square/retrofit)
-- [Butter Knife](https://github.com/JakeWharton/butterknife)
-- [Timber](https://github.com/JakeWharton/timber)
-- [Leakcanary](https://github.com/square/leakcanary)
-- [Rebound](https://github.com/facebook/rebound)
-- [Material-dialogs](https://github.com/afollestad/material-dialogs)
-- [Android-crop](https://github.com/jdamcd/android-crop)
-- [TinyPinyin](https://github.com/promeG/TinyPinyin)
-
-
-## Transfer Of Data
-With these third-party libraries contained in the software, your information, including personal data, may be transferred to computers located outside of your state, province, country or other governmental jurisdiction where the data protection laws may differ than those from your jurisdiction. Your consent to this Privacy Policy followed by your submission of such information represents your agreement to that transfer.
-
-## Links To Other Sites
-
-APlayer contains links to other services that are not directly operated by the developer. If you click on a third party library webpage or license URL, you will be directed to that third party's site. The developer has no control over and assumes no responsibility for the content, privacy policies or practices of any third party sites or services.
-
-
-## Children's policy
-
-This software is intended for general use and has no restrictions on utilization by children except otherwise stated in a law governing that locale.
-
-
-## Security Of Data
-
-The security of your data is important, but remember that no method of transmission over the Internet or method of electronic storage is 100% secure therefore the developer doesn't guarantee its absolute security.
-
-## Changes To This Privacy Policy
-
-The developer may update this policy as there will be further development of the software and these developments may not be consistent with this current policy. It is advisable to check this policy occasionally for any changes. Changes to this Privacy Policy are effective when they are made on this document.
-
-## Disclaimer
-
-APlayer is developed in good faith and for general use. The developer will not be held accountable for how you decide to use this software and will not be liable for any losses and/or damages in connection with the use of the software.
-
-## Contact
-
-Contributions to this project are welcomed. Contributions, suggestions or bug reports and fixes can be made by opening an issue or creating pull requests. Read our contributor's guidelines [here](https://github.com/rRemix/APlayer/blob/master/Contributing%20EN.md) to get started. 
-If you have any questions about this Privacy Policy, or any other issue relating to APlayer, please contact us [here](https://github.com/rRemix/APlayer) by opening an [issue](https://github.com/rRemix/APlayer/issues/new). 
+If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us at GitHub: https://github.com/rRemix/APlayer
+ 
