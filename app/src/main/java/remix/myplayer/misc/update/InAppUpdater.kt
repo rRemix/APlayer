@@ -18,7 +18,6 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.data.model.github.Release
 import remix.myplayer.data.prefs.InAppUpdatePrefs
-import remix.myplayer.data.prefs.delegate
 import remix.myplayer.request.network.GithubApi
 import remix.myplayer.ui.nav.MessageNotifier
 import timber.log.Timber
@@ -90,10 +89,12 @@ class InAppUpdater @Inject constructor(
     }
     Timber.v("assets: ${release.assets?.map { "asset: ${it.name}" }}")
 
-    // no assets
-    val asset = release.assets?.firstOrNull()
+    // 取第一个名称包含normal的
+    val asset = release.assets?.run {
+      firstOrNull { it.name?.contains("normal", ignoreCase = true) == true }
+        ?: firstOrNull()
+    }
     if (asset == null) {
-
       if (showToast) {
         MessageNotifier.show(R.string.no_update)
       }
