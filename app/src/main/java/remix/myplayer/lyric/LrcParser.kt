@@ -2,6 +2,7 @@ package remix.myplayer.lyric
 
 import android.annotation.SuppressLint
 import androidx.core.text.HtmlCompat
+import remix.myplayer.misc.helper.LanguageHelper
 import remix.myplayer.util.EncodingDetect
 import timber.log.Timber
 import java.nio.charset.Charset
@@ -132,17 +133,24 @@ object LrcParser {
     // 合并翻译
     // 相同时间戳的两行，认为第二行是第一行的翻译
     lines.sortBy { it.time }
+
     val combinedLines = ArrayList<LyricLine>()
+    val isChinese = LanguageHelper.isChinese()
+
     for (line in lines) {
       val lastLine = combinedLines.lastOrNull()
-      combinedLines.add(
-        if (lastLine?.time == line.time && lastLine.translation == null) {
-          combinedLines.removeAt(combinedLines.lastIndex)
-          lastLine.withTranslation(line.content)
-        } else {
-          line
+      if (lastLine?.time == line.time) {
+        if (isChinese) {
+          if (lastLine.translation == null) {
+            combinedLines.removeAt(combinedLines.lastIndex)
+            combinedLines.add(lastLine.withTranslation(line.content))
+          } else {
+            combinedLines.add(line)
+          }
         }
-      )
+      } else {
+        combinedLines.add(line)
+      }
     }
 
     return combinedLines

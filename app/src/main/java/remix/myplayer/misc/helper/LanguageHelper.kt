@@ -116,4 +116,21 @@ object LanguageHelper {
     setLocal(context)
     setApplicationLanguage(context)
   }
+
+  fun isChinese(): Boolean {
+    val lang = if (current == -1) AUTO else current
+    return when (lang) {
+      CHINESE_SIMPLE, CHINESE_TRADITIONAL -> {
+        true
+      }
+
+      AUTO -> {
+        sLocal.language == "zh"
+      }
+
+      else -> {
+        false
+      }
+    }
+  }
 }
