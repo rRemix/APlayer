@@ -204,7 +204,7 @@ android {
                 val sortPrefix = when (flavor) {
                     "normal" -> "1"
                     "foss" -> "2"
-                    else -> "3"
+                    else -> ""
                 }
                 if (sortPrefix.isNotEmpty()) {
                     (this as BaseVariantOutputImpl).outputFileName = "APlayer-v${variant.versionName}-${sortPrefix}-${flavor}-release.apk"
