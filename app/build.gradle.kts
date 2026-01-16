@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -77,7 +78,9 @@ android {
             )
         }
 
-        setProperty("archivesBaseName", "APlayer-v${versionName}")
+        val flavor = gradle.startParameter.taskNames.toString().lowercase()
+        val sortPrefix = if (flavor.contains("normal")) "1" else if (flavor.contains("foss")) "2" else "3"
+        setProperty("archivesBaseName", "APlayer-v${versionName}-${sortPrefix}")
     }
 
     signingConfigs {
@@ -191,6 +194,23 @@ android {
 
     room {
         schemaDirectory("$projectDir/schemas")
+    }
+
+    applicationVariants.all {
+        val variant = this
+        variant.outputs.all {
+            val flavor = variant.productFlavors.firstOrNull()?.name
+            if (variant.buildType.name == "release" && flavor != null) {
+                val sortPrefix = when (flavor) {
+                    "normal" -> "1"
+                    "foss" -> "2"
+                    else -> "3"
+                }
+                if (sortPrefix.isNotEmpty()) {
+                    (this as BaseVariantOutputImpl).outputFileName = "APlayer-v${variant.versionName}-${sortPrefix}-${flavor}-release.apk"
+                }
+            }
+        }
     }
 }
 
