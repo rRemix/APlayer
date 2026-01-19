@@ -15,17 +15,16 @@ import com.hjq.permissions.XXPermissions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
-import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.helper.LanguageHelper.setLocal
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.nav.MessageNotifier
+import remix.myplayer.util.AudioTagWriter
+import remix.myplayer.util.AudioTagWriter.PendingWriteRequest
 import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.Util
 import timber.log.Timber
-import java.util.EnumMap
 
 /**
  * Created by Remix on 2016/3/16.
@@ -55,9 +54,9 @@ open class BaseActivity : ComponentActivity(), CoroutineScope by MainScope() {
       Timber.v("writeSongLauncher resultCode: ${it.resultCode} data: ${it.data}")
       lifecycleScope.launch {
         try {
-          Util.saveAudioTag(this@BaseActivity, pendingWriteRequest ?: return@launch)
+          AudioTagWriter.saveAudioTag(this@BaseActivity, pendingWriteRequest ?: return@launch)
         } catch (e: Exception) {
-          Timber.w("Fail to save tag: $e")
+          MessageNotifier.show(R.string.save_error_arg, e.toString())
         }
       }
     }
@@ -187,8 +186,3 @@ open class BaseActivity : ComponentActivity(), CoroutineScope by MainScope() {
       }
   }
 }
-
-data class PendingWriteRequest(
-  val song: Song,
-  val fieldMap: EnumMap<FieldKey, String>
-)

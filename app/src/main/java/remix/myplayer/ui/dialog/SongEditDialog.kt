@@ -34,7 +34,7 @@ import remix.myplayer.lyric.provider.EmbeddedProvider
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
-import remix.myplayer.util.Util
+import remix.myplayer.util.AudioTagWriter
 import remix.myplayer.viewmodel.settingViewModel
 
 @Composable
@@ -66,7 +66,7 @@ fun SongEditDialog() {
   }
 
   fun requestSaveAudioTag() {
-    Util.requestSaveAudioTag(
+    AudioTagWriter.requestSaveAudioTag(
       activity,
       song,
       title,

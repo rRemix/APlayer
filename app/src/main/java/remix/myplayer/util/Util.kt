@@ -3,7 +3,6 @@ package remix.myplayer.util
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
-import android.app.RecoverableSecurityException
 import android.app.Service
 import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
@@ -16,7 +15,6 @@ import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaFormat
-import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
@@ -29,27 +27,18 @@ import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.activity.result.IntentSenderRequest
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jaudiotagger.audio.AudioFileIO
-import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.App
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.floatpermission.rom.RomUtils
 import remix.myplayer.misc.manager.APlayerActivityManager
-import remix.myplayer.service.MusicService
-import remix.myplayer.ui.activity.base.BaseActivity
-import remix.myplayer.ui.activity.base.BaseMusicActivity
-import remix.myplayer.ui.activity.base.PendingWriteRequest
 import remix.myplayer.ui.nav.MessageNotifier
 import timber.log.Timber
 import java.io.BufferedReader
@@ -60,7 +49,6 @@ import java.io.FileReader
 import java.io.IOException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.util.EnumMap
 
 /**
  * Created by Remix on 2015/11/30.
@@ -646,106 +634,4 @@ object Util {
     MessageNotifier.show(R.string.save_success)
   }
 
-  fun requestSaveAudioTag(
-    activity: BaseActivity, song: Song,
-    newTitle: String, newAlbum: String, newArtist: String,
-    newGenre: String, newYear: String, newTrackNum: String,
-    newLyrics: String
-  ) {
-    val fieldMap = EnumMap<FieldKey, String>(FieldKey::class.java)
-
-    fieldMap[FieldKey.TITLE] = newTitle
-    fieldMap[FieldKey.ALBUM] = newAlbum
-    fieldMap[FieldKey.ARTIST] = newArtist
-    fieldMap[FieldKey.GENRE] = newGenre
-    fieldMap[FieldKey.YEAR] = newYear
-    fieldMap[FieldKey.TRACK] = newTrackNum
-    fieldMap[FieldKey.LYRICS] = newLyrics
-
-    val request = PendingWriteRequest(song, fieldMap)
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      activity.pendingWriteRequest = request
-      activity.writeSongLauncher.launch(
-        IntentSenderRequest.Builder(
-          MediaStore.createWriteRequest(
-            context.contentResolver,
-            listOf(song.contentUri)
-          ).intentSender
-        ).build()
-      )
-    } else {
-      // TODO test
-      activity.lifecycleScope.launch {
-        try {
-          saveAudioTag(activity, request)
-        } catch (e: Exception) {
-          try {
-            val songFD =
-              activity.contentResolver.openFileDescriptor(
-                song.contentUri,
-                "w"
-              )!! // test if we can write
-            songFD.close()
-          } catch (securityException: SecurityException) {
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && securityException is RecoverableSecurityException) {
-              activity.pendingWriteRequest = request
-              activity.writeSongLauncher.launch(
-                IntentSenderRequest.Builder(
-                  securityException.userAction.actionIntent.intentSender,
-                ).build()
-              )
-              return@launch
-            }
-
-          }
-
-          Timber.v("Fail to save tag: $e")
-          MessageNotifier.show(R.string.save_error_arg)
-        }
-      }
-    }
-  }
-
-  suspend fun saveAudioTag(context: Context, request: PendingWriteRequest) =
-    withContext(Dispatchers.IO) {
-      val audioFile = AudioFileIO.read(File(request.song.data))
-
-      val tag = audioFile.tagOrCreateAndSetDefault
-      for ((key, value) in request.fieldMap) {
-        try {
-          tag.setField(key, value)
-        } catch (e: Exception) {
-          Timber.v("setField($key, $value) failed: $e")
-        }
-      }
-
-      audioFile.commit()
-      MediaScannerConnection.scanFile(
-        context,
-        arrayOf(request.song.data), null
-      ) { _, uri ->
-        context.contentResolver.notifyChange(uri, null)
-        sendLocalBroadcast(
-          Intent(MusicService.TAG_CHANGE)
-            .putExtra(BaseMusicActivity.EXTRA_OLD_SONG, request.song)
-            .putExtra(
-              BaseMusicActivity.EXTRA_NEW_SONG,
-              request.song.copy(
-                title = request.fieldMap[FieldKey.TITLE],
-                album = request.fieldMap[FieldKey.ALBUM],
-                artist = request.fieldMap[FieldKey.ARTIST],
-                genre = request.fieldMap[FieldKey.GENRE],
-                year = request.fieldMap[FieldKey.YEAR],
-                track = request.fieldMap[FieldKey.TRACK]
-              )
-            )
-        )
-      }
-
-      withContext(Dispatchers.Main) {
-        MessageNotifier.show(R.string.save_success)
-      }
-    }
 }
