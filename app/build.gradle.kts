@@ -172,6 +172,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs += listOf("-module-name", "remix.myplayer")
     }
 
     lint {
