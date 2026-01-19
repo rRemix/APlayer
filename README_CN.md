@@ -6,33 +6,46 @@
 # APlayer - 安卓本地音乐播放器
 
 ## 简介
-- 基于Compose一款简洁、功能强大的的音乐播放器
+- 一款基于Jetpack Compose，简洁、功能强大的的音乐播放器
 
 ## 下载
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-     alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=remix.myplayer)
+alt="Get it on Google Play"
+height="80">](https://play.google.com/store/apps/details?id=remix.myplayer)
 [<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
-     alt="Get it at IzzyOnDroid"
-     height="80">](https://apt.izzysoft.de/packages/remix.myplayer)
+alt="Get it at IzzyOnDroid"
+height="80">](https://apt.izzysoft.de/packages/remix.myplayer)
 
 ## 截图
-<img src="/pictures/Screenshot_20180112-112950.png" alt="screenshot" title="screenshot" width="270" height="486" /><img src="/pictures/Screenshot_20180112-113007.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113128.png" alt="screenshot" title="screenshot" width="270" height="486" /><br><br>
-<img src="/pictures/Screenshot_20180112-113144.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-143937.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113550.png" alt="screenshot" title="screenshot" width="270" height="486" /> <br><br>
-<img src="/pictures/Screenshot_20180112-113637.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113707.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113820.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113855.png" alt="screenshot" title="screenshot" width="270" height="486" />  
+|   |   |   |   |
+|:-:|:-:|:-:|:-:|
+| <img src="screenshoots/1-home.png" width="200" alt="主页" /> | <img src="screenshoots/2-albums.png" width="200" alt="专辑" /> | <img src="screenshoots/3-playing-cover.png" width="200" alt="播放页封面" /> | <img src="screenshoots/4-playing-lyric.png" width="200" alt="播放页歌词" /> |
+| 主页 | 专辑 | 播放页封面 | 播放页歌词 |
+
+|   |   |   |   |
+|:-:|:-:|:-:|:-:|
+| <img src="screenshoots/5-dark.png" width="200" alt="深色模式" /> | <img src="screenshoots/6-sleep-timer.png" width="200" alt="睡眠定时" /> | <img src="screenshoots/7-desktop-lyric-widget.png" width="200" alt="桌面 歌词 & 组件" /> | <img src="screenshoots/8-lockscreen.png" width="200" alt="锁屏" /> |
+| 深色模式 | 睡眠定时 | 桌面 歌词 & 组件 | 锁屏 |
+
+|   |   |   |
+|:-:|:-:|:-:|
+| <img src="screenshoots/9-land-home.png" width="220" alt="横屏主页" /> | <img src="screenshoots/10-land-playing.png" width="220" alt="横屏播放" /> | <img src="screenshoots/11-land-desktop-lyric-widget.png" width="220" alt="横屏桌面 歌词 & 组件" /> |
+| 横屏主页 | 横屏播放 | 横屏桌面 歌词 & 组件 |
 
 
 ## 特点
-- 首页Tab可配置，最多支持五个,包括歌曲、艺术家、专辑、文件夹、播放列表、远程(webdav)
-- 专辑、艺术家封面自动补全(网易、LastFM)
-- 支持显示本地和在线歌词(网易、酷狗、qq)，支持逐词歌词，可设置歌词搜索的优先级；本地歌词可以自由选择，或者忽略歌词
-- 支持耳机线控操作,拔出耳机自动暂停
-- 支持桌面歌词、桌面部件
-- 适配Android8.0通知栏
-- 锁屏控制,可选择原生或者软件实现
-- 动态主题颜色
-- 监测媒体库变化自动刷新，或者手动扫描指定目录
-- 其他必备和便捷操作如歌曲信息编辑、睡眠定时、均衡器等
+- 首页 Tab 可配置：歌曲/艺术家/专辑/文件夹/播放列表/远程(WebDAV)
+- 歌词体验：内嵌/本地/在线歌词(网易/酷狗/QQ)，支持逐字歌词与优先级设置
+- 悬浮歌词与桌面小组件
+- 主题：普通/暗色/纯黑，支持自定义主题色
+- 专辑/艺术家封面自动补全
+- 内置标签编辑器：标题/歌手/专辑/歌词
+- 歌单管理：创建、编辑、导入、导出，支持每个歌单独立排序
+- WebDAV 支持：个人云盘串流播放
+- 音效与控制：均衡器、播放速度、睡眠定时
+- 锁屏控制与通知栏播放控制
+- 蓝牙/有线耳机按键控制
+- 自动扫描媒体库，或手动扫描目录
 
 
 ## 感谢
@@ -45,7 +58,7 @@
 - [Jaudiotagger for Android](https://github.com/hexise/jaudiotagger-android)
 
 
-## 最后 
+## 最后
 - 如果喜欢或者能给你提供帮助，欢迎Star
 - 因为是刚学安卓的时候就开始做了，很多代码待完善或者重构，还有一些待开发的功能，欢迎Pull Request
 - 有任何问题可以发邮件到我的邮箱: rRemix.me@gmail.com,或者加[tg群](https://t.me/joinchat/PqrPPBbM4poRPDH7qnXxLw)

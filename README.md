@@ -7,31 +7,45 @@
 # APlayer - Android Music Player
 
 ## Intro
-- A beautiful and powerful music player built with Compose
+- A beautiful and powerful music player built with Jetpack Compose
 
 ## Download
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-     alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=remix.myplayer)
+alt="Get it on Google Play"
+height="80">](https://play.google.com/store/apps/details?id=remix.myplayer)
 [<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
-     alt="Get it at IzzyOnDroid"
-     height="80">](https://apt.izzysoft.de/packages/remix.myplayer)
+alt="Get it at IzzyOnDroid"
+height="80">](https://apt.izzysoft.de/packages/remix.myplayer)
 
 ## Screenshot
-<img src="/pictures/Screenshot_20180112-112950.png" alt="screenshot" title="screenshot" width="270" height="486" /><img src="/pictures/Screenshot_20180112-113007.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113128.png" alt="screenshot" title="screenshot" width="270" height="486" /><br><br>
-<img src="/pictures/Screenshot_20180112-113144.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-143937.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113550.png" alt="screenshot" title="screenshot" width="270" height="486" /> <br><br>
-<img src="/pictures/Screenshot_20180112-113637.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113707.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113820.png" alt="screenshot" title="screenshot" width="270" height="486" />  <img src="/pictures/Screenshot_20180112-113855.png" alt="screenshot" title="screenshot" width="270" height="486" />  
+|   |   |   |   |
+|:-:|:-:|:-:|:-:|
+| <img src="screenshoots/1-home.png" width="200" alt="Home Screen" /> | <img src="screenshoots/2-albums.png" width="200" alt="Albums Screen" /> | <img src="screenshoots/3-playing-cover.png" width="200" alt="Playing Cover Screen" /> | <img src="screenshoots/4-playing-lyric.png" width="200" alt="Playing Lyric Screen" /> |
+| Home | Albums | Playing Cover | Playing Lyric |
+
+|   |   |   |   |
+|:-:|:-:|:-:|:-:|
+| <img src="screenshoots/5-dark.png" width="200" alt="Dark Mode" /> | <img src="screenshoots/6-sleep-timer.png" width="200" alt="Sleep Timer" /> | <img src="screenshoots/7-desktop-lyric-widget.png" width="200" alt="Desktop Lyric & Widget" /> | <img src="screenshoots/8-lockscreen.png" width="200" alt="Lockscreen" /> |
+| Dark Mode | Sleep Timer | Desktop Lyric & Widget | Lockscreen |
+
+|   |   |   |
+|:-:|:-:|:-:|
+| <img src="screenshoots/9-land-home.png" width="220" alt="Landscape Home" /> | <img src="screenshoots/10-land-playing.png" width="220" alt="Landscape Playing" /> | <img src="screenshoots/11-land-desktop-lyric-widget.png" width="220" alt="Landscape Desktop Lyric & Widget" /> |
+| Landscape Home | Landscape Playing | Landscape Desktop Lyric & Widget |
 
 ## Feature
-- Configurable tabs,include song,artist,album,folder,playlist,remote(webdav)
-- Auto download album&artist cover
-- Online, local, embedded and enhanced word-by-word lyrics and you can set priority for lyrics search
-- Desktop lyric and Widget
-- Android media notification
-- Screen lock
-- Custom theme
-- Auto scan media library,or you can scan folder manually
-- Other useful features you would expect from a music player,such as sleep timer,song editor,equalizer and so on
+- Configurable tabs: songs, artists, albums, folders, playlists, remote (WebDAV)
+- Local and online lyrics: embedded/local/online, word-by-word, searchable with priority
+- Floating lyrics and home screen widgets
+- Themes: light, dark, and AMOLED black, with customizable colors
+- Auto download album and artist artwork
+- Built-in tag editor for title/artist/album/lyrics
+- Playlists: create, edit, import, export, and per-playlist sorting
+- WebDAV streaming from your personal cloud storage
+- Playback controls: equalizer, speed control, sleep timer
+- Lock screen controls and Android media notification
+- Bluetooth/wired headset media buttons
+- Auto scan media library or manual folder scan
 
 ## Thanks
 - [XXPermissions](https://github.com/getActivity/XXPermissions)
@@ -42,7 +56,7 @@
 - [TinyPinyin](https://github.com/promeG/TinyPinyin)
 - [Jaudiotagger for Android](https://github.com/hexise/jaudiotagger-android)
 
-## Finally 
+## Finally
 - Pull request is welcome
 - I'll be appreciate if you star
 - If you have any question,you can send email to rRemix.me@gmail.com,open an issue or join [tg group](https://t.me/joinchat/PqrPPBbM4poRPDH7qnXxLw)
