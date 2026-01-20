@@ -155,9 +155,13 @@ class LibraryViewModel @Inject constructor(
 
   fun searchSong(key: String): List<Song> {
     checkWorkerThread()
+    val likeKey = "%$key%"
     return songRepo.getSongs(
-      Audio.Media.TITLE + " LIKE ? OR " + Audio.ArtistColumns.ARTIST + " LIKE ? OR " + Audio.AlbumColumns.ALBUM + " LIKE ?",
-      arrayOf("%$key%", "%$key%", "%$key%"),
+      Audio.Media.TITLE + " LIKE ? OR " +
+          Audio.ArtistColumns.ARTIST + " LIKE ? OR " +
+          Audio.AlbumColumns.ALBUM + " LIKE ? OR " +
+          Audio.Media.DISPLAY_NAME + " LIKE ?",
+      arrayOf(likeKey, likeKey, likeKey, likeKey),
       settingPrefs.songSortOrder
     )
   }
