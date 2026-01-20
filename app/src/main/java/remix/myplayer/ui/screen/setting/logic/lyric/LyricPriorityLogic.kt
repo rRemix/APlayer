@@ -3,9 +3,11 @@ package remix.myplayer.ui.screen.setting.logic.lyric
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,6 +31,7 @@ import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.screen.setting.NormalPreference
+import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.Util
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.settings.SettingViewModel
@@ -80,21 +84,29 @@ fun LyricPriorityLogic() {
             Box(
               modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
-                .draggableHandle(
-                  onDragStarted = {
-                    Util.vibrate(context, 50)
-                  },
-                  onDragStopped = {
-                    Util.vibrate(context, 50)
-                  },
-                ),
+                .height(48.dp),
               contentAlignment = Alignment.CenterStart
             ) {
               Text(
                 text = stringResource(lyricOrder.stringRes),
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center
+              )
+              Icon(
+                painter = painterResource(R.drawable.ic_drag_handle_24dp),
+                contentDescription = "LyricDragHandle",
+                tint = LocalTheme.current.textSecondary,
+                modifier = Modifier
+                  .align(Alignment.CenterEnd)
+                  .padding(end = 4.dp)
+                  .draggableHandle(
+                    onDragStarted = {
+                      Util.vibrate(context, 50)
+                    },
+                    onDragStopped = {
+                      Util.vibrate(context, 50)
+                    },
+                  )
               )
             }
           }

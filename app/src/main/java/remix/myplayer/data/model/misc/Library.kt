@@ -1,7 +1,6 @@
 package remix.myplayer.data.model.misc
 
 import android.content.Context
-import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.misc.helper.SortOrder
 import java.io.Serializable
@@ -9,6 +8,7 @@ import java.io.Serializable
 @kotlinx.serialization.Serializable
 data class Library(
   val tag: Int,
+  @Deprecated("never use")
   val order: Int = tag
 ) : Serializable {
 
@@ -105,21 +105,6 @@ data class Library(
 
       else -> throw IllegalArgumentException("unknown tag: $tag")
     }
-
-  fun getTitle(context: Context = App.context): String {
-    return context.getString(
-      when (tag) {
-        TAG_SONG -> R.string.tab_song
-        TAG_ALBUM -> R.string.tab_album
-        TAG_ARTIST -> R.string.tab_artist
-        TAG_PLAYLIST -> R.string.tab_playlist
-        TAG_GENRE -> R.string.tab_genre
-        TAG_FOLDER -> R.string.tab_folder
-        TAG_REMOTE -> R.string.tab_remote
-        else -> throw IllegalArgumentException("unknown tag: $tag")
-      }
-    )
-  }
 
   companion object {
 
