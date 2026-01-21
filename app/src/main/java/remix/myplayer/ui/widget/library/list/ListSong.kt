@@ -49,7 +49,6 @@ fun ListSong(
   Box(
     modifier = modifier
       .fillMaxWidth()
-      .height(IntrinsicSize.Min)
       .combinedClickable(
         interactionSource = remember { MutableInteractionSource() },
         indication = ripple(color = theme.ripple),
@@ -86,6 +85,9 @@ fun ListSong(
         Spacer(modifier = Modifier.width(16.dp))
       }
 
+//      Box(modifier = Modifier
+//        .background(Color.Red)
+//        .size(40.dp))
       GlideCover(
         model = song,
         modifier = Modifier

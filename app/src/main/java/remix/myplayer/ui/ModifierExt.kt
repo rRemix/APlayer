@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -16,8 +15,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
@@ -27,13 +26,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collectLatest
 import remix.myplayer.ui.theme.LocalTheme
+import kotlin.math.roundToInt
 
 /**
  * 为 LazyColumn 添加简单的垂直滚动条
@@ -46,7 +45,27 @@ fun Modifier.verticalScrollbar(
   cornerRadius: Dp = width / 2,
   color: Color = LocalTheme.current.primary,
 ): Modifier {
-  val coroutineScope = rememberCoroutineScope()
+  val targetScroll = remember { mutableStateOf<Float?>(null) }
+
+  LaunchedEffect(state) {
+    snapshotFlow { targetScroll.value }
+      .collectLatest { progress ->
+        if (progress != null) {
+          val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
+          val totalItemsCount = state.layoutInfo.totalItemsCount
+
+          if (visibleItemsInfo.isNotEmpty() && totalItemsCount > 0) {
+            val estimatedItemSize = visibleItemsInfo.sumOf { it.size } / visibleItemsInfo.size.toFloat()
+            if (estimatedItemSize > 0f) {
+              val exactIndex = progress * totalItemsCount
+              val index = exactIndex.toInt()
+              val offset = ((exactIndex - index) * estimatedItemSize).roundToInt()
+              state.scrollToItem(index, -offset)
+            }
+          }
+        }
+      }
+  }
 
   return verticalScrollbarImpl(
     isScrollInProgress = state.isScrollInProgress,
@@ -54,23 +73,10 @@ fun Modifier.verticalScrollbar(
     height = height,
     cornerRadius = cornerRadius,
     color = color,
-    onDrag = { dragAmount, viewportSize, indicatorHeightPx ->
-      val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
-      val totalItemsCount = state.layoutInfo.totalItemsCount
-
-      if (visibleItemsInfo.isNotEmpty() && totalItemsCount > 0) {
-        val estimatedItemSize = visibleItemsInfo.sumOf { it.size } / visibleItemsInfo.size.toFloat()
-        val totalContentHeight = estimatedItemSize * totalItemsCount
-        val maxScrollOffset = (totalContentHeight - viewportSize.height).coerceAtLeast(1f)
-        val maxScrollbarOffset = (viewportSize.height - indicatorHeightPx).coerceAtLeast(1f)
-        val scrollDelta = dragAmount * (maxScrollOffset / maxScrollbarOffset)
-
-        coroutineScope.launch {
-          state.scrollBy(scrollDelta)
-        }
-      }
+    onDrag = { progress ->
+      targetScroll.value = progress
     },
-    calculateScrollMetrics = { viewportSize ->
+    calculateScrollMetrics = { _ ->
       val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
       val totalItemsCount = state.layoutInfo.totalItemsCount
 
@@ -96,7 +102,35 @@ fun Modifier.verticalScrollbar(
   cornerRadius: Dp = width / 2,
   color: Color = LocalTheme.current.primary,
 ): Modifier {
-  val coroutineScope = rememberCoroutineScope()
+  val targetScroll = remember { mutableStateOf<Float?>(null) }
+
+  LaunchedEffect(state) {
+    snapshotFlow { targetScroll.value }
+      .collectLatest { progress ->
+        if (progress != null) {
+          val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
+          val totalItemsCount = state.layoutInfo.totalItemsCount
+
+          if (visibleItemsInfo.isNotEmpty() && totalItemsCount > 0) {
+            val estimatedItemHeight =
+              visibleItemsInfo.sumOf { it.size.height } / visibleItemsInfo.size.toFloat()
+            val estimatedItemWidth =
+              visibleItemsInfo.sumOf { it.size.width } / visibleItemsInfo.size.toFloat()
+
+            if (estimatedItemHeight > 0 && estimatedItemWidth > 0) {
+              val spanCount =
+                (state.layoutInfo.viewportSize.width / estimatedItemWidth).toInt().coerceAtLeast(1)
+              val totalRows = (totalItemsCount + spanCount - 1) / spanCount
+
+              val exactRow = progress * totalRows
+              val row = exactRow.toInt()
+              val offset = ((exactRow - row) * estimatedItemHeight).roundToInt()
+              state.scrollToItem(row * spanCount, -offset)
+            }
+          }
+        }
+      }
+  }
 
   return verticalScrollbarImpl(
     isScrollInProgress = state.isScrollInProgress,
@@ -104,30 +138,8 @@ fun Modifier.verticalScrollbar(
     height = height,
     cornerRadius = cornerRadius,
     color = color,
-    onDrag = { dragAmount, viewportSize, indicatorHeightPx ->
-      val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
-      val totalItemsCount = state.layoutInfo.totalItemsCount
-
-      if (visibleItemsInfo.isNotEmpty() && totalItemsCount > 0) {
-        val estimatedItemHeight =
-          visibleItemsInfo.sumOf { it.size.height } / visibleItemsInfo.size.toFloat()
-        val estimatedItemWidth =
-          visibleItemsInfo.sumOf { it.size.width } / visibleItemsInfo.size.toFloat()
-
-        if (estimatedItemHeight > 0 && estimatedItemWidth > 0) {
-          val spanCount = (viewportSize.width / estimatedItemWidth).toInt().coerceAtLeast(1)
-          val totalRows = (totalItemsCount + spanCount - 1) / spanCount
-          val totalContentHeight = totalRows * estimatedItemHeight
-
-          val maxScrollOffset = (totalContentHeight - viewportSize.height).coerceAtLeast(1f)
-          val maxScrollbarOffset = (viewportSize.height - indicatorHeightPx).coerceAtLeast(1f)
-          val scrollDelta = dragAmount * (maxScrollOffset / maxScrollbarOffset)
-
-          coroutineScope.launch {
-            state.scrollBy(scrollDelta)
-          }
-        }
-      }
+    onDrag = { progress ->
+      targetScroll.value = progress
     },
     calculateScrollMetrics = { viewportSize ->
       val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
@@ -160,7 +172,7 @@ private fun Modifier.verticalScrollbarImpl(
   height: Dp,
   cornerRadius: Dp,
   color: Color,
-  onDrag: (dragAmount: Float, viewportSize: Size, indicatorHeightPx: Float) -> Unit,
+  onDrag: (progress: Float) -> Unit,
   calculateScrollMetrics: (viewportSize: Size) -> Pair<Float, Float>?
 ): Modifier {
   var isVisible by remember { mutableStateOf(false) }
@@ -192,25 +204,28 @@ private fun Modifier.verticalScrollbarImpl(
         if (down.position.x >= size.width - (with(density) { width.toPx() } + with(density) { 16.dp.toPx() })) {
           down.consume()
           isDragging = true
+          val indicatorHeightPx = with(density) { height.toPx() }
 
-          val currentPointerId = down.id
           do {
             // 拦截move事件
             val event = awaitPointerEvent(pass = PointerEventPass.Initial)
-            val change = event.changes.firstOrNull { it.id == currentPointerId }
+            val change = event.changes.firstOrNull { it.id == down.id }
 
             if (change == null || !change.pressed) {
               isDragging = false
               break
             }
 
-            val dragAmount = change.positionChange().y
-            if (dragAmount != 0f) {
-              change.consume()
-              val viewportSize = Size(size.width.toFloat(), size.height.toFloat())
-              val indicatorHeightPx = with(density) { height.toPx() }
-              onDrag(dragAmount, viewportSize, indicatorHeightPx)
+            // 计算进度
+            val trackHeight = size.height.toFloat()
+            val maxOffset = trackHeight - indicatorHeightPx
+            if (maxOffset > 0) {
+              val thumbTop = (change.position.y - indicatorHeightPx / 2f).coerceIn(0f, maxOffset)
+              val progress = thumbTop / maxOffset
+              onDrag(progress)
             }
+            
+            change.consume()
           } while (true)
         }
       }
