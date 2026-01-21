@@ -230,6 +230,11 @@ class ExoPlayback(private val context: Context) : Playback {
       return false
     }
 
+    if (player.mediaItemCount == 0) {
+      addSongs(listOf(nextSong), 0)
+      return true
+    }
+
     var existIndex = findIndexOfSong(nextSong.id)
 
     // 无论什么模式，物理上都移动/插入到 currentIndex + 1
@@ -237,11 +242,10 @@ class ExoPlayback(private val context: Context) : Playback {
 
     if (existIndex == C.INDEX_UNSET) {
       addSongs(listOf(nextSong), targetIndex)
-      existIndex = targetIndex
     } else {
       player.moveMediaItem(existIndex, targetIndex)
-      existIndex = if (existIndex < targetIndex) targetIndex - 1 else targetIndex
     }
+    existIndex = targetIndex
 
     // 如果是随机模式，还需要调整 ShuffleOrder 确保逻辑上也是下一首
     if (player.shuffleModeEnabled) {

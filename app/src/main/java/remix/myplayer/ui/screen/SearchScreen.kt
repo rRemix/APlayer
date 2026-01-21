@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.TextFieldDefaults
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
@@ -80,9 +82,10 @@ fun SearchScreen() {
   val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val listState = rememberLazyListState()
-  val songs = remember {
-    mutableStateListOf<Song>()
+  var songs by remember {
+    mutableStateOf(emptyList<Song>())
   }
+  var isLoading by remember { mutableStateOf(false) }
   val context = LocalContext.current
 
   val showMultiSelect = multiSelectState.isShowInSearch()
@@ -131,7 +134,14 @@ fun SearchScreen() {
         .fillMaxSize(),
       contentAlignment = Alignment.TopCenter
     ) {
-      if (songs.isEmpty()) {
+      if (isLoading) {
+        LinearProgressIndicator(
+          modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.TopCenter),
+          color = LocalTheme.current.primary
+        )
+      } else if (songs.isEmpty()) {
         TextSecondary(
           modifier = Modifier.padding(top = 64.dp),
           text = stringResource(R.string.no_search_result), fontSize = 16.sp
@@ -182,15 +192,18 @@ fun SearchScreen() {
   }
 
   LaunchedEffect(searchKey) {
-    val result = withContext(Dispatchers.IO) {
-      if (searchKey.isNotEmpty()) {
-        libraryVM.searchSong(searchKey)
-      } else {
-        emptyList()
-      }
+    if (searchKey.isEmpty()) {
+      songs = emptyList()
+      isLoading = false
+      return@LaunchedEffect
     }
-    songs.clear()
-    songs.addAll(result)
+    isLoading = true
+    delay(300)
+    val result = withContext(Dispatchers.IO) {
+      libraryVM.searchSong(searchKey)
+    }
+    songs = result
+    isLoading = false
   }
 }
 

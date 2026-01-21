@@ -1234,14 +1234,12 @@ class MusicService : BaseService(),
           lastCommand = Command.PLAY_TEMP
           val song = it as Song.Local
 
-          if (playback.getPlaylist().isEmpty()) {
-            playback.setPlaylist(listOf(song))
-          } else if (playback.currentSong?.id != song.id) {
-            playback.addToNextSong(song)
-            skipToNext()
-          } else {
+          if (playback.currentSong?.id == song.id) {
             // 如果是当前歌曲，从头播放
             seekTo(0)
+          } else {
+            playback.addToNextSong(song)
+            skipToNext()
           }
 
           playQueueStore.save(playback.getPlaylist())
