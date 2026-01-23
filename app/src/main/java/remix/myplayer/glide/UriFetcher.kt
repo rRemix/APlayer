@@ -23,7 +23,6 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.DOWNLOAD_COVER_WIFI_ONLY
 import remix.myplayer.data.prefs.SettingPrefs.Companion.DOWNLOAD_LASTFM
 import remix.myplayer.lyric.provider.SearchScorer
 import remix.myplayer.misc.cache.DiskCache
-import remix.myplayer.misc.checkWorkerThread
 import remix.myplayer.repo.SongRepository
 import remix.myplayer.repo.usecase.FetchMetaDataUseCase
 import remix.myplayer.request.netease.NetEaseClient
@@ -31,6 +30,7 @@ import remix.myplayer.request.network.LastFMApi
 import remix.myplayer.util.Constants
 import remix.myplayer.util.SearchKeyUtil
 import remix.myplayer.util.Util
+import remix.myplayer.util.ext.checkWorkerThread
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject

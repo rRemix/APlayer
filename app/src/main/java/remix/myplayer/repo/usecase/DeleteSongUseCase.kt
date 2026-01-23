@@ -13,12 +13,11 @@ import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.misc.checkWorkerThread
-import remix.myplayer.misc.helper.MusicServiceRemote
 import remix.myplayer.repo.AbstractRepository.Companion.makeInStrQuery
 import remix.myplayer.repo.PlayListRepository
 import remix.myplayer.repo.PlayQueueRepository
 import remix.myplayer.repo.SongRepository
+import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.nav.MessageNotifier
 import timber.log.Timber

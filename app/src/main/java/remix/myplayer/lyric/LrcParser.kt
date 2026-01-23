@@ -2,7 +2,7 @@ package remix.myplayer.lyric
 
 import android.annotation.SuppressLint
 import androidx.core.text.HtmlCompat
-import remix.myplayer.misc.helper.LanguageHelper
+import remix.myplayer.helper.LanguageHelper
 import remix.myplayer.util.EncodingDetect
 import timber.log.Timber
 import java.nio.charset.Charset

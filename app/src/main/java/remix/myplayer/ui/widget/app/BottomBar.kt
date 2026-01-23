@@ -35,7 +35,6 @@ import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
-import remix.myplayer.ui.clickableWithoutRipple
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RoutePlayingScreen
 import remix.myplayer.ui.theme.LocalTheme
@@ -43,6 +42,7 @@ import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.library.GlideCover
 import remix.myplayer.util.Util
+import remix.myplayer.util.ext.clickableWithoutRipple
 import remix.myplayer.viewmodel.PlaybackViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 import kotlin.math.absoluteValue

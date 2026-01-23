@@ -1,4 +1,4 @@
-package remix.myplayer.misc.observer
+package remix.myplayer.service
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -7,8 +7,7 @@ import android.database.ContentObserver
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import remix.myplayer.service.MusicService
-import remix.myplayer.util.Util.sendLocalBroadcast
+import remix.myplayer.util.Util
 import timber.log.Timber
 
 /**
@@ -16,17 +15,17 @@ import timber.log.Timber
  * @param service
  * @param handler The handler to run [.onChange] on, or null if none.
  */
-class MediaStoreObserver : ContentObserver(null), Runnable {
+internal class MediaStoreObserver : ContentObserver(null), Runnable {
   private val handler = Handler(Looper.getMainLooper())
   private var match = -1
 
   override fun run() {
-    sendLocalBroadcast(Intent(MusicService.MEDIA_STORE_CHANGE))
+    Util.sendLocalBroadcast(Intent(MusicService.MEDIA_STORE_CHANGE))
   }
 
   @SuppressLint("CheckResult")
   override fun onChange(selfChange: Boolean, uri: Uri?) {
-    Timber.v("onChange, selfChange: $selfChange uri: $uri")
+    Timber.Forest.v("onChange, selfChange: $selfChange uri: $uri")
     if (!selfChange && uri != null) {
       match = sUriMatcher.match(uri)
       if (match > 0) {

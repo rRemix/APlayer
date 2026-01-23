@@ -46,14 +46,14 @@ import remix.myplayer.data.prefs.DesktopLyricPrefs.Companion.ELLIPSIS
 import remix.myplayer.data.prefs.DesktopLyricPrefs.Companion.HIDE_PANEL_DELAY
 import remix.myplayer.lyric.CurrentNextLyricsLine
 import remix.myplayer.lyric.LyricManager
-import remix.myplayer.misc.CenterInBox
 import remix.myplayer.service.Command
-import remix.myplayer.ui.clickWithRipple
-import remix.myplayer.ui.clickableWithoutRipple
 import remix.myplayer.ui.dialog.ColorSpace
 import remix.myplayer.ui.theme.ThemeController
 import remix.myplayer.util.MusicUtil.makeCmdIntent
 import remix.myplayer.util.Util.sendLocalBroadcast
+import remix.myplayer.util.ext.CenterInBox
+import remix.myplayer.util.ext.clickWithRipple
+import remix.myplayer.util.ext.clickableWithoutRipple
 
 @Composable
 fun DesktopLyricOverlay(

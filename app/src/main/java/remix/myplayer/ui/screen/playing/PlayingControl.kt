@@ -44,13 +44,10 @@ import remix.myplayer.R
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
-import remix.myplayer.misc.CenterInBox
-import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.service.playback.PlaybackUiState
-import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.dialog.BottomSheetDialog
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
@@ -60,6 +57,9 @@ import remix.myplayer.ui.widget.playpause.PlayPauseView
 import remix.myplayer.util.MusicUtil.makeCmdIntent
 import remix.myplayer.util.Util
 import remix.myplayer.util.Util.sendLocalBroadcast
+import remix.myplayer.util.ext.CenterInBox
+import remix.myplayer.util.ext.clickWithRipple
+import remix.myplayer.util.ext.isPortraitOrientation
 import remix.myplayer.viewmodel.playbackViewModel
 
 private val itemRes = mapOf(

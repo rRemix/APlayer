@@ -15,7 +15,6 @@ import com.bumptech.glide.request.target.AppWidgetTarget
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.misc.getPendingIntentFlag
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
@@ -23,6 +22,7 @@ import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.activity.ComposeActivity
 import remix.myplayer.ui.appwidgets.big.AppWidgetBig
 import remix.myplayer.util.DensityUtil
+import remix.myplayer.util.ext.getPendingIntentFlag
 import timber.log.Timber
 
 /**

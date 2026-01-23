@@ -25,7 +25,6 @@ import remix.myplayer.ui.theme.APlayerTheme
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.LocalThemeController
 import remix.myplayer.ui.theme.ThemeController
-import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.ThemeUtil
 import remix.myplayer.viewmodel.LibraryViewModel
 import remix.myplayer.viewmodel.MainViewModel
@@ -105,7 +104,7 @@ class ComposeActivity : BaseMusicActivity() {
         else -> {
           lifecycleScope.launch {
             delay(500)
-            MusicUtil.playFromUri(this@ComposeActivity, it)
+            libraryViewModel.playFromUri(it)
           }
           intent = Intent()
         }

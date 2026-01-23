@@ -1,4 +1,4 @@
-package remix.myplayer.misc.helper
+package remix.myplayer.helper
 
 import android.app.Activity
 import android.content.Context
@@ -14,6 +14,7 @@ import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.data.prefs.SettingPrefsEntryPoint
 import remix.myplayer.data.prefs.delegate
+import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.nav.RouteEq
 import remix.myplayer.util.Util.isIntentAvailable
 import timber.log.Timber

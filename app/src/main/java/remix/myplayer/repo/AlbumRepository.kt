@@ -5,7 +5,7 @@ import android.provider.MediaStore.Audio
 import dagger.hilt.android.qualifiers.ApplicationContext
 import remix.myplayer.data.model.audio.Album
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.util.ItemsSorter
+import remix.myplayer.helper.ItemsSorter
 import remix.myplayer.util.PermissionUtil
 import timber.log.Timber
 import javax.inject.Inject

@@ -12,9 +12,9 @@ import android.os.IBinder
 import android.os.Message
 import kotlinx.coroutines.cancel
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.misc.helper.MusicEventCallback
-import remix.myplayer.misc.helper.MusicServiceRemote
+import remix.myplayer.service.MusicEventCallback
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.util.Util.isAppOnForeground
 import remix.myplayer.util.Util.registerLocalReceiver
 import remix.myplayer.util.Util.unregisterLocalReceiver

@@ -11,7 +11,7 @@ import remix.myplayer.data.model.misc.LyricOrder
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.delegate
 import remix.myplayer.lyric.provider.ILyricsProvider
-import remix.myplayer.misc.checkWorkerThread
+import remix.myplayer.util.ext.checkWorkerThread
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException

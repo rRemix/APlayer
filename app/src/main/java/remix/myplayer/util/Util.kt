@@ -33,7 +33,6 @@ import androidx.core.text.HtmlCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import remix.myplayer.App
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
@@ -47,8 +46,6 @@ import java.io.Closeable
 import java.io.File
 import java.io.FileReader
 import java.io.IOException
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 
 /**
  * Created by Remix on 2015/11/30.
@@ -188,16 +185,6 @@ object Util {
   }
 
   /**
-   * 防止修改字体大小
-   */
-  fun setFontSize(Application: App) {
-    val resource = Application.resources
-    val c = resource.configuration
-    c.fontScale = 1.0f
-    resource.updateConfiguration(c, resource.displayMetrics)
-  }
-
-  /**
    * 获得歌曲格式
    */
   fun getType(mimeType: String): String {
@@ -318,6 +305,10 @@ object Util {
     return file.exists() && file.delete()
   }
 
+  const val TYPE_SONG = 0
+  const val TYPE_ARTIST = 1
+  const val TYPE_ALBUM = 2
+  const val TYPE_DISPLAYNAME = 3
   /**
    * 处理歌曲名、歌手名或者专辑名
    *
@@ -325,10 +316,6 @@ object Util {
    * @param type 处理类型 0:歌曲名 1:歌手名 2:专辑名 3:文件名
    * @return
    */
-  const val TYPE_SONG = 0
-  const val TYPE_ARTIST = 1
-  const val TYPE_ALBUM = 2
-  const val TYPE_DISPLAYNAME = 3
   fun processInfo(origin: String?, type: Int): String {
     return if (type == TYPE_SONG) {
       if (origin == null || origin == "") {
@@ -353,50 +340,6 @@ object Util {
     }
   }
 
-  /**
-   * 判断是否连续点击
-   *
-   * @return
-   */
-  private var mLastClickTime: Long = 0
-  private const val INTERVAL = 500
-  val isFastDoubleClick: Boolean
-    get() {
-      val time = System.currentTimeMillis()
-      val timeInterval = time - mLastClickTime
-      if (timeInterval in 1 until INTERVAL) {
-        return true
-      }
-      mLastClickTime = time
-      return false
-    }
-
-  /**
-   * 返回关键词的MD值
-   */
-  @JvmStatic
-  fun hashKeyForDisk(key: String): String {
-    val cacheKey: String = try {
-      val mDigest = MessageDigest.getInstance("MD5")
-      mDigest.update(key.toByteArray())
-      bytesToHexString(mDigest.digest())
-    } catch (e: NoSuchAlgorithmException) {
-      key.hashCode().toString()
-    }
-    return cacheKey
-  }
-
-  private fun bytesToHexString(bytes: ByteArray): String {
-    val sb = StringBuilder()
-    for (i in bytes.indices) {
-      val hex = Integer.toHexString(0xFF and bytes[i].toInt())
-      if (hex.length == 1) {
-        sb.append('0')
-      }
-      sb.append(hex)
-    }
-    return sb.toString()
-  }
 
   /**
    * 浏览器打开指定地址

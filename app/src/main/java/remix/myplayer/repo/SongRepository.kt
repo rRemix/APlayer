@@ -6,10 +6,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio
 import android.provider.MediaStore.Audio.Genres
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -22,25 +19,24 @@ import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.misc.checkWorkerThread
-import remix.myplayer.misc.helper.SortOrder
-import remix.myplayer.util.ItemsSorter
+import remix.myplayer.helper.ItemsSorter
+import remix.myplayer.helper.SortOrder
+import remix.myplayer.util.ext.checkWorkerThread
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
-@EntryPoint
-@InstallIn(SingletonComponent::class)
-interface SongRepositoryEntryPoint {
-  fun songRepository(): SongRepository
-}
 
 interface SongRepository {
 
   fun allSongs(): List<Song>
 
-  fun getSongs(selection: String?, selectionValues: Array<String?>?, sortOrder: String? = null): List<Song>
+  fun getSongs(
+    selection: String?,
+    selectionValues: Array<String?>?,
+    sortOrder: String? = null
+  ): List<Song>
 
   fun song(id: Long): Song?
 

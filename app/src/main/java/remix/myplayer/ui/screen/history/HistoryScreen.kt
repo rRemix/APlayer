@@ -16,9 +16,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.misc.helper.MusicServiceRemote.setPlayQueue
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.AppBarAction
 import remix.myplayer.ui.widget.common.CommonAppBar

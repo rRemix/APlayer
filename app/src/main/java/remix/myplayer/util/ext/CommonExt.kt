@@ -1,6 +1,5 @@
-package remix.myplayer.misc
+package remix.myplayer.util.ext
 
-import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.res.Configuration
@@ -158,8 +157,6 @@ fun DavResource.isAudio(): Boolean {
       (contentType == "application/octet-stream" || contentType.startsWith("audio"))
 }
 
-// glide加载图片之前检查activity是否被销毁
-fun Context.isValidGlideContext() = this !is Activity || (!this.isDestroyed && !this.isFinishing)
 
 fun Color.toHexString(withAlpha: Boolean = false): String {
   val argb = this.toArgb()

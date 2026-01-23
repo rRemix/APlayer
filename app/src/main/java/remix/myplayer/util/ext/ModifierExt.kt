@@ -1,4 +1,4 @@
-package remix.myplayer.ui
+package remix.myplayer.util.ext
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween

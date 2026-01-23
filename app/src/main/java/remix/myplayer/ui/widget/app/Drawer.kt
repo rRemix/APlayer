@@ -43,12 +43,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import kotlinx.coroutines.launch
-import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.data.prefs.ThemePrefs.Companion.BLACK
 import remix.myplayer.data.prefs.ThemePrefs.Companion.DARK
 import remix.myplayer.data.prefs.ThemePrefs.Companion.LIGHT
-import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteHistory
@@ -60,6 +58,7 @@ import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.library.GlideCover
 import remix.myplayer.util.Constants
+import remix.myplayer.util.ext.isPortraitOrientation
 import remix.myplayer.viewmodel.PlaybackViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 

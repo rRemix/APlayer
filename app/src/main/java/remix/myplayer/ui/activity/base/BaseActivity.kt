@@ -17,11 +17,11 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
-import remix.myplayer.misc.helper.LanguageHelper.setLocal
+import remix.myplayer.helper.AudioTagWriter
+import remix.myplayer.helper.AudioTagWriter.PendingWriteRequest
+import remix.myplayer.helper.LanguageHelper.setLocal
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.nav.MessageNotifier
-import remix.myplayer.util.AudioTagWriter
-import remix.myplayer.util.AudioTagWriter.PendingWriteRequest
 import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.Util
 import timber.log.Timber

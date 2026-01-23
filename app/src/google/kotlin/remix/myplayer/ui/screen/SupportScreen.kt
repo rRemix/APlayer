@@ -37,12 +37,12 @@ import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsParams.Product
 import remix.myplayer.R
-import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
+import remix.myplayer.util.ext.clickWithRipple
 import timber.log.Timber
 
 @Composable
@@ -92,7 +92,7 @@ fun SupportScreen() {
 
     val productListener = remember {
       ProductDetailsResponseListener { result, details ->
-        Timber.v("onProductDetailsResponse: $result")
+        Timber.v("onProductDetailsResponse, r: $result, d: $details")
         if (details.isEmpty()) return@ProductDetailsResponseListener
         details.sortWith { o1, o2 ->
           o1.oneTimePurchaseOfferDetails!!.priceAmountMicros.compareTo(

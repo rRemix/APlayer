@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
-import remix.myplayer.misc.helper.EQHelper
+import remix.myplayer.helper.EQHelper
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteAbout
 import remix.myplayer.ui.screen.setting.logic.color.BlackThemeLogic

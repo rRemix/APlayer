@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.misc.helper.LanguageHelper
+import remix.myplayer.helper.LanguageHelper
 import remix.myplayer.ui.activity.ComposeActivity
 import remix.myplayer.ui.dialog.ItemsCallbackSingleChoice
 import remix.myplayer.ui.dialog.NormalDialog

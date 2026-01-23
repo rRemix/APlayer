@@ -31,7 +31,7 @@ import remix.myplayer.data.model.audio.Album
 import remix.myplayer.data.model.audio.Artist
 import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
-import remix.myplayer.misc.helper.SortOrder
+import remix.myplayer.helper.SortOrder
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteCustomSort
 import remix.myplayer.ui.theme.LocalTheme

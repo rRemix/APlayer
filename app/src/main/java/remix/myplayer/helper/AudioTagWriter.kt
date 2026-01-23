@@ -1,7 +1,6 @@
-package remix.myplayer.util
+package remix.myplayer.helper
 
 import android.app.RecoverableSecurityException
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.media.MediaScannerConnection
@@ -98,7 +97,7 @@ object AudioTagWriter {
 
           }
 
-          Timber.v("Fail to save tag: $e")
+          Timber.Forest.v("Fail to save tag: $e")
           MessageNotifier.show(R.string.save_error, e.toString())
         }
       }
@@ -124,10 +123,10 @@ object AudioTagWriter {
     }
 
   private fun sendTagChangedBroadcast(context: Context, request: PendingWriteRequest) {
-    val intent = Intent(MusicService.TAG_CHANGE)
-      .putExtra(BaseMusicActivity.EXTRA_OLD_SONG, request.song)
+    val intent = Intent(MusicService.Companion.TAG_CHANGE)
+      .putExtra(BaseMusicActivity.Companion.EXTRA_OLD_SONG, request.song)
       .putExtra(
-        BaseMusicActivity.EXTRA_NEW_SONG,
+        BaseMusicActivity.Companion.EXTRA_NEW_SONG,
         request.song.copy(
           title = request.fieldMap[FieldKey.TITLE],
           album = request.fieldMap[FieldKey.ALBUM],
@@ -145,7 +144,7 @@ object AudioTagWriter {
       try {
         tag.setField(key, value)
       } catch (e: Exception) {
-        Timber.v("setField($key, $value) failed: $e")
+        Timber.Forest.v("setField($key, $value) failed: $e")
       }
     }
   }
@@ -164,7 +163,7 @@ object AudioTagWriter {
       }
     }
 
-    Timber.v("Fallback to content uri write: ${request.song.data}")
+    Timber.Forest.v("Fallback to content uri write: ${request.song.data}")
     writeAudioTagByContentUri(context, request)
   }
 

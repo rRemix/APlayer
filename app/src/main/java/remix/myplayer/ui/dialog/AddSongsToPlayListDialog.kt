@@ -6,7 +6,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.settingViewModel
 

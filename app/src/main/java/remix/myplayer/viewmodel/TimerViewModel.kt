@@ -14,9 +14,9 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.misc.helper.SleepTimer.Companion.getMillisUntilFinish
-import remix.myplayer.misc.helper.SleepTimer.Companion.isTicking
-import remix.myplayer.misc.helper.SleepTimer.Companion.toggleTimer
+import remix.myplayer.helper.SleepTimer.Companion.getMillisUntilFinish
+import remix.myplayer.helper.SleepTimer.Companion.isTicking
+import remix.myplayer.helper.SleepTimer.Companion.toggleTimer
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.nav.MessageNotifier
 import javax.inject.Inject

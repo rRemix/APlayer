@@ -11,8 +11,8 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import remix.myplayer.misc.helper.LanguageHelper.AUTO
-import remix.myplayer.misc.helper.SortOrder
+import remix.myplayer.helper.LanguageHelper.AUTO
+import remix.myplayer.helper.SortOrder
 import remix.myplayer.util.Constants.MB
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -159,7 +159,7 @@ class SettingPrefs @Inject constructor(
   var enableEq by PrefsDelegate(sp, PrefKeys.Setting.ENABLE_EQ, false)
 
   var checkMigration16600 by PrefsDelegate(sp, "check_migration_16600", false)
-  var checkMigration20100 by PrefsDelegate(sp, "check_migration_20100", false)
+  var checkMigration20500 by PrefsDelegate(sp, "check_migration_20500", false)
 
   companion object {
 

@@ -2,7 +2,7 @@ package remix.myplayer.data.model.misc
 
 import android.content.Context
 import remix.myplayer.R
-import remix.myplayer.misc.helper.SortOrder
+import remix.myplayer.helper.SortOrder
 import java.io.Serializable
 
 @kotlinx.serialization.Serializable

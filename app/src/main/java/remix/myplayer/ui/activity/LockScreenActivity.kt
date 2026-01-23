@@ -77,10 +77,10 @@ import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
 import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.blur.StackBlurManager
-import remix.myplayer.ui.clickableWithoutRipple
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.Util.sendLocalBroadcast
+import remix.myplayer.util.ext.clickableWithoutRipple
 import remix.myplayer.viewmodel.PlaybackViewModel
 import timber.log.Timber
 import javax.inject.Inject

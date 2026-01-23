@@ -40,7 +40,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.APlayerTheme
@@ -48,6 +47,7 @@ import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.library.GlideCover
+import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.LibraryViewModel
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.playbackViewModel

@@ -1,10 +1,10 @@
 package remix.myplayer.data.prefs
 
 import android.content.Context
+import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import androidx.core.content.edit
 
 @Singleton
 class InAppUpdatePrefs @Inject constructor(

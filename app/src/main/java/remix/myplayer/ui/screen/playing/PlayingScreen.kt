@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.misc.isPortraitOrientation
+import remix.myplayer.util.ext.isPortraitOrientation
 import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 

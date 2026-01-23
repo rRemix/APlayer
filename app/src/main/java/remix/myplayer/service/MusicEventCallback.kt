@@ -1,7 +1,6 @@
-package remix.myplayer.misc.helper
+package remix.myplayer.service
 
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.service.MusicService
 
 interface MusicEventCallback {
   fun onMediaStoreChanged()

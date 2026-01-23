@@ -33,10 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.R
-import remix.myplayer.misc.CenterInBox
-import remix.myplayer.misc.helper.EQHelper
-import remix.myplayer.misc.helper.MusicServiceRemote
-import remix.myplayer.ui.clickWithRipple
+import remix.myplayer.helper.EQHelper
+import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
@@ -45,6 +43,8 @@ import remix.myplayer.ui.widget.common.LineSlider
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.common.defaultLineSliderProperties
+import remix.myplayer.util.ext.CenterInBox
+import remix.myplayer.util.ext.clickWithRipple
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 

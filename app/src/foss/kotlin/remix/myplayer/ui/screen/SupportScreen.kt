@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.theme.LocalTheme
@@ -33,6 +32,7 @@ import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.util.AlipayUtil
 import remix.myplayer.util.Util
+import remix.myplayer.util.ext.clickWithRipple
 
 private data class DonationItem(val icon: Int, val titleRes: Int, val onClick: (Activity) -> Unit)
 

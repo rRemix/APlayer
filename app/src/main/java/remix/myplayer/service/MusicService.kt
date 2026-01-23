@@ -49,19 +49,15 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
 import remix.myplayer.data.prefs.SettingPrefs.Companion.OPEN_SOFTWARE
+import remix.myplayer.helper.EQHelper
+import remix.myplayer.helper.LanguageHelper
+import remix.myplayer.helper.ShakeDetector
+import remix.myplayer.helper.SleepTimer
 import remix.myplayer.lyric.LyricManager
-import remix.myplayer.misc.checkMainThread
-import remix.myplayer.misc.getPendingIntentFlag
-import remix.myplayer.misc.helper.EQHelper
-import remix.myplayer.misc.helper.LanguageHelper
-import remix.myplayer.misc.helper.MusicEventCallback
-import remix.myplayer.misc.helper.ShakeDetector
-import remix.myplayer.misc.helper.SleepTimer
-import remix.myplayer.misc.observer.MediaStoreObserver
+import remix.myplayer.service.MediaStoreObserver
 import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
 import remix.myplayer.misc.receiver.MediaButtonReceiver
-import remix.myplayer.misc.tryLaunch
 import remix.myplayer.repo.HistoryRepository
 import remix.myplayer.repo.PlayListRepository
 import remix.myplayer.repo.SongRepository
@@ -91,6 +87,9 @@ import remix.myplayer.util.Util
 import remix.myplayer.util.Util.isAppOnForeground
 import remix.myplayer.util.Util.registerLocalReceiver
 import remix.myplayer.util.Util.unregisterLocalReceiver
+import remix.myplayer.util.ext.checkMainThread
+import remix.myplayer.util.ext.getPendingIntentFlag
+import remix.myplayer.util.ext.tryLaunch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -1312,7 +1311,9 @@ class MusicService : BaseService(),
       .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.title)
       .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currentSong.title)
       .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currentSong.artist)
-    builder.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playback.itemCount.toLong())
+      .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playback.itemCount.toLong())
+      .putString("ucar.media.metadata.UCAR_TITLE", currentSong.title)
+      .putString("ucar.media.metadata.UCAR_ARTIST", currentSong.artist)
 
     mediaSession.setMetadata(builder.build())
     updatePlaybackState()

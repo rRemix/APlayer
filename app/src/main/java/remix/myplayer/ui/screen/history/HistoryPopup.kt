@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import remix.myplayer.R
-import remix.myplayer.misc.helper.SortOrder
+import remix.myplayer.helper.SortOrder
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.viewmodel.libraryViewModel
 

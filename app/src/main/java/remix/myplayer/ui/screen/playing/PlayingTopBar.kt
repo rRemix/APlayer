@@ -26,10 +26,10 @@ import androidx.compose.ui.unit.sp
 import androidx.palette.graphics.Palette
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.popupButton
+import remix.myplayer.util.ext.clickWithRipple
 
 @Composable
 @Stable

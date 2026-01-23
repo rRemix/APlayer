@@ -26,7 +26,6 @@ import remix.myplayer.data.model.audio.Song
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.ui.activity.base.BaseActivity
-import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteCrop
 import remix.myplayer.ui.theme.LocalTheme
@@ -34,6 +33,7 @@ import remix.myplayer.ui.theme.popupButton
 import remix.myplayer.util.Constants
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.Util
+import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel

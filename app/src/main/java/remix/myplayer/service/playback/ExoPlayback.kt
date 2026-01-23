@@ -33,9 +33,9 @@ import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
-import remix.myplayer.misc.checkMainThread
 import remix.myplayer.service.playback.Playback.PlayerCallback
 import remix.myplayer.util.Constants.MB
+import remix.myplayer.util.ext.checkMainThread
 import timber.log.Timber
 import java.io.File
 

@@ -9,7 +9,7 @@ import org.jaudiotagger.tag.id3.framebody.FrameBodyTXXX
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.misc.LyricOrder
 import remix.myplayer.lyric.LrcParser
-import remix.myplayer.misc.checkWorkerThread
+import remix.myplayer.util.ext.checkWorkerThread
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton

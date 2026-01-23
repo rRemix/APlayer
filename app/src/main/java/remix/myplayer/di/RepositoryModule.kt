@@ -18,12 +18,11 @@ import remix.myplayer.repo.PlayListRepoImpl
 import remix.myplayer.repo.PlayListRepository
 import remix.myplayer.repo.PlayQueueRepoImpl
 import remix.myplayer.repo.PlayQueueRepository
-import remix.myplayer.repo.SongRepoImpl
-import remix.myplayer.repo.SongRepository
-
-import remix.myplayer.repo.WebDavRepository
 import remix.myplayer.repo.SmbRepoImpl
 import remix.myplayer.repo.SmbRepository
+import remix.myplayer.repo.SongRepoImpl
+import remix.myplayer.repo.SongRepository
+import remix.myplayer.repo.WebDavRepository
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)

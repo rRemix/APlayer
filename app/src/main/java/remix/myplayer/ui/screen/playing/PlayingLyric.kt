@@ -37,7 +37,6 @@ import remix.myplayer.lyric.LyricLine
 import remix.myplayer.lyric.LyricManager
 import remix.myplayer.lyric.provider.ILyricsProvider
 import remix.myplayer.lyric.provider.UriProvider
-import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.ProgressAware
@@ -45,6 +44,7 @@ import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.util.Util.registerLocalReceiver
 import remix.myplayer.util.Util.unregisterLocalReceiver
+import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.settingViewModel
 import java.util.Locale
 import kotlin.math.max

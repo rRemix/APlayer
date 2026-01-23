@@ -34,6 +34,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.db.room.entity.Smb
 import remix.myplayer.data.db.room.entity.WebDav
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Album
@@ -48,15 +49,14 @@ import remix.myplayer.ui.screen.HomeScreen
 import remix.myplayer.ui.screen.LastAddedScreen
 import remix.myplayer.ui.screen.SearchScreen
 import remix.myplayer.ui.screen.SongChooserScreen
+import remix.myplayer.ui.screen.SupportScreen
 import remix.myplayer.ui.screen.crop.CropScreen
 import remix.myplayer.ui.screen.detail.DetailScreen
 import remix.myplayer.ui.screen.history.HistoryScreen
 import remix.myplayer.ui.screen.playing.PlayingScreen
 import remix.myplayer.ui.screen.setting.SettingScreen
-import remix.myplayer.ui.screen.webdav.WebDavDetailScreen
 import remix.myplayer.ui.screen.smb.SmbDetailScreen
-import remix.myplayer.data.db.room.entity.Smb
-import remix.myplayer.ui.screen.SupportScreen
+import remix.myplayer.ui.screen.webdav.WebDavDetailScreen
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 

@@ -78,9 +78,7 @@ android {
             )
         }
 
-        val flavor = gradle.startParameter.taskNames.toString().lowercase()
-        val sortPrefix = if (flavor.contains("normal")) "1" else if (flavor.contains("foss")) "2" else "3"
-        setProperty("archivesBaseName", "APlayer-v${versionName}-${sortPrefix}")
+        setProperty("archivesBaseName", "APlayer-v${versionName}")
     }
 
     signingConfigs {
@@ -200,6 +198,7 @@ android {
     applicationVariants.all {
         val variant = this
         variant.outputs.all {
+            val output = this
             val flavor = variant.productFlavors.firstOrNull()?.name
             if (variant.buildType.name == "release" && flavor != null) {
                 val sortPrefix = when (flavor) {
@@ -208,7 +207,7 @@ android {
                     else -> ""
                 }
                 if (sortPrefix.isNotEmpty()) {
-                    (this as BaseVariantOutputImpl).outputFileName = "APlayer-v${variant.versionName}-${sortPrefix}-${flavor}-release.apk"
+                    (output as BaseVariantOutputImpl).outputFileName = "${sortPrefix}-APlayer-v${variant.versionName}-${flavor}-release.apk"
                 }
             }
         }

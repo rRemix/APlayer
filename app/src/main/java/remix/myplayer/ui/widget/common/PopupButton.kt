@@ -18,9 +18,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import remix.myplayer.R
-import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.popupButton
+import remix.myplayer.util.ext.clickWithRipple
 
 @Composable
 fun PopupButton(menu: List<Int>, contentDescription: String? = null, onMenuClick: (Int) -> Unit) {

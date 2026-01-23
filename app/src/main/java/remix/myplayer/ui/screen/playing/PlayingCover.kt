@@ -21,10 +21,10 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.glide.addBitmapListener
-import remix.myplayer.misc.isPortraitOrientation
 import remix.myplayer.service.Command
 import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.theme.LocalTheme
+import remix.myplayer.util.ext.isPortraitOrientation
 import remix.myplayer.viewmodel.playbackViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class)

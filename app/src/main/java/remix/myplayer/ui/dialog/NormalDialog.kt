@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.R
-import remix.myplayer.ui.clickWithRipple
 import remix.myplayer.ui.widget.common.TextPrimary
+import remix.myplayer.util.ext.clickWithRipple
 
 class ItemsCallbackMultiChoice(
   val selectedIndices: Set<Int>,

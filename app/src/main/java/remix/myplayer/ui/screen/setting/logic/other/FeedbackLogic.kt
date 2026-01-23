@@ -16,14 +16,14 @@ import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.misc.AppInfo
 import remix.myplayer.misc.SystemInfo
-import remix.myplayer.misc.tryLaunch
-import remix.myplayer.misc.zipFrom
-import remix.myplayer.misc.zipOutputStream
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.screen.setting.ArrowPreference
 import remix.myplayer.util.Util
+import remix.myplayer.util.ext.tryLaunch
+import remix.myplayer.util.ext.zipFrom
+import remix.myplayer.util.ext.zipOutputStream
 import timber.log.Timber
 import java.io.File
 

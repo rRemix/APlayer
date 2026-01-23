@@ -23,11 +23,11 @@ import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.misc.helper.MusicEventCallback
-import remix.myplayer.misc.helper.MusicServiceRemote
 import remix.myplayer.repo.PlayQueueRepository
 import remix.myplayer.service.Command
+import remix.myplayer.service.MusicEventCallback
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.nav.MessageNotifier

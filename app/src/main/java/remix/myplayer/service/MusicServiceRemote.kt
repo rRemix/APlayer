@@ -1,4 +1,4 @@
-package remix.myplayer.misc.helper
+package remix.myplayer.service
 
 import android.app.Activity
 import android.content.ComponentName
@@ -9,7 +9,6 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.core.content.ContextCompat
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.service.MusicService
 import java.util.WeakHashMap
 
 object MusicServiceRemote {

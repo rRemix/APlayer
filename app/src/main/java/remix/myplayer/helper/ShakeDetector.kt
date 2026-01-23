@@ -1,4 +1,4 @@
-package remix.myplayer.misc.helper
+package remix.myplayer.helper
 
 import android.content.Context
 import android.hardware.Sensor

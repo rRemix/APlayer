@@ -1,6 +1,5 @@
 package remix.myplayer.ui.screen.smb
  
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,14 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hierynomus.mserref.NtStatus
 import com.hierynomus.mssmb2.SMBApiException
-import com.thegrizzlylabs.sardineandroid.impl.SardineException
 import remix.myplayer.R
 import remix.myplayer.data.db.room.entity.Smb
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.misc.helper.MusicServiceRemote
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.ui.clickWithRipple
+import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.dialog.runWithLoading
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
@@ -56,6 +53,7 @@ import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.Util
+import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.SmbFile
 import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel

@@ -1,6 +1,7 @@
 package remix.myplayer.viewmodel
 
 import android.content.Context
+import android.net.Uri
 import android.provider.MediaStore.Audio
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -29,8 +30,6 @@ import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.glide.UriFetcher
-import remix.myplayer.misc.checkWorkerThread
-import remix.myplayer.misc.helper.MusicEventCallback
 import remix.myplayer.repo.AlbumRepository
 import remix.myplayer.repo.ArtistRepository
 import remix.myplayer.repo.FolderRepository
@@ -38,10 +37,14 @@ import remix.myplayer.repo.GenreRepository
 import remix.myplayer.repo.HistoryRepository
 import remix.myplayer.repo.PlayListRepository
 import remix.myplayer.repo.SongRepository
+import remix.myplayer.repo.usecase.ExportPlayListUseCase
+import remix.myplayer.repo.usecase.PlayFromUriUseCase
+import remix.myplayer.service.MusicEventCallback
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.util.PermissionUtil
+import remix.myplayer.util.ext.checkWorkerThread
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -58,6 +61,8 @@ class LibraryViewModel @Inject constructor(
   private val uriFetcher: UriFetcher,
   private val historyRepo: HistoryRepository,
   val settingPrefs: SettingPrefs,
+  private val exportPlayListUseCase: ExportPlayListUseCase,
+  private val playFromUriUseCase: PlayFromUriUseCase
 ) : ViewModel(), MusicEventCallback {
 
   private var hasPermission = false
@@ -81,15 +86,15 @@ class LibraryViewModel @Inject constructor(
   val folders: StateFlow<List<Folder>> = _folders.asStateFlow()
 
   val historySongs = historyRepo.allHistories().map { histories ->
-      histories.mapNotNull { history ->
-        val song = withContext(Dispatchers.IO) { songRepo.song(history.audio_id) }
-        song?.let { it to history.play_count }
-      }
-    }.stateIn(
-      scope = viewModelScope,
-      started = SharingStarted.WhileSubscribed(5000),
-      initialValue = emptyList()
-    )
+    histories.mapNotNull { history ->
+      val song = withContext(Dispatchers.IO) { songRepo.song(history.audio_id) }
+      song?.let { it to history.play_count }
+    }
+  }.stateIn(
+    scope = viewModelScope,
+    started = SharingStarted.WhileSubscribed(5000),
+    initialValue = emptyList()
+  )
 
   private val _createPlaylistState = MutableStateFlow(CreatePlaylistState())
   val createPlaylistState = _createPlaylistState.asStateFlow()
@@ -183,6 +188,18 @@ class LibraryViewModel @Inject constructor(
       } catch (e: Exception) {
         MessageNotifier.show(R.string.save_error)
       }
+    }
+  }
+
+  fun exportPlayListToFile(playList: PlayList?, uri: Uri) {
+    viewModelScope.launch {
+      exportPlayListUseCase(playList, uri)
+    }
+  }
+
+  fun playFromUri(uri: Uri) {
+    viewModelScope.launch {
+      playFromUriUseCase(uri)
     }
   }
 

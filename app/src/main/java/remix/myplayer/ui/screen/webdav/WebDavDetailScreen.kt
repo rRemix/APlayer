@@ -39,11 +39,9 @@ import okhttp3.OkHttpClient
 import remix.myplayer.R
 import remix.myplayer.data.db.room.entity.WebDav
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.misc.helper.MusicServiceRemote
-import remix.myplayer.misc.isAudio
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
-import remix.myplayer.ui.clickWithRipple
+import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.dialog.runWithLoading
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
@@ -59,6 +57,8 @@ import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.Util
+import remix.myplayer.util.ext.clickWithRipple
+import remix.myplayer.util.ext.isAudio
 import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.webDavViewModel

@@ -46,7 +46,7 @@ import remix.myplayer.data.prefs.DesktopLyricPrefs
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.delegate
 import remix.myplayer.lyric.provider.ILyricsProvider
-import remix.myplayer.misc.helper.MusicServiceRemote
+import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.ThemeController

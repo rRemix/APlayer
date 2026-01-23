@@ -26,6 +26,7 @@ import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.misc.LyricOrder
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.delegate
+import remix.myplayer.helper.EQHelper
 import remix.myplayer.lyric.LyricManager.Companion.ACTION_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.CHANGE_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.EXTRA_LYRIC
@@ -33,8 +34,6 @@ import remix.myplayer.lyric.LyricManager.Companion.EXTRA_LYRIC_URI
 import remix.myplayer.lyric.LyricManager.Companion.SHOW_OFFSET_PANEL
 import remix.myplayer.lyric.LyricManagerEntryPoint
 import remix.myplayer.lyric.LyricSearcher
-import remix.myplayer.misc.ShowLyricTipDialog
-import remix.myplayer.misc.helper.EQHelper
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.InputDialog
@@ -44,6 +43,7 @@ import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.Util.sendLocalBroadcast
+import remix.myplayer.util.ext.ShowLyricTipDialog
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.settings.SettingsState

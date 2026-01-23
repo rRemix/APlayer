@@ -1,4 +1,4 @@
-package remix.myplayer.misc
+package remix.myplayer.util.ext
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box

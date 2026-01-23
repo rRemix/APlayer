@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
-import remix.myplayer.misc.activityViewModel
+import remix.myplayer.util.ext.activityViewModel
 import remix.myplayer.viewmodel.settings.SettingViewModel
 
 val LocalLibraryViewModel = compositionLocalOf<LibraryViewModel> {

@@ -11,8 +11,8 @@ import remix.myplayer.data.db.room.dao.PlayListDao
 import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.data.prefs.playlistSortOrderFlow
-import remix.myplayer.misc.helper.SortOrder
-import remix.myplayer.util.ItemsSorter
+import remix.myplayer.helper.ItemsSorter
+import remix.myplayer.helper.SortOrder
 import java.util.Date
 import javax.inject.Inject
 

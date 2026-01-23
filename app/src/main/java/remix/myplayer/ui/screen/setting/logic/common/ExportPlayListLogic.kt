@@ -10,25 +10,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.screen.setting.NormalPreference
-import remix.myplayer.util.MusicUtil
 import remix.myplayer.viewmodel.libraryViewModel
 
 @Composable
 fun ExportPlayListLogic() {
-  val scope = rememberCoroutineScope()
   val libraryVM = libraryViewModel
   val state = rememberDialogState(false)
-  val context = LocalContext.current
 
   var allPlayList by remember {
     mutableStateOf(emptyList<PlayList>())
@@ -54,13 +48,10 @@ fun ExportPlayListLogic() {
     ) { result ->
       if (result.resultCode == Activity.RESULT_OK) {
         val uri = result.data?.data ?: return@rememberLauncherForActivityResult
-        scope.launch {
-          MusicUtil.exportPlayListToFile(
-            context,
-            allPlayList.firstOrNull { it.name == select },
-            uri
-          )
-        }
+        libraryVM.exportPlayListToFile(
+          allPlayList.firstOrNull { it.name == select },
+          uri
+        )
       }
     }
 
