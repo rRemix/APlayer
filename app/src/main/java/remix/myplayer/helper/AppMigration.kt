@@ -3,6 +3,7 @@ package remix.myplayer.helper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import remix.myplayer.data.db.room.AppDatabase
 import remix.myplayer.data.model.misc.Library
 import remix.myplayer.data.prefs.SettingPrefs
@@ -23,8 +24,9 @@ class AppMigration @Inject constructor(
       }
     }
 
-    // Fix invalid sort orders to defaults.
+
     if (!settingPrefs.checkMigration20500) {
+      // 1.Fix invalid sort orders to defaults.
       settingPrefs.checkMigration20500 = true
 
       fun fixSortOrder(current: String, valid: List<String>, fallback: String): String {
@@ -61,6 +63,36 @@ class AppMigration @Inject constructor(
           Library(Library.TAG_GENRE).sortOrders,
           SortOrder.GENRE_A_Z
         )
+
+      val jsonParser = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        encodeDefaults = true
+      }
+      val libraries = try {
+        jsonParser.decodeFromString<List<Library>>(settingPrefs.libraryJson)
+      } catch (_: Exception) {
+        emptyList()
+      }
+
+      // 2.Migration library config
+      val inputTags = libraries.map { it.tag }.toSet()
+      val allTags = Library.default.map { it.tag }.toSet()
+
+      val migratedList = if (libraries.isNotEmpty() && !inputTags.containsAll(allTags)) {
+        Library.default.map { defaultLib ->
+          val found = libraries.find { it.tag == defaultLib.tag }
+          if (found != null) {
+            defaultLib.copy(enable = found.enable)
+          } else {
+            defaultLib.copy(enable = false)
+          }
+        }
+      } else {
+        libraries
+      }
+
+      settingPrefs.libraryJson = Json.encodeToString(migratedList)
     }
   }
 }

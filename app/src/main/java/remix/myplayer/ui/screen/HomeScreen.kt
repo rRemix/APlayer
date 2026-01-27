@@ -95,7 +95,7 @@ fun HomeScreen() {
     drawerState = drawerState,
     drawerContent = { Drawer(drawerState) }) {
 
-    val libraries by settingViewModel.allLibraries.collectAsStateWithLifecycle()
+    val libraries by settingViewModel.enabledLibraries.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState { libraries.size }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 

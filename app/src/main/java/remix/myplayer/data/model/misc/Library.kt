@@ -1,6 +1,5 @@
 package remix.myplayer.data.model.misc
 
-import android.content.Context
 import remix.myplayer.R
 import remix.myplayer.helper.SortOrder
 import java.io.Serializable
@@ -8,8 +7,7 @@ import java.io.Serializable
 @kotlinx.serialization.Serializable
 data class Library(
   val tag: Int,
-  @Deprecated("never use")
-  val order: Int = tag
+  val enable: Boolean = true
 ) : Serializable {
 
   val stringRes: Int
@@ -116,7 +114,7 @@ data class Library(
     const val TAG_FOLDER = 5
     const val TAG_REMOTE = 6
 
-    val allLibraries = listOf(
+    val default = listOf(
       Library(TAG_SONG),
       Library(TAG_ALBUM),
       Library(TAG_ARTIST),
@@ -126,20 +124,6 @@ data class Library(
       Library(TAG_REMOTE)
     )
 
-    val defaultLibrary = Library(TAG_SONG, 0)
-
-    fun getAllLibraryString(context: Context): List<String> {
-      return listOf(
-        context.resources.getString(R.string.tab_song),
-        context.resources.getString(R.string.tab_album),
-        context.resources.getString(R.string.tab_artist),
-        context.resources.getString(R.string.tab_genre),
-        context.resources.getString(R.string.tab_playlist),
-        context.resources.getString(R.string.tab_folder),
-        context.resources.getString(R.string.tab_remote),
-        context.resources.getString(R.string.tab_smb),
-      )
-    }
   }
 
 }

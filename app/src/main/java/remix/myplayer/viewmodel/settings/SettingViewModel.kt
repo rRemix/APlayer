@@ -20,6 +20,7 @@ import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.misc.Library
+import remix.myplayer.data.model.misc.Library.Companion.TAG_SONG
 import remix.myplayer.data.model.misc.LyricOrder
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.SettingPrefs
@@ -54,11 +55,14 @@ class SettingViewModel @Inject constructor(
   @Inject
   lateinit var deleteSongUseCase: DeleteSongUseCase
 
-  private val _currentLibrary = MutableStateFlow(Library.defaultLibrary)
+  private val _currentLibrary = MutableStateFlow(Library(TAG_SONG))
   val currentLibrary = _currentLibrary.asStateFlow()
 
-  private val _allLibraries = MutableStateFlow(Library.allLibraries)
-  val allLibraries = _allLibraries.asStateFlow()
+  private val _enabledLibraries = MutableStateFlow(Library.default)
+  val enabledLibraries = _enabledLibraries.asStateFlow()
+
+  private val _libraryConfig = MutableStateFlow(Library.default)
+  val libraryConfig = _libraryConfig.asStateFlow()
 
   // 设置状态
   private val _settingsState = MutableStateFlow(loadState())
@@ -133,19 +137,19 @@ class SettingViewModel @Inject constructor(
     // load libraries
     val libraries = try {
       Json.decodeFromString<List<Library>>(settingPrefs.libraryJson)
-        .ifEmpty { Library.allLibraries }
+        .ifEmpty { Library.default }
     } catch (_: Exception) {
-      Library.allLibraries
+      Library.default
     }
 
-    setAllLibraries(libraries)
-
-    changeLibrary(libraries[0])
+    updateAllLibraries(libraries)
+    changeLibrary(enabledLibraries.value[0])
   }
 
-  fun setAllLibraries(libraries: List<Library>) {
-    _allLibraries.value = libraries
+  fun updateAllLibraries(libraries: List<Library>) {
+    _libraryConfig.value = libraries
     settingPrefs.libraryJson = Json.encodeToString(libraries)
+    _enabledLibraries.value = libraries.filter { it.enable }
   }
 
   fun changeLibrary(library: Library) {

@@ -54,7 +54,6 @@ import remix.myplayer.helper.LanguageHelper
 import remix.myplayer.helper.ShakeDetector
 import remix.myplayer.helper.SleepTimer
 import remix.myplayer.lyric.LyricManager
-import remix.myplayer.service.MediaStoreObserver
 import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
 import remix.myplayer.misc.receiver.MediaButtonReceiver

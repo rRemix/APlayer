@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.data.model.misc.Library
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.screen.setting.NormalPreference
@@ -33,7 +32,6 @@ import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.util.Util
 import remix.myplayer.util.ext.clickWithRipple
-import remix.myplayer.util.ext.rememberMutableStateSetOf
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.settings.SettingViewModel
 import sh.calvin.reorderable.ReorderableItem
@@ -43,19 +41,16 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 fun LibraryLogic() {
   val vm: SettingViewModel = settingViewModel
 
-  val libraries by vm.allLibraries.collectAsStateWithLifecycle()
   val currentLibrary by vm.currentLibrary.collectAsStateWithLifecycle()
+  val libraryConfig by vm.libraryConfig.collectAsStateWithLifecycle()
   val context = LocalContext.current
 
-  val selectedTags = rememberMutableStateSetOf<Int>()
   var orderList by remember {
-    mutableStateOf(buildLibraryOrderList(libraries))
+    mutableStateOf(libraryConfig)
   }
 
   fun resetState() {
-    selectedTags.clear()
-    selectedTags.addAll(libraries.map { it.tag })
-    orderList = buildLibraryOrderList(libraries)
+    orderList = libraryConfig
   }
 
   val state = rememberDialogState(false)
@@ -74,18 +69,17 @@ fun LibraryLogic() {
       resetState()
     },
     onPositive = {
-      val newLibraries = orderList.filter { selectedTags.contains(it.tag) }
-      if (newLibraries.isEmpty()) {
+      if (orderList.none { it.enable }) {
         return@NormalDialog
       }
-      if (libraries == newLibraries) {
+      if (libraryConfig == orderList) {
         return@NormalDialog
       }
 
-      vm.setAllLibraries(newLibraries)
+      vm.updateAllLibraries(orderList)
 
-      if (newLibraries.none { it.tag == currentLibrary.tag }) {
-        vm.changeLibrary(newLibraries[0])
+      if (orderList.none { it.tag == currentLibrary.tag && it.enable }) {
+        vm.changeLibrary(orderList.first { it.enable })
       }
     },
     custom = {
@@ -103,16 +97,13 @@ fun LibraryLogic() {
       ) {
         items(orderList, key = { it.tag }) { library ->
           ReorderableItem(reorderableLazyListState, key = library.tag) { isDragging ->
-            val checked = selectedTags.contains(library.tag)
             Row(
               modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
                 .clickWithRipple(false) {
-                  if (checked) {
-                    selectedTags.remove(library.tag)
-                  } else {
-                    selectedTags.add(library.tag)
+                  orderList = orderList.map {
+                    if (it.tag == library.tag) it.copy(enable = !it.enable) else it
                   }
                 },
               verticalAlignment = Alignment.CenterVertically
@@ -120,12 +111,10 @@ fun LibraryLogic() {
               CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
                 Checkbox(
                   modifier = Modifier.padding(end = 8.dp),
-                  checked = checked,
-                  onCheckedChange = {
-                    if (it) {
-                      selectedTags.add(library.tag)
-                    } else {
-                      selectedTags.remove(library.tag)
+                  checked = library.enable,
+                  onCheckedChange = { checked ->
+                    orderList = orderList.map {
+                      if (it.tag == library.tag) it.copy(enable = checked) else it
                     }
                   })
               }
@@ -155,15 +144,4 @@ fun LibraryLogic() {
       }
     }
   )
-}
-
-private fun buildLibraryOrderList(libraries: List<Library>): List<Library> {
-  val result = LinkedHashMap<Int, Library>()
-  libraries.forEach { result[it.tag] = it }
-  Library.allLibraries.forEach { library ->
-    if (!result.containsKey(library.tag)) {
-      result[library.tag] = library
-    }
-  }
-  return result.values.toList()
 }
