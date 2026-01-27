@@ -1,1 +1,1 @@
-Ein schöner und leistungsstarker Musikplayer
+Lokaler Musikplayer mit Songtexten, Themes und WebDAV-Unterstützung
