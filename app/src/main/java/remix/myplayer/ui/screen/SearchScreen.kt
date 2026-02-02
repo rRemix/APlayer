@@ -71,6 +71,7 @@ import remix.myplayer.viewmodel.MultiSelectState
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.playbackViewModel
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,6 +81,7 @@ fun SearchScreen() {
 
   val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
+  val librarySongs by libraryVM.songs.collectAsStateWithLifecycle()
   val listState = rememberLazyListState()
   var songs by remember {
     mutableStateOf(emptyList<Song>())
@@ -190,7 +192,7 @@ fun SearchScreen() {
     }
   }
 
-  LaunchedEffect(searchKey) {
+  LaunchedEffect(searchKey, librarySongs) {
     if (searchKey.isEmpty()) {
       songs = emptyList()
       isLoading = false
