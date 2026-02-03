@@ -356,6 +356,15 @@
   <string name="update_notification">アップデート通知</string>
   <string name="update_notification_description">アップデートのダウンロード進捗状況を通知で表示します</string>
   <string name="downloading">ダウンロード中</string>
+  <string name="smb_downloading_with_progress">ダウンロード中: %d%%</string>
+  <string name="smb_installing">インストール中</string>
+  <string name="smb_install_success">インストール完了</string>
+  <string name="smb_download_canceled">ダウンロードをキャンセルしました</string>
+  <string name="smb_download_failed">ダウンロード失敗: %s</string>
+  <string name="smb_module_not_supported">モジュールはサポートされていません</string>
+  <string name="smb_unknown_error">不明なエラー</string>
+  <string name="smb_download_required_title">SMB を有効にするには追加のダウンロードが必要です</string>
+  <string name="smb_download_required_message">ダウンロードを開始しますか?</string>
   <string name="download_complete">ダウンロード完了</string>
   <string name="download_complete_to_do">ダウンロードが完了しました。タップしてインストールしてください</string>
   <string name="plz_give_install_permission">提供元不明のアプリをインストールする権限を許可してください</string>
@@ -485,4 +494,5 @@
   <plurals name="song_num_1">
       <item quantity="other">%1$s    %2$d 曲</item>
   </plurals>
+    <string name="title_dynamic_smb">SMB クライアント</string>
 </resources>

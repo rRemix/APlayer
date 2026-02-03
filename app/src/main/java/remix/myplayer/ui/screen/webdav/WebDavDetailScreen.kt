@@ -45,12 +45,12 @@ import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.dialog.runWithLoading
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
-import remix.myplayer.ui.screen.BackPressHandler
 import remix.myplayer.ui.state.DataUiState
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.icon
 import remix.myplayer.ui.widget.app.BottomBar
 import remix.myplayer.ui.widget.common.AppBarAction
+import remix.myplayer.ui.widget.common.BackPressHandler
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.PopupButton
 import remix.myplayer.ui.widget.common.TextPrimary

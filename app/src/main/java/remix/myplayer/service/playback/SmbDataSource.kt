@@ -1,239 +1,50 @@
 package remix.myplayer.service.playback
 
 import android.net.Uri
-import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.BaseDataSource
 import androidx.media3.datasource.DataSpec
-import com.hierynomus.msdtyp.AccessMask
-import com.hierynomus.mssmb2.SMB2CreateDisposition
-import com.hierynomus.mssmb2.SMB2ShareAccess
-import com.hierynomus.smbj.SMBClient
-import com.hierynomus.smbj.SmbConfig
-import com.hierynomus.smbj.auth.AuthenticationContext
-import com.hierynomus.smbj.connection.Connection
-import com.hierynomus.smbj.session.Session
-import com.hierynomus.smbj.share.DiskShare
-import com.hierynomus.smbj.share.File
+import remix.myplayer.data.model.smb.SmbStreamDelegate
 import timber.log.Timber
-import java.io.BufferedInputStream
 import java.io.IOException
-import java.io.InputStream
-import java.util.concurrent.TimeUnit
 
 @UnstableApi
 class SmbDataSource : BaseDataSource(true) {
 
-  private var client: SMBClient? = null
-  private var connection: Connection? = null
-  private var session: Session? = null
-  private var diskShare: DiskShare? = null
-  private var file: File? = null
-  private var bufferedInputStream: InputStream? = null
-  private var dataSpec: DataSpec? = null
-  private var bytesRemaining: Long = 0
-  private var opened: Boolean = false
+  private var delegate: SmbStreamDelegate? = null
+  private var uri: Uri? = null
 
   override fun open(dataSpec: DataSpec): Long {
-    this.dataSpec = dataSpec
     transferInitializing(dataSpec)
+    uri = dataSpec.uri
     try {
-      val uri = dataSpec.uri
-      // Use encodedUserInfo to correctly parse parts containing special characters (e.g. colon in password)
-      val userInfo = uri.encodedUserInfo
-      var username = ""
-      var password = ""
-      var domain: String? = null
-
-      if (!userInfo.isNullOrEmpty()) {
-        val colonIndex = userInfo.indexOf(':')
-        val userPartRaw: String
-        if (colonIndex != -1) {
-          userPartRaw = userInfo.substring(0, colonIndex)
-          password = Uri.decode(userInfo.substring(colonIndex + 1))
-        } else {
-          userPartRaw = userInfo
-        }
-
-        val semiIndex = userPartRaw.indexOf(';')
-        if (semiIndex != -1) {
-          domain = Uri.decode(userPartRaw.substring(0, semiIndex))
-          username = Uri.decode(userPartRaw.substring(semiIndex + 1))
-        } else {
-          username = Uri.decode(userPartRaw)
-        }
-      }
-
-      // 禁用签名(Signing)可以显著提高传输速度（局域网通常安全）。
-      // 增大缓冲区和超时时间。
-      val config = SmbConfig.builder()
-        .withMultiProtocolNegotiate(true) // 恢复自动协商
-        .withSigningRequired(false)       // 关闭签名提速
-        .withDfsEnabled(false)            // 关闭DFS提速
-        .withBufferSize(1024 * 1024)      // 1MB 传输块提速
-        .withTimeout(120, TimeUnit.SECONDS)
-        .withSoTimeout(180, TimeUnit.SECONDS)
-        .build()
-
-      client = SMBClient(config)
-
-      Timber.tag(TAG).v("Try connect to host: ${uri.host} port: ${uri.port}")
-      connection = client?.connect(uri.host, if (uri.port != -1) uri.port else SMBClient.DEFAULT_PORT)
-
-      val authContext = AuthenticationContext(username, password.toCharArray(), domain)
-      session = connection?.authenticate(authContext)
-
-      val pathSegments = uri.pathSegments
-      if (pathSegments.isEmpty()) throw IOException("Invalid path")
-
-      val shareName = pathSegments[0]
-      val filePath = pathSegments.drop(1).joinToString("\\")
-
-      Timber.tag(TAG).v("SMB Connected")
-
-      diskShare = session?.connectShare(shareName) as? DiskShare
-      if (diskShare == null) throw IOException("Connect share failed")
-
-      if (!diskShare!!.fileExists(filePath)) {
-        throw IOException("File not found: $filePath")
-      }
-
-      val accessMask: MutableSet<AccessMask> = HashSet()
-      accessMask.add(AccessMask.GENERIC_READ) // 万能读取权限
-
-      val shareMode: MutableSet<SMB2ShareAccess> = HashSet()
-      shareMode.add(SMB2ShareAccess.FILE_SHARE_READ)
-      shareMode.add(SMB2ShareAccess.FILE_SHARE_WRITE)
-      shareMode.add(SMB2ShareAccess.FILE_SHARE_DELETE)
-
-      val smbFile = diskShare!!.openFile(
-        filePath,
-        accessMask,
-        null,
-        shareMode,
-        SMB2CreateDisposition.FILE_OPEN,
-        null
-      )
-      file = smbFile
-
-      val fileSize = smbFile.fileInformation.standardInformation.endOfFile
-
-      if (dataSpec.position > fileSize) {
-        throw IOException("Position out of range")
-      }
-
-      // 创建缓冲输入流
-      // 默认 smbj 的 read 是一次网络请求对应一次读取。
-      // 这里我们用 64KB 的 Buffer，意味着每 64KB 数据才请求一次网络，
-      // 哪怕 ExoPlayer 每次只读 1KB，也会非常快。
-      val rawStream = smbFile.inputStream
-      // skip 到指定位置 (断点续传或 Seek)
-      if (dataSpec.position > 0) {
-        rawStream.skip(dataSpec.position)
-      }
-      // 512KB 内存缓冲
-      bufferedInputStream = BufferedInputStream(rawStream, 512 * 1024)
-
-      bytesRemaining = if (dataSpec.length == C.LENGTH_UNSET.toLong()) {
-        fileSize - dataSpec.position
-      } else {
-        dataSpec.length
-      }
-
-      opened = true
+      val clazz = Class.forName("remix.myplayer.smb.SmbStreamDelegateImpl")
+      delegate = clazz.getDeclaredConstructor().newInstance() as SmbStreamDelegate
+      val length = delegate!!.open(dataSpec.uri.toString(), dataSpec.position)
       transferStarted(dataSpec)
-      return bytesRemaining
+      return length
     } catch (e: Exception) {
-      Timber.tag(TAG).e(e, "SMB Open Failed")
-      cleanup()
-      if (e is IOException) throw e else throw IOException(e)
-    }
-  }
-
-  override fun read(buffer: ByteArray, offset: Int, readLength: Int): Int {
-    if (readLength == 0) return 0
-    if (bytesRemaining == 0L) return C.RESULT_END_OF_INPUT
-
-    try {
-      val bytesToRead = if (bytesRemaining == C.LENGTH_UNSET.toLong()) {
-        readLength
-      } else {
-        minOf(bytesRemaining, readLength.toLong()).toInt()
-      }
-
-      // 使用 bufferedInputStream 读取
-      val bytesRead = bufferedInputStream!!.read(buffer, offset, bytesToRead)
-
-      if (bytesRead > 0) {
-        if (bytesRemaining != C.LENGTH_UNSET.toLong()) {
-          bytesRemaining -= bytesRead
-        }
-        bytesTransferred(bytesRead)
-        return bytesRead
-      } else {
-        return C.RESULT_END_OF_INPUT
-      }
-    } catch (e: Exception) {
-      Timber.tag(TAG).e(e, "SMB Read Failed")
+      Timber.e(e)
       throw IOException(e)
     }
   }
 
-  override fun getUri(): Uri? = dataSpec?.uri
-
-  override fun close() {
-    if (opened) {
-      opened = false
-      transferEnded()
-    }
-    cleanup()
+  override fun read(buffer: ByteArray, offset: Int, readLength: Int): Int {
+    return delegate?.read(buffer, offset, readLength) ?: -1
   }
 
-  private fun cleanup() {
-    try {
-      bufferedInputStream?.close()
-    } catch (e: Exception) {
-      Timber.tag(TAG).w(e)
-    }
-    bufferedInputStream = null
+  override fun getUri(): Uri? {
+    return uri
+  }
 
-    try {
-      file?.close()
-    } catch (e: Exception) {
-      Timber.tag(TAG).w(e)
-    }
-    file = null
-
-    try {
-      diskShare?.close()
-    } catch (e: Exception) {
-      Timber.tag(TAG).w(e)
-    }
-    diskShare = null
-
-    try {
-      session?.close()
-    } catch (e: Exception) {
-      Timber.tag(TAG).w(e)
-    }
-    session = null
-
-    try {
-      connection?.close()
-    } catch (e: Exception) {
-      Timber.tag(TAG).w(e)
-    }
-    connection = null
-
-    try {
-      client?.close()
-    } catch (e: Exception) {
-      Timber.tag(TAG).w(e)
-    }
-    client = null
+  override fun close() {
+    delegate?.close()
+    delegate = null
+    transferEnded()
   }
 
   companion object {
-    private const val TAG = "SMBDataSource"
+
+    private const val TAG = "SmbDataSource"
   }
 }

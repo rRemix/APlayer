@@ -45,10 +45,10 @@ import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RoutePlayingScreen
-import remix.myplayer.ui.screen.BackPressHandler
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.BottomBar
 import remix.myplayer.ui.widget.app.MultiSelectBar
+import remix.myplayer.ui.widget.common.BackPressHandler
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.common.defaultAppBarActions

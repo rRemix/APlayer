@@ -356,6 +356,15 @@
   <string name="update_notification">更新通知</string>
   <string name="update_notification_description">更新通知用于展示下载进度</string>
   <string name="downloading">下载中</string>
+  <string name="smb_downloading_with_progress">下载中: %d%%</string>
+  <string name="smb_installing">安装中</string>
+  <string name="smb_install_success">安装成功</string>
+  <string name="smb_download_canceled">下载取消</string>
+  <string name="smb_download_failed">下载失败: %s</string>
+  <string name="smb_module_not_supported">模块不支持</string>
+  <string name="smb_unknown_error">未知错误</string>
+  <string name="smb_download_required_title">开启SMB需要额外的下载</string>
+  <string name="smb_download_required_message">是否开始下载?</string>
   <string name="download_complete">下载完成</string>
   <string name="download_complete_to_do">下载完成，点击安装</string>
   <string name="plz_give_install_permission">请授予安装未知来源应用的权限</string>
@@ -488,4 +497,5 @@
   <plurals name="song_num_1">
     <item quantity="other">%1$s    %2$d首</item>
   </plurals>
+  <string name="title_dynamic_smb">SMB 客户端</string>
 </resources>

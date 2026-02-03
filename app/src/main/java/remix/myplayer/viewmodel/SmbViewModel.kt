@@ -3,19 +3,18 @@ package remix.myplayer.viewmodel
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hierynomus.smbj.SMBClient
-import com.hierynomus.smbj.auth.AuthenticationContext
-import com.hierynomus.smbj.share.DiskShare
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import remix.myplayer.data.db.room.entity.Smb
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.model.smb.SmbClientDelegateProvider
+import remix.myplayer.data.model.smb.SmbFile
+import remix.myplayer.misc.manager.DynamicModuleManager
+import remix.myplayer.misc.manager.DynamicModuleStatus
 import remix.myplayer.repo.SmbRepository
 import remix.myplayer.repo.usecase.FetchMetaDataUseCase
 import remix.myplayer.ui.dialog.DialogState
@@ -28,8 +27,31 @@ import javax.inject.Inject
 @HiltViewModel
 class SmbViewModel @Inject constructor(
   private val smbRepository: SmbRepository,
-  private val fetchMetaDataUseCase: FetchMetaDataUseCase
+  private val fetchMetaDataUseCase: FetchMetaDataUseCase,
+  private val delegateProvider: SmbClientDelegateProvider,
+  private val dynamicModuleManager: DynamicModuleManager
 ) : ViewModel() {
+
+  val supportSmb get() = dynamicModuleManager.isModuleSupport("feature_smb")
+
+  val isSmbModuleInstalled get() = dynamicModuleManager.isModuleInstalled("feature_smb")
+
+  fun installSmbModule() = dynamicModuleManager.installModule("feature_smb")
+
+  private val _moduleInstallStatus = MutableStateFlow<DynamicModuleStatus?>(null)
+  val moduleInstallStatus = _moduleInstallStatus.asStateFlow()
+
+  fun startSmbModuleInstallation() {
+    viewModelScope.launch {
+      installSmbModule().collect {
+        _moduleInstallStatus.value = it
+      }
+    }
+  }
+
+  fun clearInstallStatus() {
+    _moduleInstallStatus.value = null
+  }
 
   private val _smbList = MutableStateFlow<List<Smb>>(emptyList())
   val smbList: StateFlow<List<Smb>> = _smbList.asStateFlow()
@@ -53,39 +75,14 @@ class SmbViewModel @Inject constructor(
   }
 
   private suspend fun apiCall(smb: Smb, url: String) {
+    val d = delegateProvider.getDelegate()
+    if (d == null) {
+      _smbResState.value = DataUiState.Error(Exception("SMB module not installed"))
+      return
+    }
     try {
-      withContext(Dispatchers.IO) {
-        SMBClient().use { client ->
-          val (host, port) = Smb.parseServerAddress(smb.server)
-          val connection = if (port != null) client.connect(host, port) else client.connect(host)
-          connection.use {
-            val authContext = AuthenticationContext(smb.account, smb.pwd.toCharArray(), smb.domain)
-            val session = connection.authenticate(authContext)
-            session.use {
-              val diskShare = session.connectShare(smb.share) as DiskShare
-              diskShare.use { share ->
-                val relativePath = smb.getRelativePath(url).replace('/', '\\')
-
-                val fileInfos = share.list(relativePath)
-                val files = fileInfos.map {
-                  val fileName = it.fileName
-                  val fileRelativePath = if (relativePath.isEmpty()) fileName else "$relativePath\\$fileName"
-                  SmbFile(
-                    name = fileName,
-                    isDirectory = (it.fileAttributes and 16L) != 0L,
-                    path = fileRelativePath.replace('\\', '/'),
-                    size = it.endOfFile,
-                    lastModified = it.changeTime.toEpochMillis()
-                  )
-                }.filter { it.name != "." && it.name != ".." }.filter {
-                  it.isDirectory || it.isAudio
-                }
-                _smbResState.value = DataUiState.Success(files)
-              }
-            }
-          }
-        }
-      }
+      val files = d.listFiles(smb, url)
+      _smbResState.value = DataUiState.Success(files)
     } catch (e: Exception) {
       Timber.e(e)
       _smbResState.value = DataUiState.Error(e)
@@ -105,23 +102,13 @@ class SmbViewModel @Inject constructor(
   }
 
   fun insertOrReplaceSmb(smb: Smb) = viewModelScope.runWithLoading {
+    val d = delegateProvider.getDelegate()
+    if (d == null) {
+      MessageNotifier.show("SMB module not installed")
+      return@runWithLoading
+    }
     try {
-      withContext(Dispatchers.IO) {
-        SMBClient().use { client ->
-          val (host, port) = Smb.parseServerAddress(smb.server)
-          val connection = if (port != null) client.connect(host, port) else client.connect(host)
-          connection.use {
-            val authContext = AuthenticationContext(smb.account, smb.pwd.toCharArray(), smb.domain)
-            val session = connection.authenticate(authContext)
-            session.use {
-              val diskShare = session.connectShare(smb.share) as DiskShare
-              diskShare.use {
-                // Just to check if connection works
-              }
-            }
-          }
-        }
-      }
+      d.checkConnection(smb)
       smbRepository.insertOrReplace(smb)
     } catch (e: Exception) {
       Timber.e(e)
@@ -191,20 +178,3 @@ data class AddSmbState(
   val isLoadingShares: Boolean = false,
   val showShareSelection: Boolean = false
 )
-
-data class SmbFile(
-  val name: String,
-  val isDirectory: Boolean,
-  val path: String,
-  val size: Long,
-  val lastModified: Long
-) {
-
-  val isAudio: Boolean
-    get() {
-      val lower = name.lowercase()
-      return lower.endsWith(".mp3") || lower.endsWith(".flac") || lower.endsWith(".wav") || lower.endsWith(
-        ".m4a"
-      ) || lower.endsWith(".ogg")
-    }
-}

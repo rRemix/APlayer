@@ -357,6 +357,15 @@
   <string name="update_notification">Update notification</string>
   <string name="update_notification_description">Show donwload progress using update notification</string>
   <string name="downloading">Downloading</string>
+  <string name="smb_downloading_with_progress">Downloading: %d%%</string>
+  <string name="smb_installing">Installing</string>
+  <string name="smb_install_success">Install complete</string>
+  <string name="smb_download_canceled">Download canceled</string>
+  <string name="smb_download_failed">Download failed: %s</string>
+  <string name="smb_module_not_supported">Module not supported</string>
+  <string name="smb_unknown_error">Unknown error</string>
+  <string name="smb_download_required_title">Enabling SMB requires an extra download</string>
+  <string name="smb_download_required_message">Start the download?</string>
   <string name="download_complete">Download completed</string>
   <string name="download_complete_to_do">Download complete and click to install</string>
   <string name="plz_give_install_permission">Please give permission to install unknown apps</string>
@@ -506,4 +515,5 @@
   <string name="desktop_lyrics_translation_text_color">Color of translation text</string>
 
   <string name="play_from_this_line">Play from this line</string>
+  <string name="title_dynamic_smb">SMB Client</string>
 </resources>

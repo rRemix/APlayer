@@ -30,23 +30,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.hierynomus.mserref.NtStatus
-import com.hierynomus.mssmb2.SMBApiException
 import remix.myplayer.R
 import remix.myplayer.data.db.room.entity.Smb
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.model.smb.SmbException
+import remix.myplayer.data.model.smb.SmbFile
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.dialog.runWithLoading
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
-import remix.myplayer.ui.screen.BackPressHandler
 import remix.myplayer.ui.state.DataUiState
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.icon
 import remix.myplayer.ui.widget.app.BottomBar
 import remix.myplayer.ui.widget.common.AppBarAction
+import remix.myplayer.ui.widget.common.BackPressHandler
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.PopupButton
 import remix.myplayer.ui.widget.common.TextPrimary
@@ -54,7 +54,6 @@ import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.Util
 import remix.myplayer.util.ext.clickWithRipple
-import remix.myplayer.viewmodel.SmbFile
 import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.smbViewModel
@@ -122,7 +121,7 @@ fun SmbDetailScreen(smb: Smb) {
 
         is DataUiState.Error -> {
           val ex = (resourceState as DataUiState.Error).throwable
-          if (ex is SMBApiException && ex.status == NtStatus.STATUS_OBJECT_NAME_NOT_FOUND) {
+          if (ex is SmbException && ex.isNotFound) {
             if (pathStack.size <= 1) {
               nav.popBackStack()
               MessageNotifier.show(R.string.load_failed)

@@ -1,7 +1,5 @@
-package remix.myplayer.ui.screen
+package remix.myplayer.ui.screen.home
 
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -12,15 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
@@ -28,13 +21,9 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -43,17 +32,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.data.model.misc.Library
 import remix.myplayer.ui.dialog.CreatePlayListDialog
@@ -63,8 +49,7 @@ import remix.myplayer.ui.widget.app.Drawer
 import remix.myplayer.ui.widget.app.FAButton
 import remix.myplayer.ui.widget.app.MultiSelectBar
 import remix.myplayer.ui.widget.app.ViewPager
-import remix.myplayer.ui.widget.common.defaultAppBarActions
-import remix.myplayer.ui.widget.popup.ScreenPopupButton
+import remix.myplayer.ui.widget.common.BackPressHandler
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.settingViewModel
@@ -144,9 +129,8 @@ fun HomeScreen() {
 
         val webDavVM = webDavViewModel
         val smbVM = smbViewModel
-
         Column {
-          if (BuildConfig.SUPPORT_SMB && showAddRemoteMenu) {
+          if (showAddRemoteMenu) {
             DropdownMenu(
               expanded = true,
               containerColor = LocalTheme.current.dialogBackground,
@@ -164,18 +148,12 @@ fun HomeScreen() {
                   webDavVM.showAddWebDavDialog()
                 }
               )
-              DropdownMenuItem(
-                text = {
-                  Text(
-                    stringResource(R.string.smb),
-                    color = LocalTheme.current.textPrimary
-                  )
-                },
-                onClick = {
+              if (smbVM.supportSmb) {
+                SmbDropDownMenu(smbVM) {
                   showAddRemoteMenu = false
                   smbVM.showAddSmbDialog()
                 }
-              )
+              }
             }
           }
 
@@ -189,11 +167,7 @@ fun HomeScreen() {
             if (selectLibrary.tag == Library.TAG_PLAYLIST) {
               libraryVM.showCreatePlaylistDialog()
             } else if (selectLibrary.tag == Library.TAG_REMOTE) {
-              if (BuildConfig.SUPPORT_SMB) {
-                showAddRemoteMenu = true
-              } else {
-                webDavVM.showAddWebDavDialog()
-              }
+              showAddRemoteMenu = true
             }
           }
         }
@@ -278,69 +252,3 @@ fun hackTabMinWidth() {
   }
 }
 
-@Composable
-fun BackPressHandler(
-  enabled: Boolean = true,
-  onBackPressed: () -> Unit
-) {
-  val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-  val backCallback = remember {
-    object : OnBackPressedCallback(enabled) {
-      override fun handleOnBackPressed() {
-        onBackPressed()
-      }
-    }
-  }
-
-  LaunchedEffect(enabled) {
-    backCallback.isEnabled = enabled
-  }
-
-  DisposableEffect(dispatcher) {
-    dispatcher?.addCallback(backCallback)
-    onDispose {
-      backCallback.remove()
-    }
-  }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-fun HomeAppBar(
-  scrollBehavior: TopAppBarScrollBehavior,
-  drawerState: DrawerState
-) {
-  val library by settingViewModel.currentLibrary.collectAsStateWithLifecycle()
-  val scope = rememberCoroutineScope()
-
-  TopAppBar(
-    scrollBehavior = scrollBehavior,
-    colors = TopAppBarDefaults.topAppBarColors(
-      containerColor = LocalTheme.current.primary,
-      scrolledContainerColor = LocalTheme.current.primary,
-      navigationIconContentColor = Color.White,
-      actionIconContentColor = Color.White,
-    ),
-    title = {},
-    navigationIcon = {
-      IconButton(onClick = { scope.launch { drawerState.open() } }) {
-        Icon(Icons.Filled.Menu, contentDescription = "Menu")
-      }
-    },
-    actions = {
-      if (library.tag != Library.TAG_FOLDER && library.tag != Library.TAG_REMOTE) {
-        ScreenPopupButton(library)
-      }
-
-      defaultAppBarActions.map { it ->
-        IconButton(onClick = {
-          it.action()
-        }) {
-          Icon(
-            painter = painterResource(it.icon),
-            contentDescription = it.contentDescription
-          )
-        }
-      }
-    })
-}

@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 rootProject.name = "APlayer"
 include(":app")
 include(":baselineprofile")
+include(":feature_smb")

@@ -355,6 +355,15 @@
   <string name="update_notification">更新通知</string>
   <string name="update_notification_description">更新通知用於展示下載進度</string>
   <string name="downloading">下載中</string>
+  <string name="smb_downloading_with_progress">下載中: %d%%</string>
+  <string name="smb_installing">安裝中</string>
+  <string name="smb_install_success">安裝成功</string>
+  <string name="smb_download_canceled">下載取消</string>
+  <string name="smb_download_failed">下載失敗: %s</string>
+  <string name="smb_module_not_supported">模組不支援</string>
+  <string name="smb_unknown_error">未知錯誤</string>
+  <string name="smb_download_required_title">啟用SMB需要額外下載</string>
+  <string name="smb_download_required_message">是否開始下載?</string>
   <string name="download_complete">下載完成</string>
   <string name="download_complete_to_do">下載完成，點擊安裝</string>
   <string name="plz_give_install_permission">請授予安裝未知來源應用程式的權限</string>
@@ -487,4 +496,5 @@
   <plurals name="song_num_1">
     <item quantity="other">%1$s    %2$d 首</item>
   </plurals>
+  <string name="title_dynamic_smb">SMB 客戶端</string>
 </resources>
