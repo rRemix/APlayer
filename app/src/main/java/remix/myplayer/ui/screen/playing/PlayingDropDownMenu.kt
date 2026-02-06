@@ -41,11 +41,13 @@ import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
+import remix.myplayer.ui.nav.RouteTagEdit
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.ShowLyricTipDialog
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.settingViewModel
+import remix.myplayer.viewmodel.tagEditViewModel
 import remix.myplayer.viewmodel.settings.SettingsState
 import remix.myplayer.viewmodel.timerViewModel
 
@@ -61,6 +63,7 @@ fun PlayingDropDownMenu(
   val nav = LocalNavController.current
   val libraryVM = libraryViewModel
   val settingVM = settingViewModel
+  val tagEditVM = tagEditViewModel
   val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
 
   val menuItems =
@@ -156,7 +159,8 @@ fun PlayingDropDownMenu(
                 return@DropdownMenuItem
               }
               if (song.isLocal()) {
-                settingVM.showSongEditDialog(song)
+                tagEditVM.startTagEdit(song)
+                nav.navigate(RouteTagEdit)
               }
             }
 
@@ -328,5 +332,3 @@ private fun SpeedDialog(state: DialogState, settingState: SettingsState) {
       }
     })
 }
-
-

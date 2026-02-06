@@ -63,9 +63,6 @@ internal fun BaseDialog(
 }
 
 @Stable
-data class SongEditState(val dialogState: DialogState, val song: Song? = null)
-
-@Stable
 data class SongDetailState(val dialogState: DialogState, val song: Song = Song.EMPTY_SONG)
 
 @Stable

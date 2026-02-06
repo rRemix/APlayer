@@ -1,118 +1,89 @@
 package remix.myplayer.ui.screen.crop
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.misc.cache.DiskCache
-import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.CommonAppBar
-import remix.myplayer.util.Constants
-import remix.myplayer.util.ext.CenterInBox
-import remix.myplayer.util.ext.clickWithRipple
-import remix.myplayer.viewmodel.libraryViewModel
-import java.io.File
+import remix.myplayer.util.ext.clickableWithoutRipple
+
 
 @Composable
-fun CropScreen(id: Long, type: Int) {
+fun CropScreen(
+  destinationUri: Uri,
+  onCropSuccess: () -> Unit,
+  onCancel: () -> Unit
+) {
   val context = LocalContext.current
-  val libraryVM = libraryViewModel
-  val nav = LocalNavController.current
-  val theme = LocalTheme.current
+  BackHandler(onBack = onCancel)
+
   var pickUri by rememberSaveable {
     mutableStateOf(Uri.EMPTY)
   }
   val scope = rememberCoroutineScope()
 
-  val destination: Uri? = remember(id, type) {
-    val cacheDir = DiskCache.getDiskCacheDir(context, "thumbnail")
-    if (!cacheDir.exists() && !cacheDir.mkdir()) {
-      null
-    }
-    val file = File(cacheDir, "$type-${id}.jpg")
-    Uri.fromFile(file)
-  }
-
   val state = rememberImageCropperState(uri = pickUri.toString())
 
-  Scaffold(topBar = {
-    CommonAppBar(stringResource(R.string.back), actions = emptyList())
-  }) { contentPadding ->
-    Column(
-      modifier = Modifier
+  Scaffold(
+    topBar = {
+      CommonAppBar(stringResource(R.string.back), onBack = onCancel, actions = emptyList())
+    },
+    floatingActionButton = {
+      Box(
+        modifier = Modifier
+          .size(48.dp)
+          .background(color = LocalTheme.current.secondary, shape = CircleShape)
+          .clickableWithoutRipple {
+            scope.launch {
+              val success = state.crop(context, saveUri = destinationUri)
+              if (success == true) {
+                onCropSuccess()
+              } else {
+                onCancel()
+              }
+            }
+          },
+        contentAlignment = Alignment.Center
+      ) {
+        Icon(
+          painterResource(R.drawable.ic_save_white_24dp),
+          contentDescription = "CustomSortSave",
+          tint = Color.White
+        )
+      }
+    }) { contentPadding ->
+    ImageCropper(
+      state, modifier = Modifier
         .fillMaxSize()
         .padding(contentPadding)
-    ) {
-
-      ImageCropper(
-        state, modifier = Modifier
-          .fillMaxWidth()
-          .weight(1f)
-      )
-
-      Row(
-        modifier = Modifier
-          .height(48.dp)
-      ) {
-        CenterInBox(
-          modifier = Modifier
-            .fillMaxHeight()
-            .weight(1f)
-            .clickWithRipple(false) {
-              nav.popBackStack()
-            }
-        ) {
-          Text(stringResource(R.string.cancel), fontSize = 16.sp, color = theme.textSecondary)
-        }
-        CenterInBox(
-          Modifier
-            .fillMaxHeight()
-            .weight(1f)
-            .background(theme.primary)
-            .clickWithRipple(false) {
-              scope.launch {
-                val success = state.crop(context, saveUri = destination ?: return@launch)
-                if (success == true) {
-                  libraryVM.fetchMedia(
-                    clear = true,
-                    updateAlbumVersion = type == Constants.ALBUM,
-                    updateArtistVersion = type == Constants.ARTIST,
-                    updatePlayListVersion = type == Constants.PLAYLIST,
-                  )
-                }
-                nav.popBackStack()
-              }
-            }) {
-          Text(stringResource(R.string.confirm), fontSize = 16.sp, color = theme.textPrimary)
-        }
-      }
-    }
+        .padding(bottom = 72.dp)
+    )
   }
 
   val pickLauncher = rememberLauncherForActivityResult(
@@ -120,6 +91,9 @@ fun CropScreen(id: Long, type: Int) {
   ) { uri ->
     if (uri != null) {
       pickUri = uri
+      state.load(pickUri)
+    } else {
+      onCancel()
     }
   }
   LaunchedEffect(Unit) {

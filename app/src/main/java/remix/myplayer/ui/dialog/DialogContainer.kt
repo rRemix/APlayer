@@ -20,6 +20,4 @@ fun DialogContainer() {
   InAppUpdateDialog()
 
   SongDetailDialog()
-
-  SongEditDialog()
 }

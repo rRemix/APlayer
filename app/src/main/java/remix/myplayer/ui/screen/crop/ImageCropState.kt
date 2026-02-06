@@ -30,9 +30,9 @@ class ImageCropState(private val progressColor: Int) {
 
   private var cropView by mutableStateOf<CropImageView?>(null)
 
-  var aspectRatio by mutableStateOf(1 to 1)
+//  var aspectRatio by mutableStateOf(1 to 1)
   var isAutoZoomEnabled by mutableStateOf(true)
-  var isFixAspectRatio by mutableStateOf(true)
+//  var isFixAspectRatio by mutableStateOf(true)
   var cropShape by mutableStateOf(CropImageView.CropShape.RECTANGLE)
   var guidelines by mutableStateOf(CropImageView.Guidelines.ON)
 
@@ -44,8 +44,8 @@ class ImageCropState(private val progressColor: Int) {
   }
 
   internal fun applyConfig() {
-    cropView?.setAspectRatio(aspectRatio.first, aspectRatio.second)
-    cropView?.setFixedAspectRatio(isFixAspectRatio)
+//    cropView?.setAspectRatio(aspectRatio.first, aspectRatio.second)
+//    cropView?.setFixedAspectRatio(isFixAspectRatio)
     cropView?.isAutoZoomEnabled = isAutoZoomEnabled
     cropView?.cropShape = cropShape
     cropView?.guidelines = guidelines
@@ -104,7 +104,7 @@ fun rememberImageCropperState(
     }
 
     LaunchedEffect(
-      state.aspectRatio,
+//      state.aspectRatio,
       state.isAutoZoomEnabled,
       state.cropShape,
       state.guidelines

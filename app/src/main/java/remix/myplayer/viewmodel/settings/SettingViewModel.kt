@@ -35,7 +35,6 @@ import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.ImportPlayListState
 import remix.myplayer.ui.dialog.ReNamePlayListState
 import remix.myplayer.ui.dialog.SongDetailState
-import remix.myplayer.ui.dialog.SongEditState
 import remix.myplayer.ui.dialog.runWithLoading
 import remix.myplayer.ui.theme.ThemeController
 import remix.myplayer.util.ext.updateIf
@@ -461,19 +460,6 @@ class SettingViewModel @Inject constructor(
 
   fun showSongDetailDialog(song: Song) {
     _songDetailState.updateIf(
-      condition = { !it.dialogState.isOpen },
-      transform = {
-        it.dialogState.show()
-        it.copy(song = song)
-      }
-    )
-  }
-
-  private val _songEditState = MutableStateFlow(SongEditState(DialogState()))
-  val songEditState = _songEditState.asStateFlow()
-
-  fun showSongEditDialog(song: Song) {
-    _songEditState.updateIf(
       condition = { !it.dialogState.isOpen },
       transform = {
         it.dialogState.show()

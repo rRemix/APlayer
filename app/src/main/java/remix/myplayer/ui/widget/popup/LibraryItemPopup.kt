@@ -35,7 +35,7 @@ import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
-import remix.myplayer.ui.nav.RouteCrop
+import remix.myplayer.ui.nav.RouteCustomCoverCrop
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.popupButton
 import remix.myplayer.util.MusicUtil.makeCmdIntent
@@ -144,7 +144,7 @@ fun LibraryItemDropdownMenu(
               }
               // 设置封面
               R.string.set_album_cover, R.string.set_artist_cover, R.string.set_playlist_cover -> {
-                nav.navigate("${RouteCrop}/${model.getKey().toLong()}/${model.type()}")
+                nav.navigate("${RouteCustomCoverCrop}/${model.getKey().toLong()}/${model.type()}")
               }
               // 列表重命名
               R.string.rename -> {
@@ -176,7 +176,7 @@ private fun APlayerModel.popMenuItems(): List<Int> {
       R.string.play,
       R.string.add_to_play_queue,
       R.string.add_to_playlist,
-      R.string.set_album_cover,
+//      R.string.set_album_cover,
       R.string.delete
     )
 
@@ -184,7 +184,7 @@ private fun APlayerModel.popMenuItems(): List<Int> {
       R.string.play,
       R.string.add_to_play_queue,
       R.string.add_to_playlist,
-      R.string.set_artist_cover,
+//      R.string.set_artist_cover,
       R.string.delete
     )
 
@@ -192,7 +192,7 @@ private fun APlayerModel.popMenuItems(): List<Int> {
       R.string.play,
       R.string.add_to_play_queue,
       R.string.add_to_playlist,
-      R.string.set_playlist_cover,
+//      R.string.set_playlist_cover,
       R.string.rename,
       R.string.delete
     )

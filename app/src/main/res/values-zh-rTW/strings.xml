@@ -498,4 +498,6 @@
     <item quantity="other">%1$s    %2$d 首</item>
   </plurals>
   <string name="title_dynamic_smb">SMB 客戶端</string>
+  <string name="select_image">選擇圖片</string>
+  <string name="clear_cover">清除封面</string>
 </resources>

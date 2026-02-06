@@ -98,6 +98,8 @@
   <string name="send_success">Sent successfully.Thank you for the feedback!</string>
   <string name="send_error">Sent failed: %s</string>
   <string name="screenshot_save_at">The screenshot has been saved to %s</string>
+  <string name="select_image">Select Image</string>
+  <string name="clear_cover">Clear Cover</string>
   <string name="not_install_weibo">You haven\'t install Weibo </string>
   <string name="create_dir_error">Failed to create directory</string>
   <string name="need_permission">App needs necessary permissions to perform the requested action</string>

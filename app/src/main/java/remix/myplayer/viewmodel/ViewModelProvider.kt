@@ -13,6 +13,9 @@ val LocalLibraryViewModel = compositionLocalOf<LibraryViewModel> {
 val LocalSettingViewModel = compositionLocalOf<SettingViewModel> {
   error("SettingViewModel not provided")
 }
+val LocalTagEditViewModel = compositionLocalOf<TagEditViewModel> {
+  error("TagEditViewModel not provided")
+}
 val LocalMainViewModel = compositionLocalOf<MainViewModel> {
   error("MainViewModel not provided")
 }
@@ -35,6 +38,7 @@ fun ProvideViewModels(content: @Composable () -> Unit) {
   CompositionLocalProvider(
     LocalLibraryViewModel provides activityViewModel(),
     LocalSettingViewModel provides activityViewModel(),
+    LocalTagEditViewModel provides activityViewModel(),
     LocalMainViewModel provides activityViewModel(),
     LocalTimerViewModel provides activityViewModel(),
     LocalWebDavViewModel provides activityViewModel(),
@@ -59,6 +63,11 @@ val settingViewModel: SettingViewModel
   @Composable
   @ReadOnlyComposable
   get() = LocalSettingViewModel.current
+
+val tagEditViewModel: TagEditViewModel
+  @Composable
+  @ReadOnlyComposable
+  get() = LocalTagEditViewModel.current
 
 val timerViewModel: TimerViewModel
   @Composable

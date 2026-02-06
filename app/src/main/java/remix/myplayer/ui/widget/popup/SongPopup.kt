@@ -27,7 +27,8 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.nav.LocalNavController
-import remix.myplayer.ui.nav.RouteCrop
+import remix.myplayer.ui.nav.RouteCustomCoverCrop
+import remix.myplayer.ui.nav.RouteTagEdit
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.popupButton
 import remix.myplayer.util.Constants
@@ -37,6 +38,7 @@ import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
+import remix.myplayer.viewmodel.tagEditViewModel
 
 @Composable
 fun SongPopupButton(
@@ -79,7 +81,7 @@ private fun SongDropdownMenu(
       R.string.add_to_playlist,
       R.string.song_detail,
       R.string.song_edit,
-      R.string.set_album_cover,
+//      R.string.set_album_cover,
       R.string.collect,
       R.string.share,
       R.string.ring,
@@ -87,6 +89,7 @@ private fun SongDropdownMenu(
     )
   val activity = LocalActivity.current as? BaseActivity
   val settingVM = settingViewModel
+  val tagEditVM = tagEditViewModel
   val playbackVM = playbackViewModel
   val libraryVM = libraryViewModel
   val nav = LocalNavController.current
@@ -131,12 +134,13 @@ private fun SongDropdownMenu(
 
             R.string.song_edit -> {
               if (song.isLocal()) {
-                settingVM.showSongEditDialog(song)
+                tagEditVM.startTagEdit(song)
+                nav.navigate(RouteTagEdit)
               }
             }
 
             R.string.set_album_cover -> {
-              nav.navigate("${RouteCrop}/${song.albumId}/${Constants.ALBUM}")
+              nav.navigate("${RouteCustomCoverCrop}/${song.albumId}/${Constants.ALBUM}")
             }
 
             R.string.collect -> {

@@ -3,6 +3,7 @@ package remix.myplayer.helper
 import android.app.RecoverableSecurityException
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.media.MediaScannerConnection
 import android.os.Build
 import android.provider.MediaStore
@@ -17,6 +18,8 @@ import org.jaudiotagger.audio.exceptions.CannotWriteException
 import org.jaudiotagger.audio.exceptions.UnableToCreateFileException
 import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.Tag
+import org.jaudiotagger.tag.images.AndroidArtwork
+import org.jaudiotagger.tag.reference.PictureTypes
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.service.MusicService
@@ -24,6 +27,7 @@ import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.nav.MessageNotifier
 import timber.log.Timber
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -34,7 +38,9 @@ object AudioTagWriter {
 
   data class PendingWriteRequest(
     val song: Song,
-    val fieldMap: EnumMap<FieldKey, String>
+    val fieldMap: EnumMap<FieldKey, String>,
+    val deleteArtwork: Boolean = false,
+    val newArtwork: Bitmap? = null
   )
 
   // Build the tag map and start the permission flow if needed.
@@ -47,8 +53,11 @@ object AudioTagWriter {
     newGenre: String,
     newYear: String,
     newTrackNum: String,
-    newLyrics: String
+    newLyrics: String,
+    deleteArtwork: Boolean = false,
+    newArtwork: Bitmap? = null
   ) {
+    Timber.v("requestSaveAudioTag, deleteArtwork: $deleteArtwork newArtwork: $newArtwork lyric: $newLyrics")
     val fieldMap = EnumMap<FieldKey, String>(FieldKey::class.java)
     fieldMap[FieldKey.TITLE] = newTitle
     fieldMap[FieldKey.ALBUM] = newAlbum
@@ -58,7 +67,7 @@ object AudioTagWriter {
     fieldMap[FieldKey.TRACK] = newTrackNum
     fieldMap[FieldKey.LYRICS] = newLyrics
 
-    val request = PendingWriteRequest(song, fieldMap)
+    val request = PendingWriteRequest(song, fieldMap, deleteArtwork, newArtwork)
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
       // Scoped storage: ask for write access to the specific file.
@@ -97,7 +106,7 @@ object AudioTagWriter {
 
           }
 
-          Timber.Forest.v("Fail to save tag: $e")
+          Timber.v("Fail to save tag: $e")
           MessageNotifier.show(R.string.save_error, e.toString())
         }
       }
@@ -105,7 +114,11 @@ object AudioTagWriter {
   }
 
   // Save tags on a worker thread and notify media store/UI.
-  suspend fun saveAudioTag(context: Context, request: PendingWriteRequest, withFallback: Boolean = true) =
+  suspend fun saveAudioTag(
+    context: Context,
+    request: PendingWriteRequest,
+    withFallback: Boolean = true
+  ) =
     withContext(Dispatchers.IO) {
       writeAudioTag(context, request, withFallback)
       MediaScannerConnection.scanFile(
@@ -123,10 +136,10 @@ object AudioTagWriter {
     }
 
   private fun sendTagChangedBroadcast(context: Context, request: PendingWriteRequest) {
-    val intent = Intent(MusicService.Companion.TAG_CHANGE)
-      .putExtra(BaseMusicActivity.Companion.EXTRA_OLD_SONG, request.song)
+    val intent = Intent(MusicService.TAG_CHANGE)
+      .putExtra(BaseMusicActivity.EXTRA_OLD_SONG, request.song)
       .putExtra(
-        BaseMusicActivity.Companion.EXTRA_NEW_SONG,
+        BaseMusicActivity.EXTRA_NEW_SONG,
         request.song.copy(
           title = request.fieldMap[FieldKey.TITLE],
           album = request.fieldMap[FieldKey.ALBUM],
@@ -144,7 +157,7 @@ object AudioTagWriter {
       try {
         tag.setField(key, value)
       } catch (e: Exception) {
-        Timber.Forest.v("setField($key, $value) failed: $e")
+        Timber.v("setField($key, $value) failed: $e")
       }
     }
   }
@@ -153,6 +166,28 @@ object AudioTagWriter {
     val audioFile = AudioFileIO.read(File(request.song.data))
     val tag = audioFile.tagOrCreateAndSetDefault
     applyTagFields(tag, request.fieldMap)
+    if (request.newArtwork != null) {
+      try {
+        // Delete old artwork first to ensure we replace it
+        try {
+          tag.deleteArtworkField()
+        } catch (ignored: Exception) {
+        }
+        val artwork = AndroidArtwork()
+        artwork.binaryData = bitmapToByteArray(request.newArtwork)
+        artwork.mimeType = "image/jpeg"
+        artwork.pictureType = PictureTypes.DEFAULT_ID
+        tag.setField(artwork)
+      } catch (e: Exception) {
+        Timber.e(e, "Failed to set new artwork")
+      }
+    } else if (request.deleteArtwork) {
+      try {
+        tag.deleteArtworkField()
+      } catch (e: Exception) {
+        Timber.e(e, "Failed to delete artwork")
+      }
+    }
 
     try {
       audioFile.commit()
@@ -163,7 +198,7 @@ object AudioTagWriter {
       }
     }
 
-    Timber.Forest.v("Fallback to content uri write: ${request.song.data}")
+    Timber.v("Fallback to content uri write: ${request.song.data}")
     writeAudioTagByContentUri(context, request)
   }
 
@@ -198,6 +233,27 @@ object AudioTagWriter {
       val audioFile = AudioFileIO.read(tempFile)
       val tag = audioFile.tagOrCreateAndSetDefault
       applyTagFields(tag, request.fieldMap)
+      if (request.newArtwork != null) {
+        try {
+          try {
+            tag.deleteArtworkField()
+          } catch (ignored: Exception) {
+          }
+          val artwork = AndroidArtwork()
+          artwork.binaryData = bitmapToByteArray(request.newArtwork)
+          artwork.mimeType = "image/jpeg"
+          artwork.pictureType = PictureTypes.DEFAULT_ID
+          tag.setField(artwork)
+        } catch (e: Exception) {
+          Timber.e(e, "Failed to set new artwork")
+        }
+      } else if (request.deleteArtwork) {
+        try {
+          tag.deleteArtworkField()
+        } catch (e: Exception) {
+          Timber.e(e, "Failed to delete artwork")
+        }
+      }
       audioFile.commit()
 
       // Overwrite the original file through contentUri.
@@ -212,5 +268,11 @@ object AudioTagWriter {
     } finally {
       tempFile.delete()
     }
+  }
+
+  private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+    val stream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
+    return stream.toByteArray()
   }
 }

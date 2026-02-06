@@ -76,46 +76,18 @@ class UriFetcher @Inject constructor(
   }
 
   fun fetch(model: Any): Uri {
-    val key = cacheKey(model)
-
-    val fromCache = coverPrefs.getCover(key)
-    if (fromCache.isNotEmpty()) {
-      Timber.v("from cache: $fromCache")
-      return fromCache.toUri()
-    }
-
     val uri = when (model) {
-      is Song -> {
-        fetch(model)
-      }
-
-      is Album -> {
-        fetch(model)
-      }
-
-      is Artist -> {
-        fetch(model)
-      }
-
-      is PlayList -> {
-        fetch(model)
-      }
-
-      is Genre -> {
-        fetch(model)
-      }
-
-      else -> {
-        throw IllegalArgumentException("unknown model: ${model::class.java.simpleName}")
-      }
+      is Song -> fetch(model)
+      is Album -> fetch(model)
+      is Artist -> fetch(model)
+      is PlayList -> fetch(model)
+      is Genre -> fetch(model)
+      else -> throw IllegalArgumentException("unknown model: ${model::class.java.simpleName}")
     }
 
-    if (uri == Uri.EMPTY) {
-      return Uri.EMPTY
+    if (uri != Uri.EMPTY) {
+      Timber.v("uri: $uri")
     }
-
-    Timber.v("uri: $uri")
-    coverPrefs.putCover(key, uri.toString())
 
     return uri
   }
@@ -154,10 +126,10 @@ class UriFetcher @Inject constructor(
         return Uri.EMPTY
       }
       // 自定义封面
-      val customArtFile = getCustomThumbIfExist(song.albumId, Constants.ALBUM)
-      if (customArtFile != null) {
-        return Uri.fromFile(customArtFile)
-      }
+//      val customArtFile = getCustomThumbIfExist(song.albumId, Constants.ALBUM)
+//      if (customArtFile != null) {
+//        return Uri.fromFile(customArtFile)
+//      }
 
       // 内置
       if (ignoreMediaStore()) {
@@ -215,10 +187,10 @@ class UriFetcher @Inject constructor(
 
   private fun fetch(album: Album): Uri {
     // 自定义封面
-    val customArtFile = getCustomThumbIfExist(album.albumID, Constants.ALBUM)
-    if (customArtFile != null) {
-      return Uri.fromFile(customArtFile)
-    }
+//    val customArtFile = getCustomThumbIfExist(album.albumID, Constants.ALBUM)
+//    if (customArtFile != null) {
+//      return Uri.fromFile(customArtFile)
+//    }
 
     // 内置
     if (ignoreMediaStore()) {
@@ -271,10 +243,10 @@ class UriFetcher @Inject constructor(
 
   private fun fetch(artist: Artist): Uri {
     // 自定义封面
-    val customArtFile = getCustomThumbIfExist(artist.artistID, Constants.ARTIST)
-    if (customArtFile != null) {
-      return Uri.fromFile(customArtFile)
-    }
+//    val customArtFile = getCustomThumbIfExist(artist.artistID, Constants.ARTIST)
+//    if (customArtFile != null) {
+//      return Uri.fromFile(customArtFile)
+//    }
 
     // 内置
     val imageUrl = getArtistArt(artist.artistID)
@@ -321,10 +293,10 @@ class UriFetcher @Inject constructor(
 
   private fun fetch(playList: PlayList): Uri {
     // 自定义封面
-    val customArtFile = getCustomThumbIfExist(playList.id, Constants.PLAYLIST)
-    if (customArtFile != null) {
-      return Uri.fromFile(customArtFile)
-    }
+//    val customArtFile = getCustomThumbIfExist(playList.id, Constants.PLAYLIST)
+//    if (customArtFile != null) {
+//      return Uri.fromFile(customArtFile)
+//    }
 
     val songs = songRepo.getSongsByModels(listOf(playList))
 

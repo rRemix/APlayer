@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -54,6 +55,7 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
   GlideImage(
     model = song,
     contentDescription = "PlayingCover",
+    contentScale = ContentScale.Crop,
     failure = placeholder(LocalTheme.current.albumPlaceHolder),
     loading = placeholder(LocalTheme.current.albumPlaceHolder),
     modifier = Modifier

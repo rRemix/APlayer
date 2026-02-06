@@ -495,4 +495,6 @@
       <item quantity="other">%1$s    %2$d 曲</item>
   </plurals>
     <string name="title_dynamic_smb">SMB クライアント</string>
+  <string name="select_image">画像を選択</string>
+  <string name="clear_cover">カバーを削除</string>
 </resources>

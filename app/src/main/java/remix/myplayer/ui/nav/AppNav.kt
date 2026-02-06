@@ -17,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -49,6 +50,7 @@ import remix.myplayer.ui.screen.LastAddedScreen
 import remix.myplayer.ui.screen.SearchScreen
 import remix.myplayer.ui.screen.SongChooserScreen
 import remix.myplayer.ui.screen.SupportScreen
+import remix.myplayer.ui.screen.TagEditScreen
 import remix.myplayer.ui.screen.crop.CropScreen
 import remix.myplayer.ui.screen.detail.DetailScreen
 import remix.myplayer.ui.screen.history.HistoryScreen
@@ -60,6 +62,11 @@ import remix.myplayer.ui.screen.webdav.WebDavDetailScreen
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
+import remix.myplayer.misc.cache.DiskCache
+import remix.myplayer.util.Constants
+import remix.myplayer.viewmodel.libraryViewModel
+import java.io.File
+
 const val RouteHome = "home"
 const val RouteSetting = "setting"
 const val RouteSongChoose = "song_choose"
@@ -69,7 +76,9 @@ const val RouteCustomSort = "custom_sort"
 const val RouteLastAdded = "last_added"
 const val RouteHistory = "history"
 const val RouteSearch = "search"
-const val RouteCrop = "crop"
+const val RouteTagEdit = "tag_edit"
+const val RouteCustomCoverCrop = "custom_cover_crop"
+const val RouteTagEditCrop = "tag_edit_crop"
 const val RouteEq = "eq"
 const val RouteSupport = "support"
 
@@ -161,6 +170,10 @@ fun AppNav() {
           SearchScreen()
         }
 
+        normalAnimatedScreen(RouteTagEdit) {
+          TagEditScreen(it)
+        }
+
         composable<WebDav>(
           enterTransition = enterTransition(),
           exitTransition = exitTransition(),
@@ -182,14 +195,65 @@ fun AppNav() {
         }
 
         normalAnimatedScreen(
-          "${RouteCrop}/{id}/{type}",
+          "${RouteCustomCoverCrop}/{id}/{type}",
           arguments = listOf(
             navArgument("id") { type = NavType.LongType },
             navArgument("type") { type = NavType.IntType })
         ) {
           val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
           val type = it.arguments?.getInt("type") ?: return@normalAnimatedScreen
-          CropScreen(id, type)
+          val context = LocalContext.current
+          val nav = LocalNavController.current
+          val libraryVM = libraryViewModel
+
+          val destinationUri = remember(id, type) {
+            val cacheDir = DiskCache.getDiskCacheDir(context, "thumbnail")
+            if (!cacheDir.exists() && !cacheDir.mkdir()) {
+              Uri.EMPTY
+            } else {
+              val file = File(cacheDir, "$type-${id}.jpg")
+              Uri.fromFile(file)
+            }
+          }
+
+          CropScreen(
+            destinationUri = destinationUri,
+            onCropSuccess = {
+              libraryVM.fetchMedia(
+                clear = true,
+                updateAlbumVersion = type == Constants.ALBUM,
+                updateArtistVersion = type == Constants.ARTIST,
+                updatePlayListVersion = type == Constants.PLAYLIST,
+              )
+              nav.popBackStack()
+            },
+            onCancel = {
+              nav.popBackStack()
+            }
+          )
+        }
+
+        composable(
+          "$RouteTagEditCrop/{uri}",
+          arguments = listOf(navArgument("uri") { type = NavType.StringType })
+        ) {
+          val uriString = it.arguments?.getString("uri") ?: return@composable
+          val destinationUri = Uri.decode(uriString).toUri()
+          val nav = LocalNavController.current
+
+          CropScreen(
+            destinationUri = destinationUri,
+            onCropSuccess = {
+              nav.previousBackStackEntry?.savedStateHandle?.set(
+                "song_crop_result",
+                System.currentTimeMillis()
+              )
+              nav.popBackStack()
+            },
+            onCancel = {
+              nav.popBackStack()
+            }
+          )
         }
 
         normalAnimatedScreen(RouteEq) {

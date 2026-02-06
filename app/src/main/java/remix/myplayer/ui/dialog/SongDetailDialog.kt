@@ -1,10 +1,12 @@
 package remix.myplayer.ui.dialog
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,40 +46,28 @@ fun SongDetailDialog() {
     title = stringResource(R.string.song_detail),
     negative = null,
     custom = {
-      LazyColumn(
+      Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = Modifier.padding(top = 18.dp)
+        modifier = Modifier
+          .padding(top = 18.dp)
+          .verticalScroll(rememberScrollState())
       ) {
-        item {
-          DetailItem(R.string.song_path, song.data, true)
-        }
-        item {
-          DetailItem(R.string.song_name, song.showName)
-        }
-        item {
-          DetailItem(R.string.file_size, stringResource(R.string.cache_size, 1.0f * song.size / MB))
-        }
-        item {
-          DetailItem(
-            R.string.format,
-            if (song.isLocal()) audioHeader?.format ?: "" else song.data.substringAfterLast('.')
-          )
-        }
-        item {
-          DetailItem(R.string.length, Util.getTime(song.duration))
-        }
-        item {
-          DetailItem(
-            R.string.bitrate,
-            if (song.isLocal()) "${audioHeader?.bitRate ?: 0} kb/s" else if (song is Song.Remote) "${song.bitRate} kb/s" else ""
-          )
-        }
-        item {
-          DetailItem(
-            R.string.sample_rate,
-            if (song.isLocal()) "${audioHeader?.sampleRate ?: 0} Hz" else if (song is Song.Remote) "${song.sampleRate} Hz" else ""
-          )
-        }
+        DetailItem(R.string.song_path, song.data, true)
+        DetailItem(R.string.song_name, song.showName)
+        DetailItem(R.string.file_size, stringResource(R.string.cache_size, 1.0f * song.size / MB))
+        DetailItem(
+          R.string.format,
+          if (song.isLocal()) audioHeader?.format ?: "" else song.data.substringAfterLast('.')
+        )
+        DetailItem(R.string.length, Util.getTime(song.duration))
+        DetailItem(
+          R.string.bitrate,
+          if (song.isLocal()) "${audioHeader?.bitRate ?: 0} kb/s" else if (song is Song.Remote) "${song.bitRate} kb/s" else ""
+        )
+        DetailItem(
+          R.string.sample_rate,
+          if (song.isLocal()) "${audioHeader?.sampleRate ?: 0} Hz" else if (song is Song.Remote) "${song.sampleRate} Hz" else ""
+        )
       }
     },
     positive = stringResource(R.string.close)
