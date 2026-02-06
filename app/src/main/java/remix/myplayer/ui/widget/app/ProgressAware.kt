@@ -10,13 +10,20 @@ import remix.myplayer.service.playback.MusicStateSource
  */
 
 @Composable
-fun ProgressAware(interval: Long = 50, content: @Composable (Long, Long) -> Unit) {
-//  val playbackVM = playbackViewModel
+fun ProgressAware(interval: Long = 0, content: @Composable (Long, Long) -> Unit) {
   val playbackState by MusicStateSource.playbackUiState.collectAsStateWithLifecycle()
   val progressState by MusicStateSource.progressState.collectAsStateWithLifecycle()
 
-  if (playbackState.song.valid()) {
-    content(progressState.position, progressState.duration)
-  }
+  val smoothPosition = rememberSmoothPosition(
+    position = progressState.position,
+    duration = progressState.duration,
+    isPlaying = playbackState.isPlaying,
+    speed = playbackState.speed,
+    intervalMs = interval
+  )
 
+  if (playbackState.song.valid()) {
+    val position = if (playbackState.isPlaying) smoothPosition else progressState.position
+    content(position, progressState.duration)
+  }
 }

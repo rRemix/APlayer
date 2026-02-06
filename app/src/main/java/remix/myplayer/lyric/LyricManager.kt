@@ -339,10 +339,7 @@ class LyricManager @Inject constructor(
   private fun getProgressOfLine(line: LyricLine, time: Long, endTime: Long): Double {
     if (endTime <= line.time) {
       Timber.tag(TAG).w("Invalid line range, time=$time, lineTime=${line.time}, endTime=$endTime")
-      return when (line) {
-        is PerWordLyricLine -> if (time > line.time) line.words.size.toDouble() else 0.0
-        else -> if (time > line.time) 1.0 else 0.0
-      }
+      return computeLineProgress(line, time, endTime)
     }
 
     val clampedTime = time.coerceIn(line.time, endTime)
@@ -350,11 +347,7 @@ class LyricManager @Inject constructor(
       Timber.tag(TAG).w("Clamped time, time=$time, lineTime=${line.time}, endTime=$endTime")
     }
 
-    return if (line is PerWordLyricLine) {
-      line.getProgress(clampedTime, endTime)
-    } else {
-      (clampedTime - line.time).toDouble() / (endTime - line.time)
-    }
+    return computeLineProgress(line, time, endTime)
   }
 
   private fun getCurrentNextLine(
@@ -495,6 +488,29 @@ class LyricManager @Inject constructor(
   companion object {
 
     private const val TAG = "LyricsManager"
+
+    /**
+     * 计算当前行的播放进度：普通歌词返回 0~1，逐字歌词返回 0~words.size
+     *
+     * @param line 当前歌词行
+     * @param time 当前播放时间
+     * @param endTime 当前行的结束时间
+     */
+    fun computeLineProgress(line: LyricLine, time: Long, endTime: Long): Double {
+      if (endTime <= line.time) {
+        return when (line) {
+          is PerWordLyricLine -> if (time > line.time) line.words.size.toDouble() else 0.0
+          else -> if (time > line.time) 1.0 else 0.0
+        }
+      }
+
+      val clampedTime = time.coerceIn(line.time, endTime)
+      return if (line is PerWordLyricLine) {
+        line.getProgress(clampedTime, endTime)
+      } else {
+        (clampedTime - line.time).toDouble() / (endTime - line.time)
+      }
+    }
 
     const val ACTION_LYRIC = "action_lyric"
 

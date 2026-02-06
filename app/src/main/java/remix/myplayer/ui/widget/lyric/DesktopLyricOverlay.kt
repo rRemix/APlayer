@@ -47,8 +47,10 @@ import remix.myplayer.data.prefs.DesktopLyricPrefs.Companion.HIDE_PANEL_DELAY
 import remix.myplayer.lyric.CurrentNextLyricsLine
 import remix.myplayer.lyric.LyricManager
 import remix.myplayer.service.Command
+import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.dialog.ColorSpace
 import remix.myplayer.ui.theme.ThemeController
+import remix.myplayer.ui.widget.app.rememberSmoothPosition
 import remix.myplayer.util.MusicUtil.makeCmdIntent
 import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.CenterInBox
@@ -141,43 +143,15 @@ fun DesktopLyricOverlay(
       contentDescription = "DkpClose"
     )
 
-    // 歌词内容
-    Column(
-      modifier = Modifier.fillMaxWidth(),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-      val currentLyric = uiState.currentLyricLine
-      LyricSingleLine(
-        sungColor,
-        unSungColor,
-        firstLineSize.sp,
-        currentLyric.currentLineProgress,
-        currentLyric.currentLine
-      )
-
-      val isTranslation = !currentLyric.currentLine?.translation.isNullOrBlank()
-      Text(
-        text = if (isTranslation) {
-          currentLyric.currentLine.translation!!
-        } else {
-          // 翻译和下一行歌词都没有时显示省略号
-          (currentLyric.nextLine?.content ?: "").ifBlank { ELLIPSIS }
-        },
-        style = TextStyle(
-          color = if (isTranslation) translationColor else unSungColor,
-          fontSize = secondLineSize.sp,
-          shadow = Shadow(
-            color = Color.Black,
-            offset = Offset(1f, 1f),
-            blurRadius = 2f
-          )
-        ),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        softWrap = false
-      )
-    }
+    DesktopLyricLines(
+      lyricManager = lyricManager,
+      uiState = uiState,
+      firstLineSize = firstLineSize,
+      secondLineSize = secondLineSize,
+      sungColor = sungColor,
+      unSungColor = unSungColor,
+      translationColor = translationColor
+    )
 
     if (showPanel) {
       // 控制按钮
@@ -294,6 +268,74 @@ fun DesktopLyricOverlay(
     showPanel = false
     showSetting = false
     showSizeContainer = true
+  }
+}
+
+@Composable
+private fun DesktopLyricLines(
+  lyricManager: LyricManager,
+  uiState: DesktopLyricUiState,
+  firstLineSize: Float,
+  secondLineSize: Float,
+  sungColor: Color,
+  unSungColor: Color,
+  translationColor: Color
+) {
+  val playbackState by MusicStateSource.playbackUiState.collectAsStateWithLifecycle()
+  val progressState by MusicStateSource.progressState.collectAsStateWithLifecycle()
+
+  val smoothPosition = rememberSmoothPosition(
+    position = progressState.position,
+    duration = progressState.duration,
+    isPlaying = playbackState.isPlaying,
+    speed = playbackState.speed
+  )
+
+  val currentLyric = uiState.currentLyricLine
+  val currentLine = currentLyric.currentLine
+
+  Column(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.spacedBy(4.dp)
+  ) {
+    LyricSingleLine(
+      sungColor = sungColor,
+      unSungColor = unSungColor,
+      fontSize = firstLineSize.sp,
+      progress = if (currentLine != null) {
+        LyricManager.computeLineProgress(
+          line = currentLyric.currentLine,
+          time = smoothPosition + lyricManager.offset,
+          endTime = currentLyric.nextLine?.time ?: (progressState.duration + lyricManager.offset)
+        )
+      } else {
+        null
+      },
+      currentLine
+    )
+
+    val isTranslation = !currentLine?.translation.isNullOrBlank()
+    Text(
+      text = if (isTranslation) {
+        currentLine.translation!!
+      } else {
+        // 翻译和下一行歌词都没有时显示省略号
+        (currentLyric.nextLine?.content ?: "").ifBlank { ELLIPSIS }
+      },
+      style = TextStyle(
+        color = if (isTranslation) translationColor else unSungColor,
+        fontSize = secondLineSize.sp,
+        shadow = Shadow(
+          color = Color.Black,
+          offset = Offset(1f, 1f),
+          blurRadius = 2f
+        )
+      ),
+      maxLines = 1,
+      overflow = TextOverflow.Ellipsis,
+      softWrap = false
+    )
   }
 }
 
