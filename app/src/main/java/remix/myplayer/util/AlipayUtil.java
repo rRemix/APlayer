@@ -7,14 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.view.Gravity;
-import android.widget.TextView;
-import android.widget.Toast;
 import remix.myplayer.R;
+import remix.myplayer.ui.nav.MessageNotifier;
 
 /**
- * Created by codeest on 16/10/17. https://github.com/fython/AlipayZeroSdk/blob/master/library/src/main/java/moe/feng/alipay/zerosdk/AlipayZeroSdk.java
+ * Created by codeest on 16/10/17.
+ * https://github.com/fython/AlipayZeroSdk/blob/master/library/src/main/java/moe/feng/alipay/zerosdk/AlipayZeroSdk.java
  */
 
 public class AlipayUtil {
@@ -29,7 +27,8 @@ public class AlipayUtil {
       "scheme=alipayqr;package=com.eg.android.AlipayGphone;end";
 
   /**
-   * 打开转账窗口 旧版支付宝二维码方法，需要使用 https://fama.alipay.com/qrcode/index.htm 网站生成的二维码 这个方法最好，但在 2016 年 8 月发现新用户可能无法使用
+   * 打开转账窗口 旧版支付宝二维码方法，需要使用 https://fama.alipay.com/qrcode/index.htm 网站生成的二维码 这个方法最好，但在 2016 年 8
+   * 月发现新用户可能无法使用
    *
    * @param activity Parent Activity
    * @return 是否成功调用
@@ -56,12 +55,7 @@ public class AlipayUtil {
           .getSystemService(Context.CLIPBOARD_SERVICE);
       ClipData clipData = ClipData.newPlainText("text", "lin_kin_p@163.com");
       clipboardManager.setPrimaryClip(clipData);
-      Toast toast = Toast
-          .makeText(activity, activity.getString(R.string.jump_alipay_error), Toast.LENGTH_SHORT);
-      ((TextView) toast.getView()
-          .findViewById(Resources.getSystem().getIdentifier("message", "id", "android")))
-          .setGravity(Gravity.CENTER);
-      toast.show();
+      MessageNotifier.INSTANCE.show(R.string.jump_alipay_error);
       return false;
     }
   }

@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -165,6 +166,7 @@ internal fun PlayingLyric(song: Song) {
     }
   }
 
+  val currentSong by rememberUpdatedState(song)
   DisposableEffect(Unit) {
     val receiver = object : BroadcastReceiver() {
       override fun onReceive(context: Context, intent: Intent) {
@@ -173,7 +175,7 @@ internal fun PlayingLyric(song: Song) {
 
           when (extra) {
             LyricManager.CHANGE_LYRIC -> {
-              lyricsManager.clearCache(song)
+              lyricsManager.clearCache(currentSong)
 
               // 如果是手动选择则直接使用UriProvider解析
               val uri = intent.getParcelableExtra<Uri>(LyricManager.EXTRA_LYRIC_URI)
