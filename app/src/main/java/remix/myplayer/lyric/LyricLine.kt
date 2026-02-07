@@ -26,7 +26,7 @@ sealed class LyricLine {
     val minutes = TimeUnit.MILLISECONDS.toMinutes(time)
     val seconds = TimeUnit.MILLISECONDS.toSeconds(time) -
         TimeUnit.MINUTES.toSeconds(minutes)
-    val millis = time % 1000
+    val millis = (time % 1000) / 10
     String.format(Locale.getDefault(), "%02d:%02d.%02d", minutes, seconds, millis)
   }
 

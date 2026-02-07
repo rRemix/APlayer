@@ -3,22 +3,19 @@ package remix.myplayer.ui.screen.playing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -28,8 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -38,14 +33,12 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
-import remix.myplayer.R
 import remix.myplayer.lyric.LyricLine
 import remix.myplayer.lyric.PerWordLyricLine
 import remix.myplayer.ui.theme.LocalTheme
@@ -53,6 +46,7 @@ import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.lyric.LyricMultiLine
 import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.playbackViewModel
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -61,6 +55,7 @@ private val DEFAULT_ANIM_SPEC =
   tween<Float>(durationMillis = 400, easing = FastOutSlowInEasing)
 private const val HIGHLIGHT_SCALE = 1.2f
 private const val LYRIC_WIDTH_FRACTION = 1f / HIGHLIGHT_SCALE
+private const val BOUNDS_UPDATE_EPSILON_PX = 0.5f
 
 @Composable
 internal fun LyricContainer(
@@ -95,6 +90,15 @@ internal fun LyricContainer(
   val lineBounds = remember(lyrics) {
     mutableStateListOf<LineBounds?>().apply { repeat(lyrics.size) { add(null) } }
   }
+  val centerLineIndex by remember(lyrics, allowProgressUpdates, viewportHeightPx, scrollState) {
+    derivedStateOf {
+      if (allowProgressUpdates || viewportHeightPx == 0 || lyrics.isEmpty()) {
+        return@derivedStateOf -1
+      }
+      val y = scrollState.value + viewportHeightPx / 2f
+      findNearestLineIndex(y, lineBounds)
+    }
+  }
 
   val fontSize = (fontScale * DEFAULT_TEXT_SIZE).sp
 
@@ -128,56 +132,80 @@ internal fun LyricContainer(
 
       lyrics.forEachIndexed { index, line ->
         val isHighLight = index == highlightIndex
+        val showSeek = !allowProgressUpdates && index == centerLineIndex
+        val renderAsHighlight = isHighLight || showSeek
         val scale by animateFloatAsState(
           targetValue = if (isHighLight) HIGHLIGHT_SCALE else 1.0f,
           animationSpec = DEFAULT_ANIM_SPEC
         )
-        Column(
+        val scaleModifier = if (abs(scale - 1f) > 0.001f) {
+          Modifier.graphicsLayer(scaleX = scale, scaleY = scale)
+        } else {
+          Modifier
+        }
+        Box(
           modifier = Modifier
-            // 预留缩放后的空间，避免高亮时长句被裁切
-            .fillMaxWidth(LYRIC_WIDTH_FRACTION)
+            .fillMaxWidth()
             .onGloballyPositioned { c ->
-              lineBounds[index] = LineBounds(
-                c.positionInParent().y,
-                c.size.height.toFloat()
+              val newTop = c.positionInParent().y
+              val newHeight = c.size.height.toFloat()
+              val oldBound = lineBounds[index]
+              if (oldBound == null ||
+                abs(oldBound.top - newTop) > BOUNDS_UPDATE_EPSILON_PX ||
+                abs(oldBound.height - newHeight) > BOUNDS_UPDATE_EPSILON_PX
+              ) {
+                lineBounds[index] = LineBounds(newTop, newHeight)
+              }
+            }
+            .clickWithRipple(circle = false) {
+              playbackVM.setProgress(line.time)
+              allowProgressUpdates = true
+            }
+            .padding(vertical = 2.dp),
+          contentAlignment = Alignment.Center
+        ) {
+          Column(
+            modifier = Modifier
+              // 预留缩放后的空间，避免高亮时长句被裁切
+              .fillMaxWidth(LYRIC_WIDTH_FRACTION)
+              .then(scaleModifier),
+            horizontalAlignment = Alignment.CenterHorizontally
+          ) {
+            if (renderAsHighlight) {
+              val endTime = max(line.time, lyrics.getOrNull(index + 1)?.time ?: duration)
+
+              LyricMultiLine(
+                LocalTheme.current.textPrimary,
+                LocalTheme.current.textSecondary,
+                fontSize = fontSize,
+                // 如果是逐行歌词并且允许更新进度则分开绘制，否则只绘制已唱
+                if (allowProgressUpdates && isHighLight && line is PerWordLyricLine) {
+                  line.getProgress(
+                    progress.coerceIn(line.time, endTime),
+                    endTime
+                  )
+                } else null,
+                line,
+              )
+            } else {
+              TextSecondary(
+                line.content,
+                fontSize = fontSize,
+                maxLine = Int.MAX_VALUE,
+                textAlign = TextAlign.Center
               )
             }
-            .graphicsLayer(scaleX = scale, scaleY = scale),
-          horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-          if (isHighLight) {
-            val endTime = max(line.time, lyrics.getOrNull(index + 1)?.time ?: duration)
 
-            LyricMultiLine(
-              LocalTheme.current.textPrimary,
-              LocalTheme.current.textSecondary,
-              fontSize = fontSize,
-              // 如果是逐行歌词并且允许更新进度则分开绘制，否则只绘制已唱
-              if (allowProgressUpdates && line is PerWordLyricLine) {
-                line.getProgress(
-                  progress.coerceIn(line.time, endTime),
-                  endTime
-                )
-              } else null,
-              line,
-            )
-          } else {
-            TextSecondary(
-              line.content,
-              fontSize = fontSize,
-              maxLine = Int.MAX_VALUE,
-              textAlign = TextAlign.Center
-            )
+            if (!line.translation.isNullOrEmpty()) {
+              TextSecondary(
+                line.translation ?: "",
+                fontSize = 15.sp,
+                maxLine = Int.MAX_VALUE,
+                textAlign = TextAlign.Center
+              )
+            }
           }
 
-          if (!line.translation.isNullOrEmpty()) {
-            TextSecondary(
-              line.translation ?: "",
-              fontSize = 15.sp,
-              maxLine = Int.MAX_VALUE,
-              textAlign = TextAlign.Center
-            )
-          }
         }
       }
 
@@ -185,48 +213,14 @@ internal fun LyricContainer(
       Spacer(Modifier.height(with(LocalDensity.current) { (viewportHeightPx / 2).toDp() }))
     }
 
-    if (!allowProgressUpdates) {
-      Box(
+    if (!allowProgressUpdates && centerLineIndex in lyrics.indices) {
+      TextSecondary(
+        lyrics[centerLineIndex].formattedTime,
         modifier = Modifier
-          .padding(horizontal = 8.dp)
-          .fillMaxWidth()
-      ) {
-        Row(
-          horizontalArrangement = Arrangement.spacedBy(4.dp),
-          verticalAlignment = Alignment.CenterVertically
-        ) {
-          Image(
-            modifier = Modifier
-              .clickWithRipple {
-                playbackVM.setProgress(lyrics[highlightIndex].time)
-                allowProgressUpdates = true
-              },
-            painter = painterResource(R.drawable.ic_play_arrow_black_24dp),
-            contentDescription = "LyricPlayFromLine",
-            colorFilter = ColorFilter.tint(LocalTheme.current.textSecondary)
-          )
-
-          HorizontalDivider(
-            modifier = Modifier
-              .fillMaxWidth(),
-            thickness = 1.dp,
-            color = Color.Black
-          )
-        }
-
-        var viewHeight by remember { mutableIntStateOf(0) }
-        TextSecondary(
-          lyrics[highlightIndex].formattedTime,
-          modifier = Modifier
-            .align(Alignment.CenterEnd)
-            .onGloballyPositioned {
-              viewHeight = it.size.height
-            }
-            .offset(y = (-viewHeight / 3).dp)
-        )
-      }
+          .align(Alignment.CenterEnd)
+          .padding(end = 8.dp)
+      )
     }
-
   }
 
   // 滚动到视图中心
@@ -271,25 +265,9 @@ internal fun LyricContainer(
 
     delay(DEFAULT_ANIM_SPEC.durationMillis.toLong())
     val y = scrollState.value + viewportHeightPx / 2f
-    var targetLine: Int = -1
-    var targetBound: LineBounds? = null
-    var minDistance = Float.POSITIVE_INFINITY
-    for (i in lyrics.indices) {
-      val bound = lineBounds.getOrNull(i) ?: return@LaunchedEffect
-      if (y >= bound.top && y <= bound.bottom) {
-        targetLine = i
-        targetBound = bound
-        break
-      }
-
-      val distance = if (y < bound.top) (bound.top - y) else (y - bound.bottom)
-      if (distance < minDistance) {
-        targetLine = i
-        targetBound = bound
-        minDistance = distance
-      }
-    }
-    check(targetLine != -1)
+    val targetLine = findNearestLineIndex(y, lineBounds)
+    if (targetLine == -1) return@LaunchedEffect
+    val targetBound = lineBounds.getOrNull(targetLine)
 
     // 如果高亮行改变直接滑动，否则计算下滑动距离
     if (highlightIndex != targetLine) {
@@ -307,4 +285,22 @@ private data class LineBounds(val top: Float, val height: Float) {
 
   val bottom = top + height
   val mid = top + height / 2
+}
+
+private fun findNearestLineIndex(y: Float, lineBounds: List<LineBounds?>): Int {
+  var targetLine = -1
+  var minDistance = Float.POSITIVE_INFINITY
+  for (i in lineBounds.indices) {
+    val bound = lineBounds[i] ?: continue
+    if (y >= bound.top && y <= bound.bottom) {
+      return i
+    }
+
+    val distance = if (y < bound.top) (bound.top - y) else (y - bound.bottom)
+    if (distance < minDistance) {
+      targetLine = i
+      minDistance = distance
+    }
+  }
+  return targetLine
 }
