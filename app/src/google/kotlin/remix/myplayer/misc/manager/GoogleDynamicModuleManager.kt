@@ -29,7 +29,8 @@ class GoogleDynamicModuleManager @Inject constructor(
   }
 
   override fun isModuleSupport(moduleName: String): Boolean {
-    return moduleName == "feature_smb"
+//    return moduleName == "feature_smb"
+    return false
   }
 
   override fun isModuleInstalled(moduleName: String): Boolean {
