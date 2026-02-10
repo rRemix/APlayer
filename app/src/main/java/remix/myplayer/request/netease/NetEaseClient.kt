@@ -20,6 +20,7 @@ import java.security.MessageDigest
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
+import androidx.core.content.edit
 
 
 /**
@@ -62,11 +63,14 @@ class NetEaseClient @Inject constructor(
     return arr.joinToString("") { "%02x".format(it) }
   }
 
-  @SuppressLint("HardwareIds")
   private fun getDeviceId(): String {
-    // 使用 ANDROID_ID 作为稳定的设备ID，如果取不到则生成一次随机ID
-    val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-    return androidId ?: genTokenHex(16)
+    val sp = context.getSharedPreferences("netease_config", Context.MODE_PRIVATE)
+    var deviceId = sp.getString("device_id", null)
+    if (deviceId.isNullOrEmpty()) {
+      deviceId = genTokenHex(16)
+      sp.edit { putString("device_id", deviceId) }
+    }
+    return deviceId
   }
 
   private fun getAnonymousUsername(deviceId: String): String {
