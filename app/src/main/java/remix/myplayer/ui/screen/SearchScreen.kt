@@ -2,6 +2,7 @@
 
 package remix.myplayer.ui.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -61,7 +62,6 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.MultiSelectBar
-import remix.myplayer.ui.widget.common.BackPressHandler
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
@@ -91,7 +91,7 @@ fun SearchScreen() {
 
   val showMultiSelect = multiSelectState.isShowInSearch()
 
-  BackPressHandler(showMultiSelect) {
+  BackHandler(showMultiSelect) {
     mainVM.closeMultiSelect()
   }
 

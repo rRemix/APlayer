@@ -111,8 +111,6 @@ class PlaybackViewModel @Inject constructor(
     }
   }
 
-  fun isKeepScreenOn() = settingPrefs.keepScreenOn
-
   override fun onServiceConnected(service: MusicService) {
     Timber.v("onServiceConnected")
   }

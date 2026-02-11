@@ -37,11 +37,11 @@ import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 
 @Composable
-fun PlayingScreen() {
+fun PlayingPanel(isVisible: Boolean) {
   PlayingContainer {
     val context = LocalContext.current
     if (context.isPortraitOrientation()) {
-      Portrait()
+      Portrait(isVisible)
     } else {
       Landscape()
     }
@@ -49,14 +49,13 @@ fun PlayingScreen() {
 }
 
 @Composable
-private fun Portrait() {
+private fun Portrait(isVisible: Boolean) {
   Column(
     modifier = Modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(30.dp)
   ) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
-    val playbackVM = playbackViewModel
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
 
     PlayingTopBar(playbackState.song, swatch)
@@ -115,9 +114,11 @@ private fun Portrait() {
       )
     }
 
+    val keepScreenOn =
+      settingViewModel.settingsState.collectAsStateWithLifecycle().value.playingScreen.keepScreenOn
     val window = LocalActivity.current?.window
-    DisposableEffect(pagerState.currentPage) {
-      if (pagerState.currentPage == 1 && playbackVM.isKeepScreenOn()) {
+    DisposableEffect(pagerState.currentPage, isVisible, keepScreenOn) {
+      if (pagerState.currentPage == 1 && isVisible && keepScreenOn) {
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
       }
       onDispose {

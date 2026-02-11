@@ -25,9 +25,9 @@ fun enterTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> E
 fun exitTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
   // playingScreen has special animation
   when (targetState.destination.route) {
-    RoutePlayingScreen -> {
-      slideOutToTop()
-    }
+//    RoutePlayingScreen -> {
+//      slideOutToTop()
+//    }
 
     else -> {
       slideOutToLeft()
@@ -39,9 +39,9 @@ fun popEnterTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -
   {
     // playingScreen has special animation
     when (initialState.destination.route) {
-      RoutePlayingScreen -> {
-        slideInFromTop()
-      }
+//      RoutePlayingScreen -> {
+//        slideInFromTop()
+//      }
 
       else -> {
         slideInFromLeft()

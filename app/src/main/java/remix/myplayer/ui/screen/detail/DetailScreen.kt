@@ -1,10 +1,12 @@
 package remix.myplayer.ui.screen.detail
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.data.db.room.entity.PlayList
@@ -43,12 +47,9 @@ import remix.myplayer.service.MusicEventCallback
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.activity.base.BaseMusicActivity
-import remix.myplayer.ui.nav.LocalNavController
-import remix.myplayer.ui.nav.RoutePlayingScreen
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.BottomBar
 import remix.myplayer.ui.widget.app.MultiSelectBar
-import remix.myplayer.ui.widget.common.BackPressHandler
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.common.defaultAppBarActions
@@ -57,6 +58,7 @@ import remix.myplayer.ui.widget.library.list.ListSong
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.ext.verticalScrollbar
 import remix.myplayer.viewmodel.MultiSelectState
+import remix.myplayer.viewmodel.PlayingScreenValue
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.playbackViewModel
@@ -70,6 +72,7 @@ fun DetailScreen(model: APlayerModel) {
   val mainVM = mainViewModel
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val context = LocalContext.current
+  val scope = rememberCoroutineScope()
 
   val playLists by libraryVM.playLists.collectAsStateWithLifecycle()
 
@@ -81,11 +84,9 @@ fun DetailScreen(model: APlayerModel) {
     mutableIntStateOf(0)
   }
 
-  val nav = LocalNavController.current
-
   val showMultiSelect = multiSelectState.isShowInDetail()
 
-  BackPressHandler(showMultiSelect) {
+  BackHandler(showMultiSelect) {
     mainVM.closeMultiSelect()
   }
 
@@ -157,7 +158,9 @@ fun DetailScreen(model: APlayerModel) {
               }
 
               if (playbackState.isPlaying && isPlayingSong) {
-                nav.navigate(RoutePlayingScreen)
+                scope.launch {
+                  mainVM.playingScreenState.animateTo(PlayingScreenValue.Expanded)
+                }
               } else {
                 setPlayQueue(
                   songs, MusicUtil.makeCmdIntent(Command.PLAY_AT)

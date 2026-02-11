@@ -1,5 +1,6 @@
 package remix.myplayer.ui.screen.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -49,7 +50,6 @@ import remix.myplayer.ui.widget.app.Drawer
 import remix.myplayer.ui.widget.app.FAButton
 import remix.myplayer.ui.widget.app.MultiSelectBar
 import remix.myplayer.ui.widget.app.ViewPager
-import remix.myplayer.ui.widget.common.BackPressHandler
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.settingViewModel
@@ -66,7 +66,7 @@ fun HomeScreen() {
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
-  BackPressHandler(enabled = drawerState.isOpen || multiSelectState.isShowing()) {
+  BackHandler(enabled = drawerState.isOpen || multiSelectState.isShowing()) {
     if (drawerState.isOpen) {
       scope.launch {
         drawerState.close()

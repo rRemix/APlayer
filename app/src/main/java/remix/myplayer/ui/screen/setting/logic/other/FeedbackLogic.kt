@@ -65,6 +65,7 @@ fun send(context: Context, scope: CoroutineScope, sendLog: Boolean) {
     Timber.w(it)
     MessageNotifier.show(R.string.send_error, it.toString())
   }, block = {
+    val email = "rRemix.apps@gmail.com"
     if (sendLog) {
       withContext(Dispatchers.IO) {
         try {
@@ -92,7 +93,7 @@ fun send(context: Context, scope: CoroutineScope, sendLog: Boolean) {
             emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
             emailIntent.putExtra(
               Intent.EXTRA_EMAIL,
-              arrayOf("568920427@qq.com")
+              arrayOf(email)
             )
           }
         } catch (e: Exception) {
@@ -101,7 +102,7 @@ fun send(context: Context, scope: CoroutineScope, sendLog: Boolean) {
       }
     } else {
       emailIntent.action = Intent.ACTION_SENDTO
-      emailIntent.data = "mailto:rRemix.me@gmail.com".toUri()
+      emailIntent.data = "mailto:$email".toUri()
     }
 
     Util.startActivitySafely(context, emailIntent)

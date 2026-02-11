@@ -1,5 +1,6 @@
 package remix.myplayer.ui.screen.webdav
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,7 +51,6 @@ import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.icon
 import remix.myplayer.ui.widget.app.BottomBar
 import remix.myplayer.ui.widget.common.AppBarAction
-import remix.myplayer.ui.widget.common.BackPressHandler
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.PopupButton
 import remix.myplayer.ui.widget.common.TextPrimary
@@ -109,7 +109,7 @@ fun WebDavDetailScreen(webDav: WebDav) {
     pathStack.removeAt(pathStack.lastIndex)
   }
 
-  BackPressHandler {
+  BackHandler {
     handleBack()
   }
 

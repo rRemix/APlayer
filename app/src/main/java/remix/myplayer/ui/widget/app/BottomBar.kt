@@ -2,6 +2,7 @@ package remix.myplayer.ui.widget.app
 
 import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,12 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
-import remix.myplayer.ui.nav.LocalNavController
-import remix.myplayer.ui.nav.RoutePlayingScreen
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
@@ -44,6 +45,8 @@ import remix.myplayer.ui.widget.library.GlideCover
 import remix.myplayer.util.Util
 import remix.myplayer.util.ext.clickableWithoutRipple
 import remix.myplayer.viewmodel.PlaybackViewModel
+import remix.myplayer.viewmodel.PlayingScreenValue
+import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 import kotlin.math.absoluteValue
 
@@ -51,8 +54,9 @@ private const val triggerThreshold = 10
 
 @Composable
 fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackViewModel) {
+  val mainVM = mainViewModel
+  val scope = rememberCoroutineScope()
   val playbackState by vm.playbackUiState.collectAsStateWithLifecycle()
-  val nav = LocalNavController.current
   val interactionSource = remember { MutableInteractionSource() }
 
   var hasTriggerAct by remember { mutableStateOf(false) }
@@ -68,7 +72,9 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
     Modifier
       // 点击跳转播放页
       .clickableWithoutRipple(interactionSource) {
-        nav.navigate(RoutePlayingScreen)
+        scope.launch {
+          mainVM.playingScreenState.animateTo(PlayingScreenValue.Expanded)
+        }
       }
       // 垂直滑动跳转播放页
       .pointerInput(Unit) {
@@ -77,7 +83,9 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
         ) { _, dragAmount ->
           if (dragAmount < -triggerThreshold && !hasTriggerAct) {
             hasTriggerAct = true
-            nav.navigate(RoutePlayingScreen)
+            scope.launch {
+              mainVM.playingScreenState.animateTo(PlayingScreenValue.Expanded)
+            }
           }
         }
       }

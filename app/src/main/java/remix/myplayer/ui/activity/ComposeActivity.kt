@@ -7,14 +7,18 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import remix.myplayer.BuildConfig
 import remix.myplayer.ui.activity.base.BaseMusicActivity
@@ -29,6 +33,7 @@ import remix.myplayer.util.ThemeUtil
 import remix.myplayer.viewmodel.LibraryViewModel
 import remix.myplayer.viewmodel.MainViewModel
 import remix.myplayer.viewmodel.PlaybackViewModel
+import remix.myplayer.viewmodel.PlayingScreenValue
 import remix.myplayer.viewmodel.ProvideViewModels
 import timber.log.Timber
 import javax.inject.Inject
@@ -99,6 +104,13 @@ class ComposeActivity : BaseMusicActivity() {
       when (it.scheme) {
         playingScreenDeepLink.scheme -> {
           Timber.v("deepLink")
+          lifecycleScope.launch {
+            val state = mainViewModel.playingScreenState
+            snapshotFlow {
+              state.anchors.hasPositionFor(PlayingScreenValue.Expanded)
+            }.filter { it }.first()
+            state.snapTo(PlayingScreenValue.Expanded)
+          }
         }
 
         else -> {

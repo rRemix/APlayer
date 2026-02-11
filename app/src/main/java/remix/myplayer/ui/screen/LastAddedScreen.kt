@@ -1,5 +1,6 @@
 package remix.myplayer.ui.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -32,7 +33,6 @@ import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.MultiSelectBar
-import remix.myplayer.ui.widget.common.BackPressHandler
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.defaultAppBarActions
 import remix.myplayer.ui.widget.library.SongListHeader
@@ -59,7 +59,7 @@ fun LastAddedScreen() {
 
   val showMultiSelect = multiSelectState.isShowInLastAdded()
 
-  BackPressHandler(showMultiSelect) {
+  BackHandler(showMultiSelect) {
     mainVM.closeMultiSelect()
   }
 
