@@ -150,7 +150,8 @@ fun SmbDetailScreen(smb: Smb) {
 
                 if (resource.isDirectory) {
                   // Enter directory
-                  val nextPath = smb.getRoot().removeSuffix("/") + "/" + resource.path.trimStart('/')
+                  val nextPath =
+                    smb.getRoot().removeSuffix("/") + "/" + resource.path.trimStart('/')
                   Timber.v("nextPath: $nextPath")
                   pathStack.add(nextPath)
                 } else {

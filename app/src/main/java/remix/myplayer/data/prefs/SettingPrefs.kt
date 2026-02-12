@@ -129,6 +129,16 @@ class SettingPrefs @Inject constructor(
     PrefKeys.Setting.PLAYER_BACKGROUND,
     BACKGROUND_ADAPTIVE_COLOR
   )
+  var playingCoverAnimationStyle by PrefsDelegate(
+    sp,
+    PrefKeys.Setting.PLAYING_COVER_ANIMATION_STYLE,
+    COVER_ANIMATION_CLASSIC
+  )
+  var playingCoverAnimationSpeed by PrefsDelegate(
+    sp,
+    PrefKeys.Setting.PLAYING_COVER_ANIMATION_SPEED,
+    COVER_ANIMATION_SPEED_DEFAULT
+  )
   var playingScreenBottom by PrefsDelegate(
     sp,
     PrefKeys.Setting.BOTTOM_OF_NOW_PLAYING_SCREEN,
@@ -173,6 +183,15 @@ class SettingPrefs @Inject constructor(
     const val BACKGROUND_THEME = 0
     const val BACKGROUND_ADAPTIVE_COLOR = 1
     const val BACKGROUND_CUSTOM_IMAGE = 2
+
+    // 播放页封面切换动画
+    const val COVER_ANIMATION_CLASSIC = "classic"
+    const val COVER_ANIMATION_PARALLAX_PUSH = "parallax_push"
+    const val COVER_ANIMATION_CARD_SQUEEZE = "card_squeeze"
+    const val COVER_ANIMATION_PAGE_TURN = "page_turn"
+    const val COVER_ANIMATION_SLICE_STAGGER = "slice_stagger"
+    const val COVER_ANIMATION_DISSOLVE_ZOOM = "dissolve_zoom"
+    const val COVER_ANIMATION_SPEED_DEFAULT = 1.5f
 
     // 封面下载
     const val DOWNLOAD_COVER_ALWAYS = 0

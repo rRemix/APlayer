@@ -68,7 +68,7 @@ fun PlayingDropDownMenu(
 
   val menuItems =
     listOf(
-      R.string.song_edit,
+//      R.string.song_edit,
       R.string.song_detail,
       R.string.collect,
       R.string.add_to_playlist,

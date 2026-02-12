@@ -167,6 +167,12 @@ object PrefKeys {
     /** 自定义播放背景 */
     const val PLAYER_BACKGROUND = "player_background"
 
+    /** 播放页封面切换动画 */
+    const val PLAYING_COVER_ANIMATION_STYLE = "playing_cover_animation_style"
+
+    /** 播放页封面切换动画速率 */
+    const val PLAYING_COVER_ANIMATION_SPEED = "playing_cover_animation_speed"
+
     /** 版本号 */
     const val VERSION = "version"
 

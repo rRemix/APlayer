@@ -53,14 +53,15 @@ fun PlayingContainer(content: @Composable () -> Unit) {
       Container(brush = brush, content = content)
 
       LaunchedEffect(swatch, initialColor) {
-        color.snapTo(initialColor)
-        color.animateTo(Color(swatch.rgb), animationSpec = tween(1000))
+        color.animateTo(Color(swatch.rgb), animationSpec = tween(600))
       }
     }
+
     SettingPrefs.BACKGROUND_THEME -> {
       val brush = Brush.verticalGradient(colors = listOf(theme.primary, initialColor))
       Container(brush = brush, content = content)
     }
+
     else -> {
       Container(brush = null, content = content)
     }

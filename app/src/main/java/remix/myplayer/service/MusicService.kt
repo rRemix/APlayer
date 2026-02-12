@@ -137,11 +137,6 @@ class MusicService : BaseService(),
 
   private val stateSource = MusicStateSource
 
-  private val playbackState
-    get() = stateSource.playbackUiState.value
-  private val progressState
-    get() = stateSource.progressState.value
-
   /**
    * 是否第一次准备完成
    */
@@ -300,7 +295,7 @@ class MusicService : BaseService(),
    * 当前是否正在播放
    */
   private val isPlaying: Boolean
-    get() = playbackState.isPlaying
+    get() = playback.isPlaying
 
   override fun onTaskRemoved(rootIntent: Intent) {
     super.onTaskRemoved(rootIntent)
@@ -1218,7 +1213,7 @@ class MusicService : BaseService(),
       Command.LOVE -> {
         playback.currentSong?.let {
           playListRepository.toggleFavorite(it.id)
-          MusicStateSource.updatePlaybackUiState(isFavorite = !playbackState.isFavorite)
+          MusicStateSource.updatePlaybackUiState(isFavorite = !stateSource.playbackUiState.value.isFavorite)
           updateAppwidget()
         }
       }
@@ -1311,8 +1306,6 @@ class MusicService : BaseService(),
       .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currentSong.title)
       .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currentSong.artist)
       .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playback.itemCount.toLong())
-      .putString("ucar.media.metadata.UCAR_TITLE", currentSong.title)
-      .putString("ucar.media.metadata.UCAR_ARTIST", currentSong.artist)
 
     mediaSession.setMetadata(builder.build())
     updatePlaybackState()
@@ -1349,11 +1342,11 @@ class MusicService : BaseService(),
     val desktopLyricLock = lyricManager.isDesktopLyricLocked
 
     val builder = PlaybackStateCompat.Builder()
-    builder.setActiveQueueItemId(playbackState.song.id)
+    builder.setActiveQueueItemId(playback.currentSong?.id ?: return)
       .setState(
         if (isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED,
-        progressState.position,
-        playbackState.speed
+        playback.position,
+        playback.speed
       )
       .setActions(MEDIA_SESSION_ACTIONS)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -1477,7 +1470,7 @@ class MusicService : BaseService(),
     }
     progressJob = launch {
       while (isActive) {
-        val progress = progressState.position
+        val progress = playback.position
         if (progress > 0) {
           settingPrefs.lastProgress = progress.toInt()
         }

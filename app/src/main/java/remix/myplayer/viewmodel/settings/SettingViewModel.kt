@@ -36,6 +36,7 @@ import remix.myplayer.ui.dialog.ImportPlayListState
 import remix.myplayer.ui.dialog.ReNamePlayListState
 import remix.myplayer.ui.dialog.SongDetailState
 import remix.myplayer.ui.dialog.runWithLoading
+import remix.myplayer.ui.screen.playing.PlayingCoverAnimationStyle
 import remix.myplayer.ui.theme.ThemeController
 import remix.myplayer.util.ext.updateIf
 import javax.inject.Inject
@@ -118,7 +119,9 @@ class SettingViewModel @Inject constructor(
     cover = CoverSettings(
       ignoreMediaStore = settingPrefs.ignoreMediaStore,
       autoDownloadCover = settingPrefs.autoDownloadCover,
-      downloadSource = settingPrefs.downloadSource
+      downloadSource = settingPrefs.downloadSource,
+      coverAnimationStyle = PlayingCoverAnimationStyle.fromPrefValue(settingPrefs.playingCoverAnimationStyle),
+      coverAnimationSpeed = settingPrefs.playingCoverAnimationSpeed
     ),
     lyric = LyricSettings(
       desktopLyricEnabled = lyricPrefs.desktopLyricEnabled,
@@ -338,6 +341,16 @@ class SettingViewModel @Inject constructor(
   fun setDownloadSource(source: Int) {
     settingPrefs.downloadSource = source
     _settingsState.update { it.copy(cover = it.cover.copy(downloadSource = source)) }
+  }
+
+  fun setCoverAnimationStyle(style: PlayingCoverAnimationStyle) {
+    settingPrefs.playingCoverAnimationStyle = style.prefValue
+    _settingsState.update { it.copy(cover = it.cover.copy(coverAnimationStyle = style)) }
+  }
+
+  fun setCoverAnimationSpeed(speed: Float) {
+    settingPrefs.playingCoverAnimationSpeed = speed
+    _settingsState.update { it.copy(cover = it.cover.copy(coverAnimationSpeed = speed)) }
   }
 
   // -------- Lyric 分组 ----------

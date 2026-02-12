@@ -457,6 +457,20 @@
   <string name="now_playing_screen_theme">Follow theme</string>
   <string name="now_playing_screen_cover">Follow album cover</string>
   <string name="now_playing_screen_custom">Custom</string>
+  <string name="now_playing_cover_animation">Cover transition animation</string>
+  <string name="cover_animation_preview_badge">Preview</string>
+  <string name="cover_animation_classic">Classic</string>
+  <string name="cover_animation_desc_classic">Slide with fade and gentle scale.</string>
+  <string name="cover_animation_parallax_push">Parallax push</string>
+  <string name="cover_animation_desc_parallax_push">Incoming and outgoing covers move at different distances.</string>
+  <string name="cover_animation_card_squeeze">Card squeeze</string>
+  <string name="cover_animation_desc_card_squeeze">Edge-anchored horizontal squeeze and unfold.</string>
+  <string name="cover_animation_page_turn">Page turn</string>
+  <string name="cover_animation_desc_page_turn">Page-turn effect around the vertical axis.</string>
+  <string name="cover_animation_slice_stagger">Slice stagger</string>
+  <string name="cover_animation_desc_slice_stagger">Vertical slices shift in staggered timing to complete the transition.</string>
+  <string name="cover_animation_dissolve_zoom">Dissolve zoom</string>
+  <string name="cover_animation_desc_dissolve_zoom">Soft dissolve with a slight zoom out.</string>
 
   <string name="song_list_select_title_format">%1$,d selected</string>
 

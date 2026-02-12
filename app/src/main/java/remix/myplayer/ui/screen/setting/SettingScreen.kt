@@ -47,6 +47,7 @@ import remix.myplayer.ui.screen.setting.logic.play.AutoPlayLogic
 import remix.myplayer.ui.screen.setting.logic.play.IgnoreAudioFocusLogic
 import remix.myplayer.ui.screen.setting.logic.play.PlayFadeLogic
 import remix.myplayer.ui.screen.setting.logic.playingscreen.KeepScreenOnLogic
+import remix.myplayer.ui.screen.setting.logic.playingscreen.PlayingCoverAnimationLogic
 import remix.myplayer.ui.screen.setting.logic.playingscreen.PlayingScreenBackgroundLogic
 import remix.myplayer.ui.screen.setting.logic.playingscreen.PlayingScreenBottomLogic
 import remix.myplayer.ui.theme.LocalTheme
@@ -164,6 +165,8 @@ private fun PlayingScreenPreferences() {
 @Composable
 private fun CoverPreferences() {
   SettingTitle(R.string.cover)
+
+  PlayingCoverAnimationLogic()
 
   IgnoreMediaStoreLogic()
 

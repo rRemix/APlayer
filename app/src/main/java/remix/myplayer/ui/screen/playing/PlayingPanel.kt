@@ -79,16 +79,21 @@ private fun Portrait(isVisible: Boolean) {
               modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)
                 .fillMaxWidth()
-                .aspectRatio(1f)
-                .shadow(elevation = 8.dp)
-                .clip(RoundedCornerShape(8.dp)),
+                .aspectRatio(1f),
               song = playbackState.song
             )
           }
         }
 
         else -> {
-          PlayingLyric(playbackState.song)
+          Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+              .fillMaxSize()
+              .clipToBounds()
+          ) {
+            PlayingLyric(playbackState.song)
+          }
         }
       }
     }
@@ -163,17 +168,25 @@ private fun Landscape() {
     PlayingTopBar(playbackState.song, swatch)
 
     Row(modifier = Modifier.weight(3f)) {
-      Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+      Box(
+        modifier = Modifier
+          .weight(1f)
+          .clipToBounds(),
+        contentAlignment = Alignment.Center
+      ) {
         PlayingCover(
           modifier = Modifier
             .fillMaxHeight()
-            .aspectRatio(1f)
-            .shadow(elevation = 8.dp)
-            .clip(RoundedCornerShape(8.dp)),
+            .aspectRatio(1f),
           song = playbackState.song
         )
       }
-      Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+      Box(
+        modifier = Modifier
+          .weight(1f)
+          .clipToBounds(),
+        contentAlignment = Alignment.Center
+      ) {
         PlayingLyric(playbackState.song)
       }
     }
@@ -183,4 +196,3 @@ private fun Landscape() {
     PlayingControl(Modifier.weight(1f), playbackState, swatch)
   }
 }
-

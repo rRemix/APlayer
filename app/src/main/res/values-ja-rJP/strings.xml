@@ -454,6 +454,20 @@
   <string name="now_playing_screen_theme">テーマに従う</string>
   <string name="now_playing_screen_cover">アルバムカバーに従う</string>
   <string name="now_playing_screen_custom">カスタム</string>
+  <string name="now_playing_cover_animation">カバー切り替えアニメーション</string>
+  <string name="cover_animation_preview_badge">プレビュー</string>
+  <string name="cover_animation_classic">クラシック</string>
+  <string name="cover_animation_desc_classic">スライドにフェードと軽い拡縮を組み合わせます。</string>
+  <string name="cover_animation_parallax_push">パララックスプッシュ</string>
+  <string name="cover_animation_desc_parallax_push">新旧カバーを異なる移動量で切り替えます。</string>
+  <string name="cover_animation_card_squeeze">カードスクイーズ</string>
+  <string name="cover_animation_desc_card_squeeze">横方向の圧縮と展開で、カードが反転するような錯覚を作ります。</string>
+  <string name="cover_animation_page_turn">ページめくり</string>
+  <string name="cover_animation_desc_page_turn">垂直軸を中心に、左右へページをめくるように切り替えます。</string>
+  <string name="cover_animation_slice_stagger">スライススタッガー</string>
+  <string name="cover_animation_desc_slice_stagger">縦スライスを時間差でずらして切り替えます。</string>
+  <string name="cover_animation_dissolve_zoom">ディゾルブズーム</string>
+  <string name="cover_animation_desc_dissolve_zoom">わずかな移動と縮小、柔らかいフェードで切り替えます。</string>
 
   <string name="song_list_select_title_format">%1$,d 曲選択</string>
 

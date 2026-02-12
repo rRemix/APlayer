@@ -454,6 +454,20 @@
   <string name="now_playing_screen_theme">跟随主题</string>
   <string name="now_playing_screen_cover">跟随专辑封面</string>
   <string name="now_playing_screen_custom">自定义</string>
+  <string name="now_playing_cover_animation">封面切换动画</string>
+  <string name="cover_animation_preview_badge">预览</string>
+  <string name="cover_animation_classic">经典滑动</string>
+  <string name="cover_animation_desc_classic">方向滑动，伴随淡入淡出和轻微缩放。</string>
+  <string name="cover_animation_parallax_push">视差推进</string>
+  <string name="cover_animation_desc_parallax_push">新旧封面使用不同滑动距离。</string>
+  <string name="cover_animation_card_squeeze">卡片挤压</string>
+  <string name="cover_animation_desc_card_squeeze">通过横向挤压与展开营造翻牌错觉。</string>
+  <string name="cover_animation_page_turn">水平翻页</string>
+  <string name="cover_animation_desc_page_turn">沿垂直轴做左右翻页效果。</string>
+  <string name="cover_animation_slice_stagger">分片错峰</string>
+  <string name="cover_animation_desc_slice_stagger">将封面分为竖向切片，按错峰节奏位移切换。</string>
+  <string name="cover_animation_dissolve_zoom">溶解缩放</string>
+  <string name="cover_animation_desc_dissolve_zoom">弱位移，配合柔和淡入淡出与轻微缩小。</string>
 
   <string name="song_list_select_title_format">已选择 %1$,d</string>
 

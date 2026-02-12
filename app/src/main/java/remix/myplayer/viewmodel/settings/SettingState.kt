@@ -3,6 +3,7 @@ package remix.myplayer.viewmodel.settings
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import remix.myplayer.data.model.misc.LyricOrder
+import remix.myplayer.ui.screen.playing.PlayingCoverAnimationStyle
 
 @Stable
 data class CommonSettings(
@@ -67,6 +68,8 @@ data class CoverSettings(
   val ignoreMediaStore: Boolean,
   val autoDownloadCover: Int,
   val downloadSource: Int,
+  val coverAnimationStyle: PlayingCoverAnimationStyle,
+  val coverAnimationSpeed: Float,
 )
 
 @Stable
