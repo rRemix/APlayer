@@ -52,7 +52,8 @@ fun AppScaffold(content: @Composable () -> Unit) {
             DraggableAnchors {
               PlayingScreenValue.Hidden at newHeight
               PlayingScreenValue.Expanded at 0f
-            }
+            },
+            newTarget = playingScreenState.currentValue
           )
         }
       }
