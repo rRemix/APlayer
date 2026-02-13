@@ -192,7 +192,7 @@ class LyricManager @Inject constructor(
     get() = lyricPrefs.statusBarLyricEnabled
     set(value) {
       lyricPrefs.statusBarLyricEnabled = value
-      // TODO: remove existing (but how?)
+      updateStatusBarLyric()
     }
 
   @UiThread
@@ -398,6 +398,7 @@ class LyricManager @Inject constructor(
           updateProgress()
         }
       }
+      updateStatusBarLyric()
       ensureDesktopLyric()
     }
   private var progress: Long = 0
@@ -418,13 +419,26 @@ class LyricManager @Inject constructor(
   // For status bar lyrics
   private var currentLyricsLine: String = ""
     set(value) {
-      if (value != field && isStatusBarLyricEnabled) {
-        MusicServiceRemote.service?.run {
-          field = value
-          updateNotificationWithLrc(value)
-        }
+      if (value == field) {
+        return
       }
+      field = value
+      updateStatusBarLyric()
     }
+
+  private fun updateStatusBarLyric() {
+    val service = MusicServiceRemote.service ?: return
+    val lyricLine = currentLyricsLine
+    val shouldShow = isStatusBarLyricEnabled && isPlaying &&
+        lyricLine.isNotBlank() &&
+        lyricLine != LyricLine.LYRICS_LINE_NO_LRC.content
+
+    if (shouldShow) {
+      service.updateNotificationWithLrc(lyricLine)
+    } else {
+      service.clearStatusBarLyricNotification()
+    }
+  }
 
   private val updateMutex = Mutex()
   private var updateLyricsJob: Job? = null

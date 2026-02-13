@@ -1135,6 +1135,10 @@ class MusicService : BaseService(),
     notify.updateWithLyric(lrc)
   }
 
+  fun clearStatusBarLyricNotification() {
+    notify.clearStatusBarLyricNotification()
+  }
+
   /**
    * 接受控制命令 包括暂停、播放、上下首、改版播放模式等
    */

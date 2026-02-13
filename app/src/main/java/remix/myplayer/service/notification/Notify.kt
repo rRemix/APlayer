@@ -106,6 +106,10 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     notificationManager.notify(STATUS_BAR_LYRIC_NOTIFICATION_ID, notification)
   }
 
+  fun clearStatusBarLyricNotification() {
+    notificationManager.cancel(STATUS_BAR_LYRIC_NOTIFICATION_ID)
+  }
+
   var isForeground = false
     private set
 
@@ -155,6 +159,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
     Timber.v("stopForegroundAndNotification")
     ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
     notificationManager.cancel(PLAYING_NOTIFICATION_ID)
+    clearStatusBarLyricNotification()
     isForeground = false
     isNotifyShowing = false
   }
