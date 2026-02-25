@@ -27,11 +27,13 @@ fun PrimaryColorLogic() {
     state.show()
   }
 
-  var primaryColor by remember {
+  var primaryColor by remember(state.isOpen) {
     mutableStateOf(settingState.color.primaryColor)
   }
+
   ColorDialog(
     dialogState = state,
+    titleRes = R.string.primary_color,
     initialColor = primaryColor,
     onColorChange = {
       primaryColor = it

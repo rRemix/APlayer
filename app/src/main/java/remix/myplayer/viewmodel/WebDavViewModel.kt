@@ -13,12 +13,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import remix.myplayer.R
 import remix.myplayer.data.db.room.entity.WebDav
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.repo.WebDavRepository
 import remix.myplayer.repo.usecase.FetchMetaDataUseCase
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.runWithLoading
+import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.state.DataUiState
 import remix.myplayer.util.ext.isAudio
 import remix.myplayer.util.ext.updateIf
@@ -34,7 +36,8 @@ class WebDavViewModel @Inject constructor(
   private val _webDavList = MutableStateFlow<List<WebDav>>(emptyList())
   val webDavList: StateFlow<List<WebDav>> = _webDavList.asStateFlow()
 
-  private val _webDavResState = MutableStateFlow<DataUiState<List<DavResource>>>(DataUiState.Loading())
+  private val _webDavResState =
+    MutableStateFlow<DataUiState<List<DavResource>>>(DataUiState.Loading())
   val webDavResState: StateFlow<DataUiState<List<DavResource>>> = _webDavResState.asStateFlow()
 
   init {
@@ -56,7 +59,8 @@ class WebDavViewModel @Inject constructor(
         _webDavResState.value = DataUiState.Error(e)
         return@launch
       }
-      _webDavResState.value = DataUiState.Success(resources.drop(1).filter { it.isAudio() || it.isDirectory })
+      _webDavResState.value =
+        DataUiState.Success(resources.drop(1).filter { it.isAudio() || it.isDirectory })
     }
   }
 
@@ -81,9 +85,12 @@ class WebDavViewModel @Inject constructor(
       }
       if (davResources.isNotEmpty()) {
         webDavRepository.insertOrReplace(webdav)
+      } else {
+        MessageNotifier.show(R.string.add_error)
       }
     } catch (e: Exception) {
       Timber.e(e)
+      MessageNotifier.show(e.localizedMessage ?: "Save failed")
     }
   }
 

@@ -1,5 +1,6 @@
 package remix.myplayer.ui.dialog
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
@@ -42,6 +44,7 @@ import remix.myplayer.util.ext.toHexString
 fun ColorDialog(
   dialogState: DialogState,
   initialColor: Color,
+  titleRes: Int,
   onDismissRequest: (() -> Unit)? = {},
   onColorChange: (Color) -> Unit,
   onPositive: () -> Unit
@@ -49,13 +52,13 @@ fun ColorDialog(
   NormalDialog(
     dialogState = dialogState,
     onDismissRequest = onDismissRequest,
-    titleRes = R.string.custom,
+    titleRes = titleRes,
     positiveRes = R.string.confirm,
     onPositive = onPositive,
 
     custom = {
       val theme = LocalTheme.current
-      var text by remember {
+      var text by remember(initialColor) {
         mutableStateOf(initialColor.toHexString())
       }
 
@@ -78,9 +81,9 @@ fun ColorDialog(
           val interactionSource = remember { MutableInteractionSource() }
           BasicTextField(
             value = text,
-            onValueChange = {
-              text = it.filter {
-                it.isDigit() || it in 'a'..'f' || it in 'A'..'F'
+            onValueChange = { input ->
+              text = input.filter { char ->
+                char.isDigit() || char in 'a'..'f' || char in 'A'..'F'
               }
                 .take(6)
                 .uppercase()

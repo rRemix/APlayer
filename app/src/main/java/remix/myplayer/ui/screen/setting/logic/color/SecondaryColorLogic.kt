@@ -28,11 +28,13 @@ fun SecondaryColorLogic() {
     state.show()
   }
 
-  var secondaryColor by remember {
+  var secondaryColor by remember(state.isOpen) {
     mutableStateOf(settingState.color.secondaryColor)
   }
+
   ColorDialog(
     dialogState = state,
+    titleRes = R.string.accent_color,
     initialColor = secondaryColor,
     onColorChange = {
       secondaryColor = it
