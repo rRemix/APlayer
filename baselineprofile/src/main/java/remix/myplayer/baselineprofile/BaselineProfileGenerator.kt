@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
@@ -67,7 +68,8 @@ class BaselineProfileGenerator {
       scrollSongScreen()
       openAlbumScreen()
       scrollAlbumScreen()
-      openPlayingScreen()
+      openPlayingPanel()
+      playNextThenDelay()
       if (device.displayHeight > device.displayWidth) {
         swipeToPlayingLyric()
       }
@@ -77,10 +79,12 @@ class BaselineProfileGenerator {
 }
 
 private const val DEFAULT_WAIT = 5_000L
-private const val SLEEP = 2_000L
+private const val SWIPE_STEPS = 20
+private const val NEXT_TO_LYRIC_DELAY_MS = 1_000L
 
 private fun MacrobenchmarkScope.waitForHomeContent() {
-  device.wait(Until.hasObject(By.desc("BottomBar")), DEFAULT_WAIT)
+  waitForObject("BottomBar")
+  waitForObject("PlayPause")
   device.waitForIdle()
 }
 
@@ -88,61 +92,84 @@ private fun MacrobenchmarkScope.scrollSongScreen() {
   val width = device.displayWidth / 2
   val startY = (device.displayHeight * 0.85f).toInt()
   val endY = (device.displayHeight * 0.15f).toInt()
-  device.swipe(width, startY, width, endY, /*steps=*/ 20)
-  SystemClock.sleep(SLEEP)
+  device.swipe(width, startY, width, endY, SWIPE_STEPS)
+  device.waitForIdle()
 }
 
-private fun MacrobenchmarkScope.openPlayingScreen() {
-  device.findObject(By.desc("PlayPause")).click()
+private fun MacrobenchmarkScope.openPlayingPanel() {
+  waitForObject("PlayPause").click()
+  device.waitForIdle()
 
-  SystemClock.sleep(SLEEP)
-  device.findObject(By.desc("BottomBar")).click()
-  device.wait(Until.hasObject(By.desc("PlayingBack")), DEFAULT_WAIT)
+  waitForObject("BottomBar").click()
+  check(device.wait(Until.hasObject(By.desc("PlayingBack")), DEFAULT_WAIT)) {
+    "Failed to open playing panel from BottomBar. Ensure the test device has at least one playable local song."
+  }
+  device.waitForIdle()
+}
+
+private fun MacrobenchmarkScope.playNextThenDelay() {
+  waitForObject("PlayingNext").click()
+  device.waitForIdle()
+  SystemClock.sleep(NEXT_TO_LYRIC_DELAY_MS)
 }
 
 private fun MacrobenchmarkScope.openAlbumScreen() {
   val startX = (device.displayWidth * 0.8f).toInt()
   val endX = (device.displayWidth * 0.2f).toInt()
   val y = device.displayHeight / 2
-  device.swipe(startX, y, endX, y, /*steps=*/ 20)
+  device.swipe(startX, y, endX, y, SWIPE_STEPS)
+  device.waitForIdle()
 }
 
 private fun MacrobenchmarkScope.scrollAlbumScreen() {
   val width = device.displayWidth / 2
   val startY = (device.displayHeight * 0.85f).toInt()
   val endY = (device.displayHeight * 0.15f).toInt()
-  device.swipe(width, startY, width, endY, /*steps=*/ 20)
-
-  SystemClock.sleep(SLEEP)
+  device.swipe(width, startY, width, endY, SWIPE_STEPS)
+  device.waitForIdle()
 }
 
 private fun MacrobenchmarkScope.swipeToPlayingLyric() {
   val startX = (device.displayWidth * 0.8f).toInt()
   val endX = (device.displayWidth * 0.2f).toInt()
   val y = device.displayHeight / 2
-  device.swipe(startX, y, endX, y, /*steps=*/ 20)
+  device.swipe(startX, y, endX, y, SWIPE_STEPS)
+  device.waitForIdle()
 }
 
 private fun MacrobenchmarkScope.grantPermissions(packageName: String) {
-  when {
+  val permissions = when {
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
       listOf(
-        Manifest.permission.READ_MEDIA_AUDIO,
-        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.READ_MEDIA_AUDIO to true,
+        Manifest.permission.POST_NOTIFICATIONS to true,
       )
     }
 
     Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q -> {
       listOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.READ_EXTERNAL_STORAGE to true,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE to false,
       )
     }
 
     else -> {
-      listOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+      listOf(Manifest.permission.READ_EXTERNAL_STORAGE to true)
     }
-  }.forEach { perm ->
-    device.executeShellCommand("pm grant $packageName $perm")
   }
+
+  permissions.forEach { (permission, required) ->
+    val output = device.executeShellCommand("pm grant $packageName $permission").trim()
+    check(!required || output.isEmpty()) {
+      "Failed to grant required permission $permission for $packageName. shell output: $output"
+    }
+  }
+}
+
+private fun MacrobenchmarkScope.waitForObject(
+  contentDescription: String,
+  timeoutMs: Long = DEFAULT_WAIT
+): UiObject2 {
+  return device.wait(Until.findObject(By.desc(contentDescription)), timeoutMs)
+    ?: throw AssertionError("Timed out waiting for object with contentDescription=$contentDescription")
 }
