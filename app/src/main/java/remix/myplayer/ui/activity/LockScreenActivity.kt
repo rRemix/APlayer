@@ -146,9 +146,8 @@ class LockScreenActivity : BaseMusicActivity() {
 //  }
 //
 //  override fun finish() {
-//    super.finish()
-//    overridePendingTransition(0, R.anim.cover_right_out)
-//  }
+  //    super.finish()
+  //  }
 }
 
 @Composable

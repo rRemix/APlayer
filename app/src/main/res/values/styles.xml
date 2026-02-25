@@ -2,14 +2,9 @@
 
   <style name="Theme.APlayer" parent="@style/Theme.APlayer.Base" tools:ignore="ResourceCycle"/>
 
-  <style name="Theme.APlayer.Dark" parent="@style/Theme.APlayer.Base.Dark"/>
+  <style name="Theme.APlayer.Notification" parent="TextAppearance.Compat.Notification" />
 
-  <style name="Theme.APlayer.Black" parent="@style/Theme.APlayer.Base.Black"/>
-
-
-  <style name="Theme.APlayer.Notification" parent="@android:style/TextAppearance.StatusBar.EventContent" />
-
-  <style name="Theme.APlayer.Notification.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title" />
+  <style name="Theme.APlayer.Notification.Title" parent="TextAppearance.Compat.Notification.Title" />
 
   <!-- Base application theme. -->
 
@@ -17,12 +12,7 @@
     <!-- Customize your theme here. -->
     <item name="colorPrimary">@color/transparent</item>
     <item name="colorPrimaryDark">@color/transparent</item>
-    <item name="editTextStyle">@style/EditTextStyle</item>
   </style>
-
-  <style name="EditTextStyle" parent="@style/Widget.AppCompat.EditText">
-  </style>
-
 
   <style name="AppTheme.NoActionBar">
     <item name="windowActionBar">false</item>
@@ -35,43 +25,6 @@
     <item name="android:windowIsTranslucent">true</item>
   </style>
 
-  <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
-  <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
-
-  <style name="PlayerActivityStyle" parent="@style/AppTheme">
-<!--    <item name="android:windowIsTranslucent">true</item>-->
-<!--    <item name="android:windowBackground">@color/transparent</item>-->
-    <item name="android:windowAnimationStyle">@style/PlayerActivityAnim</item>
-  </style>
-
-  <style name="PlayerActivityStyle.Black" parent="@style/Theme.APlayer.Black">
-<!--    <item name="android:windowIsTranslucent">true</item>-->
-<!--    <item name="android:windowBackground">@color/transparent</item>-->
-    <item name="android:windowAnimationStyle">@style/PlayerActivityAnim</item>
-  </style>
-
-  <style name="PlayerActivityStyle.Dark" parent="@style/Theme.APlayer.Dark">
-    <item name="android:windowIsTranslucent">true</item>
-    <item name="android:windowBackground">@color/transparent</item>
-    <item name="android:windowAnimationStyle">@style/PlayerActivityAnim</item>
-  </style>
-
-  <style name="PlayerActivityAnim" >
-    <item name="android:windowEnterAnimation">@anim/audio_in</item>
-    <item name="android:windowExitAnimation">@anim/audio_out</item>
-  </style>
-
-  <style name="DialogAnimBottom" parent="@android:style/Animation">
-    <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
-    <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
-  </style>
-
-  <style name="DialogAnimPopup">
-    <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
-    <item name="android:windowExitAnimation">@android:anim/fade_out</item>
-  </style>
-
   <!--锁屏-->
   <style name="LockScreenActivity" parent="AppTheme.NoActionBar.Translucent">
     <item name="android:windowFrame">@null</item>
@@ -82,25 +35,11 @@
     <item name="android:backgroundDimEnabled">true</item>
   </style>
 
-  <style name="AnimActivity">
-    <item name="android:activityOpenExitAnimation">@anim/slide_left_out</item>
-    <item name="android:activityOpenEnterAnimation">@anim/slide_left_in</item>
-    <item name="android:activityCloseExitAnimation">@anim/slide_right_out</item>
-    <item name="android:activityCloseEnterAnimation">@anim/slide_right_in</item>
-  </style>
-
-  <style name="ActivityStyle" parent="@style/AppTheme">
-    <item name="android:windowAnimationStyle">@style/AnimActivity</item>
-  </style>
-
-
-  <style name="AppShortcut" parent="ActivityStyle">
+  <style name="AppShortcut" parent="AppTheme">
     <item name="android:windowBackground">@android:color/transparent</item>
     <item name="android:colorBackgroundCacheHint">@null</item>
     <item name="android:windowIsTranslucent">true</item>
-    <item name="android:windowAnimationStyle">@android:style/Animation</item>
-    <item name="android:windowNoTitle">true</item>
-    <item name="android:windowContentOverlay">@null</item>
+    <item name="android:windowAnimationStyle">@null</item>
   </style>
 
 

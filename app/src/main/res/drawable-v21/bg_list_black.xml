@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:state_selected="true" android:drawable="@drawable/bg_list_selected_dark"/>
-  <item>
-    <ripple android:color="?android:attr/colorControlHighlight">
-      <item android:drawable="@drawable/bg_list_default_black"/>
-    </ripple>
-  </item>
-</selector>

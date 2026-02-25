@@ -84,6 +84,7 @@ fun Preference(
   onClick: () -> Unit,
   title: String,
   content: String? = null,
+  leading: (@Composable (() -> Unit))? = null,
   trailing: (@Composable (() -> Unit))? = null
 ) {
   Row(
@@ -96,6 +97,8 @@ fun Preference(
       .background(color = LocalTheme.current.mainBackground, shape = RectangleShape)
       .padding(horizontal = 16.dp, vertical = 10.dp),
     verticalAlignment = Alignment.CenterVertically) {
+    leading?.invoke()
+
     Column(
       modifier = Modifier
         .padding(end = 16.dp)

@@ -52,7 +52,6 @@ import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteHistory
 import remix.myplayer.ui.nav.RouteLastAdded
 import remix.myplayer.ui.nav.RouteSetting
-import remix.myplayer.ui.nav.RouteSupport
 import remix.myplayer.ui.theme.AppTheme
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
@@ -62,12 +61,10 @@ import remix.myplayer.util.ext.isPortraitOrientation
 import remix.myplayer.viewmodel.PlaybackViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 
-// 非谷歌才展示支持开发者
 private val drawerTitles = mutableListOf(
   R.string.drawer_song,
   R.string.drawer_history,
   R.string.drawer_recently_add,
-  R.string.support_develop,
   R.string.drawer_setting,
   R.string.exit
 )
@@ -76,7 +73,6 @@ private val drawerIcons = mutableListOf(
   R.drawable.ic_library_music_24dp,
   R.drawable.ic_history_24dp,
   R.drawable.ic_recent_24dp,
-  R.drawable.ic_favorite_24dp,
   R.drawable.ic_settings_24dp,
   R.drawable.ic_exit_to_app_24dp
 )
@@ -164,19 +160,17 @@ fun Drawer(drawerState: DrawerState, vm: PlaybackViewModel = playbackViewModel) 
           },
           selected = index == 0,
           onClick = {
-            when (index) {
+            when (item) {
               // 歌曲库
-              0 -> scope.launch { drawerState.close() }
+              R.string.drawer_song -> scope.launch { drawerState.close() }
               // 历史
-              1 -> navController.navigate(RouteHistory)
+              R.string.drawer_history -> navController.navigate(RouteHistory)
               // 最近添加
-              2 -> navController.navigate(RouteLastAdded)
-              // 捐赠
-              3 -> navController.navigate(RouteSupport)
+              R.string.drawer_recently_add -> navController.navigate(RouteLastAdded)
               // 设置
-              4 -> navController.navigate(RouteSetting)
-              // 退出（索引随渠道差异调整）
-              5 -> {
+              R.string.drawer_setting -> navController.navigate(RouteSetting)
+              // 退出
+              R.string.exit -> {
                 context.sendBroadcast(
                   Intent(Constants.ACTION_EXIT)
                     .setComponent(ComponentName(context, ExitReceiver::class.java))

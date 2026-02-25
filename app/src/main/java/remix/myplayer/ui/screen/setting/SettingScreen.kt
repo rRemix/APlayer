@@ -1,20 +1,23 @@
 package remix.myplayer.ui.screen.setting
 
 import androidx.activity.compose.LocalActivity
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteAbout
+import remix.myplayer.ui.nav.RouteSettingDetail
 import remix.myplayer.ui.screen.setting.logic.color.BlackThemeLogic
 import remix.myplayer.ui.screen.setting.logic.color.ColoredNaviBarLogic
 import remix.myplayer.ui.screen.setting.logic.color.DarkThemeLogic
@@ -42,7 +45,6 @@ import remix.myplayer.ui.screen.setting.logic.lyric.StatusBarLyricLogic
 import remix.myplayer.ui.screen.setting.logic.notification.ClassicNotifyLogic
 import remix.myplayer.ui.screen.setting.logic.notification.NotifyBackgroundLogic
 import remix.myplayer.ui.screen.setting.logic.other.ClearCacheLogic
-import remix.myplayer.ui.screen.setting.logic.other.FeedbackLogic
 import remix.myplayer.ui.screen.setting.logic.play.AutoPlayLogic
 import remix.myplayer.ui.screen.setting.logic.play.IgnoreAudioFocusLogic
 import remix.myplayer.ui.screen.setting.logic.play.PlayFadeLogic
@@ -60,38 +62,123 @@ fun SettingScreen() {
     topBar = { CommonAppBar(title = stringResource(R.string.setting), actions = emptyList()) },
     containerColor = LocalTheme.current.mainBackground,
   ) { contentPadding ->
-
     LazyColumn(
-      modifier = Modifier
-        .padding(contentPadding)
+      modifier = Modifier.padding(contentPadding)
     ) {
       item {
-        CommonPreferences()
+        val nav = LocalNavController.current
 
-        PlayPreferences()
-
-        ColorPreferences()
-
-        LibraryPreferences()
-
-        PlayingScreenPreferences()
-
-        CoverPreferences()
-
-        LyricPreferences()
-
-        NotificationPreferences()
-
-        OtherPreferences()
+        SettingCategory.entries.forEach { category ->
+          SettingCategoryPreference(
+            iconRes = category.iconRes,
+            titleRes = category.titleRes,
+            descriptionRes = category.descriptionRes,
+          ) {
+            nav.navigate(settingDetailRoute(category.route))
+          }
+        }
       }
     }
   }
 }
 
 @Composable
-private fun CommonPreferences() {
-  SettingTitle(R.string.common)
+fun SettingDetailScreen(categoryKey: String) {
+  val category = SettingCategory.fromRoute(categoryKey) ?: return
 
+  Scaffold(
+    topBar = { CommonAppBar(title = stringResource(category.titleRes), actions = emptyList()) },
+    containerColor = LocalTheme.current.mainBackground,
+  ) { contentPadding ->
+    LazyColumn(
+      modifier = Modifier.padding(contentPadding)
+    ) {
+      item {
+        when (category) {
+          SettingCategory.Common -> CommonPreferenceItems()
+          SettingCategory.Play -> PlayPreferenceItems()
+          SettingCategory.Color -> ColorPreferenceItems()
+          SettingCategory.Library -> LibraryPreferenceItems()
+          SettingCategory.PlayingScreen -> PlayingScreenPreferenceItems()
+          SettingCategory.Cover -> CoverPreferenceItems()
+          SettingCategory.Lyric -> LyricPreferenceItems()
+          SettingCategory.Notification -> NotificationPreferenceItems()
+          SettingCategory.Other -> OtherPreferenceItems()
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun SettingCategoryPreference(
+  @DrawableRes iconRes: Int,
+  @StringRes titleRes: Int,
+  @StringRes descriptionRes: Int,
+  onClick: () -> Unit,
+) {
+  val title = stringResource(titleRes)
+  Preference(
+    onClick = onClick,
+    title = stringResource(titleRes),
+    content = stringResource(descriptionRes),
+    leading = {
+      Icon(
+        modifier = Modifier.padding(end = 24.dp),
+        painter = painterResource(iconRes),
+        contentDescription = title,
+        tint = LocalTheme.current.primary
+      )
+    }
+  )
+}
+
+private fun settingDetailRoute(categoryRoute: String): String {
+  return "$RouteSettingDetail/$categoryRoute"
+}
+
+private enum class SettingCategory(
+  @get:DrawableRes val iconRes: Int,
+  @get:StringRes val titleRes: Int,
+  @get:StringRes val descriptionRes: Int,
+  val route: String,
+) {
+
+  Common(R.drawable.ic_tune_24dp, R.string.common, R.string.setting_common_desc, "common"),
+  Play(R.drawable.ic_play_arrow_black_24dp, R.string.play, R.string.setting_play_desc, "play"),
+  Color(R.drawable.ic_palette_24dp, R.string.color, R.string.setting_color_desc, "color"),
+  Library(
+    R.drawable.ic_library_books_24dp,
+    R.string.library,
+    R.string.setting_library_desc,
+    "library"
+  ),
+  PlayingScreen(
+    R.drawable.ic_smart_display_24dp,
+    R.string.playing_screen,
+    R.string.setting_playing_screen_desc,
+    "playing_screen"
+  ),
+  Cover(R.drawable.ic_album_24dp, R.string.cover, R.string.setting_cover_desc, "cover"),
+  Lyric(R.drawable.ic_lyrics_24dp, R.string.lrc, R.string.setting_lyric_desc, "lyric"),
+  Notification(
+    R.drawable.ic_notification_sound_24dp,
+    R.string.notify,
+    R.string.setting_notification_desc,
+    "notification"
+  ),
+  Other(R.drawable.ic_info_outlined_24dp, R.string.other, R.string.setting_other_desc, "other");
+
+  companion object {
+
+    fun fromRoute(route: String): SettingCategory? {
+      return entries.firstOrNull { it.route == route }
+    }
+  }
+}
+
+@Composable
+private fun CommonPreferenceItems() {
   ScanSizeLogic()
 
   BlackListLogic()
@@ -116,9 +203,7 @@ private fun CommonPreferences() {
 }
 
 @Composable
-private fun PlayPreferences() {
-  SettingTitle(R.string.play)
-
+private fun PlayPreferenceItems() {
   IgnoreAudioFocusLogic()
 
   BreakPointLogic()
@@ -129,9 +214,7 @@ private fun PlayPreferences() {
 }
 
 @Composable
-private fun ColorPreferences() {
-  SettingTitle(R.string.color)
-
+private fun ColorPreferenceItems() {
   DarkThemeLogic()
 
   BlackThemeLogic()
@@ -145,16 +228,12 @@ private fun ColorPreferences() {
 }
 
 @Composable
-private fun LibraryPreferences() {
-  SettingTitle(R.string.library)
-
+private fun LibraryPreferenceItems() {
   LibraryLogic()
 }
 
 @Composable
-private fun PlayingScreenPreferences() {
-  SettingTitle(R.string.playing_screen)
-
+private fun PlayingScreenPreferenceItems() {
   PlayingScreenBackgroundLogic()
 
   PlayingScreenBottomLogic()
@@ -163,9 +242,7 @@ private fun PlayingScreenPreferences() {
 }
 
 @Composable
-private fun CoverPreferences() {
-  SettingTitle(R.string.cover)
-
+private fun CoverPreferenceItems() {
   PlayingCoverAnimationLogic()
 
   IgnoreMediaStoreLogic()
@@ -176,18 +253,14 @@ private fun CoverPreferences() {
 }
 
 @Composable
-private fun NotificationPreferences() {
-  SettingTitle(R.string.notify)
-
+private fun NotificationPreferenceItems() {
   ClassicNotifyLogic()
 
   NotifyBackgroundLogic()
 }
 
 @Composable
-private fun LyricPreferences() {
-  SettingTitle(R.string.lrc)
-
+private fun LyricPreferenceItems() {
   DesktopLyricLogic()
 
   StatusBarLyricLogic()
@@ -196,9 +269,7 @@ private fun LyricPreferences() {
 }
 
 @Composable
-private fun OtherPreferences() {
-  SettingTitle(R.string.other)
-
+private fun OtherPreferenceItems() {
   val mainViewModel = mainViewModel
   val activity = LocalActivity.current
   val nav = LocalNavController.current
@@ -206,8 +277,6 @@ private fun OtherPreferences() {
   ArrowPreference(R.string.eq_setting) {
     EQHelper.startEqualizer(activity ?: return@ArrowPreference, nav)
   }
-
-  FeedbackLogic()
 
   ArrowPreference(R.string.about_info) {
     nav.navigate(RouteAbout)
@@ -220,14 +289,4 @@ private fun OtherPreferences() {
   }
 
   ClearCacheLogic()
-}
-
-@Composable
-private fun SettingTitle(res: Int) {
-  Text(
-    modifier = Modifier.padding(14.dp),
-    text = stringResource(res),
-    fontSize = 16.sp,
-    color = LocalTheme.current.secondary
-  )
 }

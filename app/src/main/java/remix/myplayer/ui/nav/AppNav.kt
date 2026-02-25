@@ -56,6 +56,7 @@ import remix.myplayer.ui.screen.crop.CropScreen
 import remix.myplayer.ui.screen.detail.DetailScreen
 import remix.myplayer.ui.screen.history.HistoryScreen
 import remix.myplayer.ui.screen.home.HomeScreen
+import remix.myplayer.ui.screen.setting.SettingDetailScreen
 import remix.myplayer.ui.screen.setting.SettingScreen
 import remix.myplayer.ui.screen.smb.SmbDetailScreen
 import remix.myplayer.ui.screen.webdav.WebDavDetailScreen
@@ -67,6 +68,7 @@ import kotlin.reflect.typeOf
 
 const val RouteHome = "home"
 const val RouteSetting = "setting"
+const val RouteSettingDetail = "setting_detail"
 const val RouteSongChoose = "song_choose"
 const val RouteAbout = "about"
 const val RouteCustomSort = "custom_sort"
@@ -98,6 +100,14 @@ fun AppNav() {
 
           normalAnimatedScreen(RouteSetting) {
             SettingScreen()
+          }
+
+          normalAnimatedScreen(
+            "$RouteSettingDetail/{category}",
+            arguments = listOf(navArgument("category") { type = NavType.StringType })
+          ) {
+            val category = it.arguments?.getString("category") ?: return@normalAnimatedScreen
+            SettingDetailScreen(category)
           }
 
           normalAnimatedScreen(

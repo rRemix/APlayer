@@ -1,5 +1,0 @@
-<translate
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:fromXDelta="0"
-  android:toXDelta="100%p"
-  android:duration="@integer/LockScreenRightOutDuration"/>
