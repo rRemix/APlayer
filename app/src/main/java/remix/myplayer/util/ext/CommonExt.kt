@@ -28,6 +28,10 @@ fun Context.isPortraitOrientation(): Boolean {
   return orientation == Configuration.ORIENTATION_PORTRAIT
 }
 
+fun Context.isTablet(): Boolean {
+  return resources.configuration.smallestScreenWidthDp >= 600
+}
+
 fun CoroutineScope.tryLaunch(
   context: CoroutineContext = EmptyCoroutineContext,
   start: CoroutineStart = CoroutineStart.DEFAULT,

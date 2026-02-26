@@ -1,6 +1,5 @@
 package remix.myplayer.ui.dialog
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,10 +25,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
@@ -37,6 +38,8 @@ import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.LineSlider
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.defaultLineSliderProperties
+import remix.myplayer.util.ext.isPortraitOrientation
+import remix.myplayer.util.ext.isTablet
 import remix.myplayer.util.ext.toHexString
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,36 +52,32 @@ fun ColorDialog(
   onColorChange: (Color) -> Unit,
   onPositive: () -> Unit
 ) {
+  val isLandscape = !LocalContext.current.isPortraitOrientation()
+  val isTablet = LocalContext.current.isTablet()
+
   NormalDialog(
     dialogState = dialogState,
     onDismissRequest = onDismissRequest,
     titleRes = titleRes,
     positiveRes = R.string.confirm,
     onPositive = onPositive,
-
+    usePlatformDefaultWidth = !isLandscape,
     custom = {
       val theme = LocalTheme.current
       var text by remember(initialColor) {
         mutableStateOf(initialColor.toHexString())
       }
+      val interactionSource = remember { MutableInteractionSource() }
 
-      Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
-          modifier = Modifier
-            .padding(top = 24.dp)
-            .fillMaxWidth()
-            .height(120.dp)
-            .background(initialColor)
-        )
-
+      @Composable
+      fun ColorTextInput(modifier: Modifier = Modifier) {
         Row(
-          modifier = Modifier.padding(top = 24.dp),
+          modifier = modifier,
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.Center
         ) {
           TextPrimary("#", modifier = Modifier.padding(end = 6.dp))
 
-          val interactionSource = remember { MutableInteractionSource() }
           BasicTextField(
             value = text,
             onValueChange = { input ->
@@ -118,14 +117,64 @@ fun ColorDialog(
         }
       }
 
-      SliderWithText(ColorSpace.Red, initialColor) {
-        onColorChange(initialColor.copy(red = it))
-      }
-      SliderWithText(ColorSpace.Green, initialColor) {
-        onColorChange(initialColor.copy(green = it))
-      }
-      SliderWithText(ColorSpace.Blue, initialColor) {
-        onColorChange(initialColor.copy(blue = it))
+      if (isLandscape) {
+        Row(
+          modifier = Modifier
+            .fillMaxWidth()
+            .then(
+              if (isTablet) Modifier.height(180.dp)
+              else Modifier.weight(1f)
+            ),
+          horizontalArrangement = Arrangement.spacedBy(16.dp),
+          verticalAlignment = Alignment.Top
+        ) {
+          Box(
+            modifier = Modifier
+              .weight(0.45f)
+              .fillMaxHeight()
+              .background(initialColor)
+          )
+
+          Column(
+            modifier = Modifier
+              .weight(0.55f)
+              .fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceBetween
+          ) {
+            ColorTextInput()
+            val sliderHeight = if (isTablet) 36.dp else 16.dp
+            SliderWithText(ColorSpace.Red, initialColor, sliderHeight) {
+              onColorChange(initialColor.copy(red = it))
+            }
+            SliderWithText(ColorSpace.Green, initialColor, sliderHeight) {
+              onColorChange(initialColor.copy(green = it))
+            }
+            SliderWithText(ColorSpace.Blue, initialColor, sliderHeight) {
+              onColorChange(initialColor.copy(blue = it))
+            }
+          }
+        }
+      } else {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+          Box(
+            modifier = Modifier
+              .padding(top = 24.dp)
+              .fillMaxWidth()
+              .height(120.dp)
+              .background(initialColor)
+          )
+          ColorTextInput(modifier = Modifier.padding(top = 24.dp))
+        }
+
+        SliderWithText(ColorSpace.Red, initialColor) {
+          onColorChange(initialColor.copy(red = it))
+        }
+        SliderWithText(ColorSpace.Green, initialColor) {
+          onColorChange(initialColor.copy(green = it))
+        }
+        SliderWithText(ColorSpace.Blue, initialColor) {
+          onColorChange(initialColor.copy(blue = it))
+        }
       }
     }
   )
@@ -146,7 +195,12 @@ enum class ColorSpace(val text: String) {
 }
 
 @Composable
-private fun SliderWithText(space: ColorSpace, color: Color, onValueChange: (Float) -> Unit) {
+private fun SliderWithText(
+  space: ColorSpace,
+  color: Color,
+  height: Dp = 36.dp,
+  onValueChange: (Float) -> Unit
+) {
   Row(
     modifier = Modifier,
     verticalAlignment = Alignment.CenterVertically,
@@ -158,7 +212,7 @@ private fun SliderWithText(space: ColorSpace, color: Color, onValueChange: (Floa
       onValueChange = onValueChange,
       modifier = Modifier
         .padding(horizontal = 12.dp)
-        .height(36.dp)
+        .height(height)
         .weight(1f),
       properties = defaultLineSliderProperties.copy(
         trackProgressColor = color,

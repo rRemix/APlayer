@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -26,6 +27,7 @@ internal fun BaseDialog(
   onDismissRequest: (() -> Unit)?,
   onDismiss: (() -> Unit)? = null,
   cancelOutside: Boolean = true,
+  usePlatformDefaultWidth: Boolean = true,
   content: @Composable () -> Unit,
 ) {
   if (!show) {
@@ -38,13 +40,15 @@ internal fun BaseDialog(
       Timber.v("BaseDialog onDismissRequest")
       onDismissRequest?.invoke()
     }, properties = DialogProperties(
-      cancelOutside, cancelOutside
+      dismissOnBackPress = cancelOutside,
+      dismissOnClickOutside = cancelOutside,
+      usePlatformDefaultWidth = usePlatformDefaultWidth
     )
   ) {
-    BoxWithConstraints {
+    BoxWithConstraints(contentAlignment = Alignment.Center) {
       Surface(
         modifier = Modifier
-          .fillMaxWidth()
+          .fillMaxWidth(if (usePlatformDefaultWidth) 1f else 0.8f)
           .heightIn(max = maxHeight * 0.8f),
         color = LocalTheme.current.dialogBackground,
         shape = RoundedCornerShape(12.dp),

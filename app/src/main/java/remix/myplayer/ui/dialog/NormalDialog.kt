@@ -59,7 +59,8 @@ fun NormalDialog(
   onDismiss: (() -> Unit)? = null,
   itemsCallback: ItemsCallback? = null,
   itemsCallbackSingleChoice: ItemsCallbackSingleChoice? = null,
-  itemsCallbackMultiChoice: ItemsCallbackMultiChoice? = null
+  itemsCallbackMultiChoice: ItemsCallbackMultiChoice? = null,
+  usePlatformDefaultWidth: Boolean = true,
 ) {
   NormalDialog(
     dialogState,
@@ -81,7 +82,8 @@ fun NormalDialog(
     onDismiss = onDismiss,
     itemsCallback = itemsCallback,
     itemsCallbackSingleChoice = itemsCallbackSingleChoice,
-    itemsCallbackMultiChoice = itemsCallbackMultiChoice
+    itemsCallbackMultiChoice = itemsCallbackMultiChoice,
+    usePlatformDefaultWidth = usePlatformDefaultWidth
   )
 }
 
@@ -105,11 +107,13 @@ fun NormalDialog(
   onDismiss: (() -> Unit)? = null,
   itemsCallback: ItemsCallback? = null,
   itemsCallbackSingleChoice: ItemsCallbackSingleChoice? = null,
-  itemsCallbackMultiChoice: ItemsCallbackMultiChoice? = null
+  itemsCallbackMultiChoice: ItemsCallbackMultiChoice? = null,
+  usePlatformDefaultWidth: Boolean = true,
 ) {
   BaseDialog(
     show = dialogState.isOpen,
     cancelOutside = cancelOutside,
+    usePlatformDefaultWidth = usePlatformDefaultWidth,
     onDismissRequest = {
       onDismissRequest?.invoke()
       dialogState.dismiss()
