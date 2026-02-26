@@ -10,9 +10,6 @@ import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.util.Util
 
 abstract class AbstractRepository(private val settingPrefs: SettingPrefs) {
-    protected val forceSort: Boolean
-        get() = settingPrefs.forceSort
-
   val baseSelection: String
     get() {
       val deleteIds = settingPrefs.deleteIds

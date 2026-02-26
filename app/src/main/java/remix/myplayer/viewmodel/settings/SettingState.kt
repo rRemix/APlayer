@@ -8,7 +8,6 @@ import remix.myplayer.ui.screen.playing.PlayingCoverAnimationStyle
 @Stable
 data class CommonSettings(
   val scanSize: Int,
-  val forceSort: Boolean,
   val lockScreen: Int,
   val manualScanFolder: String,
   val blacklist: Set<String>,

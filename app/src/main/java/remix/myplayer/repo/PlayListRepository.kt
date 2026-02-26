@@ -50,11 +50,7 @@ class PlayListRepoImpl @Inject constructor(
 
         playListDao.selectAll(orderByKey)
           .map { list ->
-            if (settingPrefs.forceSort) {
-              ItemsSorter.sortedPlayLists(list, sortOrder)
-            } else {
-              list
-            }
+            ItemsSorter.sortedPlayLists(list, sortOrder)
           }
       }
   }

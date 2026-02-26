@@ -42,7 +42,7 @@ interface SongRepository {
 
   fun getSongsByModels(models: List<APlayerModel>): List<Song>
 
-  fun getSongsByGenreId(id: Long): List<Song>
+  fun getSongsByGenreId(genreId: Long, sortOrder: String? = null): List<Song>
 
   fun getLastAddedSongs(): List<Song>
 
@@ -84,11 +84,7 @@ class SongRepoImpl @Inject constructor(
     } catch (e: Exception) {
       Timber.v(e)
     }
-    return if (forceSort) {
-      ItemsSorter.sortedSongs(songs, sortOrder)
-    } else {
-      songs
-    }
+    return ItemsSorter.sortedSongs(songs, sortOrder)
   }
 
   override fun makeSongCursor(
@@ -166,17 +162,7 @@ class SongRepoImpl @Inject constructor(
         }
 
         is Genre -> {
-          context.contentResolver.query(
-            Genres.Members.getContentUri("external", it.id),
-            baseProjection,
-            null,
-            null,
-            settingPrefs.genreDetailSortOrder
-          )?.use { songCursor ->
-            while (songCursor.moveToNext()) {
-              result.add(resolveSong(songCursor))
-            }
-          }
+          result.addAll(getSongsByGenreId(it.id, settingPrefs.genreDetailSortOrder))
         }
 
         is Folder -> {
@@ -230,7 +216,7 @@ class SongRepoImpl @Inject constructor(
     return result
   }
 
-  override fun getSongsByGenreId(genreId: Long): List<Song> {
+  override fun getSongsByGenreId(genreId: Long, sortOrder: String?): List<Song> {
     checkWorkerThread()
     val songs = ArrayList<Song>()
     context.contentResolver.query(
@@ -238,13 +224,13 @@ class SongRepoImpl @Inject constructor(
       baseProjection,
       null,
       null,
-      null
+      sortOrder
     )?.use { songCursor ->
       while (songCursor.moveToNext()) {
         songs.add(resolveSong(songCursor))
       }
     }
-    return songs
+    return ItemsSorter.sortedSongs(songs, sortOrder)
   }
 
   override fun getLastAddedSongs(): List<Song> {

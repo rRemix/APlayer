@@ -4,18 +4,19 @@ import android.content.Context
 import android.provider.MediaStore.Audio.Genres
 import dagger.hilt.android.qualifiers.ApplicationContext
 import remix.myplayer.data.model.audio.Genre
-import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.helper.ItemsSorter
 import remix.myplayer.util.PermissionUtil
 import timber.log.Timber
 import javax.inject.Inject
 
 interface GenreRepository {
+
   fun allGenres(): List<Genre>
 }
 
 class GenreRepoImpl @Inject constructor(
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val settingPrefs: SettingPrefs
 ) : GenreRepository, AbstractRepository(settingPrefs) {
 
@@ -36,30 +37,23 @@ class GenreRepoImpl @Inject constructor(
         while (cursor.moveToNext()) {
           val genreId = cursor.getLong(0)
           if (genreId > 0) {
-            val songs = getSongsByGenreId(genreId)
-            genres.add(Genre(genreId, cursor.getString(1) ?: "", songs.size))
+            genres.add(Genre(genreId, cursor.getString(1) ?: "", count(genreId)))
           }
         }
       }
     } catch (e: Exception) {
       Timber.w(e)
     }
-    return genres
+    return ItemsSorter.sortedGenres(genres, settingPrefs.genreSortOrder)
   }
 
-  private fun getSongsByGenreId(genreId: Long, sortOrder: String? = null): List<Song> {
-    val songs = ArrayList<Song>()
-    context.contentResolver.query(
+  private fun count(genreId: Long): Int {
+    return context.contentResolver.query(
       Genres.Members.getContentUri("external", genreId),
-      baseProjection,
+      arrayOf(Genres.Members.AUDIO_ID),
       null,
       null,
-      sortOrder
-    )?.use { songCursor ->
-      while (songCursor.moveToNext()) {
-        songs.add(resolveSong(songCursor))
-      }
-    }
-    return songs
+      null
+    )?.use { it.count } ?: 0
   }
 }

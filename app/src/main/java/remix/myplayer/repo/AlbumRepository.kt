@@ -72,10 +72,6 @@ class AlbumRepoImpl @Inject constructor(
     } catch (e: Exception) {
       Timber.v("getAllAlbum failed: $e")
     }
-    return if (forceSort) {
-      ItemsSorter.sortedAlbums(albums, sortOrder)
-    } else {
-      albums
-    }
+    return ItemsSorter.sortedAlbums(albums, sortOrder)
   }
 }

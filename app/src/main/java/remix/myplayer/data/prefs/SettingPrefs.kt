@@ -34,7 +34,6 @@ class SettingPrefs @Inject constructor(
   var libraryJson by PrefsDelegate(sp, PrefKeys.Setting.LIBRARY, "")
 
   var scanSize by PrefsDelegate(sp, PrefKeys.Setting.SCAN_SIZE, MB)
-  var forceSort by PrefsDelegate(sp, PrefKeys.Setting.FORCE_SORT, false)
 
   var songSortOrder by PrefsDelegate(sp, PrefKeys.Setting.SONG_SORT_ORDER, SortOrder.SONG_A_Z)
   var albumSortOrder by PrefsDelegate(sp, PrefKeys.Setting.ALBUM_SORT_ORDER, SortOrder.ALBUM_A_Z)

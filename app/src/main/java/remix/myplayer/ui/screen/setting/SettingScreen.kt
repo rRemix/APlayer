@@ -26,7 +26,6 @@ import remix.myplayer.ui.screen.setting.logic.color.SecondaryColorLogic
 import remix.myplayer.ui.screen.setting.logic.common.BlackListLogic
 import remix.myplayer.ui.screen.setting.logic.common.BreakPointLogic
 import remix.myplayer.ui.screen.setting.logic.common.ExportPlayListLogic
-import remix.myplayer.ui.screen.setting.logic.common.ForceSortLogic
 import remix.myplayer.ui.screen.setting.logic.common.ImportPlayListLogic
 import remix.myplayer.ui.screen.setting.logic.common.LanguageLogic
 import remix.myplayer.ui.screen.setting.logic.common.LockScreenLogic
@@ -198,8 +197,6 @@ private fun CommonPreferenceItems() {
   ShakeLogic()
 
   ShowDisplayNameLogic()
-
-  ForceSortLogic()
 }
 
 @Composable

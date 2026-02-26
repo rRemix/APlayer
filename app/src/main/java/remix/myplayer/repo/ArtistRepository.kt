@@ -63,11 +63,7 @@ class ArtistRepoImpl @Inject constructor(
     } catch (e: Exception) {
       Timber.v("getAllArtist failed: $e")
     }
-    return if (forceSort) {
-      ItemsSorter.sortedArtists(artists, sortOrder)
-    } else {
-      artists
-    }
+    return ItemsSorter.sortedArtists(artists, sortOrder)
   }
 
 }

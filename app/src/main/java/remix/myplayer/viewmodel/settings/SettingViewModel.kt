@@ -71,7 +71,6 @@ class SettingViewModel @Inject constructor(
   private fun loadState(): SettingsState = SettingsState(
     common = CommonSettings(
       scanSize = settingPrefs.scanSize,
-      forceSort = settingPrefs.forceSort,
       lockScreen = settingPrefs.lockScreen,
       manualScanFolder = settingPrefs.manualScanFolder,
       blacklist = settingPrefs.blacklist,
@@ -162,11 +161,6 @@ class SettingViewModel @Inject constructor(
   fun setScanSize(kb: Int) {
     settingPrefs.scanSize = kb
     _settingsState.update { it.copy(common = it.common.copy(scanSize = kb)) }
-  }
-
-  fun setForceSort(enabled: Boolean) {
-    settingPrefs.forceSort = enabled
-    _settingsState.update { it.copy(common = it.common.copy(forceSort = enabled)) }
   }
 
   fun setLockScreen(mode: Int) {
