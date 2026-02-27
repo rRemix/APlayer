@@ -1,6 +1,10 @@
 package remix.myplayer.ui.screen.playing
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Context.AUDIO_SERVICE
+import android.content.Intent
+import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.AudioManager.STREAM_MUSIC
 import android.os.Build
@@ -26,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,8 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.palette.graphics.Palette
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import remix.myplayer.R
 import remix.myplayer.data.prefs.SettingPrefs.Companion.BOTTOM_SHOW_BOTH
 import remix.myplayer.data.prefs.SettingPrefs.Companion.BOTTOM_SHOW_NEXT
@@ -58,6 +60,10 @@ import remix.myplayer.util.ext.CenterInBox
 import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.util.ext.clickableWithoutRipple
 
+private const val ACTION_VOLUME_CHANGED = "android.media.VOLUME_CHANGED_ACTION"
+private const val EXTRA_VOLUME_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_TYPE"
+private const val EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE"
+
 @Composable
 internal fun PlayingBottomBar(
   modifier: Modifier,
@@ -69,14 +75,14 @@ internal fun PlayingBottomBar(
     val swatchColor = Color(swatch.rgb)
     assert(playingScreenBottom != BOTTOM_SHOW_NONE)
 
-    var nextSongIsVisible by remember {
+    var nextSongIsVisible by remember(playingScreenBottom) {
       mutableStateOf(playingScreenBottom == BOTTOM_SHOW_NEXT)
     }
-    var volumeIsVisible by remember {
+    var volumeIsVisible by remember(playingScreenBottom) {
       mutableStateOf(playingScreenBottom != BOTTOM_SHOW_NEXT)
     }
 
-    var refreshKey by remember {
+    var refreshKey by remember(playingScreenBottom) {
       mutableIntStateOf(0)
     }
 
@@ -97,7 +103,7 @@ internal fun PlayingBottomBar(
       }
     }
 
-    LaunchedEffect(refreshKey) {
+    LaunchedEffect(refreshKey, playingScreenBottom) {
       if (refreshKey == 0 && playingScreenBottom == BOTTOM_SHOW_BOTH || refreshKey > 0) {
         // nextSong -> GONE
         // volume -> VISIBLE
@@ -157,6 +163,7 @@ private fun VolumeSeekbar(swatchColor: Color, onValueChange: () -> Unit) {
             AudioManager.ADJUST_LOWER,
             AudioManager.FLAG_PLAY_SOUND
           )
+          onValueChange()
         }) {
       Image(
         painter = painterResource(R.drawable.ic_volume_down_black_24dp),
@@ -176,6 +183,7 @@ private fun VolumeSeekbar(swatchColor: Color, onValueChange: () -> Unit) {
             AudioManager.ADJUST_RAISE,
             AudioManager.FLAG_PLAY_SOUND
           )
+          onValueChange()
         }) {
       Image(
         painter = painterResource(R.drawable.ic_volume_up_black_24dp),
@@ -192,6 +200,7 @@ private fun RowScope.VolumeSeekBar(
   swatchColor: Color,
   onValueChange: () -> Unit
 ) {
+  val context = LocalContext.current
   var min by remember {
     mutableIntStateOf(0)
   }
@@ -201,20 +210,30 @@ private fun RowScope.VolumeSeekBar(
   var current by remember {
     mutableIntStateOf(0)
   }
+  var isSliderDragging by remember {
+    mutableStateOf(false)
+  }
 
   LineSlider(
     value = current.toFloat(),
     valueRange = min.toFloat()..max.toFloat(),
+    steps = (max - min - 1).coerceAtLeast(0),
     onValueChange = {
-      current = it.toInt()
+      isSliderDragging = true
+      val volume = it.roundToInt().coerceIn(min, max)
+      if (volume != current) {
+        current = volume
+        audioManager.setStreamVolume(
+          STREAM_MUSIC,
+          current,
+          0
+        )
+      }
       onValueChange()
     },
     onValueChangeFinished = {
-      audioManager.setStreamVolume(
-        STREAM_MUSIC,
-        current,
-        AudioManager.FLAG_PLAY_SOUND
-      )
+      isSliderDragging = false
+      current = audioManager.getStreamVolume(STREAM_MUSIC).coerceIn(min, max)
     },
     modifier = Modifier
       .height(48.dp)
@@ -235,19 +254,34 @@ private fun RowScope.VolumeSeekBar(
       audioManager.getStreamMinVolume(STREAM_MUSIC)
     } else 0
     max = audioManager.getStreamMaxVolume(STREAM_MUSIC)
+    current = audioManager.getStreamVolume(STREAM_MUSIC).coerceIn(min, max)
   }
 
-  val scope = rememberCoroutineScope()
-  DisposableEffect(Unit) {
-    scope.launch {
-      while (isActive) {
-        current = audioManager.getStreamVolume(STREAM_MUSIC)
-        delay(1000)
+  DisposableEffect(audioManager, context, min, max) {
+    val receiver = object : BroadcastReceiver() {
+      override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != ACTION_VOLUME_CHANGED) return
+        if (intent.getIntExtra(EXTRA_VOLUME_STREAM_TYPE, -1) != STREAM_MUSIC) return
+        if (isSliderDragging) return
+
+        val volume = intent.getIntExtra(
+          EXTRA_VOLUME_STREAM_VALUE,
+          audioManager.getStreamVolume(STREAM_MUSIC)
+        )
+        current = volume.coerceIn(min, max)
       }
+    }
+    val filter = IntentFilter(ACTION_VOLUME_CHANGED)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+    } else {
+      context.registerReceiver(receiver, filter)
     }
 
     onDispose {
-
+      runCatching {
+        context.unregisterReceiver(receiver)
+      }
     }
   }
 }
