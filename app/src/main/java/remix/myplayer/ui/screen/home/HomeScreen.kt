@@ -82,7 +82,10 @@ fun HomeScreen() {
 
     val libraries by settingViewModel.enabledLibraries.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState { libraries.size }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+      flingAnimationSpec = null,
+      snapAnimationSpec = null
+    )
 
     val showMultiSelect by remember {
       derivedStateOf {
