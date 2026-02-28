@@ -2,7 +2,6 @@
 
 package remix.myplayer.ui.activity
 
-import android.app.KeyguardManager
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
@@ -14,11 +13,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,7 +25,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -44,19 +37,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,10 +64,13 @@ import remix.myplayer.lyric.LyricManager
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
+import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.blur.StackBlurManager
 import remix.myplayer.ui.theme.LocalTheme
+import remix.myplayer.ui.widget.app.rememberSmoothPosition
+import remix.myplayer.ui.widget.lyric.LyricSingleLine
 import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.clickableWithoutRipple
@@ -121,7 +114,7 @@ class LockScreenActivity : BaseMusicActivity() {
     setContent {
       val state by vm.playbackUiState.collectAsStateWithLifecycle()
       val currentLyricLine by lyricManager.currentNextLyricsLine.collectAsStateWithLifecycle()
-      LockScreen(state, currentLyricLine)
+      LockScreen(state, currentLyricLine, lyricManager)
     }
 
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
@@ -129,14 +122,6 @@ class LockScreenActivity : BaseMusicActivity() {
     } else {
       @Suppress("DEPRECATION")
       window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
-    }
-
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-      val keyguardManager = getSystemService(KeyguardManager::class.java)
-      keyguardManager?.requestDismissKeyguard(this, null)
-    } else {
-      @Suppress("DEPRECATION")
-      window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
     }
   }
 
@@ -151,12 +136,25 @@ class LockScreenActivity : BaseMusicActivity() {
 }
 
 @Composable
-private fun LockScreen(playbackUiState: PlaybackUiState, currentLyric: CurrentNextLyricsLine) {
+private fun LockScreen(
+  playbackUiState: PlaybackUiState,
+  currentLyric: CurrentNextLyricsLine,
+  lyricManager: LyricManager
+) {
   val context = LocalContext.current
   val density = LocalDensity.current
   val screenWidth = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
   val offsetX = remember { Animatable(0f) }
   val scope = rememberCoroutineScope()
+  val playbackState by MusicStateSource.playbackUiState.collectAsStateWithLifecycle()
+  val progressState by MusicStateSource.progressState.collectAsStateWithLifecycle()
+
+  val smoothPosition = rememberSmoothPosition(
+    position = progressState.position,
+    duration = progressState.duration,
+    isPlaying = playbackState.isPlaying,
+    speed = playbackState.speed
+  )
 
   Box(
     modifier = Modifier
@@ -219,8 +217,7 @@ private fun LockScreen(playbackUiState: PlaybackUiState, currentLyric: CurrentNe
 
     Column(
       modifier = Modifier
-        .fillMaxSize()
-        .background(Color.Red.copy(0.2f)),
+        .fillMaxSize(),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center
     ) {
@@ -312,58 +309,37 @@ private fun LockScreen(playbackUiState: PlaybackUiState, currentLyric: CurrentNe
           .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
-        Text(
-          currentLyric.currentLine?.content ?: "",
+        val currentLine = currentLyric.currentLine
+        LyricSingleLine(
+          sungColor = Color(swatch.bodyTextColor),
+          unSungColor = Color(swatch.bodyTextColor).copy(alpha = 0.45f),
           fontSize = 16.sp,
-          color = Color(swatch.bodyTextColor),
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis
+          useShadow = false,
+          progress = if (currentLine != null) {
+            LyricManager.computeLineProgress(
+              line = currentLine,
+              time = smoothPosition + lyricManager.offset,
+              endTime = currentLyric.nextLine?.time ?: (progressState.duration + lyricManager.offset)
+            )
+          } else {
+            null
+          },
+          line = currentLine
         )
         Spacer(modifier = Modifier.height(8.dp))
+        val secondLine = if (!currentLine?.translation.isNullOrBlank()) {
+          currentLine.translation!!
+        } else {
+          currentLyric.nextLine?.content ?: ""
+        }
         Text(
-          currentLyric.nextLine?.content ?: "",
+          secondLine,
           fontSize = 16.sp,
-          color = Color(swatch.bodyTextColor),
+          color = Color(swatch.bodyTextColor).copy(alpha = 0.85f),
           maxLines = 1,
           overflow = TextOverflow.Ellipsis
-        )
-      }
-    }
-
-    val infiniteTransition = rememberInfiniteTransition()
-    val alpha by infiniteTransition.animateFloat(
-      0.1f, 1.0f, animationSpec = infiniteRepeatable(
-        animation = tween(durationMillis = 500, easing = LinearEasing),
-        repeatMode = RepeatMode.Reverse
-      )
-    )
-    val offsetFraction by infiniteTransition.animateFloat(
-      -0.1f, 0.1f, animationSpec = infiniteRepeatable(
-        animation = tween(durationMillis = 500, easing = LinearEasing),
-        repeatMode = RepeatMode.Reverse
-      )
-    )
-    var size by remember { mutableStateOf(IntSize.Zero) }
-
-    Row(
-      modifier = Modifier
-        .onSizeChanged {
-          size = it
-        }
-        .alpha(alpha)
-        .offset(x = with(density) { (size.width * offsetFraction).toDp() })
-        .padding(bottom = 24.dp, start = 12.dp, end = 12.dp)
-        .navigationBarsPadding()
-        .align(Alignment.BottomCenter),
-      verticalAlignment = Alignment.Bottom
-    ) {
-      repeat(6) {
-        Image(
-          painter = painterResource(R.drawable.icon_lockscreen_arrow),
-          contentDescription = "LockScreenArrow"
         )
       }
     }
   }
 }
-

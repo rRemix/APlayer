@@ -312,7 +312,7 @@ private fun DesktopLyricLines(
       } else {
         null
       },
-      currentLine
+      line = currentLine
     )
 
     val isTranslation = !currentLine?.translation.isNullOrBlank()

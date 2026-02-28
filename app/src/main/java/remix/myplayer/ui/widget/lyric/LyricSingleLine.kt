@@ -25,6 +25,7 @@ fun LyricSingleLine(
   sungColor: Color,
   unSungColor: Color,
   fontSize: TextUnit,
+  useShadow: Boolean = true,
   progress: Double?,
   line: LyricLine?
 ) {
@@ -33,11 +34,15 @@ fun LyricSingleLine(
   val baseStyle = TextStyle(
     fontSize = fontSize,
     fontWeight = FontWeight.Bold,
-    shadow = Shadow(
-      color = Color.Black,
-      offset = Offset(1f, 1f),
-      blurRadius = 2f
-    )
+    shadow = if (useShadow) {
+      Shadow(
+        color = Color.Black,
+        offset = Offset(1f, 1f),
+        blurRadius = 2f
+      )
+    } else {
+      null
+    }
   )
   val isPerWord = line is PerWordLyricLine
 
