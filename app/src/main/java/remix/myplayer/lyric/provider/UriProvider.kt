@@ -18,6 +18,7 @@ class UriProvider(private val context: Context, private val uri: Uri) : ILyricsP
 
   override suspend fun getLyrics(song: Song): LyricsResult {
     return try {
+      Timber.v("Try open uri: $uri")
       context.contentResolver.openInputStream(uri)!!.run {
         try {
           LyricsResult(LrcParser.parse(readBytes()), id)

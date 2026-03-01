@@ -11,7 +11,10 @@ import kotlin.math.roundToLong
 object LrcParser {
   private const val TAG = "LrcParser"
 
-  private val WORD_TIME_TAG_REGEX = """<(\d+:){1,2}\d+(\.\d*)?>""".toRegex()
+  // 增强型LRC：<mm:ss.xx>
+  private val ENHANCED_WORD_TIME_TAG_REGEX = """<(\d+:){1,2}\d+(\.\d*)?>""".toRegex()
+  // 逐字LRC：[mm:ss.xx]
+  private val VERBATIM_WORD_TIME_TAG_REGEX = """\[(\d+:){1,2}\d+(\.\d*)?]""".toRegex()
   private val EMPTY_LINE_WITH_TIME_REGEX = """(\[(\d+:){1,2}\d+(\.\d*)?])*""".toRegex()
 
   /**
@@ -37,16 +40,16 @@ object LrcParser {
   }
 
   /**
-   * 解析精确到字的歌词
+   * 解析增强型精确到字歌词（word<time>）
    *
    * @param time 整行的开始时间
    */
-  private fun parseWords(time: Long, offset: Long, content: String): LyricLine {
+  private fun parseEnhancedWords(time: Long, offset: Long, content: String): LyricLine {
     val words = ArrayList<Word>()
     var currentTime = time
     var lastStart = 0
     var match =
-      WORD_TIME_TAG_REGEX.find(content) ?: return SimpleLyricLine(time, decodeEntities(content))
+      ENHANCED_WORD_TIME_TAG_REGEX.find(content) ?: return SimpleLyricLine(time, decodeEntities(content))
     while (true) {
       words.add(
         Word(
@@ -64,6 +67,38 @@ object LrcParser {
       match = match.next() ?: break
     }
     words.add(Word(currentTime, decodeEntities(content.substring(lastStart))))
+    return PerWordLyricLine(time, words)
+  }
+
+  /**
+   * 解析逐字LRC（word[time]）
+   *
+   * 例如：`你[00:12.34]好[00:12.56]`
+   */
+  private fun parseVerbatimWords(time: Long, offset: Long, content: String): LyricLine {
+    val words = ArrayList<Word>()
+    var currentTime = time
+    var lastStart = 0
+    var match =
+      VERBATIM_WORD_TIME_TAG_REGEX.find(content) ?: return SimpleLyricLine(time, decodeEntities(content))
+    while (true) {
+      val word = decodeEntities(content.substring(lastStart, match.range.first))
+      if (word.isNotEmpty()) {
+        words.add(Word(currentTime, word))
+      }
+      parseTime(match.value.substring(1, match.value.lastIndex), offset)?.let {
+        // 确保同一 LyricsLine 内 time 单调不减
+        if (it > currentTime) {
+          currentTime = it
+        }
+      }
+      lastStart = match.range.last + 1
+      match = match.next() ?: break
+    }
+    val tail = decodeEntities(content.substring(lastStart))
+    if (tail.isNotEmpty() || words.isEmpty()) {
+      words.add(Word(currentTime, tail))
+    }
     return PerWordLyricLine(time, words)
   }
 
@@ -90,21 +125,26 @@ object LrcParser {
         return@forEach
       }
 
-      // [xxx]
-      // 特判空行
-      if (it.endsWith(']') && !EMPTY_LINE_WITH_TIME_REGEX.matches(it)) {
-        val tag = it.substring(1, it.lastIndex)
-        // [offset:+/-xxx]
-        if (tag.startsWith("offset:")) {
-          try {
-            offset = tag.substring(7).trim().toLong()
-          } catch (t: Throwable) {
-            Timber.tag(TAG).w("Failed to parse offset, raw tag: $tag")
+      // [xxx] 标签行。仅当整行只有一个 [] 包裹时才按标签处理，
+      // 避免误判 `词[00:12.34]` 这种逐字LRC行为 tag。
+      if (it.endsWith(']')) {
+        val firstClosing = it.indexOf(']')
+        if (firstClosing == it.lastIndex) {
+          val tag = it.substring(1, it.lastIndex)
+          // [offset:+/-xxx]
+          if (tag.startsWith("offset:")) {
+            try {
+              offset = tag.substring(7).trim().toLong()
+            } catch (t: Throwable) {
+              Timber.tag(TAG).w("Failed to parse offset, raw tag: $tag")
+            }
+            return@forEach
           }
-          return@forEach
+          if (!EMPTY_LINE_WITH_TIME_REGEX.matches(it)) {
+            Timber.tag(TAG).v("Ignored unknown tag: $tag")
+            return@forEach
+          }
         }
-        Timber.tag(TAG).v("Ignored unknown tag: $tag")
-        return@forEach
       }
 
       var index = 0
@@ -120,9 +160,18 @@ object LrcParser {
         index = closing + 1
       }
 
-      val lineContent = decodeEntities(it.substring(index))
+      val rawLineContent = it.substring(index)
+      val lineContent = decodeEntities(rawLineContent)
       if (times.size == 1) {
-        lines.add(parseWords(times[0], offset, it.substring(index)))
+        lines.add(
+          when {
+            ENHANCED_WORD_TIME_TAG_REGEX.containsMatchIn(rawLineContent) ->
+              parseEnhancedWords(times[0], offset, rawLineContent)
+            VERBATIM_WORD_TIME_TAG_REGEX.containsMatchIn(rawLineContent) ->
+              parseVerbatimWords(times[0], offset, rawLineContent)
+            else -> SimpleLyricLine(times[0], lineContent)
+          }
+        )
       } else {
         times.forEach { time ->
           lines.add(SimpleLyricLine(time, lineContent))
