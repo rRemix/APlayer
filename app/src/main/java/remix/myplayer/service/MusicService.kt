@@ -1426,9 +1426,10 @@ class MusicService : BaseService(),
   private fun updateAppwidget() {
     // 暂停停止更新进度条和时间
     if (!isPlaying) {
-      // 暂停后不再更新
-      // 所以需要在停止前更新一次 保证桌面部件控件的播放|暂停按钮状态是对的
-      partiallyUpdateWidget(true)
+      // 暂停后不再持续更新，但需要完整刷新一次
+      appWidgets.forEach {
+        it.value.updateWidget(this, null, true)
+      }
       stopUpdateAppWidget()
     } else {
       if (screenOn) {
