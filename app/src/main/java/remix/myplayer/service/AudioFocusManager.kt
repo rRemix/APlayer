@@ -71,4 +71,13 @@ class AudioFocusManager @Inject constructor(
     callbacks = null
     abandonFocus()
   }
+
+  fun shouldPauseForPhoneCall(): Boolean {
+    val mode = audioManager.mode
+    val inCall = mode == AudioManager.MODE_IN_CALL
+        || mode == AudioManager.MODE_IN_COMMUNICATION
+        || mode == AudioManager.MODE_RINGTONE
+    Timber.v("shouldPauseForPhoneCall mode: $mode inCall: $inCall")
+    return inCall
+  }
 }

@@ -1502,7 +1502,7 @@ class MusicService : BaseService(),
   override fun onFocusLost() {
     Timber.v("onFocusLost")
     val ignoreFocus = settingPrefs.ignoreAudioFocus
-    if (ignoreFocus) {
+    if (ignoreFocus && !audioFocusManager.shouldPauseForPhoneCall()) {
       Timber.v("忽略音频焦点 不暂停")
       return
     }
