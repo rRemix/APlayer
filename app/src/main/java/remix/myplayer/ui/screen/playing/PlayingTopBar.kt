@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.palette.graphics.Palette
@@ -94,7 +95,7 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
         fontSize = 16.sp,
         maxLines = 1
       )
-      Text(detail, color = bodyColor, fontSize = 14.sp, maxLines = 1)
+      Text(detail, color = bodyColor, fontSize = 14.sp, maxLines = 1, textAlign = TextAlign.Center)
     }
 
     var expanded by remember { mutableStateOf(false) }
