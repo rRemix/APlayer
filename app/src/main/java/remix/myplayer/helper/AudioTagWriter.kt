@@ -50,9 +50,12 @@ object AudioTagWriter {
     newTitle: String,
     newAlbum: String,
     newArtist: String,
+    newAlbumArtist: String,
+    newComposer: String,
     newGenre: String,
     newYear: String,
     newTrackNum: String,
+    newDiscNum: String,
     newLyrics: String,
     deleteArtwork: Boolean = false,
     newArtwork: Bitmap? = null
@@ -62,9 +65,12 @@ object AudioTagWriter {
     fieldMap[FieldKey.TITLE] = newTitle
     fieldMap[FieldKey.ALBUM] = newAlbum
     fieldMap[FieldKey.ARTIST] = newArtist
+    fieldMap[FieldKey.ALBUM_ARTIST] = newAlbumArtist
+    fieldMap[FieldKey.COMPOSER] = newComposer
     fieldMap[FieldKey.GENRE] = newGenre
     fieldMap[FieldKey.YEAR] = newYear
     fieldMap[FieldKey.TRACK] = newTrackNum
+    fieldMap[FieldKey.DISC_NO] = newDiscNum
     fieldMap[FieldKey.LYRICS] = newLyrics
 
     val request = PendingWriteRequest(song, fieldMap, deleteArtwork, newArtwork)

@@ -188,15 +188,37 @@ fun TagEditScreen(backStackEntry: NavBackStackEntry) {
         EditField(formState.artist, R.string.artist_input_hint, modifier = fieldModifier) {
           tagEditVM.updateTagEditArtist(it)
         }
-        EditField(formState.genre, R.string.genre_input_hint, modifier = fieldModifier) {
-          tagEditVM.updateTagEditGenre(it)
+        EditField(
+          formState.albumArtist,
+          R.string.album_artist_input_hint,
+          modifier = fieldModifier
+        ) {
+          tagEditVM.updateTagEditAlbumArtist(it)
+        }
+        EditField(formState.composer, R.string.composer_input_hint, modifier = fieldModifier) {
+          tagEditVM.updateTagEditComposer(it)
         }
         Row(
           modifier = fieldModifier,
           horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+          EditField(formState.genre, R.string.genre_input_hint, modifier = Modifier.weight(1f)) {
+            tagEditVM.updateTagEditGenre(it)
+          }
           EditField(formState.year, R.string.year_input_hint, modifier = Modifier.weight(1f)) {
             tagEditVM.updateTagEditYear(it)
+          }
+        }
+        Row(
+          modifier = fieldModifier,
+          horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+          EditField(
+            formState.disc,
+            R.string.disc_number_input_hint,
+            modifier = Modifier.weight(1f)
+          ) {
+            tagEditVM.updateTagEditDisc(it)
           }
           EditField(
             formState.track,

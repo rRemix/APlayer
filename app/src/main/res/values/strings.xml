@@ -229,8 +229,11 @@
   <string name="song_name_input_hint">Song name</string>
   <string name="album_input_hint">Album</string>
   <string name="artist_input_hint">Artist</string>
+  <string name="album_artist_input_hint">Album artist</string>
+  <string name="composer_input_hint">Composer</string>
   <string name="year_input_hint">Year</string>
   <string name="track_number_input_hint">Track number</string>
+  <string name="disc_number_input_hint">Disc number</string>
   <string name="genre_input_hint">Genre</string>
   <string name="lyrics_input_hint">Lyrics</string>
   <string name="grant_write_permission_tip">Please grant permission to write the media file</string>

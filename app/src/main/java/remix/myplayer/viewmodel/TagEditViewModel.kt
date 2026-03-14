@@ -67,8 +67,11 @@ class TagEditViewModel @Inject constructor() : ViewModel() {
             title = tag?.getFirst(FieldKey.TITLE) ?: "",
             album = tag?.getFirst(FieldKey.ALBUM) ?: "",
             artist = tag?.getFirst(FieldKey.ARTIST) ?: "",
+            albumArtist = tag?.getFirst(FieldKey.ALBUM_ARTIST) ?: "",
+            composer = tag?.getFirst(FieldKey.COMPOSER) ?: "",
             year = tag?.getFirst(FieldKey.YEAR) ?: "",
             track = tag?.getFirst(FieldKey.TRACK) ?: "",
+            disc = tag?.getFirst(FieldKey.DISC_NO) ?: "",
             genre = tag?.getFirst(FieldKey.GENRE) ?: "",
             lyrics = lyrics
           )
@@ -100,12 +103,24 @@ class TagEditViewModel @Inject constructor() : ViewModel() {
     updateTagEditForm { it.copy(artist = value) }
   }
 
+  fun updateTagEditAlbumArtist(value: String) {
+    updateTagEditForm { it.copy(albumArtist = value) }
+  }
+
+  fun updateTagEditComposer(value: String) {
+    updateTagEditForm { it.copy(composer = value) }
+  }
+
   fun updateTagEditYear(value: String) {
     updateTagEditForm { it.copy(year = value) }
   }
 
   fun updateTagEditTrack(value: String) {
     updateTagEditForm { it.copy(track = value) }
+  }
+
+  fun updateTagEditDisc(value: String) {
+    updateTagEditForm { it.copy(disc = value) }
   }
 
   fun updateTagEditGenre(value: String) {
@@ -163,9 +178,12 @@ class TagEditViewModel @Inject constructor() : ViewModel() {
       form.title,
       form.album,
       form.artist,
+      form.albumArtist,
+      form.composer,
       form.genre,
       form.year,
       form.track,
+      form.disc,
       form.lyrics,
       state.albumArtState.isCleared,
       tagEditPickedBitmap
@@ -187,8 +205,11 @@ data class TagEditState(
     val title: String = "",
     val album: String = "",
     val artist: String = "",
+    val albumArtist: String = "",
+    val composer: String = "",
     val year: String = "",
     val track: String = "",
+    val disc: String = "",
     val genre: String = "",
     val lyrics: String = ""
   )

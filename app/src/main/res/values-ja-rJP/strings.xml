@@ -226,8 +226,11 @@
   <string name="song_name_input_hint">曲名</string>
   <string name="album_input_hint">アルバム</string>
   <string name="artist_input_hint">アーティスト</string>
+  <string name="album_artist_input_hint">アルバムアーティスト</string>
+  <string name="composer_input_hint">作曲者</string>
   <string name="year_input_hint">年</string>
   <string name="track_number_input_hint">トラックナンバー</string>
+  <string name="disc_number_input_hint">ディスクナンバー</string>
   <string name="genre_input_hint">ジャンル</string>
   <string name="lyrics_input_hint">歌詞</string>
   <string name="grant_write_permission_tip">メディアファイルに書き込むために権限を許可してください</string>

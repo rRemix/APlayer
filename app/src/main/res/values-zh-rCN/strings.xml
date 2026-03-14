@@ -226,8 +226,11 @@
   <string name="song_name_input_hint">歌曲名</string>
   <string name="album_input_hint">专辑</string>
   <string name="artist_input_hint">艺术家</string>
+  <string name="album_artist_input_hint">专辑艺术家</string>
+  <string name="composer_input_hint">作曲家</string>
   <string name="year_input_hint">年代</string>
   <string name="track_number_input_hint">音轨号</string>
+  <string name="disc_number_input_hint">碟号</string>
   <string name="genre_input_hint">流派</string>
   <string name="lyrics_input_hint">歌词</string>
   <string name="grant_write_permission_tip">请授予修改音乐文件的权限</string>
