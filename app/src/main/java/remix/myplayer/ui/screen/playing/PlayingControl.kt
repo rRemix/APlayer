@@ -3,6 +3,9 @@ package remix.myplayer.ui.screen.playing
 import android.content.Intent
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -17,15 +20,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
@@ -39,6 +50,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
@@ -47,6 +62,7 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
+import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.dialog.BottomSheetDialog
 import remix.myplayer.ui.nav.MessageNotifier
@@ -60,6 +76,7 @@ import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.CenterInBox
 import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.util.ext.isPortraitOrientation
+import remix.myplayer.viewmodel.PlaybackViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 
 private val itemRes = mapOf(
@@ -83,6 +100,7 @@ internal fun PlayingControl(
   ) {
     val swatchColor = Color(swatch.rgb)
     val playMode = playbackUiState.playMode
+    val viewModel = playbackViewModel
     ControlButton(onClick = {
       val newMode = if (playMode == MODE_REPEAT) MODE_LOOP else playMode + 1
       MessageNotifier.show(itemRes[newMode]!!.second)
@@ -95,14 +113,22 @@ internal fun PlayingControl(
       )
     }
 
-    ControlButton(onClick = {
-      sendLocalBroadcast(
-        Intent(MusicService.ACTION_CMD).putExtra(
-          MusicService.EXTRA_COMMAND,
-          Command.SKIP_TO_PREVIOUS
+    ControlButton(
+      onClick = {
+        sendLocalBroadcast(
+          Intent(MusicService.ACTION_CMD).putExtra(
+            MusicService.EXTRA_COMMAND,
+            Command.SKIP_TO_PREVIOUS
+          )
         )
-      )
-    }) {
+      },
+      onLongPressStart = {
+        viewModel.startContinuousSeek(forward = false)
+      },
+      onLongPressEnd = {
+        viewModel.stopContinuousSeek()
+      }
+    ) {
       Image(
         painter = painterResource(R.drawable.play_btn_pre),
         contentDescription = "PlayingPrev",
@@ -133,14 +159,22 @@ internal fun PlayingControl(
       )
     }
 
-    ControlButton(onClick = {
-      sendLocalBroadcast(
-        Intent(MusicService.ACTION_CMD).putExtra(
-          MusicService.EXTRA_COMMAND,
-          Command.SKIP_TO_NEXT
+    ControlButton(
+      onClick = {
+        sendLocalBroadcast(
+          Intent(MusicService.ACTION_CMD).putExtra(
+            MusicService.EXTRA_COMMAND,
+            Command.SKIP_TO_NEXT
+          )
         )
-      )
-    }) {
+      },
+      onLongPressStart = {
+        viewModel.startContinuousSeek(forward = true)
+      },
+      onLongPressEnd = {
+        viewModel.stopContinuousSeek()
+      }
+    ) {
       Image(
         painter = painterResource(R.drawable.play_btn_next),
         contentDescription = "PlayingNext",
@@ -255,13 +289,47 @@ private fun PlayQueueDialog(
 @Composable
 private fun RowScope.ControlButton(
   onClick: () -> Unit,
+  onLongPressStart: (() -> Unit)? = null,
+  onLongPressEnd: (() -> Unit)? = null,
   content: @Composable BoxScope.() -> Unit
 ) {
+  val interactionSource = remember { MutableInteractionSource() }
+  val onClick by rememberUpdatedState(onClick)
+  val onLongPressStart by rememberUpdatedState(onLongPressStart)
+  val onLongPressEnd by rememberUpdatedState(onLongPressEnd)
+  var longPressActive by remember { mutableStateOf(false) }
+
+  LaunchedEffect(interactionSource) {
+    interactionSource.interactions.collect { interaction ->
+      if ((interaction is PressInteraction.Release || interaction is PressInteraction.Cancel) &&
+        longPressActive
+      ) {
+        longPressActive = false
+        onLongPressEnd?.invoke()
+      }
+    }
+  }
+
+  val modifier = if (onLongPressStart != null && onLongPressEnd != null) {
+    Modifier
+      .clip(CircleShape)
+      .combinedClickable(
+        interactionSource = interactionSource,
+        indication = ripple(color = LocalTheme.current.ripple),
+        onClick = { onClick() },
+        onLongClick = {
+          longPressActive = true
+          onLongPressStart?.invoke()
+        }
+      )
+  } else {
+    Modifier.clickWithRipple { onClick() }
+  }
+
   Box(
-    modifier = Modifier
+    modifier = modifier
       .weight(1f, LocalContext.current.isPortraitOrientation())
-      .aspectRatio(1f)
-      .clickWithRipple { onClick() },
+      .aspectRatio(1f),
     contentAlignment = Alignment.Center
   ) {
     content()

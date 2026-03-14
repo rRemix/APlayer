@@ -12,6 +12,8 @@ import androidx.palette.graphics.Palette.Swatch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
@@ -85,6 +88,49 @@ class PlaybackViewModel @Inject constructor(
     MessageNotifier.show(R.string.add_song_playqueue_success, queue.size)
   }
 
+  private var continuousSeekJob: Job? = null
+
+  fun startContinuousSeek(forward: Boolean) {
+    stopContinuousSeek()
+    val initialPosition = MusicStateSource.currentProgressState.position
+    val duration = MusicStateSource.currentProgressState.duration
+
+    continuousSeekJob = viewModelScope.launch {
+      var currentTarget = initialPosition.coerceAtLeast(0L)
+      var counter = 0
+      while (isActive) {
+        delay(CONTINUOUS_SEEK_INTERVAL_MS)
+
+        val multiplier = (counter / CONTINUOUS_SEEK_ACCELERATION_TICKS) + 1L
+        val delta = CONTINUOUS_SEEK_STEP_MS * multiplier
+        val maxPosition = if (duration > 0L) duration else Long.MAX_VALUE
+        val target = if (forward) {
+          currentTarget + delta
+        } else {
+          currentTarget - delta
+        }.coerceAtLeast(0L).coerceAtMost(maxPosition)
+
+        setProgress(target)
+        setSeekbarUiState(target, true)
+        currentTarget = target
+
+        if (target == 0L || (duration > 0L && target == duration)) {
+          stopContinuousSeek()
+          break
+        }
+        counter += 1
+      }
+    }
+  }
+
+  fun stopContinuousSeek() {
+    if (continuousSeekJob != null) {
+      setSeekbarUiState(null, false)
+      continuousSeekJob?.cancel()
+      continuousSeekJob = null
+    }
+  }
+
   private val _swatch = MutableStateFlow(defaultSwatch)
   val swatch = _swatch.asStateFlow()
 
@@ -134,6 +180,9 @@ class PlaybackViewModel @Inject constructor(
   }
 
   companion object {
+    private const val CONTINUOUS_SEEK_STEP_MS = 5_000L
+    private const val CONTINUOUS_SEEK_INTERVAL_MS = 500L
+    private const val CONTINUOUS_SEEK_ACCELERATION_TICKS = 2
 
     val defaultSwatch = Swatch(Color.GRAY, 100)
   }
