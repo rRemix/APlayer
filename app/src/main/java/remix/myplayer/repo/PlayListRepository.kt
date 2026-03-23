@@ -31,7 +31,7 @@ interface PlayListRepository {
 }
 
 class PlayListRepoImpl @Inject constructor(
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val playListDao: PlayListDao,
   private val settingPrefs: SettingPrefs
 ) : PlayListRepository, AbstractRepository(settingPrefs) {

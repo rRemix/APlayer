@@ -41,7 +41,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class UriFetcher @Inject constructor(
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val neClient: NetEaseClient,
   private val lastFMApi: LastFMApi,
   private val settingPrefs: SettingPrefs,
@@ -298,7 +298,7 @@ class UriFetcher @Inject constructor(
 //      return Uri.fromFile(customArtFile)
 //    }
 
-    val songs = songRepo.getSongsByModels(listOf(playList))
+    val songs = runBlocking { songRepo.getSongsByModels(listOf(playList)) }
 
     var uri: Uri
     for (song in songs) {

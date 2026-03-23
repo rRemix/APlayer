@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class KuGouProvider @Inject constructor(
-  @ApplicationContext
+  @param:ApplicationContext
   private val context: Context,
   private val kuGouClient: KuGouClient
 ) : NetworkProvider<KuGouSong>() {

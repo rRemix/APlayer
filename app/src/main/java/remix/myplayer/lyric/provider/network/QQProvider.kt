@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class QQProvider @Inject constructor(
-  @ApplicationContext
+  @param:ApplicationContext
   private val context: Context,
   private val qqClient: QQClient
 ) : NetworkProvider<QQSong>() {

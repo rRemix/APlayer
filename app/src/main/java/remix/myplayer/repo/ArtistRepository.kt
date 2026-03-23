@@ -15,7 +15,7 @@ interface ArtistRepository {
 }
 
 class ArtistRepoImpl @Inject constructor(
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val settingPrefs: SettingPrefs
 ) : ArtistRepository, AbstractRepository(settingPrefs) {
 

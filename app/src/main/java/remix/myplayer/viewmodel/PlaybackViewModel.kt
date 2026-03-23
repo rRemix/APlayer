@@ -41,7 +41,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlaybackViewModel @Inject constructor(
   private val savedStateHandle: SavedStateHandle,
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val playQueueRepository: PlayQueueRepository,
   private val settingPrefs: SettingPrefs,
 ) : ViewModel(), MusicEventCallback {

@@ -23,7 +23,7 @@ import kotlin.math.min
 @OptIn(ExperimentalSerializationApi::class)
 @Singleton
 class LyricSearcher @Inject constructor(
-  @ApplicationContext
+  @param:ApplicationContext
   private val context: Context,
   val lyricPrefs: LyricPrefs,
   private val providers: Set<@JvmSuppressWildcards ILyricsProvider>

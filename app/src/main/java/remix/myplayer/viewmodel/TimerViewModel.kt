@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TimerViewModel @Inject constructor(
   private val savedStateHandle: SavedStateHandle,
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   val settingPrefs: SettingPrefs,
 ) : ViewModel() {
 

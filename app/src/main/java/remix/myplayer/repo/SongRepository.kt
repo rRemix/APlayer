@@ -7,9 +7,6 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Audio
 import android.provider.MediaStore.Audio.Genres
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import remix.myplayer.data.db.room.dao.PlayListDao
 import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
@@ -40,7 +37,7 @@ interface SongRepository {
 
   fun song(id: Long): Song?
 
-  fun getSongsByModels(models: List<APlayerModel>): List<Song>
+  suspend fun getSongsByModels(models: List<APlayerModel>): List<Song>
 
   fun getSongsByGenreId(genreId: Long, sortOrder: String? = null): List<Song>
 
@@ -54,10 +51,10 @@ interface SongRepository {
 }
 
 class SongRepoImpl @Inject constructor(
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val playListDao: PlayListDao,
   private val settingPrefs: SettingPrefs
-) : SongRepository, AbstractRepository(settingPrefs), CoroutineScope by MainScope() {
+) : SongRepository, AbstractRepository(settingPrefs) {
 
   override fun allSongs(): List<Song> {
     return getSongs(
@@ -131,7 +128,7 @@ class SongRepoImpl @Inject constructor(
   override fun song(id: Long) =
     getSongs(Audio.Media._ID + "=?", arrayOf(id.toString() + ""), null).firstOrNull()
 
-  override fun getSongsByModels(models: List<APlayerModel>): List<Song> {
+  override suspend fun getSongsByModels(models: List<APlayerModel>): List<Song> {
     checkWorkerThread()
     val result = arrayListOf<Song>()
 
@@ -200,9 +197,7 @@ class SongRepoImpl @Inject constructor(
 
             if (deleteIds.isNotEmpty()) {
               it.audioIds.removeAll(deleteIds)
-              launch {
-                playListDao.update(it)
-              }
+              playListDao.update(it)
             }
           }
 

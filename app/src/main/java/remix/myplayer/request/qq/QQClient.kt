@@ -18,7 +18,7 @@ import kotlin.random.Random
 
 @Singleton
 class QQClient @Inject constructor(
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val okHttpClient: OkHttpClient
 ) {
 

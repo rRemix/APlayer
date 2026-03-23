@@ -44,7 +44,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingViewModel @Inject constructor(
   private val savedStateHandle: SavedStateHandle,
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val songRepo: SongRepository,
   val settingPrefs: SettingPrefs,
   val lyricPrefs: LyricPrefs,

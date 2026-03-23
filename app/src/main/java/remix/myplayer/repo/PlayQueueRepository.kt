@@ -27,7 +27,7 @@ interface PlayQueueRepository {
 }
 
 class PlayQueueRepoImpl @Inject constructor(
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   settingPrefs: SettingPrefs,
   private val songRepo: SongRepository,
   private val playQueueDao: PlayQueueDao,

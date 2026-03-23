@@ -16,7 +16,7 @@ interface SmbRepository {
 }
 
 class SmbRepoImpl @Inject constructor(
-  @ApplicationContext
+  @param:ApplicationContext
   private val context: Context,
   private val smbDao: SmbDao
 ) : SmbRepository {

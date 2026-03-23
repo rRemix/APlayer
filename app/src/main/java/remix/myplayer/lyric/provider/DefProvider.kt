@@ -15,7 +15,7 @@ import javax.inject.Singleton
 
 @Singleton
 class DefProvider @Inject constructor(
-  @ApplicationContext
+  @param:ApplicationContext
   private val context: Context,
   // 默认优先级排序 内嵌-本地-酷狗-网易-QQ-忽略
   private val lyricPrefs: LyricPrefs,

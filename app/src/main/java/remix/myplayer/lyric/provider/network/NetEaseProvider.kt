@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class NetEaseProvider @Inject constructor(
-  @ApplicationContext
+  @param:ApplicationContext
   private val context: Context,
   private val netEaseClient: NetEaseClient
 ) : NetworkProvider<NetEaseSong>() {

@@ -28,7 +28,7 @@ import androidx.core.content.edit
  */
 @Singleton
 class NetEaseClient @Inject constructor(
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val okHttpClient: OkHttpClient
 ) {
 

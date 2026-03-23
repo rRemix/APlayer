@@ -26,7 +26,7 @@ import javax.inject.Singleton
 
 @Singleton
 class InAppUpdater @Inject constructor(
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val inAppUpdatePrefs: InAppUpdatePrefs,
   private val githubApi: GithubApi
 ) {

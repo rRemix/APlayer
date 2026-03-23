@@ -16,7 +16,7 @@ interface WebDavRepository {
 }
 
 class WebDavRepoImpl @Inject constructor(
-  @ApplicationContext
+  @param:ApplicationContext
   private val context: Context,
   private val webDavDao: WebDavDao
 ) : WebDavRepository {

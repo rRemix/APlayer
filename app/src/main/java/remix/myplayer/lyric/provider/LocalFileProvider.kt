@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Singleton
 class LocalFileProvider @Inject constructor(
-  @ApplicationContext
+  @param:ApplicationContext
   private val context: Context,
 ) : ILyricsProvider {
 

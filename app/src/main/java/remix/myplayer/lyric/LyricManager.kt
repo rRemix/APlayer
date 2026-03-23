@@ -70,7 +70,7 @@ interface LyricManagerEntryPoint {
 // TODO https://github.com/rRemix/APlayer/issues/298
 @Singleton
 class LyricManager @Inject constructor(
-  @ApplicationContext
+  @param:ApplicationContext
   private val context: Context,
   private val themeController: ThemeController,
   val desktopLyricPrefs: DesktopLyricPrefs,

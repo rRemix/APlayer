@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ThemePrefs @Inject constructor(
-  @ApplicationContext val context: Context,
+  @param:ApplicationContext val context: Context,
   settingPrefs: SettingPrefs
 ) :
   AbstractPref(context, name = PrefKeys.Theme.NAME) {

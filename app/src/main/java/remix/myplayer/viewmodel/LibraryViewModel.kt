@@ -51,7 +51,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
   private val savedStateHandle: SavedStateHandle,
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val songRepo: SongRepository,
   private val albumRepo: AlbumRepository,
   private val artistRepo: ArtistRepository,
@@ -151,7 +151,7 @@ class LibraryViewModel @Inject constructor(
     }
   }
 
-  fun loadSongsByModels(models: List<APlayerModel>) = songRepo.getSongsByModels(models)
+  suspend fun loadSongsByModels(models: List<APlayerModel>) = songRepo.getSongsByModels(models)
 
   fun loadSong(selection: String?, selectionValues: Array<String?>?, sortOrder: String? = null) =
     songRepo.getSongs(selection, selectionValues, sortOrder)
