@@ -87,6 +87,7 @@ interface Playback {
   interface PlayerCallback {
 
     fun onIsPlayingChanged(isPlaying: Boolean)
+    fun onAudioSessionIdChanged(audioSessionId: Int)
     fun onPrepare()
     fun onEnded()
     fun onError(error: PlaybackException)

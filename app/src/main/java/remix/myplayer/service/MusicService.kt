@@ -559,8 +559,8 @@ class MusicService : BaseService(),
     playback = ExoPlayback(this)
     playback.attach(this)
 
-    EQHelper.init(this, playback.audioSessionId)
-    EQHelper.open(this, playback.audioSessionId)
+    Timber.v("setUpPlayback, audioSessionId: ${playback.audioSessionId}")
+    EQHelper.updateAudioSession(this, playback.audioSessionId)
   }
 
   override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -571,8 +571,14 @@ class MusicService : BaseService(),
     }
   }
 
+  override fun onAudioSessionIdChanged(audioSessionId: Int) {
+    Timber.v("onAudioSessionIdChanged, audioSessionId: ${playback.audioSessionId}")
+    EQHelper.updateAudioSession(this, audioSessionId)
+  }
+
   override fun onPrepare() {
     Timber.v("onPrepare, firstPrepared: $firstPrepared")
+    EQHelper.updateAudioSession(this, playback.audioSessionId)
 
     pushPlaybackUiState()
 
@@ -600,6 +606,7 @@ class MusicService : BaseService(),
   override fun onItemTransition(mediaItem: MediaItem?, reason: Int) {
     Timber.v("onItemTransition, id: ${mediaItem?.mediaId} reason: $reason playing: $isPlaying currentSong: ${playback.currentSong?.title}")
 
+    Timber.v("onItemTransition, playback.audioSessionId: ${playback.audioSessionId}")
     val song = mediaItem?.localConfiguration?.tag as? Song
     if (song is Song.Remote) {
       launch {
@@ -679,7 +686,7 @@ class MusicService : BaseService(),
 
     cancel()
 
-    EQHelper.close(this, playback.audioSessionId)
+    EQHelper.releaseCurrentAudioSession(this)
     if (isPlaying) {
       pause()
     }

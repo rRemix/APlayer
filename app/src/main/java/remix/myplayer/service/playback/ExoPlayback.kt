@@ -99,6 +99,11 @@ class ExoPlayback(private val context: Context) : Playback {
           if (isPlaying) startProgressTicker() else stopProgressTicker()
         }
 
+        override fun onAudioSessionIdChanged(audioSessionId: Int) {
+          Timber.tag(TAG).v("onAudioSessionIdChanged: $audioSessionId")
+          callback?.onAudioSessionIdChanged(audioSessionId)
+        }
+
         override fun onPlaybackStateChanged(state: Int) {
           Timber.tag(TAG).v("onPlaybackStateChanged: $state")
           when (state) {

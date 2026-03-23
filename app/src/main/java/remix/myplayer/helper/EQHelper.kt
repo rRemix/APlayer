@@ -3,6 +3,7 @@ package remix.myplayer.helper
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.media.audiofx.AudioEffect
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
@@ -43,6 +44,7 @@ object EQHelper {
   //  var systemSessionOpen = false
 //  var builtIdSessionOpen = false
   var builtEqualizerInit = false
+  private var currentAudioSessionId: Int = AudioManager.AUDIO_SESSION_ID_GENERATE
 
   val isBassBoostEnabled: Boolean
     get() = enable && bassBoost?.strengthSupported == true
@@ -75,7 +77,7 @@ object EQHelper {
   fun init(context: Context, sessionId: Int, force: Boolean = false): Boolean {
     Timber.v("init, audioSessionId: $sessionId")
 
-    if (sessionId == AudioEffect.ERROR_BAD_VALUE) {
+    if (!isValidAudioSessionId(sessionId)) {
       return false
     }
 
@@ -95,6 +97,7 @@ object EQHelper {
     Timber.v("init start")
 
     tryRun({
+      releaseEqualizer()
       equalizer = Equalizer(0, sessionId)
       equalizer?.also { equalizer ->
         equalizer.enabled = enable
@@ -111,6 +114,7 @@ object EQHelper {
         bandNumber = equalizer.numberOfBands
 
         //得到之前存储的每个频率的db值
+        bandLevels.clear()
         for (i in 0 until bandNumber) {
           var bandLevel by settingPrefs.sp.delegate("band$i", 0)
           bandLevels.add(bandLevel.toShort())
@@ -132,7 +136,7 @@ object EQHelper {
   fun open(context: Context, audioSessionId: Int) {
     Timber.v("open, audioSessionId: $audioSessionId")
 
-    if (audioSessionId == AudioEffect.ERROR_BAD_VALUE) {
+    if (!isValidAudioSessionId(audioSessionId)) {
       return
     }
 
@@ -202,6 +206,10 @@ object EQHelper {
   fun close(context: Context, audioSessionId: Int) {
     Timber.v("close")
 
+    if (!isValidAudioSessionId(audioSessionId)) {
+      return
+    }
+
     tryRun({
       releaseEqualizer()
     }, {
@@ -215,6 +223,29 @@ object EQHelper {
     })
 
     closeSystemAudioEffectSession(context, audioSessionId)
+  }
+
+  fun updateAudioSession(context: Context, audioSessionId: Int) {
+    if (!isValidAudioSessionId(audioSessionId)) {
+      return
+    }
+    if (currentAudioSessionId == audioSessionId) {
+      return
+    }
+
+    if (isValidAudioSessionId(currentAudioSessionId)) {
+      close(context, currentAudioSessionId)
+    }
+
+    Timber.v("updateAudioSession, from: $currentAudioSessionId to: $audioSessionId")
+    init(context, audioSessionId)
+    open(context, audioSessionId)
+    currentAudioSessionId = audioSessionId
+  }
+
+  fun releaseCurrentAudioSession(context: Context) {
+    close(context, currentAudioSessionId)
+    currentAudioSessionId = AudioManager.AUDIO_SESSION_ID_GENERATE
   }
 
 
@@ -306,7 +337,7 @@ object EQHelper {
   @JvmStatic
   fun startEqualizer(activity: Activity, nav: NavHostController) {
     val sessionId = MusicServiceRemote.getAudioSessionId() ?: return
-    if (sessionId == AudioEffect.ERROR_BAD_VALUE) {
+    if (!isValidAudioSessionId(sessionId)) {
       Toast.makeText(
         activity,
         activity.resources.getString(R.string.no_audio_ID),
@@ -326,6 +357,11 @@ object EQHelper {
 
   private fun isSystemEqualizerAvailable(context: Context): Boolean {
     return isIntentAvailable(context, Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL))
+  }
+
+  private fun isValidAudioSessionId(sessionId: Int): Boolean {
+    return sessionId != AudioEffect.ERROR_BAD_VALUE &&
+      sessionId != AudioManager.AUDIO_SESSION_ID_GENERATE
   }
 
   private fun tryRun(block: () -> Unit, error: () -> Unit) {
