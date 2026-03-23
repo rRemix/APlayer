@@ -1,5 +1,9 @@
 package remix.myplayer.ui.screen.playing
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.view.WindowManager
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
@@ -21,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +36,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
+import kotlinx.coroutines.launch
 import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.lyric.LyricManager
+import remix.myplayer.util.Util.registerLocalReceiver
+import remix.myplayer.util.Util.unregisterLocalReceiver
 import remix.myplayer.util.ext.isPortraitOrientation
 import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
@@ -57,6 +66,7 @@ private fun Portrait(isVisible: Boolean) {
   ) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     PlayingTopBar(playbackState.song, swatch)
 
@@ -128,6 +138,25 @@ private fun Portrait(isVisible: Boolean) {
       }
       onDispose {
         window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+      }
+    }
+
+    DisposableEffect(Unit) {
+      val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+          if (intent.action == LyricManager.ACTION_LYRIC) {
+            val extra = intent.getIntExtra(LyricManager.EXTRA_LYRIC, -1)
+            if (extra == LyricManager.SHOW_OFFSET_PANEL) {
+              scope.launch {
+                pagerState.animateScrollToPage(1)
+              }
+            }
+          }
+        }
+      }
+      registerLocalReceiver(receiver, IntentFilter(LyricManager.ACTION_LYRIC))
+      onDispose {
+        unregisterLocalReceiver(receiver)
       }
     }
   }
