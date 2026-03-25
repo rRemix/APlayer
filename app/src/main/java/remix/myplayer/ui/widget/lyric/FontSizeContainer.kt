@@ -32,6 +32,7 @@ import remix.myplayer.util.ext.clickWithRipple
 internal fun FontSizeContainer(
   firstLineSize: Float,
   secondLineSize: Float,
+  valueRange: ClosedFloatingPointRange<Float>,
   sliderTintColor: Color,
   onInteractingStatusChange: (Boolean) -> Unit,
   onValueChange: (Int, Float) -> Unit
@@ -55,6 +56,7 @@ internal fun FontSizeContainer(
       icon = R.drawable.ic_looks_one_24dp,
       desc = "DkpFirstLineFontSize",
       value = firstLineSize,
+      valueRange = valueRange,
       sliderTintColor = sliderTintColor,
       interactionSource = firstSliderSource,
       onValueChange = {
@@ -65,6 +67,7 @@ internal fun FontSizeContainer(
       icon = R.drawable.ic_looks_two_24dp,
       desc = "DkpSecondLineFontSize",
       value = secondLineSize,
+      valueRange = valueRange,
       sliderTintColor = sliderTintColor,
       interactionSource = secondSliderSource,
       onValueChange = {
@@ -79,16 +82,16 @@ private fun FontSizeSetting(
   @DrawableRes icon: Int,
   desc: String,
   value: Float,
+  valueRange: ClosedFloatingPointRange<Float>,
   sliderTintColor: Color,
   interactionSource: MutableInteractionSource,
   onValueChange: (Float) -> Unit
 ) {
   Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-    val range = 8f..32f
     SliderIcon(icon, desc)
     SliderIcon(R.drawable.ic_text_decrease_24dp, "${desc}_decrease") {
       val newValue = value - 1
-      if (newValue in range) {
+      if (newValue in valueRange) {
         onValueChange(newValue)
       }
     }
@@ -100,7 +103,7 @@ private fun FontSizeSetting(
       interactionSource = interactionSource,
       value = value,
       onValueChange = onValueChange,
-      valueRange = range,
+      valueRange = valueRange,
       properties = defaultLineSliderProperties.copy(
         trackProgressColor = sliderTintColor,
         thumbColor = sliderTintColor
@@ -109,7 +112,7 @@ private fun FontSizeSetting(
 
     SliderIcon(R.drawable.ic_text_increase_24dp, "${desc}_increase") {
       val newValue = value + 1
-      if (newValue in range) {
+      if (newValue in valueRange) {
         onValueChange(newValue)
       }
     }

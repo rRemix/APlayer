@@ -35,6 +35,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -56,6 +57,7 @@ import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.CenterInBox
 import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.util.ext.clickableWithoutRipple
+import remix.myplayer.util.ext.isTablet
 
 @Composable
 fun DesktopLyricOverlay(
@@ -78,6 +80,11 @@ fun DesktopLyricOverlay(
   }
 
   val desktopLyricPrefs = lyricManager.desktopLyricPrefs
+  val fontSizeRange = if (LocalContext.current.isTablet()) {
+    DESKTOP_LYRIC_FONT_SIZE_RANGE_LARGE_SCREEN
+  } else {
+    DESKTOP_LYRIC_FONT_SIZE_RANGE_DEFAULT
+  }
 
   var firstLineSize by remember {
     mutableFloatStateOf(desktopLyricPrefs.firstLineSize)
@@ -217,6 +224,7 @@ fun DesktopLyricOverlay(
               FontSizeContainer(
                 firstLineSize,
                 secondLineSize,
+                fontSizeRange,
                 sungColor,
                 onInteractingStatusChange = {
                   if (it) {
@@ -377,3 +385,6 @@ data class DesktopLyricUiState(
   val locked: Boolean,
   val currentLyricLine: CurrentNextLyricsLine
 )
+
+private val DESKTOP_LYRIC_FONT_SIZE_RANGE_DEFAULT = 8f..32f
+private val DESKTOP_LYRIC_FONT_SIZE_RANGE_LARGE_SCREEN = 8f..48f
