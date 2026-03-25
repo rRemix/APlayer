@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import remix.myplayer.ui.theme.LocalTheme
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
@@ -197,37 +198,49 @@ private fun Modifier.verticalScrollbarImpl(
   return this
     .pointerInput(Unit) {
       awaitEachGesture {
-        // 拦截down事件
+        val indicatorHeightPx = with(density) { height.toPx() }
+        val touchSlop = viewConfiguration.touchSlop
+
         val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
 
-        // 加一点padding扩大点击区域
-        if (down.position.x >= size.width - (with(density) { width.toPx() } + with(density) { 16.dp.toPx() })) {
-          down.consume()
-          isDragging = true
-          val indicatorHeightPx = with(density) { height.toPx() }
-
-          do {
-            // 拦截move事件
-            val event = awaitPointerEvent(pass = PointerEventPass.Initial)
-            val change = event.changes.firstOrNull { it.id == down.id }
-
-            if (change == null || !change.pressed) {
-              isDragging = false
-              break
-            }
-
-            // 计算进度
-            val trackHeight = size.height.toFloat()
-            val maxOffset = trackHeight - indicatorHeightPx
-            if (maxOffset > 0) {
-              val thumbTop = (change.position.y - indicatorHeightPx / 2f).coerceIn(0f, maxOffset)
-              val progress = thumbTop / maxOffset
-              onDrag(progress)
-            }
-            
-            change.consume()
-          } while (true)
+        if (down.position.x < size.width - with(density) { width.toPx() + 16.dp.toPx() }) {
+          return@awaitEachGesture
         }
+
+        var dragStarted = false
+
+        do {
+          val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+          val change = event.changes.firstOrNull { it.id == down.id }
+
+          if (change == null || !change.pressed) {
+            isDragging = false
+            break
+          }
+
+          val totalDragY = change.position.y - down.position.y
+          val totalDragX = change.position.x - down.position.x
+          if (!dragStarted) {
+            val isVerticalDrag =
+              abs(totalDragY) >= touchSlop && abs(totalDragY) > abs(totalDragX)
+            if (!isVerticalDrag) {
+              continue
+            }
+
+            dragStarted = true
+            isDragging = true
+          }
+
+          val trackHeight = size.height.toFloat()
+          val maxOffset = trackHeight - indicatorHeightPx
+          if (maxOffset > 0) {
+            val thumbTop = (change.position.y - indicatorHeightPx / 2f).coerceIn(0f, maxOffset)
+            val progress = thumbTop / maxOffset
+            onDrag(progress)
+          }
+
+          change.consume()
+        } while (true)
       }
     }
     .drawWithContent {
