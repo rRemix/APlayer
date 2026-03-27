@@ -52,7 +52,7 @@ fun PlayingPanel(isVisible: Boolean) {
     if (context.isPortraitOrientation()) {
       Portrait(isVisible)
     } else {
-      Landscape()
+      Landscape(isVisible)
     }
   }
 }
@@ -186,7 +186,7 @@ private fun PlayingIndicator(
 }
 
 @Composable
-private fun Landscape() {
+private fun Landscape(isVisible: Boolean) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -217,6 +217,18 @@ private fun Landscape() {
         contentAlignment = Alignment.Center
       ) {
         PlayingLyric(playbackState.song)
+      }
+    }
+
+    val keepScreenOn =
+      settingViewModel.settingsState.collectAsStateWithLifecycle().value.playingScreen.keepScreenOn
+    val window = LocalActivity.current?.window
+    DisposableEffect(isVisible, keepScreenOn) {
+      if (isVisible && keepScreenOn) {
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+      }
+      onDispose {
+        window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
       }
     }
 
