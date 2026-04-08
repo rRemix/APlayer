@@ -21,6 +21,10 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.hchen.superlyricapi.SuperLyricData
+import com.hchen.superlyricapi.SuperLyricHelper
+import com.hchen.superlyricapi.SuperLyricLine
+import com.hchen.superlyricapi.SuperLyricWord
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import dagger.hilt.EntryPoint
@@ -195,11 +199,30 @@ class LyricManager @Inject constructor(
       updateStatusBarLyric()
     }
 
+  var isSuperLyricApiEnabled: Boolean
+    get() = lyricPrefs.superLyricApiEnabled
+    set(value) {
+      lyricPrefs.superLyricApiEnabled = value
+
+      if (SuperLyricHelper.isAvailable()) {
+        if (value) {
+          if (!SuperLyricHelper.isPublisherRegistered()) {
+            SuperLyricHelper.registerPublisher()
+          }
+        } else {
+          if (SuperLyricHelper.isPublisherRegistered()) {
+            SuperLyricHelper.unregisterPublisher()
+          }
+        }
+      }
+      updateSuperLyric()
+    }
+
   @UiThread
   private fun ensureDesktopLyric() {
     val shouldShow =
       isServiceAvailable && isNotifyShowing && isScreenOn && !isAppInForeground && isDesktopLyricEnabled &&
-          (!isDesktopLyricLocked || isPlaying)
+              (!isDesktopLyricLocked || isPlaying)
     if (shouldShow != (desktopLyricView != null)) {
       if (shouldShow) {
         createDesktopLyric()
@@ -399,6 +422,7 @@ class LyricManager @Inject constructor(
         }
       }
       updateStatusBarLyric()
+      updateSuperLyric()
       ensureDesktopLyric()
     }
   private var progress: Long = 0
@@ -424,19 +448,90 @@ class LyricManager @Inject constructor(
       }
       field = value
       updateStatusBarLyric()
+      updateSuperLyric()
     }
 
   private fun updateStatusBarLyric() {
     val service = MusicServiceRemote.service ?: return
     val lyricLine = currentLyricsLine
     val shouldShow = isStatusBarLyricEnabled && isPlaying &&
-        lyricLine.isNotBlank() &&
-        lyricLine != LyricLine.LYRICS_LINE_NO_LRC.content
+            lyricLine.isNotBlank() &&
+            lyricLine != LyricLine.LYRICS_LINE_NO_LRC.content
 
     if (shouldShow) {
       service.updateNotificationWithLrc(lyricLine)
     } else {
       service.clearStatusBarLyricNotification()
+    }
+  }
+
+  private fun updateSuperLyric() {
+    if (!isSuperLyricApiEnabled) {
+      return
+    }
+
+    if (isPlaying) {
+      val lyricLine = currentLyricsLine
+      val shouldShow = lyricLine.isNotBlank() &&
+              lyricLine != LyricLine.LYRICS_LINE_NO_LRC.content &&
+              lyricLine != LyricLine.LYRICS_LINE_SEARCHING.content
+
+      if (shouldShow) {
+        val song = MusicStateSource.playbackUiState.value.song
+        val progress = MusicStateSource.progressState.value
+        val lyrics = currentNextLyricsLine.value
+        if (SuperLyricHelper.isAvailable()) {
+          if (lyrics.currentLine != null) {
+            val superLine = when (lyrics.currentLine) {
+              is PerWordLyricLine -> {
+                SuperLyricLine(
+                  lyrics.currentLine.content,
+                  Array(lyrics.currentLine.words.size) { index ->
+                    val word = lyrics.currentLine.words[index]
+                    if (index != lyrics.currentLine.words.size - 1) {
+                      val nextWord = lyrics.currentLine.words[index + 1]
+                      SuperLyricWord(
+                        word.content,
+                        word.time,
+                        nextWord.time
+                      )
+                    } else {
+                      SuperLyricWord(
+                        word.content,
+                        word.time,
+                        lyrics.nextLine?.time ?: (progress.duration + offset)
+                      )
+                    }
+                  },
+                  lyrics.currentLine.time,
+                  lyrics.nextLine?.time ?: (progress.duration + offset)
+                )
+              }
+
+              else -> {
+                SuperLyricLine(
+                  lyrics.currentLine.content,
+                  lyrics.currentLine.time,
+                  lyrics.nextLine?.time ?: (progress.duration + offset)
+                )
+              }
+            }
+
+            SuperLyricHelper.sendLyric(
+              SuperLyricData()
+                .setTitle(song.title)
+                .setArtist(song.artist)
+                .setAlbum(song.album)
+                .setLyric(superLine)
+                .setTranslation(SuperLyricLine(lyrics.currentLine.translation ?: ""))
+            )
+          }
+        }
+      }
+    } else {
+      SuperLyricHelper.sendStop(
+        SuperLyricData()
+      )
     }
   }
 

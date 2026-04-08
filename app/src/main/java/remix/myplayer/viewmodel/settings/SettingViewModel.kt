@@ -125,6 +125,7 @@ class SettingViewModel @Inject constructor(
     lyric = LyricSettings(
       desktopLyricEnabled = lyricPrefs.desktopLyricEnabled,
       statusBarLyricEnabled = lyricPrefs.statusBarLyricEnabled,
+      superLyricApiEnabled = lyricPrefs.superLyricApiEnabled,
       fontScale = lyricPrefs.fontScale,
       generalLyricOrder = lyricPrefs.generalLyricOrderList
     ),
@@ -356,6 +357,11 @@ class SettingViewModel @Inject constructor(
   fun setStatusBarLyricEnabled(enabled: Boolean) {
     lyricManager.isStatusBarLyricEnabled = enabled
     _settingsState.update { it.copy(lyric = it.lyric.copy(statusBarLyricEnabled = enabled)) }
+  }
+
+  fun setSuperLyricApiEnabled(enabled: Boolean) {
+    lyricManager.isSuperLyricApiEnabled = enabled
+    _settingsState.update { it.copy(lyric = it.lyric.copy(superLyricApiEnabled = enabled)) }
   }
 
   fun setLyricFontScale(scale: Float) {

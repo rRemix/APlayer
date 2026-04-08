@@ -13,6 +13,7 @@ glideCompose = "1.0.0-beta01"
 retrofit = "3.0.0"
 retrofitKotlinxSerialization = "1.0.0"
 room = "2.7.2"
+superlyricapi = "3.3"
 xxpermissions = "21.2"
 workRuntimeKtx = "2.10.4"
 activityCompose = "1.10.1"
@@ -102,6 +103,7 @@ image-cropper = { module = "com.vanniktech:android-image-cropper", version.ref =
 bugly = { group = "com.tencent.bugly", name = "crashreport", version.ref = "bugly" }
 leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
 logback-android = { group = "com.github.tony19", name = "logback-android", version.ref = "logbackAndroid" }
+superlyricapi = { module = "com.github.HChenX:SuperLyricApi", version.ref = "superlyricapi" }
 xxpermissions = { module = "com.github.getActivity:XXPermissions", version.ref = "xxpermissions" }
 sardine-android = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "sardineAndroid" }
 smbj = { group = "com.hierynomus", name = "smbj", version.ref = "smbj" }

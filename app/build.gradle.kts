@@ -262,6 +262,7 @@ dependencies {
     implementation(libs.slf4j)
     implementation(libs.timber)
     implementation(libs.tinypinyin)
+    implementation(libs.superlyricapi)
 
     debugImplementation(libs.leakcanary)
 

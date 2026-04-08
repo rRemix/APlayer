@@ -35,6 +35,7 @@ class LyricPrefs @Inject constructor(
 
   var desktopLyricEnabled by PrefsDelegate(sp, KEY_DESKTOP_LYRIC_ENABLED, false)
   var statusBarLyricEnabled by PrefsDelegate(sp, KEY_STATUS_BAR_LYRIC_ENABLED, false)
+  var superLyricApiEnabled by PrefsDelegate(sp, KEY_SUPER_LYRIC_API_ENABLED, false)
 
   var fontScale by PrefsDelegate(sp, KEY_LYRIC_FONT_SCALE, 1.0f)
 
@@ -65,6 +66,9 @@ class LyricPrefs @Inject constructor(
 
     // StatusBar
     const val KEY_STATUS_BAR_LYRIC_ENABLED: String = "status_bar_lyric_enabled"
+
+    // SuperLyricApi
+    const val KEY_SUPER_LYRIC_API_ENABLED: String = "super_lyric_api_enabled"
 
     // Desktop
     const val KEY_DESKTOP_LYRIC_ENABLED: String = "desktop_lyric_enabled"
