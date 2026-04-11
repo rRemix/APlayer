@@ -111,15 +111,7 @@ fun CustomSortScreen(id: Long) {
             modifier = Modifier
               .fillMaxWidth()
               .height(56.dp)
-              .background(LocalTheme.current.mainBackground)
-              .draggableHandle(
-                onDragStarted = {
-                  Util.vibrate(context, 50)
-                },
-                onDragStopped = {
-                  Util.vibrate(context, 50)
-                }
-              ),
+              .background(LocalTheme.current.mainBackground),
             verticalAlignment = Alignment.CenterVertically
           ) {
             GlideCover(
@@ -130,10 +122,29 @@ fun CustomSortScreen(id: Long) {
               circle = false
             )
 
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Column(
+              modifier = Modifier.weight(1f),
+              verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
               TextPrimary(song.title)
               TextSecondary(song.album)
             }
+
+            Icon(
+              painter = painterResource(R.drawable.ic_drag_handle_24dp),
+              contentDescription = "CustomSortDragHandle",
+              tint = LocalTheme.current.textSecondary,
+              modifier = Modifier
+                .padding(end = 8.dp)
+                .draggableHandle(
+                  onDragStarted = {
+                    Util.vibrate(context, 50)
+                  },
+                  onDragStopped = {
+                    Util.vibrate(context, 50)
+                  }
+                )
+            )
           }
         }
       }
