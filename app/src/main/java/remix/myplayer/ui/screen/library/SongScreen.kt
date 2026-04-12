@@ -37,6 +37,7 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
   val listState = rememberLazyListState()
   val songs by libraryVM.songs.collectAsStateWithLifecycle()
   val context = LocalContext.current
+  val popupEnabled = !multiSelectState.isShowInLibrary()
 
   LaunchedEffect(scrollToCurrentEvent) {
     scrollToCurrentEvent?.collect {
@@ -76,6 +77,7 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
           modelParent = song,
           selected = selected,
           playing = isPlayingSong,
+          popupEnabled = popupEnabled,
           onClickSong = {
             if (songs.isEmpty()) {
               return@ListSong

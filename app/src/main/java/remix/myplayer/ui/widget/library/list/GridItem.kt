@@ -32,6 +32,7 @@ fun GridItem(
   text1: String,
   text2: String? = null,
   selected: Boolean,
+  popupEnabled: Boolean = true,
   onClick: () -> Unit,
   onLongClick: () -> Unit
 ) {
@@ -75,7 +76,7 @@ fun GridItem(
         }
       }
 
-      LibraryItemPopupButton(model = model)
+      LibraryItemPopupButton(model = model, enabled = popupEnabled)
     }
   }
 }

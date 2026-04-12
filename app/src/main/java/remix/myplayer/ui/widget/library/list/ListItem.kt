@@ -31,6 +31,7 @@ fun ListItem(
   text1: String,
   text2: String,
   selected: Boolean,
+  popupEnabled: Boolean = true,
   onClick: () -> Unit,
   onLongClick: () -> Unit
 ) {
@@ -66,7 +67,7 @@ fun ListItem(
       TextSecondary(text = text2)
     }
 
-    LibraryItemPopupButton(model = model)
+    LibraryItemPopupButton(model = model, enabled = popupEnabled)
 
   }
 }

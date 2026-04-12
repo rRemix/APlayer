@@ -39,6 +39,7 @@ fun ListSong(
   modelParent: APlayerModel,
   selected: Boolean,
   playing: Boolean,
+  popupEnabled: Boolean = true,
   onClickSong: () -> Unit,
   onLongClickSong: () -> Unit,
   num: Int? = null,
@@ -108,7 +109,8 @@ fun ListSong(
       SongPopupButton(
         modifier = Modifier,
         song = song,
-        parent = modelParent
+        parent = modelParent,
+        enabled = popupEnabled
       )
     }
   }

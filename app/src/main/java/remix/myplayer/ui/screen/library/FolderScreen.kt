@@ -50,6 +50,7 @@ fun FolderScreen() {
   val mainVM = mainViewModel
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val context = LocalContext.current
+  val popupEnabled = !multiSelectState.isShowInLibrary()
 
   val selectedFolders by remember {
     derivedStateOf {
@@ -64,6 +65,7 @@ fun FolderScreen() {
       FolderItem(
         folder,
         selected = selectedFolders.contains(folder.getKey()),
+        popupEnabled = popupEnabled,
         onClick = {
           if (multiSelectState.where == MultiSelectState.Where.Folder) {
             mainVM.updateMultiSelectModel(folder)
@@ -81,7 +83,13 @@ fun FolderScreen() {
 }
 
 @Composable
-fun FolderItem(folder: Folder, selected: Boolean, onClick: () -> Unit, onLongClick: () -> Unit) {
+fun FolderItem(
+  folder: Folder,
+  selected: Boolean,
+  popupEnabled: Boolean = true,
+  onClick: () -> Unit,
+  onLongClick: () -> Unit
+) {
   val theme = LocalTheme.current
 
   Box(
@@ -105,7 +113,11 @@ fun FolderItem(folder: Folder, selected: Boolean, onClick: () -> Unit, onLongCli
         .align(Alignment.CenterStart)
     )
 
-    LibraryItemPopupButton(modifier = Modifier.align(Alignment.CenterEnd), model = folder)
+    LibraryItemPopupButton(
+      modifier = Modifier.align(Alignment.CenterEnd),
+      model = folder,
+      enabled = popupEnabled
+    )
 
     TextSecondary(
       text = pluralStringResource(R.plurals.song_num, folder.count, folder.count),

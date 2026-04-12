@@ -90,6 +90,7 @@ fun SearchScreen() {
   val context = LocalContext.current
 
   val showMultiSelect = multiSelectState.isShowInSearch()
+  val popupEnabled = !showMultiSelect
 
   BackHandler(showMultiSelect) {
     mainVM.closeMultiSelect()
@@ -167,6 +168,7 @@ fun SearchScreen() {
               modelParent = song,
               selected = selected,
               playing = isPlayingSong,
+              popupEnabled = popupEnabled,
               onClickSong = {
                 if (songs.isEmpty()) {
                   return@ListSong

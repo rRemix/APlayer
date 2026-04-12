@@ -47,13 +47,14 @@ import remix.myplayer.viewmodel.settingViewModel
 @Composable
 fun LibraryItemPopupButton(
   modifier: Modifier = Modifier,
-  model: APlayerModel
+  model: APlayerModel,
+  enabled: Boolean = true
 ) {
   var expanded by remember { mutableStateOf(false) }
   Box(
     contentAlignment = Alignment.Center,
     modifier = modifier
-      .clickWithRipple {
+      .clickWithRipple(enabled = enabled) {
         expanded = !expanded
       }
       .size(dimensionResource(id = R.dimen.item_list_btn_size))

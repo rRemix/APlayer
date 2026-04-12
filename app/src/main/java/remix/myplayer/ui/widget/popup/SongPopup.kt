@@ -44,13 +44,14 @@ import remix.myplayer.viewmodel.tagEditViewModel
 fun SongPopupButton(
   modifier: Modifier = Modifier,
   song: Song,
-  parent: APlayerModel
+  parent: APlayerModel,
+  enabled: Boolean = true
 ) {
   var expanded by remember { mutableStateOf(false) }
   Box(
     contentAlignment = Alignment.Center,
     modifier = modifier
-      .clickWithRipple {
+      .clickWithRipple(enabled = enabled) {
         expanded = !expanded
       }
       .size(dimensionResource(id = R.dimen.item_list_btn_size))

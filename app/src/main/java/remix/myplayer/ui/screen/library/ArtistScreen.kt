@@ -46,6 +46,7 @@ fun ArtistScreen() {
   val mainVM = mainViewModel
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val context = LocalContext.current
+  val popupEnabled = !multiSelectState.isShowInLibrary()
 
   Column(
     modifier = Modifier.background(LocalTheme.current.libraryBackground)
@@ -80,6 +81,7 @@ fun ArtistScreen() {
             text1 = artist.artist,
             selected = selectedIds.contains(artist.getKey()),
             text2 = pluralStringResource(R.plurals.song_num, artist.count, artist.count),
+            popupEnabled = popupEnabled,
             onClick = {
               if (multiSelectState.where == MultiSelectState.Where.Artist) {
                 mainVM.updateMultiSelectModel(artist)
@@ -108,6 +110,7 @@ fun ArtistScreen() {
             GridItem(
               artist, text1 = artist.artist,
               selected = selectedIds.contains(artist.getKey()),
+              popupEnabled = popupEnabled,
               onClick = {
                 if (multiSelectState.where == MultiSelectState.Where.Artist) {
                   mainVM.updateMultiSelectModel(artist)

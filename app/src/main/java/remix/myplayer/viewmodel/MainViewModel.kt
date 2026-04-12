@@ -141,10 +141,12 @@ class MainViewModel @Inject constructor(
 
   fun updateMultiSelectModel(model: APlayerModel) {
     _multiSelectState.update {
+      val modelKey = model.getKey()
       val selectedModels = it.selectedModels.toMutableList()
-      if (selectedModels.contains(model)) {
-        selectedModels.remove(model)
-      } else {
+      val removed = selectedModels.removeAll { selected ->
+        selected.getKey() == modelKey
+      }
+      if (!removed) {
         selectedModels.add(model)
       }
 
@@ -158,7 +160,7 @@ class MainViewModel @Inject constructor(
 
   fun updateMultiSelectModelsAll(models: List<APlayerModel>) {
     _multiSelectState.update {
-      it.copy(selectedModels = models)
+      it.copy(selectedModels = models.distinctBy { model -> model.getKey() })
     }
   }
 }

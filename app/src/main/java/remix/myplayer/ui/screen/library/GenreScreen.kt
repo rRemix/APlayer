@@ -47,6 +47,7 @@ fun GenreScreen() {
   val mainVM = mainViewModel
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val context = LocalContext.current
+  val popupEnabled = !multiSelectState.isShowInLibrary()
 
   Column(
     modifier = Modifier.background(LocalTheme.current.libraryBackground)
@@ -81,6 +82,7 @@ fun GenreScreen() {
             text1 = genre.genre,
             selected = selectedIds.contains(genre.getKey()),
             text2 = pluralStringResource(R.plurals.song_num, genre.count, genre.count),
+            popupEnabled = popupEnabled,
             onClick = {
               if (multiSelectState.where == MultiSelectState.Where.Genre) {
                 mainVM.updateMultiSelectModel(genre)
@@ -110,6 +112,7 @@ fun GenreScreen() {
               genre,
               text1 = genre.genre,
               selected = selectedIds.contains(genre.getKey()),
+              popupEnabled = popupEnabled,
               onClick = {
                 if (multiSelectState.where == MultiSelectState.Where.Genre) {
                   mainVM.updateMultiSelectModel(genre)

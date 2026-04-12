@@ -58,6 +58,7 @@ fun LastAddedScreen() {
   val context = LocalContext.current
 
   val showMultiSelect = multiSelectState.isShowInLastAdded()
+  val popupEnabled = !showMultiSelect
 
   BackHandler(showMultiSelect) {
     mainVM.closeMultiSelect()
@@ -115,6 +116,7 @@ fun LastAddedScreen() {
             modelParent = song,
             selected = selected,
             playing = isPlayingSong,
+            popupEnabled = popupEnabled,
             onClickSong = {
               if (songs.isEmpty()) {
                 return@ListSong

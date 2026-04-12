@@ -85,6 +85,7 @@ fun DetailScreen(model: APlayerModel) {
   }
 
   val showMultiSelect = multiSelectState.isShowInDetail()
+  val popupEnabled = !showMultiSelect
 
   BackHandler(showMultiSelect) {
     mainVM.closeMultiSelect()
@@ -151,6 +152,7 @@ fun DetailScreen(model: APlayerModel) {
             modelParent = model,
             selected = selected,
             playing = isPlayingSong,
+            popupEnabled = popupEnabled,
             onClickSong = {
               if (multiSelectState.where == MultiSelectState.Where.Detail) {
                 mainVM.updateMultiSelectModel(song)
