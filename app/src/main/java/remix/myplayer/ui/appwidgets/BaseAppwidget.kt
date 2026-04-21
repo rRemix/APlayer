@@ -9,7 +9,6 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
 import android.widget.RemoteViews
-import androidx.compose.ui.graphics.toArgb
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.AppWidgetTarget
 import remix.myplayer.App
@@ -75,7 +74,7 @@ abstract class BaseAppwidget
   }
 
   protected fun updateCover(
-    service: MusicService,
+    context: Context,
     remoteViews: RemoteViews,
     appWidgetIds: IntArray?,
     reloadCover: Boolean
@@ -84,19 +83,19 @@ abstract class BaseAppwidget
     val size =
       if (this.javaClass.simpleName == AppWidgetBig::class.java.simpleName) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
 
-    Glide.with(service)
+    Glide.with(context)
       .asBitmap()
       .load(song)
       .centerCrop()
       .override(size, size)
       .into(
         AppWidgetTarget(
-          service,
+          context,
           size,
           size,
           R.id.appwidget_image,
           remoteViews,
-          ComponentName(service, javaClass)
+          ComponentName(context, javaClass)
         )
       )
   }
@@ -114,10 +113,6 @@ abstract class BaseAppwidget
     views.setOnClickPendingIntent(
       R.id.appwidget_next,
       buildServicePendingIntent(context, componentNameForService, Command.SKIP_TO_NEXT)
-    )
-    views.setOnClickPendingIntent(
-      R.id.appwidget_model,
-      buildServicePendingIntent(context, componentNameForService, Command.CHANGE_MODEL)
     )
     views.setOnClickPendingIntent(
       R.id.appwidget_love,
@@ -162,18 +157,22 @@ abstract class BaseAppwidget
     }
   }
 
-  protected fun updateRemoteViews(service: MusicService, remoteViews: RemoteViews, song: Song) {
+  protected fun updateRemoteViews(
+    context: Context,
+    remoteViews: RemoteViews,
+    song: Song,
+    primaryColor: Int
+  ) {
     //        int skin = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
     //        skin = skin == SKIN_TRANSPARENT ? AppWidgetSkin.TRANSPARENT : AppWidgetSkin.WHITE_1F;
     //        updateBackground(remoteViews);
     updateTitle(remoteViews, song)
     updateArtist(remoteViews, song)
     //        updateSkin(remoteViews);
-    updatePlayPause(service, remoteViews)
-    updateLove(service, remoteViews, song)
-    updateModel(service, remoteViews)
+    updatePlayPause(remoteViews)
+    updateLove(remoteViews)
     updateNextAndPrev(remoteViews)
-    updateProgress(service, remoteViews, song)
+    updateProgress(remoteViews, song, primaryColor)
     updateTimer(remoteViews)
   }
 
@@ -181,7 +180,7 @@ abstract class BaseAppwidget
     remoteViews.setImageViewResource(R.id.appwidget_timer, skin.timerRes)
   }
 
-  private fun updateProgress(service: MusicService, remoteViews: RemoteViews, song: Song) {
+  private fun updateProgress(remoteViews: RemoteViews, song: Song, primaryColor: Int) {
     // 设置时间
     remoteViews.setTextColor(R.id.appwidget_progress, skin.progressColor)
     // 进度
@@ -193,12 +192,12 @@ abstract class BaseAppwidget
     )
     // 轨道颜色
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-      val tint = ColorStateList.valueOf(service.themeController.appTheme.primary.toArgb())
+      val tint = ColorStateList.valueOf(primaryColor)
       remoteViews.setColorStateList(R.id.appwidget_seekbar, "setProgressTintList", tint)
     }
   }
 
-  private fun updateLove(service: MusicService, remoteViews: RemoteViews, song: Song) {
+  private fun updateLove(remoteViews: RemoteViews) {
     remoteViews.setImageViewResource(
       R.id.appwidget_love,
       if (playbackState.isFavorite) skin.lovedRes else skin.loveRes
@@ -211,12 +210,7 @@ abstract class BaseAppwidget
     remoteViews.setImageViewResource(R.id.appwidget_prev, skin.prevRes)
   }
 
-  private fun updateModel(service: MusicService, remoteViews: RemoteViews) {
-    // 播放模式
-    remoteViews.setImageViewResource(R.id.appwidget_model, skin.getModeRes(service))
-  }
-
-  private fun updatePlayPause(service: MusicService, remoteViews: RemoteViews) {
+  private fun updatePlayPause(remoteViews: RemoteViews) {
     //播放暂停按钮
     remoteViews.setImageViewResource(
       R.id.appwidget_toggle,
@@ -240,9 +234,14 @@ abstract class BaseAppwidget
     remoteViews.setImageViewResource(R.id.appwidget_clickable, skin.background)
   }
 
-  abstract fun updateWidget(service: MusicService, appWidgetIds: IntArray?, reloadCover: Boolean)
+  abstract fun updateWidget(
+    context: Context,
+    appWidgetIds: IntArray?,
+    reloadCover: Boolean,
+    primaryColor: Int
+  )
 
-  abstract fun partiallyUpdateWidget(service: MusicService)
+  abstract fun partiallyUpdateWidget(context: Context, primaryColor: Int)
 
   companion object {
 

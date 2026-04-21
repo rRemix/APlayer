@@ -45,8 +45,8 @@ interface Playback {
   /** 替换歌曲 */
   fun replaceSong(song: Song)
 
-  /** 设置播放模式 */
-  fun setMode(mode: Int)
+  /** 设置循环和随机播放模式 */
+  fun setPlaybackMode(repeatMode: Int, shuffleEnabled: Boolean)
 
   /** 切换下一首 */
   fun skipToNext()

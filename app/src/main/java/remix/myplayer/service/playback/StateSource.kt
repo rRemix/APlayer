@@ -22,7 +22,8 @@ interface StateSource {
     isPlaying: Boolean? = null,
     isFavorite: Boolean? = null,
     speed: Float? = null,
-    playModel: Int? = null,
+    repeatMode: Int? = null,
+    shuffleEnabled: Boolean? = null,
     lastOp: Int? = null,
   )
 
@@ -50,19 +51,23 @@ object MusicStateSource : StateSource {
     isPlaying: Boolean?,
     isFavorite: Boolean?,
     speed: Float?,
-    playModel: Int?,
+    repeatMode: Int?,
+    shuffleEnabled: Boolean?,
     lastOp: Int?,
   ) {
-    _playBackUiState.update {
-      it.copy(
-        song = song ?: it.song,
-        nextSong = nextSong ?: it.nextSong,
-        isPlaying = isPlaying ?: it.isPlaying,
-        isFavorite = isFavorite ?: it.isFavorite,
-        speed = speed ?: it.speed,
-        playMode = playModel ?: it.playMode,
-        lastOp = lastOp ?: it.lastOp,
-        seq = it.seq + 1
+    _playBackUiState.update { old ->
+      val newSong = song ?: old.song
+      val songChanged = song != null && newSong.id != old.song.id
+      old.copy(
+        song = newSong,
+        nextSong = nextSong ?: old.nextSong,
+        isPlaying = isPlaying ?: old.isPlaying,
+        isFavorite = isFavorite ?: if (songChanged) false else old.isFavorite,
+        speed = speed ?: old.speed,
+        repeatMode = repeatMode ?: old.repeatMode,
+        shuffleEnabled = shuffleEnabled ?: old.shuffleEnabled,
+        lastOp = lastOp ?: old.lastOp,
+        seq = old.seq + 1
       )
     }
   }
@@ -90,7 +95,8 @@ data class PlaybackUiState(
   val isPlaying: Boolean = false,
   val isFavorite: Boolean = false,
   val speed: Float = 1.0f,
-  val playMode: Int = SettingPrefs.MODE_LOOP,
+  val repeatMode: Int = SettingPrefs.REPEAT_MODE_ALL,
+  val shuffleEnabled: Boolean = false,
   val lastOp: Int = Command.SKIP_TO_NEXT,
   val seq: Int = 0
 )

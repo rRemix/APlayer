@@ -8,25 +8,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.media.AudioManager
 import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.MediaStore
-import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +26,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
@@ -45,10 +36,9 @@ import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_APLAYER
 import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_CLOSE
 import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_SYSTEM
-import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
-import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
-import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
 import remix.myplayer.data.prefs.SettingPrefs.Companion.OPEN_SOFTWARE
+import remix.myplayer.data.prefs.SettingPrefs.Companion.REPEAT_MODE_ALL
+import remix.myplayer.data.prefs.SettingPrefs.Companion.REPEAT_MODE_ONE
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.LanguageHelper
 import remix.myplayer.helper.ShakeDetector
@@ -67,23 +57,18 @@ import remix.myplayer.service.notification.NotifyImpl24
 import remix.myplayer.service.playback.ExoPlayback
 import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.service.playback.Playback
+import remix.myplayer.service.playback.PlaybackFavoriteState
+import remix.myplayer.service.playback.PlaybackOptions
+import remix.myplayer.service.playback.PlaybackOptionsState
+import remix.myplayer.service.playback.PlaybackProgressSaver
 import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
-import remix.myplayer.ui.appwidgets.BaseAppwidget
-import remix.myplayer.ui.appwidgets.big.AppWidgetBig
-import remix.myplayer.ui.appwidgets.medium.AppWidgetMedium
-import remix.myplayer.ui.appwidgets.medium.AppWidgetMediumTransparent
-import remix.myplayer.ui.appwidgets.small.AppWidgetSmall
-import remix.myplayer.ui.appwidgets.small.AppWidgetSmallTransparent
 import remix.myplayer.ui.nav.MessageNotifier
-import remix.myplayer.ui.theme.ThemeController
 import remix.myplayer.util.Constants.ACTION_EXIT
-import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.Util
-import remix.myplayer.util.Util.isAppOnForeground
 import remix.myplayer.util.Util.registerLocalReceiver
 import remix.myplayer.util.Util.unregisterLocalReceiver
 import remix.myplayer.util.ext.checkMainThread
@@ -112,13 +97,25 @@ class MusicService : BaseService(),
   lateinit var audioFocusManager: AudioFocusManager
 
   @Inject
-  lateinit var themeController: ThemeController
+  lateinit var appWidgetUpdater: AppWidgetUpdater
+
+  @Inject
+  lateinit var mediaSessionUpdater: MediaSessionUpdater
 
   @Inject
   lateinit var lyricManager: LyricManager
 
   @Inject
   lateinit var settingPrefs: SettingPrefs
+
+  @Inject
+  lateinit var playbackOptions: PlaybackOptions
+
+  @Inject
+  lateinit var playbackProgressSaver: PlaybackProgressSaver
+
+  @Inject
+  lateinit var playbackFavoriteState: PlaybackFavoriteState
 
   @Inject
   lateinit var playQueueStore: PlayQueueStore
@@ -151,22 +148,19 @@ class MusicService : BaseService(),
   private val LOAD_SUCCESS = 2
 
   /**
-   * 设置播放模式并更新下一首歌曲
+   * 设置循环和随机播放模式并更新下一首歌曲
    */
-  private var playModel: Int = MODE_LOOP
+  private var repeatMode: Int
+    get() = playbackOptions.repeatMode
     set(value) {
-      Timber.v("修改播放模式: $value")
-      settingPrefs.playModel = value
-
-      field = value
-      playback.setMode(value)
-      partiallyUpdateWidget()
-
-      updateQueueItem()
-
-      pushPlaybackUiState()
+      applyPlaybackMode(playbackOptions.set(value, shuffleEnabled))
     }
-    get() = settingPrefs.playModel
+
+  private var shuffleEnabled: Boolean
+    get() = playbackOptions.shuffleEnabled
+    set(value) {
+      applyPlaybackMode(playbackOptions.set(repeatMode, value))
+    }
 
   /**
    * 播放完当前歌曲后是否停止app
@@ -178,11 +172,6 @@ class MusicService : BaseService(),
    */
   lateinit var playback: ExoPlayback
     private set
-
-  /**
-   * 桌面部件
-   */
-  private val appWidgets: HashMap<String, BaseAppwidget> = HashMap()
 
   /**
    * 播放控制的Receiver
@@ -203,13 +192,6 @@ class MusicService : BaseService(),
    */
   private val headSetReceiver: HeadsetPlugReceiver by lazy {
     HeadsetPlugReceiver()
-  }
-
-  /**
-   * 接收桌面部件
-   */
-  private val widgetReceiver: WidgetReceiver by lazy {
-    WidgetReceiver()
   }
 
   /**
@@ -249,16 +231,6 @@ class MusicService : BaseService(),
   private val volumeController: VolumeController by lazy {
     VolumeController(this)
   }
-
-  /**
-   * 保存播放进度
-   */
-  private var progressJob: Job? = null
-
-  /**
-   * 更新桌面组件
-   */
-  private var desktopWidgetJob: Job? = null
 
   /**
    * 准备歌曲
@@ -369,16 +341,22 @@ class MusicService : BaseService(),
       // 锁屏
       PrefKeys.Setting.LOCKSCREEN -> {
         when (settingPrefs.lockScreen) {
-          LOCKSCREEN_CLOSE -> clearMediaSession()
-          LOCKSCREEN_SYSTEM, LOCKSCREEN_APLAYER -> updateMediaSession()
+          LOCKSCREEN_CLOSE -> mediaSessionUpdater.clear(mediaSession)
+          LOCKSCREEN_SYSTEM, LOCKSCREEN_APLAYER -> mediaSessionUpdater.updateMetadata(
+            this,
+            mediaSession,
+            playback,
+            settingPrefs.lockScreen,
+            lyricManager.isDesktopLyricLocked
+          )
         }
       }
       // 断点播放
       PrefKeys.Setting.PLAY_AT_BREAKPOINT -> {
         if (!settingPrefs.playAtBreakPoint) {
-          stopSaveProgress()
+          playbackProgressSaver.stop()
         } else {
-          startSaveProgress()
+          playbackProgressSaver.start(this) { playback.position }
         }
       }
       // 倍速播放
@@ -402,13 +380,6 @@ class MusicService : BaseService(),
       NotifyImpl(this)
     }
 
-    // 桌面部件
-    appWidgets[APPWIDGET_BIG] = AppWidgetBig.getInstance()
-    appWidgets[APPWIDGET_MEDIUM] = AppWidgetMedium.getInstance()
-    appWidgets[APPWIDGET_MEDIUM_TRANSPARENT] = AppWidgetMediumTransparent.getInstance()
-    appWidgets[APPWIDGET_SMALL] = AppWidgetSmall.getInstance()
-    appWidgets[APPWIDGET_SMALL_TRANSPARENT] = AppWidgetSmallTransparent.getInstance()
-
     // 初始化Receiver
     val eventFilter = IntentFilter()
     eventFilter.addAction(MEDIA_STORE_CHANGE)
@@ -428,7 +399,7 @@ class MusicService : BaseService(),
       registerReceiver(headSetReceiver, noisyFilter)
     }
 
-    registerLocalReceiver(widgetReceiver, IntentFilter(ACTION_WIDGET_UPDATE))
+    registerLocalReceiver(appWidgetUpdater.receiver, IntentFilter(ACTION_WIDGET_UPDATE))
     val screenFilter = IntentFilter()
     screenFilter.addAction(Intent.ACTION_SCREEN_ON)
     screenFilter.addAction(Intent.ACTION_SCREEN_OFF)
@@ -627,7 +598,7 @@ class MusicService : BaseService(),
         return
       }
 
-      if (playModel == MODE_REPEAT) {
+      if (repeatMode == REPEAT_MODE_ONE) {
         lastCommand = Command.PLAY
       } else {
         lastCommand = Command.SKIP_TO_NEXT
@@ -684,6 +655,9 @@ class MusicService : BaseService(),
       return
     }
 
+    playbackProgressSaver.stop()
+    playbackFavoriteState.cancelLookup()
+    appWidgetUpdater.stop()
     cancel()
 
     EQHelper.releaseCurrentAudioSession(this)
@@ -706,7 +680,7 @@ class MusicService : BaseService(),
 
     unregisterLocalReceiver(controlReceiver)
     unregisterLocalReceiver(musicEventReceiver)
-    unregisterLocalReceiver(widgetReceiver)
+    unregisterLocalReceiver(appWidgetUpdater.receiver)
     Util.unregisterReceiver(this, headSetReceiver)
     Util.unregisterReceiver(this, screenReceiver)
 
@@ -720,30 +694,8 @@ class MusicService : BaseService(),
     alreadyUnInit = true
   }
 
-  private fun updateQueueItem() {
-    Timber.v("updateQueueItem")
-    val playlist = playback.getPlaylist()
-    val title = playback.currentSong?.title
-    tryLaunch(block = {
-      val queue = withContext(Dispatchers.Default) {
-        ArrayList(playlist)
-          .map { song ->
-            return@map MediaSessionCompat.QueueItem(
-              MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, song.id.toString())
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.title)
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.artist)
-                .build().description, song.id
-            )
-          }
-      }
-      Timber.v("updateQueueItem, queue: ${queue.size}")
-      mediaSession.setQueueTitle(title)
-      mediaSession.setQueue(queue)
-    }, catch = {
-      MessageNotifier.show(it.toString())
-      Timber.w(it)
-    })
+  private fun updateMediaSessionQueue() {
+    mediaSessionUpdater.updateMediaSessionQueue(this, mediaSession, playback.getPlaylist(), playback.currentSong?.title)
   }
 
   /**
@@ -759,7 +711,7 @@ class MusicService : BaseService(),
     }
 
     playback.setPlaylist(newQueue)
-    updateQueueItem()
+    updateMediaSessionQueue()
     launch { playQueueStore.save(newQueue) }
   }
 
@@ -768,7 +720,7 @@ class MusicService : BaseService(),
    */
   fun setPlayQueue(newQueue: List<Song>?, intent: Intent) {
     Timber.v("setPlayQueue")
-    //如果是随机播放，需要更新randomList
+    // 随机播放全部沿用完整随机播放模式：列表循环 + 随机
     val shuffle = intent.getBooleanExtra(EXTRA_SHUFFLE, false)
     if (newQueue.isNullOrEmpty()) {
       return
@@ -781,14 +733,14 @@ class MusicService : BaseService(),
       launch { playQueueStore.save(newQueue) }
     }
     if (shuffle) {
-      playModel = MODE_SHUFFLE
+      applyPlaybackMode(playbackOptions.setShuffleAll())
     }
     handleCommand(intent)
 
     if (equals) {
       return
     }
-    updateQueueItem()
+    updateMediaSessionQueue()
   }
 
   /**
@@ -812,7 +764,7 @@ class MusicService : BaseService(),
         }
         launch { playQueueStore.save(playback.getPlaylist()) }
 
-        updateQueueItem()
+        updateMediaSessionQueue()
         pushPlaybackUiState()
       }
     }
@@ -877,16 +829,22 @@ class MusicService : BaseService(),
   /**
    * 推送播放状态更新
    */
-  private fun pushPlaybackUiState(isFavorite: Boolean? = null) {
+  private fun pushPlaybackUiState() {
+    val currentSong = playback.currentSong ?: EMPTY_SONG
+    val songChanged = currentSong.id != stateSource.currentPlaybackUiState.song.id
+
     MusicStateSource.updatePlaybackUiState(
-      song = playback.currentSong ?: EMPTY_SONG,
+      song = currentSong,
       nextSong = playback.nextSong ?: EMPTY_SONG,
       isPlaying = playback.isPlaying,
-      isFavorite = isFavorite,
       speed = settingPrefs.speedValue,
-      playModel = playModel,
+      repeatMode = repeatMode,
+      shuffleEnabled = shuffleEnabled,
       lastOp = lastCommand
     )
+    if (songChanged) {
+      playbackFavoriteState.refresh(this, currentSong, stateSource)
+    }
     onPositionChange()
   }
 
@@ -974,7 +932,7 @@ class MusicService : BaseService(),
     playback.replaceSong(newSong)
     lyricManager.clearCache(newSong)
     lyricManager.updateLyrics(newSong)
-    updateQueueItem()
+    updateMediaSessionQueue()
     pushPlaybackUiState()
   }
 
@@ -988,39 +946,6 @@ class MusicService : BaseService(),
 
   override fun onServiceDisConnected() {
 
-  }
-
-  inner class WidgetReceiver : BroadcastReceiver() {
-
-    override fun onReceive(context: Context, intent: Intent) {
-      //            final int skin = SPUtil.getValue(context,SETTING_KEY.NAME,SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
-      //            SPUtil.putValue(context,SETTING_KEY.NAME, SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
-
-      val name = intent.getStringExtra(BaseAppwidget.EXTRA_WIDGET_NAME)
-      val appIds = intent.getIntArrayExtra(BaseAppwidget.EXTRA_WIDGET_IDS)
-      Timber.v("name: $name appIds: $appIds")
-      when (name) {
-        APPWIDGET_BIG -> if (appWidgets[APPWIDGET_BIG] != null) {
-          appWidgets[APPWIDGET_BIG]?.updateWidget(service, appIds, true)
-        }
-
-        APPWIDGET_MEDIUM -> if (appWidgets[APPWIDGET_MEDIUM] != null) {
-          appWidgets[APPWIDGET_MEDIUM]?.updateWidget(service, appIds, true)
-        }
-
-        APPWIDGET_SMALL -> if (appWidgets[APPWIDGET_SMALL] != null) {
-          appWidgets[APPWIDGET_SMALL]?.updateWidget(service, appIds, true)
-        }
-
-        APPWIDGET_MEDIUM_TRANSPARENT -> if (appWidgets[APPWIDGET_MEDIUM_TRANSPARENT] != null) {
-          appWidgets[APPWIDGET_MEDIUM_TRANSPARENT]?.updateWidget(service, appIds, true)
-        }
-
-        APPWIDGET_SMALL_TRANSPARENT -> if (appWidgets[APPWIDGET_SMALL_TRANSPARENT] != null) {
-          appWidgets[APPWIDGET_SMALL_TRANSPARENT]?.updateWidget(service, appIds, true)
-        }
-      }
-    }
   }
 
   inner class MusicEventReceiver : BroadcastReceiver() {
@@ -1047,8 +972,8 @@ class MusicService : BaseService(),
       }
 
       ACTION_SHORTCUT_SHUFFLE -> {
-        if (playModel != MODE_SHUFFLE) {
-          playModel = MODE_SHUFFLE
+        if (!shuffleEnabled || repeatMode != REPEAT_MODE_ALL) {
+          applyPlaybackMode(playbackOptions.setShuffleAll())
         }
         handleCommand(Intent(ACTION_CMD).putExtra(EXTRA_COMMAND, Command.SKIP_TO_NEXT))
       }
@@ -1119,16 +1044,22 @@ class MusicService : BaseService(),
     if (song == EMPTY_SONG) {
       return
     }
-    updateAppwidget()
+    appWidgetUpdater.updateWidget(this, this, isPlaying, screenOn)
 
     // 正在播放、已有通知在显示、用户操作过
     if (isPlaying || notify.isNotifyShowing || lastCommand != -1) {
       updateNotification()
     }
-    updateMediaSession()
+    mediaSessionUpdater.updateMetadata(
+      this,
+      mediaSession,
+      playback,
+      settingPrefs.lockScreen,
+      lyricManager.isDesktopLyricLocked
+    )
     // 是否需要保存进度
     if (settingPrefs.playAtBreakPoint) {
-      startSaveProgress()
+      playbackProgressSaver.start(this) { playback.position }
     }
     // 保存当前播放歌曲
     settingPrefs.lastSong = if (song.isLocal()) song.id.toString() else song.data
@@ -1165,12 +1096,14 @@ class MusicService : BaseService(),
     val command = intent.getIntExtra(EXTRA_COMMAND, -1)
     Timber.v("handleCommand, command: $command")
 
-    val now = System.currentTimeMillis()
-    if (now - lastCommandTime < INTERVAL_CONTROL) {
-      Timber.w("ignore command")
-      return@launch
+    if (shouldThrottleCommand(command)) {
+      val now = System.currentTimeMillis()
+      if (now - lastCommandTime < INTERVAL_CONTROL) {
+        Timber.w("ignore command")
+        return@launch
+      }
+      lastCommandTime = now
     }
-    lastCommandTime = now
 
     val requiresQueue = command == Command.PLAY_AT
         || command == Command.SKIP_TO_PREVIOUS
@@ -1216,16 +1149,20 @@ class MusicService : BaseService(),
       Command.PLAY -> {
         start(false)
       }
-      // 改变播放模式
-      Command.CHANGE_MODEL -> {
-        playModel = if (playModel == MODE_REPEAT) MODE_LOOP else playModel + 1
+      // 切换循环模式
+      Command.TOGGLE_REPEAT -> {
+        applyPlaybackMode(playbackOptions.toggleRepeat())
+      }
+      // 切换随机模式
+      Command.TOGGLE_SHUFFLE -> {
+        applyPlaybackMode(playbackOptions.toggleShuffle())
       }
       // 取消或者添加收藏
       Command.LOVE -> {
         playback.currentSong?.let {
-          playListRepository.toggleFavorite(it.id)
-          MusicStateSource.updatePlaybackUiState(isFavorite = !stateSource.playbackUiState.value.isFavorite)
-          updateAppwidget()
+          if (playbackFavoriteState.toggle(it, stateSource)) {
+            appWidgetUpdater.updateWidget(this@MusicService, this, isPlaying, screenOn)
+          }
         }
       }
       // 桌面歌词
@@ -1287,89 +1224,26 @@ class MusicService : BaseService(),
     }
   }
 
-  /**
-   * 清除锁屏显示的内容
-   */
-  private fun clearMediaSession() {
-    mediaSession.setMetadata(MediaMetadataCompat.Builder().build())
-    mediaSession.setPlaybackState(
-      PlaybackStateCompat.Builder().setState(PlaybackStateCompat.STATE_NONE, 0, 1f).build()
-    )
+  private fun shouldThrottleCommand(command: Int): Boolean {
+    return command == Command.PLAY_AT
+        || command == Command.SKIP_TO_PREVIOUS
+        || command == Command.SKIP_TO_NEXT
+        || command == Command.PLAY_PAUSE
+        || command == Command.PAUSE
+        || command == Command.PLAY
   }
 
-  /**
-   * 更新锁屏
-   */
-  private fun updateMediaSession() {
-    val currentSong = playback.currentSong ?: EMPTY_SONG
-    if (currentSong == EMPTY_SONG || settingPrefs.lockScreen == LOCKSCREEN_CLOSE) {
-      return
-    }
+  private fun applyPlaybackMode(state: PlaybackOptionsState) {
+    Timber.v("修改播放模式 repeatMode: ${state.repeatMode} shuffleEnabled: ${state.shuffleEnabled}")
+    playback.setPlaybackMode(state.repeatMode, state.shuffleEnabled)
 
-    val builder = MediaMetadataCompat.Builder()
-      .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, currentSong.id.toString())
-      .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentSong.album)
-      .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentSong.artist)
-      .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentSong.artist)
-      .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.duration)
-      .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (playback.currentIndex + 1).toLong())
-      .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.title)
-      .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currentSong.title)
-      .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currentSong.artist)
-      .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playback.itemCount.toLong())
-
-    mediaSession.setMetadata(builder.build())
-    updatePlaybackState()
-
-    val placeholder =
-      if (themeController.appTheme.isLight) R.drawable.album_empty_bg_day else R.drawable.album_empty_bg_night
-    Glide.with(this)
-      .asBitmap()
-      .load(currentSong)
-      .error(placeholder)
-      .centerCrop()
-      .override(DensityUtil.dip2px(160f), DensityUtil.dip2px(160f))
-      .into(object : CustomTarget<Bitmap>() {
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-          setMediaSessionData(resource)
-        }
-
-        override fun onLoadFailed(errorDrawable: Drawable?) {
-          setMediaSessionData((errorDrawable as? BitmapDrawable)?.bitmap)
-        }
-
-        private fun setMediaSessionData(result: Bitmap?) {
-          builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, copy(result))
-          mediaSession.setMetadata(builder.build())
-        }
-
-        override fun onLoadCleared(placeholder: Drawable?) {
-
-        }
-      })
+    updateMediaSessionQueue()
+    pushPlaybackUiState()
+    appWidgetUpdater.partiallyUpdateWidget(this)
   }
 
   fun updatePlaybackState() {
-    val desktopLyricLock = lyricManager.isDesktopLyricLocked
-
-    val builder = PlaybackStateCompat.Builder()
-    builder.setActiveQueueItemId(playback.currentSong?.id ?: return)
-      .setState(
-        if (isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED,
-        playback.position,
-        playback.speed
-      )
-      .setActions(MEDIA_SESSION_ACTIONS)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      builder.addCustomAction(
-        PlaybackStateCompat.CustomAction.Builder(
-          if (desktopLyricLock) ACTION_UNLOCK_DESKTOP_LYRIC else ACTION_TOGGLE_DESKTOP_LYRIC,
-          getString(if (desktopLyricLock) R.string.desktop_lyric__unlock else R.string.desktop_lyric_lock),
-          if (desktopLyricLock) R.drawable.ic_lock_open_black_24dp else R.drawable.ic_desktop_lyric_black_24dp
-        ).build()
-      )
-    }
-    mediaSession.setPlaybackState(builder.build())
+    mediaSessionUpdater.updatePlaybackState(this, mediaSession, playback, lyricManager.isDesktopLyricLocked)
   }
 
   /**
@@ -1423,78 +1297,8 @@ class MusicService : BaseService(),
         pos,
         if (firstPrepared && settingPrefs.lastProgress > 0) settingPrefs.lastProgress.toLong() else 0L
       )
-      playback.setMode(playModel)
+      playback.setPlaybackMode(repeatMode, shuffleEnabled)
     }
-  }
-
-  /**
-   * 更新桌面部件
-   */
-  private fun updateAppwidget() {
-    // 暂停停止更新进度条和时间
-    if (!isPlaying) {
-      // 暂停后不再持续更新，但需要完整刷新一次
-      appWidgets.forEach {
-        it.value.updateWidget(this, null, true)
-      }
-      stopUpdateAppWidget()
-    } else {
-      if (screenOn) {
-        appWidgets.forEach {
-          it.value.updateWidget(this, null, true)
-        }
-        // 开始播放后更新进度条和时间
-        startUpdateAppWidget()
-      }
-    }
-  }
-
-  private fun stopUpdateAppWidget() {
-    desktopWidgetJob?.cancel()
-    desktopWidgetJob = null
-  }
-
-  private fun startUpdateAppWidget() {
-    if (desktopWidgetJob != null) {
-      return
-    }
-    desktopWidgetJob = launch {
-      while (isActive) {
-        partiallyUpdateWidget()
-        delay(INTERVAL_UPDATE_APPWIDGET)
-      }
-
-    }
-  }
-
-  private fun partiallyUpdateWidget(force: Boolean = false) {
-    // app在前台不用更新
-    if (!isAppOnForeground || force) {
-      appWidgets.forEach {
-        it.value.partiallyUpdateWidget(service)
-      }
-    }
-  }
-
-  private fun startSaveProgress() {
-    if (progressJob != null) {
-      return
-    }
-    progressJob = launch {
-      while (isActive) {
-        val progress = playback.position
-        if (progress > 0) {
-          settingPrefs.lastProgress = progress.toInt()
-        }
-
-        delay(INTERVAL_SAVE_PROGRESS)
-      }
-    }
-  }
-
-  private fun stopSaveProgress() {
-    progressJob?.cancel()
-    progressJob = null
   }
 
   override fun onFocusGained() {
@@ -1556,11 +1360,11 @@ class MusicService : BaseService(),
           }
         }
         //重新开始更新桌面部件
-        updateAppwidget()
+        appWidgetUpdater.updateWidget(this@MusicService, this@MusicService, isPlaying, screenOn)
       } else {
         screenOn = false
         //停止更新桌面部件
-        stopUpdateAppWidget()
+        appWidgetUpdater.stop()
       }
     }
   }
@@ -1597,39 +1401,6 @@ class MusicService : BaseService(),
     const val ACTION_UNLOCK_DESKTOP_LYRIC = "$APLAYER_PACKAGE_NAME.unlock.desktop_lyric"
     const val ACTION_TOGGLE_DESKTOP_LYRIC = "$APLAYER_PACKAGE_NAME.toggle.desktop_lyric"
 
-    private const val MEDIA_SESSION_ACTIONS = (PlaybackStateCompat.ACTION_PLAY
-        or PlaybackStateCompat.ACTION_PAUSE
-        or PlaybackStateCompat.ACTION_PLAY_PAUSE
-        or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-        or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-        or PlaybackStateCompat.ACTION_STOP
-        or PlaybackStateCompat.ACTION_SEEK_TO)
-
-    private const val APPWIDGET_BIG = "AppWidgetBig"
-    private const val APPWIDGET_MEDIUM = "AppWidgetMedium"
-    private const val APPWIDGET_SMALL = "AppWidgetSmall"
-    private const val APPWIDGET_MEDIUM_TRANSPARENT = "AppWidgetMediumTransparent"
-    private const val APPWIDGET_SMALL_TRANSPARENT = "AppWidgetSmallTransparent"
-
-    private const val INTERVAL_UPDATE_APPWIDGET = 1000L
-    private const val INTERVAL_SAVE_PROGRESS = 1000L
     private const val INTERVAL_CONTROL = 500
-
-    /**
-     * 复制bitmap
-     */
-    @JvmStatic
-    fun copy(bitmap: Bitmap?): Bitmap? {
-      if (bitmap == null || bitmap.isRecycled) {
-        return null
-      }
-      val config: Bitmap.Config = bitmap.config ?: return null
-      return try {
-        bitmap.copy(config, false)
-      } catch (e: OutOfMemoryError) {
-        e.printStackTrace()
-        null
-      }
-    }
   }
 }

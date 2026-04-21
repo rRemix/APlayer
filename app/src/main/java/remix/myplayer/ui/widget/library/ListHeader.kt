@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -33,7 +32,6 @@ import remix.myplayer.util.ext.clickableWithoutRipple
 
 @Composable
 fun SongListHeader(songs: List<Song>) {
-  val context = LocalContext.current
   if (songs.isEmpty()) {
     return
   }
@@ -87,7 +85,7 @@ fun ModeHeader(grid: Boolean, onClick: (mode: Int) -> Unit) {
         .padding(horizontal = 18.dp)
         .clickableWithoutRipple(interactionSource = remember { MutableInteractionSource() }) {
           onClick(SettingPrefs.LIST_MODE)
-        } ,
+        },
       painter = painterResource(R.drawable.ic_format_list_bulleted_white_24dp),
       contentDescription = "ModeList",
       tint = Color(if (!grid) LocalTheme.current.secondary.toArgb() else ColorUtil.getColor(R.color.default_model_button_color))

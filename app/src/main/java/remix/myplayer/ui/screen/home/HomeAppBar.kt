@@ -47,7 +47,7 @@ internal fun HomeAppBar(
       }
     },
     actions = {
-      if (library.tag != Library.TAG_FOLDER && library.tag != Library.TAG_REMOTE) {
+      if (library.tag != Library.TAG_REMOTE) {
         ScreenPopupButton(library)
       }
 

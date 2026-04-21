@@ -5,6 +5,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.helper.ItemsSorter
 import remix.myplayer.util.PermissionUtil
 import timber.log.Timber
 import java.util.Collections
@@ -44,7 +45,6 @@ class FolderRepoImpl @Inject constructor(
     } catch (e: Exception) {
       Timber.v(e)
     }
-    folders.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name ?: it.path })
-    return folders
+    return ItemsSorter.sortedFolders(folders, settingPrefs.folderSortOrder)
   }
 }

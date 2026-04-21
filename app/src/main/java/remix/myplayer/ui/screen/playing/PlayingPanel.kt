@@ -21,16 +21,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -62,7 +59,7 @@ private fun Portrait(isVisible: Boolean) {
   Column(
     modifier = Modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(30.dp)
+    verticalArrangement = Arrangement.spacedBy(24.dp)
   ) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
@@ -74,7 +71,7 @@ private fun Portrait(isVisible: Boolean) {
 
     HorizontalPager(
       pagerState,
-      modifier = Modifier.weight(7f),
+      modifier = Modifier.weight(6f),
       beyondViewportPageCount = 1
     ) { page ->
       when (page) {
@@ -114,20 +111,26 @@ private fun Portrait(isVisible: Boolean) {
 
     val playingScreenBottom =
       settingViewModel.settingsState.collectAsStateWithLifecycle().value.playingScreen.bottom
-    val showBottomBar = playingScreenBottom != SettingPrefs.BOTTOM_SHOW_NONE
-    PlayingControl(Modifier.weight(if (showBottomBar) 1f else 2f), playbackState, swatch)
+    val showUtilityBar = playingScreenBottom != SettingPrefs.BOTTOM_SHOW_NONE
+    PlayingControl(Modifier.weight(if (showUtilityBar) 1f else 2f), playbackState, swatch)
 
-    if (showBottomBar) {
-      PlayingBottomBar(
+    if (showUtilityBar) {
+      PlayingUtilityBar(
         Modifier
-          .weight(1.5f)
           .fillMaxWidth()
-          .padding(top = 12.dp),
+          .height(64.dp),
         playingScreenBottom,
         playbackState,
         swatch
       )
     }
+
+    PlayingFooter(
+      modifier = Modifier
+        .fillMaxWidth(),
+      playbackUiState = playbackState,
+      swatch = swatch
+    )
 
     val keepScreenOn =
       settingViewModel.settingsState.collectAsStateWithLifecycle().value.playingScreen.keepScreenOn
@@ -189,14 +192,14 @@ private fun PlayingIndicator(
 private fun Landscape(isVisible: Boolean) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(12.dp)
+    verticalArrangement = Arrangement.spacedBy(24.dp)
   ) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
 
     PlayingTopBar(playbackState.song, swatch)
 
-    Row(modifier = Modifier.weight(3f)) {
+    Row(modifier = Modifier.weight(7f)) {
       Box(
         modifier = Modifier
           .weight(1f)
@@ -234,6 +237,12 @@ private fun Landscape(isVisible: Boolean) {
 
     PlayingSeekbarWithText(swatch)
 
-    PlayingControl(Modifier.weight(1f), playbackState, swatch)
+    PlayingControl(Modifier.weight(1.5f), playbackState, swatch)
+
+    PlayingFooter(
+      modifier = Modifier.weight(1f),
+      playbackUiState = playbackState,
+      swatch = swatch
+    )
   }
 }

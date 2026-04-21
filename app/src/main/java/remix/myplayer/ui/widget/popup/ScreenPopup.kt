@@ -63,6 +63,7 @@ fun ScreenPopupButton(library: Library?, vm: LibraryViewModel = libraryViewModel
     Library.TAG_ARTIST -> settingState.library.artistSortOrder
     Library.TAG_PLAYLIST -> settingState.library.playlistSortOrder
     Library.TAG_GENRE -> settingState.library.genreSortOrder
+    Library.TAG_FOLDER -> settingState.library.folderSortOrder
     else -> throw RuntimeException("unknown tag: ${library.tag}")
   }
   val selectedIndex = sortOrders.indexOf(sortOrder)
@@ -99,6 +100,10 @@ fun ScreenPopupButton(library: Library?, vm: LibraryViewModel = libraryViewModel
 
         Library.TAG_GENRE -> {
           settingVM.setSortOrder(SortCategory.GENRE, ret)
+        }
+
+        Library.TAG_FOLDER -> {
+          settingVM.setSortOrder(SortCategory.FOLDER, ret)
         }
       }
       expanded = false

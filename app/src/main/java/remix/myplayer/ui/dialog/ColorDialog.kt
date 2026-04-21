@@ -142,15 +142,12 @@ fun ColorDialog(
             verticalArrangement = Arrangement.SpaceBetween
           ) {
             ColorTextInput()
+
             val sliderHeight = if (isTablet) 36.dp else 16.dp
-            SliderWithText(ColorSpace.Red, initialColor, sliderHeight) {
-              onColorChange(initialColor.copy(red = it))
-            }
-            SliderWithText(ColorSpace.Green, initialColor, sliderHeight) {
-              onColorChange(initialColor.copy(green = it))
-            }
-            SliderWithText(ColorSpace.Blue, initialColor, sliderHeight) {
-              onColorChange(initialColor.copy(blue = it))
+            ColorSpace.entries.forEach { space ->
+              SliderWithText(space, initialColor, sliderHeight) {
+                onColorChange(space.copy(initialColor, it))
+              }
             }
           }
         }
@@ -166,14 +163,10 @@ fun ColorDialog(
           ColorTextInput(modifier = Modifier.padding(top = 24.dp))
         }
 
-        SliderWithText(ColorSpace.Red, initialColor) {
-          onColorChange(initialColor.copy(red = it))
-        }
-        SliderWithText(ColorSpace.Green, initialColor) {
-          onColorChange(initialColor.copy(green = it))
-        }
-        SliderWithText(ColorSpace.Blue, initialColor) {
-          onColorChange(initialColor.copy(blue = it))
+        ColorSpace.entries.forEach { space ->
+          SliderWithText(space, initialColor) {
+            onColorChange(space.copy(initialColor, it))
+          }
         }
       }
     }
@@ -190,6 +183,14 @@ enum class ColorSpace(val text: String) {
       Red -> color.red
       Green -> color.green
       Blue -> color.blue
+    }
+  }
+
+  fun copy(color: Color, value: Float): Color {
+    return when (this) {
+      Red -> color.copy(red = value)
+      Green -> color.copy(green = value)
+      Blue -> color.copy(blue = value)
     }
   }
 }

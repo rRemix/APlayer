@@ -60,6 +60,11 @@ data class Library(
         R.string.genre_desc
       )
 
+      TAG_FOLDER -> listOf(
+        R.string.name,
+        R.string.name_desc
+      )
+
       else -> throw IllegalArgumentException("unknown tag: $tag")
     }
 
@@ -99,6 +104,11 @@ data class Library(
       TAG_GENRE -> listOf(
         SortOrder.GENRE_A_Z,
         SortOrder.GENRE_Z_A
+      )
+
+      TAG_FOLDER -> listOf(
+        SortOrder.FOLDER_A_Z,
+        SortOrder.FOLDER_Z_A
       )
 
       else -> throw IllegalArgumentException("unknown tag: $tag")

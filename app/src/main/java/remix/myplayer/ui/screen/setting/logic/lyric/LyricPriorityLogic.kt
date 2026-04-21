@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +31,6 @@ import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.screen.setting.NormalPreference
 import remix.myplayer.ui.theme.LocalTheme
-import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.util.Util
 import remix.myplayer.util.ext.ShowLyricTipDialog
 import remix.myplayer.viewmodel.settingViewModel
@@ -87,7 +87,7 @@ fun LyricPriorityLogic() {
                 .height(48.dp),
               contentAlignment = Alignment.CenterStart
             ) {
-              TextPrimary(
+              Text(
                 text = stringResource(lyricOrder.stringRes),
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center

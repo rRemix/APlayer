@@ -3,6 +3,7 @@ package remix.myplayer.helper
 import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.model.audio.Album
 import remix.myplayer.data.model.audio.Artist
+import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.data.model.audio.Song
 import java.text.Collator
@@ -148,6 +149,18 @@ object ItemsSorter {
         SortOrder.GENRE_Z_A -> compare(o2.genre, o1.genre, collator)
         else -> 0
       }
+    })
+  }
+
+  fun sortedFolders(folders: List<Folder>, sortOrder: String?): List<Folder> {
+    val collator = Collator.getInstance()
+    return folders.sortedWith(Comparator { o1: Folder, o2: Folder ->
+      val compareResult = when (sortOrder) {
+        SortOrder.FOLDER_A_Z -> compare(o1.name ?: o1.path, o2.name ?: o2.path, collator)
+        SortOrder.FOLDER_Z_A -> compare(o2.name ?: o2.path, o1.name ?: o1.path, collator)
+        else -> 0
+      }
+      if (compareResult != 0) compareResult else compare(o1.path, o2.path, collator)
     })
   }
 }

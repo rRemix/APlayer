@@ -99,6 +99,7 @@ class SettingViewModel @Inject constructor(
       artistSortOrder = settingPrefs.artistSortOrder,
       playlistSortOrder = settingPrefs.playlistSortOrder,
       genreSortOrder = settingPrefs.genreSortOrder,
+      folderSortOrder = settingPrefs.folderSortOrder,
       historySortOrder = settingPrefs.historySortOrder,
       albumDetailSortOrder = settingPrefs.albumDetailSortOrder,
       artistDetailSortOrder = settingPrefs.artistDetailSortOrder,
@@ -266,6 +267,7 @@ class SettingViewModel @Inject constructor(
             SortCategory.ARTIST -> lib.copy(artistSortOrder = order)
             SortCategory.PLAYLIST -> lib.copy(playlistSortOrder = order)
             SortCategory.GENRE -> lib.copy(genreSortOrder = order)
+            SortCategory.FOLDER -> lib.copy(folderSortOrder = order)
             SortCategory.HISTORY -> lib.copy(historySortOrder = order)
             SortCategory.ALBUM_DETAIL -> lib.copy(albumDetailSortOrder = order)
             SortCategory.ARTIST_DETAIL -> lib.copy(artistDetailSortOrder = order)

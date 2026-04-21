@@ -25,14 +25,16 @@ fun FolderDialog(
     onNegative = { dialogState.dismiss() },
     items = contents.map { it.name }.toMutableList().apply {
       if (canGoUp) {
-        add(0, "..")
+        add(0, PARENT_FOLDER_ITEM)
       }
     },
     itemsCallback = { index, str ->
-      val newFolder = if (str == "..") {
+      val newFolder = if (str == PARENT_FOLDER_ITEM) {
         folderState.parentFolder ?: return@NormalDialog
       } else {
-        contents.getOrNull(if (canGoUp) index - 1 else index) ?: return@NormalDialog
+        val childFolder = contents.getOrNull(if (canGoUp) index - 1 else index)
+          ?: return@NormalDialog
+        folderState.resolveChildFolder(childFolder)
       }
       onFolderSelection(newFolder)
     }
@@ -45,20 +47,43 @@ internal data class FolderState(
   var currentFolder: File = Environment.getExternalStorageDirectory(),
 ) {
 
+  private val primaryExternalStorage: File = Environment.getExternalStorageDirectory()
+  private val primaryExternalStorageParent: File? = primaryExternalStorage.parentFile
+  private val storageRoot: File =
+    primaryExternalStorageParent?.parentFile ?: primaryExternalStorage
+
   init {
-    if (!currentFolder.exists() || !currentFolder.isDirectory) {
-      currentFolder = Environment.getExternalStorageDirectory()
+    if (currentFolder.path.isBlank() || !currentFolder.exists() || !currentFolder.isDirectory) {
+      currentFolder = primaryExternalStorage
+    } else if (currentFolder.absolutePath == primaryExternalStorageParent?.absolutePath) {
+      currentFolder = primaryExternalStorage
     }
   }
 
-  val parentFolder: File? = currentFolder.parentFile
+  val parentFolder: File?
+    get() {
+      val parent = currentFolder.parentFile ?: return null
+      return if (parent.absolutePath == primaryExternalStorageParent?.absolutePath) {
+        storageRoot
+      } else {
+        parent
+      }
+    }
+
+  fun resolveChildFolder(childFolder: File): File {
+    return if (childFolder.absolutePath == primaryExternalStorageParent?.absolutePath) {
+      primaryExternalStorage
+    } else {
+      childFolder
+    }
+  }
 
   val canGoUp: Boolean
     get() {
       if (parentFolder == null) {
         return false
       }
-      if (currentFolder.absolutePath == Environment.getExternalStorageDirectory().absolutePath) {
+      if (currentFolder.absolutePath == storageRoot.absolutePath) {
         return false
       }
       return true
@@ -68,3 +93,5 @@ internal data class FolderState(
     get() = (currentFolder.listFiles()?.filter { it.isDirectory }?.sortedBy { it.name }
       ?: emptyList<File>())
 }
+
+private const val PARENT_FOLDER_ITEM = "..."

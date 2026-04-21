@@ -4,7 +4,7 @@ import remix.myplayer.data.prefs.SettingPrefs
 
 
 enum class SortCategory {
-  SONG, ALBUM, ARTIST, PLAYLIST, GENRE, HISTORY,
+  SONG, ALBUM, ARTIST, PLAYLIST, GENRE, FOLDER, HISTORY,
   ALBUM_DETAIL, ARTIST_DETAIL, PLAYLIST_DETAIL, GENRE_DETAIL, FOLDER_DETAIL;
 
   fun getOrder(settingPrefs: SettingPrefs, playlistId: Long? = null): String {
@@ -14,6 +14,7 @@ enum class SortCategory {
       ARTIST -> settingPrefs.artistSortOrder
       PLAYLIST -> settingPrefs.playlistSortOrder
       GENRE -> settingPrefs.genreSortOrder
+      FOLDER -> settingPrefs.folderSortOrder
       HISTORY -> settingPrefs.historySortOrder
       ALBUM_DETAIL -> settingPrefs.albumDetailSortOrder
       ARTIST_DETAIL -> settingPrefs.artistDetailSortOrder
@@ -38,6 +39,7 @@ enum class SortCategory {
         ARTIST -> settingPrefs.artistSortOrder = newOrder
         PLAYLIST -> settingPrefs.playlistSortOrder = newOrder
         GENRE -> settingPrefs.genreSortOrder = newOrder
+        FOLDER -> settingPrefs.folderSortOrder = newOrder
         HISTORY -> settingPrefs.historySortOrder = newOrder
         ALBUM_DETAIL -> settingPrefs.albumDetailSortOrder = newOrder
         ARTIST_DETAIL -> settingPrefs.artistDetailSortOrder = newOrder

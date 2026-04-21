@@ -61,7 +61,6 @@ fun PlayingDropDownMenu(
     return
   }
   val nav = LocalNavController.current
-  val libraryVM = libraryViewModel
   val settingVM = settingViewModel
   val tagEditVM = tagEditViewModel
   val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
@@ -70,7 +69,7 @@ fun PlayingDropDownMenu(
     listOf(
 //      R.string.song_edit,
       R.string.song_detail,
-      R.string.collect,
+//      R.string.collect,
       R.string.add_to_playlist,
       R.string.sleep_timer,
       R.string.eq,
@@ -169,16 +168,6 @@ fun PlayingDropDownMenu(
                 return@DropdownMenuItem
               }
               settingVM.showSongDetailDialog(song)
-            }
-
-            R.string.collect -> {
-              if (activity == null) {
-                return@DropdownMenuItem
-              }
-              val favorite =
-                libraryVM.playLists.value.firstOrNull { it.isFavorite() } ?: return@DropdownMenuItem
-
-              libraryVM.addSongsToPlayList(listOf(song.id), favorite.name)
             }
 
             R.string.add_to_playlist -> {

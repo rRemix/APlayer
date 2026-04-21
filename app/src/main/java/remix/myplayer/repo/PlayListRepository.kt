@@ -24,7 +24,7 @@ interface PlayListRepository {
   suspend fun updatePlayList(playList: PlayList): Int
   suspend fun deletePlayList(id: Long): Int
   suspend fun isFavorite(id: Long): Boolean
-  suspend fun toggleFavorite(id: Long)
+  suspend fun toggleFavorite(id: Long): Boolean
   suspend fun getFavorite(): PlayList?
   suspend fun removeAudioIdsFromAll(audioIds: List<Long>): Int
   suspend fun checkPlayListExist(name: String): Boolean
@@ -79,18 +79,20 @@ class PlayListRepoImpl @Inject constructor(
     return p?.audioIds?.contains(id) == true
   }
 
-  override suspend fun toggleFavorite(id: Long) {
+  override suspend fun toggleFavorite(id: Long): Boolean {
     val p = getFavorite()
-      ?: return // 如果没有收藏夹则返回
+      ?: return false // 如果没有收藏夹则返回
 
-    if (p.audioIds.contains(id)) {
+    val favorite = if (p.audioIds.contains(id)) {
       p.audioIds.remove(id)
+      false
     } else {
       p.audioIds.add(id)
+      true
     }
 
     playListDao.update(p)
-
+    return favorite
   }
 
   override suspend fun getFavorite() = playListDao.getFavorite()

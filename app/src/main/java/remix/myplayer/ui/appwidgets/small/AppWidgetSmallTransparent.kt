@@ -33,38 +33,43 @@ class AppWidgetSmallTransparent : BaseAppwidget() {
     pushUpdate(context, appWidgetIds, remoteViews)
   }
 
-  override fun updateWidget(service: MusicService, appWidgetIds: IntArray?, reloadCover: Boolean) {
+  override fun updateWidget(
+    context: Context,
+    appWidgetIds: IntArray?,
+    reloadCover: Boolean,
+    primaryColor: Int
+  ) {
     val song = playbackState.song
     if (song == Song.EMPTY_SONG) {
       return
     }
-    if (!hasInstances(service)) {
+    if (!hasInstances(context)) {
       return
     }
-    val remoteViews = RemoteViews(service.packageName, R.layout.app_widget_small_transparent)
-    buildAction(service, remoteViews)
+    val remoteViews = RemoteViews(context.packageName, R.layout.app_widget_small_transparent)
+    buildAction(context, remoteViews)
     skin = AppWidgetSkin.TRANSPARENT
-    updateRemoteViews(service, remoteViews, song)
+    updateRemoteViews(context, remoteViews, song, primaryColor)
     //设置封面
-    updateCover(service, remoteViews, appWidgetIds, reloadCover)
+    updateCover(context, remoteViews, appWidgetIds, reloadCover)
   }
 
-  override fun partiallyUpdateWidget(service: MusicService) {
+  override fun partiallyUpdateWidget(context: Context, primaryColor: Int) {
     val song = playbackState.song
     if (song == Song.EMPTY_SONG) {
       return
     }
-    if (!hasInstances(service)) {
+    if (!hasInstances(context)) {
       return
     }
-    val remoteViews = RemoteViews(service.packageName, R.layout.app_widget_small_transparent)
-    buildAction(service, remoteViews)
+    val remoteViews = RemoteViews(context.packageName, R.layout.app_widget_small_transparent)
+    buildAction(context, remoteViews)
     skin = AppWidgetSkin.TRANSPARENT
-    updateRemoteViews(service, remoteViews, song)
+    updateRemoteViews(context, remoteViews, song, primaryColor)
 
     val appIds =
-      AppWidgetManager.getInstance(service).getAppWidgetIds(ComponentName(service, javaClass))
-    pushPartiallyUpdate(service, appIds, remoteViews)
+      AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, javaClass))
+    pushPartiallyUpdate(context, appIds, remoteViews)
   }
 
   companion object {

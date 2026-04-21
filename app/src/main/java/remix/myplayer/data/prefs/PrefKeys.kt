@@ -61,6 +61,9 @@ object PrefKeys {
     /** 流派排序 */
     const val GENRE_SORT_ORDER = "genre_sort_order"
 
+    /** 文件夹排序顺序 */
+    const val FOLDER_SORT_ORDER = "folder_sort_order"
+
     /** 文件夹内歌曲排序顺序 */
     const val CHILD_FOLDER_SONG_SORT_ORDER = "child_folder_song_sort_order"
 
@@ -94,6 +97,8 @@ object PrefKeys {
 
     /** 播放模式 */
     const val PLAY_MODEL = "play_model"
+    const val REPEAT_MODE = "repeat_mode"
+    const val SHUFFLE_ENABLED = "shuffle_enabled"
 
     /** 经典通知栏背景是否是系统背景色 */
     const val NOTIFY_SYSTEM_COLOR = "notify_system_color"

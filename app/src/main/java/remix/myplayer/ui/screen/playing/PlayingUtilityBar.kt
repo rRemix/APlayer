@@ -65,13 +65,13 @@ private const val EXTRA_VOLUME_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_
 private const val EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE"
 
 @Composable
-internal fun PlayingBottomBar(
+internal fun PlayingUtilityBar(
   modifier: Modifier,
   playingScreenBottom: Int,
   musicState: PlaybackUiState,
   swatch: Palette.Swatch
 ) {
-  Box(modifier = modifier, contentAlignment = Alignment.TopCenter) {
+  Box(modifier = modifier, contentAlignment = Alignment.Center) {
     val swatchColor = Color(swatch.rgb)
     assert(playingScreenBottom != BOTTOM_SHOW_NONE)
 
@@ -167,7 +167,7 @@ private fun VolumeSeekbar(swatchColor: Color, onValueChange: () -> Unit) {
         }) {
       Image(
         painter = painterResource(R.drawable.ic_volume_down_black_24dp),
-        contentDescription = "PlayingBottomBarVolumeDown",
+        contentDescription = "PlayingUtilityBarVolumeDown",
         colorFilter = ColorFilter.tint(swatchColor.copy(0.5f))
       )
     }
@@ -187,7 +187,7 @@ private fun VolumeSeekbar(swatchColor: Color, onValueChange: () -> Unit) {
         }) {
       Image(
         painter = painterResource(R.drawable.ic_volume_up_black_24dp),
-        contentDescription = "PlayingBottomBarVolumeUp",
+        contentDescription = "PlayingUtilityBarVolumeUp",
         colorFilter = ColorFilter.tint(swatchColor.copy(0.5f))
       )
     }
