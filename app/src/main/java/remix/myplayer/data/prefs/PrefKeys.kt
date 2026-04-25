@@ -97,8 +97,6 @@ object PrefKeys {
 
     /** 播放模式 */
     const val PLAY_MODEL = "play_model"
-    const val REPEAT_MODE = "repeat_mode"
-    const val SHUFFLE_ENABLED = "shuffle_enabled"
 
     /** 经典通知栏背景是否是系统背景色 */
     const val NOTIFY_SYSTEM_COLOR = "notify_system_color"

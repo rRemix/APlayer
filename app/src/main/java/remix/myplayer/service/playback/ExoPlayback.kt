@@ -30,9 +30,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.data.prefs.SettingPrefs.Companion.REPEAT_MODE_ALL
-import remix.myplayer.data.prefs.SettingPrefs.Companion.REPEAT_MODE_OFF
-import remix.myplayer.data.prefs.SettingPrefs.Companion.REPEAT_MODE_ONE
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
 import remix.myplayer.service.playback.Playback.PlayerCallback
 import remix.myplayer.util.Constants.MB
 import remix.myplayer.util.ext.checkMainThread
@@ -309,15 +309,29 @@ class ExoPlayback(private val context: Context) : Playback {
     }
   }
 
-  override fun setPlaybackMode(repeatMode: Int, shuffleEnabled: Boolean) {
+  override fun setMode(mode: Int) {
     checkMainThread()
-    player.repeatMode = when (repeatMode) {
-      REPEAT_MODE_OFF -> Player.REPEAT_MODE_OFF
-      REPEAT_MODE_ONE -> Player.REPEAT_MODE_ONE
-      REPEAT_MODE_ALL -> Player.REPEAT_MODE_ALL
-      else -> Player.REPEAT_MODE_ALL
+    when (mode) {
+      MODE_LOOP -> {
+        player.repeatMode = Player.REPEAT_MODE_ALL
+        player.shuffleModeEnabled = false
+      }
+
+      MODE_REPEAT -> {
+        player.repeatMode = Player.REPEAT_MODE_ONE
+        player.shuffleModeEnabled = false
+      }
+
+      MODE_SHUFFLE -> {
+        player.repeatMode = Player.REPEAT_MODE_ALL
+        player.shuffleModeEnabled = true
+      }
+
+      else -> {
+        player.repeatMode = Player.REPEAT_MODE_OFF
+        player.shuffleModeEnabled = false
+      }
     }
-    player.shuffleModeEnabled = shuffleEnabled
   }
 
   override fun skipToNext() {

@@ -6,7 +6,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import remix.myplayer.data.db.room.AppDatabase
 import remix.myplayer.data.model.misc.Library
-import remix.myplayer.data.prefs.PrefKeys
 import remix.myplayer.data.prefs.SettingPrefs
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -95,25 +94,5 @@ class AppMigration @Inject constructor(
 
       settingPrefs.libraryJson = Json.encodeToString(migratedList)
     }
-
-    if (!settingPrefs.checkMigration21000) {
-      settingPrefs.checkMigration21000 = true
-      // 1-loop 2-shuffle 3-repeat
-      when (settingPrefs.sp.getInt(PrefKeys.Setting.PLAY_MODEL, 1)) {
-        2 -> {
-          settingPrefs.repeatMode = SettingPrefs.REPEAT_MODE_ALL
-          settingPrefs.shuffleEnabled = true
-        }
-        3 -> {
-          settingPrefs.repeatMode = SettingPrefs.REPEAT_MODE_ONE
-          settingPrefs.shuffleEnabled = false
-        }
-        else -> {
-          settingPrefs.repeatMode = SettingPrefs.REPEAT_MODE_ALL
-          settingPrefs.shuffleEnabled = false
-        }
-      }
-    }
   }
-
 }

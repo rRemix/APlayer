@@ -22,8 +22,7 @@ interface StateSource {
     isPlaying: Boolean? = null,
     isFavorite: Boolean? = null,
     speed: Float? = null,
-    repeatMode: Int? = null,
-    shuffleEnabled: Boolean? = null,
+    playModel: Int? = null,
     lastOp: Int? = null,
   )
 
@@ -51,8 +50,7 @@ object MusicStateSource : StateSource {
     isPlaying: Boolean?,
     isFavorite: Boolean?,
     speed: Float?,
-    repeatMode: Int?,
-    shuffleEnabled: Boolean?,
+    playModel: Int?,
     lastOp: Int?,
   ) {
     _playBackUiState.update { old ->
@@ -64,8 +62,7 @@ object MusicStateSource : StateSource {
         isPlaying = isPlaying ?: old.isPlaying,
         isFavorite = isFavorite ?: if (songChanged) false else old.isFavorite,
         speed = speed ?: old.speed,
-        repeatMode = repeatMode ?: old.repeatMode,
-        shuffleEnabled = shuffleEnabled ?: old.shuffleEnabled,
+        playMode = playModel ?: old.playMode,
         lastOp = lastOp ?: old.lastOp,
         seq = old.seq + 1
       )
@@ -95,8 +92,7 @@ data class PlaybackUiState(
   val isPlaying: Boolean = false,
   val isFavorite: Boolean = false,
   val speed: Float = 1.0f,
-  val repeatMode: Int = SettingPrefs.REPEAT_MODE_ALL,
-  val shuffleEnabled: Boolean = false,
+  val playMode: Int = SettingPrefs.MODE_LOOP,
   val lastOp: Int = Command.SKIP_TO_NEXT,
   val seq: Int = 0
 )

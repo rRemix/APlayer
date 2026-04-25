@@ -59,7 +59,7 @@ private fun Portrait(isVisible: Boolean) {
   Column(
     modifier = Modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(24.dp)
+    verticalArrangement = Arrangement.spacedBy(30.dp)
   ) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
@@ -71,7 +71,7 @@ private fun Portrait(isVisible: Boolean) {
 
     HorizontalPager(
       pagerState,
-      modifier = Modifier.weight(6f),
+      modifier = Modifier.weight(7f),
       beyondViewportPageCount = 1
     ) { page ->
       when (page) {
@@ -111,26 +111,20 @@ private fun Portrait(isVisible: Boolean) {
 
     val playingScreenBottom =
       settingViewModel.settingsState.collectAsStateWithLifecycle().value.playingScreen.bottom
-    val showUtilityBar = playingScreenBottom != SettingPrefs.BOTTOM_SHOW_NONE
-    PlayingControl(Modifier.weight(if (showUtilityBar) 1f else 2f), playbackState, swatch)
+    val showBottomBar = playingScreenBottom != SettingPrefs.BOTTOM_SHOW_NONE
+    PlayingControl(Modifier.weight(if (showBottomBar) 1f else 2f), playbackState, swatch)
 
-    if (showUtilityBar) {
+    if (showBottomBar) {
       PlayingUtilityBar(
         Modifier
+          .weight(1.5f)
           .fillMaxWidth()
-          .height(64.dp),
+          .padding(top = 12.dp),
         playingScreenBottom,
         playbackState,
         swatch
       )
     }
-
-    PlayingFooter(
-      modifier = Modifier
-        .fillMaxWidth(),
-      playbackUiState = playbackState,
-      swatch = swatch
-    )
 
     val keepScreenOn =
       settingViewModel.settingsState.collectAsStateWithLifecycle().value.playingScreen.keepScreenOn
@@ -192,14 +186,14 @@ private fun PlayingIndicator(
 private fun Landscape(isVisible: Boolean) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(24.dp)
+    verticalArrangement = Arrangement.spacedBy(12.dp)
   ) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
 
     PlayingTopBar(playbackState.song, swatch)
 
-    Row(modifier = Modifier.weight(7f)) {
+    Row(modifier = Modifier.weight(3f)) {
       Box(
         modifier = Modifier
           .weight(1f)
@@ -237,12 +231,6 @@ private fun Landscape(isVisible: Boolean) {
 
     PlayingSeekbarWithText(swatch)
 
-    PlayingControl(Modifier.weight(1.5f), playbackState, swatch)
-
-    PlayingFooter(
-      modifier = Modifier.weight(1f),
-      playbackUiState = playbackState,
-      swatch = swatch
-    )
+    PlayingControl(Modifier.weight(1f), playbackState, swatch)
   }
 }

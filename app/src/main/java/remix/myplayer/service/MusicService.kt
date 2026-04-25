@@ -36,9 +36,10 @@ import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_APLAYER
 import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_CLOSE
 import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_SYSTEM
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
+import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
 import remix.myplayer.data.prefs.SettingPrefs.Companion.OPEN_SOFTWARE
-import remix.myplayer.data.prefs.SettingPrefs.Companion.REPEAT_MODE_ALL
-import remix.myplayer.data.prefs.SettingPrefs.Companion.REPEAT_MODE_ONE
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.LanguageHelper
 import remix.myplayer.helper.ShakeDetector
@@ -58,8 +59,6 @@ import remix.myplayer.service.playback.ExoPlayback
 import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.service.playback.Playback
 import remix.myplayer.service.playback.PlaybackFavoriteState
-import remix.myplayer.service.playback.PlaybackOptions
-import remix.myplayer.service.playback.PlaybackOptionsState
 import remix.myplayer.service.playback.PlaybackProgressSaver
 import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity
@@ -109,9 +108,6 @@ class MusicService : BaseService(),
   lateinit var settingPrefs: SettingPrefs
 
   @Inject
-  lateinit var playbackOptions: PlaybackOptions
-
-  @Inject
   lateinit var playbackProgressSaver: PlaybackProgressSaver
 
   @Inject
@@ -148,18 +144,17 @@ class MusicService : BaseService(),
   private val LOAD_SUCCESS = 2
 
   /**
-   * 设置循环和随机播放模式并更新下一首歌曲
+   * 设置播放模式并更新下一首歌曲
    */
-  private var repeatMode: Int
-    get() = playbackOptions.repeatMode
+  private var playModel: Int
+    get() = settingPrefs.playModel
     set(value) {
-      applyPlaybackMode(playbackOptions.set(value, shuffleEnabled))
-    }
-
-  private var shuffleEnabled: Boolean
-    get() = playbackOptions.shuffleEnabled
-    set(value) {
-      applyPlaybackMode(playbackOptions.set(repeatMode, value))
+      Timber.v("修改播放模式: $value")
+      settingPrefs.playModel = value
+      playback.setMode(value)
+      updateMediaSessionQueue()
+      pushPlaybackUiState()
+      appWidgetUpdater.partiallyUpdateWidget(this)
     }
 
   /**
@@ -598,7 +593,7 @@ class MusicService : BaseService(),
         return
       }
 
-      if (repeatMode == REPEAT_MODE_ONE) {
+      if (playModel == MODE_REPEAT) {
         lastCommand = Command.PLAY
       } else {
         lastCommand = Command.SKIP_TO_NEXT
@@ -720,7 +715,7 @@ class MusicService : BaseService(),
    */
   fun setPlayQueue(newQueue: List<Song>?, intent: Intent) {
     Timber.v("setPlayQueue")
-    // 随机播放全部沿用完整随机播放模式：列表循环 + 随机
+    // 如果是随机播放，需要更新播放模式
     val shuffle = intent.getBooleanExtra(EXTRA_SHUFFLE, false)
     if (newQueue.isNullOrEmpty()) {
       return
@@ -733,7 +728,7 @@ class MusicService : BaseService(),
       launch { playQueueStore.save(newQueue) }
     }
     if (shuffle) {
-      applyPlaybackMode(playbackOptions.setShuffleAll())
+      playModel = MODE_SHUFFLE
     }
     handleCommand(intent)
 
@@ -838,8 +833,7 @@ class MusicService : BaseService(),
       nextSong = playback.nextSong ?: EMPTY_SONG,
       isPlaying = playback.isPlaying,
       speed = settingPrefs.speedValue,
-      repeatMode = repeatMode,
-      shuffleEnabled = shuffleEnabled,
+      playModel = playModel,
       lastOp = lastCommand
     )
     if (songChanged) {
@@ -972,8 +966,8 @@ class MusicService : BaseService(),
       }
 
       ACTION_SHORTCUT_SHUFFLE -> {
-        if (!shuffleEnabled || repeatMode != REPEAT_MODE_ALL) {
-          applyPlaybackMode(playbackOptions.setShuffleAll())
+        if (playModel != MODE_SHUFFLE) {
+          playModel = MODE_SHUFFLE
         }
         handleCommand(Intent(ACTION_CMD).putExtra(EXTRA_COMMAND, Command.SKIP_TO_NEXT))
       }
@@ -1149,13 +1143,9 @@ class MusicService : BaseService(),
       Command.PLAY -> {
         start(false)
       }
-      // 切换循环模式
-      Command.TOGGLE_REPEAT -> {
-        applyPlaybackMode(playbackOptions.toggleRepeat())
-      }
-      // 切换随机模式
-      Command.TOGGLE_SHUFFLE -> {
-        applyPlaybackMode(playbackOptions.toggleShuffle())
+      // 改变播放模式
+      Command.CHANGE_MODEL -> {
+        playModel = if (playModel == MODE_REPEAT) MODE_LOOP else playModel + 1
       }
       // 取消或者添加收藏
       Command.LOVE -> {
@@ -1233,15 +1223,6 @@ class MusicService : BaseService(),
         || command == Command.PLAY
   }
 
-  private fun applyPlaybackMode(state: PlaybackOptionsState) {
-    Timber.v("修改播放模式 repeatMode: ${state.repeatMode} shuffleEnabled: ${state.shuffleEnabled}")
-    playback.setPlaybackMode(state.repeatMode, state.shuffleEnabled)
-
-    updateMediaSessionQueue()
-    pushPlaybackUiState()
-    appWidgetUpdater.partiallyUpdateWidget(this)
-  }
-
   fun updatePlaybackState() {
     mediaSessionUpdater.updatePlaybackState(this, mediaSession, playback, lyricManager.isDesktopLyricLocked)
   }
@@ -1297,7 +1278,7 @@ class MusicService : BaseService(),
         pos,
         if (firstPrepared && settingPrefs.lastProgress > 0) settingPrefs.lastProgress.toLong() else 0L
       )
-      playback.setPlaybackMode(repeatMode, shuffleEnabled)
+      playback.setMode(playModel)
     }
   }
 

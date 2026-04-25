@@ -71,7 +71,7 @@ internal fun PlayingUtilityBar(
   musicState: PlaybackUiState,
   swatch: Palette.Swatch
 ) {
-  Box(modifier = modifier, contentAlignment = Alignment.Center) {
+  Box(modifier = modifier, contentAlignment = Alignment.TopCenter) {
     val swatchColor = Color(swatch.rgb)
     assert(playingScreenBottom != BOTTOM_SHOW_NONE)
 
@@ -167,7 +167,7 @@ private fun VolumeSeekbar(swatchColor: Color, onValueChange: () -> Unit) {
         }) {
       Image(
         painter = painterResource(R.drawable.ic_volume_down_black_24dp),
-        contentDescription = "PlayingUtilityBarVolumeDown",
+        contentDescription = "PlayingBottomBarVolumeDown",
         colorFilter = ColorFilter.tint(swatchColor.copy(0.5f))
       )
     }
@@ -187,7 +187,7 @@ private fun VolumeSeekbar(swatchColor: Color, onValueChange: () -> Unit) {
         }) {
       Image(
         painter = painterResource(R.drawable.ic_volume_up_black_24dp),
-        contentDescription = "PlayingUtilityBarVolumeUp",
+        contentDescription = "PlayingBottomBarVolumeUp",
         colorFilter = ColorFilter.tint(swatchColor.copy(0.5f))
       )
     }

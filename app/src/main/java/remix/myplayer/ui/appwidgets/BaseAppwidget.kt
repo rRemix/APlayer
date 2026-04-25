@@ -115,6 +115,10 @@ abstract class BaseAppwidget
       buildServicePendingIntent(context, componentNameForService, Command.SKIP_TO_NEXT)
     )
     views.setOnClickPendingIntent(
+      R.id.appwidget_model,
+      buildServicePendingIntent(context, componentNameForService, Command.CHANGE_MODEL)
+    )
+    views.setOnClickPendingIntent(
       R.id.appwidget_love,
       buildServicePendingIntent(context, componentNameForService, Command.LOVE)
     )
@@ -171,6 +175,7 @@ abstract class BaseAppwidget
     //        updateSkin(remoteViews);
     updatePlayPause(remoteViews)
     updateLove(remoteViews)
+    updateModel(remoteViews)
     updateNextAndPrev(remoteViews)
     updateProgress(remoteViews, song, primaryColor)
     updateTimer(remoteViews)
@@ -208,6 +213,11 @@ abstract class BaseAppwidget
     // 上下首歌曲
     remoteViews.setImageViewResource(R.id.appwidget_next, skin.nextRes)
     remoteViews.setImageViewResource(R.id.appwidget_prev, skin.prevRes)
+  }
+
+  private fun updateModel(remoteViews: RemoteViews) {
+    // 播放模式
+    remoteViews.setImageViewResource(R.id.appwidget_model, skin.getModeRes())
   }
 
   private fun updatePlayPause(remoteViews: RemoteViews) {

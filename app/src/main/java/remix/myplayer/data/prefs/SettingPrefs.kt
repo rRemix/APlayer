@@ -120,8 +120,7 @@ class SettingPrefs @Inject constructor(
   var crossFade by PrefsDelegate(sp, PrefKeys.Setting.CROSS_FADE, false)
   var speed by PrefsDelegate(sp, PrefKeys.Setting.SPEED, "1.0")
   val speedValue get() = speed.toFloat()
-  var repeatMode by PrefsDelegate(sp, PrefKeys.Setting.REPEAT_MODE, REPEAT_MODE_ALL)
-  var shuffleEnabled by PrefsDelegate(sp, PrefKeys.Setting.SHUFFLE_ENABLED, false)
+  var playModel by PrefsDelegate(sp, PrefKeys.Setting.PLAY_MODEL, MODE_LOOP)
   var lastSong by PrefsDelegate(sp, PrefKeys.Setting.LAST_SONG, "")
   var lastProgress by PrefsDelegate(sp, PrefKeys.Setting.LAST_PLAY_PROGRESS, 0)
 
@@ -171,7 +170,6 @@ class SettingPrefs @Inject constructor(
 
   var checkMigration16600 by PrefsDelegate(sp, "check_migration_16600", false)
   var checkMigration20500 by PrefsDelegate(sp, "check_migration_20500", false)
-  var checkMigration21000 by PrefsDelegate(sp, "check_migration_21000", false)
 
   companion object {
 
@@ -207,10 +205,10 @@ class SettingPrefs @Inject constructor(
     const val LOCKSCREEN_SYSTEM: Int = 1
     const val LOCKSCREEN_CLOSE: Int = 2
 
-    // 循环模式
-    const val REPEAT_MODE_OFF: Int = 0
-    const val REPEAT_MODE_ALL: Int = 1
-    const val REPEAT_MODE_ONE: Int = 2
+    // 播放模式
+    const val MODE_LOOP: Int = 1
+    const val MODE_SHUFFLE: Int = 2
+    const val MODE_REPEAT: Int = 3
 
     // 自动播放
     const val HEADSET_PLUG = 0
