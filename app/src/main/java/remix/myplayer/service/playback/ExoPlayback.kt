@@ -309,11 +309,11 @@ class ExoPlayback(private val context: Context) : Playback {
     }
   }
 
-  override fun setMode(mode: Int) {
+  override fun setMode(mode: Int, listLoop: Boolean) {
     checkMainThread()
     when (mode) {
       MODE_LOOP -> {
-        player.repeatMode = Player.REPEAT_MODE_ALL
+        player.repeatMode = if (listLoop) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
         player.shuffleModeEnabled = false
       }
 
@@ -323,7 +323,7 @@ class ExoPlayback(private val context: Context) : Playback {
       }
 
       MODE_SHUFFLE -> {
-        player.repeatMode = Player.REPEAT_MODE_ALL
+        player.repeatMode = if (listLoop) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
         player.shuffleModeEnabled = true
       }
 

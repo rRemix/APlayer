@@ -151,7 +151,7 @@ class MusicService : BaseService(),
     set(value) {
       Timber.v("修改播放模式: $value")
       settingPrefs.playModel = value
-      playback.setMode(value)
+      playback.setMode(value, settingPrefs.listLoop)
       updateMediaSessionQueue()
       pushPlaybackUiState()
       appWidgetUpdater.partiallyUpdateWidget(this)
@@ -357,6 +357,11 @@ class MusicService : BaseService(),
       // 倍速播放
       PrefKeys.Setting.SPEED -> {
         playback.speed = settingPrefs.speedValue
+        pushPlaybackUiState()
+      }
+      // 列表循环
+      PrefKeys.Setting.LIST_LOOP -> {
+        playback.setMode(playModel, settingPrefs.listLoop)
         pushPlaybackUiState()
       }
     }
@@ -1278,7 +1283,7 @@ class MusicService : BaseService(),
         pos,
         if (firstPrepared && settingPrefs.lastProgress > 0) settingPrefs.lastProgress.toLong() else 0L
       )
-      playback.setMode(playModel)
+      playback.setMode(playModel, settingPrefs.listLoop)
     }
   }
 

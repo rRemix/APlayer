@@ -121,6 +121,7 @@ class SettingPrefs @Inject constructor(
   var speed by PrefsDelegate(sp, PrefKeys.Setting.SPEED, "1.0")
   val speedValue get() = speed.toFloat()
   var playModel by PrefsDelegate(sp, PrefKeys.Setting.PLAY_MODEL, MODE_LOOP)
+  var listLoop by PrefsDelegate(sp, PrefKeys.Setting.LIST_LOOP, true)
   var lastSong by PrefsDelegate(sp, PrefKeys.Setting.LAST_SONG, "")
   var lastProgress by PrefsDelegate(sp, PrefKeys.Setting.LAST_PLAY_PROGRESS, 0)
 

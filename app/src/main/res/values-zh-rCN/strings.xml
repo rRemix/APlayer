@@ -351,6 +351,8 @@
   <string name="save_wechat_qrcode_success">已保存微信二维码，请打开微信识别该二维码</string>
   <string name="play_breakpoint">断点播放</string>
   <string name="play_breakpoint_tip">再次打开软件时将从断点处开始播放</string>
+  <string name="list_loop">列表循环</string>
+  <string name="list_loop_tip">播放到列表末尾后从第一首继续播放</string>
   <string name="will_stop_at_x">将在%d分钟后关闭</string>
   <string name="saveing">保存中</string>
   <string name="ignore_mediastore_artwork">忽略系统缓存中的媒体封面</string>

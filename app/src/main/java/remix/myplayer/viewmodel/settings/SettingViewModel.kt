@@ -85,6 +85,7 @@ class SettingViewModel @Inject constructor(
       crossFade = settingPrefs.crossFade,
       autoPlay = settingPrefs.autoPlay,
       speed = settingPrefs.speed,
+      listLoop = settingPrefs.listLoop,
     ),
     color = ColorSettings(
       primaryColor = themeController.appTheme.primary,
@@ -224,6 +225,11 @@ class SettingViewModel @Inject constructor(
   fun setSpeed(speed: String) {
     settingPrefs.speed = speed
     _settingsState.update { it.copy(play = it.play.copy(speed = speed)) }
+  }
+
+  fun setListLoop(enabled: Boolean) {
+    settingPrefs.listLoop = enabled
+    _settingsState.update { it.copy(play = it.play.copy(listLoop = enabled)) }
   }
 
   // -------- Color 分组 ----------

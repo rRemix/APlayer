@@ -24,6 +24,7 @@ data class PlaySettings(
   val crossFade: Boolean,
   val autoPlay: Int,
   val speed: String,
+  val listLoop: Boolean,
 )
 
 @Stable

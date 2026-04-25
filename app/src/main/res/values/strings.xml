@@ -354,6 +354,8 @@
   <string name="save_wechat_qrcode_success">We have saved WeChat QRCode. Please open WeChat to identify the qr code</string>
   <string name="play_breakpoint">Remember playback position</string>
   <string name="play_breakpoint_tip">When you open the APlayer again, it will start playing from the breakpoint</string>
+  <string name="list_loop">Loop playlist</string>
+  <string name="list_loop_tip">Continue from the first song after the playlist reaches the end</string>
   <string name="will_stop_at_x">APlayer will be closed in %d minutes</string>
   <string name="saveing">Saving</string>
   <string name="ignore_mediastore_artwork">Ignore Media Store covers</string>

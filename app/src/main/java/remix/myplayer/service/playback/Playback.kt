@@ -46,7 +46,7 @@ interface Playback {
   fun replaceSong(song: Song)
 
   /** 设置播放模式 */
-  fun setMode(mode: Int)
+  fun setMode(mode: Int, listLoop: Boolean)
 
   /** 切换下一首 */
   fun skipToNext()
