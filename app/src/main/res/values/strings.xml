@@ -152,6 +152,8 @@
   <string name="song_edit">Tag editor</string>
   <string name="common">Common</string>
   <string name="setting_common_desc">Scan, language and general behavior</string>
+  <string name="ui_font_size">Interface font size</string>
+  <string name="ui_font_size_preview">Preview text</string>
   <string name="lrc">Lyrics</string>
   <string name="setting_lyric_desc">Desktop, status bar and lyric source</string>
   <string name="music_filter">Filter</string>

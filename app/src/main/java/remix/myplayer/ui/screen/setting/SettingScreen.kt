@@ -34,6 +34,7 @@ import remix.myplayer.ui.screen.setting.logic.common.RestoreDeleteLogic
 import remix.myplayer.ui.screen.setting.logic.common.ScanSizeLogic
 import remix.myplayer.ui.screen.setting.logic.common.ShakeLogic
 import remix.myplayer.ui.screen.setting.logic.common.ShowDisplayNameLogic
+import remix.myplayer.ui.screen.setting.logic.common.UiFontScaleLogic
 import remix.myplayer.ui.screen.setting.logic.cover.AutoDownloadLogic
 import remix.myplayer.ui.screen.setting.logic.cover.DownloadSourceLogic
 import remix.myplayer.ui.screen.setting.logic.cover.IgnoreMediaStoreLogic
@@ -194,6 +195,8 @@ private fun CommonPreferenceItems() {
   RestoreDeleteLogic()
 
   LanguageLogic()
+
+  UiFontScaleLogic()
 
   ShakeLogic()
 

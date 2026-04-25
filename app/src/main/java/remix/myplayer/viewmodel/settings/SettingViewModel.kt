@@ -76,6 +76,7 @@ class SettingViewModel @Inject constructor(
       blacklist = settingPrefs.blacklist,
       deleteIds = settingPrefs.deleteIds,
       language = settingPrefs.language,
+      uiFontScale = SettingPrefs.normalizeUiFontScale(settingPrefs.uiFontScale),
       shake = settingPrefs.shake,
       showDisplayName = settingPrefs.showDisplayName
     ),
@@ -199,6 +200,13 @@ class SettingViewModel @Inject constructor(
   fun setShowDisplayName(enabled: Boolean) {
     settingPrefs.showDisplayName = enabled
     _settingsState.update { it.copy(common = it.common.copy(showDisplayName = enabled)) }
+  }
+
+  fun setUiFontScale(scale: Float) {
+    val normalized = SettingPrefs.normalizeUiFontScale(scale)
+    if (_settingsState.value.common.uiFontScale == normalized) return
+    settingPrefs.uiFontScale = normalized
+    _settingsState.update { it.copy(common = it.common.copy(uiFontScale = normalized)) }
   }
 
   // -------- Play 分组 ----------

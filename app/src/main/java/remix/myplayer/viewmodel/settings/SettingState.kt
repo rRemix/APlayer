@@ -13,6 +13,7 @@ data class CommonSettings(
   val blacklist: Set<String>,
   val deleteIds: Set<String>,
   val language: Int,
+  val uiFontScale: Float,
   val shake: Boolean,
   val showDisplayName: Boolean,
 )

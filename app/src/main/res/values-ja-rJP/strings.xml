@@ -149,6 +149,8 @@
     <string name="song_edit">タグエディタ</string>
     <string name="common">一般</string>
     <string name="setting_common_desc">一般機能・スキャン・言語</string>
+    <string name="ui_font_size">表示フォントサイズ</string>
+    <string name="ui_font_size_preview">プレビューテキスト</string>
     <string name="lrc">歌詞</string>
     <string name="setting_lyric_desc">デスクトップ/ステータスバー歌詞と歌詞ソース</string>
     <string name="music_filter">フィルタ</string>

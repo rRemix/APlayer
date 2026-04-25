@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
@@ -46,7 +47,7 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
   val bodyColor = if (theme.isLight) Color(swatch.bodyTextColor) else theme.textSecondary
   val tintColor = if (theme.isLight) titleColor else theme.popupButton()
 
-  Row(modifier = Modifier.height(56.dp), verticalAlignment = Alignment.CenterVertically) {
+  Row(modifier = Modifier.heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
     Box(
       contentAlignment = Alignment.Center,
       modifier = Modifier

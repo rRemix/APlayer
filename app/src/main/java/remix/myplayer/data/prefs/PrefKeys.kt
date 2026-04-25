@@ -152,6 +152,9 @@ object PrefKeys {
     /** 语言 */
     const val LANGUAGE = "language"
 
+    /** 界面字体缩放 */
+    const val UI_FONT_SCALE = "ui_font_scale"
+
     /** EQ */
     const val ENABLE_EQ = "enable_eq"
 

@@ -149,6 +149,8 @@
   <string name="song_edit">音樂標簽編輯</string>
   <string name="common">一般</string>
   <string name="setting_common_desc">一般功能、掃描與語言</string>
+  <string name="ui_font_size">介面字體大小</string>
+  <string name="ui_font_size_preview">預覽文字</string>
   <string name="lrc">歌詞</string>
   <string name="setting_lyric_desc">桌面歌詞、狀態列歌詞與來源</string>
   <string name="music_filter">音訊排除</string>

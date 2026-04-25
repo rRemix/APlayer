@@ -16,6 +16,7 @@ import remix.myplayer.helper.SortOrder
 import remix.myplayer.util.Constants.MB
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.roundToInt
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
@@ -61,6 +62,7 @@ class SettingPrefs @Inject constructor(
     PrefKeys.Setting.CHILD_ARTIST_SONG_SORT_ORDER,
     SortOrder.SONG_A_Z
   )
+
   @Deprecated("use getPlayListDetailSortOrder(playlistId) / setPlayListDetailSortOrder(playlistId, order) instead")
   var playListDetailSortOrder by PrefsDelegate(
     sp,
@@ -111,6 +113,11 @@ class SettingPrefs @Inject constructor(
 
   var lockScreen by PrefsDelegate(sp, PrefKeys.Setting.LOCKSCREEN, LOCKSCREEN_SYSTEM)
   var language by PrefsDelegate(sp, PrefKeys.Setting.LANGUAGE, AUTO)
+  var uiFontScale by PrefsDelegate(
+    sp,
+    PrefKeys.Setting.UI_FONT_SCALE,
+    UI_FONT_SCALE_DEFAULT
+  )
   var playAtBreakPoint by PrefsDelegate(sp, PrefKeys.Setting.PLAY_AT_BREAKPOINT, false)
   var shake by PrefsDelegate(sp, PrefKeys.Setting.SHAKE, false)
   var showDisplayName by PrefsDelegate(sp, PrefKeys.Setting.SHOW_DISPLAYNAME, false)
@@ -222,6 +229,16 @@ class SettingPrefs @Inject constructor(
 
     const val LIST_MODE = 0
     const val GRID_MODE = 1
+
+    const val UI_FONT_SCALE_DEFAULT = 1.0f
+    const val UI_FONT_SCALE_MIN = 0.85f
+    const val UI_FONT_SCALE_MAX = 1.5f
+    const val UI_FONT_SCALE_STEP = 0.05f
+
+    fun normalizeUiFontScale(scale: Float): Float {
+      val snapped = (scale / UI_FONT_SCALE_STEP).roundToInt() * UI_FONT_SCALE_STEP
+      return snapped.coerceIn(UI_FONT_SCALE_MIN, UI_FONT_SCALE_MAX)
+    }
   }
 }
 

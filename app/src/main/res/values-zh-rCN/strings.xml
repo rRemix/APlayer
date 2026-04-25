@@ -149,6 +149,8 @@
   <string name="song_edit">音乐标签编辑</string>
   <string name="common">常规</string>
   <string name="setting_common_desc">常规功能、扫描与语言</string>
+  <string name="ui_font_size">界面字体大小</string>
+  <string name="ui_font_size_preview">预览文字</string>
   <string name="lrc">歌词</string>
   <string name="setting_lyric_desc">桌面歌词、状态栏歌词与来源</string>
   <string name="music_filter">音频过滤</string>
