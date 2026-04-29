@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -44,6 +45,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -83,7 +85,10 @@ private val itemRes = mapOf(
 internal fun PlayingControl(
   modifier: Modifier = Modifier,
   playbackUiState: PlaybackUiState,
-  swatch: Palette.Swatch
+  swatch: Palette.Swatch,
+  iconSize: Dp? = null,
+  playPauseSize: Dp = 56.dp,
+  buttonSize: Dp? = null
 ) {
   Row(
     modifier = modifier
@@ -94,12 +99,17 @@ internal fun PlayingControl(
     val swatchColor = Color(swatch.rgb)
     val playMode = playbackUiState.playMode
     val viewModel = playbackViewModel
-    ControlButton(onClick = {
-      val newMode = if (playMode == MODE_REPEAT) MODE_LOOP else playMode + 1
-      MessageNotifier.show(itemRes[newMode]!!.second)
-      Util.sendCMDLocalBroadcast(Command.CHANGE_MODEL)
-    }) {
+    val iconModifier = if (iconSize != null) Modifier.size(iconSize) else Modifier
+    ControlButton(
+      onClick = {
+        val newMode = if (playMode == MODE_REPEAT) MODE_LOOP else playMode + 1
+        MessageNotifier.show(itemRes[newMode]!!.second)
+        Util.sendCMDLocalBroadcast(Command.CHANGE_MODEL)
+      },
+      buttonSize = buttonSize
+    ) {
       Image(
+        modifier = iconModifier,
         painter = painterResource(itemRes[playMode]!!.first),
         contentDescription = "PlayingMode",
         colorFilter = ColorFilter.tint(swatchColor.copy(0.5f))
@@ -120,24 +130,29 @@ internal fun PlayingControl(
       },
       onLongPressEnd = {
         viewModel.stopContinuousSeek()
-      }
+      },
+      buttonSize = buttonSize
     ) {
       Image(
+        modifier = iconModifier,
         painter = painterResource(R.drawable.play_btn_pre),
         contentDescription = "PlayingPrev",
         colorFilter = ColorFilter.tint(swatchColor)
       )
     }
 
-    ControlButton(onClick = {
-      sendLocalBroadcast(
-        Intent(MusicService.ACTION_CMD).putExtra(
-          MusicService.EXTRA_COMMAND,
-          Command.PLAY_PAUSE
+    ControlButton(
+      onClick = {
+        sendLocalBroadcast(
+          Intent(MusicService.ACTION_CMD).putExtra(
+            MusicService.EXTRA_COMMAND,
+            Command.PLAY_PAUSE
+          )
         )
-      )
-    }) {
-      val size = with(LocalDensity.current) { 56.dp.roundToPx() }
+      },
+      buttonSize = buttonSize
+    ) {
+      val size = with(LocalDensity.current) { playPauseSize.roundToPx() }
       AndroidView(
         factory = {
           PlayPauseView(it).apply {
@@ -147,6 +162,9 @@ internal fun PlayingControl(
         },
         update = {
           it.setBackgroundColor(swatch.rgb)
+          if (it.layoutParams.width != size || it.layoutParams.height != size) {
+            it.layoutParams = ViewGroup.LayoutParams(size, size)
+          }
           it.updateState(playbackUiState.isPlaying, true)
         }
       )
@@ -166,9 +184,11 @@ internal fun PlayingControl(
       },
       onLongPressEnd = {
         viewModel.stopContinuousSeek()
-      }
+      },
+      buttonSize = buttonSize
     ) {
       Image(
+        modifier = iconModifier,
         painter = painterResource(R.drawable.play_btn_next),
         contentDescription = "PlayingNext",
         colorFilter = ColorFilter.tint(swatchColor)
@@ -179,12 +199,16 @@ internal fun PlayingControl(
     PlayQueueDialog(state, playbackUiState)
 
     val scope = rememberCoroutineScope()
-    ControlButton(onClick = {
-      scope.launch {
-        state.show()
-      }
-    }) {
+    ControlButton(
+      onClick = {
+        scope.launch {
+          state.show()
+        }
+      },
+      buttonSize = buttonSize
+    ) {
       Image(
+        modifier = iconModifier,
         painter = painterResource(R.drawable.play_btn_normal_list),
         contentDescription = "PlayingPlayQueue",
         colorFilter = ColorFilter.tint(swatchColor.copy(0.5f))
@@ -282,6 +306,7 @@ private fun PlayQueueDialog(
 @Composable
 private fun RowScope.ControlButton(
   onClick: () -> Unit,
+  buttonSize: Dp? = null,
   onLongPressStart: (() -> Unit)? = null,
   onLongPressEnd: (() -> Unit)? = null,
   content: @Composable BoxScope.() -> Unit
@@ -318,11 +343,19 @@ private fun RowScope.ControlButton(
   } else {
     Modifier.clickWithRipple { onClick() }
   }
+  val isPortrait = LocalContext.current.isPortraitOrientation()
+  val buttonModifier = if (buttonSize != null) {
+    modifier
+      .weight(1f, isPortrait)
+      .size(buttonSize)
+  } else {
+    modifier
+      .weight(1f, isPortrait)
+      .aspectRatio(1f)
+  }
 
   Box(
-    modifier = modifier
-      .weight(1f, LocalContext.current.isPortraitOrientation())
-      .aspectRatio(1f),
+    modifier = buttonModifier,
     contentAlignment = Alignment.Center
   ) {
     content()
