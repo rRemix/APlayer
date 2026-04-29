@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
@@ -25,6 +26,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.launch
 import remix.myplayer.ui.screen.playing.PlayingPanel
+import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.viewmodel.PlayingScreenValue
 import remix.myplayer.viewmodel.mainViewModel
 import kotlin.math.roundToInt
@@ -44,6 +46,7 @@ fun AppScaffold(content: @Composable () -> Unit) {
   Box(
     modifier = Modifier
       .fillMaxSize()
+      .background(LocalTheme.current.mainBackground)
       .onSizeChanged { size ->
         val newHeight = size.height.toFloat()
         if (screenHeight != newHeight) {
