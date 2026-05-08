@@ -7,10 +7,13 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.widget.RemoteViews
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.AppWidgetTarget
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
@@ -41,9 +44,8 @@ abstract class BaseAppwidget
   protected val playbackState
     get() = MusicStateSource.currentPlaybackUiState
 
-//  private val defaultDrawableRes: Int
-//    @DrawableRes
-//    get() = if (skin == WHITE_1F) R.drawable.album_empty_bg_night else R.drawable.album_empty_bg_day
+  private val defaultDrawableRes: Int
+    get() = R.drawable.album_empty_bg_night
 
   private fun buildServicePendingIntent(
     context: Context,
@@ -88,16 +90,39 @@ abstract class BaseAppwidget
       .load(song)
       .centerCrop()
       .override(size, size)
-      .into(
-        AppWidgetTarget(
-          context,
-          size,
-          size,
-          R.id.appwidget_image,
-          remoteViews,
-          ComponentName(context, javaClass)
-        )
-      )
+      .into(object : CustomTarget<Bitmap>() {
+        override fun onLoadStarted(placeholder: Drawable?) {
+          updateWithDefaultCover()
+        }
+
+        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+          if (song.id != playbackState.song.id) {
+            return
+          }
+          if (resource.isRecycled) {
+            updateWithDefaultCover()
+            return
+          }
+
+          remoteViews.setImageViewBitmap(R.id.appwidget_image, resource)
+          pushUpdate(context, appWidgetIds, remoteViews)
+        }
+
+        override fun onLoadFailed(errorDrawable: Drawable?) {
+          updateWithDefaultCover()
+        }
+
+        override fun onLoadCleared(placeholder: Drawable?) {
+        }
+
+        private fun updateWithDefaultCover() {
+          if (song.id != playbackState.song.id) {
+            return
+          }
+          remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
+          pushUpdate(context, appWidgetIds, remoteViews)
+        }
+      })
   }
 
   protected fun buildAction(context: Context, views: RemoteViews) {
