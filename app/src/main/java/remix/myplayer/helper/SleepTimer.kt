@@ -1,6 +1,8 @@
 package remix.myplayer.helper
 
 import android.os.CountDownTimer
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.ui.nav.MessageNotifier
@@ -40,6 +42,9 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) :
     private var millisUntilFinish: Long = 0
 
     private var running = false
+
+    private val _runningState = MutableStateFlow(running)
+    val runningState = _runningState.asStateFlow()
 
     @JvmStatic
     fun getMillisUntilFinish(): Long {
@@ -85,6 +90,7 @@ class SleepTimer(millisInFuture: Long, countDownInterval: Long) :
         millisUntilFinish = 0
       }
       running = start
+      _runningState.value = running
       MessageNotifier.show(
         if (!start) context.getString(R.string.cancel_timer) else context.getString(
           R.string.will_stop_at_x,

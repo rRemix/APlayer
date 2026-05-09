@@ -87,130 +87,128 @@ val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 fun AppNav() {
   val snackBarHostState = remember { SnackbarHostState() }
   ProvideSnackBarHostState(snackBarHostState) {
-    AppScaffold {
-      Box(modifier = Modifier.fillMaxSize()) {
-        DialogContainer()
+    Box(modifier = Modifier.fillMaxSize()) {
+      AppScaffold {
+        Box(modifier = Modifier.fillMaxSize()) {
+          DialogContainer()
 
-        NavHost(LocalNavController.current, startDestination = RouteHome) {
-          normalAnimatedScreen(
-            RouteHome,
-          ) {
-            HomeScreen()
-          }
-
-          normalAnimatedScreen(RouteSetting) {
-            SettingScreen()
-          }
-
-          normalAnimatedScreen(
-            "$RouteSettingDetail/{category}",
-            arguments = listOf(navArgument("category") { type = NavType.StringType })
-          ) {
-            val category = it.arguments?.getString("category") ?: return@normalAnimatedScreen
-            SettingDetailScreen(category)
-          }
-
-          normalAnimatedScreen(
-            "${RouteSongChoose}/{id}/{name}",
-            arguments = listOf(navArgument("id") {
-              type = NavType.LongType
-            })
-          ) {
-            val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
-            val name = Uri.decode(it.arguments?.getString("name") ?: return@normalAnimatedScreen)
-            SongChooserScreen(id, name)
-          }
-
-          normalAnimatedScreen(RouteAbout) {
-            AboutScreen()
-          }
-
-          composable<DetailScreenRoute>(
-            typeMap = mapOf(
-              typeOf<Album?>() to ModelRouteType.album,
-              typeOf<Artist?>() to ModelRouteType.artist,
-              typeOf<Genre?>() to ModelRouteType.genre,
-              typeOf<PlayList?>() to ModelRouteType.playList,
-              typeOf<Folder?>() to ModelRouteType.folder,
-            ),
-            enterTransition = enterTransition(),
-            exitTransition = exitTransition(),
-            popEnterTransition = popEnterTransition(),
-            popExitTransition = popExitTransition(),
-          ) {
-            val route = it.toRoute<DetailScreenRoute>()
-
-            DetailScreen(route.findNotNull())
-          }
-
-          normalAnimatedScreen("${RouteCustomSort}/{id}", arguments = listOf(navArgument("id") {
-            type = NavType.LongType
-          })) {
-            val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
-            CustomSortScreen(id)
-          }
-
-          normalAnimatedScreen(RouteLastAdded) {
-            LastAddedScreen()
-          }
-
-          normalAnimatedScreen(RouteHistory) {
-            HistoryScreen()
-          }
-
-          normalAnimatedScreen(RouteSearch) {
-            SearchScreen()
-          }
-
-          normalAnimatedScreen(RouteTagEdit) {
-            TagEditScreen(it)
-          }
-
-          composable<WebDav>(
-            enterTransition = enterTransition(),
-            exitTransition = exitTransition(),
-            popEnterTransition = popEnterTransition(),
-            popExitTransition = popExitTransition(),
-          ) {
-            val webDav = it.toRoute<WebDav>()
-            WebDavDetailScreen(webDav)
-          }
-
-          composable<Smb>(
-            enterTransition = enterTransition(),
-            exitTransition = exitTransition(),
-            popEnterTransition = popEnterTransition(),
-            popExitTransition = popExitTransition(),
-          ) {
-            val smb = it.toRoute<Smb>()
-            SmbDetailScreen(smb)
-          }
-
-          normalAnimatedScreen(
-            "${RouteCustomCoverCrop}/{id}/{type}",
-            arguments = listOf(
-              navArgument("id") { type = NavType.LongType },
-              navArgument("type") { type = NavType.IntType })
-          ) {
-            val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
-            val type = it.arguments?.getInt("type") ?: return@normalAnimatedScreen
-            val context = LocalContext.current
-            val nav = LocalNavController.current
-            val libraryVM = libraryViewModel
-
-            val destinationUri = remember(id, type) {
-              val cacheDir = DiskCache.getDiskCacheDir(context, "thumbnail")
-              if (!cacheDir.exists() && !cacheDir.mkdir()) {
-                Uri.EMPTY
-              } else {
-                val file = File(cacheDir, "$type-${id}.jpg")
-                Uri.fromFile(file)
-              }
+          NavHost(LocalNavController.current, startDestination = RouteHome) {
+            normalAnimatedScreen(
+              RouteHome,
+            ) {
+              HomeScreen()
             }
 
-            CropScreen(
-              destinationUri = destinationUri,
-              onCropSuccess = {
+            normalAnimatedScreen(RouteSetting) {
+              SettingScreen()
+            }
+
+            normalAnimatedScreen(
+              "$RouteSettingDetail/{category}",
+              arguments = listOf(navArgument("category") { type = NavType.StringType })
+            ) {
+              val category = it.arguments?.getString("category") ?: return@normalAnimatedScreen
+              SettingDetailScreen(category)
+            }
+
+            normalAnimatedScreen(
+              "${RouteSongChoose}/{id}/{name}", arguments = listOf(navArgument("id") {
+                type = NavType.LongType
+              })
+            ) {
+              val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
+              val name = Uri.decode(it.arguments?.getString("name") ?: return@normalAnimatedScreen)
+              SongChooserScreen(id, name)
+            }
+
+            normalAnimatedScreen(RouteAbout) {
+              AboutScreen()
+            }
+
+            composable<DetailScreenRoute>(
+              typeMap = mapOf(
+                typeOf<Album?>() to ModelRouteType.album,
+                typeOf<Artist?>() to ModelRouteType.artist,
+                typeOf<Genre?>() to ModelRouteType.genre,
+                typeOf<PlayList?>() to ModelRouteType.playList,
+                typeOf<Folder?>() to ModelRouteType.folder,
+              ),
+              enterTransition = enterTransition(),
+              exitTransition = exitTransition(),
+              popEnterTransition = popEnterTransition(),
+              popExitTransition = popExitTransition(),
+            ) {
+              val route = it.toRoute<DetailScreenRoute>()
+
+              DetailScreen(route.findNotNull())
+            }
+
+            normalAnimatedScreen("${RouteCustomSort}/{id}", arguments = listOf(navArgument("id") {
+              type = NavType.LongType
+            })) {
+              val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
+              CustomSortScreen(id)
+            }
+
+            normalAnimatedScreen(RouteLastAdded) {
+              LastAddedScreen()
+            }
+
+            normalAnimatedScreen(RouteHistory) {
+              HistoryScreen()
+            }
+
+            normalAnimatedScreen(RouteSearch) {
+              SearchScreen()
+            }
+
+            normalAnimatedScreen(RouteTagEdit) {
+              TagEditScreen(it)
+            }
+
+            composable<WebDav>(
+              enterTransition = enterTransition(),
+              exitTransition = exitTransition(),
+              popEnterTransition = popEnterTransition(),
+              popExitTransition = popExitTransition(),
+            ) {
+              val webDav = it.toRoute<WebDav>()
+              WebDavDetailScreen(webDav)
+            }
+
+            composable<Smb>(
+              enterTransition = enterTransition(),
+              exitTransition = exitTransition(),
+              popEnterTransition = popEnterTransition(),
+              popExitTransition = popExitTransition(),
+            ) {
+              val smb = it.toRoute<Smb>()
+              SmbDetailScreen(smb)
+            }
+
+            normalAnimatedScreen(
+              "${RouteCustomCoverCrop}/{id}/{type}",
+              arguments = listOf(
+                navArgument("id") { type = NavType.LongType },
+                navArgument("type") { type = NavType.IntType })
+            ) {
+              val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
+              val type = it.arguments?.getInt("type") ?: return@normalAnimatedScreen
+              val context = LocalContext.current
+              val nav = LocalNavController.current
+              val libraryVM = libraryViewModel
+
+              val destinationUri = remember(id, type) {
+                val cacheDir = DiskCache.getDiskCacheDir(context, "thumbnail")
+                if (!cacheDir.exists() && !cacheDir.mkdir()) {
+                  Uri.EMPTY
+                } else {
+                  val file = File(cacheDir, "$type-${id}.jpg")
+                  Uri.fromFile(file)
+                }
+              }
+
+              CropScreen(destinationUri = destinationUri, onCropSuccess = {
                 libraryVM.fetchMedia(
                   clear = true,
                   updateAlbumVersion = type == Constants.ALBUM,
@@ -218,52 +216,46 @@ fun AppNav() {
                   updatePlayListVersion = type == Constants.PLAYLIST,
                 )
                 nav.popBackStack()
-              },
-              onCancel = {
+              }, onCancel = {
                 nav.popBackStack()
-              }
-            )
-          }
+              })
+            }
 
-          composable(
-            "$RouteTagEditCrop/{uri}",
-            arguments = listOf(navArgument("uri") { type = NavType.StringType })
-          ) {
-            val uriString = it.arguments?.getString("uri") ?: return@composable
-            val destinationUri = Uri.decode(uriString).toUri()
-            val nav = LocalNavController.current
+            composable(
+              "$RouteTagEditCrop/{uri}",
+              arguments = listOf(navArgument("uri") { type = NavType.StringType })
+            ) {
+              val uriString = it.arguments?.getString("uri") ?: return@composable
+              val destinationUri = Uri.decode(uriString).toUri()
+              val nav = LocalNavController.current
 
-            CropScreen(
-              destinationUri = destinationUri,
-              onCropSuccess = {
+              CropScreen(destinationUri = destinationUri, onCropSuccess = {
                 nav.previousBackStackEntry?.savedStateHandle?.set(
-                  "song_crop_result",
-                  System.currentTimeMillis()
+                  "song_crop_result", System.currentTimeMillis()
                 )
                 nav.popBackStack()
-              },
-              onCancel = {
+              }, onCancel = {
                 nav.popBackStack()
-              }
-            )
-          }
+              })
+            }
 
-          normalAnimatedScreen(RouteEq) {
-            EQScreen()
-          }
+            normalAnimatedScreen(RouteEq) {
+              EQScreen()
+            }
 
-          normalAnimatedScreen(RouteSupport) {
-            SupportScreen()
+            normalAnimatedScreen(RouteSupport) {
+              SupportScreen()
+            }
           }
         }
-
-        SnackbarHost(
-          hostState = snackBarHostState,
-          modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .padding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom).asPaddingValues())
-        )
       }
+
+      SnackbarHost(
+        hostState = snackBarHostState,
+        modifier = Modifier
+          .align(Alignment.BottomCenter)
+          .padding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom).asPaddingValues())
+      )
     }
 
     LaunchedEffect(Unit) {

@@ -8,8 +8,9 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Checkbox
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -218,85 +220,89 @@ fun NormalDialog(
       }
 
       if (positive != null || neutral != null || negative != null) {
-        Row(
-          modifier = Modifier
-            .fillMaxWidth(),
-          verticalAlignment = Alignment.CenterVertically
-        ) {
-          val buttonPadding = 6.dp
-          val buttonFontSize = 15.sp
-          val buttonWeight = FontWeight.SemiBold
-
-          Box(
-            contentAlignment = Alignment.CenterStart,
-            modifier = Modifier
-              .weight(1f)
-          ) {
-            TextPrimary(
-              neutral ?: "",
-              modifier = Modifier
-                .clickable(
-                  enabled = !neutral.isNullOrEmpty(),
-                  onClick = {
-                    if (autoDismiss) {
-                      dialogState.dismiss()
-                    }
-                    onNeutral?.invoke()
-                  }
-                )
-                .padding(buttonPadding),
-              textAlign = TextAlign.Center,
-              fontWeight = buttonWeight,
-              fontSize = buttonFontSize
-            )
-          }
-
-          Spacer(modifier = Modifier.width(4.dp))
-
-          Row(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-          ) {
-            TextPrimary(
-              negative ?: "",
-              textAlign = TextAlign.Center,
-              modifier = Modifier
-                .clickable(
-                  enabled = !negative.isNullOrEmpty(),
-                  onClick = {
-                    if (autoDismiss) {
-                      dialogState.dismiss()
-                    }
-                    onNegative?.invoke()
-                  }
-                )
-                .padding(buttonPadding)
-                .weight(1f),
-              fontWeight = buttonWeight,
-              fontSize = buttonFontSize
-            )
-            TextPrimary(
-              positive ?: "",
-              textAlign = TextAlign.Center,
-              modifier = Modifier
-                .clickable(
-                  enabled = !positive.isNullOrEmpty(),
-                  onClick = {
-                    if (autoDismiss) {
-                      dialogState.dismiss()
-                    }
-                    onPositive?.invoke()
-                  }
-                )
-                .padding(buttonPadding)
-                .weight(1f),
-              fontWeight = buttonWeight,
-              fontSize = buttonFontSize
-            )
-          }
-        }
+        NormalDialogActions(
+          dialogState = dialogState,
+          autoDismiss = autoDismiss,
+          positive = positive,
+          onPositive = onPositive,
+          neutral = neutral,
+          onNeutral = onNeutral,
+          negative = negative,
+          onNegative = onNegative
+        )
       }
     }
+  }
+}
+
+@Composable
+private fun NormalDialogActions(
+  dialogState: DialogState,
+  autoDismiss: Boolean,
+  positive: String?,
+  onPositive: (() -> Unit)?,
+  neutral: String?,
+  onNeutral: (() -> Unit)?,
+  negative: String?,
+  onNegative: (() -> Unit)?,
+) {
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    verticalAlignment = Alignment.Top
+  ) {
+    NormalDialogActionButton(neutral) {
+      if (autoDismiss) {
+        dialogState.dismiss()
+      }
+      onNeutral?.invoke()
+    }
+
+    Spacer(modifier = Modifier.weight(1f))
+
+    Row(
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      NormalDialogActionButton(negative) {
+        if (autoDismiss) {
+          dialogState.dismiss()
+        }
+        onNegative?.invoke()
+      }
+      NormalDialogActionButton(positive) {
+        if (autoDismiss) {
+          dialogState.dismiss()
+        }
+        onPositive?.invoke()
+      }
+    }
+  }
+}
+
+@Composable
+private fun NormalDialogActionButton(
+  text: String?,
+  onClick: () -> Unit,
+) {
+  if (text.isNullOrEmpty()) {
+    return
+  }
+
+  Box(
+    contentAlignment = Alignment.Center,
+    modifier = Modifier
+      .widthIn(min = 48.dp)
+      .heightIn(min = 36.dp)
+      .clickable(onClick = onClick)
+      .padding(horizontal = 6.dp, vertical = 6.dp)
+  ) {
+    TextPrimary(
+      text,
+      textAlign = TextAlign.Center,
+      fontWeight = FontWeight.SemiBold,
+      fontSize = 15.sp,
+      maxLine = 1,
+      overflow = TextOverflow.Ellipsis
+    )
   }
 }
