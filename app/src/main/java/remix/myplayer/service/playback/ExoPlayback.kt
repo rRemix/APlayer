@@ -13,11 +13,13 @@ import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
+import androidx.media3.decoder.ffmpeg.FfmpegLibrary
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
@@ -30,6 +32,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.prefs.SettingPrefs.Companion.DECODER_MODE_FFMPEG
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
@@ -40,7 +43,10 @@ import timber.log.Timber
 import java.io.File
 
 @OptIn(UnstableApi::class)
-class ExoPlayback(private val context: Context) : Playback {
+class ExoPlayback(
+  private val context: Context,
+  private val decoderMode: Int,
+) : Playback {
 
   override var speed: Float
     get() = player.playbackParameters.speed
@@ -84,8 +90,12 @@ class ExoPlayback(private val context: Context) : Playback {
 
   private val localDataSourceFactory = DefaultDataSource.Factory(context)
 
-  private val player: ExoPlayer =
-    ExoPlayer.Builder(context).build().apply {
+  private val player: ExoPlayer = run {
+    val rendererMode = resolveRendererMode(decoderMode)
+    val renderersFactory = DefaultRenderersFactory(context)
+      .setExtensionRendererMode(rendererMode)
+    Timber.v("rendererMode: $rendererMode, decoderMode: $decoderMode")
+    ExoPlayer.Builder(context, renderersFactory).build().apply {
       playWhenReady = false
       val attrs = AudioAttributes.Builder()
         .setUsage(C.USAGE_MEDIA)
@@ -148,6 +158,7 @@ class ExoPlayback(private val context: Context) : Playback {
         }
       })
     }
+  }
 
   private fun startProgressTicker() {
     if (progressTickerJob != null) return
@@ -243,7 +254,8 @@ class ExoPlayback(private val context: Context) : Playback {
     var existIndex = findIndexOfSong(nextSong.id)
 
     // 无论什么模式，物理上都移动/插入到 currentIndex + 1
-    val targetIndex = if (existIndex != C.INDEX_UNSET && existIndex < currentIndex) currentIndex else currentIndex + 1
+    val targetIndex =
+      if (existIndex != C.INDEX_UNSET && existIndex < currentIndex) currentIndex else currentIndex + 1
 
     if (existIndex == C.INDEX_UNSET) {
       addSongs(listOf(nextSong), targetIndex)
@@ -441,11 +453,24 @@ class ExoPlayback(private val context: Context) : Playback {
 
   companion object {
     private const val TAG = "ExoPlayback"
+
+    private fun resolveRendererMode(decoderMode: Int): Int {
+      if (decoderMode != DECODER_MODE_FFMPEG) {
+        return DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF
+      }
+      return if (FfmpegLibrary.isAvailable()) {
+        DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
+      } else {
+        Timber.w("FFmpeg decoder is unavailable, fallback to default decoder")
+        DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF
+      }
+    }
   }
 }
 
 @OptIn(UnstableApi::class)
 private object MediaCache {
+
   @Volatile
   private var cache: SimpleCache? = null
 

@@ -46,6 +46,7 @@ import remix.myplayer.ui.screen.setting.logic.notification.ClassicNotifyLogic
 import remix.myplayer.ui.screen.setting.logic.notification.NotifyBackgroundLogic
 import remix.myplayer.ui.screen.setting.logic.other.ClearCacheLogic
 import remix.myplayer.ui.screen.setting.logic.play.AutoPlayLogic
+import remix.myplayer.ui.screen.setting.logic.play.DecoderModeLogic
 import remix.myplayer.ui.screen.setting.logic.play.IgnoreAudioFocusLogic
 import remix.myplayer.ui.screen.setting.logic.play.ListLoopLogic
 import remix.myplayer.ui.screen.setting.logic.play.PlayFadeLogic
@@ -214,6 +215,8 @@ private fun PlayPreferenceItems() {
   ListLoopLogic()
 
   AutoPlayLogic()
+
+  DecoderModeLogic()
 }
 
 @Composable

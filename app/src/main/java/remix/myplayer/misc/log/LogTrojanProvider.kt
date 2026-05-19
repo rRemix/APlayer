@@ -22,6 +22,7 @@ class LogTrojanProvider : ContentProvider() {
 
 
   override fun onCreate(): Boolean {
+    context?.let { LogFileWriter.init(it) }
     Timber.plant(LogTree())
     Timber.v("onCreate")
     return true

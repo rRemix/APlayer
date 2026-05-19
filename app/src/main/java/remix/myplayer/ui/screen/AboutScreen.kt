@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
-import android.os.Environment
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -57,6 +56,7 @@ import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.misc.AppInfo
 import remix.myplayer.misc.SystemInfo
+import remix.myplayer.misc.log.LogFileWriter
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
@@ -345,12 +345,12 @@ fun sendFeedback(context: Context, scope: CoroutineScope, sendLog: Boolean) {
     if (sendLog) {
       withContext(Dispatchers.IO) {
         try {
-          val zipFile =
-            File("${Environment.getExternalStorageDirectory().absolutePath}/Android/data/${context.packageName}/logs.zip")
+          val logDir = LogFileWriter.getLogDir(context)
+          val zipFile = File(logDir.parentFile, "logs.zip")
           zipFile.delete()
           zipFile.createNewFile()
           zipFile.zipOutputStream().zipFrom(
-            "${Environment.getExternalStorageDirectory().absolutePath}/Android/data/${context.packageName}/logs",
+            logDir.absolutePath,
             "${context.applicationInfo.dataDir}/shared_prefs"
           )
           if (zipFile.length() > 0) {

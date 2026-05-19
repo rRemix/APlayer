@@ -71,7 +71,7 @@ android {
             abiFilters += listOf(
                 "armeabi-v7a",
                 "arm64-v8a",
-                "x86",
+//                "x86",
                 "x86_64"
             )
         }
@@ -234,6 +234,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.media)
     implementation(libs.androidx.media3.exoplayer)
+    implementation(files("libs/lib-decoder-ffmpeg-release.aar"))
     implementation(libs.multidex)
     implementation(libs.palette.ktx)
 
@@ -251,7 +252,6 @@ dependencies {
     implementation(libs.room.runtime)
 
     implementation(libs.image.cropper)
-    implementation(libs.logback.android)
     implementation(libs.xxpermissions)
     implementation(libs.sardine.android) {
         // https://github.com/thegrizzlylabs/sardine-android/issues/70
@@ -259,9 +259,7 @@ dependencies {
         // https://github.com/thegrizzlylabs/sardine-android/blob/d0af7ae8e7ee0654a763c4c6f638a5e98b1782e9/build.gradle#L46
         exclude(group = "xpp3", module = "xpp3")
     }
-    implementation(libs.slf4j)
     implementation(libs.timber)
-    implementation(libs.tinypinyin)
 
     debugImplementation(libs.leakcanary)
 

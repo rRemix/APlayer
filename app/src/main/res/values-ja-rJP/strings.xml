@@ -166,6 +166,10 @@
   <string name="color">配色</string>
   <string name="setting_color_desc">テーマ色と表示スタイル</string>
   <string name="setting_play_desc">再生方法・音声フォーカス・フェード</string>
+  <string name="audio_decoder_mode">音声デコーダー</string>
+  <string name="audio_decoder_mode_tip">一部の曲で再生異常がある場合は、「FFmpeg を使用」に切り替えてアプリを再起動してください</string>
+  <string name="audio_decoder_mode_default">デフォルト</string>
+  <string name="audio_decoder_mode_ffmpeg">FFmpeg を使用</string>
   <string name="setting_library_desc">ライブラリ表示と並び順</string>
   <string name="setting_playing_screen_desc">再生画面のレイアウトと表示</string>
   <string name="setting_cover_desc">アートワークとカバー取得設定</string>

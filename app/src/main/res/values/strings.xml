@@ -169,6 +169,10 @@
   <string name="color">Colors</string>
   <string name="setting_color_desc">Theme colors and appearance</string>
   <string name="setting_play_desc">Playback, focus and fade behavior</string>
+  <string name="audio_decoder_mode">Audio decoder</string>
+  <string name="audio_decoder_mode_tip">If some songs play abnormally, try switching to "Use FFmpeg" and restart the app</string>
+  <string name="audio_decoder_mode_default">Default</string>
+  <string name="audio_decoder_mode_ffmpeg">Use FFmpeg</string>
   <string name="setting_library_desc">Library display and sorting</string>
   <string name="setting_playing_screen_desc">Now playing layout and behavior</string>
   <string name="setting_cover_desc">Artwork and cover download options</string>

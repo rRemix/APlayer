@@ -167,6 +167,9 @@ object PrefKeys {
     /** 音频焦点 */
     const val AUDIO_FOCUS = "audio_focus"
 
+    /** 音频解码方式 */
+    const val AUDIO_DECODER_MODE = "audio_decoder_mode"
+
     /** 自动播放 */
     const val AUTO_PLAY = "auto_play_headset_plug_in"
 

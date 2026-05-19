@@ -21,6 +21,7 @@ data class CommonSettings(
 @Stable
 data class PlaySettings(
   val ignoreAudioFocus: Boolean,
+  val decoderMode: Int,
   val playAtBreakPoint: Boolean,
   val crossFade: Boolean,
   val autoPlay: Int,

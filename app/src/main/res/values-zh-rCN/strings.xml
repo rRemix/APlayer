@@ -166,6 +166,10 @@
   <string name="color">色彩</string>
   <string name="setting_color_desc">主题颜色与界面外观</string>
   <string name="setting_play_desc">播放方式与音频焦点</string>
+  <string name="audio_decoder_mode">音频解码方式</string>
+  <string name="audio_decoder_mode_tip">如果部分歌曲播放异常，可尝试切换为“使用 FFmpeg”，重启应用后生效</string>
+  <string name="audio_decoder_mode_default">默认</string>
+  <string name="audio_decoder_mode_ffmpeg">使用 FFmpeg</string>
   <string name="setting_library_desc">曲库展示与排序方式</string>
   <string name="setting_playing_screen_desc">播放界面布局与显示行为</string>
   <string name="setting_cover_desc">封面显示与下载选项</string>

@@ -527,7 +527,7 @@ class MusicService : BaseService(),
    * 初始化Mediaplayer
    */
   private fun setUpPlayback() {
-    playback = ExoPlayback(this)
+    playback = ExoPlayback(this, settingPrefs.decoderMode)
     playback.attach(this)
 
     Timber.v("setUpPlayback, audioSessionId: ${playback.audioSessionId}")

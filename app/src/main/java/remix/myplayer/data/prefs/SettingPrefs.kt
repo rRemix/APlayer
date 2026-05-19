@@ -123,6 +123,11 @@ class SettingPrefs @Inject constructor(
   var showDisplayName by PrefsDelegate(sp, PrefKeys.Setting.SHOW_DISPLAYNAME, false)
 
   var ignoreAudioFocus by PrefsDelegate(sp, PrefKeys.Setting.AUDIO_FOCUS, false)
+  var decoderMode by PrefsDelegate(
+    sp,
+    PrefKeys.Setting.AUDIO_DECODER_MODE,
+    DECODER_MODE_DEFAULT
+  )
   var autoPlay by PrefsDelegate(sp, PrefKeys.Setting.AUTO_PLAY, NEVER)
   var crossFade by PrefsDelegate(sp, PrefKeys.Setting.CROSS_FADE, false)
   var speed by PrefsDelegate(sp, PrefKeys.Setting.SPEED, "1.0")
@@ -217,6 +222,10 @@ class SettingPrefs @Inject constructor(
     const val MODE_LOOP: Int = 1
     const val MODE_SHUFFLE: Int = 2
     const val MODE_REPEAT: Int = 3
+
+    // 音频解码方式
+    const val DECODER_MODE_DEFAULT: Int = 0
+    const val DECODER_MODE_FFMPEG: Int = 1
 
     // 自动播放
     const val HEADSET_PLUG = 0
