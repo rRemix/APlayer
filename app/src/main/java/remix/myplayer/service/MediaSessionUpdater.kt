@@ -10,6 +10,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,6 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_CLOSE
 import remix.myplayer.service.playback.Playback
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.ThemeController
-import remix.myplayer.util.DensityUtil
 import remix.myplayer.util.ext.tryLaunch
 import timber.log.Timber
 import javax.inject.Inject
@@ -74,7 +74,7 @@ class MediaSessionUpdater @Inject constructor(
     desktopLyricLocked: Boolean
   ) {
     val currentSong = playback.currentSong ?: EMPTY_SONG
-    if (currentSong == EMPTY_SONG || lockScreen == LOCKSCREEN_CLOSE) {
+    if (currentSong == EMPTY_SONG) {
       return
     }
 
@@ -93,6 +93,12 @@ class MediaSessionUpdater @Inject constructor(
     mediaSession.setMetadata(builder.build())
     updatePlaybackState(context, mediaSession, playback, desktopLyricLocked)
 
+    val shouldLoadAlbumArt =
+      lockScreen != LOCKSCREEN_CLOSE || Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+    if (!shouldLoadAlbumArt) {
+      return
+    }
+
     val placeholder =
       if (themeController.appTheme.isLight) R.drawable.album_empty_bg_day else R.drawable.album_empty_bg_night
     Glide.with(context)
@@ -100,7 +106,7 @@ class MediaSessionUpdater @Inject constructor(
       .load(currentSong)
       .error(placeholder)
       .centerCrop()
-      .override(DensityUtil.dip2px(160f), DensityUtil.dip2px(160f))
+      .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
       .into(object : CustomTarget<Bitmap>() {
         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
           setMediaSessionData(resource)
@@ -113,6 +119,7 @@ class MediaSessionUpdater @Inject constructor(
         private fun setMediaSessionData(result: Bitmap?) {
           builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, copy(result))
           mediaSession.setMetadata(builder.build())
+          updatePlaybackState(context, mediaSession, playback, desktopLyricLocked)
         }
 
         override fun onLoadCleared(placeholder: Drawable?) {
