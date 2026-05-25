@@ -107,13 +107,13 @@ internal fun PlayingLyric(song: Song) {
         if (panelState.show) {
           Column(horizontalAlignment = Alignment.CenterHorizontally) {
             OffsetButton(iconRes = R.drawable.ic_stat_1_24dp, text = "-0.5s") {
-              lyricOffset = max(0, lyricOffset - 500)
+              lyricOffset = max(-6000L, lyricOffset - 500)
               lyricsManager.offset = lyricOffset
 
               MessageNotifier.show(
                 context.getString(
-                  if (lyricOffset > 0) R.string.lyric_advance_x_second else R.string.lyric_delay_x_second,
-                  String.format(Locale.getDefault(), "%.1f", lyricOffset / 1000f)
+                  R.string.lyric_delay_x_second,
+                  String.format(Locale.getDefault(), "%.1f", kotlin.math.abs(lyricOffset) / 1000f)
                 )
               )
               panelState = panelState.copy(tick = panelState.tick + 1)
@@ -134,8 +134,8 @@ internal fun PlayingLyric(song: Song) {
               lyricsManager.offset = lyricOffset
               MessageNotifier.show(
                 context.getString(
-                  if (lyricOffset > 0) R.string.lyric_advance_x_second else R.string.lyric_delay_x_second,
-                  String.format(Locale.getDefault(), "%.1f", lyricOffset / 1000f)
+                  R.string.lyric_advance_x_second,
+                  String.format(Locale.getDefault(), "%.1f", kotlin.math.abs(lyricOffset) / 1000f)
                 )
               )
               panelState = panelState.copy(tick = panelState.tick + 1)
