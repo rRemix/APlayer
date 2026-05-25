@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import remix.myplayer.data.db.room.AppDatabase
 import remix.myplayer.data.model.misc.Library
+import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.SettingPrefs
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,6 +14,7 @@ import javax.inject.Singleton
 @Singleton
 class AppMigration @Inject constructor(
   private val settingPrefs: SettingPrefs,
+  private val lyricPrefs: LyricPrefs,
   private val database: AppDatabase
 ) {
 
@@ -23,7 +25,6 @@ class AppMigration @Inject constructor(
         database.playQueueDao().clear()
       }
     }
-
 
     if (!settingPrefs.checkMigration20500) {
       // 1.Fix invalid sort orders to defaults.
@@ -93,6 +94,12 @@ class AppMigration @Inject constructor(
       }
 
       settingPrefs.libraryJson = Json.encodeToString(migratedList)
+    }
+
+    if (!settingPrefs.checkMigration21100) {
+      settingPrefs.checkMigration21100 = true
+
+      lyricPrefs.translationEnabled = LanguageHelper.isChinese()
     }
   }
 }

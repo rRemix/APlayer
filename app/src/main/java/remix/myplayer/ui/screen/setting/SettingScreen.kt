@@ -42,6 +42,7 @@ import remix.myplayer.ui.screen.setting.logic.library.LibraryLogic
 import remix.myplayer.ui.screen.setting.logic.lyric.DesktopLyricLogic
 import remix.myplayer.ui.screen.setting.logic.lyric.LyricPriorityLogic
 import remix.myplayer.ui.screen.setting.logic.lyric.StatusBarLyricLogic
+import remix.myplayer.ui.screen.setting.logic.lyric.TranslationLogic
 import remix.myplayer.ui.screen.setting.logic.notification.ClassicNotifyLogic
 import remix.myplayer.ui.screen.setting.logic.notification.NotifyBackgroundLogic
 import remix.myplayer.ui.screen.setting.logic.other.ClearCacheLogic
@@ -268,6 +269,8 @@ private fun NotificationPreferenceItems() {
 @Composable
 private fun LyricPreferenceItems() {
   DesktopLyricLogic()
+
+  TranslationLogic()
 
   StatusBarLyricLogic()
 

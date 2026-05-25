@@ -249,6 +249,8 @@
   <string name="closed_desktop_lrc">デスクトップ歌詞は オフ です</string>
   <string name="opened_desktop_lrc">デスクトップ歌詞は オン です</string>
   <string name="statusbar_lrc">ステータスバー歌詞</string>
+  <string name="lyric_translation_title">歌詞翻訳</string>
+  <string name="lyric_translation_tip">歌詞ソースに翻訳がある場合、翻訳行を表示します</string>
   <string name="confirm_ignore_lrc">歌詞を無視してよろしいですか?</string>
   <string name="confirm_cancel_ignore_lrc">歌詞の無視しないようにしますか?</string>
   <string name="ignore_lrc">歌詞を無視</string>

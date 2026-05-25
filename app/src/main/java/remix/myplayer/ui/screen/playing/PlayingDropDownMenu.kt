@@ -12,15 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.misc.LyricOrder
@@ -32,7 +29,6 @@ import remix.myplayer.lyric.LyricManager.Companion.CHANGE_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.EXTRA_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.EXTRA_LYRIC_URI
 import remix.myplayer.lyric.LyricManager.Companion.SHOW_OFFSET_PANEL
-import remix.myplayer.lyric.LyricManagerEntryPoint
 import remix.myplayer.lyric.LyricSearcher
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.DialogState
@@ -47,8 +43,8 @@ import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.ShowLyricTipDialog
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.settingViewModel
-import remix.myplayer.viewmodel.tagEditViewModel
 import remix.myplayer.viewmodel.settings.SettingsState
+import remix.myplayer.viewmodel.tagEditViewModel
 import remix.myplayer.viewmodel.timerViewModel
 
 @Composable
@@ -79,14 +75,6 @@ fun PlayingDropDownMenu(
       R.string.delete,
     )
   val activity = LocalActivity.current as? BaseActivity
-  val context = LocalContext.current
-
-  val lyricsManager = remember {
-    EntryPointAccessors.fromApplication(
-      context.applicationContext,
-      LyricManagerEntryPoint::class.java
-    ).lyricManager()
-  }
 
   val timerVM = timerViewModel
 
@@ -138,7 +126,6 @@ fun PlayingDropDownMenu(
         }
       } else {
         order = it.toString()
-        lyricsManager.clearCache(song)
         sendLocalBroadcast(Intent(ACTION_LYRIC).putExtra(EXTRA_LYRIC, CHANGE_LYRIC))
       }
     })

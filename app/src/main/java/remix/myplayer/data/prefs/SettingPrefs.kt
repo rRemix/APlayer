@@ -183,6 +183,7 @@ class SettingPrefs @Inject constructor(
 
   var checkMigration16600 by PrefsDelegate(sp, "check_migration_16600", false)
   var checkMigration20500 by PrefsDelegate(sp, "check_migration_20500", false)
+  var checkMigration21100 by PrefsDelegate(sp, "check_migration_21100", false)
 
   companion object {
 

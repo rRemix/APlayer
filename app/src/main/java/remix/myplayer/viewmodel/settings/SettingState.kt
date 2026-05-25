@@ -79,6 +79,7 @@ data class CoverSettings(
 data class LyricSettings(
   val desktopLyricEnabled: Boolean,
   val statusBarLyricEnabled: Boolean,
+  val translationEnabled: Boolean,
   val fontScale: Float,
   val generalLyricOrder: List<LyricOrder>,
 )

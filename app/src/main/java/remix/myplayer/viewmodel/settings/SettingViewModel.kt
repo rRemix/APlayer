@@ -2,6 +2,7 @@ package remix.myplayer.viewmodel.settings
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -26,9 +27,11 @@ import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.helper.ShakeDetector
 import remix.myplayer.lyric.LyricManager
+import remix.myplayer.lyric.LyricManager.Companion.ACTION_LYRIC
+import remix.myplayer.lyric.LyricManager.Companion.CHANGE_LYRIC
+import remix.myplayer.lyric.LyricManager.Companion.EXTRA_LYRIC
 import remix.myplayer.repo.SongRepository
 import remix.myplayer.repo.usecase.DeleteSongUseCase
-import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.DeleteSongState
 import remix.myplayer.ui.dialog.DialogState
@@ -38,6 +41,7 @@ import remix.myplayer.ui.dialog.SongDetailState
 import remix.myplayer.ui.dialog.runWithLoading
 import remix.myplayer.ui.screen.playing.PlayingCoverAnimationStyle
 import remix.myplayer.ui.theme.ThemeController
+import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.updateIf
 import javax.inject.Inject
 
@@ -129,6 +133,7 @@ class SettingViewModel @Inject constructor(
     lyric = LyricSettings(
       desktopLyricEnabled = lyricPrefs.desktopLyricEnabled,
       statusBarLyricEnabled = lyricPrefs.statusBarLyricEnabled,
+      translationEnabled = lyricPrefs.translationEnabled,
       fontScale = lyricPrefs.fontScale,
       generalLyricOrder = lyricPrefs.generalLyricOrderList
     ),
@@ -380,6 +385,14 @@ class SettingViewModel @Inject constructor(
     _settingsState.update { it.copy(lyric = it.lyric.copy(statusBarLyricEnabled = enabled)) }
   }
 
+  fun setLyricTranslationEnabled(enabled: Boolean) {
+    lyricManager.isTranslationEnabled = enabled
+    viewModelScope.launch(Dispatchers.IO) {
+      sendLocalBroadcast(Intent(ACTION_LYRIC).putExtra(EXTRA_LYRIC, CHANGE_LYRIC))
+    }
+    _settingsState.update { it.copy(lyric = it.lyric.copy(translationEnabled = enabled)) }
+  }
+
   fun setLyricFontScale(scale: Float) {
     lyricPrefs.fontScale = scale
     _settingsState.update { it.copy(lyric = it.lyric.copy(fontScale = scale)) }
@@ -392,7 +405,7 @@ class SettingViewModel @Inject constructor(
       lyricPrefs.generalLyricOrder = Json.encodeToString(orderList)
       lyricManager.clearAllCache(includePersistent = true)
       // 重新获取歌词
-      lyricManager.updateLyrics(MusicStateSource.currentPlaybackUiState.song)
+      sendLocalBroadcast(Intent(ACTION_LYRIC).putExtra(EXTRA_LYRIC, CHANGE_LYRIC))
     }
     _settingsState.update { it.copy(lyric = it.lyric.copy(generalLyricOrder = orderList)) }
   }

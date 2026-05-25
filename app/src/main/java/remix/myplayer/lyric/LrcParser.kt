@@ -2,7 +2,6 @@ package remix.myplayer.lyric
 
 import android.annotation.SuppressLint
 import androidx.core.text.HtmlCompat
-import remix.myplayer.helper.LanguageHelper
 import remix.myplayer.util.EncodingDetect
 import timber.log.Timber
 import java.nio.charset.Charset
@@ -178,24 +177,22 @@ object LrcParser {
         }
       }
     }
+    return lines
+  }
 
-    // 合并翻译
-    // 相同时间戳的两行，认为第二行是第一行的翻译
-    lines.sortBy { it.time }
-
+  /**
+   * 合并翻译行。
+   *
+   * 相同时间戳的两行，认为第二行是第一行的翻译；关闭翻译时忽略后续同时间戳行。
+   */
+  fun mergeTranslations(lines: List<LyricLine>, translationEnabled: Boolean): ArrayList<LyricLine> {
     val combinedLines = ArrayList<LyricLine>()
-    val isChinese = LanguageHelper.isChinese()
 
-    for (line in lines) {
+    lines.sortedBy { it.time }.forEach { line ->
       val lastLine = combinedLines.lastOrNull()
       if (lastLine?.time == line.time) {
-        if (isChinese) {
-          if (lastLine.translation == null) {
-            combinedLines.removeAt(combinedLines.lastIndex)
-            combinedLines.add(lastLine.withTranslation(line.content))
-          } else {
-            combinedLines.add(line)
-          }
+        if (translationEnabled && lastLine.translation == null) {
+          combinedLines[combinedLines.lastIndex] = lastLine.withTranslation(line.content)
         }
       } else {
         combinedLines.add(line)

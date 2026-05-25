@@ -252,6 +252,8 @@
   <string name="closed_desktop_lrc">Desktop lyric is off</string>
   <string name="opened_desktop_lrc">Desktop lyric is on</string>
   <string name="statusbar_lrc">Statusbar Lyric</string>
+  <string name="lyric_translation_title">Lyric translation</string>
+  <string name="lyric_translation_tip">Show translated lines when the lyric source provides them</string>
   <string name="confirm_ignore_lrc">Confirm to ignore lyric?</string>
   <string name="confirm_cancel_ignore_lrc">Confirm to cancel ignore?</string>
   <string name="ignore_lrc">Ignore lyric</string>

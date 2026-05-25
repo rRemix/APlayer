@@ -25,7 +25,7 @@ import kotlin.math.min
 class LyricSearcher @Inject constructor(
   @param:ApplicationContext
   private val context: Context,
-  val lyricPrefs: LyricPrefs,
+  private val lyricPrefs: LyricPrefs,
   private val providers: Set<@JvmSuppressWildcards ILyricsProvider>
 ) {
 

@@ -7,7 +7,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import remix.myplayer.data.db.room.entity.WebDav
 
-internal object Migrations {
+internal object DbMigrations {
 
   val migration3to4 = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {

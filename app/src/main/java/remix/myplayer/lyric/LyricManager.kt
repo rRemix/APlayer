@@ -23,10 +23,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -59,13 +56,6 @@ import javax.inject.Singleton
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
-
-@EntryPoint
-@InstallIn(SingletonComponent::class)
-interface LyricManagerEntryPoint {
-
-  fun lyricManager(): LyricManager
-}
 
 // TODO https://github.com/rRemix/APlayer/issues/298
 @Singleton
@@ -193,6 +183,12 @@ class LyricManager @Inject constructor(
     set(value) {
       lyricPrefs.statusBarLyricEnabled = value
       updateStatusBarLyric()
+    }
+
+  var isTranslationEnabled: Boolean
+    get() = lyricPrefs.translationEnabled
+    set(value) {
+      lyricPrefs.translationEnabled = value
     }
 
   @UiThread
@@ -479,7 +475,7 @@ class LyricManager @Inject constructor(
         _currentNextLyricsLine.value = CurrentNextLyricsLine.SEARCHING
         val s = lyricSearcher.getLyricsAndOffset(song, provider)
         ensureActive()
-        lyrics = s.first
+        lyrics = LrcParser.mergeTranslations(s.first, lyricPrefs.translationEnabled)
         offset = s.second
       }
       updateProgress()

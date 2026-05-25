@@ -8,10 +8,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import remix.myplayer.data.db.Migrations.migration3to4
-import remix.myplayer.data.db.Migrations.migration4to5
-import remix.myplayer.data.db.Migrations.migration5to6
-import remix.myplayer.data.db.Migrations.migration6to7
+import remix.myplayer.data.db.DbMigrations.migration3to4
+import remix.myplayer.data.db.DbMigrations.migration4to5
+import remix.myplayer.data.db.DbMigrations.migration5to6
+import remix.myplayer.data.db.DbMigrations.migration6to7
 import remix.myplayer.data.db.room.dao.HistoryDao
 import remix.myplayer.data.db.room.dao.MetaDataCacheDao
 import remix.myplayer.data.db.room.dao.PlayListDao
