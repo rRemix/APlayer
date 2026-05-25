@@ -4,6 +4,7 @@
 # Sets the minimum version of CMake required to build the native library.
 
 cmake_minimum_required(VERSION 3.4.1)
+project(APlayerNative LANGUAGES C CXX)
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -46,4 +47,3 @@ target_link_libraries( # Specifies the target library.
                        ${log-lib}
                        "-Wl,--build-id=none"
                        "-Wl,-z,max-page-size=16384" )
-
