@@ -164,7 +164,7 @@ class SongRepoImpl @Inject constructor(
 
         is Folder -> {
           result.addAll(getSongs(null, null, settingPrefs.folderDetailSortOrder).filter { song ->
-            song.data.substring(0, song.data.lastIndexOf("/")) == it.path
+            song.data.substringBeforeLast("/", missingDelimiterValue = "") == it.path
           })
         }
 

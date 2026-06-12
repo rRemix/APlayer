@@ -309,6 +309,11 @@ class MusicService : BaseService(),
     stop = false
 
     tryLaunch {
+      if (action == ACTION_CMD && command == Command.CLOSE_NOTIFY) {
+        handleStartCommandIntent(commandIntent, action)
+        return@tryLaunch
+      }
+
       hasPermission = PermissionUtil.hasNecessaryPermission()
       load()
       handleStartCommandIntent(commandIntent, action)
