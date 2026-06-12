@@ -1,6 +1,9 @@
 package remix.myplayer.ui
 
+import android.os.Build
+import androidx.activity.BackEventCompat
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.PredictiveBackHandler
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -24,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import remix.myplayer.ui.screen.playing.PlayingPanel
 import remix.myplayer.ui.theme.LocalTheme
@@ -37,10 +42,20 @@ fun AppScaffold(content: @Composable () -> Unit) {
   val scope = rememberCoroutineScope()
   var screenHeight by remember { mutableFloatStateOf(10000f) }
   val playingScreenState = mainVM.playingScreenState
+  var predictiveBackProgress by remember { mutableFloatStateOf(0f) }
   val isVisible by remember {
     derivedStateOf {
       playingScreenState.progress(PlayingScreenValue.Hidden, PlayingScreenValue.Expanded) > 0.01f
     }
+  }
+
+  fun calculateRenderedOffset(): Float {
+    val currentOffset = playingScreenState.offset.takeIf { !it.isNaN() } ?: screenHeight
+    return currentOffset + (screenHeight - currentOffset) * predictiveBackProgress
+  }
+
+  fun calculateRenderedProgress(renderedOffset: Float = calculateRenderedOffset()): Float {
+    return (1f - renderedOffset / screenHeight).coerceIn(0f, 1f)
   }
 
   Box(
@@ -65,12 +80,9 @@ fun AppScaffold(content: @Composable () -> Unit) {
       Modifier
         .fillMaxSize()
         .graphicsLayer {
-          val progress = playingScreenState.progress(
-            from = PlayingScreenValue.Hidden,
-            to = PlayingScreenValue.Expanded
-          )
-          translationY = -size.height * 0.2f * progress
-          alpha = 1f - 0.5f * progress
+          val renderedProgress = calculateRenderedProgress()
+          translationY = -size.height * 0.2f * renderedProgress
+          alpha = 1f - 0.5f * renderedProgress
         }) {
       content()
     }
@@ -79,8 +91,8 @@ fun AppScaffold(content: @Composable () -> Unit) {
       modifier = Modifier
         .fillMaxSize()
         .offset {
-          val currentOffset = playingScreenState.offset.takeIf { !it.isNaN() } ?: screenHeight
-          IntOffset(0, currentOffset.roundToInt())
+          val renderedOffset = calculateRenderedOffset()
+          IntOffset(0, renderedOffset.roundToInt())
         }
         .anchoredDraggable(
           state = playingScreenState,
@@ -95,15 +107,26 @@ fun AppScaffold(content: @Composable () -> Unit) {
           )
         )
         .graphicsLayer {
-          val progress = playingScreenState.progress(
-            from = PlayingScreenValue.Hidden,
-            to = PlayingScreenValue.Expanded
-          )
-          alpha = FastOutSlowInEasing.transform(progress)
-          clip = progress > 0f
+          val renderedProgress = calculateRenderedProgress()
+          alpha = FastOutSlowInEasing.transform(renderedProgress)
+          clip = renderedProgress > 0f
         }
     ) {
-      BackHandler(enabled = isVisible) {
+      PredictiveBackHandler(
+        enabled = isVisible && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+      ) { progress ->
+        try {
+          progress.collect { backEvent: BackEventCompat ->
+            predictiveBackProgress = backEvent.progress
+          }
+          playingScreenState.animateTo(PlayingScreenValue.Hidden)
+          predictiveBackProgress = 0f
+        } catch (_: CancellationException) {
+          predictiveBackProgress = 0f
+        }
+      }
+
+      BackHandler(enabled = isVisible && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
         scope.launch {
           playingScreenState.animateTo(PlayingScreenValue.Hidden)
         }
