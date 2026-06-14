@@ -36,6 +36,7 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.DECODER_MODE_FFMPEG
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
+import remix.myplayer.service.AudioFocusManager
 import remix.myplayer.service.playback.Playback.PlayerCallback
 import remix.myplayer.util.Constants.MB
 import remix.myplayer.util.ext.checkMainThread
@@ -46,6 +47,7 @@ import java.io.File
 class ExoPlayback(
   private val context: Context,
   private val decoderMode: Int,
+  private val audioFocusManager: AudioFocusManager,
 ) : Playback {
 
   override var speed: Float
@@ -406,6 +408,9 @@ class ExoPlayback(
   }
 
   override fun start() {
+    if (!audioFocusManager.requestFocus()) {
+      return
+    }
     player.play()
   }
 

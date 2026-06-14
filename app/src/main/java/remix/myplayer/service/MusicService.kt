@@ -532,7 +532,7 @@ class MusicService : BaseService(),
    * 初始化Mediaplayer
    */
   private fun setUpPlayback() {
-    playback = ExoPlayback(this, settingPrefs.decoderMode)
+    playback = ExoPlayback(this, settingPrefs.decoderMode, audioFocusManager)
     playback.attach(this)
 
     Timber.v("setUpPlayback, audioSessionId: ${playback.audioSessionId}")
@@ -813,10 +813,6 @@ class MusicService : BaseService(),
     Timber.v("play: $crossFade")
     if (!playback.isPrepared) {
       MessageNotifier.show(R.string.buffering_wait)
-      return
-    }
-
-    if (!audioFocusManager.requestFocus()) {
       return
     }
 
