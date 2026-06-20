@@ -22,16 +22,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,7 +47,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
-import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
@@ -60,7 +55,7 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.service.playback.PlaybackUiState
-import remix.myplayer.ui.dialog.BottomSheetDialog
+import remix.myplayer.ui.dialog.BottomDialog
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
@@ -80,7 +75,6 @@ private val itemRes = mapOf(
   MODE_REPEAT to Pair(R.drawable.play_btn_loop_one, R.string.model_repeat)
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun PlayingControl(
   modifier: Modifier = Modifier,
@@ -195,15 +189,16 @@ internal fun PlayingControl(
       )
     }
 
-    val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    PlayQueueDialog(state, playbackUiState)
+    var showPlayQueue by remember { mutableStateOf(false) }
+    PlayQueueDialog(
+      visible = showPlayQueue,
+      onDismissRequest = { showPlayQueue = false },
+      musicState = playbackUiState
+    )
 
-    val scope = rememberCoroutineScope()
     ControlButton(
       onClick = {
-        scope.launch {
-          state.show()
-        }
+        showPlayQueue = true
       },
       buttonSize = buttonSize
     ) {
@@ -218,17 +213,19 @@ internal fun PlayingControl(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 private fun PlayQueueDialog(
-  state: SheetState,
+  visible: Boolean,
+  onDismissRequest: () -> Unit,
   musicState: PlaybackUiState
 ) {
-  val scope = rememberCoroutineScope()
   val playbackVM = playbackViewModel
   val playbackState by playbackVM.playbackUiState.collectAsStateWithLifecycle()
   val songs by playbackVM.playQueueSongs.collectAsStateWithLifecycle()
 
-  BottomSheetDialog(state) {
+  BottomDialog(
+    visible = visible,
+    onDismissRequest = onDismissRequest
+  ) {
     Column {
       CenterInBox(
         modifier = Modifier
@@ -241,62 +238,62 @@ private fun PlayQueueDialog(
           textAlign = TextAlign.Center
         )
       }
-    }
 
-    val lazyState = rememberLazyListState()
-    LazyColumn(state = lazyState) {
-      itemsIndexed(songs, key = { _, song -> song.id }) { pos, song ->
-        Row(
-          verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier
-            .height(50.dp)
-            .clickWithRipple(false) {
-              sendLocalBroadcast(
-                makeCmdIntent(Command.PLAY_AT)
-                  .putExtra(EXTRA_POSITION, pos)
-              )
-              scope.launch { state.hide() }
-            }) {
-          Column(
-            verticalArrangement = Arrangement.Center,
+      val lazyState = rememberLazyListState()
+      LazyColumn(state = lazyState) {
+        itemsIndexed(songs, key = { _, song -> song.id }) { pos, song ->
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-              .padding(horizontal = 16.dp)
-              .weight(1f)
-          ) {
-            if (!song.valid()) {
-              TextPrimary(stringResource(R.string.song_lose_effect))
-            } else {
-              TextPrimary(
-                song.title,
-                color = if (song == musicState.song) LocalTheme.current.secondary else LocalTheme.current.textPrimary
-              )
-              TextSecondary(song.artist)
-            }
-          }
-
-          if (song.valid()) {
-            CenterInBox(
+              .height(50.dp)
+              .clickWithRipple(false) {
+                sendLocalBroadcast(
+                  makeCmdIntent(Command.PLAY_AT)
+                    .putExtra(EXTRA_POSITION, pos)
+                )
+                onDismissRequest()
+              }) {
+            Column(
+              verticalArrangement = Arrangement.Center,
               modifier = Modifier
-                .clickWithRipple {
-                  playbackVM.removeFromQueue(song.id)
-                }
-                .padding(8.dp)
+                .padding(horizontal = 16.dp)
+                .weight(1f)
             ) {
-              Image(
-                painter = painterResource(R.drawable.icon_playqueue_delete),
-                contentDescription = "PlayQueueDelete"
-              )
+              if (!song.valid()) {
+                TextPrimary(stringResource(R.string.song_lose_effect))
+              } else {
+                TextPrimary(
+                  song.title,
+                  color = if (song == musicState.song) LocalTheme.current.secondary else LocalTheme.current.textPrimary
+                )
+                TextSecondary(song.artist)
+              }
+            }
+
+            if (song.valid()) {
+              CenterInBox(
+                modifier = Modifier
+                  .clickWithRipple {
+                    playbackVM.removeFromQueue(song.id)
+                  }
+                  .padding(8.dp)
+              ) {
+                Image(
+                  painter = painterResource(R.drawable.icon_playqueue_delete),
+                  contentDescription = "PlayQueueDelete"
+                )
+              }
             }
           }
         }
       }
-    }
 
-    LaunchedEffect(state.isVisible) {
-      if (state.isVisible) {
-        val index = songs.indexOfFirst { it.id == playbackState.song.id }
-        if (index != -1) {
-          lazyState.scrollToItem(index)
+      LaunchedEffect(visible) {
+        if (visible) {
+          val index = songs.indexOfFirst { it.id == playbackState.song.id }
+          if (index != -1) {
+            lazyState.scrollToItem(index)
+          }
         }
       }
     }
