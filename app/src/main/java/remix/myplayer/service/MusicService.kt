@@ -791,9 +791,7 @@ class MusicService : BaseService(),
    */
   private fun skipToNext() {
     playback.skipToNext()
-    if (!playback.isPlaying) {
-      playback.start()
-    }
+    start(true)
   }
 
   /**
@@ -801,9 +799,7 @@ class MusicService : BaseService(),
    */
   private fun skipToPrevious() {
     playback.skipToPrevious()
-    if (!playback.isPlaying) {
-      playback.start()
-    }
+    start(true)
   }
 
   /**
@@ -904,9 +900,7 @@ class MusicService : BaseService(),
     }
 
     playback.skipTo(position)
-    if (!playback.isPlaying) {
-      playback.start()
-    }
+    start(true)
   }
 
   override fun onMediaStoreChanged() {

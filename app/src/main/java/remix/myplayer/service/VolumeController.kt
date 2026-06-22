@@ -1,6 +1,7 @@
 package remix.myplayer.service
 
 import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.os.Handler
 import android.os.Looper
@@ -58,14 +59,22 @@ class VolumeController(private val service: MusicService) {
           service.playback.setVolume(volume)
           lastVolume = volume
         }
-        if (onEnd != null) {
-          addListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(animation: Animator) = Unit
-            override fun onAnimationEnd(animation: Animator) = onEnd()
-            override fun onAnimationCancel(animation: Animator) = Unit
-            override fun onAnimationRepeat(animation: Animator) = Unit
-          })
-        }
+        addListener(object : AnimatorListenerAdapter() {
+          private var canceled = false
+
+          override fun onAnimationCancel(animation: Animator) {
+            canceled = true
+          }
+
+          override fun onAnimationEnd(animation: Animator) {
+            if (animator === animation) {
+              animator = null
+            }
+            if (!canceled) {
+              onEnd?.invoke()
+            }
+          }
+        })
       }
       animator?.start()
     }
