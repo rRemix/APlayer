@@ -28,9 +28,7 @@ billingclient = "7.1.0"
 material = "1.11.0"
 bugly = "3.3.9"
 leakcanary = "2.14"
-logbackAndroid = "3.0.0"
 sardineAndroid = "0.9"
-slf4j = "2.0.13"
 timber = "5.0.1"
 tinypinyin = "2.0.3.RELEASE"
 hiltNavigationCompose = "1.2.0"
@@ -48,6 +46,7 @@ annotation = "1.7.0"
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
@@ -101,14 +100,10 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 image-cropper = { module = "com.vanniktech:android-image-cropper", version.ref = "imageCropper" }
 bugly = { group = "com.tencent.bugly", name = "crashreport", version.ref = "bugly" }
 leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
-logback-android = { group = "com.github.tony19", name = "logback-android", version.ref = "logbackAndroid" }
 xxpermissions = { module = "com.github.getActivity:XXPermissions", version.ref = "xxpermissions" }
 sardine-android = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "sardineAndroid" }
 smbj = { group = "com.hierynomus", name = "smbj", version.ref = "smbj" }
-slf4j = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
-# noinspection GradleDependency
-tinypinyin = { group = "io.github.biezhi", name = "TinyPinyin", version.ref = "tinypinyin" }
 
 # compose
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }

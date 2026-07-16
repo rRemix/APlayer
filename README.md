@@ -54,7 +54,7 @@ height="80">](https://apt.izzysoft.de/packages/remix.myplayer)
 - [Leakcanary](https://github.com/square/leakcanary)
 - [ImageCropper](https://github.com/CanHub/Android-Image-Cropper)
 - [TinyPinyin](https://github.com/promeG/TinyPinyin)
-- [Jaudiotagger for Android](https://github.com/hexise/jaudiotagger-android)
+- [TagLib for Android](https://github.com/rRemix/taglib)
 
 ## Finally
 - Pull request is welcome

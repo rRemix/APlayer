@@ -12,11 +12,6 @@
 -keep public class com.tencent.bugly.** { *; }
 -dontwarn com.tencent.bugly.**
 
-# jaudiotagger
-# Simply keep all classes as they use reflection
--keep class org.jaudiotagger.** { *; }
--dontwarn org.jaudiotagger.**
-
 # logback-android
 # https://github.com/tony19/logback-android/issues/229
 # They've added consumer-rules.pro, but it seems to be unused

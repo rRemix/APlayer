@@ -8,8 +8,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jaudiotagger.audio.AudioFileIO
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.helper.AudioTagFile
 import timber.log.Timber
 import java.io.File
 
@@ -54,9 +54,9 @@ object ImageUtil {
     }
 
     try {
-      val artworkTag = AudioFileIO.read(File(song.data)).tagOrCreateAndSetDefault.firstArtwork
-      if (artworkTag != null) {
-        val artworkBinaryData = artworkTag.binaryData
+      val artwork = AudioTagFile.readFrontCover(File(song.data))
+      if (artwork != null) {
+        val artworkBinaryData = artwork.data
         val bitmap = BitmapFactory.decodeByteArray(
           artworkBinaryData,
           0,

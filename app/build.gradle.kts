@@ -127,12 +127,6 @@ android {
         }
     }
 
-    sourceSets {
-        getByName("main") {
-            java.srcDir("src/third-party/jaudiotagger-android/src")
-        }
-    }
-
     externalNativeBuild {
         cmake {
             path("CMakeLists.txt")
@@ -291,6 +285,8 @@ dependencies {
 
     implementation(libs.androidx.profileinstaller)
     "baselineProfile"(project(":baselineprofile"))
+
+    implementation(project(":taglib"))
 }
 
 // 上传mapping文件

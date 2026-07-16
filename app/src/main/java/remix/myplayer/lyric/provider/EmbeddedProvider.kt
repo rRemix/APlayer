@@ -2,12 +2,9 @@ package remix.myplayer.lyric.provider
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import org.jaudiotagger.audio.AudioFileIO
-import org.jaudiotagger.tag.FieldKey
-import org.jaudiotagger.tag.id3.AbstractID3v2Frame
-import org.jaudiotagger.tag.id3.framebody.FrameBodyTXXX
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.misc.LyricOrder
+import remix.myplayer.helper.AudioTagFile
 import remix.myplayer.lyric.LrcParser
 import remix.myplayer.util.ext.checkWorkerThread
 import java.io.File
@@ -34,47 +31,38 @@ class EmbeddedProvider @Inject constructor(
 
   companion object {
 
+    private val lrcTimestampPattern = Regex("""\[(\d+:){1,2}\d+(\.\d*)?]""")
+
     fun extractLyric(song: Song): String {
       checkWorkerThread()
-      if (song is Song.Local) {
-        try {
-          val audioFile = AudioFileIO.read(File(song.data))
-
-          // 先读标准的 FieldKey.LYRICS
-          var lrc = audioFile.tag.getFirst(FieldKey.LYRICS)
-          if (lrc.isNullOrEmpty()) {
-            val uslt = audioFile.tag.getFirst("USLT")
-            if (!uslt.isNullOrEmpty()) {
-              lrc = uslt
-            }
-          }
-
-          // 如果没有，再尝试扫描所有 TXXX
-          if (lrc.isNullOrEmpty()) {
-            val candidates = audioFile.tag.getFields("TXXX")
-            for (f in candidates) {
-              if (f is AbstractID3v2Frame) {
-                val body = f.body
-                if (body is FrameBodyTXXX) {
-                  val desc = body.description?.lowercase()?.trim()
-                  val text = body.text
-                  if ((desc != null &&
-                        (desc.contains("lyric") || desc.contains("lrc") || desc.contains("歌词")))
-                    || text.contains(Regex("""\[(\d+:){1,2}\d+(\.\d*)?]"""))
-                  ) {
-                    lrc = text
-                    break
-                  }
-                }
-              }
-            }
-          }
-
-          return lrc
-        } catch (ignore: Exception) {
-
-        }
+      if (song !is Song.Local) {
+        return ""
       }
+
+      return runCatching {
+        val propertyMap = AudioTagFile.readMetadata(File(song.data), readPictures = false)
+          ?.propertyMap
+          ?: return ""
+        extractLyric(propertyMap)
+      }.getOrDefault("")
+    }
+
+    private fun extractLyric(propertyMap: Map<String, Array<String>>): String {
+      AudioTagFile.firstValue(propertyMap, AudioTagFile.LYRICS).takeIf(String::isNotEmpty)?.let {
+        return it
+      }
+
+      // TagLib maps ID3 USLT descriptions to LYRICS:<description> and TXXX descriptions to
+      // property keys, so this retains the former frame-specific fallback without ID3 APIs.
+      propertyMap.entries.firstNotNullOfOrNull { (key, values) ->
+        val normalizedKey = key.lowercase()
+        values.firstOrNull { value ->
+          normalizedKey.contains("lyric") ||
+              normalizedKey.contains("lrc") ||
+              normalizedKey.contains("歌词") ||
+              lrcTimestampPattern.containsMatchIn(value)
+        }
+      }?.let { return it }
 
       return ""
     }
