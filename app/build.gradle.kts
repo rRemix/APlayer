@@ -79,6 +79,18 @@ android {
         setProperty("archivesBaseName", "APlayer-v${versionName}")
     }
 
+    androidResources {
+        localeFilters += listOf(
+            "en",
+            "ja",
+            "ja-rJP",
+            "zh",
+            "zh-rCN",
+            "zh-rHK",
+            "zh-rTW"
+        )
+    }
+
     signingConfigs {
         create("debugConfig") {
             storeFile = project.file("Debug.jks")

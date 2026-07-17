@@ -66,7 +66,7 @@ object ImageUtil {
       }
       return@withContext null
     } catch (e: Exception) {
-      Timber.w("extractAlbumArt", e)
+      Timber.w(e, "extractAlbumArt")
       return@withContext null
     }
   }
