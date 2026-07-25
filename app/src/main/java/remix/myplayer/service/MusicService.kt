@@ -807,10 +807,10 @@ class MusicService : BaseService(),
    */
   private fun start(crossFade: Boolean) {
     Timber.v("play: $crossFade")
-    if (!playback.isPrepared) {
-      MessageNotifier.show(R.string.buffering_wait)
-      return
-    }
+//    if (!playback.isPrepared) {
+//      MessageNotifier.show(R.string.buffering_wait)
+//      return
+//    }
 
     // 播放
     playback.start()

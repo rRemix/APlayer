@@ -175,6 +175,10 @@ internal fun PlayingLyric(song: Song) {
 
           when (extra) {
             LyricManager.CHANGE_LYRIC -> {
+              if (!currentSong.valid()) {
+                return
+              }
+
               lyricsManager.clearCache(currentSong)
 
               // 如果是手动选择则直接使用UriProvider解析
