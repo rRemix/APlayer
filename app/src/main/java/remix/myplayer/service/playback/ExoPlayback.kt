@@ -253,24 +253,23 @@ class ExoPlayback(
       return true
     }
 
-    var existIndex = findIndexOfSong(nextSong.id)
+    val existingIndex = findIndexOfSong(nextSong.id)
 
     // 无论什么模式，物理上都移动/插入到 currentIndex + 1
     val targetIndex =
-      if (existIndex != C.INDEX_UNSET && existIndex < currentIndex) currentIndex else currentIndex + 1
+      if (existingIndex != C.INDEX_UNSET && existingIndex < currentIndex) currentIndex else currentIndex + 1
 
-    if (existIndex == C.INDEX_UNSET) {
+    if (existingIndex == C.INDEX_UNSET) {
       addSongs(listOf(nextSong), targetIndex)
     } else {
-      player.moveMediaItem(existIndex, targetIndex)
+      player.moveMediaItem(existingIndex, targetIndex)
     }
-    existIndex = targetIndex
 
     // 如果是随机模式，还需要调整 ShuffleOrder 确保逻辑上也是下一首
     if (player.shuffleModeEnabled) {
       val indices = buildShuffledIndices(player.shuffleOrder, player.mediaItemCount).toMutableList()
-      indices.remove(existIndex)
-      indices.add(indices.indexOf(currentIndex) + 1, existIndex)
+      indices.remove(targetIndex)
+      indices.add(indices.indexOf(currentIndex) + 1, targetIndex)
 
       player.shuffleOrder = ShuffleOrder.DefaultShuffleOrder(
         indices.toIntArray(),
@@ -338,6 +337,10 @@ class ExoPlayback(
 
       MODE_SHUFFLE -> {
         player.repeatMode = if (listLoop) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
+        // Media3 会在关闭随机模式后保留原 ShuffleOrder，重新进入时需要主动洗牌。
+        if (!player.shuffleModeEnabled) {
+          player.shuffleOrder = ShuffleOrder.DefaultShuffleOrder(player.mediaItemCount)
+        }
         player.shuffleModeEnabled = true
       }
 
