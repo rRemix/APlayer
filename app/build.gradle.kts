@@ -79,6 +79,18 @@ android {
         setProperty("archivesBaseName", "APlayer-v${versionName}")
     }
 
+    androidResources {
+        localeFilters += listOf(
+            "en",
+            "ja",
+            "ja-rJP",
+            "zh",
+            "zh-rCN",
+            "zh-rHK",
+            "zh-rTW"
+        )
+    }
+
     signingConfigs {
         create("debugConfig") {
             storeFile = project.file("Debug.jks")
@@ -124,12 +136,6 @@ android {
                     "proguard-rules.pro"
                 )
             )
-        }
-    }
-
-    sourceSets {
-        getByName("main") {
-            java.srcDir("src/third-party/jaudiotagger-android/src")
         }
     }
 
@@ -291,6 +297,8 @@ dependencies {
 
     implementation(libs.androidx.profileinstaller)
     "baselineProfile"(project(":baselineprofile"))
+
+    implementation(project(":taglib"))
 }
 
 // 上传mapping文件

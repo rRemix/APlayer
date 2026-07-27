@@ -13,9 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jaudiotagger.audio.AudioFileIO
-import org.jaudiotagger.tag.FieldKey
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.helper.AudioTagFile
 import remix.myplayer.helper.AudioTagWriter
 import remix.myplayer.lyric.provider.EmbeddedProvider
 import remix.myplayer.ui.activity.base.BaseActivity
@@ -45,9 +44,9 @@ class TagEditViewModel @Inject constructor() : ViewModel() {
 
   private fun loadTagEditData(song: Song) {
     viewModelScope.launch {
-      val tag = withContext(Dispatchers.IO) {
+      val propertyMap = withContext(Dispatchers.IO) {
         runCatching {
-          AudioFileIO.read(File(song.data)).tagOrCreateAndSetDefault
+          AudioTagFile.readMetadata(File(song.data), readPictures = false)?.propertyMap
         }.getOrNull()
       }
       val lyrics = withContext(Dispatchers.IO) {
@@ -64,15 +63,15 @@ class TagEditViewModel @Inject constructor() : ViewModel() {
           state.tagFormState
         } else {
           TagEditState.TagFormState(
-            title = tag?.getFirst(FieldKey.TITLE) ?: "",
-            album = tag?.getFirst(FieldKey.ALBUM) ?: "",
-            artist = tag?.getFirst(FieldKey.ARTIST) ?: "",
-            albumArtist = tag?.getFirst(FieldKey.ALBUM_ARTIST) ?: "",
-            composer = tag?.getFirst(FieldKey.COMPOSER) ?: "",
-            year = tag?.getFirst(FieldKey.YEAR) ?: "",
-            track = tag?.getFirst(FieldKey.TRACK) ?: "",
-            disc = tag?.getFirst(FieldKey.DISC_NO) ?: "",
-            genre = tag?.getFirst(FieldKey.GENRE) ?: "",
+            title = AudioTagFile.firstValue(propertyMap, AudioTagFile.TITLE),
+            album = AudioTagFile.firstValue(propertyMap, AudioTagFile.ALBUM),
+            artist = AudioTagFile.firstValue(propertyMap, AudioTagFile.ARTIST),
+            albumArtist = AudioTagFile.firstValue(propertyMap, AudioTagFile.ALBUM_ARTIST),
+            composer = AudioTagFile.firstValue(propertyMap, AudioTagFile.COMPOSER),
+            year = AudioTagFile.firstValue(propertyMap, AudioTagFile.DATE),
+            track = AudioTagFile.firstValue(propertyMap, AudioTagFile.TRACK_NUMBER),
+            disc = AudioTagFile.firstValue(propertyMap, AudioTagFile.DISC_NUMBER),
+            genre = AudioTagFile.firstValue(propertyMap, AudioTagFile.GENRE),
             lyrics = lyrics
           )
         }

@@ -20,12 +20,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kyant.taglib.AudioProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jaudiotagger.audio.AudioFileIO
-import org.jaudiotagger.audio.AudioHeader
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.helper.AudioTagFile
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.Constants.MB
 import remix.myplayer.util.Util
@@ -37,8 +37,8 @@ fun SongDetailDialog() {
   val state by settingViewModel.songDetailState.collectAsStateWithLifecycle()
   val song = state.song
 
-  var audioHeader by remember {
-    mutableStateOf<AudioHeader?>(null)
+  var audioProperties by remember(song) {
+    mutableStateOf<AudioProperties?>(null)
   }
 
   NormalDialog(
@@ -57,16 +57,16 @@ fun SongDetailDialog() {
         DetailItem(R.string.file_size, stringResource(R.string.cache_size, 1.0f * song.size / MB))
         DetailItem(
           R.string.format,
-          if (song.isLocal()) audioHeader?.format ?: "" else song.data.substringAfterLast('.')
+          song.data.substringAfterLast('.')
         )
         DetailItem(R.string.length, Util.getTime(song.duration))
         DetailItem(
           R.string.bitrate,
-          if (song.isLocal()) "${audioHeader?.bitRate ?: 0} kb/s" else if (song is Song.Remote) "${song.bitRate} kb/s" else ""
+          if (song.isLocal()) "${audioProperties?.bitrate ?: 0} kb/s" else if (song is Song.Remote) "${song.bitRate} kb/s" else ""
         )
         DetailItem(
           R.string.sample_rate,
-          if (song.isLocal()) "${audioHeader?.sampleRate ?: 0} Hz" else if (song is Song.Remote) "${song.sampleRate} Hz" else ""
+          if (song.isLocal()) "${audioProperties?.sampleRate ?: 0} Hz" else if (song is Song.Remote) "${song.sampleRate} Hz" else ""
         )
       }
     },
@@ -76,8 +76,8 @@ fun SongDetailDialog() {
   LaunchedEffect(song) {
     if (song.id > 0 && song.isLocal()) {
       try {
-        audioHeader = withContext(Dispatchers.IO) {
-          AudioFileIO.read(File(song.data)).audioHeader
+        audioProperties = withContext(Dispatchers.IO) {
+          AudioTagFile.readAudioProperties(File(song.data))
         }
       } catch (ignore: Exception) {
       }

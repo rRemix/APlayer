@@ -1,3 +1,4 @@
-[submodule "app/src/third-party/jaudiotagger-android"]
-	path = app/src/third-party/jaudiotagger-android
-	url = https://github.com/hexise/jaudiotagger-android.git
+[submodule "third-party/taglib"]
+	path = third-party/taglib
+	url = ../taglib.git
+	branch = main
