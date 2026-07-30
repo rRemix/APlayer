@@ -2,7 +2,6 @@ package remix.myplayer.data.prefs
 
 import android.content.Context
 import android.content.res.Configuration
-import android.content.res.Resources
 import androidx.core.graphics.toColorInt
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -32,8 +31,12 @@ class ThemePrefs @Inject constructor(
 
   var coloredNaviBar by PrefsDelegate(sp, PrefKeys.Theme.COLOR_NAVIGATION, false)
 
-  fun resolveTheme(darkTheme: String, blackTheme: Boolean): String {
-    return if (darkTheme == ALWAYS_ON || (darkTheme == FOLLOW_SYSTEM && (Resources.getSystem().configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)) {
+  fun resolveTheme(
+    darkTheme: String,
+    blackTheme: Boolean,
+    uiMode: Int = context.resources.configuration.uiMode
+  ): String {
+    return if (darkTheme == ALWAYS_ON || (darkTheme == FOLLOW_SYSTEM && (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)) {
       if (blackTheme) {
         BLACK
       } else {

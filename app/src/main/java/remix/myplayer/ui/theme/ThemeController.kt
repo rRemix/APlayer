@@ -21,7 +21,7 @@ interface ThemeController {
 
   var black: Boolean
 
-  fun onSystemThemeChanged()
+  fun onSystemThemeChanged(uiMode: Int)
 
   fun setColoredNaviBar(colored: Boolean)
 
@@ -70,11 +70,11 @@ class ThemeControllerImpl @Inject constructor(private val storage: ThemePrefs) :
       )
     }
 
-  override fun onSystemThemeChanged() {
+  override fun onSystemThemeChanged(uiMode: Int) {
     if (storage.darkTheme != FOLLOW_SYSTEM) {
       return
     }
-    val resolved = storage.resolveTheme(storage.darkTheme, storage.blackTheme)
+    val resolved = storage.resolveTheme(storage.darkTheme, storage.blackTheme, uiMode)
     if (_currentTheme.value.theme == resolved) {
       return
     }

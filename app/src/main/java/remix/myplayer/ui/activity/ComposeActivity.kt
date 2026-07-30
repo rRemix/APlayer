@@ -100,7 +100,7 @@ class ComposeActivity : BaseMusicActivity() {
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    themeController.onSystemThemeChanged()
+    themeController.onSystemThemeChanged(newConfig.uiMode)
   }
 
   private fun handleIntent() {
