@@ -17,6 +17,7 @@ import remix.myplayer.R
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteAbout
+import remix.myplayer.ui.nav.RouteEq
 import remix.myplayer.ui.nav.RouteSettingDetail
 import remix.myplayer.ui.screen.setting.logic.color.BlackThemeLogic
 import remix.myplayer.ui.screen.setting.logic.color.ColoredNaviBarLogic
@@ -284,7 +285,9 @@ private fun OtherPreferenceItems() {
   val nav = LocalNavController.current
 
   ArrowPreference(R.string.eq_setting) {
-    EQHelper.startEqualizer(activity ?: return@ArrowPreference, nav)
+    EQHelper.startEqualizer(activity ?: return@ArrowPreference) {
+      nav.navigate(RouteEq)
+    }
   }
 
   ArrowPreference(R.string.about_info) {

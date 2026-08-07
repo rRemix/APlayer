@@ -81,6 +81,10 @@ const val RouteTagEditCrop = "tag_edit_crop"
 const val RouteEq = "eq"
 const val RouteSupport = "support"
 
+// 存在目标页 NavBackStackEntry.savedStateHandle 里的标志，
+// 标记该页是从播放页浮窗跳转过来的，退出时需要恢复浮窗
+const val ExtraRestorePlayingScreen = "restore_playing_screen"
+
 val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 
 @Composable
@@ -240,7 +244,7 @@ fun AppNav() {
             }
 
             normalAnimatedScreen(RouteEq) {
-              EQScreen()
+              EQScreen(it)
             }
 
             normalAnimatedScreen(RouteSupport) {

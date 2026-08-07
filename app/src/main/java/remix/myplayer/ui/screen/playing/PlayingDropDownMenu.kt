@@ -5,6 +5,8 @@ import android.content.Intent
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.gestures.animateTo
+import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -12,12 +14,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.misc.LyricOrder
@@ -35,13 +41,17 @@ import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.InputDialog
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
+import remix.myplayer.ui.nav.ExtraRestorePlayingScreen
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
+import remix.myplayer.ui.nav.RouteEq
 import remix.myplayer.ui.nav.RouteTagEdit
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.ShowLyricTipDialog
+import remix.myplayer.viewmodel.PlayingScreenValue
 import remix.myplayer.viewmodel.libraryViewModel
+import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.settings.SettingsState
 import remix.myplayer.viewmodel.tagEditViewModel
@@ -64,7 +74,7 @@ fun PlayingDropDownMenu(
 
   val menuItems =
     listOf(
-//      R.string.song_edit,
+      R.string.song_edit,
       R.string.song_detail,
       R.string.collect,
       R.string.add_to_playlist,
@@ -77,6 +87,32 @@ fun PlayingDropDownMenu(
   val activity = LocalActivity.current as? BaseActivity
 
   val timerVM = timerViewModel
+
+  val mainVM = mainViewModel
+  val scope = rememberCoroutineScope()
+
+  // 播放页是覆盖在 NavHost 之上的全屏浮窗，直接跳转会被它盖住
+  // 先跳转，等目标页面进入 RESUMED（组合完成）后再收起浮窗，
+  // 避免浮窗先消失、目标页面还没组合好时闪出下层主页面
+  // 目标页面出栈销毁后再把浮窗展开，回到跳转前的状态
+  fun navigateFromPlayingScreen(route: String) {
+    scope.launch {
+      nav.navigate(route)
+      val entry = runCatching { nav.getBackStackEntry(route) }.getOrNull() ?: return@launch
+      // 标记从播放页跳转，目标页退出时据此判断是否需要恢复浮窗
+      // (从主界面等其它入口进入时不会设置该标志，退出时不应展开浮窗)
+      entry.savedStateHandle[ExtraRestorePlayingScreen] = true
+      entry.lifecycle.currentStateFlow.first {
+        it == Lifecycle.State.RESUMED || it == Lifecycle.State.DESTROYED
+      }
+      if (entry.lifecycle.currentState == Lifecycle.State.DESTROYED) {
+        return@launch
+      }
+      mainVM.playingScreenState.snapTo(PlayingScreenValue.Hidden)
+      entry.lifecycle.currentStateFlow.first { it == Lifecycle.State.DESTROYED }
+      mainVM.playingScreenState.snapTo(PlayingScreenValue.Expanded)
+    }
+  }
 
   val speedDialogState = rememberDialogState()
   SpeedDialog(speedDialogState, settingState)
@@ -147,7 +183,7 @@ fun PlayingDropDownMenu(
               }
               if (song.isLocal()) {
                 tagEditVM.startTagEdit(song)
-                nav.navigate(RouteTagEdit)
+                navigateFromPlayingScreen(RouteTagEdit)
               }
             }
 
@@ -180,7 +216,9 @@ fun PlayingDropDownMenu(
               if (activity == null) {
                 return@DropdownMenuItem
               }
-              EQHelper.startEqualizer(activity, nav)
+              EQHelper.startEqualizer(activity) {
+                navigateFromPlayingScreen(RouteEq)
+              }
             }
 
             R.string.lyric -> {

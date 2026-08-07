@@ -9,14 +9,12 @@ import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.Virtualizer
 import android.widget.Toast
-import androidx.navigation.NavHostController
 import dagger.hilt.android.EntryPointAccessors
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.data.prefs.SettingPrefsEntryPoint
 import remix.myplayer.data.prefs.delegate
 import remix.myplayer.service.MusicServiceRemote
-import remix.myplayer.ui.nav.RouteEq
 import remix.myplayer.util.Util.isIntentAvailable
 import timber.log.Timber
 
@@ -335,7 +333,7 @@ object EQHelper {
    * 启动均衡器
    */
   @JvmStatic
-  fun startEqualizer(activity: Activity, nav: NavHostController) {
+  fun startEqualizer(activity: Activity, navigateToEq: () -> Unit) {
     val sessionId = MusicServiceRemote.getAudioSessionId() ?: return
     if (!isValidAudioSessionId(sessionId)) {
       Toast.makeText(
@@ -351,7 +349,7 @@ object EQHelper {
     if (isSystemEqualizerAvailable(activity)) {
       activity.startActivityForResult(audioEffectIntent, REQUEST_EQ)
     } else {
-      nav.navigate(RouteEq)
+      navigateToEq()
     }
   }
 

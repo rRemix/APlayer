@@ -3,10 +3,12 @@
 package remix.myplayer.ui.screen
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +52,7 @@ import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.ItemsCallback
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
+import remix.myplayer.ui.nav.ExtraRestorePlayingScreen
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.nav.RouteTagEditCrop
@@ -58,6 +61,8 @@ import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.EditField
 import remix.myplayer.util.ImageUtil
 import remix.myplayer.util.ext.clickableWithoutRipple
+import remix.myplayer.viewmodel.PlayingScreenValue
+import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.tagEditViewModel
 import timber.log.Timber
 import java.io.File
@@ -79,6 +84,22 @@ fun TagEditScreen(backStackEntry: NavBackStackEntry) {
   val activity = LocalActivity.current as? BaseActivity ?: return
   val editAlbumArtState = rememberDialogState()
   val scope = rememberCoroutineScope()
+  val mainVM = mainViewModel
+
+  // 从播放页浮窗跳转过来时浮窗已被收起(Hidden)；退出时先恢复浮窗再 popBackStack，
+  // 让浮窗在同一帧内重新盖住 NavHost，避免 popBackStack 后主页面先于浮窗渲染而闪现。
+  // 通过 savedStateHandle 中的 ExtraRestorePlayingScreen 标志判断是否从播放页跳转，
+  // 从主界面(SongPopup)等入口进入时不设置该标志，退出时不应展开浮窗。
+  fun exitTagEdit() {
+    scope.launch {
+      if (backStackEntry.savedStateHandle.get<Boolean>(ExtraRestorePlayingScreen) == true) {
+        mainVM.playingScreenState.snapTo(PlayingScreenValue.Expanded)
+      }
+      navController.popBackStack()
+    }
+  }
+
+  BackHandler { exitTagEdit() }
 
   val cropDestinationUri = remember(song) {
     val cacheDir = DiskCache.getDiskCacheDir(activity, "song_cover")
@@ -118,6 +139,7 @@ fun TagEditScreen(backStackEntry: NavBackStackEntry) {
     topBar = {
       CommonAppBar(
         title = stringResource(R.string.song_edit),
+        onBack = { exitTagEdit() },
         actions = emptyList()
       )
     },
@@ -128,7 +150,7 @@ fun TagEditScreen(backStackEntry: NavBackStackEntry) {
           .background(color = LocalTheme.current.secondary, shape = CircleShape)
           .clickableWithoutRipple {
             tagEditVM.saveTagEdit(activity)
-            navController.popBackStack()
+            exitTagEdit()
           },
         contentAlignment = Alignment.Center
       ) {
