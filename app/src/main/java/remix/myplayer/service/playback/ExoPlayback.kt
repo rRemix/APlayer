@@ -21,6 +21,8 @@ import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.audio.AudioSink
+import androidx.media3.exoplayer.audio.DefaultAudioSink
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.ShuffleOrder
@@ -48,6 +50,7 @@ class ExoPlayback(
   private val context: Context,
   private val decoderMode: Int,
   private val audioFocusManager: AudioFocusManager,
+  private val replayGainController: ReplayGainController,
 ) : Playback {
 
   override var speed: Float
@@ -94,8 +97,7 @@ class ExoPlayback(
 
   private val player: ExoPlayer = run {
     val rendererMode = resolveRendererMode(decoderMode)
-    val renderersFactory = DefaultRenderersFactory(context)
-      .setExtensionRendererMode(rendererMode)
+    val renderersFactory = ReplayGainRenderersFactory(context, rendererMode, replayGainController.processor)
     Timber.v("rendererMode: $rendererMode, decoderMode: $decoderMode")
     ExoPlayer.Builder(context, renderersFactory).build().apply {
       playWhenReady = false
@@ -156,6 +158,7 @@ class ExoPlayback(
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+          replayGainController.applyFor(currentSong)
           callback?.onItemTransition(mediaItem, reason)
         }
       })
@@ -455,6 +458,10 @@ class ExoPlayback(
     player.volume = volume
   }
 
+  override fun applyReplayGain() {
+    replayGainController.applyFor(currentSong)
+  }
+
   fun attach(cb: PlayerCallback) {
     this.callback = cb
   }
@@ -473,6 +480,30 @@ class ExoPlayback(
         DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF
       }
     }
+  }
+}
+
+@OptIn(UnstableApi::class)
+private class ReplayGainRenderersFactory(
+  context: Context,
+  rendererMode: Int,
+  private val replayGainProcessor: ReplayGainAudioProcessor,
+) : DefaultRenderersFactory(context) {
+
+  init {
+    setExtensionRendererMode(rendererMode)
+  }
+
+  override fun buildAudioSink(
+    context: Context,
+    enableFloatOutput: Boolean,
+    enableAudioTrackPlaybackParams: Boolean
+  ): AudioSink {
+    return DefaultAudioSink.Builder(context)
+      .setEnableFloatOutput(enableFloatOutput)
+      .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
+      .setAudioProcessors(arrayOf(replayGainProcessor))
+      .build()
   }
 }
 

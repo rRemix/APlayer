@@ -131,6 +131,19 @@ class SettingPrefs @Inject constructor(
   var autoPlay by PrefsDelegate(sp, PrefKeys.Setting.AUTO_PLAY, NEVER)
   var crossFade by PrefsDelegate(sp, PrefKeys.Setting.CROSS_FADE, false)
   var speed by PrefsDelegate(sp, PrefKeys.Setting.SPEED, "1.0")
+  var replayGainEnabled by PrefsDelegate(sp, PrefKeys.Setting.REPLAY_GAIN_ENABLED, false)
+  var replayGainMode by PrefsDelegate(sp, PrefKeys.Setting.REPLAY_GAIN_MODE, REPLAY_GAIN_MODE_TRACK)
+  var replayGainPeakProtection by PrefsDelegate(
+    sp,
+    PrefKeys.Setting.REPLAY_GAIN_PEAK_PROTECTION,
+    true
+  )
+  var replayGainPreampDb by PrefsDelegate(sp, PrefKeys.Setting.REPLAY_GAIN_PREAMP, 0f)
+  var replayGainMissingGainDb by PrefsDelegate(
+    sp,
+    PrefKeys.Setting.REPLAY_GAIN_MISSING_GAIN,
+    0f
+  )
   val speedValue get() = speed.toFloat()
   var playModel by PrefsDelegate(sp, PrefKeys.Setting.PLAY_MODEL, MODE_LOOP)
   var listLoop by PrefsDelegate(sp, PrefKeys.Setting.LIST_LOOP, true)
@@ -233,6 +246,13 @@ class SettingPrefs @Inject constructor(
     const val OPEN_SOFTWARE = 1
     const val NEVER = 2
 
+    // 回放增益模式
+    const val REPLAY_GAIN_MODE_TRACK = 0
+    const val REPLAY_GAIN_MODE_ALBUM = 1
+    const val REPLAY_GAIN_GAIN_MIN_DB = -15f
+    const val REPLAY_GAIN_GAIN_MAX_DB = 15f
+    const val REPLAY_GAIN_GAIN_STEP_DB = 0.5f
+
     // 封面下载源
     const val DOWNLOAD_LASTFM = 0
     const val DOWNLOAD_NETEASE = 1
@@ -248,6 +268,11 @@ class SettingPrefs @Inject constructor(
     fun normalizeUiFontScale(scale: Float): Float {
       val snapped = (scale / UI_FONT_SCALE_STEP).roundToInt() * UI_FONT_SCALE_STEP
       return snapped.coerceIn(UI_FONT_SCALE_MIN, UI_FONT_SCALE_MAX)
+    }
+
+    fun normalizeReplayGainGainDb(gainDb: Float): Float {
+      val snapped = (gainDb / REPLAY_GAIN_GAIN_STEP_DB).roundToInt() * REPLAY_GAIN_GAIN_STEP_DB
+      return snapped.coerceIn(REPLAY_GAIN_GAIN_MIN_DB, REPLAY_GAIN_GAIN_MAX_DB)
     }
   }
 }

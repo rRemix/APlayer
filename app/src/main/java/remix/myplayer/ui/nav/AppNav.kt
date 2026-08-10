@@ -58,6 +58,7 @@ import remix.myplayer.ui.screen.history.HistoryScreen
 import remix.myplayer.ui.screen.home.HomeScreen
 import remix.myplayer.ui.screen.setting.SettingDetailScreen
 import remix.myplayer.ui.screen.setting.SettingScreen
+import remix.myplayer.ui.screen.setting.ReplayGainSettingScreen
 import remix.myplayer.ui.screen.smb.SmbDetailScreen
 import remix.myplayer.ui.screen.webdav.WebDavDetailScreen
 import remix.myplayer.util.Constants
@@ -69,6 +70,7 @@ import kotlin.reflect.typeOf
 const val RouteHome = "home"
 const val RouteSetting = "setting"
 const val RouteSettingDetail = "setting_detail"
+const val RouteReplayGain = "replay_gain"
 const val RouteSongChoose = "song_choose"
 const val RouteAbout = "about"
 const val RouteCustomSort = "custom_sort"
@@ -113,6 +115,10 @@ fun AppNav() {
             ) {
               val category = it.arguments?.getString("category") ?: return@normalAnimatedScreen
               SettingDetailScreen(category)
+            }
+
+            normalAnimatedScreen(RouteReplayGain) {
+              ReplayGainSettingScreen()
             }
 
             normalAnimatedScreen(

@@ -6,6 +6,7 @@ import com.kyant.taglib.Metadata
 import com.kyant.taglib.Picture
 import com.kyant.taglib.PropertyMap
 import com.kyant.taglib.TagLib
+import remix.myplayer.data.model.audio.ReplayGain
 import java.io.File
 import java.io.IOException
 
@@ -41,6 +42,13 @@ object AudioTagFile {
   fun readFrontCover(file: File): Picture? =
     withFileDescriptor(file, ParcelFileDescriptor.MODE_READ_ONLY) { fd ->
       TagLib.getFrontCover(fd)
+    }
+
+  fun readReplayGain(file: File): ReplayGain? =
+    withFileDescriptor(file, ParcelFileDescriptor.MODE_READ_ONLY) { fd ->
+      TagLib.getMetadata(fd, readPictures = false)?.propertyMap?.let { map ->
+        ReplayGain.fromPropertyMap(map)
+      }
     }
 
   fun savePropertyMap(file: File, propertyMap: PropertyMap): Boolean =

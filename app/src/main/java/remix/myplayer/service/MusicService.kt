@@ -58,6 +58,7 @@ import remix.myplayer.service.notification.NotifyImpl24
 import remix.myplayer.service.playback.ExoPlayback
 import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.service.playback.Playback
+import remix.myplayer.service.playback.ReplayGainController
 import remix.myplayer.service.playback.PlaybackFavoriteState
 import remix.myplayer.service.playback.PlaybackProgressSaver
 import remix.myplayer.ui.activity.LockScreenActivity
@@ -127,6 +128,9 @@ class MusicService : BaseService(),
 
   @Inject
   lateinit var fetchMetaDataUseCase: FetchMetaDataUseCase
+
+  @Inject
+  lateinit var replayGainController: ReplayGainController
 
   private val stateSource = MusicStateSource
 
@@ -364,6 +368,14 @@ class MusicService : BaseService(),
         playback.speed = settingPrefs.speedValue
         pushPlaybackUiState()
       }
+      // 回放增益
+      PrefKeys.Setting.REPLAY_GAIN_ENABLED,
+      PrefKeys.Setting.REPLAY_GAIN_MODE,
+      PrefKeys.Setting.REPLAY_GAIN_PEAK_PROTECTION,
+      PrefKeys.Setting.REPLAY_GAIN_PREAMP,
+      PrefKeys.Setting.REPLAY_GAIN_MISSING_GAIN -> {
+        playback.applyReplayGain()
+      }
       // 列表循环
       PrefKeys.Setting.LIST_LOOP -> {
         playback.setMode(playModel, settingPrefs.listLoop)
@@ -532,7 +544,7 @@ class MusicService : BaseService(),
    * 初始化Mediaplayer
    */
   private fun setUpPlayback() {
-    playback = ExoPlayback(this, settingPrefs.decoderMode, audioFocusManager)
+    playback = ExoPlayback(this, settingPrefs.decoderMode, audioFocusManager, replayGainController)
     playback.attach(this)
 
     Timber.v("setUpPlayback, audioSessionId: ${playback.audioSessionId}")

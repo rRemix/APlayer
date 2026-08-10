@@ -534,6 +534,23 @@
   <string name="last_play">最後にプレイした</string>
   <string name="play_cross_fade">フェードインとフェードアウト</string>
   <string name="play_cross_fade_tip">再生中および一時停止中にフェード効果を使用する</string>
+  <string name="play_replay_gain">リプレイゲイン</string>
+  <string name="play_replay_gain_disabled">オフ</string>
+  <string name="play_replay_gain_disabled_tip">無効</string>
+  <string name="play_replay_gain_summary">%1$s・%2$s</string>
+  <string name="play_replay_gain_mode">リプレイゲインモード</string>
+  <string name="play_replay_gain_mode_track">トラックモード</string>
+  <string name="play_replay_gain_mode_track_tip">各トラックの音量を個別にそろえます</string>
+  <string name="play_replay_gain_mode_album">アルバムモード</string>
+  <string name="play_replay_gain_mode_album_tip">同じアルバム内のトラック間の音量差を維持します</string>
+  <string name="play_replay_gain_peak_protection">ピーク保護</string>
+  <string name="play_replay_gain_peak_protection_off">ピーク保護オフ</string>
+  <string name="play_replay_gain_peak_protection_tip">音声のピーク値に基づいてゲインを制限し、クリッピングノイズを防ぎます</string>
+  <string name="play_replay_gain_gain_summary">%1$s・%2$s</string>
+  <string name="play_replay_gain_preamp">プリアンプ</string>
+  <string name="play_replay_gain_preamp_tip">ReplayGain タグ付き音声のゲイン値に加算します</string>
+  <string name="play_replay_gain_missing_gain">タグなし音声のデフォルトゲイン</string>
+  <string name="play_replay_gain_missing_gain_tip">ReplayGain タグのない音声に使用します。正方向に増幅するには、ピーク保護をオフにしてください。</string>
 
   <plurals name="song_num">
       <item quantity="other">%d曲</item>

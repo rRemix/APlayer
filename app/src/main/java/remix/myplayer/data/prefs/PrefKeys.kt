@@ -131,6 +131,21 @@ object PrefKeys {
     /** 倍速播放 */
     const val SPEED = "speed"
 
+    /** 回放增益开关 */
+    const val REPLAY_GAIN_ENABLED = "replay_gain_enabled"
+
+    /** 回放增益模式 */
+    const val REPLAY_GAIN_MODE = "replay_gain_mode"
+
+    /** 回放增益峰值保护 */
+    const val REPLAY_GAIN_PEAK_PROTECTION = "replay_gain_peak_protection"
+
+    /** 回放增益前置放大 */
+    const val REPLAY_GAIN_PREAMP = "replay_gain_preamp"
+
+    /** 无回放增益标签时的默认增益 */
+    const val REPLAY_GAIN_MISSING_GAIN = "replay_gain_missing_gain"
+
     /** 移除是否同时源文件 */
     const val DELETE_SOURCE = "delete_source"
 

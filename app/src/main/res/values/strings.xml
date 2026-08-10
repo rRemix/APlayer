@@ -543,6 +543,23 @@
   <string name="last_play_desc">Last Play TimeAt Desc</string>
   <string name="play_cross_fade">Fade in and out</string>
   <string name="play_cross_fade_tip">Use fade-in and fade-out effects when playing and pausing</string>
+  <string name="play_replay_gain">Replay Gain</string>
+  <string name="play_replay_gain_disabled">Off</string>
+  <string name="play_replay_gain_disabled_tip">Disabled</string>
+  <string name="play_replay_gain_summary">%1$s · %2$s</string>
+  <string name="play_replay_gain_mode">Replay Gain mode</string>
+  <string name="play_replay_gain_mode_track">Track mode</string>
+  <string name="play_replay_gain_mode_track_tip">Normalize each track individually</string>
+  <string name="play_replay_gain_mode_album">Album mode</string>
+  <string name="play_replay_gain_mode_album_tip">Preserve the relative volume between tracks in an album</string>
+  <string name="play_replay_gain_peak_protection">Peak protection</string>
+  <string name="play_replay_gain_peak_protection_off">Peak protection off</string>
+  <string name="play_replay_gain_peak_protection_tip">Prevent clipping by limiting gain based on the audio peak</string>
+  <string name="play_replay_gain_gain_summary">%1$s · %2$s</string>
+  <string name="play_replay_gain_preamp">Preamp</string>
+  <string name="play_replay_gain_preamp_tip">Added to the ReplayGain value of tagged audio</string>
+  <string name="play_replay_gain_missing_gain">Default gain for untagged audio</string>
+  <string name="play_replay_gain_missing_gain_tip">Used for audio without ReplayGain tags. Positive gain requires peak protection to be off.</string>
 
   <plurals name="song_num">
     <item quantity="one">%d song</item>

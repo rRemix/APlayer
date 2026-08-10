@@ -537,6 +537,23 @@
   <string name="last_play_desc">最後播放降序</string>
   <string name="play_cross_fade">淡入淡出</string>
   <string name="play_cross_fade_tip">播放、暫停時使用淡入淡出效果</string>
+  <string name="play_replay_gain">回放增益</string>
+  <string name="play_replay_gain_disabled">關閉</string>
+  <string name="play_replay_gain_disabled_tip">已關閉</string>
+  <string name="play_replay_gain_summary">%1$s · %2$s</string>
+  <string name="play_replay_gain_mode">回放增益模式</string>
+  <string name="play_replay_gain_mode_track">音軌模式</string>
+  <string name="play_replay_gain_mode_track_tip">分別統一每首歌曲的響度</string>
+  <string name="play_replay_gain_mode_album">專輯模式</string>
+  <string name="play_replay_gain_mode_album_tip">保留同一專輯內歌曲的相對響度</string>
+  <string name="play_replay_gain_peak_protection">峰值保護</string>
+  <string name="play_replay_gain_peak_protection_off">峰值保護已關閉</string>
+  <string name="play_replay_gain_peak_protection_tip">根據音訊峰值限制增益，防止爆音</string>
+  <string name="play_replay_gain_gain_summary">%1$s · %2$s</string>
+  <string name="play_replay_gain_preamp">前置放大</string>
+  <string name="play_replay_gain_preamp_tip">疊加到帶有回放增益標籤的音訊增益值上</string>
+  <string name="play_replay_gain_missing_gain">無標籤預設增益</string>
+  <string name="play_replay_gain_missing_gain_tip">用於沒有回放增益標籤的音訊。若要正向放大，請關閉峰值保護。</string>
 
   <plurals name="song_num">
     <item quantity="other">%d首</item>

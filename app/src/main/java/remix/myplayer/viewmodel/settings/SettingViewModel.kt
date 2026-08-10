@@ -92,6 +92,13 @@ class SettingViewModel @Inject constructor(
       autoPlay = settingPrefs.autoPlay,
       speed = settingPrefs.speed,
       listLoop = settingPrefs.listLoop,
+      replayGainEnabled = settingPrefs.replayGainEnabled,
+      replayGainMode = settingPrefs.replayGainMode,
+      replayGainPeakProtection = settingPrefs.replayGainPeakProtection,
+      replayGainPreampDb = SettingPrefs.normalizeReplayGainGainDb(settingPrefs.replayGainPreampDb),
+      replayGainMissingGainDb = SettingPrefs.normalizeReplayGainGainDb(
+        settingPrefs.replayGainMissingGainDb
+      ),
     ),
     color = ColorSettings(
       primaryColor = themeController.appTheme.primary,
@@ -244,6 +251,31 @@ class SettingViewModel @Inject constructor(
   fun setSpeed(speed: String) {
     settingPrefs.speed = speed
     _settingsState.update { it.copy(play = it.play.copy(speed = speed)) }
+  }
+
+  fun setReplayGain(enabled: Boolean, mode: Int) {
+    settingPrefs.replayGainMode = mode
+    settingPrefs.replayGainEnabled = enabled
+    _settingsState.update {
+      it.copy(play = it.play.copy(replayGainEnabled = enabled, replayGainMode = mode))
+    }
+  }
+
+  fun setReplayGainPeakProtection(enabled: Boolean) {
+    settingPrefs.replayGainPeakProtection = enabled
+    _settingsState.update { it.copy(play = it.play.copy(replayGainPeakProtection = enabled)) }
+  }
+
+  fun setReplayGainPreamp(gainDb: Float) {
+    val normalized = SettingPrefs.normalizeReplayGainGainDb(gainDb)
+    settingPrefs.replayGainPreampDb = normalized
+    _settingsState.update { it.copy(play = it.play.copy(replayGainPreampDb = normalized)) }
+  }
+
+  fun setReplayGainMissingGain(gainDb: Float) {
+    val normalized = SettingPrefs.normalizeReplayGainGainDb(gainDb)
+    settingPrefs.replayGainMissingGainDb = normalized
+    _settingsState.update { it.copy(play = it.play.copy(replayGainMissingGainDb = normalized)) }
   }
 
   fun setListLoop(enabled: Boolean) {

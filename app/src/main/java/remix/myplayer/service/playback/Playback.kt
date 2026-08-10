@@ -84,6 +84,9 @@ interface Playback {
   /** 设置音量 */
   fun setVolume(volume: Float)
 
+  /** 回放增益设置变化时重新应用当前曲目增益 */
+  fun applyReplayGain()
+
   interface PlayerCallback {
 
     fun onIsPlayingChanged(isPlaying: Boolean)
