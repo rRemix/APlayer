@@ -89,9 +89,20 @@ internal data class FolderState(
       return true
     }
 
-  val contents
-    get() = (currentFolder.listFiles()?.filter { it.isDirectory }?.sortedBy { it.name }
-      ?: emptyList<File>())
+  val contents: List<File>
+    get() {
+      val folders = currentFolder.listFiles()?.filter { it.isDirectory } ?: emptyList()
+      val primaryStorageEntry = primaryExternalStorageParent
+      if (
+        currentFolder.absolutePath != storageRoot.absolutePath ||
+        primaryStorageEntry == null ||
+        folders.any { it.absolutePath == primaryStorageEntry.absolutePath }
+      ) {
+        return folders.sortedBy { it.name }
+      }
+
+      return (folders + primaryStorageEntry).sortedBy { it.name }
+    }
 }
 
 private const val PARENT_FOLDER_ITEM = "..."
