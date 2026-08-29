@@ -2,6 +2,7 @@ package remix.myplayer.glide
 
 import android.content.ContentUris
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore.Audio
 import androidx.core.net.toUri
@@ -122,8 +123,9 @@ class UriFetcher @Inject constructor(
       }
     }
     if (song.isLocal()) { // 仅本地歌曲
-      if (song.albumId <= 0 || song.id <= 0) {
-        return Uri.EMPTY
+      // 1. 始终优先尝试嵌入式封面（直接从音频文件读取，无需 albumId）
+      if (song.data.isNotEmpty() && hasAnyLocalCover(song.data)) {
+        return (PREFIX_EMBEDDED + song.data).toUri()
       }
       // 自定义封面
 //      val customArtFile = getCustomThumbIfExist(song.albumId, Constants.ALBUM)
@@ -131,14 +133,11 @@ class UriFetcher @Inject constructor(
 //        return Uri.fromFile(customArtFile)
 //      }
 
-      // 内置
-      if (ignoreMediaStore()) {
-        val songs = songRepo.getSongs(Audio.Media._ID + "=" + song.id, null)
-        if (songs.isNotEmpty()) {
-          return (PREFIX_EMBEDDED + songs[0].data).toUri()
+      // 2. MediaStore 封面（仅当未禁用 MediaStore 且 albumId 有效时）
+      if (!ignoreMediaStore() && song.albumId > 0 && song.id > 0) {
+        if (isAlbumThumbExistInMediaCache(song.artUri)) {
+          return song.artUri
         }
-      } else if (isAlbumThumbExistInMediaCache(song.artUri)) {
-        return song.artUri
       }
     }
 
@@ -380,6 +379,23 @@ class UriFetcher @Inject constructor(
       return img
     }
     return null
+  }
+
+  /**
+   * 快速检查音频文件是否存在嵌入式封面图
+   */
+  private fun hasAnyLocalCover(filePath: String): Boolean {
+    try {
+      val retriever = MediaMetadataRetriever()
+      try {
+        retriever.setDataSource(filePath)
+        return retriever.embeddedPicture != null
+      } finally {
+        retriever.release()
+      }
+    } catch (_: Exception) {
+    }
+    return false
   }
 
   private fun getSearchKey(model: Any): String? {
