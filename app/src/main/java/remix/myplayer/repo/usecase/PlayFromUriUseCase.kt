@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import remix.myplayer.R
+import remix.myplayer.data.model.audio.PlayEventSource
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.MediaScanner
 import remix.myplayer.repo.SongRepository
@@ -96,6 +97,7 @@ class PlayFromUriUseCase @Inject constructor(
         Intent(context, MusicService::class.java).run {
           action = MusicService.ACTION_CMD
           putExtra(MusicService.EXTRA_COMMAND, Command.PLAY_TEMP)
+          putExtra(MusicService.EXTRA_PLAY_EVENT_SOURCE, PlayEventSource.EXTERNAL_INTENT.value)
           putExtra(
             MusicService.EXTRA_SONG,
             songs.first()

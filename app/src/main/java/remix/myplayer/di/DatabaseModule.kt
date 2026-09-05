@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import remix.myplayer.data.db.room.AppDatabase
 import remix.myplayer.data.db.room.dao.HistoryDao
 import remix.myplayer.data.db.room.dao.MetaDataCacheDao
+import remix.myplayer.data.db.room.dao.PlayEventDao
 import remix.myplayer.data.db.room.dao.PlayListDao
 import remix.myplayer.data.db.room.dao.PlayQueueDao
 import remix.myplayer.data.db.room.dao.WebDavDao
@@ -37,6 +38,11 @@ object DatabaseModule {
   @Provides
   fun provideHistoryDao(database: AppDatabase): HistoryDao {
     return database.historyDao()
+  }
+
+  @Provides
+  fun providePlayEventDao(database: AppDatabase): PlayEventDao {
+    return database.playEventDao()
   }
 
   @Provides
