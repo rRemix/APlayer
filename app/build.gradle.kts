@@ -266,6 +266,7 @@ dependencies {
         exclude(group = "xpp3", module = "xpp3")
     }
     implementation(libs.timber)
+    implementation(libs.tinypinyin)
 
     debugImplementation(libs.leakcanary)
 

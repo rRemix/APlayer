@@ -66,4 +66,37 @@ internal object DbMigrations {
       db.execSQL("CREATE TABLE IF NOT EXISTS `Smb` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `alias` TEXT NOT NULL, `domain` TEXT, `account` TEXT NOT NULL, `pwd` TEXT NOT NULL, `server` TEXT NOT NULL, `share` TEXT NOT NULL, `lastUrl` TEXT NOT NULL, `createAt` INTEGER NOT NULL)")
     }
   }
+
+  val migration7to8 = object : Migration(7, 8) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+      db.execSQL(
+        "CREATE TABLE IF NOT EXISTS `play_events` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `schemaVersion` INTEGER NOT NULL, `eventId` TEXT NOT NULL, `deviceId` TEXT NOT NULL, `eventType` TEXT NOT NULL, `canonicalId` TEXT NOT NULL, `audioId` INTEGER, `startedAt` INTEGER NOT NULL, `endedAt` INTEGER NOT NULL, `durationMs` INTEGER NOT NULL, `listenedMs` INTEGER NOT NULL, `listenRatio` REAL NOT NULL, `playScore` REAL NOT NULL, `completed` INTEGER NOT NULL, `source` TEXT NOT NULL, `endReason` TEXT NOT NULL, `titleSnapshot` TEXT NOT NULL, `artistSnapshot` TEXT NOT NULL, `albumSnapshot` TEXT NOT NULL, `genreSnapshot` TEXT, `sourceUri` TEXT, `contentHash` TEXT, `pathHint` TEXT, `year` INTEGER NOT NULL, `month` INTEGER NOT NULL, `day` INTEGER NOT NULL, `hour` INTEGER NOT NULL, `weekday` INTEGER NOT NULL)"
+      )
+      db.execSQL("CREATE INDEX IF NOT EXISTS `index_play_events_year` ON `play_events` (`year`)")
+      db.execSQL("CREATE INDEX IF NOT EXISTS `index_play_events_canonicalId` ON `play_events` (`canonicalId`)")
+      db.execSQL("CREATE INDEX IF NOT EXISTS `index_play_events_audioId` ON `play_events` (`audioId`)")
+      db.execSQL("CREATE INDEX IF NOT EXISTS `index_play_events_source` ON `play_events` (`source`)")
+
+      db.execSQL("CREATE INDEX IF NOT EXISTS `index_play_events_startedAt` ON `play_events` (`startedAt`)")
+    }
+  }
+
+  val migration8to9 = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `songId` TEXT")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `artistId` TEXT")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `albumId` TEXT")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `genreId` TEXT")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `playlistId` TEXT")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `mediaType` TEXT")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `sessionId` TEXT")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `gapBeforeMs` INTEGER")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `gapAfterMs` INTEGER")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `loopCount` INTEGER NOT NULL DEFAULT 0")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `outputDevice` TEXT")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `isForeground` INTEGER")
+      db.execSQL("ALTER TABLE `play_events` ADD COLUMN `decoder` TEXT")
+      db.execSQL("CREATE INDEX IF NOT EXISTS `index_play_events_eventType` ON `play_events` (`eventType`)")
+    }
+  }
 }

@@ -104,6 +104,7 @@ xxpermissions = { module = "com.github.getActivity:XXPermissions", version.ref =
 sardine-android = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "sardineAndroid" }
 smbj = { group = "com.hierynomus", name = "smbj", version.ref = "smbj" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+tinypinyin = { group = "io.github.biezhi", name = "TinyPinyin", version.ref = "tinypinyin" }
 
 # compose
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
