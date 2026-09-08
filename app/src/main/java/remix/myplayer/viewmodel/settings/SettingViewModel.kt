@@ -30,6 +30,7 @@ import remix.myplayer.lyric.LyricManager
 import remix.myplayer.lyric.LyricManager.Companion.ACTION_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.CHANGE_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.EXTRA_LYRIC
+import remix.myplayer.repo.PlayEventRepository
 import remix.myplayer.repo.SongRepository
 import remix.myplayer.repo.usecase.DeleteSongUseCase
 import remix.myplayer.ui.activity.base.BaseActivity
@@ -58,6 +59,9 @@ class SettingViewModel @Inject constructor(
 
   @Inject
   lateinit var deleteSongUseCase: DeleteSongUseCase
+
+  @Inject
+  lateinit var playEventRepository: PlayEventRepository
 
   private val _currentLibrary = MutableStateFlow(Library(TAG_SONG))
   val currentLibrary = _currentLibrary.asStateFlow()
@@ -540,6 +544,12 @@ class SettingViewModel @Inject constructor(
         it.copy(song = song)
       }
     )
+  }
+
+  fun clearPlayEvents() {
+    viewModelScope.launch {
+      playEventRepository.clear()
+    }
   }
 
   fun clearCache(context: Context, andThen: () -> Unit = {}) {

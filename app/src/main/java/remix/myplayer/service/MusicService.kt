@@ -29,6 +29,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
+import remix.myplayer.data.model.audio.PlayEventSource
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.audio.Song.Companion.EMPTY_SONG
 import remix.myplayer.data.prefs.PrefKeys
@@ -49,6 +50,7 @@ import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
 import remix.myplayer.misc.receiver.MediaButtonReceiver
 import remix.myplayer.repo.HistoryRepository
+import remix.myplayer.repo.PlayEventRepository
 import remix.myplayer.repo.PlayListRepository
 import remix.myplayer.repo.SongRepository
 import remix.myplayer.repo.usecase.FetchMetaDataUseCase
@@ -58,6 +60,7 @@ import remix.myplayer.service.notification.NotifyImpl24
 import remix.myplayer.service.playback.ExoPlayback
 import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.service.playback.Playback
+import remix.myplayer.service.playback.PlayEventRecorder
 import remix.myplayer.service.playback.ReplayGainController
 import remix.myplayer.service.playback.PlaybackFavoriteState
 import remix.myplayer.service.playback.PlaybackProgressSaver
@@ -66,7 +69,9 @@ import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
 import remix.myplayer.ui.nav.MessageNotifier
+import remix.myplayer.util.CanonicalIdProvider
 import remix.myplayer.util.Constants.ACTION_EXIT
+import remix.myplayer.util.DeviceIdProvider
 import remix.myplayer.util.PermissionUtil
 import remix.myplayer.util.Util
 import remix.myplayer.util.Util.registerLocalReceiver
@@ -127,6 +132,15 @@ class MusicService : BaseService(),
   lateinit var historyRepository: HistoryRepository
 
   @Inject
+  lateinit var playEventRepository: PlayEventRepository
+
+  @Inject
+  lateinit var deviceIdProvider: DeviceIdProvider
+
+  @Inject
+  lateinit var canonicalIdProvider: CanonicalIdProvider
+
+  @Inject
   lateinit var fetchMetaDataUseCase: FetchMetaDataUseCase
 
   @Inject
@@ -171,6 +185,11 @@ class MusicService : BaseService(),
    */
   lateinit var playback: ExoPlayback
     private set
+
+  /**
+   * 播放事件采集器
+   */
+  private lateinit var playEventRecorder: PlayEventRecorder
 
   /**
    * 播放控制的Receiver
@@ -544,6 +563,14 @@ class MusicService : BaseService(),
    * 初始化Mediaplayer
    */
   private fun setUpPlayback() {
+    playEventRecorder = PlayEventRecorder(
+      repository = playEventRepository,
+      deviceIdProvider = deviceIdProvider,
+      canonicalIdProvider = canonicalIdProvider,
+      scope = this,
+      enabled = { settingPrefs.playEventEnabled }
+    )
+
     playback = ExoPlayback(this, settingPrefs.decoderMode, audioFocusManager, replayGainController)
     playback.attach(this)
 
@@ -553,6 +580,7 @@ class MusicService : BaseService(),
 
   override fun onIsPlayingChanged(isPlaying: Boolean) {
     Timber.v("onIsPlayingChanged: $isPlaying")
+    playEventRecorder.onIsPlayingChanged(isPlaying)
     stateSource.updatePlaybackUiState(isPlaying = isPlaying)
     if (isPlaying) {
       updatePlayHistory()
@@ -586,6 +614,7 @@ class MusicService : BaseService(),
 
   override fun onEnded() {
     Timber.v("onEnded")
+    playEventRecorder.onEnded()
     if (playback.itemCount == 0) {
       notify.stopForegroundAndNotification()
     }
@@ -596,6 +625,7 @@ class MusicService : BaseService(),
 
     Timber.v("onItemTransition, playback.audioSessionId: ${playback.audioSessionId}")
     val song = mediaItem?.localConfiguration?.tag as? Song
+    playEventRecorder.onItemTransition(song, reason)
     if (song is Song.Remote) {
       launch {
         withContext(Dispatchers.IO) {
@@ -631,6 +661,7 @@ class MusicService : BaseService(),
 
   override fun onError(error: PlaybackException) {
     Timber.e("onPlayerError, code: ${error.errorCode} name: ${error.errorCodeName} cause: ${error.cause}")
+    playEventRecorder.onError()
     MessageNotifier.show(R.string.play_failed, error.errorCodeName)
     when (error.errorCode) {
       // fatal error
@@ -649,6 +680,7 @@ class MusicService : BaseService(),
   }
 
   override fun onPositionChange() {
+    playEventRecorder.onPositionChange(playback.position)
     pushProgressUiState()
   }
 
@@ -681,6 +713,7 @@ class MusicService : BaseService(),
     if (isPlaying) {
       pause()
     }
+    playEventRecorder.stop()
     playback.release()
     load = 0
 
@@ -733,10 +766,26 @@ class MusicService : BaseService(),
   }
 
   /**
+   * 根据 Intent 与命令设置下一次播放的来源。
+   */
+  private fun setPendingPlayEventSource(intent: Intent, command: Int) {
+    val explicit = PlayEventSource.fromValue(intent.getIntExtra(EXTRA_PLAY_EVENT_SOURCE, -1))
+    val source = explicit ?: when (command) {
+      Command.PLAY_AT -> PlayEventSource.LIBRARY_CLICK
+      Command.PLAY_TEMP -> PlayEventSource.SEARCH_CLICK
+      else -> null
+    }
+    if (source != null) {
+      playEventRecorder.setPendingSource(source)
+    }
+  }
+
+  /**
    * 设置播放队列
    */
   fun setPlayQueue(newQueue: List<Song>?, intent: Intent) {
     Timber.v("setPlayQueue")
+    setPendingPlayEventSource(intent, Command.PLAY_AT)
     // 如果是随机播放，需要更新播放模式
     val shuffle = intent.getBooleanExtra(EXTRA_SHUFFLE, false)
     if (newQueue.isNullOrEmpty()) {
@@ -1101,6 +1150,7 @@ class MusicService : BaseService(),
     }
     val command = intent.getIntExtra(EXTRA_COMMAND, -1)
     Timber.v("handleCommand, command: $command")
+    setPendingPlayEventSource(intent, command)
 
     if (shouldThrottleCommand(command)) {
       val now = System.currentTimeMillis()
@@ -1285,6 +1335,7 @@ class MusicService : BaseService(),
     }
 
     if (queue.isNotEmpty()) {
+      playEventRecorder.setPendingSource(PlayEventSource.RESUME)
       playback.setPlaylist(
         queue,
         pos,
@@ -1385,6 +1436,7 @@ class MusicService : BaseService(),
     const val EXTRA_COMMAND = "command"
     const val EXTRA_SHUFFLE = "shuffle"
     const val EXTRA_PROGRESS = "progress"
+    const val EXTRA_PLAY_EVENT_SOURCE = "play_event_source"
     const val ACTION_APPWIDGET_OPERATE = "$APLAYER_PACKAGE_NAME.appwidget.operate"
     const val ACTION_SHORTCUT_SHUFFLE = "$APLAYER_PACKAGE_NAME.shortcut.shuffle"
     const val ACTION_SHORTCUT_MYLOVE = "$APLAYER_PACKAGE_NAME.shortcut.my_love"
