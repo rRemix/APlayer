@@ -46,3 +46,13 @@ target_link_libraries( # Specifies the target library.
                        # included in the NDK.
                        ${log-lib}
                        "-Wl,--build-id=none")
+
+# NDK clang can embed host-specific compiler-build metadata in the ELF
+# .comment section (for example, different BOLT/MLGO settings between
+# macOS and Linux host toolchains). The section is not used at runtime,
+# so remove it to keep libblur.so byte-for-byte reproducible.
+add_custom_command(TARGET blur POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY}
+        --remove-section .comment
+        $<TARGET_FILE:blur>
+        VERBATIM)
