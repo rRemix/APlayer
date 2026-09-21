@@ -75,7 +75,7 @@ public class HuaweiUtils {
 //   ComponentName comp = new ComponentName("com.android.settings","com.android.settings.permission.single_app_activity");//此处可跳转到指定app对应的权限管理页面，但是需要相关权限，未解决
       intent.setComponent(comp);
       context.startActivity(intent);
-      e.printStackTrace();
+      Log.e("APlayer", "Error", e);
       Log.e(TAG, Log.getStackTraceString(e));
     } catch (Exception e) {
       //抛出异常时提示信息

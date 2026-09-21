@@ -1,5 +1,9 @@
 package remix.myplayer.util;
 
+import android.util.Log
+
+import android.util.Log;
+
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -72,7 +76,7 @@ public class AlipayUtil {
       PackageInfo info = pm.getPackageInfo(ALIPAY_PACKAGE_NAME, 0);
       return info != null;
     } catch (PackageManager.NameNotFoundException e) {
-      e.printStackTrace();
+      Log.e("APlayer", "Error", e);
       return false;
     }
   }

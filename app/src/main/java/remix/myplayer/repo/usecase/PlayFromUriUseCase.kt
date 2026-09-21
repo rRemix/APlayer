@@ -1,5 +1,7 @@
 package remix.myplayer.repo.usecase
 
+import android.util.Log
+
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -119,7 +121,7 @@ class PlayFromUriUseCase @Inject constructor(
         return cursor.getString(columnIndex)
       }
     } catch (e: Exception) {
-      e.printStackTrace()
+      Log.e("APlayer", "Error", e)
     } finally {
       cursor?.close()
     }

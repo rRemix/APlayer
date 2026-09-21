@@ -1,5 +1,7 @@
 package remix.myplayer.ui.screen.home
 
+import android.util.Log
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInVertically
@@ -271,7 +273,7 @@ fun hackTabMinWidth() {
         isAccessible = true
       }.set(null, 72f)
   } catch (e: Exception) {
-    e.printStackTrace()
+    Log.e("APlayer", "Error", e)
   }
 }
 

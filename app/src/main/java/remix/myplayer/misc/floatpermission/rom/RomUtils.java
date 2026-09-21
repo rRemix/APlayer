@@ -29,7 +29,7 @@ public class RomUtils {
       String version = emuiVersion.substring(emuiVersion.indexOf("_") + 1);
       return Double.parseDouble(version);
     } catch (Exception e) {
-      e.printStackTrace();
+      Log.e("APlayer", "Error", e);
     }
     return 4.0;
   }
