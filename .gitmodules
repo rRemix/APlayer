@@ -2,3 +2,7 @@
 	path = third-party/taglib
 	url = ../taglib.git
 	branch = main
+[submodule "third-party/media3"]
+	path = third-party/media3
+	url = ../media.git
+	branch = media3-1.8.0
