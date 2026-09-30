@@ -21,6 +21,10 @@ import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.defaultAppBarActions
 import remix.myplayer.ui.widget.popup.ScreenPopupButton
 import remix.myplayer.viewmodel.settingViewModel
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
 
 
 @Composable
@@ -33,6 +37,7 @@ internal fun HomeAppBar(
   val scope = rememberCoroutineScope()
 
   TopAppBar(
+    windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
     scrollBehavior = scrollBehavior,
     colors = TopAppBarDefaults.topAppBarColors(
       containerColor = LocalTheme.current.primary,

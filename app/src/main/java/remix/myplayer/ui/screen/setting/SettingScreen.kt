@@ -3,7 +3,9 @@ package remix.myplayer.ui.screen.setting
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -64,6 +66,7 @@ import remix.myplayer.viewmodel.mainViewModel
 @Composable
 fun SettingScreen() {
   Scaffold(
+    contentWindowInsets = WindowInsets.systemBars,
     topBar = { CommonAppBar(title = stringResource(R.string.setting), actions = emptyList()) },
     containerColor = LocalTheme.current.mainBackground,
   ) { contentPadding ->
@@ -92,6 +95,7 @@ fun SettingDetailScreen(categoryKey: String) {
   val category = SettingCategory.fromRoute(categoryKey) ?: return
 
   Scaffold(
+    contentWindowInsets = WindowInsets.systemBars,
     topBar = { CommonAppBar(title = stringResource(category.titleRes), actions = emptyList()) },
     containerColor = LocalTheme.current.mainBackground,
   ) { contentPadding ->

@@ -7,9 +7,11 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -51,6 +53,7 @@ fun CropScreen(
   val state = rememberImageCropperState(uri = pickUri.toString())
 
   Scaffold(
+    contentWindowInsets = WindowInsets.systemBars,
     topBar = {
       CommonAppBar(stringResource(R.string.back), onBack = onCancel, actions = emptyList())
     },

@@ -1,7 +1,5 @@
 package remix.myplayer.ui.screen.home
 
-import android.util.Log
-
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInVertically
@@ -10,8 +8,10 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.DrawerValue
@@ -102,6 +102,7 @@ fun HomeScreen() {
         .fillMaxSize()
         .nestedScroll(scrollBehavior.nestedScrollConnection),
       containerColor = LocalTheme.current.libraryBackground,
+      contentWindowInsets = WindowInsets.systemBars,
       floatingActionButton = {
         val selectLibrary by remember(libraries) {
           derivedStateOf {
