@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -103,6 +105,7 @@ fun SearchScreen() {
   }
 
   Scaffold(
+    modifier = Modifier.imePadding(),
     contentWindowInsets = WindowInsets.systemBars,
     containerColor = LocalTheme.current.mainBackground,
     topBar = {
@@ -136,6 +139,7 @@ fun SearchScreen() {
     Box(
       modifier = Modifier
         .padding(contentPadding)
+        .consumeWindowInsets(contentPadding)
         .fillMaxSize(),
       contentAlignment = Alignment.TopCenter
     ) {

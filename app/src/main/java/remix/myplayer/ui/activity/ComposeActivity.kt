@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
@@ -72,9 +73,10 @@ class ComposeActivity : BaseMusicActivity() {
         } else {
           Color.White
         }
-        // TODO
-        window.navigationBarColor = color.toArgb()
-        ThemeUtil.setLightNavigationBarAuto(this, theme.isPrimaryLight)
+        SideEffect {
+          window.navigationBarColor = color.toArgb()
+          ThemeUtil.setLightNavigationBarAuto(this, theme.isPrimaryLight)
+        }
 
         APlayerTheme {
           AppNav()

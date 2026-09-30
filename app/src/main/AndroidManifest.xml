@@ -44,6 +44,7 @@
 
     <activity android:name="remix.myplayer.ui.activity.ComposeActivity"
         android:theme="@style/AppTheme"
+        android:windowSoftInputMode="adjustResize"
         android:launchMode="singleTop"
         android:exported="true"
         android:configChanges="uiMode|colorMode">

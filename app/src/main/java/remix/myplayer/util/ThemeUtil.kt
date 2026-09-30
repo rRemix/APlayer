@@ -3,22 +3,15 @@ package remix.myplayer.util
 import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.os.Build
-import android.view.View
 import androidx.annotation.AttrRes
+import androidx.core.view.WindowCompat
 
 object ThemeUtil {
   fun setLightNavigationBarAuto(activity: Activity, enabled: Boolean) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val decorView = activity.window.decorView
-      var systemUiVisibility = decorView.getSystemUiVisibility()
-      systemUiVisibility = if (enabled) {
-        systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-      } else {
-        systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
-      }
-      decorView.setSystemUiVisibility(systemUiVisibility)
-    }
+    // 只更新图标外观，避免直接修改 systemUiVisibility 干扰 edge-to-edge 布局。
+    val window = activity.window
+    WindowCompat.getInsetsController(window, window.decorView)
+      .isAppearanceLightNavigationBars = enabled
   }
 
   fun resolveColor(context: Context, @AttrRes attr: Int, fallback: Int): Int {
