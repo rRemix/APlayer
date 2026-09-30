@@ -40,6 +40,7 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
 import remix.myplayer.service.AudioFocusManager
 import remix.myplayer.service.playback.Playback.PlayerCallback
+import remix.myplayer.service.playback.extractor.ApeExtractorsFactory
 import remix.myplayer.util.Constants.MB
 import remix.myplayer.util.ext.checkMainThread
 import timber.log.Timber
@@ -94,7 +95,7 @@ class ExoPlayback(
   private var progressTickerJob: Job? = null
 
   private val localDataSourceFactory = DefaultDataSource.Factory(context)
-
+  private val extractorsFactory = ApeExtractorsFactory()
   private val player: ExoPlayer = run {
     val rendererMode = resolveRendererMode(decoderMode)
     val renderersFactory = ReplayGainRenderersFactory(context, rendererMode, replayGainController.processor)
@@ -192,7 +193,7 @@ class ExoPlayback(
           .setCache(MediaCache.get(context))
           .setUpstreamDataSourceFactory(smbFactory)
           .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-        ProgressiveMediaSource.Factory(cacheFactory)
+        ProgressiveMediaSource.Factory(cacheFactory, extractorsFactory)
           .createMediaSource(mediaItem)
       } else {
         val httpFactory = DefaultHttpDataSource.Factory()
@@ -202,11 +203,11 @@ class ExoPlayback(
           .setCache(MediaCache.get(context))
           .setUpstreamDataSourceFactory(httpFactory)
           .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-        ProgressiveMediaSource.Factory(cacheFactory)
+        ProgressiveMediaSource.Factory(cacheFactory, extractorsFactory)
           .createMediaSource(mediaItem)
       }
     } else {
-      ProgressiveMediaSource.Factory(localDataSourceFactory)
+      ProgressiveMediaSource.Factory(localDataSourceFactory, extractorsFactory)
         .createMediaSource(mediaItem)
     }
   }
