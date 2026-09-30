@@ -200,6 +200,9 @@ object PrefKeys {
     /** 播放页封面切换动画速率 */
     const val PLAYING_COVER_ANIMATION_SPEED = "playing_cover_animation_speed"
 
+    /** 播放统计（年度报告）开关 */
+    const val PLAY_EVENT_ENABLED = "play_event_enabled"
+
     /** 版本号 */
     const val VERSION = "version"
 

@@ -1,6 +1,6 @@
 [submodule "third-party/taglib"]
 	path = third-party/taglib
-	url = ../taglib.git
+	url = https://github.com/rRemix/taglib.git
 	branch = main
 [submodule "third-party/media3"]
 	path = third-party/media3

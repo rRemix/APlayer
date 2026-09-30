@@ -14,6 +14,8 @@ import remix.myplayer.repo.GenreRepoImpl
 import remix.myplayer.repo.GenreRepository
 import remix.myplayer.repo.HistoryRepoImpl
 import remix.myplayer.repo.HistoryRepository
+import remix.myplayer.repo.PlayEventRepoImpl
+import remix.myplayer.repo.PlayEventRepository
 import remix.myplayer.repo.PlayListRepoImpl
 import remix.myplayer.repo.PlayListRepository
 import remix.myplayer.repo.PlayQueueRepoImpl
@@ -59,6 +61,10 @@ abstract class RepositoryModule {
   @Singleton
   @Binds
   abstract fun bindHistoryRepo(repo: HistoryRepoImpl): HistoryRepository
+
+  @Singleton
+  @Binds
+  abstract fun bindPlayEventRepo(repo: PlayEventRepoImpl): PlayEventRepository
 
   @Singleton
   @Binds

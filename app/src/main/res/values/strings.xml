@@ -583,4 +583,26 @@
 
   <string name="play_from_this_line">Play from this line</string>
   <string name="title_dynamic_smb">SMB Client</string>
+  <!-- Play event / annual report -->
+  <string name="annual_report">Annual Listening Report</string>
+  <string name="no_play_stat_data">No listening data yet</string>
+  <string name="stat_plays">Plays</string>
+  <string name="stat_listen_score">Listen Score</string>
+  <string name="stat_completed">Completed</string>
+  <string name="stat_listen_ms">Listened</string>
+  <string name="stat_days">Days</string>
+  <string name="stat_first_listened">First Listened</string>
+  <string name="stat_songs">Songs</string>
+  <string name="stat_artists">Artists</string>
+  <string name="stat_albums">Albums</string>
+  <string name="stat_top_songs">Top Songs</string>
+  <string name="stat_top_artists">Top Artists</string>
+  <string name="stat_top_albums">Top Albums</string>
+  <string name="stat_months">Months</string>
+  <string name="stat_sources">Sources</string>
+  <string name="export_jsonl">Export JSONL</string>
+  <string name="clear_play_stats">Clear listening stats</string>
+  <string name="play_stat_enabled">Listening stats</string>
+  <string name="play_stat_enabled_desc">Record play events for the annual report</string>
+  <string name="confirm_clear_play_stats">Clear all listening stats?</string>
 </resources>

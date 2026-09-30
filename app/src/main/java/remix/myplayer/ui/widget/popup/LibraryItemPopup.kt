@@ -26,11 +26,13 @@ import remix.myplayer.R
 import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Album
+import remix.myplayer.data.model.audio.PlayEventSource
 import remix.myplayer.data.model.audio.Artist
 import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.data.model.audio.type
 import remix.myplayer.service.Command
+import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.nav.LocalNavController
@@ -117,6 +119,10 @@ fun LibraryItemDropdownMenu(
                 setPlayQueue(
                   songs, makeCmdIntent(Command.PLAY_AT)
                     .putExtra(EXTRA_POSITION, 0)
+                    .putExtra(
+                      MusicService.EXTRA_PLAY_EVENT_SOURCE,
+                      (if (model is PlayList) PlayEventSource.PLAYLIST_CLICK else PlayEventSource.LIBRARY_CLICK).value
+                    )
                 )
               }
               // 添加到播放队列

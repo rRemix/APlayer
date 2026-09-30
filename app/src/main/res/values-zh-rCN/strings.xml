@@ -565,4 +565,26 @@
   <string name="title_dynamic_smb">SMB 客户端</string>
   <string name="select_image">选择图片</string>
   <string name="clear_cover">清除封面</string>
+  <!-- 播放事件 / 年度报告 -->
+  <string name="annual_report">年度听歌报告</string>
+  <string name="no_play_stat_data">暂无收听数据</string>
+  <string name="stat_plays">播放次数</string>
+  <string name="stat_listen_score">收听积分</string>
+  <string name="stat_completed">完整播放</string>
+  <string name="stat_listen_ms">收听时长</string>
+  <string name="stat_days">听歌天数</string>
+  <string name="stat_first_listened">首次收听</string>
+  <string name="stat_songs">歌曲数</string>
+  <string name="stat_artists">歌手数</string>
+  <string name="stat_albums">专辑数</string>
+  <string name="stat_top_songs">TOP 歌曲</string>
+  <string name="stat_top_artists">TOP 歌手</string>
+  <string name="stat_top_albums">TOP 专辑</string>
+  <string name="stat_months">月份</string>
+  <string name="stat_sources">来源</string>
+  <string name="export_jsonl">导出 JSONL</string>
+  <string name="clear_play_stats">清除播放统计数据</string>
+  <string name="play_stat_enabled">播放统计</string>
+  <string name="play_stat_enabled_desc">记录播放事件以生成年度报告</string>
+  <string name="confirm_clear_play_stats">确定清除所有播放统计数据？</string>
 </resources>
