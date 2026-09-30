@@ -1,5 +1,7 @@
 package remix.myplayer.util
 
+import android.util.Log
+
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
@@ -143,7 +145,7 @@ object Util {
         }
       }
     } catch (e: Exception) {
-      e.printStackTrace()
+      Log.e("APlayer", "Error", e)
     }
     return size
   }
@@ -385,7 +387,7 @@ object Util {
         }
       }
     } catch (e: PackageManager.NameNotFoundException) {
-      e.printStackTrace()
+      Log.e("APlayer", "Error", e)
     }
     return channelNumber
   }
@@ -407,7 +409,7 @@ object Util {
         .setType("audio/*")
     } catch (e: IllegalArgumentException) {
       //the path is most likely not like /storage/emulated/0/... but something like /storage/28C7-75B0/...
-      e.printStackTrace()
+      Log.e("APlayer", "Error", e)
       Toast.makeText(context, context.getString(R.string.cant_share_song), Toast.LENGTH_SHORT)
         .show()
       Intent()
@@ -430,7 +432,7 @@ object Util {
         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         .setType("image/*")
     } catch (e: IllegalArgumentException) {
-      e.printStackTrace()
+      Log.e("APlayer", "Error", e)
       Toast.makeText(context, context.getString(R.string.cant_share_song), Toast.LENGTH_SHORT)
         .show()
       Intent()
@@ -446,7 +448,7 @@ object Util {
       try {
         closeable.close()
       } catch (e: Exception) {
-        e.printStackTrace()
+        Log.e("APlayer", "Error", e)
       }
     }
   }
@@ -489,12 +491,12 @@ object Util {
       }
       return processName
     } catch (throwable: Throwable) {
-      throwable.printStackTrace()
+      throwablLog.e("APlayer", "Error", e)
     } finally {
       try {
         reader?.close()
       } catch (exception: IOException) {
-        exception.printStackTrace()
+        Log.e("APlayer", "Error", exception)
       }
     }
     return null
@@ -530,7 +532,7 @@ object Util {
         false
       } else imm.hideSoftInputFromWindow(view.windowToken, 0)
     } catch (e: Exception) {
-      e.printStackTrace()
+      Log.e("APlayer", "Error", e)
     }
     return false
   }

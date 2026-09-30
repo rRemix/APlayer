@@ -1,5 +1,7 @@
 package remix.myplayer.service
 
+import android.util.Log
+
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -161,7 +163,7 @@ class MediaSessionUpdater @Inject constructor(
     return try {
       bitmap.copy(config, false)
     } catch (e: OutOfMemoryError) {
-      e.printStackTrace()
+      Log.e("APlayer", "Error", e)
       null
     }
   }

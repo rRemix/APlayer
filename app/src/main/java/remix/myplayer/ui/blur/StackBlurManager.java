@@ -19,6 +19,10 @@
 
 package remix.myplayer.ui.blur;
 
+import android.util.Log
+
+import android.util.Log;
+
 import android.graphics.Bitmap;
 import java.io.FileOutputStream;
 import java.util.concurrent.ExecutorService;
@@ -81,7 +85,7 @@ public class StackBlurManager {
       FileOutputStream out = new FileOutputStream(path);
       _result.compress(Bitmap.CompressFormat.PNG, 90, out);
     } catch (Exception e) {
-      e.printStackTrace();
+      Log.e("APlayer", "Error", e);
     }
   }
 
