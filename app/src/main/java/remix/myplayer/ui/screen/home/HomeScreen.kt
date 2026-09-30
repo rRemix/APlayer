@@ -214,41 +214,43 @@ private fun HomeContent(
       )
       .background(LocalTheme.current.libraryBackground)
   ) {
-    ScrollableTabRow(
-      selectedTabIndex = pagerState.currentPage,
-      indicator = { tabPositions ->
-        TabRowDefaults.SecondaryIndicator(
-          modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-          height = 3.dp,
-          color = LocalTheme.current.primaryReverse
-        )
-      },
-      edgePadding = 0.dp,
-      containerColor = LocalTheme.current.primary
-    ) {
-      libraries.forEachIndexed { index, library ->
-        val theme = LocalTheme.current
-        var lastClickTime by remember { mutableLongStateOf(0L) }
-
-        Tab(
-          selected = pagerState.currentPage == index,
-          onClick = {
-            val currentTime = System.currentTimeMillis()
-            if (currentTime - lastClickTime < 300) {
-              if (library.tag == Library.TAG_SONG) {
-                scope.launch { scrollToCurrentEvent.emit(Unit) }
-              }
-              return@Tab
-            }
-            lastClickTime = currentTime
-            scope.launch { pagerState.animateScrollToPage(index) }
-          },
-          text = { Text(stringResource(library.stringRes), maxLines = 1) },
-          selectedContentColor = theme.primaryReverse,
-          unselectedContentColor = colorResource(
-            if (theme.isPrimaryCloseToWhite) R.color.dark_normal_tab_text_color else R.color.light_normal_tab_text_color
+    if (libraries.size > 1) {
+      ScrollableTabRow(
+        selectedTabIndex = pagerState.currentPage,
+        indicator = { tabPositions ->
+          TabRowDefaults.SecondaryIndicator(
+            modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+            height = 3.dp,
+            color = LocalTheme.current.primaryReverse
           )
-        )
+        },
+        edgePadding = 0.dp,
+        containerColor = LocalTheme.current.primary
+      ) {
+        libraries.forEachIndexed { index, library ->
+          val theme = LocalTheme.current
+          var lastClickTime by remember { mutableLongStateOf(0L) }
+
+          Tab(
+            selected = pagerState.currentPage == index,
+            onClick = {
+              val currentTime = System.currentTimeMillis()
+              if (currentTime - lastClickTime < 300) {
+                if (library.tag == Library.TAG_SONG) {
+                  scope.launch { scrollToCurrentEvent.emit(Unit) }
+                }
+                return@Tab
+              }
+              lastClickTime = currentTime
+              scope.launch { pagerState.animateScrollToPage(index) }
+            },
+            text = { Text(stringResource(library.stringRes), maxLines = 1) },
+            selectedContentColor = theme.primaryReverse,
+            unselectedContentColor = colorResource(
+              if (theme.isPrimaryCloseToWhite) R.color.dark_normal_tab_text_color else R.color.light_normal_tab_text_color
+            )
+          )
+        }
       }
     }
 

@@ -19,7 +19,7 @@
 
 package remix.myplayer.ui.blur;
 
-import android.util.Log
+import android.util.Log;
 
 import android.util.Log;
 

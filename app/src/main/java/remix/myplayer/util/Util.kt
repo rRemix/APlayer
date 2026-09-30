@@ -491,7 +491,7 @@ object Util {
       }
       return processName
     } catch (throwable: Throwable) {
-      throwablLog.e("APlayer", "Error", e)
+      Log.e("APlayer", "Error", throwable)
     } finally {
       try {
         reader?.close()
