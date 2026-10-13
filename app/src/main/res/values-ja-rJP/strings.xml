@@ -303,6 +303,12 @@
   <string name="configure_library_category">表示するライブラリのカテゴリを設定します</string>
   <string name="load_failed">読み込めません</string>
   <string name="plz_choose_at_least_one_category">1つ以上のカテゴリを選択してください</string>
+  <string name="search_playback_action">曲をタップしたとき</string>
+  <string name="play_all">すべて再生</string>
+  <string name="search_play_description">キューを保持し、選択した曲を次に挿入してすぐに再生</string>
+  <string name="search_play_all_description">検索結果をキューに設定し、選択した曲から再生</string>
+  <string name="search_add_to_queue_description">選択した曲をキューの末尾に追加し、すぐには再生しない</string>
+  <string name="songs_already_in_queue">曲はすでに再生キューにあります</string>
   <string name="play">再生</string>
   <string name="add_to_play_queue">再生キューに追加</string>
   <string name="set_album_cover">アルバムカバーを設定</string>

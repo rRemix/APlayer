@@ -84,8 +84,12 @@ class PlaybackViewModel @Inject constructor(
   }
 
   fun insertToQueue(queue: List<Song>) = viewModelScope.launch {
-    MusicServiceRemote.insertToQueue(queue)
-    MessageNotifier.show(R.string.add_song_playqueue_success, queue.size)
+    val addedCount = MusicServiceRemote.insertToQueue(queue) ?: return@launch
+    if (addedCount > 0) {
+      MessageNotifier.show(R.string.add_song_playqueue_success, addedCount)
+    } else if (queue.isNotEmpty()) {
+      MessageNotifier.show(R.string.songs_already_in_queue)
+    }
   }
 
   private var continuousSeekJob: Job? = null

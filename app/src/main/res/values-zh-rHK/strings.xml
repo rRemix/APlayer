@@ -84,6 +84,12 @@
   <string name="play_random">隨機播放全部(%d)</string>
   <string name="scan_tip">僅大於此設定數值的音訊檔案將出現在音樂庫中</string>
   <string name="search_hint">搜尋曲目 藝術家 專輯</string>
+  <string name="search_playback_action">點擊曲目時</string>
+  <string name="play_all">播放全部</string>
+  <string name="search_play_description">保留佇列，插入為下一首並立即播放</string>
+  <string name="search_play_all_description">將所有搜尋結果設為佇列，從所選曲目開始播放</string>
+  <string name="search_add_to_queue_description">將所選曲目加入佇列末尾，不立即播放</string>
+  <string name="songs_already_in_queue">曲目已在播放佇列中</string>
   <string name="no_search_result">無搜尋結果</string>
   <string name="create_playlist">建立播放清單...</string>
   <string name="use_system_color">使用系統背景色</string>

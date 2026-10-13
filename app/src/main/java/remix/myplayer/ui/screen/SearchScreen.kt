@@ -10,6 +10,8 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -30,14 +33,23 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -50,7 +62,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
@@ -62,8 +77,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.prefs.SettingPrefs.Companion.SEARCH_PLAYBACK_ADD_TO_QUEUE
+import remix.myplayer.data.prefs.SettingPrefs.Companion.SEARCH_PLAYBACK_PLAY
+import remix.myplayer.data.prefs.SettingPrefs.Companion.SEARCH_PLAYBACK_PLAY_ALL
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.MultiSelectBar
 import remix.myplayer.ui.widget.common.CommonAppBar
@@ -76,14 +95,18 @@ import remix.myplayer.viewmodel.MultiSelectState
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.playbackViewModel
+import remix.myplayer.viewmodel.settingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen() {
   val libraryVM = libraryViewModel
   val mainVM = mainViewModel
+  val playbackVM = playbackViewModel
+  val settingVM = settingViewModel
 
-  val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
+  val playbackState by playbackVM.playbackUiState.collectAsStateWithLifecycle()
+  val settingsState by settingVM.settingsState.collectAsStateWithLifecycle()
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val librarySongs by libraryVM.songs.collectAsStateWithLifecycle()
   val listState = rememberLazyListState()
@@ -121,9 +144,12 @@ fun SearchScreen() {
         }
       ) { isMultiSelect ->
         if (!isMultiSelect) {
-          SongSearchBar(textFieldState) {
-            searchKey = it
-          }
+          SongSearchBar(
+            textFieldState = textFieldState,
+            playbackAction = settingsState.play.searchPlaybackAction,
+            onPlaybackActionSelected = settingVM::setSearchPlaybackAction,
+            onSearch = { searchKey = it },
+          )
         } else {
           MultiSelectBar(
             state = multiSelectState,
@@ -186,10 +212,17 @@ fun SearchScreen() {
                   return@ListSong
                 }
 
-                Util.sendLocalBroadcast(
-                  MusicUtil.makeCmdIntent(Command.PLAY_TEMP)
-                    .putExtra(MusicService.EXTRA_SONG, song)
-                )
+                when (settingsState.play.searchPlaybackAction) {
+                  SEARCH_PLAYBACK_PLAY_ALL -> setPlayQueue(
+                    songs, MusicUtil.makeCmdIntent(Command.PLAY_AT)
+                      .putExtra(MusicService.EXTRA_POSITION, pos)
+                  )
+                  SEARCH_PLAYBACK_ADD_TO_QUEUE -> playbackVM.insertToQueue(listOf(song))
+                  else -> Util.sendLocalBroadcast(
+                    MusicUtil.makeCmdIntent(Command.PLAY_TEMP)
+                      .putExtra(MusicService.EXTRA_SONG, song)
+                  )
+                }
               },
               onLongClickSong = {
                 mainVM.showMultiSelect(context, MultiSelectState.Where.Search, song)
@@ -218,7 +251,12 @@ fun SearchScreen() {
 }
 
 @Composable
-private fun SongSearchBar(textFieldState: TextFieldState, onSearch: (String) -> Unit) {
+private fun SongSearchBar(
+  textFieldState: TextFieldState,
+  playbackAction: Int,
+  onPlaybackActionSelected: (Int) -> Unit,
+  onSearch: (String) -> Unit,
+) {
   val theme = LocalTheme.current
 
   CommonAppBar(null, true) {
@@ -239,7 +277,7 @@ private fun SongSearchBar(textFieldState: TextFieldState, onSearch: (String) -> 
           textFieldState.edit { replace(0, length, it) }
           onSearch(textFieldState.text.toString())
         },
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.weight(1f).height(56.dp),
         singleLine = true,
         textStyle = TextStyle(fontSize = fontSize),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -289,6 +327,80 @@ private fun SongSearchBar(textFieldState: TextFieldState, onSearch: (String) -> 
             )
           }
       )
+      SearchPlaybackActionButton(playbackAction, onPlaybackActionSelected)
+    }
+  }
+}
+
+@Composable
+private fun SearchPlaybackActionButton(
+  action: Int,
+  onActionSelected: (Int) -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  var expanded by remember { mutableStateOf(false) }
+  val title = stringResource(R.string.search_playback_action)
+  val theme = LocalTheme.current
+  val options = remember {
+    listOf(
+      Triple(SEARCH_PLAYBACK_PLAY, R.string.play, R.string.search_play_description),
+      Triple(SEARCH_PLAYBACK_PLAY_ALL, R.string.play_all, R.string.search_play_all_description),
+      Triple(
+        SEARCH_PLAYBACK_ADD_TO_QUEUE,
+        R.string.add_to_play_queue,
+        R.string.search_add_to_queue_description,
+      ),
+    )
+  }
+
+  Box(modifier) {
+    TooltipBox(
+      positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+      tooltip = { PlainTooltip { Text(title) } },
+      state = rememberTooltipState(),
+    ) {
+      IconButton(onClick = { expanded = true }) {
+        Icon(
+          painter = painterResource(R.drawable.ic_tune_24dp),
+          contentDescription = title,
+          tint = LocalContentColor.current,
+        )
+      }
+    }
+
+    DropdownMenu(
+      expanded = expanded,
+      onDismissRequest = { expanded = false },
+      modifier = Modifier.widthIn(min = 256.dp, max = 320.dp),
+      containerColor = theme.dialogBackground,
+    ) {
+      TextSecondary(title, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+
+      options.forEach { (option, labelRes, descriptionRes) ->
+        DropdownMenuItem(
+          modifier = Modifier.semantics { selected = action == option },
+          contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+          text = {
+            Column {
+              TextPrimary(stringResource(labelRes), maxLine = 2)
+              TextSecondary(
+                stringResource(descriptionRes),
+                modifier = Modifier.padding(top = 4.dp),
+                maxLine = 3,
+              )
+            }
+          },
+          trailingIcon = {
+            if (action == option) {
+              Icon(Icons.Filled.Check, contentDescription = null, tint = theme.primary)
+            }
+          },
+          onClick = {
+            onActionSelected(option)
+            expanded = false
+          },
+        )
+      }
     }
   }
 }

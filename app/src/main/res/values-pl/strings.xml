@@ -85,6 +85,12 @@
   <string name="play_random">Odtwarzaj losowo wszystkie (%d)</string>
   <string name="scan_tip">Utwory i klipy audio krótsze niż ten czas trwania zostaną pominięte podczas skanowania</string>
   <string name="search_hint">Szukaj utworu, wykonawcy, albumu</string>
+  <string name="search_playback_action">Po dotknięciu utworu</string>
+  <string name="play_all">Odtwarzaj wszystkie</string>
+  <string name="search_play_description">Zachowaj kolejkę, wstaw utwór jako następny i odtwórz go od razu</string>
+  <string name="search_play_all_description">Zastąp kolejkę wszystkimi wynikami wyszukiwania i odtwarzaj od wybranego utworu</string>
+  <string name="search_add_to_queue_description">Dodaj wybrany utwór na koniec kolejki bez rozpoczynania odtwarzania</string>
+  <string name="songs_already_in_queue">Utwory są już w kolejce odtwarzania</string>
   <string name="no_search_result">Brak wyników</string>
   <string name="create_playlist">Utwórz playlistę...</string>
   <string name="use_system_color">Użyj systemowego koloru tła</string>

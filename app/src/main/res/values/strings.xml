@@ -85,6 +85,12 @@
   <string name="play_random">Shuffle all(%d)</string>
   <string name="scan_tip">Songs and audio clips smaller than this duration will be excluded from scanning</string>
   <string name="search_hint">Search song  artist  album</string>
+  <string name="search_playback_action">When tapping a song</string>
+  <string name="play_all">Play all</string>
+  <string name="search_play_description">Keep the queue, insert this song next and play it now</string>
+  <string name="search_play_all_description">Replace the queue with all search results and play from this song</string>
+  <string name="search_add_to_queue_description">Add this song to the end of the queue without starting playback</string>
+  <string name="songs_already_in_queue">Songs are already in the play queue</string>
   <string name="no_search_result">No result</string>
   <string name="create_playlist">Create playlist...</string>
   <string name="use_system_color">Use system background color</string>

@@ -790,12 +790,16 @@ class MusicService : BaseService(),
   /**
    * 添加歌曲到播放队列并保存
    */
-  fun insertToQueue(songs: List<Song>) {
-    if (songs.isNotEmpty()) {
-      playback.addSongs(songs)
-      launch { playQueueStore.save(playback.getPlaylist()) }
-      pushPlaybackUiState()
-    }
+  fun insertToQueue(songs: List<Song>): Int {
+    val queuedIds = playback.getPlaylist().mapTo(HashSet()) { it.id }
+    val newSongs = songs.filter { queuedIds.add(it.id) }
+    if (newSongs.isEmpty()) return 0
+
+    playback.addSongs(newSongs)
+    launch { playQueueStore.save(playback.getPlaylist()) }
+    updateMediaSessionQueue()
+    pushPlaybackUiState()
+    return newSongs.size
   }
 
   /**

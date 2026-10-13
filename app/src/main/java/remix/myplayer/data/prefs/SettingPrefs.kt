@@ -147,6 +147,11 @@ class SettingPrefs @Inject constructor(
   val speedValue get() = speed.toFloat()
   var playModel by PrefsDelegate(sp, PrefKeys.Setting.PLAY_MODEL, MODE_LOOP)
   var listLoop by PrefsDelegate(sp, PrefKeys.Setting.LIST_LOOP, true)
+  var searchPlaybackAction by PrefsDelegate(
+    sp,
+    PrefKeys.Setting.SEARCH_PLAYBACK_ACTION,
+    SEARCH_PLAYBACK_PLAY
+  )
   var lastSong by PrefsDelegate(sp, PrefKeys.Setting.LAST_SONG, "")
   var lastProgress by PrefsDelegate(sp, PrefKeys.Setting.LAST_PLAY_PROGRESS, 0)
 
@@ -236,6 +241,11 @@ class SettingPrefs @Inject constructor(
     const val MODE_LOOP: Int = 1
     const val MODE_SHUFFLE: Int = 2
     const val MODE_REPEAT: Int = 3
+
+    // 搜索结果点击行为
+    const val SEARCH_PLAYBACK_PLAY = 0
+    const val SEARCH_PLAYBACK_PLAY_ALL = 1
+    const val SEARCH_PLAYBACK_ADD_TO_QUEUE = 2
 
     // 音频解码方式
     const val DECODER_MODE_DEFAULT: Int = 0

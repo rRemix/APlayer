@@ -27,6 +27,7 @@ data class PlaySettings(
   val autoPlay: Int,
   val speed: String,
   val listLoop: Boolean,
+  val searchPlaybackAction: Int,
   val replayGainEnabled: Boolean,
   val replayGainMode: Int,
   val replayGainPeakProtection: Boolean,

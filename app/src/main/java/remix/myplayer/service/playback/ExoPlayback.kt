@@ -238,6 +238,11 @@ class ExoPlayback(
 
   override fun addSongs(songs: List<Song>, index: Int) {
     checkMainThread()
+    if (songs.isEmpty()) return
+    // 向空队列或已播放结束的队列添加歌曲时，不应自动开始播放。
+    if (player.mediaItemCount == 0 || player.playbackState == Player.STATE_ENDED) {
+      player.pause()
+    }
     val sources = songs.map { buildSource(it) }
     if (index == -1) {
       player.addMediaSources(sources)
@@ -418,6 +423,7 @@ class ExoPlayback(
     if (!audioFocusManager.requestFocus()) {
       return
     }
+    ensurePrepared()
     player.play()
   }
 

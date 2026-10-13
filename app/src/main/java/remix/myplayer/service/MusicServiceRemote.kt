@@ -91,9 +91,7 @@ object MusicServiceRemote {
     service?.removeFromQueue(ids)
   }
 
-  fun insertToQueue(songs: List<Song>) {
-    service?.insertToQueue(songs)
-  }
+  fun insertToQueue(songs: List<Song>): Int? = service?.insertToQueue(songs)
 
   fun getAudioSessionId(): Int? {
     return service?.playback?.audioSessionId

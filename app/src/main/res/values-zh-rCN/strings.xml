@@ -84,6 +84,12 @@
   <string name="play_random">随机播放全部(%d)</string>
   <string name="scan_tip">大于此设置数值的音频文件就会出现在歌曲库里</string>
   <string name="search_hint">搜索歌曲 艺人 专辑</string>
+  <string name="search_playback_action">点击歌曲时</string>
+  <string name="play_all">播放全部</string>
+  <string name="search_play_description">保留队列，插入为下一首并立即播放</string>
+  <string name="search_play_all_description">将全部搜索结果设为队列，从所选歌曲开始播放</string>
+  <string name="search_add_to_queue_description">将所选歌曲追加到队尾，不立即播放</string>
+  <string name="songs_already_in_queue">歌曲已在播放队列中</string>
   <string name="no_search_result">无搜索结果</string>
   <string name="create_playlist">创建播放列表...</string>
   <string name="use_system_color">使用系统底色</string>

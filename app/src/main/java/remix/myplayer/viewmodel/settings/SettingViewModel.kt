@@ -92,6 +92,7 @@ class SettingViewModel @Inject constructor(
       autoPlay = settingPrefs.autoPlay,
       speed = settingPrefs.speed,
       listLoop = settingPrefs.listLoop,
+      searchPlaybackAction = settingPrefs.searchPlaybackAction,
       replayGainEnabled = settingPrefs.replayGainEnabled,
       replayGainMode = settingPrefs.replayGainMode,
       replayGainPeakProtection = settingPrefs.replayGainPeakProtection,
@@ -281,6 +282,11 @@ class SettingViewModel @Inject constructor(
   fun setListLoop(enabled: Boolean) {
     settingPrefs.listLoop = enabled
     _settingsState.update { it.copy(play = it.play.copy(listLoop = enabled)) }
+  }
+
+  fun setSearchPlaybackAction(action: Int) {
+    settingPrefs.searchPlaybackAction = action
+    _settingsState.update { it.copy(play = it.play.copy(searchPlaybackAction = action)) }
   }
 
   // -------- Color 分组 ----------

@@ -101,6 +101,9 @@ object PrefKeys {
     /** 列表是否循环 */
     const val LIST_LOOP = "list_loop"
 
+    /** 搜索结果点击后的播放行为 */
+    const val SEARCH_PLAYBACK_ACTION = "search_playback_action"
+
     /** 经典通知栏背景是否是系统背景色 */
     const val NOTIFY_SYSTEM_COLOR = "notify_system_color"
 
