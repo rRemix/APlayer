@@ -7,6 +7,7 @@ import android.graphics.PixelFormat
 import android.hardware.input.InputManager
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -68,22 +69,19 @@ class LyricManager @Inject constructor(
   val lyricSearcher: LyricSearcher
 ) : CoroutineScope by CoroutineScope(Dispatchers.IO + SupervisorJob()) {
 
-  private val UPDATE_INTERVAL = 50.milliseconds
   private val CHECK_FOREGROUND_INTERVAL = 500.milliseconds
+  private var foregroundCheckJob: Job? = null
   private val windowManager by lazy {
     context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
   }
 
   init {
-    launch(Dispatchers.Default) {
-      // 每 500ms 检查一次
-      var inForeground: Boolean
-      while (isActive) {
-        inForeground = Util.isAppOnForeground
-        withContext(Dispatchers.Main) {
-          isAppInForeground = inForeground
-        }
-        delay(CHECK_FOREGROUND_INTERVAL)
+    launch(Dispatchers.Main) {
+      updateForegroundCheck()
+    }
+    launch(Dispatchers.Main) {
+      MusicStateSource.progressState.collect {
+        updateProgress()
       }
     }
     launch(Dispatchers.Main) {
@@ -135,10 +133,14 @@ class LyricManager @Inject constructor(
         ensureDesktopLyric()
       }
     }
-  var isScreenOn: Boolean = true
+  @Volatile
+  var isScreenOn: Boolean =
+    (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
     @UiThread set(value) {
       if (field != value) {
         field = value
+        updateForegroundCheck()
+        if (value) updateProgress()
         ensureDesktopLyric()
       }
     }
@@ -190,6 +192,25 @@ class LyricManager @Inject constructor(
     set(value) {
       lyricPrefs.translationEnabled = value
     }
+
+  @UiThread
+  private fun updateForegroundCheck() {
+    if (!isScreenOn) {
+      foregroundCheckJob?.cancel()
+      foregroundCheckJob = null
+      return
+    }
+    if (foregroundCheckJob?.isActive == true) return
+    foregroundCheckJob = launch(Dispatchers.Default) {
+      while (isActive) {
+        val inForeground = Util.isAppOnForeground
+        withContext(Dispatchers.Main) {
+          isAppInForeground = inForeground
+        }
+        delay(CHECK_FOREGROUND_INTERVAL)
+      }
+    }
+  }
 
   @UiThread
   private fun ensureDesktopLyric() {
@@ -389,18 +410,8 @@ class LyricManager @Inject constructor(
       }
       field = value
       _desktopUiState.value = _desktopUiState.value.copy(playing = value)
-      if (value) {
-        launch(Dispatchers.IO) {
-          updateProgress()
-        }
-      }
       updateStatusBarLyric()
       ensureDesktopLyric()
-    }
-  private var progress: Long = 0
-    set(value) {
-      field = value
-      _currentNextLyricsLine.value = getCurrentNextLine(lyrics ?: return, offset, value, duration)
     }
   var offset: Long = 0
     @UiThread set(value) {
@@ -410,8 +421,6 @@ class LyricManager @Inject constructor(
         lyricSearcher.saveOffset(MusicStateSource.currentPlaybackUiState.song, value)
       }
     }
-  private var duration: Long = 0
-
   // For status bar lyrics
   private var currentLyricsLine: String = ""
     set(value) {
@@ -438,26 +447,18 @@ class LyricManager @Inject constructor(
 
   private val updateMutex = Mutex()
   private var updateLyricsJob: Job? = null
-  private var updateProgressJob: Job? = null
 
-  fun updateProgress() {
+  private fun updateProgress() {
+    if (!isScreenOn) return
     if (!updateMutex.tryLock()) {
       // 还没拿到歌词或者当前有别的线程在更新
       return
     }
     try {
-//      Timber.tag(TAG).d("update progress")
-      updateProgressJob?.cancel()
+      val currentLyrics = lyrics ?: return
       val state = MusicStateSource.currentProgressState
-      duration = state.duration
-      progress = state.position
-      if (isPlaying) {
-        updateProgressJob = launch(Dispatchers.IO) {
-          // TODO: should we consider thread create cost?
-          delay(UPDATE_INTERVAL)
-          updateProgress()
-        }
-      }
+      _currentNextLyricsLine.value =
+        getCurrentNextLine(currentLyrics, offset, state.position, state.duration)
     } finally {
       updateMutex.unlock()
     }
@@ -467,7 +468,6 @@ class LyricManager @Inject constructor(
     if (!song.valid()) {
       return null
     }
-    updateProgressJob?.cancel()
     updateLyricsJob?.cancel()
     updateLyricsJob = launch(Dispatchers.IO) {
       updateMutex.withLock {

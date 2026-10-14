@@ -26,13 +26,6 @@ import androidx.media3.exoplayer.audio.DefaultAudioSink
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.ShuffleOrder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs.Companion.DECODER_MODE_FFMPEG
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
@@ -91,9 +84,6 @@ class ExoPlayback(
 
   private var callback: PlayerCallback? = null
 
-  private val scope = CoroutineScope(Dispatchers.Main)
-  private var progressTickerJob: Job? = null
-
   private val localDataSourceFactory = DefaultDataSource.Factory(context)
   private val extractorsFactory = ApeExtractorsFactory()
   private val player: ExoPlayer = run {
@@ -111,7 +101,6 @@ class ExoPlayback(
       addListener(object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
           callback?.onIsPlayingChanged(isPlaying)
-          if (isPlaying) startProgressTicker() else stopProgressTicker()
         }
 
         override fun onAudioSessionIdChanged(audioSessionId: Int) {
@@ -139,7 +128,6 @@ class ExoPlayback(
 
             Player.STATE_IDLE -> {
               isPrepared = false
-              stopProgressTicker()
             }
           }
         }
@@ -164,21 +152,6 @@ class ExoPlayback(
         }
       })
     }
-  }
-
-  private fun startProgressTicker() {
-    if (progressTickerJob != null) return
-    progressTickerJob = scope.launch {
-      while (isActive) {
-        callback?.onPositionChange()
-        delay(100)
-      }
-    }
-  }
-
-  private fun stopProgressTicker() {
-    progressTickerJob?.cancel()
-    progressTickerJob = null
   }
 
   // 构建MediaSource
@@ -432,11 +405,9 @@ class ExoPlayback(
   }
 
   override fun release() {
-    stopProgressTicker()
     player.release()
     isPrepared = false
     callback = null
-    scope.cancel()
   }
 
   override val duration: Long

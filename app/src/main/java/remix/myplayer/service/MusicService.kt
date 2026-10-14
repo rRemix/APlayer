@@ -13,6 +13,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.os.PowerManager
 import android.provider.MediaStore
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.media3.common.C
@@ -26,6 +27,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
@@ -215,12 +217,15 @@ class MusicService : BaseService(),
   private val screenReceiver: ScreenReceiver by lazy {
     ScreenReceiver()
   }
+  private var progressTickerJob: Job? = null
   private var screenOn = true
     set(value) {
       if (field == value) {
         return
       }
       field = value
+      if (value && ::playback.isInitialized) pushProgressUiState()
+      updateProgressTicker()
       lyricManager.isScreenOn = value
     }
 
@@ -425,6 +430,8 @@ class MusicService : BaseService(),
     } else {
       registerReceiver(screenReceiver, screenFilter)
     }
+    screenOn = (getSystemService(POWER_SERVICE) as PowerManager).isInteractive
+    lyricManager.isScreenOn = screenOn
 
     // 监听数据库变化
     contentResolver.registerContentObserver(
@@ -546,6 +553,8 @@ class MusicService : BaseService(),
   private fun setUpPlayback() {
     playback = ExoPlayback(this, settingPrefs.decoderMode, audioFocusManager, replayGainController)
     playback.attach(this)
+    pushProgressUiState()
+    updateProgressTicker()
 
     Timber.v("setUpPlayback, audioSessionId: ${playback.audioSessionId}")
     EQHelper.updateAudioSession(this, playback.audioSessionId)
@@ -554,6 +563,8 @@ class MusicService : BaseService(),
   override fun onIsPlayingChanged(isPlaying: Boolean) {
     Timber.v("onIsPlayingChanged: $isPlaying")
     stateSource.updatePlaybackUiState(isPlaying = isPlaying)
+    pushProgressUiState()
+    updateProgressTicker()
     if (isPlaying) {
       updatePlayHistory()
     }
@@ -858,6 +869,24 @@ class MusicService : BaseService(),
       playbackFavoriteState.refresh(this, currentSong, stateSource)
     }
     onPositionChange()
+  }
+
+  /**
+   * 亮屏且正在播放时定时推送界面进度
+   */
+  private fun updateProgressTicker() {
+    if (!isActive || !screenOn || !::playback.isInitialized || !isPlaying) {
+      progressTickerJob?.cancel()
+      progressTickerJob = null
+      return
+    }
+    if (progressTickerJob?.isActive == true) return
+    progressTickerJob = launch {
+      while (isActive) {
+        pushProgressUiState()
+        delay(100)
+      }
+    }
   }
 
   /**
@@ -1249,9 +1278,6 @@ class MusicService : BaseService(),
   private fun seekTo(current: Long) {
     if (playback.isPrepared) {
       playback.seek(current)
-      launch(Dispatchers.IO) {
-        lyricManager.updateProgress()
-      }
       updatePlaybackState()
     }
   }
