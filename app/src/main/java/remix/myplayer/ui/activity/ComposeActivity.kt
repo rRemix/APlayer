@@ -2,6 +2,7 @@ package remix.myplayer.ui.activity
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -13,8 +14,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
@@ -24,6 +26,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import remix.myplayer.BuildConfig
+import remix.myplayer.R
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.nav.AppNav
 import remix.myplayer.ui.nav.LocalNavController
@@ -33,6 +36,7 @@ import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.LocalThemeController
 import remix.myplayer.ui.theme.ProvideAppFontScale
 import remix.myplayer.ui.theme.ThemeController
+import remix.myplayer.ui.theme.updateSplashScreenTheme
 import remix.myplayer.util.ThemeUtil
 import remix.myplayer.viewmodel.LibraryViewModel
 import remix.myplayer.viewmodel.MainViewModel
@@ -54,28 +58,36 @@ class ComposeActivity : BaseMusicActivity() {
   lateinit var themeController: ThemeController
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    installSplashScreen()
     super.onCreate(savedInstanceState)
+
+    updateSplashScreenTheme(themeController.dark)
 
     addMusicServiceEventListener(libraryViewModel)
     addMusicServiceEventListener(playbackViewModel)
 
     enableEdgeToEdge(
       navigationBarStyle = SystemBarStyle.auto(
-        android.graphics.Color.WHITE,
-        android.graphics.Color.WHITE
-      )
+        ContextCompat.getColor(this, R.color.light_background_color_main),
+        ContextCompat.getColor(this, R.color.dark_background_color_main)
+      ) { !themeController.appTheme.isLight }
     )
     setContent {
       AppCompositionLocalProvider(themeController) {
         val theme = LocalTheme.current
+        val background = theme.mainBackground
         val color = if (theme.coloredNaviBar) {
           theme.primary
         } else {
-          Color.White
+          background
         }
         SideEffect {
+          window.setBackgroundDrawable(ColorDrawable(background.toArgb()))
           window.navigationBarColor = color.toArgb()
-          ThemeUtil.setLightNavigationBarAuto(this, theme.isPrimaryLight)
+          ThemeUtil.setLightNavigationBarAuto(
+            this,
+            if (theme.coloredNaviBar) theme.isPrimaryLight else theme.isLight
+          )
         }
 
         APlayerTheme {

@@ -43,6 +43,7 @@ rules = "1.7.0"
 smbj = "0.13.0"
 play-feature-delivery = "2.1.0"
 annotation = "1.7.0"
+coreSplashscreen = "1.2.0"
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }
@@ -67,6 +68,7 @@ hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", ve
 
 # androidx
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation"}
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }

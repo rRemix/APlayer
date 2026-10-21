@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Keep the complete launcher icon inside the splash screen's 192dp safe circle. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+  android:drawable="@mipmap/ic_launcher"
+  android:insetLeft="48dp"
+  android:insetTop="48dp"
+  android:insetRight="48dp"
+  android:insetBottom="48dp" />

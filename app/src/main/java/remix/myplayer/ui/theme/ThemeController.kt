@@ -44,13 +44,12 @@ class ThemeControllerImpl @Inject constructor(private val storage: ThemePrefs) :
   override val appTheme: AppTheme
     get() = _currentTheme.value
 
-  override var dark: String = FOLLOW_SYSTEM
+  override var dark: String
     get() = storage.darkTheme
     set(value) {
-      if (field == value) {
+      if (storage.darkTheme == value) {
         return
       }
-      field = value
       storage.darkTheme = value
       _currentTheme.value = _currentTheme.value.copy(
         theme = storage.resolveTheme(value, storage.blackTheme)

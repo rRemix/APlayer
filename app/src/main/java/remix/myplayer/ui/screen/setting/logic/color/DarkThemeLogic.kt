@@ -1,7 +1,9 @@
 package remix.myplayer.ui.screen.setting.logic.color
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
@@ -10,6 +12,7 @@ import remix.myplayer.ui.dialog.ItemsCallbackSingleChoice
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.screen.setting.NormalPreference
+import remix.myplayer.ui.theme.updateSplashScreenTheme
 import remix.myplayer.viewmodel.settingViewModel
 
 private val itemRes = listOf(
@@ -20,6 +23,7 @@ private val itemRes = listOf(
 
 @Composable
 fun DarkThemeLogic() {
+  val activity = LocalContext.current as? Activity
   val settingVM = settingViewModel
   val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
 
@@ -46,13 +50,13 @@ fun DarkThemeLogic() {
         return@ItemsCallbackSingleChoice
       }
 
-      settingVM.setDarkTheme(
-        when (it) {
-          0 -> ThemePrefs.ALWAYS_OFF
-          1 -> ThemePrefs.ALWAYS_ON
-          else -> ThemePrefs.FOLLOW_SYSTEM
-        }
-      )
+      val darkTheme = when (it) {
+        0 -> ThemePrefs.ALWAYS_OFF
+        1 -> ThemePrefs.ALWAYS_ON
+        else -> ThemePrefs.FOLLOW_SYSTEM
+      }
+      settingVM.setDarkTheme(darkTheme)
+      activity?.updateSplashScreenTheme(darkTheme)
     }
   )
 }

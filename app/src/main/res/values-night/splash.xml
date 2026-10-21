@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="splash_background">@color/dark_background_color_main</color>
+  <bool name="splash_light_system_bars">false</bool>
+</resources>

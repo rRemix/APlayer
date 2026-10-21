@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="AppTheme.Starting" parent="AppTheme.Starting.Base">
+    <item name="android:windowSplashScreenBehavior">icon_preferred</item>
+  </style>
+</resources>

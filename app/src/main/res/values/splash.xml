@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="splash_background">@color/light_background_color_main</color>
+  <bool name="splash_light_system_bars">true</bool>
+
+  <style name="AppTheme.Starting" parent="AppTheme.Starting.Base" />
+
+  <style name="AppTheme.Starting.Base" parent="Theme.SplashScreen">
+    <item name="windowSplashScreenBackground">@color/splash_background</item>
+    <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+    <item name="postSplashScreenTheme">@style/AppTheme</item>
+    <item name="android:statusBarColor">@color/splash_background</item>
+    <item name="android:navigationBarColor">@color/splash_background</item>
+    <item name="android:windowLightStatusBar">@bool/splash_light_system_bars</item>
+    <item name="android:windowLightNavigationBar">@bool/splash_light_system_bars</item>
+  </style>
+
+  <!-- These names are persisted by SplashScreen.setSplashScreenTheme(). -->
+  <style name="AppTheme.Starting.Light" parent="AppTheme.Starting">
+    <item name="windowSplashScreenBackground">@color/light_background_color_main</item>
+    <item name="android:statusBarColor">@color/light_background_color_main</item>
+    <item name="android:navigationBarColor">@color/light_background_color_main</item>
+    <item name="android:windowLightStatusBar">true</item>
+    <item name="android:windowLightNavigationBar">true</item>
+  </style>
+
+  <style name="AppTheme.Starting.Dark" parent="AppTheme.Starting">
+    <item name="windowSplashScreenBackground">@color/dark_background_color_main</item>
+    <item name="android:statusBarColor">@color/dark_background_color_main</item>
+    <item name="android:navigationBarColor">@color/dark_background_color_main</item>
+    <item name="android:windowLightStatusBar">false</item>
+    <item name="android:windowLightNavigationBar">false</item>
+  </style>
+</resources>

@@ -6,7 +6,7 @@
     <item name="android:windowActionBarOverlay">true</item>
     <item name="windowActionBarOverlay">true</item>
 
-    <item name="android:windowBackground">@color/light_background_color_main</item>
+    <item name="android:windowBackground">@color/splash_background</item>
     <item name="colorPrimary">?android:attr/windowBackground</item>
 
     <item name="text_color_primary">@color/light_text_color_primary</item>

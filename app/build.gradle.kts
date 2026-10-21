@@ -227,6 +227,7 @@ dependencies {
 //    implementation(libs.kotlinx.serialization)
 
     implementation(libs.appcompat)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.media)
     implementation(libs.androidx.media3.exoplayer)
     implementation(files("libs/lib-decoder-ffmpeg-release.aar"))
