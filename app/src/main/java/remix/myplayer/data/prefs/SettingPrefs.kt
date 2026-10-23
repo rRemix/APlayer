@@ -32,6 +32,8 @@ class SettingPrefs @Inject constructor(
 
   var firstLoad by PrefsDelegate(sp, PrefKeys.Setting.FIRST_LOAD, true)
 
+  var playEventEnabled by PrefsDelegate(sp, PrefKeys.Setting.PLAY_EVENT_ENABLED, true)
+
   var libraryJson by PrefsDelegate(sp, PrefKeys.Setting.LIBRARY, "")
 
   var scanSize by PrefsDelegate(sp, PrefKeys.Setting.SCAN_SIZE, MB)

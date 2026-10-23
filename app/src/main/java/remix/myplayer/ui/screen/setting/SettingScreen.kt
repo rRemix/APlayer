@@ -19,6 +19,7 @@ import remix.myplayer.R
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteAbout
+import remix.myplayer.ui.nav.RouteAnnualReport
 import remix.myplayer.ui.nav.RouteEq
 import remix.myplayer.ui.nav.RouteSettingDetail
 import remix.myplayer.ui.screen.setting.logic.color.BlackThemeLogic
@@ -49,6 +50,7 @@ import remix.myplayer.ui.screen.setting.logic.lyric.TranslationLogic
 import remix.myplayer.ui.screen.setting.logic.notification.ClassicNotifyLogic
 import remix.myplayer.ui.screen.setting.logic.notification.NotifyBackgroundLogic
 import remix.myplayer.ui.screen.setting.logic.other.ClearCacheLogic
+import remix.myplayer.ui.screen.setting.logic.other.PlayEventSettingLogic
 import remix.myplayer.ui.screen.setting.logic.play.AutoPlayLogic
 import remix.myplayer.ui.screen.setting.logic.play.DecoderModeLogic
 import remix.myplayer.ui.screen.setting.logic.play.IgnoreAudioFocusLogic
@@ -305,6 +307,12 @@ private fun OtherPreferenceItems() {
     Preference(onClick = {
       mainViewModel.checkInAppUpdate(true)
     }, title = stringResource(R.string.check_update))
+  }
+
+  PlayEventSettingLogic()
+
+  ArrowPreference(R.string.annual_report) {
+    nav.navigate(RouteAnnualReport)
   }
 
   ClearCacheLogic()
