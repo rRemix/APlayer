@@ -110,6 +110,8 @@ object PrefKeys {
     /** 断点播放 */
     const val PLAY_AT_BREAKPOINT = "play_at_breakpoint"
 
+    const val SOURCE_OPEN_ACTION = "source_open_action"
+
     /** 是否忽略媒体缓存 */
     const val IGNORE_MEDIA_STORE = "ignore_media_store"
 

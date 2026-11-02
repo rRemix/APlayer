@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.core.content.ContextCompat
+import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
 import java.util.WeakHashMap
 
@@ -83,8 +84,19 @@ object MusicServiceRemote {
     service?.setPlayQueue(newQueue)
   }
 
-  fun setPlayQueue(newQueues: List<Song>?, intent: Intent) {
-    service?.setPlayQueue(newQueues, intent)
+  fun setPlayQueue(newQueues: List<Song>?, intent: Intent, source: APlayerModel? = null) {
+    service?.setPlayQueue(newQueues, intent, source)
+  }
+
+  suspend fun hasResumableRecord(model: APlayerModel): Boolean =
+    service?.hasResumableRecord(model) == true
+
+  fun resumeFrom(model: APlayerModel) {
+    service?.resumeFrom(model)
+  }
+
+  fun isPlayingFrom(model: APlayerModel): Boolean {
+    return service?.isPlayingFrom(model) == true
   }
 
   fun removeFromQueue(ids: List<Long>) {

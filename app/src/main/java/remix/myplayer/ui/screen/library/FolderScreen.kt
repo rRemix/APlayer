@@ -72,7 +72,7 @@ fun FolderScreen() {
             return@FolderItem
           }
 
-          nav.navigate(DetailScreenRoute(folder = folder))
+          nav.navigate(DetailScreenRoute(folder = folder, openFromLibrary = true))
         },
         onLongClick = {
           mainVM.showMultiSelect(context, MultiSelectState.Where.Folder, folder)

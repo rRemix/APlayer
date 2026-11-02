@@ -367,6 +367,14 @@
   <string name="cant_share_song">Nie udało się udostępnić tego pliku (problem jest nam znany)</string>
   <string name="save_wechat_qrcode_success">Zapisano kod QR WeChat. Otwórz aplikację WeChat, aby zeskanować kod</string>
   <string name="play_breakpoint">Zapamiętaj pozycję odtwarzania</string>
+  <string name="source_open_action">Po otwarciu folderu lub playlisty</string>
+  <string name="source_open_only">Tylko otwórz</string>
+  <string name="source_open_ask">Zapytaj o wznowienie odtwarzania</string>
+  <string name="source_open_resume">Automatycznie wznów odtwarzanie</string>
+  <string name="resume_playback_title">Wznowić poprzednie odtwarzanie?</string>
+  <string name="resume_playback_message">Wznowić ostatni utwór od zapisanej pozycji?</string>
+  <string name="resume_playback_browse">Tylko przeglądaj</string>
+  <string name="resume_playback_confirm">Wznów odtwarzanie</string>
   <string name="play_breakpoint_tip">Po ponownym otwarciu aplikacji APlayer odtwarzanie rozpocznie się od miejsca, w którym zostało przerwane</string>
   <string name="list_loop">Zapętl playlistę</string>
   <string name="list_loop_tip">Rozpocznij odtwarzanie od pierwszego utworu po dotarciu do końca playlisty</string>

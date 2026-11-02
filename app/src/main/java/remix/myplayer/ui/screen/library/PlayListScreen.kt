@@ -89,7 +89,7 @@ fun PlayListScreen() {
                 return@ListItem
               }
 
-              nav.navigate(DetailScreenRoute(playList = pl))
+              nav.navigate(DetailScreenRoute(playList = pl, openFromLibrary = true))
             },
             onLongClick = {
               mainVM.showMultiSelect(context, MultiSelectState.Where.PlayList, pl)
@@ -118,7 +118,7 @@ fun PlayListScreen() {
                   return@GridItem
                 }
 
-                nav.navigate(DetailScreenRoute(playList = pl))
+                nav.navigate(DetailScreenRoute(playList = pl, openFromLibrary = true))
               },
               onLongClick = {
                 mainVM.showMultiSelect(context, MultiSelectState.Where.PlayList, pl)

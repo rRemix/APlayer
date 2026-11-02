@@ -31,6 +31,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
+import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.audio.Song.Companion.EMPTY_SONG
 import remix.myplayer.data.prefs.PrefKeys
@@ -62,7 +63,7 @@ import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.service.playback.Playback
 import remix.myplayer.service.playback.ReplayGainController
 import remix.myplayer.service.playback.PlaybackFavoriteState
-import remix.myplayer.service.playback.PlaybackProgressSaver
+import remix.myplayer.service.playback.ProgressManager
 import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
@@ -111,7 +112,7 @@ class MusicService : BaseService(),
   lateinit var settingPrefs: SettingPrefs
 
   @Inject
-  lateinit var playbackProgressSaver: PlaybackProgressSaver
+  lateinit var progressManager: ProgressManager
 
   @Inject
   lateinit var playbackFavoriteState: PlaybackFavoriteState
@@ -360,12 +361,9 @@ class MusicService : BaseService(),
           )
         }
       }
-      // 断点播放
-      PrefKeys.Setting.PLAY_AT_BREAKPOINT -> {
-        if (!settingPrefs.playAtBreakPoint) {
-          playbackProgressSaver.stop()
-        } else {
-          playbackProgressSaver.start(this) { playback.position }
+      PrefKeys.Setting.SOURCE_OPEN_ACTION -> {
+        if (settingPrefs.sourceOpenAction == SettingPrefs.SOURCE_OPEN_ONLY) {
+          progressManager.cancelResume()
         }
       }
       // 倍速播放
@@ -505,31 +503,37 @@ class MusicService : BaseService(),
 
       override fun onSkipToNext() {
         Timber.v("onSkipToNext")
+        progressManager.cancelResume()
         skipToNext()
       }
 
       override fun onSkipToPrevious() {
         Timber.v("onSkipToPrevious")
+        progressManager.cancelResume()
         skipToPrevious()
       }
 
       override fun onPlay() {
         Timber.v("onPlay")
+        progressManager.cancelResume()
         start(true)
       }
 
       override fun onPause() {
         Timber.v("onPause")
+        progressManager.cancelResume()
         pause()
       }
 
       override fun onStop() {
+        progressManager.cancelResume()
         pause()
         notify.stopForegroundAndNotification()
         stopSelf()
       }
 
       override fun onSeekTo(pos: Long) {
+        progressManager.cancelResume()
         seekTo(pos)
       }
 
@@ -562,6 +566,8 @@ class MusicService : BaseService(),
 
   override fun onIsPlayingChanged(isPlaying: Boolean) {
     Timber.v("onIsPlayingChanged: $isPlaying")
+    if (isPlaying) progressManager.activateSource()
+    progressManager.saveSource(playback)
     stateSource.updatePlaybackUiState(isPlaying = isPlaying)
     pushProgressUiState()
     updateProgressTicker()
@@ -597,6 +603,7 @@ class MusicService : BaseService(),
 
   override fun onEnded() {
     Timber.v("onEnded")
+    progressManager.saveSource(playback)
     if (playback.itemCount == 0) {
       notify.stopForegroundAndNotification()
     }
@@ -607,6 +614,7 @@ class MusicService : BaseService(),
 
     Timber.v("onItemTransition, playback.audioSessionId: ${playback.audioSessionId}")
     val song = mediaItem?.localConfiguration?.tag as? Song
+    progressManager.saveSource(playback)
     if (song is Song.Remote) {
       launch {
         withContext(Dispatchers.IO) {
@@ -653,7 +661,7 @@ class MusicService : BaseService(),
         playback.release()
         setUpPlayback()
         launch {
-          restorePlayList()
+          restorePlayQueue()
         }
       }
     }
@@ -661,6 +669,7 @@ class MusicService : BaseService(),
 
   override fun onPositionChange() {
     pushProgressUiState()
+    progressManager.saveSource(playback)
   }
 
   /**
@@ -683,7 +692,8 @@ class MusicService : BaseService(),
       return
     }
 
-    playbackProgressSaver.stop()
+    progressManager.saveSource(playback)
+    progressManager.stop()
     playbackFavoriteState.cancelLookup()
     appWidgetUpdater.stop()
     cancel()
@@ -726,6 +736,31 @@ class MusicService : BaseService(),
     mediaSessionUpdater.updateMediaSessionQueue(this, mediaSession, playback.getPlaylist(), playback.currentSong?.title)
   }
 
+  fun isPlayingFrom(model: APlayerModel): Boolean {
+    return progressManager.isPlayingFrom(model)
+  }
+
+  suspend fun hasResumableRecord(model: APlayerModel): Boolean =
+    progressManager.hasResumableRecord(model)
+
+  fun resumeFrom(model: APlayerModel) {
+    progressManager.resumeFrom(
+      this,
+      model,
+      playback,
+      onContinue = { start(false) },
+      onRestore = { songs, index, positionMs ->
+        progressManager.switchSource(this, playback, model)
+        playback.setPlaylist(songs, index, positionMs)
+        playback.setMode(playModel, settingPrefs.listLoop)
+        launch { playQueueStore.save(songs) }
+        updateMediaSessionQueue()
+        lastCommand = Command.PLAY_AT
+        start(false)
+      }
+    )
+  }
+
   /**
    * 设置播放队列
    */
@@ -734,6 +769,7 @@ class MusicService : BaseService(),
     if (newQueue.isNullOrEmpty()) {
       return
     }
+    progressManager.switchSource(this, playback)
     if (newQueue == playback.getPlaylist()) {
       return
     }
@@ -746,13 +782,16 @@ class MusicService : BaseService(),
   /**
    * 设置播放队列
    */
-  fun setPlayQueue(newQueue: List<Song>?, intent: Intent) {
+  fun setPlayQueue(newQueue: List<Song>?, intent: Intent, source: APlayerModel? = null) {
     Timber.v("setPlayQueue")
     // 如果是随机播放，需要更新播放模式
     val shuffle = intent.getBooleanExtra(EXTRA_SHUFFLE, false)
     if (newQueue.isNullOrEmpty()) {
       return
     }
+    // 提前完成节流判断，避免命令被忽略后来源/队列已被改动。
+    if (!acceptCommand(intent.getIntExtra(EXTRA_COMMAND, -1))) return
+    progressManager.switchSource(this, playback, source)
 
     //设置的播放队列相等
     val equals = newQueue == playback.getPlaylist()
@@ -763,7 +802,7 @@ class MusicService : BaseService(),
     if (shuffle) {
       playModel = MODE_SHUFFLE
     }
-    handleCommand(intent)
+    handleCommand(intent, throttleChecked = true)
 
     if (equals) {
       return
@@ -775,6 +814,8 @@ class MusicService : BaseService(),
    * 从播放队列移除歌曲并保存
    */
   fun removeFromQueue(ids: List<Long>) {
+    progressManager.cancelResume()
+    progressManager.saveSource(playback)
     if (ids.isNotEmpty()) {
       val idSet = ids.toSet()
       val playlist = playback.getPlaylist()
@@ -802,6 +843,7 @@ class MusicService : BaseService(),
    * 添加歌曲到播放队列并保存
    */
   fun insertToQueue(songs: List<Song>): Int {
+    progressManager.cancelResume()
     val queuedIds = playback.getPlaylist().mapTo(HashSet()) { it.id }
     val newSongs = songs.filter { queuedIds.add(it.id) }
     if (newSongs.isEmpty()) return 0
@@ -818,6 +860,7 @@ class MusicService : BaseService(),
    */
   private fun skipToNext() {
     playback.skipToNext()
+    progressManager.activateAndSave(playback)
     start(true)
   }
 
@@ -826,6 +869,7 @@ class MusicService : BaseService(),
    */
   private fun skipToPrevious() {
     playback.skipToPrevious()
+    progressManager.activateAndSave(playback)
     start(true)
   }
 
@@ -945,6 +989,7 @@ class MusicService : BaseService(),
     }
 
     playback.skipTo(position)
+    progressManager.activateAndSave(playback)
     start(true)
   }
 
@@ -1032,7 +1077,7 @@ class MusicService : BaseService(),
           setPlayQueue(songs, Intent(ACTION_CMD).apply {
             putExtra(EXTRA_COMMAND, Command.PLAY_AT)
             putExtra(EXTRA_POSITION, 0)
-          })
+          }, source = playlist)
         }
 
       }
@@ -1096,10 +1141,7 @@ class MusicService : BaseService(),
       settingPrefs.lockScreen,
       lyricManager.isDesktopLyricLocked
     )
-    // 是否需要保存进度
-    if (settingPrefs.playAtBreakPoint) {
-      playbackProgressSaver.start(this) { playback.position }
-    }
+    progressManager.start(this) { playback }
     // 保存当前播放歌曲
     settingPrefs.lastSong = if (song.isLocal()) song.id.toString() else song.data
   }
@@ -1128,21 +1170,14 @@ class MusicService : BaseService(),
     }
   }
 
-  private fun handleCommand(intent: Intent?) = launch {
+  private fun handleCommand(intent: Intent?, throttleChecked: Boolean = false) = launch {
     if (intent == null || intent.extras == null) {
       return@launch
     }
     val command = intent.getIntExtra(EXTRA_COMMAND, -1)
     Timber.v("handleCommand, command: $command")
 
-    if (shouldThrottleCommand(command)) {
-      val now = System.currentTimeMillis()
-      if (now - lastCommandTime < INTERVAL_CONTROL) {
-        Timber.w("ignore command")
-        return@launch
-      }
-      lastCommandTime = now
-    }
+    if (!throttleChecked && !acceptCommand(command)) return@launch
 
     val requiresQueue = command == Command.PLAY_AT
         || command == Command.SKIP_TO_PREVIOUS
@@ -1154,6 +1189,12 @@ class MusicService : BaseService(),
     if (requiresQueue && playback.itemCount == 0) {
       load()
       if (playback.itemCount == 0) return@launch
+    }
+
+    when (command) {
+      Command.PLAY_AT, Command.SKIP_TO_PREVIOUS, Command.SKIP_TO_NEXT,
+      Command.PLAY_PAUSE, Command.PAUSE, Command.PLAY, Command.PLAY_TEMP,
+      Command.SEEK_TO, Command.ADD_TO_NEXT_SONG, Command.CLOSE_NOTIFY -> progressManager.cancelResume()
     }
 
     lastCommand = command
@@ -1210,6 +1251,8 @@ class MusicService : BaseService(),
           lastCommand = Command.PLAY_TEMP
           val song = it as Song.Local
 
+          progressManager.switchSource(this, playback)
+
           if (playback.currentSong?.id == song.id) {
             // 如果是当前歌曲，从头播放
             seekTo(0)
@@ -1259,6 +1302,17 @@ class MusicService : BaseService(),
     }
   }
 
+  private fun acceptCommand(command: Int): Boolean {
+    if (!shouldThrottleCommand(command)) return true
+    val now = System.currentTimeMillis()
+    if (now - lastCommandTime < INTERVAL_CONTROL) {
+      Timber.w("ignore command")
+      return false
+    }
+    lastCommandTime = now
+    return true
+  }
+
   private fun shouldThrottleCommand(command: Int): Boolean {
     return command == Command.PLAY_AT
         || command == Command.SKIP_TO_PREVIOUS
@@ -1277,7 +1331,9 @@ class MusicService : BaseService(),
    */
   private fun seekTo(current: Long) {
     if (playback.isPrepared) {
+      progressManager.activateSource()
       playback.seek(current)
+      progressManager.saveSource(playback)
       updatePlaybackState()
     }
   }
@@ -1303,22 +1359,33 @@ class MusicService : BaseService(),
       ShakeDetector.getInstance().beginListen()
     }
 
-    restorePlayList()
+    restorePlayQueue()
 
     load = LOAD_SUCCESS
   }
 
-  private suspend fun restorePlayList() {
+  private suspend fun restorePlayQueue() {
     // 读取播放列表
-    val (queue, pos) = withContext(Dispatchers.IO) {
+    val (queue, pos, hasSavedQueue) = withContext(Dispatchers.IO) {
       playQueueStore.restore()
     }
+
+    // 用户已经建立队列时，不再覆盖它。
+    if (playback.itemCount != 0) return
+
+    if (!progressManager.restoreSource(this, hasSavedQueue) {
+        playback.itemCount == 0
+      }) return
 
     if (queue.isNotEmpty()) {
       playback.setPlaylist(
         queue,
         pos,
-        if (firstPrepared && settingPrefs.lastProgress > 0) settingPrefs.lastProgress.toLong() else 0L
+        if (firstPrepared && settingPrefs.playAtBreakPoint && settingPrefs.lastProgress > 0) {
+          settingPrefs.lastProgress.toLong()
+        } else {
+          0L
+        }
       )
       playback.setMode(playModel, settingPrefs.listLoop)
     }

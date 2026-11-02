@@ -42,6 +42,7 @@ import remix.myplayer.ui.screen.setting.logic.cover.AutoDownloadLogic
 import remix.myplayer.ui.screen.setting.logic.cover.DownloadSourceLogic
 import remix.myplayer.ui.screen.setting.logic.cover.IgnoreMediaStoreLogic
 import remix.myplayer.ui.screen.setting.logic.library.LibraryLogic
+import remix.myplayer.ui.screen.setting.logic.play.SourceOpenActionLogic
 import remix.myplayer.ui.screen.setting.logic.lyric.DesktopLyricLogic
 import remix.myplayer.ui.screen.setting.logic.lyric.LyricPriorityLogic
 import remix.myplayer.ui.screen.setting.logic.lyric.StatusBarLyricLogic
@@ -216,6 +217,8 @@ private fun PlayPreferenceItems() {
   IgnoreAudioFocusLogic()
 
   BreakPointLogic()
+
+  SourceOpenActionLogic()
 
   PlayFadeLogic()
 

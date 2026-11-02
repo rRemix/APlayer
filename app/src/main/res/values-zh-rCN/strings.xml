@@ -364,6 +364,14 @@
   <string name="cant_share_song">无法分享歌曲</string>
   <string name="save_wechat_qrcode_success">已保存微信二维码，请打开微信识别该二维码</string>
   <string name="play_breakpoint">断点播放</string>
+  <string name="source_open_action">打开文件夹或播放列表时</string>
+  <string name="source_open_only">仅打开</string>
+  <string name="source_open_ask">询问是否继续播放</string>
+  <string name="source_open_resume">自动继续播放</string>
+  <string name="resume_playback_title">继续上次播放？</string>
+  <string name="resume_playback_message">是否从上次记录的歌曲和进度继续播放？</string>
+  <string name="resume_playback_browse">仅浏览</string>
+  <string name="resume_playback_confirm">继续播放</string>
   <string name="play_breakpoint_tip">再次打开软件时将从断点处开始播放</string>
   <string name="list_loop">列表循环</string>
   <string name="list_loop_tip">播放到列表末尾后从第一首继续播放</string>

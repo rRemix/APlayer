@@ -364,6 +364,14 @@
   <string name="cant_share_song">無法分享曲目</string>
   <string name="save_wechat_qrcode_success">已儲存 WeChat QR碼，請打開 WeChat 識別該QR碼</string>
   <string name="play_breakpoint">接續播放</string>
+  <string name="source_open_action">開啟資料夾或播放清單時</string>
+  <string name="source_open_only">僅開啟</string>
+  <string name="source_open_ask">詢問是否繼續播放</string>
+  <string name="source_open_resume">自動繼續播放</string>
+  <string name="resume_playback_title">繼續上次播放？</string>
+  <string name="resume_playback_message">要從上次儲存的歌曲與進度繼續播放嗎？</string>
+  <string name="resume_playback_browse">僅瀏覽</string>
+  <string name="resume_playback_confirm">繼續播放</string>
   <string name="play_breakpoint_tip">再次打開應用程式時將從斷點處開始播放</string>
   <string name="list_loop">列表循環</string>
   <string name="list_loop_tip">播放到列表末尾後從第一首繼續播放</string>

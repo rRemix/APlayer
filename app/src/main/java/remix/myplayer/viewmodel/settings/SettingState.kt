@@ -23,6 +23,7 @@ data class PlaySettings(
   val ignoreAudioFocus: Boolean,
   val decoderMode: Int,
   val playAtBreakPoint: Boolean,
+  val sourceOpenAction: Int,
   val crossFade: Boolean,
   val autoPlay: Int,
   val speed: String,

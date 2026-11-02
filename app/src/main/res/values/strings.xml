@@ -367,6 +367,14 @@
   <string name="cant_share_song">Could not share this file, I\'m aware of the issue</string>
   <string name="save_wechat_qrcode_success">We have saved WeChat QRCode. Please open WeChat to identify the qr code</string>
   <string name="play_breakpoint">Remember playback position</string>
+  <string name="source_open_action">When opening a folder or playlist</string>
+  <string name="source_open_only">Just open</string>
+  <string name="source_open_ask">Ask to resume playback</string>
+  <string name="source_open_resume">Resume playback automatically</string>
+  <string name="resume_playback_title">Resume previous playback?</string>
+  <string name="resume_playback_message">Resume the last song from its saved position?</string>
+  <string name="resume_playback_browse">Just browse</string>
+  <string name="resume_playback_confirm">Continue playback</string>
   <string name="play_breakpoint_tip">When you open the APlayer again, it will start playing from the breakpoint</string>
   <string name="list_loop">Loop playlist</string>
   <string name="list_loop_tip">Continue from the first song after the playlist reaches the end</string>

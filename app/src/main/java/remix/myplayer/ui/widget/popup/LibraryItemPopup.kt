@@ -116,7 +116,8 @@ fun LibraryItemDropdownMenu(
                 }
                 setPlayQueue(
                   songs, makeCmdIntent(Command.PLAY_AT)
-                    .putExtra(EXTRA_POSITION, 0)
+                    .putExtra(EXTRA_POSITION, 0),
+                  model
                 )
               }
               // 添加到播放队列

@@ -119,6 +119,7 @@ class SettingPrefs @Inject constructor(
     UI_FONT_SCALE_DEFAULT
   )
   var playAtBreakPoint by PrefsDelegate(sp, PrefKeys.Setting.PLAY_AT_BREAKPOINT, false)
+  var sourceOpenAction by PrefsDelegate(sp, PrefKeys.Setting.SOURCE_OPEN_ACTION, SOURCE_OPEN_ONLY)
   var shake by PrefsDelegate(sp, PrefKeys.Setting.SHAKE, false)
   var showDisplayName by PrefsDelegate(sp, PrefKeys.Setting.SHOW_DISPLAYNAME, false)
 
@@ -250,6 +251,11 @@ class SettingPrefs @Inject constructor(
     // 音频解码方式
     const val DECODER_MODE_DEFAULT: Int = 0
     const val DECODER_MODE_FFMPEG: Int = 1
+
+    // 打开文件夹或本地歌单时的行为
+    const val SOURCE_OPEN_ONLY = 0
+    const val SOURCE_OPEN_ASK = 1
+    const val SOURCE_OPEN_RESUME = 2
 
     // 自动播放
     const val HEADSET_PLUG = 0

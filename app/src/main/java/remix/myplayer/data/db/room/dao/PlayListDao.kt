@@ -31,6 +31,9 @@ interface PlayListDao {
   )
   suspend fun selectByName(name: String): PlayList?
 
+  @Query("SELECT * FROM PlayList WHERE id = :id LIMIT 1")
+  fun observeById(id: Long): Flow<PlayList?>
+
   @Update
   suspend fun update(playlist: PlayList): Int
 

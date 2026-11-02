@@ -17,16 +17,18 @@ class PlayQueueStore @Inject constructor(
   private val settingPrefs: SettingPrefs,
 ) {
 
-  suspend fun restore(): Pair<List<Song>, Int> {
+  data class RestoredQueue(val songs: List<Song>, val position: Int, val hasSavedQueue: Boolean)
+
+  suspend fun restore(): RestoredQueue {
     var queue = playQueueRepository.getAllSongs().first()
+    val hasSavedQueue = queue.isNotEmpty()
     if (queue.isEmpty()) {
       // 默认全部歌曲为播放列表
       queue = songRepository.allSongs()
       save(queue)
     }
 
-    val pos = restoreLastSong(queue)
-    return queue to pos
+    return RestoredQueue(queue, restoreLastSong(queue), hasSavedQueue)
   }
 
   /**

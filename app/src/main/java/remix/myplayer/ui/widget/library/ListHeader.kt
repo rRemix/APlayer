@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import remix.myplayer.R
+import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.service.Command
@@ -31,7 +32,7 @@ import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.ext.clickableWithoutRipple
 
 @Composable
-fun SongListHeader(songs: List<Song>) {
+fun SongListHeader(songs: List<Song>, source: APlayerModel? = null) {
   if (songs.isEmpty()) {
     return
   }
@@ -45,7 +46,7 @@ fun SongListHeader(songs: List<Song>) {
           MessageNotifier.show(R.string.no_song)
           return@clickableWithoutRipple
         }
-        setPlayQueue(songs, MusicUtil.makeCmdIntent(Command.SKIP_TO_NEXT, true))
+        setPlayQueue(songs, MusicUtil.makeCmdIntent(Command.SKIP_TO_NEXT, true), source)
       },
     verticalAlignment = Alignment.CenterVertically
   ) {

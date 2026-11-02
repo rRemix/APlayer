@@ -36,19 +36,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.data.prefs.playbackSourceKey
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicEventCallback
 import remix.myplayer.service.MusicService
+import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.activity.base.BaseMusicActivity
+import remix.myplayer.ui.dialog.NormalDialog
+import remix.myplayer.ui.dialog.rememberDialogState
+import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.app.BottomBar
 import remix.myplayer.ui.widget.app.MultiSelectBar
@@ -64,10 +74,11 @@ import remix.myplayer.viewmodel.PlayingScreenValue
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.playbackViewModel
+import remix.myplayer.viewmodel.settingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(model: APlayerModel) {
+fun DetailScreen(model: APlayerModel, openFromLibrary: Boolean = false) {
   val libraryVM = libraryViewModel
   val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
 
@@ -75,6 +86,40 @@ fun DetailScreen(model: APlayerModel) {
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
+  val nav = LocalNavController.current
+  val entry = LocalLifecycleOwner.current as? NavBackStackEntry
+  val settingState by settingViewModel.settingsState.collectAsStateWithLifecycle()
+  val sourceOpenAction = settingState.play.sourceOpenAction
+  val resumeDialog = rememberDialogState(false)
+
+  LaunchedEffect(entry, openFromLibrary) {
+    if (!openFromLibrary || entry == null ||
+      entry.savedStateHandle.get<Boolean>(SOURCE_OPEN_HANDLED) == true
+    ) return@LaunchedEffect
+    entry.savedStateHandle[SOURCE_OPEN_HANDLED] = true
+
+    when (sourceOpenAction) {
+      SettingPrefs.SOURCE_OPEN_RESUME -> MusicServiceRemote.resumeFrom(model)
+      SettingPrefs.SOURCE_OPEN_ASK -> {
+        if ((!MusicServiceRemote.isPlayingFrom(model) || !playbackState.isPlaying) &&
+          MusicServiceRemote.hasResumableRecord(model)
+        ) {
+          // Do not show the confirmation over a screen that is still transitioning away.
+          entry.lifecycle.currentStateFlow.first { it == Lifecycle.State.RESUMED }
+          if (nav.currentBackStackEntry == entry) resumeDialog.show()
+        }
+      }
+    }
+  }
+
+  NormalDialog(
+    dialogState = resumeDialog,
+    titleRes = R.string.resume_playback_title,
+    contentRes = R.string.resume_playback_message,
+    positiveRes = R.string.resume_playback_confirm,
+    onPositive = { MusicServiceRemote.resumeFrom(model) },
+    negativeRes = R.string.resume_playback_browse,
+  )
 
   val playLists by libraryVM.playLists.collectAsStateWithLifecycle()
 
@@ -129,7 +174,7 @@ fun DetailScreen(model: APlayerModel) {
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       if (songs.isNotEmpty()) {
-        SongListHeader(songs)
+        SongListHeader(songs, model)
       }
 
       val selectedIds by remember {
@@ -162,14 +207,17 @@ fun DetailScreen(model: APlayerModel) {
                 return@ListSong
               }
 
-              if (playbackState.isPlaying && isPlayingSong) {
+              if (playbackState.isPlaying && isPlayingSong &&
+                (model.playbackSourceKey() == null || MusicServiceRemote.isPlayingFrom(model))
+              ) {
                 scope.launch {
                   mainVM.playingScreenState.animateTo(PlayingScreenValue.Expanded)
                 }
               } else {
                 setPlayQueue(
                   songs, MusicUtil.makeCmdIntent(Command.PLAY_AT)
-                    .putExtra(MusicService.EXTRA_POSITION, index)
+                    .putExtra(MusicService.EXTRA_POSITION, index),
+                  source = model
                 )
               }
             },
@@ -247,3 +295,5 @@ private fun DetailActions(model: APlayerModel, onSortOrderChange: () -> Unit) {
     }
   }
 }
+
+private const val SOURCE_OPEN_HANDLED = "source_open_handled"

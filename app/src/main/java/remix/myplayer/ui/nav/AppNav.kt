@@ -150,7 +150,7 @@ fun AppNav() {
             ) {
               val route = it.toRoute<DetailScreenRoute>()
 
-              DetailScreen(route.findNotNull())
+              DetailScreen(route.findNotNull(), openFromLibrary = route.openFromLibrary)
             }
 
             normalAnimatedScreen("${RouteCustomSort}/{id}", arguments = listOf(navArgument("id") {
@@ -301,7 +301,8 @@ data class DetailScreenRoute(
   val artist: Artist? = null,
   val genre: Genre? = null,
   val playList: PlayList? = null,
-  val folder: Folder? = null
+  val folder: Folder? = null,
+  val openFromLibrary: Boolean = false
 ) {
 
   fun findNotNull(): APlayerModel {

@@ -12,6 +12,9 @@ interface Playback {
   /** 是否正在播放 */
   val isPlaying: Boolean
 
+  /** 是否播放结束 */
+  val isEnded: Boolean
+
   /** 当前播放的歌曲 */
   val currentSong: Song?
 

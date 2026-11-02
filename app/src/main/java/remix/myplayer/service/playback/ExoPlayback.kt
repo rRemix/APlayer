@@ -57,6 +57,9 @@ class ExoPlayback(
   override val isPlaying: Boolean
     get() = player.isPlaying
 
+  override val isEnded: Boolean
+    get() = player.playbackState == Player.STATE_ENDED
+
   override val currentSong: Song?
     get() = player.currentMediaItem?.localConfiguration?.tag as? Song
 

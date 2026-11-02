@@ -364,6 +364,14 @@
   <string name="cant_share_song">楽曲の共有ができません</string>
   <string name="save_wechat_qrcode_success">WeChatのQRコードを保存しました。WeChatで読み込んでください</string>
   <string name="play_breakpoint">停止時間から再生</string>
+  <string name="source_open_action">フォルダーやプレイリストを開くとき</string>
+  <string name="source_open_only">開くだけ</string>
+  <string name="source_open_ask">再生を再開するか確認</string>
+  <string name="source_open_resume">自動的に再生を再開</string>
+  <string name="resume_playback_title">前回の再生を再開しますか？</string>
+  <string name="resume_playback_message">前回の曲を保存された位置から再生しますか？</string>
+  <string name="resume_playback_browse">閲覧のみ</string>
+  <string name="resume_playback_confirm">再生を再開</string>
   <string name="play_breakpoint_tip">APlayerを開き直したとき, 一時停止した時間から再生を再開します</string>
   <string name="list_loop">プレイリストをループ</string>
   <string name="list_loop_tip">プレイリストの最後まで再生したら最初の曲から続けます</string>

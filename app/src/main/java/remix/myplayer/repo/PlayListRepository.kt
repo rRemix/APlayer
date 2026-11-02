@@ -19,6 +19,7 @@ import javax.inject.Inject
 interface PlayListRepository {
 
   fun allPlayLists(): Flow<List<PlayList>>
+  fun observePlayList(id: Long): Flow<PlayList?>
   suspend fun addSongsToPlayList(audioIds: List<Long>, playListName: String): Int
   suspend fun insertPlayList(name: String): Long
   suspend fun updatePlayList(playList: PlayList): Int
@@ -54,6 +55,8 @@ class PlayListRepoImpl @Inject constructor(
           }
       }
   }
+
+  override fun observePlayList(id: Long): Flow<PlayList?> = playListDao.observeById(id)
 
   override suspend fun addSongsToPlayList(audioIds: List<Long>, playListName: String): Int {
     val playList = playListDao.selectByName(playListName)

@@ -88,6 +88,7 @@ class SettingViewModel @Inject constructor(
       ignoreAudioFocus = settingPrefs.ignoreAudioFocus,
       decoderMode = settingPrefs.decoderMode,
       playAtBreakPoint = settingPrefs.playAtBreakPoint,
+      sourceOpenAction = settingPrefs.sourceOpenAction,
       crossFade = settingPrefs.crossFade,
       autoPlay = settingPrefs.autoPlay,
       speed = settingPrefs.speed,
@@ -237,6 +238,11 @@ class SettingViewModel @Inject constructor(
   fun setPlayAtBreakPoint(enabled: Boolean) {
     settingPrefs.playAtBreakPoint = enabled
     _settingsState.update { it.copy(play = it.play.copy(playAtBreakPoint = enabled)) }
+  }
+
+  fun setSourceOpenAction(action: Int) {
+    settingPrefs.sourceOpenAction = action
+    _settingsState.update { it.copy(play = it.play.copy(sourceOpenAction = action)) }
   }
 
   fun setCrossFade(enabled: Boolean) {
