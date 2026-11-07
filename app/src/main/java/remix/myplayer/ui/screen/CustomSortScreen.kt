@@ -2,7 +2,6 @@ package remix.myplayer.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -26,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -38,12 +35,12 @@ import remix.myplayer.data.model.audio.Song
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.theme.LocalTheme
+import remix.myplayer.ui.widget.common.AppBarAction
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.library.GlideCover
 import remix.myplayer.util.Util
-import remix.myplayer.util.ext.clickableWithoutRipple
 import remix.myplayer.viewmodel.libraryViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -65,15 +62,11 @@ fun CustomSortScreen(id: Long) {
   Scaffold(
     contentWindowInsets = WindowInsets.systemBars,
     topBar = {
-      CommonAppBar(title = playList?.name ?: "", actions = emptyList())
-    },
-    floatingActionButton = {
-      Box(
-        modifier = Modifier
-          .size(48.dp)
-          .background(color = LocalTheme.current.secondary, shape = CircleShape)
-          .clickableWithoutRipple {
-            val playList = playList ?: return@clickableWithoutRipple
+      CommonAppBar(
+        title = playList?.name ?: "",
+        actions = listOf(
+          AppBarAction(R.drawable.ic_save_white_24dp, "CustomSortSave") {
+            val playList = playList ?: return@AppBarAction
 
             val newIds = songs.map { it.id }
             if (newIds != playList.audioIds) {
@@ -86,15 +79,9 @@ fun CustomSortScreen(id: Long) {
             }
 
             nav.popBackStack()
-          },
-        contentAlignment = Alignment.Center
-      ) {
-        Icon(
-          painterResource(R.drawable.ic_save_white_24dp),
-          contentDescription = "CustomSortSave",
-          tint = Color.White
+          }
         )
-      }
+      )
     }
   ) { padding ->
     val lazyListState = rememberLazyListState()
