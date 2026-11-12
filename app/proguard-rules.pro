@@ -3,6 +3,11 @@
 -keep public class com.tencent.bugly.** { *; }
 -dontwarn com.tencent.bugly.**
 
+# FOSS/Google disable updates, so R8 can remove all GithubApi methods and Retrofit's
+# conditional keep rule no longer matches. Keep the dynamically implemented interface
+# to preserve Retrofit.create() casts in any remaining injection/worker entry points.
+-keep,allowobfuscation interface remix.myplayer.request.network.GithubApi
+
 # smbj
 -dontwarn com.hierynomus.**
 -dontwarn org.bouncycastle.**

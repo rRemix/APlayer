@@ -6,6 +6,7 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
+import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
   @param:ApplicationContext private val context: Context,
-  private val inAppUpdater: InAppUpdater
+  private val inAppUpdater: Lazy<InAppUpdater>
 ) : ViewModel() {
 
   val playingScreenState = AnchoredDraggableState(
@@ -50,10 +51,10 @@ class MainViewModel @Inject constructor(
     if (inAppUpdateChecked && !force) {
       return
     }
-    inAppUpdater.cancelDownloadWorker()
+    inAppUpdater.get().cancelDownloadWorker()
     inAppUpdateChecked = true
     viewModelScope.launch {
-      val release = inAppUpdater.checkUpdate(force)
+      val release = inAppUpdater.get().checkUpdate(force)
       Timber.v("checkInAppUpdate release: $release")
       showInAppUpdateDialog(release ?: return@launch)
     }
@@ -66,7 +67,7 @@ class MainViewModel @Inject constructor(
     viewModelScope.launch {
 
       suspend fun awaitWorkerAndGetPath(): String? {
-        return inAppUpdater
+        return inAppUpdater.get()
           .startDownloadWorker(release)
           .onEach {
             Timber.v("DownloadWorker, state: ${it?.state}")
@@ -103,11 +104,18 @@ class MainViewModel @Inject constructor(
   }
 
   fun ignoreForever() {
-    inAppUpdater.ignoreForever()
+    if (!BuildConfig.ENABLE_UPDATE) {
+      return
+    }
+    inAppUpdater.get().ignoreForever()
   }
 
   fun ignoreCurrentVersion(release: Release) {
-    inAppUpdater.ignoreVersion(inAppUpdater.getOnlineVersionCode(release))
+    if (!BuildConfig.ENABLE_UPDATE) {
+      return
+    }
+    val updater = inAppUpdater.get()
+    updater.ignoreVersion(updater.getOnlineVersionCode(release))
   }
 
   private val _multiSelectState = MutableStateFlow(MultiSelectState())
