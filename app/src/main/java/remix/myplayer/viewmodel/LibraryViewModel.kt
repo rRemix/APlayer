@@ -6,7 +6,6 @@ import android.provider.MediaStore.Audio
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +18,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import remix.myplayer.util.Constants
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.data.db.room.entity.PlayList
@@ -29,7 +31,7 @@ import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.glide.UriFetcher
+import remix.myplayer.coil.CoverUriResolver
 import remix.myplayer.repo.AlbumRepository
 import remix.myplayer.repo.ArtistRepository
 import remix.myplayer.repo.FolderRepository
@@ -58,7 +60,7 @@ class LibraryViewModel @Inject constructor(
   private val genreRepo: GenreRepository,
   private val playListRepo: PlayListRepository,
   private val folderRepo: FolderRepository,
-  private val uriFetcher: UriFetcher,
+  private val coverUriResolver: CoverUriResolver,
   private val historyRepo: HistoryRepository,
   val settingPrefs: SettingPrefs,
   private val exportPlayListUseCase: ExportPlayListUseCase,
@@ -66,6 +68,7 @@ class LibraryViewModel @Inject constructor(
 ) : ViewModel(), MusicEventCallback {
 
   private var hasPermission = false
+  private val mediaMutex = Mutex()
 
   private val _songs = MutableStateFlow<List<Song>>(emptyList())
   val songs: StateFlow<List<Song>> = _songs.asStateFlow()
@@ -183,9 +186,6 @@ class LibraryViewModel @Inject constructor(
         }
 
         playListRepo.updatePlayList(playList)
-        uriFetcher.updatePlayListVersion()
-        uriFetcher.clearAllCache()
-        Glide.get(context).clearMemory()
         MessageNotifier.show(R.string.save_success)
       } catch (e: Exception) {
         MessageNotifier.show(R.string.save_error)
@@ -205,33 +205,28 @@ class LibraryViewModel @Inject constructor(
     }
   }
 
-  fun fetchMedia(
-    clear: Boolean = false,
-    updateAlbumVersion: Boolean = false,
-    updateArtistVersion: Boolean = false,
-    updatePlayListVersion: Boolean = false
-  ) {
-    viewModelScope.launch {
-      if (clear) {
-        if (updateAlbumVersion) {
-          uriFetcher.updateAlbumVersion()
-        } else if (updateArtistVersion) {
-          uriFetcher.updateArtistVersion()
-        } else if (updatePlayListVersion) {
-          uriFetcher.updatePlayListVersion()
-        } else {
-          uriFetcher.updateAllVersion()
-        }
-        uriFetcher.clearAllCache()
-        Glide.get(context).clearMemory()
-      }
+  fun refreshCovers() = coverUriResolver.refreshMemory()
 
-      _songs.value = async(Dispatchers.IO) { songRepo.allSongs() }.await()
-      _albums.value = async(Dispatchers.IO) { albumRepo.allAlbums() }.await()
-      _artists.value = async(Dispatchers.IO) { artistRepo.allArtists() }.await()
-      _genres.value = async(Dispatchers.IO) { genreRepo.allGenres() }.await()
-      _folders.value = async(Dispatchers.IO) { folderRepo.allFolders() }.await()
-      Timber.v("songCount: ${_songs.value.size} albumCount: ${_albums.value.size} artistCount: ${_artists.value.size} genreCount: ${_genres.value.size} folderCount: ${_folders.value.size}")
+  fun invalidateCover(type: Int, id: Long) {
+    val key = when (type) {
+      Constants.ALBUM -> "album:$id"
+      Constants.ARTIST -> "artist:$id"
+      Constants.PLAYLIST -> "playlist:$id"
+      else -> return
+    }
+    coverUriResolver.invalidate(key)
+  }
+
+  fun fetchMedia() {
+    viewModelScope.launch {
+      mediaMutex.withLock {
+        _songs.value = async(Dispatchers.IO) { songRepo.allSongs() }.await()
+        _albums.value = async(Dispatchers.IO) { albumRepo.allAlbums() }.await()
+        _artists.value = async(Dispatchers.IO) { artistRepo.allArtists() }.await()
+        _genres.value = async(Dispatchers.IO) { genreRepo.allGenres() }.await()
+        _folders.value = async(Dispatchers.IO) { folderRepo.allFolders() }.await()
+        Timber.v("songCount: ${_songs.value.size} albumCount: ${_albums.value.size} artistCount: ${_artists.value.size} genreCount: ${_genres.value.size} folderCount: ${_folders.value.size}")
+      }
     }
   }
 
@@ -264,7 +259,7 @@ class LibraryViewModel @Inject constructor(
   override fun onTagChanged(
     oldSong: Song?, newSong: Song
   ) {
-    fetchMedia(true, updateAlbumVersion = true, updatePlayListVersion = true)
+    fetchMedia()
   }
 }
 

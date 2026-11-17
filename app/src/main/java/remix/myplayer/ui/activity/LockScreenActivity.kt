@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalGlideComposeApi::class)
-
 package remix.myplayer.ui.activity
 
 import android.content.Intent
@@ -30,6 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,14 +50,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.placeholder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import coil3.compose.AsyncImage
+import coil3.toBitmap
+import remix.myplayer.ui.widget.library.rememberCoverRequest
 import remix.myplayer.R
-import remix.myplayer.glide.addBitmapListener
 import remix.myplayer.lyric.CurrentNextLyricsLine
 import remix.myplayer.lyric.LyricManager
 import remix.myplayer.service.Command
@@ -197,11 +196,23 @@ private fun LockScreen(
     val defaultBitmap = remember {
       BitmapFactory.decodeResource(context.resources, R.drawable.album_empty_bg_night)
     }
+    val coverRequest = rememberCoverRequest(playbackUiState.song, allowHardware = false)
+    var coverBitmap: Bitmap? by remember(coverRequest) { mutableStateOf(null) }
     var blurBitmap: Bitmap? by remember {
       mutableStateOf(null)
     }
     var swatch: Palette.Swatch by remember {
       mutableStateOf(Palette.Swatch(Color.Gray.toArgb(), 100))
+    }
+
+    LaunchedEffect(coverBitmap, coverRequest) {
+      val bitmap = coverBitmap ?: defaultBitmap
+      val (blur, color) = withContext(Dispatchers.Default) {
+        StackBlurManager(bitmap).processNatively(40) to
+          ColorUtil.getSwatch(Palette.from(bitmap).generate())
+      }
+      blurBitmap = blur
+      swatch = color
     }
 
     blurBitmap?.let {
@@ -222,24 +233,18 @@ private fun LockScreen(
       verticalArrangement = Arrangement.Center
     ) {
 //      Spacer(Modifier.statusBarsPadding())
-      GlideImage(
-        model = playbackUiState.song,
+      AsyncImage(
+        model = coverRequest,
         contentDescription = "LockScreenCover",
-        failure = placeholder(LocalTheme.current.albumPlaceHolder),
-        loading = placeholder(LocalTheme.current.albumPlaceHolder),
+        placeholder = painterResource(LocalTheme.current.albumPlaceHolder),
+        error = painterResource(LocalTheme.current.albumPlaceHolder),
+        onSuccess = { coverBitmap = it.result.image.toBitmap() },
+        onError = { coverBitmap = null },
         modifier = Modifier
           .background(Color.White)
           .size(210.dp)
           .padding(1.5.dp)
-      ) { builder ->
-        builder.addBitmapListener {
-          val bitmap = it ?: defaultBitmap
-          scope.launch(Dispatchers.IO) {
-            blurBitmap = StackBlurManager(bitmap).processNatively(40)
-            swatch = ColorUtil.getSwatch(Palette.from(bitmap).generate())
-          }
-        }
-      }
+      )
 
       Text(
         playbackUiState.song.title,

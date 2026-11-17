@@ -30,6 +30,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import remix.myplayer.coil.CoverUriResolver
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
@@ -134,6 +137,9 @@ class MusicService : BaseService(),
 
   @Inject
   lateinit var replayGainController: ReplayGainController
+
+  @Inject
+  lateinit var coverResolver: CoverUriResolver
 
   private val stateSource = MusicStateSource
 
@@ -260,7 +266,7 @@ class MusicService : BaseService(),
    * 监听MediaStore变化
    */
   private val mediaStoreObserver: MediaStoreObserver by lazy {
-    MediaStoreObserver()
+    MediaStoreObserver { refreshMediaStore() }
   }
   private lateinit var service: MusicService
 
@@ -337,14 +343,13 @@ class MusicService : BaseService(),
       // 通知栏样式
       PrefKeys.Setting.NOTIFY_STYLE_CLASSIC -> {
         val wasShowing = notify.isNotifyShowing
+        notify.stopForegroundAndNotification()
         notify = if (settingPrefs.classicNotify) {
           NotifyImpl(this@MusicService)
         } else {
           NotifyImpl24(this@MusicService)
         }
         if (wasShowing) {
-          // 先取消再重新显示 让通知栏彻底刷新一次
-          notify.stopForegroundAndNotification()
           updateNotification()
         }
       }
@@ -467,8 +472,9 @@ class MusicService : BaseService(),
 
     launch {
       // 收集播放状态
-      stateSource.playbackUiState.collect {
-        Timber.v("collect, playbackState collect: $it")
+      combine(stateSource.playbackUiState, coverResolver.revisions) { state, _ ->
+        state to coverResolver.memoryRevision(state.song)
+      }.distinctUntilChanged().collect {
         handleMetaChange()
       }
     }
@@ -713,6 +719,7 @@ class MusicService : BaseService(),
 
     audioFocusManager.detach()
 
+    mediaSessionUpdater.clear(mediaSession)
     mediaSession.isActive = false
     mediaSession.release()
 
@@ -726,6 +733,7 @@ class MusicService : BaseService(),
       .unregisterOnSharedPreferenceChangeListener(this)
 
     contentResolver.unregisterContentObserver(mediaStoreObserver)
+    mediaStoreObserver.close()
 
     ShakeDetector.getInstance().stopListen()
 
@@ -993,7 +1001,13 @@ class MusicService : BaseService(),
     start(true)
   }
 
+  private fun refreshMediaStore() {
+    coverResolver.refreshMemory()
+    Util.sendLocalBroadcast(Intent(MEDIA_STORE_CHANGE))
+  }
+
   override fun onMediaStoreChanged() {
+    // The observer has already invalidated covers; the existing broadcast refreshes UI lists.
   }
 
   override fun onPermissionChanged(has: Boolean) {
@@ -1013,11 +1027,14 @@ class MusicService : BaseService(),
       return
     }
 
-    playback.replaceSong(newSong)
-    lyricManager.clearCache(newSong)
-    lyricManager.updateLyrics(newSong)
-    updateMediaSessionQueue()
-    pushPlaybackUiState()
+    launch {
+      val scanned = withContext(Dispatchers.IO) { songRepository.song(newSong.id) } ?: newSong
+      playback.replaceSong(scanned)
+      lyricManager.clearCache(scanned)
+      lyricManager.updateLyrics(scanned)
+      updateMediaSessionQueue()
+      pushPlaybackUiState()
+    }
   }
 
   override fun onPlayListChanged(name: String) {
@@ -1147,6 +1164,7 @@ class MusicService : BaseService(),
   }
 
   fun updateNotification() {
+    if (stop) return
     notify.updateAndNotify()
   }
 

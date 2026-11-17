@@ -138,7 +138,10 @@ class PlaybackViewModel @Inject constructor(
   private val _swatch = MutableStateFlow(defaultSwatch)
   val swatch = _swatch.asStateFlow()
 
+  private var swatchJob: Job? = null
+
   fun updateSwatch(bitmap: Bitmap?) {
+    swatchJob?.cancel()
     if (settingPrefs.playingScreenBackground != SettingPrefs.BACKGROUND_ADAPTIVE_COLOR) {
       return
     }
@@ -147,7 +150,7 @@ class PlaybackViewModel @Inject constructor(
       return
     }
 
-    viewModelScope.launch(Dispatchers.Default) {
+    swatchJob = viewModelScope.launch(Dispatchers.Default) {
       val newSwatch: Swatch
       val palette = Palette.from(bitmap).generate()
       if (palette.mutedSwatch != null) {
@@ -157,7 +160,7 @@ class PlaybackViewModel @Inject constructor(
         swatches.sortWith(Comparator { o1, o2 -> o1.population.compareTo(o2.population) })
         newSwatch = if (swatches.isNotEmpty()) swatches[0] else defaultSwatch
       }
-      _swatch.value = newSwatch
+      if (isActive) _swatch.value = newSwatch
     }
   }
 

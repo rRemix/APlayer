@@ -19,10 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -41,7 +44,7 @@ import remix.myplayer.data.model.audio.Album
 import remix.myplayer.data.model.audio.Artist
 import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
-import remix.myplayer.misc.cache.DiskCache
+import remix.myplayer.data.model.audio.Song
 import remix.myplayer.ui.AppScaffold
 import remix.myplayer.ui.dialog.DialogContainer
 import remix.myplayer.ui.screen.AboutScreen
@@ -86,6 +89,8 @@ const val RouteSupport = "support"
 // 存在目标页 NavBackStackEntry.savedStateHandle 里的标志，
 // 标记该页是从播放页浮窗跳转过来的，退出时需要恢复浮窗
 const val ExtraRestorePlayingScreen = "restore_playing_screen"
+// Pending handoff to a detail page; consumed when that destination is ready.
+const val ExtraHidePlayingScreenOnEntry = "hide_playing_screen_on_entry"
 
 val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 
@@ -209,8 +214,8 @@ fun AppNav() {
               val libraryVM = libraryViewModel
 
               val destinationUri = remember(id, type) {
-                val cacheDir = DiskCache.getDiskCacheDir(context, "thumbnail")
-                if (!cacheDir.exists() && !cacheDir.mkdir()) {
+                val cacheDir = File(context.cacheDir, "thumbnail")
+                if (!cacheDir.isDirectory && !cacheDir.mkdirs()) {
                   Uri.EMPTY
                 } else {
                   val file = File(cacheDir, "$type-${id}.jpg")
@@ -219,12 +224,7 @@ fun AppNav() {
               }
 
               CropScreen(destinationUri = destinationUri, onCropSuccess = {
-                libraryVM.fetchMedia(
-                  clear = true,
-                  updateAlbumVersion = type == Constants.ALBUM,
-                  updateArtistVersion = type == Constants.ARTIST,
-                  updatePlayListVersion = type == Constants.PLAYLIST,
-                )
+                libraryVM.invalidateCover(type, id)
                 nav.popBackStack()
               }, onCancel = {
                 nav.popBackStack()
@@ -316,6 +316,37 @@ data class DetailScreenRoute(
     }
   }
 
+}
+
+/** Only local songs carry MediaStore album/artist ids that map to a library detail page. */
+private val Song.canOpenLibraryDetail: Boolean
+  get() = valid() && isLocal()
+
+fun Song.artistDetailRoute(): DetailScreenRoute? =
+  if (canOpenLibraryDetail && artistId > 0 && artist.isNotBlank()) {
+    DetailScreenRoute(artist = Artist(artistId, artist, 0))
+  } else null
+
+fun Song.albumDetailRoute(): DetailScreenRoute? =
+  if (canOpenLibraryDetail && albumId > 0 && album.isNotBlank()) {
+    DetailScreenRoute(album = Album(albumId, album, artistId, artist))
+  } else null
+
+/** True when [entry] already shows the album/artist detail page [route] points to. */
+internal fun NavBackStackEntry.isSameDetail(route: DetailScreenRoute): Boolean {
+  if (!destination.hasRoute<DetailScreenRoute>()) return false
+  val current = toRoute<DetailScreenRoute>()
+  return (route.album != null && route.album.albumID == current.album?.albumID) ||
+    (route.artist != null && route.artist.artistID == current.artist?.artistID)
+}
+
+/** Open a detail page from a song list, without stacking the page we are already on. */
+fun NavHostController.openSongLibraryDetail(route: DetailScreenRoute) {
+  val current = currentBackStackEntry ?: return
+  // Ignore taps while a previous navigation transition is still running.
+  if (current.lifecycle.currentState != Lifecycle.State.RESUMED) return
+  if (current.isSameDetail(route)) return
+  navigate(route)
 }
 
 private object ModelRouteType {

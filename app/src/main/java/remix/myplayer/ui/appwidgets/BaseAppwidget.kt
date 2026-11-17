@@ -7,13 +7,14 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.widget.RemoteViews
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
+import coil3.imageLoader
+import coil3.request.Disposable
+import coil3.request.allowHardware
+import coil3.size.Scale
+import coil3.toBitmap
+import remix.myplayer.coil.coverUriResolver
 import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
@@ -36,6 +37,9 @@ import timber.log.Timber
 
 abstract class BaseAppwidget
   : AppWidgetProvider() {
+
+  private var coverRequest: Disposable? = null
+  private var coverRequestId = 0L
 
   protected lateinit var skin: AppWidgetSkin
 
@@ -85,44 +89,36 @@ abstract class BaseAppwidget
     val size =
       if (this.javaClass.simpleName == AppWidgetBig::class.java.simpleName) IMAGE_SIZE_BIG else IMAGE_SIZE_MEDIUM
 
-    Glide.with(context)
-      .asBitmap()
-      .load(song)
-      .centerCrop()
-      .override(size, size)
-      .into(object : CustomTarget<Bitmap>() {
-        override fun onLoadStarted(placeholder: Drawable?) {
-          updateWithDefaultCover()
-        }
-
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-          if (song.id != playbackState.song.id) {
-            return
+    val resolver = context.coverUriResolver()
+    val memoryVersion = resolver.memoryRevision(song)
+    val requestId = ++coverRequestId
+    coverRequest?.dispose()
+    fun isCurrent(): Boolean = requestId == coverRequestId &&
+      resolver.cacheKey(song) == resolver.cacheKey(playbackState.song) &&
+      memoryVersion == resolver.memoryRevision(song)
+    fun showDefault() {
+      if (!isCurrent()) return
+      remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
+      // All instances of this provider share the same cover and cancellable request.
+      pushUpdate(context, null, remoteViews)
+    }
+    coverRequest = context.imageLoader.enqueue(
+      resolver.request(song, memoryVersion)
+        .size(size, size)
+        .scale(Scale.FILL)
+        .allowHardware(false)
+        .target(
+          onStart = { showDefault() },
+          onError = { showDefault() },
+          onSuccess = {
+            if (isCurrent()) {
+              remoteViews.setImageViewBitmap(R.id.appwidget_image, it.toBitmap())
+              pushUpdate(context, null, remoteViews)
+            }
           }
-          if (resource.isRecycled) {
-            updateWithDefaultCover()
-            return
-          }
-
-          remoteViews.setImageViewBitmap(R.id.appwidget_image, resource)
-          pushUpdate(context, appWidgetIds, remoteViews)
-        }
-
-        override fun onLoadFailed(errorDrawable: Drawable?) {
-          updateWithDefaultCover()
-        }
-
-        override fun onLoadCleared(placeholder: Drawable?) {
-        }
-
-        private fun updateWithDefaultCover() {
-          if (song.id != playbackState.song.id) {
-            return
-          }
-          remoteViews.setImageViewResource(R.id.appwidget_image, defaultDrawableRes)
-          pushUpdate(context, appWidgetIds, remoteViews)
-        }
-      })
+        )
+        .build()
+    )
   }
 
   protected fun buildAction(context: Context, views: RemoteViews) {

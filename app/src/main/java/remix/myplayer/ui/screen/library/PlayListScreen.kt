@@ -110,6 +110,7 @@ fun PlayListScreen() {
           }) { pl ->
             GridItem(
               pl, text1 = pl.name,
+              text2 = pluralStringResource(R.plurals.song_num, pl.audioIds.size, pl.audioIds.size),
               selected = selectedIds.contains(pl.getKey()),
               popupEnabled = popupEnabled,
               onClick = {

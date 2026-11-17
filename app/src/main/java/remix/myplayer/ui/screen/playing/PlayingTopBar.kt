@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,13 +23,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.palette.graphics.Palette
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.ui.nav.DetailScreenRoute
+import remix.myplayer.ui.nav.LocalNavController
+import remix.myplayer.ui.nav.albumDetailRoute
+import remix.myplayer.ui.nav.artistDetailRoute
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.popupButton
 import remix.myplayer.util.ext.clickWithRipple
@@ -41,6 +48,7 @@ import remix.myplayer.viewmodel.mainViewModel
 @Stable
 internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
   val mainVM = mainViewModel
+  val nav = LocalNavController.current
   val scope = rememberCoroutineScope()
   val theme = LocalTheme.current
   val titleColor = if (theme.isLight) Color(swatch.titleTextColor) else theme.textPrimary
@@ -76,18 +84,25 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
       val artist = song.artist
       val album = song.album
 
-      val detail = when {
-        artist == "" -> {
-          song.album
+      val detail = buildAnnotatedString {
+        fun appendDetail(label: String, tag: String, route: DetailScreenRoute?) {
+          if (route == null) {
+            append(label)
+          } else {
+            // An explicit empty style prevents Material's default link color and underline.
+            withLink(LinkAnnotation.Clickable(tag, styles = TextLinkStyles()) {
+              scope.launch {
+                nav.openPlayingDetail(route, mainVM)
+              }
+            }) {
+              append(label)
+            }
+          }
         }
 
-        album == "" -> {
-          song.artist
-        }
-
-        else -> {
-          String.format("%s-%s", song.artist, song.album)
-        }
+        appendDetail(artist, "artist", song.artistDetailRoute())
+        if (artist.isNotEmpty() && album.isNotEmpty()) append("-")
+        appendDetail(album, "album", song.albumDetailRoute())
       }
 
       Text(

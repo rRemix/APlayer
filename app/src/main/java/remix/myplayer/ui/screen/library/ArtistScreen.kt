@@ -109,6 +109,7 @@ fun ArtistScreen() {
           }) { artist ->
             GridItem(
               artist, text1 = artist.artist,
+              text2 = pluralStringResource(R.plurals.song_num, artist.count, artist.count),
               selected = selectedIds.contains(artist.getKey()),
               popupEnabled = popupEnabled,
               onClick = {

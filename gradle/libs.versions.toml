@@ -8,8 +8,7 @@ ksp = "2.2.20-2.0.2"
 hilt = "2.60.1"
 media3 = "1.8.0"
 nav = "2.9.2"
-glide = "4.16.0"
-glideCompose = "1.0.0-beta01"
+coil = "3.3.0"
 retrofit = "3.0.0"
 retrofitKotlinxSerialization = "1.0.0"
 room = "2.7.2"
@@ -34,6 +33,8 @@ tinypinyin = "2.0.3.RELEASE"
 hiltNavigationCompose = "1.2.0"
 reorderable = "2.5.1"
 junit = "1.3.0"
+junit4 = "4.13.2"
+robolectric = "4.14.1"
 espressoCore = "3.7.0"
 uiautomator = "2.3.0"
 benchmarkMacroJunit4 = "1.4.1"
@@ -83,10 +84,9 @@ material = { group = "com.google.android.material", name = "material", version.r
 play-feature-delivery = { group = "com.google.android.play", name = "feature-delivery", version.ref = "play-feature-delivery"}
 play-feature-delivery-ktx = { group = "com.google.android.play", name = "feature-delivery-ktx", version.ref = "play-feature-delivery"}
 
-# glide
-glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
-glide-ksp = { group = "com.github.bumptech.glide", name = "ksp", version.ref = "glide" }
-glide-compose = { module = "com.github.bumptech.glide:compose", version.ref = "glideCompose" }
+# coil
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 
 # retrofit
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
@@ -121,6 +121,8 @@ androidx-hilt-navi-compose = { group = "androidx.hilt", name = "hilt-navigation-
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
 # test
+junit4 = { module = "junit:junit", version.ref = "junit4" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }

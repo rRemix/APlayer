@@ -40,7 +40,7 @@ import remix.myplayer.ui.screen.setting.logic.common.ShowDisplayNameLogic
 import remix.myplayer.ui.screen.setting.logic.common.UiFontScaleLogic
 import remix.myplayer.ui.screen.setting.logic.cover.AutoDownloadLogic
 import remix.myplayer.ui.screen.setting.logic.cover.DownloadSourceLogic
-import remix.myplayer.ui.screen.setting.logic.cover.IgnoreMediaStoreLogic
+import remix.myplayer.ui.screen.setting.logic.cover.LoadEmbeddedCoverLogic
 import remix.myplayer.ui.screen.setting.logic.library.LibraryLogic
 import remix.myplayer.ui.screen.setting.logic.play.SourceOpenActionLogic
 import remix.myplayer.ui.screen.setting.logic.lyric.DesktopLyricLogic
@@ -263,7 +263,7 @@ private fun PlayingScreenPreferenceItems() {
 private fun CoverPreferenceItems() {
   PlayingCoverAnimationLogic()
 
-  IgnoreMediaStoreLogic()
+  LoadEmbeddedCoverLogic()
 
   AutoDownloadLogic()
 

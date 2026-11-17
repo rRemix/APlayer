@@ -50,7 +50,7 @@ import remix.myplayer.ui.theme.APlayerTheme
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
-import remix.myplayer.ui.widget.library.GlideCover
+import remix.myplayer.ui.widget.library.CoverImage
 import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.LibraryViewModel
 import remix.myplayer.viewmodel.libraryViewModel
@@ -182,7 +182,7 @@ private fun ListSong(song: Song, checked: Boolean, onCheckedChange: (Boolean) ->
       },
     verticalAlignment = Alignment.CenterVertically
   ) {
-    GlideCover(
+    CoverImage(
       modifier = Modifier
         .padding(horizontal = 8.dp)
         .size(42.dp), model = song, circle = false

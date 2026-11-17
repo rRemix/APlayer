@@ -2,14 +2,9 @@ package remix.myplayer.service.notification
 
 import android.app.Notification
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -86,46 +81,16 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     val size = DensityUtil.dip2px(service, 128f)
     startForegroundOrNotify(notification)
 
-    Glide.with(service).clear(target)
-    target = Glide.with(service)
-      .asBitmap()
-      .load(song)
-      .override(size, size)
-      .centerCrop()
-      .into(object : CustomTarget<Bitmap>() {
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-          if (song.id == playbackState.song.id) {
-            if (!resource.isRecycled) {
-              remoteBigView.setImageViewBitmap(R.id.notify_image, resource)
-              remoteView.setImageViewBitmap(R.id.notify_image, resource)
-            } else {
-              remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-              remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            }
-
-            startForegroundOrNotify(notification)
-          }
-        }
-
-        override fun onLoadCleared(placeholder: Drawable?) {
-        }
-
-        override fun onLoadFailed(errorDrawable: Drawable?) {
-          if (song.id == playbackState.song.id) {
-            remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            startForegroundOrNotify(notification)
-          }
-        }
-
-        override fun onLoadStarted(placeholder: Drawable?) {
-          if (song.id == playbackState.song.id) {
-            remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
-            startForegroundOrNotify(notification)
-          }
-        }
-      })
+    loadCover(size) { bitmap ->
+      if (bitmap != null && !bitmap.isRecycled) {
+        remoteBigView.setImageViewBitmap(R.id.notify_image, bitmap)
+        remoteView.setImageViewBitmap(R.id.notify_image, bitmap)
+      } else {
+        remoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+        remoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day)
+      }
+      startForegroundOrNotify(notification)
+    }
   }
 
   private fun buildNotification(

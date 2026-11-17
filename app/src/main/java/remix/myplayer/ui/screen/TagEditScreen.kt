@@ -48,7 +48,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.ItemsCallback
@@ -104,8 +103,8 @@ fun TagEditScreen(backStackEntry: NavBackStackEntry) {
   BackHandler { exitTagEdit() }
 
   val cropDestinationUri = remember(song) {
-    val cacheDir = DiskCache.getDiskCacheDir(activity, "song_cover")
-    if (!cacheDir.exists() && !cacheDir.mkdirs()) {
+    val cacheDir = File(activity.cacheDir, "song_cover")
+    if (!cacheDir.isDirectory && !cacheDir.mkdirs()) {
       Uri.EMPTY
     } else {
       Uri.fromFile(File(cacheDir, "song-${song.id}.jpg"))

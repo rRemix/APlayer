@@ -39,7 +39,7 @@ import remix.myplayer.ui.widget.common.AppBarAction
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
-import remix.myplayer.ui.widget.library.GlideCover
+import remix.myplayer.ui.widget.library.CoverImage
 import remix.myplayer.util.Util
 import remix.myplayer.viewmodel.libraryViewModel
 import sh.calvin.reorderable.ReorderableItem
@@ -104,7 +104,7 @@ fun CustomSortScreen(id: Long) {
               .background(LocalTheme.current.mainBackground),
             verticalAlignment = Alignment.CenterVertically
           ) {
-            GlideCover(
+            CoverImage(
               modifier = Modifier
                 .padding(8.dp)
                 .size(42.dp),

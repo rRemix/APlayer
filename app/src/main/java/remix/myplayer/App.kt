@@ -4,9 +4,15 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
 import com.hjq.permissions.XXPermissions
 import dagger.hilt.android.HiltAndroidApp
 import remix.myplayer.helper.AppMigration
+import remix.myplayer.coil.CoverFetcher
+import remix.myplayer.coil.CoverInterceptor
+import remix.myplayer.coil.CoverUriResolver
+import remix.myplayer.coil.EmbeddedFetcher
 import remix.myplayer.helper.LanguageHelper.onConfigurationChanged
 import remix.myplayer.helper.LanguageHelper.saveSystemCurrentLanguage
 import remix.myplayer.helper.LanguageHelper.setApplicationLanguage
@@ -21,10 +27,21 @@ import javax.inject.Inject
  * Created by Remix on 16-3-16.
  */
 @HiltAndroidApp
-class App : Application() {
+class App : Application(), SingletonImageLoader.Factory {
 
   @Inject
   lateinit var appMigration: AppMigration
+
+  @Inject
+  lateinit var coverUriResolver: dagger.Lazy<CoverUriResolver>
+
+  override fun newImageLoader(context: Context): ImageLoader = ImageLoader.Builder(context)
+    .components {
+      add(CoverInterceptor(coverUriResolver.get()))
+      add(CoverFetcher.Factory())
+      add(EmbeddedFetcher.Factory())
+    }
+    .build()
 
   override fun attachBaseContext(base: Context) {
     saveSystemCurrentLanguage()

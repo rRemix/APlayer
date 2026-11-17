@@ -21,7 +21,7 @@ import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
-import remix.myplayer.ui.widget.library.GlideCover
+import remix.myplayer.ui.widget.library.CoverImage
 import remix.myplayer.ui.widget.popup.LibraryItemPopupButton
 
 @Composable
@@ -47,7 +47,7 @@ fun ListItem(
       .background(if (selected) theme.select else theme.mainBackground),
     verticalAlignment = Alignment.CenterVertically
   ) {
-    GlideCover(
+    CoverImage(
       modifier = Modifier
         .padding(start = 8.dp)
         .size(42.dp),

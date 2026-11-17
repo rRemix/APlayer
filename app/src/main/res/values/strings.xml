@@ -380,8 +380,8 @@
   <string name="list_loop_tip">Continue from the first song after the playlist reaches the end</string>
   <string name="will_stop_at_x">APlayer will be closed in %d minutes</string>
   <string name="saveing">Saving</string>
-  <string name="ignore_mediastore_artwork">Ignore Media Store covers</string>
-  <string name="ignore_mediastore_artwork_tips">Ignore media store cache and read embedded album covers from audio files (might cause slower image loading time)</string>
+  <string name="load_embedded_cover">Load embedded covers</string>
+  <string name="load_embedded_cover_tips">When enabled, APlayer will load embedded album covers from audio files, which may increase loading time</string>
   <string name="error_setup_inapp_billing">Problem setting up in-app billing: %s</string>
   <string name="error_occur">Error occurred: %s</string>
   <string name="thank_you">Thank you!</string>
@@ -579,10 +579,6 @@
     <item quantity="one">%d song</item>
     <item quantity="other">%d songs</item>
   </plurals>
-  <plurals name="song_num_1">
-    <item quantity="one">%1$s    %2$d song</item>
-    <item quantity="other">%1$s    %2$d songs</item>
-  </plurals>
 
   <!-- Desktop lyrics -->
   <string name="close_desktop_lyrics">Turn off desktop lyrics</string>
@@ -597,4 +593,18 @@
 
   <string name="play_from_this_line">Play from this line</string>
   <string name="title_dynamic_smb">SMB Client</string>
+
+  <!-- Details -->
+  <string name="artist_library_summary">%1$s · %2$s</string>
+  <string name="detail_total_duration">Total duration · %1$s</string>
+  <string name="detail_shuffle">Shuffle</string>
+  <string name="detail_retry">Retry</string>
+  <plurals name="artist_album_count">
+    <item quantity="one">%d album</item>
+    <item quantity="other">%d albums</item>
+  </plurals>
+
+  <!-- Song menu -->
+  <string name="go_to_artist">Go to Artist</string>
+  <string name="go_to_album">Go to Album</string>
 </resources>

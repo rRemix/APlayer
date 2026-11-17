@@ -235,9 +235,10 @@ dependencies {
 
     implementation(libs.material)
 
-    implementation(libs.glide)
-    ksp(libs.glide.ksp)
-    implementation(libs.glide.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    testImplementation(libs.junit4)
+    testImplementation(libs.robolectric)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.kotlinx.serialization)

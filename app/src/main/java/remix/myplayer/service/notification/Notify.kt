@@ -14,7 +14,12 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.app.TaskStackBuilder
-import com.bumptech.glide.request.target.CustomTarget
+import coil3.imageLoader
+import coil3.request.Disposable
+import coil3.request.allowHardware
+import coil3.size.Scale
+import coil3.toBitmap
+import remix.myplayer.coil.coverUriResolver
 import remix.myplayer.R
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
@@ -36,7 +41,35 @@ abstract class Notify internal constructor(internal var service: MusicService) {
   private val FLAG_ALWAYS_SHOW_TICKER = 0x1000000
   private val FLAG_ONLY_UPDATE_TICKER = 0x2000000
 
-  protected var target: CustomTarget<Bitmap>? = null
+  private var coverRequest: Disposable? = null
+  private var coverRequestId = 0L
+
+  protected fun loadCover(size: Int, onBitmap: (Bitmap?) -> Unit) {
+    val song = playbackState.song
+    val resolver = service.coverUriResolver()
+    val memoryVersion = resolver.memoryRevision(song)
+    val requestId = ++coverRequestId
+    coverRequest?.dispose()
+    fun deliver(bitmap: Bitmap?) {
+      if (!service.stop && requestId == coverRequestId &&
+        resolver.cacheKey(song) == resolver.cacheKey(playbackState.song) &&
+        memoryVersion == resolver.memoryRevision(song)) {
+        onBitmap(bitmap)
+      }
+    }
+    coverRequest = service.imageLoader.enqueue(
+      resolver.request(song, memoryVersion)
+        .size(size, size)
+        .scale(Scale.FILL)
+        .allowHardware(false)
+        .target(
+          onStart = { deliver(null) },
+          onError = { deliver(null) },
+          onSuccess = { deliver(it.toBitmap()) }
+        )
+        .build()
+    )
+  }
 
   protected val lyricManager = service.lyricManager
 
@@ -157,6 +190,9 @@ abstract class Notify internal constructor(internal var service: MusicService) {
    */
   fun stopForegroundAndNotification() {
     Timber.v("stopForegroundAndNotification")
+    coverRequestId++
+    coverRequest?.dispose()
+    coverRequest = null
     ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
     notificationManager.cancel(PLAYING_NOTIFICATION_ID)
     clearStatusBarLyricNotification()

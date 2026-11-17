@@ -10,7 +10,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
-import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -20,12 +19,10 @@ import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.screen.setting.Preference
 import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.util.Util
-import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.settingViewModel
 
 @Composable
 fun ClearCacheLogic() {
-  val libraryVM = libraryViewModel
   val settingVM = settingViewModel
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
@@ -46,11 +43,8 @@ fun ClearCacheLogic() {
     dialogState = state,
     titleRes = R.string.confirm_clear_cache,
     onPositive = {
-      Glide.get(context).clearMemory()
-
       scope.launch {
         settingVM.clearCache(context) {
-          libraryVM.fetchMedia(true)
           cacheSize = 0
         }
       }

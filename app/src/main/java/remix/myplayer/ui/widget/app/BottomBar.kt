@@ -41,7 +41,7 @@ import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
-import remix.myplayer.ui.widget.library.GlideCover
+import remix.myplayer.ui.widget.library.CoverImage
 import remix.myplayer.util.Util
 import remix.myplayer.util.ext.clickableWithoutRipple
 import remix.myplayer.viewmodel.PlaybackViewModel
@@ -117,7 +117,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
       .then(interactionModifiers),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    GlideCover(
+    CoverImage(
       model = playbackState.song,
       modifier = Modifier
         .padding(start = 12.dp)

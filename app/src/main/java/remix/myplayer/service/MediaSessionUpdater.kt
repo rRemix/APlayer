@@ -4,16 +4,16 @@ import android.util.Log
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.request.transition.Transition
+import coil3.imageLoader
+import coil3.request.Disposable
+import coil3.request.allowHardware
+import coil3.request.error
+import coil3.toBitmap
+import remix.myplayer.coil.CoverUriResolver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -29,10 +29,17 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class MediaSessionUpdater @Inject constructor(
-  private val themeController: ThemeController
+  private val themeController: ThemeController,
+  private val coverResolver: CoverUriResolver
 ) {
 
+  private var coverRequest: Disposable? = null
+  private var coverRequestId = 0L
+
   fun clear(mediaSession: MediaSessionCompat) {
+    coverRequestId++
+    coverRequest?.dispose()
+    coverRequest = null
     mediaSession.setMetadata(MediaMetadataCompat.Builder().build())
     mediaSession.setPlaybackState(
       PlaybackStateCompat.Builder().setState(PlaybackStateCompat.STATE_NONE, 0, 1f).build()
@@ -75,6 +82,9 @@ class MediaSessionUpdater @Inject constructor(
     lockScreen: Int,
     desktopLyricLocked: Boolean
   ) {
+    val requestId = ++coverRequestId
+    coverRequest?.dispose()
+    coverRequest = null
     val currentSong = playback.currentSong ?: EMPTY_SONG
     if (currentSong == EMPTY_SONG) {
       return
@@ -103,30 +113,27 @@ class MediaSessionUpdater @Inject constructor(
 
     val placeholder =
       if (themeController.appTheme.isLight) R.drawable.album_empty_bg_day else R.drawable.album_empty_bg_night
-    Glide.with(context)
-      .asBitmap()
-      .load(currentSong)
-      .error(placeholder)
-      .centerCrop()
-      .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-      .into(object : CustomTarget<Bitmap>() {
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-          setMediaSessionData(resource)
-        }
-
-        override fun onLoadFailed(errorDrawable: Drawable?) {
-          setMediaSessionData((errorDrawable as? BitmapDrawable)?.bitmap)
-        }
-
-        private fun setMediaSessionData(result: Bitmap?) {
-          builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, copy(result))
-          mediaSession.setMetadata(builder.build())
-          updatePlaybackState(context, mediaSession, playback, desktopLyricLocked)
-        }
-
-        override fun onLoadCleared(placeholder: Drawable?) {
-        }
-      })
+    val memoryVersion = coverResolver.memoryRevision(currentSong)
+    fun setMediaSessionData(bitmap: Bitmap?) {
+      val playing = playback.currentSong ?: return
+      if (requestId != coverRequestId ||
+        coverResolver.cacheKey(playing) != coverResolver.cacheKey(currentSong) ||
+        memoryVersion != coverResolver.memoryRevision(currentSong)) return
+      builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, copy(bitmap))
+      mediaSession.setMetadata(builder.build())
+      updatePlaybackState(context, mediaSession, playback, desktopLyricLocked)
+    }
+    coverRequest = context.imageLoader.enqueue(
+      coverResolver.request(currentSong, memoryVersion)
+        .size(512)
+        .allowHardware(false)
+        .error(placeholder)
+        .target(
+          onSuccess = { setMediaSessionData(it.toBitmap()) },
+          onError = { setMediaSessionData(it?.toBitmap()) }
+        )
+        .build()
+    )
   }
 
   fun updatePlaybackState(

@@ -29,6 +29,9 @@ import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteCustomCoverCrop
 import remix.myplayer.ui.nav.RouteTagEdit
+import remix.myplayer.ui.nav.albumDetailRoute
+import remix.myplayer.ui.nav.artistDetailRoute
+import remix.myplayer.ui.nav.openSongLibraryDetail
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.popupButton
 import remix.myplayer.util.Constants
@@ -75,19 +78,21 @@ private fun SongDropdownMenu(
   parent: APlayerModel,
   onDismissRequest: () -> Unit
 ) {
-  val menuItems =
-    listOf(
-      R.string.add_to_next_song,
-      R.string.add_to_play_queue,
-      R.string.add_to_playlist,
-      R.string.song_detail,
-      R.string.song_edit,
-//      R.string.set_album_cover,
-      R.string.collect,
-      R.string.share,
-      R.string.ring,
-      R.string.delete
-    )
+  val menuItems = buildList {
+    add(R.string.add_to_next_song)
+    add(R.string.add_to_play_queue)
+    add(R.string.add_to_playlist)
+    add(R.string.song_detail)
+    // Only local songs with valid MediaStore ids can be linked to a library detail page.
+    if (song.artistDetailRoute() != null) add(R.string.go_to_artist)
+    if (song.albumDetailRoute() != null) add(R.string.go_to_album)
+    add(R.string.song_edit)
+//    add(R.string.set_album_cover)
+    add(R.string.collect)
+    add(R.string.share)
+    add(R.string.ring)
+    add(R.string.delete)
+  }
   val activity = LocalActivity.current as? BaseActivity
   val settingVM = settingViewModel
   val tagEditVM = tagEditViewModel
@@ -131,6 +136,14 @@ private fun SongDropdownMenu(
 
             R.string.song_detail -> {
               settingVM.showSongDetailDialog(song)
+            }
+
+            R.string.go_to_artist -> {
+              song.artistDetailRoute()?.let { nav.openSongLibraryDetail(it) }
+            }
+
+            R.string.go_to_album -> {
+              song.albumDetailRoute()?.let { nav.openSongLibraryDetail(it) }
             }
 
             R.string.song_edit -> {

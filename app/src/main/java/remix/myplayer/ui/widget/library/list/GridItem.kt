@@ -23,7 +23,7 @@ import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
-import remix.myplayer.ui.widget.library.GlideCover
+import remix.myplayer.ui.widget.library.CoverImage
 import remix.myplayer.ui.widget.popup.LibraryItemPopupButton
 
 @Composable
@@ -33,6 +33,7 @@ fun GridItem(
   text2: String? = null,
   selected: Boolean,
   popupEnabled: Boolean = true,
+  trailingText: String? = null,
   onClick: () -> Unit,
   onLongClick: () -> Unit
 ) {
@@ -49,7 +50,7 @@ fun GridItem(
       )
       .background(if (selected) theme.select else theme.mainBackground)
   ) {
-    GlideCover(
+    CoverImage(
       modifier = Modifier
         .fillMaxWidth()
         .aspectRatio(1f)
@@ -72,7 +73,17 @@ fun GridItem(
       ) {
         TextPrimary(text = text1)
         if (text2 != null) {
-          TextSecondary(text2)
+          if (trailingText != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+              // Reserve space for the count; only the artist name gives up width.
+              if (text2.isNotBlank()) {
+                TextSecondary(text2, modifier = Modifier.weight(1f, fill = false))
+              }
+              TextSecondary(if (text2.isBlank()) trailingText else " · $trailingText")
+            }
+          } else {
+            TextSecondary(text2)
+          }
         }
       }
 

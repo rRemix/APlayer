@@ -178,7 +178,7 @@ class SettingPrefs @Inject constructor(
   )
   var keepScreenOn by PrefsDelegate(sp, PrefKeys.Setting.SCREEN_ALWAYS_ON, false)
 
-  var ignoreMediaStore by PrefsDelegate(sp, PrefKeys.Setting.IGNORE_MEDIA_STORE, false)
+  var loadEmbeddedCover by PrefsDelegate(sp, PrefKeys.Setting.LOAD_EMBEDDED_COVER, false)
   var autoDownloadCover by PrefsDelegate(
     sp,
     PrefKeys.Setting.AUTO_DOWNLOAD_ALBUM_COVER,

@@ -1,13 +1,11 @@
 package remix.myplayer.service
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.UriMatcher
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import remix.myplayer.util.Util
 import timber.log.Timber
 
 /**
@@ -15,12 +13,16 @@ import timber.log.Timber
  * @param service
  * @param handler The handler to run [.onChange] on, or null if none.
  */
-internal class MediaStoreObserver : ContentObserver(null), Runnable {
+internal class MediaStoreObserver(private val onChanged: () -> Unit) : ContentObserver(null), Runnable {
   private val handler = Handler(Looper.getMainLooper())
   private var match = -1
 
   override fun run() {
-    Util.sendLocalBroadcast(Intent(MusicService.MEDIA_STORE_CHANGE))
+    onChanged()
+  }
+
+  fun close() {
+    handler.removeCallbacksAndMessages(null)
   }
 
   @SuppressLint("CheckResult")

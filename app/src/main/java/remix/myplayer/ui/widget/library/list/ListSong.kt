@@ -21,17 +21,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.highLightText
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
-import remix.myplayer.ui.widget.library.GlideCover
+import remix.myplayer.ui.widget.library.CoverImage
 import remix.myplayer.ui.widget.popup.SongPopupButton
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ListSong(
   modifier: Modifier = Modifier,
@@ -43,6 +41,7 @@ fun ListSong(
   onClickSong: () -> Unit,
   onLongClickSong: () -> Unit,
   num: Int? = null,
+  subtitle: String = String.format("%s · %s", song.artist, song.album),
 ) {
   val theme = LocalTheme.current
 
@@ -88,7 +87,7 @@ fun ListSong(
 //      Box(modifier = Modifier
 //        .background(Color.Red)
 //        .size(40.dp))
-      GlideCover(
+      CoverImage(
         model = song,
         modifier = Modifier
           .size(40.dp)
@@ -103,7 +102,7 @@ fun ListSong(
       ) {
         TextPrimary(song.showName)
         Spacer(modifier = Modifier.height(4.dp))
-        TextSecondary(String.format("%s-%s", song.artist, song.album))
+        TextSecondary(subtitle)
       }
 
       SongPopupButton(

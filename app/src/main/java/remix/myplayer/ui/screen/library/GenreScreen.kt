@@ -111,6 +111,7 @@ fun GenreScreen() {
             GridItem(
               genre,
               text1 = genre.genre,
+              text2 = pluralStringResource(R.plurals.song_num, genre.count, genre.count),
               selected = selectedIds.contains(genre.getKey()),
               popupEnabled = popupEnabled,
               onClick = {

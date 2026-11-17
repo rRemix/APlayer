@@ -16,6 +16,7 @@ import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.data.prefs.CoverPrefs
 import remix.myplayer.helper.ItemsSorter
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.util.ext.checkWorkerThread
@@ -53,7 +54,8 @@ interface SongRepository {
 class SongRepoImpl @Inject constructor(
   @param:ApplicationContext private val context: Context,
   private val playListDao: PlayListDao,
-  private val settingPrefs: SettingPrefs
+  private val settingPrefs: SettingPrefs,
+  private val coverPrefs: CoverPrefs
 ) : SongRepository, AbstractRepository(settingPrefs) {
 
   override fun allSongs(): List<Song> {
@@ -197,7 +199,7 @@ class SongRepoImpl @Inject constructor(
 
             if (deleteIds.isNotEmpty()) {
               it.audioIds.removeAll(deleteIds)
-              playListDao.update(it)
+              if (playListDao.update(it) > 0) coverPrefs.invalidate("playlist:${it.id}")
             }
           }
 

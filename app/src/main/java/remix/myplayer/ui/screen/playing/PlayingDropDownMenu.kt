@@ -46,6 +46,8 @@ import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.nav.RouteEq
 import remix.myplayer.ui.nav.RouteTagEdit
+import remix.myplayer.ui.nav.albumDetailRoute
+import remix.myplayer.ui.nav.artistDetailRoute
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.ShowLyricTipDialog
@@ -72,18 +74,20 @@ fun PlayingDropDownMenu(
   val tagEditVM = tagEditViewModel
   val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
 
-  val menuItems =
-    listOf(
-      R.string.song_edit,
-      R.string.song_detail,
-      R.string.collect,
-      R.string.add_to_playlist,
-      R.string.sleep_timer,
-      R.string.eq,
-      R.string.lyric,
-      R.string.speed,
-      R.string.delete,
-    )
+  val menuItems = buildList {
+    add(R.string.song_edit)
+    add(R.string.song_detail)
+    // Only local songs with valid MediaStore ids can be linked to a library detail page.
+    if (song.artistDetailRoute() != null) add(R.string.go_to_artist)
+    if (song.albumDetailRoute() != null) add(R.string.go_to_album)
+    add(R.string.collect)
+    add(R.string.add_to_playlist)
+    add(R.string.sleep_timer)
+    add(R.string.eq)
+    add(R.string.lyric)
+    add(R.string.speed)
+    add(R.string.delete)
+  }
   val activity = LocalActivity.current as? BaseActivity
 
   val timerVM = timerViewModel
@@ -192,6 +196,18 @@ fun PlayingDropDownMenu(
                 return@DropdownMenuItem
               }
               settingVM.showSongDetailDialog(song)
+            }
+
+            R.string.go_to_artist, R.string.go_to_album -> {
+              val route = if (res == R.string.go_to_artist) {
+                song.artistDetailRoute()
+              } else {
+                song.albumDetailRoute()
+              }
+              if (route != null) {
+                // Detail pages live behind the full-screen player overlay; hand off after navigation.
+                scope.launch { nav.openPlayingDetail(route, mainVM) }
+              }
             }
 
             R.string.add_to_playlist -> {

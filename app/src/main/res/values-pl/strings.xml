@@ -582,12 +582,6 @@
     <item quantity="many">%d utworów</item>
     <item quantity="other">%d utworu</item>
   </plurals>
-  <plurals name="song_num_1">
-    <item quantity="one">%1$s    %2$d utwór</item>
-    <item quantity="few">%1$s    %2$d utwory</item>
-    <item quantity="many">%1$s    %2$d utworów</item>
-    <item quantity="other">%1$s    %2$d utworu</item>
-  </plurals>
 
   <!-- Desktop lyrics -->
   <string name="close_desktop_lyrics">Wyłącz tekst na pulpicie</string>
@@ -602,4 +596,20 @@
 
   <string name="play_from_this_line">Odtwarzaj od tego wersu</string>
   <string name="title_dynamic_smb">Klient SMB</string>
+
+  <!-- Details -->
+  <string name="artist_library_summary">%1$s · %2$s</string>
+  <string name="detail_total_duration">Łączny czas · %1$s</string>
+  <string name="detail_shuffle">Odtwarzaj losowo</string>
+  <string name="detail_retry">Spróbuj ponownie</string>
+  <plurals name="artist_album_count">
+    <item quantity="one">%d album</item>
+    <item quantity="few">%d albumy</item>
+    <item quantity="many">%d albumów</item>
+    <item quantity="other">%d albumu</item>
+  </plurals>
+
+  <!-- Song menu -->
+  <string name="go_to_artist">Przejdź do wykonawcy</string>
+  <string name="go_to_album">Przejdź do albumu</string>
 </resources>

@@ -4,13 +4,9 @@ import android.annotation.TargetApi
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.service.Command
@@ -32,29 +28,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
   override fun updateAndNotify() {
     val song = playbackState.song
 
-    //设置封面
-    Glide.with(service).clear(target)
-    target = Glide.with(service)
-      .asBitmap()
-      .load(song)
-      .centerCrop()
-      .override(size, size)
-      .into(object : CustomTarget<Bitmap>() {
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-          updateWithBitmap(resource, song)
-        }
-
-        override fun onLoadFailed(errorDrawable: Drawable?) {
-          updateWithBitmap(defaultBitmap, song)
-        }
-
-        override fun onLoadCleared(placeholder: Drawable?) {
-        }
-
-        override fun onLoadStarted(placeholder: Drawable?) {
-          updateWithBitmap(null, song)
-        }
-      })
+    loadCover(size) { bitmap -> updateWithBitmap(bitmap ?: defaultBitmap, song) }
   }
 
   private fun updateWithBitmap(bitmap: Bitmap?, song: Song) {

@@ -1,22 +1,12 @@
 package remix.myplayer.request.network
 
-import android.content.Context
-import okhttp3.Cache
 import okhttp3.OkHttpClient
-import remix.myplayer.misc.cache.DiskCache
 import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
 
 class OkHttpHelper {
-  private fun createDefaultCache(context: Context): Cache? {
-    val cacheDir = DiskCache.getDiskCacheDir(context, "okhttp")
-    return if (cacheDir.mkdirs() || cacheDir.isDirectory) {
-      Cache(cacheDir, 1024 * 1024 * 10)
-    } else null
-  }
-
   companion object {
     private const val TIMEOUT = 30000
     private var sOkHttpClient: OkHttpClient? = null

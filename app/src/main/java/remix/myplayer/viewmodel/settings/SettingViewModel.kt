@@ -7,7 +7,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide
+import coil3.imageLoader
+import kotlinx.coroutines.withContext
+import remix.myplayer.coil.coverUriResolver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +45,7 @@ import remix.myplayer.ui.screen.playing.PlayingCoverAnimationStyle
 import remix.myplayer.ui.theme.ThemeController
 import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.updateIf
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -133,7 +136,7 @@ class SettingViewModel @Inject constructor(
       keepScreenOn = settingPrefs.keepScreenOn
     ),
     cover = CoverSettings(
-      ignoreMediaStore = settingPrefs.ignoreMediaStore,
+      loadEmbeddedCover = settingPrefs.loadEmbeddedCover,
       autoDownloadCover = settingPrefs.autoDownloadCover,
       downloadSource = settingPrefs.downloadSource,
       coverAnimationStyle = PlayingCoverAnimationStyle.fromPrefValue(settingPrefs.playingCoverAnimationStyle),
@@ -393,9 +396,9 @@ class SettingViewModel @Inject constructor(
   }
 
   // -------- Cover 分组 ----------
-  fun setIgnoreMediaStore(enabled: Boolean) {
-    settingPrefs.ignoreMediaStore = enabled
-    _settingsState.update { it.copy(cover = it.cover.copy(ignoreMediaStore = enabled)) }
+  fun setLoadEmbeddedCover(enabled: Boolean) {
+    settingPrefs.loadEmbeddedCover = enabled
+    _settingsState.update { it.copy(cover = it.cover.copy(loadEmbeddedCover = enabled)) }
   }
 
   fun setAutoDownloadCover(mode: Int) {
@@ -556,12 +559,18 @@ class SettingViewModel @Inject constructor(
 
   fun clearCache(context: Context, andThen: () -> Unit = {}) {
     viewModelScope.launch(Dispatchers.IO) {
-      context.cacheDir.deleteRecursively()
-      context.externalCacheDir?.deleteRecursively()
-      Glide.get(context).clearDiskCache()
+      context.imageLoader.diskCache?.clear()
+      context.imageLoader.memoryCache?.clear()
+      // Only clear temporary tag-edit artwork, including legacy external locations.
+      for (root in listOf(context.cacheDir) + context.externalCacheDirs.filterNotNull()) {
+        File(root, "song_cover").deleteRecursively()
+      }
       // 只清除非持久化歌词缓存，保留用户手动选择的歌词
       lyricManager.clearAllCache(includePersistent = false)
-      andThen()
+      withContext(Dispatchers.Main) {
+        context.coverUriResolver().invalidateAll()
+        andThen()
+      }
     }
   }
 }

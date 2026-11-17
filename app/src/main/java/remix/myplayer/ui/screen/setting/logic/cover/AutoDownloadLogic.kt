@@ -41,7 +41,7 @@ fun AutoDownloadLogic() {
         return@ItemsCallbackSingleChoice
       }
       settingVM.setAutoDownloadCover(it)
-      libraryVM.fetchMedia(true)
+      libraryVM.refreshCovers()
     }
   )
 }

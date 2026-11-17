@@ -33,6 +33,7 @@ fun CommonAppBar(
   title: String?,
   showBack: Boolean = true,
   onBack: (() -> Unit)? = null,
+  titleModifier: Modifier = Modifier,
   actions: @Composable () -> Unit
 ) {
   val navController = LocalNavController.current
@@ -45,7 +46,7 @@ fun CommonAppBar(
           title,
           color = Color.White,
           fontSize = 18.sp,
-          modifier = Modifier.padding(start = 16.dp)
+          modifier = titleModifier.padding(start = 16.dp)
         )
       }
     },

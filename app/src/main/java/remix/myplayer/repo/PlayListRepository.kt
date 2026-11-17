@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.map
 import remix.myplayer.data.db.room.dao.PlayListDao
 import remix.myplayer.data.db.room.entity.PlayList
 import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.data.prefs.CoverPrefs
 import remix.myplayer.data.prefs.playlistSortOrderFlow
 import remix.myplayer.helper.ItemsSorter
 import remix.myplayer.helper.SortOrder
@@ -34,7 +35,8 @@ interface PlayListRepository {
 class PlayListRepoImpl @Inject constructor(
   @param:ApplicationContext private val context: Context,
   private val playListDao: PlayListDao,
-  private val settingPrefs: SettingPrefs
+  private val settingPrefs: SettingPrefs,
+  private val coverPrefs: CoverPrefs
 ) : PlayListRepository, AbstractRepository(settingPrefs) {
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -66,16 +68,29 @@ class PlayListRepoImpl @Inject constructor(
     val old = playList.audioIds.size
     playList.audioIds.addAll(audioIds.filter { !playList.audioIds.contains(it) })
     val count = playList.audioIds.size - old
-    playListDao.update(playList)
+    if (count > 0 && playListDao.update(playList) > 0) {
+      coverPrefs.invalidate("playlist:${playList.id}")
+    }
     return count
   }
 
   override suspend fun insertPlayList(name: String) =
     playListDao.insert(PlayList(0, name, ArrayList(), Date().time))
 
-  override suspend fun updatePlayList(playList: PlayList) = playListDao.update(playList)
+  override suspend fun updatePlayList(playList: PlayList): Int {
+    val previous = playListDao.observeById(playList.id).first()
+    val updated = playListDao.update(playList)
+    if (updated > 0 && previous?.audioIds != playList.audioIds) {
+      coverPrefs.invalidate("playlist:${playList.id}")
+    }
+    return updated
+  }
 
-  override suspend fun deletePlayList(id: Long) = playListDao.delete(id)
+  override suspend fun deletePlayList(id: Long): Int {
+    val deleted = playListDao.delete(id)
+    if (deleted > 0) coverPrefs.invalidate("playlist:$id")
+    return deleted
+  }
 
   override suspend fun isFavorite(id: Long): Boolean {
     val p = getFavorite()
@@ -94,7 +109,7 @@ class PlayListRepoImpl @Inject constructor(
       true
     }
 
-    playListDao.update(p)
+    if (playListDao.update(p) > 0) coverPrefs.invalidate("playlist:${p.id}")
     return favorite
   }
 
@@ -107,7 +122,10 @@ class PlayListRepoImpl @Inject constructor(
       val filtered = pl.audioIds.filterNot { it in toRemove }
       if (filtered.size != pl.audioIds.size) pl.copy(audioIds = ArrayList(filtered)) else null
     }
-    return if (updated.isEmpty()) 0 else playListDao.update(updated)
+    if (updated.isEmpty()) return 0
+    val count = playListDao.update(updated)
+    if (count > 0) coverPrefs.invalidate(updated.map { "playlist:${it.id}" })
+    return count
   }
 
   override suspend fun checkPlayListExist(name: String): Boolean {

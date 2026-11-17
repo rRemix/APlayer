@@ -377,8 +377,8 @@
   <string name="list_loop_tip">プレイリストの最後まで再生したら最初の曲から続けます</string>
   <string name="will_stop_at_x">APlayerは %d 分後に終了します</string>
   <string name="saveing">保存</string>
-  <string name="ignore_mediastore_artwork">メディアストアのカバー画像を無視</string>
-  <string name="ignore_mediastore_artwork_tips">アルバムカバーの画質が向上するかもしれませんが、読込に時間がかかることがあります</string>
+  <string name="load_embedded_cover">埋め込みカバー画像を読み込む</string>
+  <string name="load_embedded_cover_tips">オンにすると音声ファイルの埋め込みカバー画像を読み込みます。読み込みに時間がかかる場合があります</string>
   <string name="error_setup_inapp_billing">アプリ内購入で問題が発生しました: %s</string>
   <string name="error_occur">エラーが発生しました: %s</string>
   <string name="thank_you">ありがとうございます!</string>
@@ -570,10 +570,20 @@
       <item quantity="other">%d曲</item>
   </plurals>
 
-  <plurals name="song_num_1">
-      <item quantity="other">%1$s    %2$d 曲</item>
-  </plurals>
     <string name="title_dynamic_smb">SMB クライアント</string>
   <string name="select_image">画像を選択</string>
   <string name="clear_cover">カバーを削除</string>
+
+  <!-- Details -->
+    <string name="artist_library_summary">%1$s · %2$s</string>
+    <string name="detail_total_duration">合計再生時間 · %1$s</string>
+    <string name="detail_shuffle">シャッフル再生</string>
+    <string name="detail_retry">再試行</string>
+    <plurals name="artist_album_count">
+      <item quantity="other">アルバム %d 枚</item>
+    </plurals>
+
+    <!-- Song menu -->
+    <string name="go_to_artist">アーティストを表示</string>
+    <string name="go_to_album">アルバムを表示</string>
 </resources>

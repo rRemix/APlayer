@@ -42,7 +42,7 @@ fun DownloadSourceLogic() {
         return@ItemsCallbackSingleChoice
       }
       settingVM.setDownloadSource(it)
-      libraryVM.fetchMedia(true)
+      libraryVM.refreshCovers()
     }
   )
 }

@@ -10,18 +10,18 @@ import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.settingViewModel
 
 @Composable
-fun IgnoreMediaStoreLogic() {
+fun LoadEmbeddedCoverLogic() {
   val settingVM = settingViewModel
   val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
 
   val libraryVM = libraryViewModel
 
   SwitchPreference(
-    stringResource(R.string.ignore_mediastore_artwork),
-    stringResource(R.string.ignore_mediastore_artwork_tips),
-    settingState.cover.ignoreMediaStore
+    stringResource(R.string.load_embedded_cover),
+    stringResource(R.string.load_embedded_cover_tips),
+    settingState.cover.loadEmbeddedCover
   ) {
-    settingVM.setIgnoreMediaStore(it)
-    libraryVM.fetchMedia(true)
+    settingVM.setLoadEmbeddedCover(it)
+    libraryVM.refreshCovers()
   }
 }

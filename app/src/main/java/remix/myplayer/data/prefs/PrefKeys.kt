@@ -112,7 +112,10 @@ object PrefKeys {
 
     const val SOURCE_OPEN_ACTION = "source_open_action"
 
-    /** 是否忽略媒体缓存 */
+    /** 是否加载内嵌封面 */
+    const val LOAD_EMBEDDED_COVER = "load_embedded_cover"
+
+    /** 迁移旧版“忽略媒体缓存”开关 */
     const val IGNORE_MEDIA_STORE = "ignore_media_store"
 
     /** 桌面部件样式 */

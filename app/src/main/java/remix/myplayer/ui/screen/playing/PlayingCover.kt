@@ -10,16 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.placeholder
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.glide.addBitmapListener
 import remix.myplayer.service.Command
 import remix.myplayer.service.playback.MusicStateSource
-import remix.myplayer.ui.theme.LocalTheme
+import remix.myplayer.ui.widget.library.CoverImage
 import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import timber.log.Timber
@@ -74,7 +70,7 @@ enum class PlayingCoverAnimationStyle(val prefValue: String) {
   }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun PlayingCover(modifier: Modifier, song: Song) {
   val playbackVM = playbackViewModel
@@ -122,17 +118,16 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
       else -> imageModifier
     }
 
-    GlideImage(
+    CoverImage(
       model = currentSong,
-      contentDescription = "PlayingCover",
-      contentScale = ContentScale.Crop,
-      failure = placeholder(LocalTheme.current.albumPlaceHolder),
-      loading = placeholder(LocalTheme.current.albumPlaceHolder),
-      modifier = contentModifier
-    ) { builder ->
-      builder.addBitmapListener { bitmap ->
-        playbackVM.updateSwatch(bitmap)
+      circle = false,
+      modifier = contentModifier,
+      onBitmap = { bitmap ->
+        val playing = MusicStateSource.currentPlaybackUiState.song
+        if (currentSong.id == playing.id && currentSong.data == playing.data) {
+          playbackVM.updateSwatch(bitmap)
+        }
       }
-    }
+    )
   }
 }

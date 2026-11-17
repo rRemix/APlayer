@@ -75,7 +75,7 @@ data class PlayingScreenSettings(
 
 @Stable
 data class CoverSettings(
-  val ignoreMediaStore: Boolean,
+  val loadEmbeddedCover: Boolean,
   val autoDownloadCover: Int,
   val downloadSource: Int,
   val coverAnimationStyle: PlayingCoverAnimationStyle,

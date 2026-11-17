@@ -80,10 +80,10 @@ fun AlbumScreen() {
             modifier = Modifier.height(64.dp),
             model = album,
             text1 = album.album,
-            text2 = pluralStringResource(
-              R.plurals.song_num_1, album.count, album.artist,
-              album.count
-            ),
+            text2 = listOf(
+              album.artist,
+              pluralStringResource(R.plurals.song_num, album.count, album.count),
+            ).filter { it.isNotBlank() }.joinToString(" · "),
             selected = selectedIds.contains(album.getKey()),
             popupEnabled = popupEnabled,
             onClick = {
@@ -112,6 +112,7 @@ fun AlbumScreen() {
           }) { album ->
             GridItem(
               album, album.album, album.artist,
+              trailingText = pluralStringResource(R.plurals.song_num, album.count, album.count),
               selected = selectedIds.contains(album.getKey()),
               popupEnabled = popupEnabled,
               onClick = {

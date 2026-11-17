@@ -102,7 +102,7 @@ fun BlackListLogic() {
     contentRes = R.string.clear_blacklist_content,
     onPositive = {
       settingVM.setBlacklist(emptySet())
-      libraryVM.fetchMedia(false)
+      libraryVM.fetchMedia()
     }
   )
 }
