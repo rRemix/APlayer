@@ -14,92 +14,66 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavBackStackEntry
-import remix.myplayer.BuildConfig
 
-
-fun enterTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
+fun enterTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition =
   {
-    slideInFromRight()
+    if (targetState.destination.route == RoutePlaying) {
+      slideInVertically(animationSpec = slideSpec, initialOffsetY = { it }) +
+          fadeIn(animationSpec = fadeSpec)
+    } else {
+      slideInFromRight()
+    }
   }
 
-fun exitTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
-  // playingScreen has special animation
-  when (targetState.destination.route) {
-//    RoutePlayingScreen -> {
-//      slideOutToTop()
-//    }
-
-    else -> {
-      slideOutToLeft()
-    }
+fun exitTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+  if (targetState.destination.route == RoutePlaying) {
+    slideOutVertically(animationSpec = slideSpec, targetOffsetY = { (-it * 0.2f).toInt() }) +
+        fadeOut(animationSpec = fadeSpec, targetAlpha = 0.5f)
+  } else {
+    slideOutToLeft()
   }
 }
 
-fun popEnterTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
+fun popEnterTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition =
   {
-    // playingScreen has special animation
-    when (initialState.destination.route) {
-//      RoutePlayingScreen -> {
-//        slideInFromTop()
-//      }
+    if (initialState.destination.route == RoutePlaying) slideInFromTop() else slideInFromLeft()
+  }
 
-      else -> {
-        slideInFromLeft()
-      }
+fun popExitTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition =
+  {
+    if (initialState.destination.route == RoutePlaying) {
+      slideOutVertically(animationSpec = slideSpec, targetOffsetY = { it }) +
+          fadeOut(animationSpec = fadeSpec)
+    } else {
+      slideOutToRight()
     }
   }
 
-fun popExitTransition(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> @JvmSuppressWildcards ExitTransition? =
-  {
-    slideOutToRight()
-  }
-
-private val duration = if (BuildConfig.DEBUG) 2000 else 350
-
-//private val slideSpec = tween<IntOffset>(durationMillis = duration)
 private val slideSpec = spring(
   stiffness = Spring.StiffnessMediumLow,
   visibilityThreshold = IntOffset.VisibilityThreshold
 )
 
-//private val fadeSpec = tween<Float>(durationMillis = duration)
 private val fadeSpec = spring<Float>(stiffness = Spring.StiffnessMediumLow)
 
 fun slideInFromRight(): EnterTransition =
   slideInHorizontally(animationSpec = slideSpec, initialOffsetX = {
     it
-  }) + fadeIn(animationSpec = fadeSpec)
+  })
 
 fun slideInFromLeft(): EnterTransition =
   slideInHorizontally(animationSpec = slideSpec, initialOffsetX = {
     (-it * 0.35f).toInt()
-  }) + fadeIn(animationSpec = fadeSpec)
+  })
 
 fun slideOutToRight(): ExitTransition =
-  slideOutHorizontally(animationSpec = slideSpec, targetOffsetX = { it }) + fadeOut(
-    animationSpec = fadeSpec
-  )
+  slideOutHorizontally(animationSpec = slideSpec, targetOffsetX = { it })
 
-fun slideOutToLeft(): ExitTransition? = slideOutHorizontally(
+fun slideOutToLeft(): ExitTransition = slideOutHorizontally(
   animationSpec = slideSpec,
-  targetOffsetX = { (-it * 0.35f).toInt() }) + fadeOut(animationSpec = fadeSpec)
+  targetOffsetX = { (-it * 0.35f).toInt() })
 
 fun slideInFromTop(): EnterTransition = slideInVertically(
   animationSpec = slideSpec,
   initialOffsetY = { -(it * 0.2).toInt() }) +
     fadeIn(animationSpec = fadeSpec, initialAlpha = 0.5f)
-
-fun slideOutToTop(): ExitTransition = slideOutVertically(
-  animationSpec = slideSpec,
-  targetOffsetY = { -(it * 0.2).toInt() }) + fadeOut(animationSpec = fadeSpec)
-
-fun slideInFromBottom(): EnterTransition =
-  slideInVertically(
-    animationSpec = slideSpec,
-    initialOffsetY = { (it * 0.05).toInt() }) +
-      fadeIn(animationSpec = fadeSpec, initialAlpha = 0.5f)
-
-fun slideOutToBottom(): ExitTransition =
-  slideOutVertically(
-    animationSpec = slideSpec,
-    targetOffsetY = { (it * 0.2).toInt() }) + fadeOut(animationSpec = fadeSpec)

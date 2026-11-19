@@ -111,7 +111,7 @@ fun WebDavDetailScreen(webDav: WebDav) {
     pathStack.removeAt(pathStack.lastIndex)
   }
 
-  BackHandler {
+  BackHandler(enabled = pathStack.size > 1) {
     handleBack()
   }
 

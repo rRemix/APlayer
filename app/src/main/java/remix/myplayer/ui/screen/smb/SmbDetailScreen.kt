@@ -94,7 +94,7 @@ fun SmbDetailScreen(smb: Smb) {
     pathStack.removeAt(pathStack.lastIndex)
   }
 
-  BackHandler {
+  BackHandler(enabled = pathStack.size > 1) {
     handleBack()
   }
 

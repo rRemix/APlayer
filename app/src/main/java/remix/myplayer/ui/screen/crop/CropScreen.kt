@@ -1,7 +1,6 @@
 package remix.myplayer.ui.screen.crop
 
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,7 +42,6 @@ fun CropScreen(
   onCancel: () -> Unit
 ) {
   val context = LocalContext.current
-  BackHandler(onBack = onCancel)
 
   var pickUri by rememberSaveable {
     mutableStateOf(Uri.EMPTY)

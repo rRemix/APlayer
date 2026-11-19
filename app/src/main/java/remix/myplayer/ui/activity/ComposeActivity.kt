@@ -8,12 +8,10 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -22,8 +20,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
@@ -41,7 +37,6 @@ import remix.myplayer.util.ThemeUtil
 import remix.myplayer.viewmodel.LibraryViewModel
 import remix.myplayer.viewmodel.MainViewModel
 import remix.myplayer.viewmodel.PlaybackViewModel
-import remix.myplayer.viewmodel.PlayingScreenValue
 import remix.myplayer.viewmodel.ProvideViewModels
 import remix.myplayer.viewmodel.settingViewModel
 import timber.log.Timber
@@ -103,10 +98,6 @@ class ComposeActivity : BaseMusicActivity() {
     }
   }
 
-  override fun onDestroy() {
-    super.onDestroy()
-  }
-
   override fun onResume() {
     super.onResume()
     handleIntent()
@@ -122,13 +113,8 @@ class ComposeActivity : BaseMusicActivity() {
       when (it.scheme) {
         playingScreenDeepLink.scheme -> {
           Timber.v("deepLink")
-          lifecycleScope.launch {
-            val state = mainViewModel.playingScreenState
-            snapshotFlow {
-              state.anchors.hasPositionFor(PlayingScreenValue.Expanded)
-            }.filter { it }.first()
-            state.snapTo(PlayingScreenValue.Expanded)
-          }
+          mainViewModel.requestPlayingScreen()
+          intent = Intent()
         }
 
         else -> {

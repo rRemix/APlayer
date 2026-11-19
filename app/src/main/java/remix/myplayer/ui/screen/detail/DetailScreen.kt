@@ -10,8 +10,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.animateTo
-import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -90,9 +88,8 @@ import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.nav.DetailScreenRoute
-import remix.myplayer.ui.nav.ExtraHidePlayingScreenOnEntry
-import remix.myplayer.ui.nav.ExtraRestorePlayingScreen
 import remix.myplayer.ui.nav.LocalNavController
+import remix.myplayer.ui.nav.openPlayingScreen
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.theme.LocalTheme
@@ -109,7 +106,6 @@ import remix.myplayer.util.ext.verticalScrollbar
 import remix.myplayer.viewmodel.DetailState
 import remix.myplayer.viewmodel.DetailViewModel
 import remix.myplayer.viewmodel.MultiSelectState
-import remix.myplayer.viewmodel.PlayingScreenValue
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.playbackViewModel
@@ -157,7 +153,6 @@ fun DetailScreen(
   }
   val albumRowState = rememberLazyListState()
   val entry = LocalLifecycleOwner.current as? NavBackStackEntry
-  val restorePlayingScreen = entry?.savedStateHandle?.get<Boolean>(ExtraRestorePlayingScreen) == true
   val settingState by settingViewModel.settingsState.collectAsStateWithLifecycle()
   val sourceOpenAction = settingState.play.sourceOpenAction
   val resumeDialog = rememberDialogState(false)
@@ -166,6 +161,9 @@ fun DetailScreen(
     if (!openFromLibrary || entry == null ||
       entry.savedStateHandle.get<Boolean>(SOURCE_OPEN_HANDLED) == true
     ) return@LaunchedEffect
+    // Merely previewing this destination must not start playback or open a dialog.
+    entry.lifecycle.currentStateFlow.first { it == Lifecycle.State.RESUMED }
+    if (nav.currentBackStackEntry != entry) return@LaunchedEffect
     entry.savedStateHandle[SOURCE_OPEN_HANDLED] = true
 
     when (sourceOpenAction) {
@@ -182,25 +180,10 @@ fun DetailScreen(
     }
   }
 
-  LaunchedEffect(entry) {
-    if (entry?.savedStateHandle?.get<Boolean>(ExtraHidePlayingScreenOnEntry) == true) {
-      entry.lifecycle.currentStateFlow.first { it == Lifecycle.State.RESUMED }
-      if (nav.currentBackStackEntry == entry) {
-        mainVM.playingScreenState.snapTo(PlayingScreenValue.Hidden)
-        entry.savedStateHandle[ExtraHidePlayingScreenOnEntry] = false
-      }
-    }
-  }
-
   fun exitDetail() {
-    scope.launch {
-      if (entry != null && (nav.currentBackStackEntry != entry ||
-          entry.lifecycle.currentState != Lifecycle.State.RESUMED)) return@launch
-      if (restorePlayingScreen) {
-        mainVM.playingScreenState.snapTo(PlayingScreenValue.Expanded)
-      }
-      nav.popBackStack()
-    }
+    if (entry != null && (nav.currentBackStackEntry != entry ||
+        entry.lifecycle.currentState != Lifecycle.State.RESUMED)) return
+    nav.popBackStack()
   }
 
   NormalDialog(
@@ -213,7 +196,6 @@ fun DetailScreen(
   )
 
   DetailRefreshEffect(detailModel, vm)
-  BackHandler(enabled = restorePlayingScreen && !selecting) { exitDetail() }
   BackHandler(selecting) { mainVM.closeMultiSelect() }
 
   fun playAll(shuffle: Boolean, index: Int = 0) {
@@ -347,7 +329,7 @@ fun DetailScreen(
               } else if (playbackState.isPlaying && playing &&
                 (detailModel.playbackSourceKey() == null || MusicServiceRemote.isPlayingFrom(detailModel))
               ) {
-                scope.launch { mainVM.playingScreenState.animateTo(PlayingScreenValue.Expanded) }
+                nav.openPlayingScreen()
               } else {
                 playAll(false, index)
               }

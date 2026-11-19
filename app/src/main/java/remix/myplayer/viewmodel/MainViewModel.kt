@@ -1,7 +1,6 @@
 package remix.myplayer.viewmodel
 
 import android.content.Context
-import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,9 +34,16 @@ class MainViewModel @Inject constructor(
   private val inAppUpdater: Lazy<InAppUpdater>
 ) : ViewModel() {
 
-  val playingScreenState = AnchoredDraggableState(
-    initialValue = PlayingScreenValue.Hidden
-  )
+  private val _openPlayingScreenRequests = MutableStateFlow(false)
+  val openPlayingScreenRequests = _openPlayingScreenRequests.asStateFlow()
+
+  fun requestPlayingScreen() {
+    _openPlayingScreenRequests.value = true
+  }
+
+  fun consumePlayingScreenRequest() {
+    _openPlayingScreenRequests.value = false
+  }
 
   private val _inAppUpdateState = MutableStateFlow(InAppUpdateState())
   val inAppUpdateState = _inAppUpdateState.asStateFlow()
@@ -218,5 +224,3 @@ data class InAppUpdateState(
   val dialogState: DialogState = DialogState(),
   val release: Release? = null
 )
-
-enum class PlayingScreenValue { Hidden, Expanded }
