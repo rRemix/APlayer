@@ -354,6 +354,23 @@ class ExoPlayback(
     }
   }
 
+  override val nextIndexRespectingMode: Int
+    get() {
+      // 单曲循环时歌曲结束应重新播放当前歌曲
+      if (player.repeatMode == Player.REPEAT_MODE_ONE) {
+        return player.currentMediaItemIndex
+      }
+      // 其余模式与自然播放结束后的行为一致，包括随机播放顺序和列表循环
+      return player.nextMediaItemIndex
+    }
+
+  override fun seekToIndex(index: Int) {
+    checkMainThread()
+    if (index == C.INDEX_UNSET) return
+    player.seekToDefaultPosition(index)
+    ensurePrepared()
+  }
+
   override fun skipToPrevious() {
     checkMainThread()
     val timeline = player.currentTimeline
