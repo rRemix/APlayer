@@ -214,6 +214,15 @@ object PrefKeys {
     /** 淡入淡出 */
     const val CROSS_FADE = "cross_fade"
 
+    /** 自动跳过片头片尾 */
+    const val SKIP_INTRO_OUTRO_ENABLED = "skip_intro_outro_enabled"
+
+    /** 片头跳过时长（秒） */
+    const val SKIP_INTRO_SECONDS = "skip_intro_seconds"
+
+    /** 片尾跳过时长（秒） */
+    const val SKIP_OUTRO_SECONDS = "skip_outro_seconds"
+
     override val latestVersion = 3
   }
 
