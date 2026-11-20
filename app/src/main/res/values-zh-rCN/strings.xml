@@ -551,6 +551,11 @@
   <string name="last_play_desc">最后播放降序</string>
   <string name="play_cross_fade">淡入淡出</string>
   <string name="play_cross_fade_tip">播放、暂停时使用淡入淡出效果</string>
+  <string name="play_skip_intro_outro">自动跳过片头片尾</string>
+  <string name="play_skip_intro_outro_tip">播放时自动跳过每首歌开头和结尾的指定时长</string>
+  <string name="play_skip_intro_seconds">跳过片头</string>
+  <string name="play_skip_outro_seconds">跳过片尾</string>
+  <string name="play_skip_seconds_value">%1$d 秒</string>
   <string name="play_replay_gain">回放增益</string>
   <string name="play_replay_gain_disabled">关闭</string>
   <string name="play_replay_gain_disabled_tip">已关闭</string>

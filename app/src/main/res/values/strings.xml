@@ -557,6 +557,11 @@
   <string name="last_play_desc">Last Play TimeAt Desc</string>
   <string name="play_cross_fade">Fade in and out</string>
   <string name="play_cross_fade_tip">Use fade-in and fade-out effects when playing and pausing</string>
+  <string name="play_skip_intro_outro">Skip intro and outro</string>
+  <string name="play_skip_intro_outro_tip">Automatically skip the set duration at the beginning and end of each song</string>
+  <string name="play_skip_intro_seconds">Intro to skip</string>
+  <string name="play_skip_outro_seconds">Outro to skip</string>
+  <string name="play_skip_seconds_value">%1$d s</string>
   <string name="play_replay_gain">Replay Gain</string>
   <string name="play_replay_gain_disabled">Off</string>
   <string name="play_replay_gain_disabled_tip">Disabled</string>

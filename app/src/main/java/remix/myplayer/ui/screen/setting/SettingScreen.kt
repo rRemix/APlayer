@@ -56,6 +56,7 @@ import remix.myplayer.ui.screen.setting.logic.play.IgnoreAudioFocusLogic
 import remix.myplayer.ui.screen.setting.logic.play.ListLoopLogic
 import remix.myplayer.ui.screen.setting.logic.play.PlayFadeLogic
 import remix.myplayer.ui.screen.setting.logic.play.ReplayGainLogic
+import remix.myplayer.ui.screen.setting.logic.play.SkipIntroOutroLogic
 import remix.myplayer.ui.screen.setting.logic.playingscreen.KeepScreenOnLogic
 import remix.myplayer.ui.screen.setting.logic.playingscreen.PlayingCoverAnimationLogic
 import remix.myplayer.ui.screen.setting.logic.playingscreen.PlayingScreenBackgroundLogic
@@ -221,6 +222,8 @@ private fun PlayPreferenceItems() {
   SourceOpenActionLogic()
 
   PlayFadeLogic()
+
+  SkipIntroOutroLogic()
 
   ReplayGainLogic()
 
