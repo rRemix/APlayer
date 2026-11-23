@@ -382,6 +382,8 @@
   <string name="saveing">Zapisywanie...</string>
   <string name="ignore_mediastore_artwork">Ignoruj okładki z Media Store</string>
   <string name="ignore_mediastore_artwork_tips">Ignoruje pamięć podręczną Media Store i odczytuje okładki zaszyte bezpośrednio w plikach audio (może to wydłużyć czas ładowania obrazów)</string>
+  <string name="load_embedded_cover">Wczytuj osadzone okładki</string>
+  <string name="load_embedded_cover_tips">Po włączeniu APlayer będzie wczytywać okładki albumów osadzone w plikach audio, co może wydłużyć czas ładowania</string>
   <string name="error_setup_inapp_billing">Problem podczas konfiguracji płatności w aplikacji: %s</string>
   <string name="error_occur">Wystąpił błąd: %s</string>
   <string name="thank_you">Dziękujemy!</string>

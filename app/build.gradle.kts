@@ -80,6 +80,7 @@ android {
             "en",
             "ja",
             "ja-rJP",
+            "pl",
             "zh",
             "zh-rCN",
             "zh-rHK",

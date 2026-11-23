@@ -21,6 +21,7 @@ private val itemRes = listOf(
   R.string.zh_traditional,
   R.string.english,
   R.string.japanese,
+  R.string.polish,
 )
 @Composable
 fun LanguageLogic() {

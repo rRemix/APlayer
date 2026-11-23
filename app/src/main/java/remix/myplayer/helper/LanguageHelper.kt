@@ -15,6 +15,7 @@ object LanguageHelper {
   private const val CHINESE_TRADITIONAL = 2
   private const val ENGLISH = 3
   private const val JAPANESE = 4
+  private const val POLISH = 5
   var current = -1
 
   private var sLocal: Locale = Locale.getDefault()
@@ -49,6 +50,7 @@ object LanguageHelper {
       ENGLISH -> Locale.ENGLISH
       CHINESE_TRADITIONAL -> Locale.TRADITIONAL_CHINESE
       JAPANESE -> Locale.JAPANESE
+      POLISH -> Locale.forLanguageTag("pl-PL")
       else -> sLocal
     }
   }
