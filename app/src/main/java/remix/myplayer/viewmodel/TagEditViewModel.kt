@@ -56,7 +56,7 @@ class TagEditViewModel @Inject constructor() : ViewModel() {
       }
       val albumArt = ImageUtil.extractAlbumArt(song)
       _tagEditState.update { state ->
-        if (state.song?.id != song.id) {
+        if (state.song?.songIdentity != song.songIdentity) {
           return@update state
         }
         val updatedFormState = if (state.hasEdited) {

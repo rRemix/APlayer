@@ -1,5 +1,6 @@
 package remix.myplayer.ui.widget.library.list
 
+import remix.myplayer.viewmodel.settingViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -100,7 +101,7 @@ fun ListSong(
           .weight(1f)
           .padding(start = 16.dp, end = 8.dp)
       ) {
-        TextPrimary(song.showName)
+        TextPrimary(song.showName(settingViewModel.settingPrefs.showDisplayName))
         Spacer(modifier = Modifier.height(4.dp))
         TextSecondary(subtitle)
       }

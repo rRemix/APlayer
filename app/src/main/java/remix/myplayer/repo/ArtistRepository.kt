@@ -1,69 +1,29 @@
 package remix.myplayer.repo
 
-import android.content.Context
-import android.provider.MediaStore.Audio
-import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import remix.myplayer.data.model.audio.Artist
+import remix.myplayer.data.prefs.PrefKeys
 import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.data.prefs.observe
 import remix.myplayer.helper.ItemsSorter
-import remix.myplayer.util.PermissionUtil
-import timber.log.Timber
 import javax.inject.Inject
 
-interface ArtistRepository {
-  fun allArtists(): List<Artist>
-}
+interface ArtistRepository { fun observeArtists(): Flow<List<Artist>> }
 
 class ArtistRepoImpl @Inject constructor(
-  @param:ApplicationContext private val context: Context,
-  private val settingPrefs: SettingPrefs
-) : ArtistRepository, AbstractRepository(settingPrefs) {
-
-  override fun allArtists(): List<Artist> {
-    if (!PermissionUtil.hasNecessaryPermission()) {
-      return emptyList()
+  private val songs: SongRepository,
+  private val settings: SettingPrefs
+) : ArtistRepository {
+  override fun observeArtists(): Flow<List<Artist>> = songs.observeSongs().map { songs ->
+    songs.groupBy { it.artistId }.map { (id, tracks) ->
+      val song = tracks.first()
+      Artist(id, song.artist, tracks.size)
     }
-
-    val artistMaps: MutableMap<Long, MutableList<Artist>> = LinkedHashMap()
-    val artists: MutableList<Artist> = ArrayList()
-    val sortOrder = settingPrefs.artistSortOrder
-    try {
-      context.contentResolver
-        .query(
-          Audio.Media.EXTERNAL_CONTENT_URI, arrayOf(
-            Audio.Media.ARTIST_ID,
-            Audio.Media.ARTIST
-          ),
-          baseSelection,
-          baseSelectionArgs,
-          sortOrder
-        ).use { cursor ->
-          if (cursor != null) {
-            while (cursor.moveToNext()) {
-              try {
-                val artistId = cursor.getLong(0)
-                if (artistMaps[artistId] == null) {
-                  artistMaps[artistId] = ArrayList()
-                }
-                artistMaps[artistId]?.add(Artist(artistId, cursor.getString(1), 0))
-              } catch (ignored: Exception) {
-              }
-            }
-            for ((_, value) in artistMaps) {
-              try {
-                val artist = value[0]
-                artist.count = value.size
-                artists.add(artist)
-              } catch (e: Exception) {
-                Timber.v("addArtist failed: $e")
-              }
-            }
-          }
-        }
-    } catch (e: Exception) {
-      Timber.v("getAllArtist failed: $e")
-    }
-    return ItemsSorter.sortedArtists(artists, sortOrder)
-  }
-
+  }.combine(settings.observe(PrefKeys.Setting.ARTIST_SORT_ORDER) { artistSortOrder }) { items, order ->
+    ItemsSorter.sortedArtists(items, order)
+  }.flowOn(Dispatchers.Default)
 }

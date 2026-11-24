@@ -32,7 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.viewmodel.MultiSelectState
@@ -47,7 +47,8 @@ fun MultiSelectBar(
   state: MultiSelectState,
   scrollBehavior: TopAppBarScrollBehavior?,
   parent: APlayerModel? = null,
-  onSelectAll: (() -> Unit)? = null
+  onSelectAll: (() -> Unit)? = null,
+  onDelete: ((List<APlayerModel>) -> Unit)? = null
 ) {
   val libraryVM = libraryViewModel
   val mainVM = mainViewModel
@@ -89,9 +90,9 @@ fun MultiSelectBar(
         scope.launch {
           mainVM.closeMultiSelect()
           val songs =
-            withContext(Dispatchers.IO) { libraryVM.loadSongsByModels(state.selectedModels) }
+            withContext(Dispatchers.IO) { libraryVM.loadSongs(state.selectedModels) }
           if (songs.isNotEmpty()) {
-            settingVM.showAddSongToPlayListDialog(songs.map { it.id }, "")
+            settingVM.showAddSongToPlayListDialog(songs.map { it.songIdentity }, "")
           }
         }
       }
@@ -100,7 +101,7 @@ fun MultiSelectBar(
         scope.launch {
           mainVM.closeMultiSelect()
           val songs =
-            withContext(Dispatchers.IO) { libraryVM.loadSongsByModels(state.selectedModels) }
+            withContext(Dispatchers.IO) { libraryVM.loadSongs(state.selectedModels) }
           if (songs.isNotEmpty()) {
             playbackVM.insertToQueue(songs)
           }
@@ -109,8 +110,13 @@ fun MultiSelectBar(
 
       if (state.where != MultiSelectState.Where.Genre) {
         TooltipButton(R.string.delete, R.drawable.ic_delete_black_24dp, tintColor) {
-          mainVM.closeMultiSelect()
           if (state.selectedModels.isNotEmpty()) {
+            if (onDelete != null) {
+              // Remote deletion has its own confirmation; preserve selection on cancel.
+              onDelete(state.selectedModels.toList())
+              return@TooltipButton
+            }
+            mainVM.closeMultiSelect()
             val title = if (state.selectedModels.all { it is PlayList }) {
               R.string.confirm_delete_playlist
             } else if (parent is PlayList) {
@@ -150,13 +156,13 @@ fun MultiSelectBar(
                   MultiSelectState.Where.Genre -> libraryVM.genres.value
                   MultiSelectState.Where.PlayList -> libraryVM.playLists.value
                   MultiSelectState.Where.Folder -> libraryVM.folders.value
-                  MultiSelectState.Where.LastAdded, MultiSelectState.Where.Search -> {
+                  MultiSelectState.Where.LastAdded, MultiSelectState.Where.Search, MultiSelectState.Where.Remote -> {
                     onSelectAll?.invoke()
                     return@launch
                   }
 
                   MultiSelectState.Where.Detail -> withContext(Dispatchers.IO) {
-                    libraryVM.loadSongsByModels(
+                    libraryVM.loadSongs(
                       listOf(parent!!)
                     )
                   }

@@ -32,7 +32,7 @@ import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.db.room.entity.Smb
 import remix.myplayer.data.db.room.entity.WebDav
 import remix.myplayer.data.model.audio.APlayerModel
@@ -58,8 +58,8 @@ import remix.myplayer.ui.screen.playing.PlayingPanel
 import remix.myplayer.ui.screen.setting.SettingDetailScreen
 import remix.myplayer.ui.screen.setting.SettingScreen
 import remix.myplayer.ui.screen.setting.ReplayGainSettingScreen
-import remix.myplayer.ui.screen.smb.SmbDetailScreen
-import remix.myplayer.ui.screen.webdav.WebDavDetailScreen
+import remix.myplayer.ui.screen.remote.RemoteDetailScreen
+import remix.myplayer.data.remote.RemoteBrowserSource
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
@@ -178,12 +178,12 @@ fun AppNav() {
 
         composable<WebDav> {
           val webDav = it.toRoute<WebDav>()
-          WebDavDetailScreen(webDav)
+          RemoteDetailScreen(RemoteBrowserSource.WebDavSource(webDav))
         }
 
         composable<Smb> {
           val smb = it.toRoute<Smb>()
-          SmbDetailScreen(smb)
+          RemoteDetailScreen(RemoteBrowserSource.SmbSource(smb))
         }
 
         composable(
@@ -320,8 +320,8 @@ fun Song.albumDetailRoute(): DetailScreenRoute? =
 internal fun NavBackStackEntry.isSameDetail(route: DetailScreenRoute): Boolean {
   if (!destination.hasRoute<DetailScreenRoute>()) return false
   val current = toRoute<DetailScreenRoute>()
-  return (route.album != null && route.album.albumID == current.album?.albumID) ||
-    (route.artist != null && route.artist.artistID == current.artist?.artistID)
+  return (route.album != null && route.album.albumId == current.album?.albumId) ||
+    (route.artist != null && route.artist.artistId == current.artist?.artistId)
 }
 
 /** Open a song's library detail, reusing the current page or the source directly under the player. */

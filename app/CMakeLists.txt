@@ -56,3 +56,31 @@ add_custom_command(TARGET blur POST_BUILD
         --remove-section .comment
         $<TARGET_FILE:blur>
         VERBATIM)
+
+# SMB2/SMB3 client; compiled from the pinned upstream Git submodule.
+set(LIBSMB2_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../third-party/libsmb2")
+if(NOT EXISTS "${LIBSMB2_ROOT}/CMakeLists.txt")
+  message(FATAL_ERROR "libsmb2 submodule is missing. Run: git submodule update --init --recursive")
+endif()
+
+# Keep the same minimized feature set used for the size measurement.
+set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+set(ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(ENABLE_UTILS OFF CACHE BOOL "" FORCE)
+set(ENABLE_LIBDCERPC OFF CACHE BOOL "" FORCE)
+set(ENABLE_LIBKRB5 OFF CACHE BOOL "" FORCE)
+set(ENABLE_GSSAPI OFF CACHE BOOL "" FORCE)
+set(ENABLE_OPENSSL OFF CACHE BOOL "" FORCE)
+add_subdirectory("${LIBSMB2_ROOT}" "${CMAKE_CURRENT_BINARY_DIR}/third-party-libsmb2" EXCLUDE_FROM_ALL)
+# Android must load libsmb2 by a plain SONAME, not a host build path.
+# Clear version properties rather than setting them to empty strings (which
+# produces "libsmb2.so." on CMake/ELF toolchains).
+set_property(TARGET smb2 PROPERTY VERSION)
+set_property(TARGET smb2 PROPERTY SOVERSION)
+set_target_properties(smb2 PROPERTIES NO_SONAME FALSE)
+
+add_library(aplayer_smb SHARED src/main/cpp/smb/SmbJni.cpp)
+target_compile_features(aplayer_smb PRIVATE cxx_std_17)
+target_compile_options(aplayer_smb PRIVATE -Os -fvisibility=hidden -ffunction-sections -fdata-sections)
+target_link_options(aplayer_smb PRIVATE -Wl,--gc-sections)
+target_link_libraries(aplayer_smb PRIVATE smb2 log)

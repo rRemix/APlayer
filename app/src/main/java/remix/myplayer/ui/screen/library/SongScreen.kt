@@ -41,7 +41,7 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
 
   LaunchedEffect(scrollToCurrentEvent) {
     scrollToCurrentEvent?.collect {
-      val index = libraryVM.songs.value.indexOfFirst { it.id == playbackState.song.id }
+      val index = libraryVM.songs.value.indexOfFirst { it.songIdentity == playbackState.song.songIdentity }
       if (index != -1) {
         listState.scrollToItem(index)
       }
@@ -66,10 +66,10 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
         .verticalScrollbar(listState)
     ) {
       itemsIndexed(songs, key = { _, song ->
-        song.id
+        song.songIdentity
       }) { pos, song ->
         val selected = selectedIds.contains(song.getKey())
-        val isPlayingSong = playbackState.song.id == song.id
+        val isPlayingSong = playbackState.song.songIdentity == song.songIdentity
 
         ListSong(
           modifier = Modifier.height(64.dp),

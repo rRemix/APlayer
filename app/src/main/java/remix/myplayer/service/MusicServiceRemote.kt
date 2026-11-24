@@ -1,5 +1,6 @@
 package remix.myplayer.service
 
+import remix.myplayer.data.model.audio.SongIdentity
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
@@ -99,8 +100,12 @@ object MusicServiceRemote {
     return service?.isPlayingFrom(model) == true
   }
 
-  fun removeFromQueue(ids: List<Long>) {
+  fun removeFromQueue(ids: List<SongIdentity>) {
     service?.removeFromQueue(ids)
+  }
+
+  internal suspend fun removeFromQueue(matches: (SongIdentity) -> Boolean) {
+    service?.removeFromQueue(matches)
   }
 
   fun insertToQueue(songs: List<Song>): Int? = service?.insertToQueue(songs)

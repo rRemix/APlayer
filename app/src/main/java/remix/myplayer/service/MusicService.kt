@@ -1,5 +1,6 @@
 package remix.myplayer.service
 
+import remix.myplayer.data.model.audio.SongIdentity
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -55,9 +56,12 @@ import remix.myplayer.misc.receiver.ExitReceiver
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver
 import remix.myplayer.misc.receiver.MediaButtonReceiver
 import remix.myplayer.repo.HistoryRepository
+import remix.myplayer.repo.MusicSourceRepository
 import remix.myplayer.repo.PlayListRepository
 import remix.myplayer.repo.SongRepository
-import remix.myplayer.repo.usecase.FetchMetaDataUseCase
+import remix.myplayer.repo.SongQuery
+import remix.myplayer.repo.MediaStoreLibrary
+import remix.myplayer.repo.SongMetadataRepository
 import remix.myplayer.service.notification.Notify
 import remix.myplayer.service.notification.NotifyImpl
 import remix.myplayer.service.notification.NotifyImpl24
@@ -130,10 +134,16 @@ class MusicService : BaseService(),
   lateinit var songRepository: SongRepository
 
   @Inject
+  lateinit var mediaStoreLibrary: MediaStoreLibrary
+
+  @Inject
   lateinit var historyRepository: HistoryRepository
 
   @Inject
-  lateinit var fetchMetaDataUseCase: FetchMetaDataUseCase
+  lateinit var musicSources: MusicSourceRepository
+
+  @Inject
+  lateinit var songMetadataRepository: SongMetadataRepository
 
   @Inject
   lateinit var replayGainController: ReplayGainController
@@ -247,6 +257,7 @@ class MusicService : BaseService(),
    * 准备歌曲
    */
   private var prepareJob: Job? = null
+  private var queueSaveJob: Job? = null
 
   /**
    * 操作类型
@@ -561,7 +572,7 @@ class MusicService : BaseService(),
    * 初始化Mediaplayer
    */
   private fun setUpPlayback() {
-    playback = ExoPlayback(this, settingPrefs.decoderMode, audioFocusManager, replayGainController)
+    playback = ExoPlayback(this, settingPrefs.decoderMode, audioFocusManager, replayGainController, musicSources)
     playback.attach(this)
     pushProgressUiState()
     updateProgressTicker()
@@ -621,12 +632,19 @@ class MusicService : BaseService(),
     Timber.v("onItemTransition, playback.audioSessionId: ${playback.audioSessionId}")
     val song = mediaItem?.localConfiguration?.tag as? Song
     progressManager.saveSource(playback)
-    if (song is Song.Remote) {
+    if (song != null && song.isRemote()) {
       launch {
-        withContext(Dispatchers.IO) {
-          fetchMetaDataUseCase(song)
+        val updated = songMetadataRepository.refresh(song)
+        val currentSong = playback.currentSong
+        if (currentSong?.songIdentity == song.songIdentity) {
+          if (updated != currentSong) {
+            playback.replaceSong(updated)
+            if (updated.title != currentSong.title || updated.artist != currentSong.artist) {
+              updateMediaSessionQueue()
+            }
+          }
+          pushPlaybackUiState()
         }
-        pushPlaybackUiState()
       }
     }
 
@@ -687,7 +705,7 @@ class MusicService : BaseService(),
   ) {
     checkMainThread()
     Timber.v("updatePlayHistory, song: ${song?.title}")
-    val songId = song?.takeIf { it.isLocal() }?.id ?: return
+    val songId = song?.takeIf { it.valid() }?.songIdentity ?: return
     launch {
       historyRepository.update(songId, checkDuplicate)
     }
@@ -761,7 +779,7 @@ class MusicService : BaseService(),
         progressManager.switchSource(this, playback, model)
         playback.setPlaylist(songs, index, positionMs)
         playback.setMode(playModel, settingPrefs.listLoop)
-        launch { playQueueStore.save(songs) }
+        savePlayQueue(songs)
         updateMediaSessionQueue()
         lastCommand = Command.PLAY_AT
         start(false)
@@ -784,7 +802,7 @@ class MusicService : BaseService(),
 
     playback.setPlaylist(newQueue)
     updateMediaSessionQueue()
-    launch { playQueueStore.save(newQueue) }
+    savePlayQueue(newQueue)
   }
 
   /**
@@ -805,7 +823,7 @@ class MusicService : BaseService(),
     val equals = newQueue == playback.getPlaylist()
     if (!equals) {
       playback.setPlaylist(newQueue)
-      launch { playQueueStore.save(newQueue) }
+      savePlayQueue(newQueue)
     }
     if (shuffle) {
       playModel = MODE_SHUFFLE
@@ -818,10 +836,25 @@ class MusicService : BaseService(),
     updateMediaSessionQueue()
   }
 
+  /** Persist queue mutations in their main-thread order so an older save cannot restore removed entries. */
+  private fun savePlayQueue(queue: List<Song>): Job {
+    val previous = queueSaveJob
+    return launch {
+      previous?.join()
+      playQueueStore.save(queue)
+    }.also { queueSaveJob = it }
+  }
+
+  internal suspend fun removeFromQueue(matches: (SongIdentity) -> Boolean) {
+    val ids = playback.getPlaylist().map { it.songIdentity }.filter(matches)
+    if (ids.isNotEmpty()) removeFromQueue(ids)
+    queueSaveJob?.join()
+  }
+
   /**
    * 从播放队列移除歌曲并保存
    */
-  fun removeFromQueue(ids: List<Long>) {
+  fun removeFromQueue(ids: List<SongIdentity>) {
     progressManager.cancelResume()
     progressManager.saveSource(playback)
     if (ids.isNotEmpty()) {
@@ -829,7 +862,7 @@ class MusicService : BaseService(),
       val playlist = playback.getPlaylist()
       val indices = ArrayList<Int>()
       playlist.forEachIndexed { index, song ->
-        if (idSet.contains(song.id)) {
+        if (idSet.contains(song.songIdentity)) {
           indices.add(index)
         }
       }
@@ -839,7 +872,7 @@ class MusicService : BaseService(),
         indices.forEach { index ->
           playback.removeSong(index)
         }
-        launch { playQueueStore.save(playback.getPlaylist()) }
+        savePlayQueue(playback.getPlaylist())
 
         updateMediaSessionQueue()
         pushPlaybackUiState()
@@ -852,12 +885,12 @@ class MusicService : BaseService(),
    */
   fun insertToQueue(songs: List<Song>): Int {
     progressManager.cancelResume()
-    val queuedIds = playback.getPlaylist().mapTo(HashSet()) { it.id }
-    val newSongs = songs.filter { queuedIds.add(it.id) }
+    val queuedIds = playback.getPlaylist().mapTo(HashSet()) { it.songIdentity }
+    val newSongs = songs.filter { queuedIds.add(it.songIdentity) }
     if (newSongs.isEmpty()) return 0
 
     playback.addSongs(newSongs)
-    launch { playQueueStore.save(playback.getPlaylist()) }
+    savePlayQueue(playback.getPlaylist())
     updateMediaSessionQueue()
     pushPlaybackUiState()
     return newSongs.size
@@ -907,7 +940,7 @@ class MusicService : BaseService(),
    */
   private fun pushPlaybackUiState() {
     val currentSong = playback.currentSong ?: EMPTY_SONG
-    val songChanged = currentSong.id != stateSource.currentPlaybackUiState.song.id
+    val songChanged = currentSong.songIdentity != stateSource.currentPlaybackUiState.song.songIdentity
 
     MusicStateSource.updatePlaybackUiState(
       song = currentSong,
@@ -1007,7 +1040,7 @@ class MusicService : BaseService(),
   }
 
   override fun onMediaStoreChanged() {
-    // The observer has already invalidated covers; the existing broadcast refreshes UI lists.
+    launch { mediaStoreLibrary.refresh() }
   }
 
   override fun onPermissionChanged(has: Boolean) {
@@ -1028,7 +1061,9 @@ class MusicService : BaseService(),
     }
 
     launch {
-      val scanned = withContext(Dispatchers.IO) { songRepository.song(newSong.id) } ?: newSong
+      songMetadataRepository.invalidate(newSong.songIdentity)
+      mediaStoreLibrary.refresh()
+      val scanned = songRepository.resolveSongs(listOf(newSong.songIdentity)).firstOrNull() ?: newSong
       playback.replaceSong(scanned)
       lyricManager.clearCache(scanned)
       lyricManager.updateLyrics(scanned)
@@ -1084,7 +1119,7 @@ class MusicService : BaseService(),
           val playlist = playListRepository.getFavorite() ?: return@tryLaunch
 
           val songs =
-            withContext(Dispatchers.IO) { songRepository.getSongsByModels(listOf(playlist)) }
+            withContext(Dispatchers.IO) { songRepository.getSongs(listOf(playlist)) }
 
           if (songs.isEmpty()) {
             MessageNotifier.show(R.string.list_is_empty)
@@ -1102,7 +1137,7 @@ class MusicService : BaseService(),
       ACTION_SHORTCUT_LASTADDED -> {
         tryLaunch {
           val songs = withContext(Dispatchers.IO) {
-            songRepository.getLastAddedSongs()
+            songRepository.getSongs(SongQuery(addedAfter = System.currentTimeMillis() - 7 * 24 * 3600 * 1000L))
           }
           if (songs.isEmpty()) {
             MessageNotifier.show(R.string.list_is_empty)
@@ -1143,6 +1178,7 @@ class MusicService : BaseService(),
   private fun handleMetaChange() {
     val song = playback.currentSong ?: EMPTY_SONG
     if (song == EMPTY_SONG) {
+      mediaSessionUpdater.clear(mediaSession)
       return
     }
     appWidgetUpdater.updateWidget(this, this, isPlaying, screenOn)
@@ -1160,7 +1196,7 @@ class MusicService : BaseService(),
     )
     progressManager.start(this) { playback }
     // 保存当前播放歌曲
-    settingPrefs.lastSong = if (song.isLocal()) song.id.toString() else song.data
+    settingPrefs.lastSong = song.getKey()
   }
 
   fun updateNotification() {
@@ -1267,11 +1303,11 @@ class MusicService : BaseService(),
       Command.PLAY_TEMP -> {
         intent.getSerializableExtra(EXTRA_SONG)?.let {
           lastCommand = Command.PLAY_TEMP
-          val song = it as Song.Local
+          val song = it as Song
 
           progressManager.switchSource(this, playback)
 
-          if (playback.currentSong?.id == song.id) {
+          if (playback.currentSong?.songIdentity == song.songIdentity) {
             // 如果是当前歌曲，从头播放
             seekTo(0)
           } else {
@@ -1279,7 +1315,7 @@ class MusicService : BaseService(),
             skipToNext()
           }
 
-          playQueueStore.save(playback.getPlaylist())
+          savePlayQueue(playback.getPlaylist()).join()
           start(true)
         }
       }
@@ -1293,7 +1329,7 @@ class MusicService : BaseService(),
 
         if (playback.addToNextSong(nextSong)) {
           // 同步更新
-          playQueueStore.save(playback.getPlaylist())
+          savePlayQueue(playback.getPlaylist()).join()
           pushPlaybackUiState()
           MessageNotifier.show(R.string.already_add_to_next_song)
         }
@@ -1421,20 +1457,25 @@ class MusicService : BaseService(),
 
   override fun onFocusLost() {
     Timber.v("onFocusLost")
-    val ignoreFocus = settingPrefs.ignoreAudioFocus
-    if (ignoreFocus && !audioFocusManager.shouldPauseForPhoneCall()) {
-      Timber.v("忽略音频焦点 不暂停")
-      return
-    }
+    if (shouldIgnoreAudioFocus()) return
     if (isPlaying) {
       lastCommand = Command.PLAY_PAUSE
       pause()
     }
   }
 
+  private fun shouldIgnoreAudioFocus(): Boolean {
+    if (settingPrefs.ignoreAudioFocus && !audioFocusManager.shouldPauseForPhoneCall()) {
+      Timber.v("忽略音频焦点 不暂停")
+      return true
+    }
+    return false
+  }
+
   private var wasPlaying = false
   override fun onFocusLostTransient() {
     Timber.v("onFocusLostTransient")
+    if (shouldIgnoreAudioFocus()) return
     wasPlaying = isPlaying
     if (isPlaying) {
       lastCommand = Command.PLAY_PAUSE

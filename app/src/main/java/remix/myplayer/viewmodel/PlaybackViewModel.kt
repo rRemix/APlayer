@@ -1,5 +1,6 @@
 package remix.myplayer.viewmodel
 
+import remix.myplayer.data.model.audio.SongIdentity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -79,7 +80,7 @@ class PlaybackViewModel @Inject constructor(
     _seekBarUiState.value = SeekBarUiState(overrideProgress, interacting)
   }
 
-  fun removeFromQueue(id: Long) {
+  fun removeFromQueue(id: SongIdentity) {
     MusicServiceRemote.removeFromQueue(listOf(id))
   }
 

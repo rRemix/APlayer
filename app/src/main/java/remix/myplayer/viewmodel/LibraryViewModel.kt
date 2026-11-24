@@ -1,34 +1,28 @@
 package remix.myplayer.viewmodel
 
+import remix.myplayer.data.model.audio.SongIdentity
 import android.content.Context
 import android.net.Uri
-import android.provider.MediaStore.Audio
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import remix.myplayer.helper.ItemsSorter
 import remix.myplayer.util.Constants
-import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
-import remix.myplayer.data.model.audio.Album
-import remix.myplayer.data.model.audio.Artist
-import remix.myplayer.data.model.audio.Folder
-import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.coil.CoverUriResolver
@@ -39,6 +33,10 @@ import remix.myplayer.repo.GenreRepository
 import remix.myplayer.repo.HistoryRepository
 import remix.myplayer.repo.PlayListRepository
 import remix.myplayer.repo.SongRepository
+import remix.myplayer.repo.SongQuery
+import remix.myplayer.repo.MediaStoreLibrary
+import remix.myplayer.data.prefs.PrefKeys
+import remix.myplayer.data.prefs.observe
 import remix.myplayer.repo.usecase.ExportPlayListUseCase
 import remix.myplayer.repo.usecase.PlayFromUriUseCase
 import remix.myplayer.service.MusicEventCallback
@@ -46,8 +44,6 @@ import remix.myplayer.service.MusicService
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.util.PermissionUtil
-import remix.myplayer.util.ext.checkWorkerThread
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,6 +51,7 @@ class LibraryViewModel @Inject constructor(
   private val savedStateHandle: SavedStateHandle,
   @param:ApplicationContext private val context: Context,
   private val songRepo: SongRepository,
+  private val mediaStoreLibrary: MediaStoreLibrary,
   private val albumRepo: AlbumRepository,
   private val artistRepo: ArtistRepository,
   private val genreRepo: GenreRepository,
@@ -68,36 +65,18 @@ class LibraryViewModel @Inject constructor(
 ) : ViewModel(), MusicEventCallback {
 
   private var hasPermission = false
-  private val mediaMutex = Mutex()
+  private val sharing = SharingStarted.WhileSubscribed(5000)
+  val songs = observeSongs().stateIn(viewModelScope, sharing, emptyList())
+  val albums = albumRepo.observeAlbums().stateIn(viewModelScope, sharing, emptyList())
+  val artists = artistRepo.observeArtists().stateIn(viewModelScope, sharing, emptyList())
+  val genres = genreRepo.observeGenres().stateIn(viewModelScope, sharing, emptyList())
+  val folders = folderRepo.observeFolders().stateIn(viewModelScope, sharing, emptyList())
+  val playLists = playListRepo.allPlayLists().stateIn(viewModelScope, sharing, emptyList())
 
-  private val _songs = MutableStateFlow<List<Song>>(emptyList())
-  val songs: StateFlow<List<Song>> = _songs.asStateFlow()
-
-  private val _albums = MutableStateFlow<List<Album>>(emptyList())
-  val albums: StateFlow<List<Album>> = _albums.asStateFlow()
-
-  private val _artists = MutableStateFlow<List<Artist>>(emptyList())
-  val artists: StateFlow<List<Artist>> = _artists.asStateFlow()
-
-  private val _genres = MutableStateFlow<List<Genre>>(emptyList())
-  val genres: StateFlow<List<Genre>> = _genres.asStateFlow()
-
-  val playLists = playListRepo.allPlayLists()
-    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-  private val _folders = MutableStateFlow<List<Folder>>(emptyList())
-  val folders: StateFlow<List<Folder>> = _folders.asStateFlow()
-
-  val historySongs = historyRepo.allHistories().map { histories ->
-    histories.mapNotNull { history ->
-      val song = withContext(Dispatchers.IO) { songRepo.song(history.audio_id) }
-      song?.let { it to history.play_count }
-    }
-  }.stateIn(
-    scope = viewModelScope,
-    started = SharingStarted.WhileSubscribed(5000),
-    initialValue = emptyList()
-  )
+  val historySongs = combine(historyRepo.allHistories(), songRepo.observeSongs()) { histories, _ ->
+    val resolved = songRepo.resolveSongs(histories.map { it.identity() }).associateBy { it.songIdentity }
+    histories.mapNotNull { history -> resolved[history.identity()]?.let { it to history.play_count } }
+  }.stateIn(viewModelScope, sharing, emptyList())
 
   private val _createPlaylistState = MutableStateFlow(CreatePlaylistState())
   val createPlaylistState = _createPlaylistState.asStateFlow()
@@ -115,11 +94,7 @@ class LibraryViewModel @Inject constructor(
   }
 
   init {
-    // load all media
     hasPermission = PermissionUtil.hasNecessaryPermission()
-    if (hasPermission) {
-      fetchMedia()
-    }
   }
 
   fun insertPlayList(name: String, onSuccess: (Long) -> Unit) {
@@ -134,7 +109,7 @@ class LibraryViewModel @Inject constructor(
     }
   }
 
-  fun addSongsToPlayList(audioIds: List<Long>, playListName: String, createNew: Boolean = false) {
+  fun addSongsToPlayList(keys: List<SongIdentity>, playListName: String, createNew: Boolean = false) {
     viewModelScope.launch {
       try {
         if (createNew) {
@@ -146,7 +121,7 @@ class LibraryViewModel @Inject constructor(
           playListRepo.insertPlayList(playListName)
         }
 
-        val count = playListRepo.addSongsToPlayList(audioIds, playListName = playListName)
+        val count = playListRepo.addSongsToPlayList(keys, playListName = playListName)
         MessageNotifier.show(R.string.add_song_playlist_success, count, playListName)
       } catch (ignore: Exception) {
         MessageNotifier.show(R.string.add_song_playlist_error)
@@ -154,26 +129,21 @@ class LibraryViewModel @Inject constructor(
     }
   }
 
-  suspend fun loadSongsByModels(models: List<APlayerModel>) = songRepo.getSongsByModels(models)
+  suspend fun loadSongs(items: List<APlayerModel>) = songRepo.getSongs(items)
 
-  fun loadSong(selection: String?, selectionValues: Array<String?>?, sortOrder: String? = null) =
-    songRepo.getSongs(selection, selectionValues, sortOrder)
+  suspend fun loadSongs(query: SongQuery) = songRepo.getSongs(query)
 
-  fun loadLastAddedSongs() = songRepo.getLastAddedSongs()
+  fun observeSongs(query: SongQuery = SongQuery()): Flow<List<Song>> = songRepo
+    .observeSongs(query.copy(sortOrder = null))
+    .combine(settingPrefs.observe(PrefKeys.Setting.SONG_SORT_ORDER) { songSortOrder }) { items, order ->
+      ItemsSorter.sortedSongs(items, order)
+    }.flowOn(Dispatchers.Default)
 
-  fun searchSong(key: String): List<Song> {
-    checkWorkerThread()
-    val likeKey = "%$key%"
-    return songRepo.getSongs(
-      "(" +
-          Audio.Media.TITLE + " LIKE ? OR " +
-          Audio.ArtistColumns.ARTIST + " LIKE ? OR " +
-          Audio.AlbumColumns.ALBUM + " LIKE ? OR " +
-          Audio.Media.DISPLAY_NAME + " LIKE ?" +
-          ")",
-      arrayOf(likeKey, likeKey, likeKey, likeKey),
-      settingPrefs.songSortOrder
-    )
+  fun updateSongOrder(id: Long, keys: List<SongIdentity>) {
+    viewModelScope.launch {
+      playListRepo.updateSongOrder(id, keys)
+      MessageNotifier.show(R.string.save_success)
+    }
   }
 
   fun updatePlayList(playList: PlayList) {
@@ -218,16 +188,7 @@ class LibraryViewModel @Inject constructor(
   }
 
   fun fetchMedia() {
-    viewModelScope.launch {
-      mediaMutex.withLock {
-        _songs.value = async(Dispatchers.IO) { songRepo.allSongs() }.await()
-        _albums.value = async(Dispatchers.IO) { albumRepo.allAlbums() }.await()
-        _artists.value = async(Dispatchers.IO) { artistRepo.allArtists() }.await()
-        _genres.value = async(Dispatchers.IO) { genreRepo.allGenres() }.await()
-        _folders.value = async(Dispatchers.IO) { folderRepo.allFolders() }.await()
-        Timber.v("songCount: ${_songs.value.size} albumCount: ${_albums.value.size} artistCount: ${_artists.value.size} genreCount: ${_genres.value.size} folderCount: ${_folders.value.size}")
-      }
-    }
+    viewModelScope.launch { mediaStoreLibrary.refresh() }
   }
 
   fun clearHistory() = viewModelScope.launch {
@@ -235,9 +196,7 @@ class LibraryViewModel @Inject constructor(
   }
 
   override fun onMediaStoreChanged() {
-    if (hasPermission) {
-      fetchMedia()
-    }
+    // MusicService synchronizes this event once; all library lists observe its published snapshot.
   }
 
   override fun onPermissionChanged(has: Boolean) {
@@ -259,7 +218,7 @@ class LibraryViewModel @Inject constructor(
   override fun onTagChanged(
     oldSong: Song?, newSong: Song
   ) {
-    fetchMedia()
+    // MusicService refreshes the snapshot before replacing the tagged song in playback.
   }
 }
 

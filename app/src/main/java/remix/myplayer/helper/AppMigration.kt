@@ -7,6 +7,7 @@ import kotlinx.serialization.json.Json
 import remix.myplayer.data.db.room.AppDatabase
 import remix.myplayer.data.model.misc.Library
 import remix.myplayer.data.prefs.LyricPrefs
+import remix.myplayer.data.prefs.PrefKeys
 import remix.myplayer.data.prefs.SettingPrefs
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -100,6 +101,12 @@ class AppMigration @Inject constructor(
       settingPrefs.checkMigration21100 = true
 
       lyricPrefs.translationEnabled = LanguageHelper.isChinese()
+    }
+
+    if (!settingPrefs.checkMigration21400) {
+      settingPrefs.checkMigration21400 = true
+
+      settingPrefs.loadLocalEmbeddedCover = settingPrefs.sp.getBoolean("ignore_media_store", false)
     }
   }
 }

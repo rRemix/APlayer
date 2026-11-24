@@ -241,7 +241,7 @@ private fun PlayQueueDialog(
 
       val lazyState = rememberLazyListState()
       LazyColumn(state = lazyState) {
-        itemsIndexed(songs, key = { _, song -> song.id }) { pos, song ->
+        itemsIndexed(songs, key = { _, song -> song.songIdentity }) { pos, song ->
           Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -274,7 +274,7 @@ private fun PlayQueueDialog(
               CenterInBox(
                 modifier = Modifier
                   .clickWithRipple {
-                    playbackVM.removeFromQueue(song.id)
+                    playbackVM.removeFromQueue(song.songIdentity)
                   }
                   .padding(8.dp)
               ) {
@@ -290,7 +290,7 @@ private fun PlayQueueDialog(
 
       LaunchedEffect(visible) {
         if (visible) {
-          val index = songs.indexOfFirst { it.id == playbackState.song.id }
+          val index = songs.indexOfFirst { it.songIdentity == playbackState.song.songIdentity }
           if (index != -1) {
             lazyState.scrollToItem(index)
           }

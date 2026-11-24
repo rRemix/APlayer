@@ -1,5 +1,6 @@
 package remix.myplayer.service.playback
 
+import remix.myplayer.data.model.audio.SongIdentity
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Song
@@ -79,7 +80,7 @@ class ProgressManager @Inject constructor(
     val key = model.playbackSourceKey()
     val nextSource = when {
       key == null -> null
-      model is PlayList -> Source.Playlist(key, model.id, model.audioIds.toSet())
+      model is PlayList -> Source.Playlist(key, model.id, model.songIdentities.toSet())
       model is Folder -> Source.Folder(key, model.path)
       else -> null
     }
@@ -98,7 +99,7 @@ class ProgressManager @Inject constructor(
         key.startsWith("playlist:") -> {
           val id = key.removePrefix("playlist:").toLongOrNull()
           val playlist = id?.let { playListRepository.observePlayList(it).first() }
-          playlist?.let { Source.Playlist(key, it.id, it.audioIds.toSet()) }
+          playlist?.let { Source.Playlist(key, it.id, it.songIdentities.toSet()) }
         }
         key.startsWith("folder:") -> {
           val path = key.removePrefix("folder:")
@@ -133,7 +134,7 @@ class ProgressManager @Inject constructor(
     sourceJob = scope.launch {
       try {
         playListRepository.observePlayList(nextSource.id)
-          .map { it?.audioIds?.toSet().orEmpty() }
+          .map { it?.songIdentities?.toSet().orEmpty() }
           .distinctUntilChanged()
           .collect { songIds ->
             if (source === nextSource) {
@@ -167,7 +168,7 @@ class ProgressManager @Inject constructor(
     } ?: return
     playbackRecordPrefs.savePlaybackRecord(
       source.key,
-      PlaybackRecordPrefs.PlaybackRecord(song.id, if (playback.isEnded) 0L else playback.position)
+      PlaybackRecordPrefs.PlaybackRecord(song.songIdentity, if (playback.isEnded) 0L else playback.position)
     )
   }
 
@@ -176,7 +177,7 @@ class ProgressManager @Inject constructor(
     val record = playbackRecordPrefs.getPlaybackRecord(key) ?: return false
     return try {
       withContext(Dispatchers.IO) {
-        songRepository.getSongsByModels(listOf(model)).any { it.id == record.songId }
+        songRepository.getSongs(listOf(model)).any { it.songIdentity == record.songIdentity }
       }
     } catch (e: CancellationException) {
       throw e
@@ -210,9 +211,9 @@ class ProgressManager @Inject constructor(
     resumeJob = scope.launch {
       try {
         val songs = withContext(Dispatchers.IO) {
-          songRepository.getSongsByModels(listOf(model))
+          songRepository.getSongs(listOf(model))
         }
-        val index = songs.indexOfFirst { it.id == record.songId }
+        val index = songs.indexOfFirst { it.songIdentity == record.songIdentity }
         if (index < 0) return@launch
         // 回调切换来源时会取消待恢复任务，先清空引用，避免取消当前协程。
         resumeJob = null
@@ -236,8 +237,8 @@ class ProgressManager @Inject constructor(
 
     abstract fun contains(song: Song): Boolean
 
-    class Playlist(key: String, val id: Long, var songIds: Set<Long>) : Source(key) {
-      override fun contains(song: Song): Boolean = song.isLocal() && song.id in songIds
+    class Playlist(key: String, val id: Long, var songIds: Set<SongIdentity>) : Source(key) {
+      override fun contains(song: Song): Boolean = song.songIdentity in songIds
     }
 
     class Folder(key: String, private val path: String) : Source(key) {

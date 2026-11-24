@@ -86,11 +86,13 @@ private fun SongDropdownMenu(
     // Only local songs with valid MediaStore ids can be linked to a library detail page.
     if (song.artistDetailRoute() != null) add(R.string.go_to_artist)
     if (song.albumDetailRoute() != null) add(R.string.go_to_album)
-    add(R.string.song_edit)
+    if (song.isLocal()) add(R.string.song_edit)
 //    add(R.string.set_album_cover)
     add(R.string.collect)
-    add(R.string.share)
-    add(R.string.ring)
+    if (song.isLocal()) {
+      add(R.string.share)
+      add(R.string.ring)
+    }
     add(R.string.delete)
   }
   val activity = LocalActivity.current as? BaseActivity
@@ -127,7 +129,7 @@ private fun SongDropdownMenu(
             }
 
             R.string.add_to_playlist -> {
-              settingVM.showAddSongToPlayListDialog(listOf(song.id), "")
+              settingVM.showAddSongToPlayListDialog(listOf(song.songIdentity), "")
             }
 
             R.string.add_to_play_queue -> {
@@ -161,11 +163,11 @@ private fun SongDropdownMenu(
               val favorite =
                 libraryVM.playLists.value.firstOrNull { it.isFavorite() } ?: return@DropdownMenuItem
 
-              libraryVM.addSongsToPlayList(listOf(song.id), favorite.name)
+              libraryVM.addSongsToPlayList(listOf(song.songIdentity), favorite.name)
             }
 
             R.string.ring -> {
-              MusicUtil.setRing(activity, song.id)
+              song.mediaStoreId?.let { MusicUtil.setRing(activity, it) }
             }
 
             R.string.share -> {

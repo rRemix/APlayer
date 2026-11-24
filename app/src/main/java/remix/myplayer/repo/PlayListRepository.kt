@@ -1,134 +1,82 @@
 package remix.myplayer.repo
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import remix.myplayer.data.db.room.dao.PlayListDao
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
+import remix.myplayer.data.model.audio.SongIdentity
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.data.prefs.CoverPrefs
 import remix.myplayer.data.prefs.playlistSortOrderFlow
 import remix.myplayer.helper.ItemsSorter
-import remix.myplayer.helper.SortOrder
-import java.util.Date
 import javax.inject.Inject
+import remix.myplayer.data.db.room.entity.PlayList as PlayListEntity
 
 interface PlayListRepository {
-
   fun allPlayLists(): Flow<List<PlayList>>
   fun observePlayList(id: Long): Flow<PlayList?>
-  suspend fun addSongsToPlayList(audioIds: List<Long>, playListName: String): Int
+  suspend fun addSongsToPlayList(keys: List<SongIdentity>, playListName: String): Int
   suspend fun insertPlayList(name: String): Long
+  /** Rename only: a stale UI snapshot must not overwrite concurrently added tracks. */
   suspend fun updatePlayList(playList: PlayList): Int
+  suspend fun updateSongOrder(id: Long, keys: List<SongIdentity>)
+  suspend fun removeSongs(id: Long, keys: Set<SongIdentity>): Int
   suspend fun deletePlayList(id: Long): Int
-  suspend fun isFavorite(id: Long): Boolean
-  suspend fun toggleFavorite(id: Long): Boolean
+  suspend fun isFavorite(key: SongIdentity): Boolean
+  suspend fun toggleFavorite(key: SongIdentity): Boolean
   suspend fun getFavorite(): PlayList?
-  suspend fun removeAudioIdsFromAll(audioIds: List<Long>): Int
+  suspend fun removeSongsFromAll(keys: List<SongIdentity>): Int
   suspend fun checkPlayListExist(name: String): Boolean
 }
 
 class PlayListRepoImpl @Inject constructor(
-  @param:ApplicationContext private val context: Context,
   private val playListDao: PlayListDao,
   private val settingPrefs: SettingPrefs,
   private val coverPrefs: CoverPrefs
-) : PlayListRepository, AbstractRepository(settingPrefs) {
-
+) : PlayListRepository {
   @OptIn(ExperimentalCoroutinesApi::class)
-  override fun allPlayLists(): Flow<List<PlayList>> {
-    return settingPrefs
-      .playlistSortOrderFlow()
-      .flatMapLatest { sortOrder ->
-        val orderByKey = when (sortOrder) {
-          SortOrder.PLAYLIST_A_Z -> "name"
-          SortOrder.PLAYLIST_Z_A -> "name desc"
-          SortOrder.PLAYLIST_DATE -> "date"
-          else -> "name"
-        }
+  override fun allPlayLists(): Flow<List<PlayList>> = settingPrefs.playlistSortOrderFlow()
+    .flatMapLatest { sort -> playListDao.selectAll().map { rows ->
+      ItemsSorter.sortedPlayLists(rows.map { it.toModel() }, sort)
+    } }
 
-        playListDao.selectAll(orderByKey)
-          .map { list ->
-            ItemsSorter.sortedPlayLists(list, sortOrder)
-          }
-      }
+  override fun observePlayList(id: Long): Flow<PlayList?> =
+    playListDao.observeById(id).map { it?.toModel() }
+
+  override suspend fun addSongsToPlayList(keys: List<SongIdentity>, playListName: String): Int {
+    val list = requireNotNull(playListDao.selectByName(playListName)) { "No Playlist Found" }
+    return playListDao.addSongs(list.id, keys).also { if (it > 0) invalidate(list.id) }
   }
-
-  override fun observePlayList(id: Long): Flow<PlayList?> = playListDao.observeById(id)
-
-  override suspend fun addSongsToPlayList(audioIds: List<Long>, playListName: String): Int {
-    val playList = playListDao.selectByName(playListName)
-      ?: throw IllegalArgumentException("No Playlist Found")
-
-    // 不重复添加
-    val old = playList.audioIds.size
-    playList.audioIds.addAll(audioIds.filter { !playList.audioIds.contains(it) })
-    val count = playList.audioIds.size - old
-    if (count > 0 && playListDao.update(playList) > 0) {
-      coverPrefs.invalidate("playlist:${playList.id}")
+  override suspend fun insertPlayList(name: String): Long =
+    playListDao.insert(PlayListEntity(0, name, System.currentTimeMillis()))
+  override suspend fun updatePlayList(playList: PlayList): Int =
+    playListDao.rename(playList.id, playList.name)
+  override suspend fun updateSongOrder(id: Long, keys: List<SongIdentity>) {
+    playListDao.updateSongOrder(id, keys)
+    invalidate(id)
+  }
+  override suspend fun removeSongs(id: Long, keys: Set<SongIdentity>): Int =
+    playListDao.removeSongs(id, keys).also { if (it > 0) invalidate(id) }
+  override suspend fun deletePlayList(id: Long): Int =
+    playListDao.delete(id).also { if (it > 0) invalidate(id) }
+  override suspend fun isFavorite(key: SongIdentity): Boolean =
+    playListDao.contains(1L, key.sourceId.value, key.sourceKey)
+  override suspend fun toggleFavorite(key: SongIdentity): Boolean {
+    if (playListDao.selectById(1L) == null) return false
+    return playListDao.toggle(1L, key).also { invalidate(1L) }
+  }
+  override suspend fun getFavorite(): PlayList? = playListDao.selectById(1L)?.toModel()
+  override suspend fun removeSongsFromAll(keys: List<SongIdentity>): Int {
+    val identities = keys.toSet()
+    val affected = playListDao.selectAll().first().map { it.toModel() }
+      .filter { list -> list.songIdentities.any { it in identities } }
+    return playListDao.removeSongsFromAll(identities).also { count ->
+      if (count > 0) affected.forEach { invalidate(it.id) }
     }
-    return count
   }
-
-  override suspend fun insertPlayList(name: String) =
-    playListDao.insert(PlayList(0, name, ArrayList(), Date().time))
-
-  override suspend fun updatePlayList(playList: PlayList): Int {
-    val previous = playListDao.observeById(playList.id).first()
-    val updated = playListDao.update(playList)
-    if (updated > 0 && previous?.audioIds != playList.audioIds) {
-      coverPrefs.invalidate("playlist:${playList.id}")
-    }
-    return updated
-  }
-
-  override suspend fun deletePlayList(id: Long): Int {
-    val deleted = playListDao.delete(id)
-    if (deleted > 0) coverPrefs.invalidate("playlist:$id")
-    return deleted
-  }
-
-  override suspend fun isFavorite(id: Long): Boolean {
-    val p = getFavorite()
-    return p?.audioIds?.contains(id) == true
-  }
-
-  override suspend fun toggleFavorite(id: Long): Boolean {
-    val p = getFavorite()
-      ?: return false // 如果没有收藏夹则返回
-
-    val favorite = if (p.audioIds.contains(id)) {
-      p.audioIds.remove(id)
-      false
-    } else {
-      p.audioIds.add(id)
-      true
-    }
-
-    if (playListDao.update(p) > 0) coverPrefs.invalidate("playlist:${p.id}")
-    return favorite
-  }
-
-  override suspend fun getFavorite() = playListDao.getFavorite()
-
-  override suspend fun removeAudioIdsFromAll(audioIds: List<Long>): Int {
-    if (audioIds.isEmpty()) return 0
-    val toRemove = audioIds.toSet()
-    val updated = playListDao.selectAll("name").first().mapNotNull { pl ->
-      val filtered = pl.audioIds.filterNot { it in toRemove }
-      if (filtered.size != pl.audioIds.size) pl.copy(audioIds = ArrayList(filtered)) else null
-    }
-    if (updated.isEmpty()) return 0
-    val count = playListDao.update(updated)
-    if (count > 0) coverPrefs.invalidate(updated.map { "playlist:${it.id}" })
-    return count
-  }
-
-  override suspend fun checkPlayListExist(name: String): Boolean {
-    return playListDao.exists(name)
-  }
+  override suspend fun checkPlayListExist(name: String): Boolean = playListDao.exists(name)
+  private fun invalidate(id: Long) = coverPrefs.invalidate("playlist:$id")
 }

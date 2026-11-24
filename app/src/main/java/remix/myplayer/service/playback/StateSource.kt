@@ -55,7 +55,7 @@ object MusicStateSource : StateSource {
   ) {
     _playBackUiState.update { old ->
       val newSong = song ?: old.song
-      val songChanged = song != null && newSong.id != old.song.id
+      val songChanged = song != null && newSong.songIdentity != old.song.songIdentity
       old.copy(
         song = newSong,
         nextSong = nextSong ?: old.nextSong,

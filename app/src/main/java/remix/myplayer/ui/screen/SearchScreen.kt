@@ -72,14 +72,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs.Companion.SEARCH_PLAYBACK_ADD_TO_QUEUE
 import remix.myplayer.data.prefs.SettingPrefs.Companion.SEARCH_PLAYBACK_PLAY
 import remix.myplayer.data.prefs.SettingPrefs.Companion.SEARCH_PLAYBACK_PLAY_ALL
+import remix.myplayer.repo.SongQuery
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
@@ -108,7 +107,6 @@ fun SearchScreen() {
   val playbackState by playbackVM.playbackUiState.collectAsStateWithLifecycle()
   val settingsState by settingVM.settingsState.collectAsStateWithLifecycle()
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
-  val librarySongs by libraryVM.songs.collectAsStateWithLifecycle()
   val listState = rememberLazyListState()
   var songs by remember {
     mutableStateOf(emptyList<Song>())
@@ -190,10 +188,10 @@ fun SearchScreen() {
 
         LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
           itemsIndexed(songs, key = { _, song ->
-            song.id
+            song.songIdentity
           }) { pos, song ->
             val selected = selectedIds.contains(song.getKey())
-            val isPlayingSong = playbackState.song.id == song.id
+            val isPlayingSong = playbackState.song.songIdentity == song.songIdentity
 
             ListSong(
               modifier = Modifier.height(64.dp),
@@ -234,7 +232,7 @@ fun SearchScreen() {
     }
   }
 
-  LaunchedEffect(searchKey, librarySongs) {
+  LaunchedEffect(searchKey) {
     if (searchKey.isEmpty()) {
       songs = emptyList()
       isLoading = false
@@ -242,11 +240,10 @@ fun SearchScreen() {
     }
     isLoading = true
     delay(300)
-    val result = withContext(Dispatchers.IO) {
-      libraryVM.searchSong(searchKey)
+    libraryVM.observeSongs(SongQuery(text = searchKey)).collect { result ->
+      songs = result
+      isLoading = false
     }
-    songs = result
-    isLoading = false
   }
 }
 

@@ -1,6 +1,6 @@
 package remix.myplayer.helper
 
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.Album
 import remix.myplayer.data.model.audio.Artist
 import remix.myplayer.data.model.audio.Folder
@@ -82,7 +82,10 @@ object ItemsSorter {
   fun sortedSongs(songs: List<Song>, sortOrder: String?): List<Song> {
     val collator = Collator.getInstance()
     return when (sortOrder) {
-      SortOrder.DATE, SortOrder.DATE_DESC, SortOrder.TRACK_NUMBER -> songs
+      null, SortOrder.PLAYLIST_SONG_CUSTOM -> songs
+      SortOrder.DATE -> songs.sortedBy { it.dateModified }
+      SortOrder.DATE_DESC -> songs.sortedByDescending { it.dateModified }
+      SortOrder.TRACK_NUMBER -> songs.sortedBy { it.track?.substringBefore('/')?.toLongOrNull() ?: 0L }
       else -> {
         songs.sortedWith(Comparator { o1: Song, o2: Song ->
           when (sortOrder) {

@@ -11,6 +11,7 @@ import remix.myplayer.data.db.room.dao.HistoryDao
 import remix.myplayer.data.db.room.dao.MetaDataCacheDao
 import remix.myplayer.data.db.room.dao.PlayListDao
 import remix.myplayer.data.db.room.dao.PlayQueueDao
+import remix.myplayer.data.db.room.dao.SmbDao
 import remix.myplayer.data.db.room.dao.WebDavDao
 import javax.inject.Singleton
 
@@ -50,7 +51,7 @@ object DatabaseModule {
   }
 
   @Provides
-  fun provideSmbDao(database: AppDatabase): remix.myplayer.data.db.room.dao.SmbDao {
+  fun provideSmbDao(database: AppDatabase): SmbDao {
     return database.smbDao()
   }
 }

@@ -85,7 +85,7 @@ fun TagEditScreen(backStackEntry: NavBackStackEntry) {
     if (!cacheDir.isDirectory && !cacheDir.mkdirs()) {
       Uri.EMPTY
     } else {
-      Uri.fromFile(File(cacheDir, "song-${song.id}.jpg"))
+      Uri.fromFile(File(cacheDir, "song-${song.mediaStoreId}.jpg"))
     }
   }
 

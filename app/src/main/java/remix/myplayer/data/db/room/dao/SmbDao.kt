@@ -10,6 +10,9 @@ import remix.myplayer.data.db.room.entity.Smb
 
 @Dao
 interface SmbDao {
+  @Query("SELECT * FROM Smb WHERE id = :id LIMIT 1")
+  suspend fun byId(id: Int): Smb?
+
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insertOrReplace(smb: Smb): Long
 

@@ -56,13 +56,13 @@ class MediaSessionUpdater @Inject constructor(
     scope.tryLaunch(block = {
       val queue = withContext(Dispatchers.Default) {
         ArrayList(playlist)
-          .map { song ->
-            return@map MediaSessionCompat.QueueItem(
+          .mapIndexed { index, song ->
+            return@mapIndexed MediaSessionCompat.QueueItem(
               MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, song.id.toString())
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, song.getKey())
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, song.title)
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.artist)
-                .build().description, song.id
+                .build().description, index.toLong()
             )
           }
       }
@@ -91,7 +91,7 @@ class MediaSessionUpdater @Inject constructor(
     }
 
     val builder = MediaMetadataCompat.Builder()
-      .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, currentSong.id.toString())
+      .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, currentSong.getKey())
       .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentSong.album)
       .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentSong.artist)
       .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentSong.artist)
@@ -143,7 +143,7 @@ class MediaSessionUpdater @Inject constructor(
     desktopLyricLocked: Boolean
   ) {
     val builder = PlaybackStateCompat.Builder()
-    builder.setActiveQueueItemId(playback.currentSong?.id ?: return)
+    builder.setActiveQueueItemId(playback.currentIndex.toLong())
       .setState(
         if (playback.isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED,
         playback.position,

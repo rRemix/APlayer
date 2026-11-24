@@ -12,6 +12,9 @@ import remix.myplayer.data.db.DbMigrations.migration3to4
 import remix.myplayer.data.db.DbMigrations.migration4to5
 import remix.myplayer.data.db.DbMigrations.migration5to6
 import remix.myplayer.data.db.DbMigrations.migration6to7
+import remix.myplayer.data.db.DbMigrations.migration8to9
+import remix.myplayer.data.db.SongIdentityMigration
+import remix.myplayer.data.db.room.entity.PlayListSong
 import remix.myplayer.data.db.room.dao.HistoryDao
 import remix.myplayer.data.db.room.dao.MetaDataCacheDao
 import remix.myplayer.data.db.room.dao.PlayListDao
@@ -35,6 +38,7 @@ import timber.log.Timber
 @Database(
   entities = [
     PlayList::class,
+    PlayListSong::class,
     PlayQueue::class,
     History::class,
     WebDav::class,
@@ -58,7 +62,7 @@ abstract class AppDatabase : RoomDatabase() {
 
   companion object {
 
-    const val VERSION = 7
+    const val VERSION = 9
 
     @Volatile
     private var INSTANCE: AppDatabase? = null
@@ -83,17 +87,20 @@ abstract class AppDatabase : RoomDatabase() {
           .addMigrations(migration4to5)
           .addMigrations(migration5to6)
           .addMigrations(migration6to7)
+          .addMigrations(SongIdentityMigration)
+          .addMigrations(migration8to9)
           .build()
       database.invalidationTracker.addObserver(object :
-        InvalidationTracker.Observer(PlayList.TABLE_NAME, PlayQueue.TABLE_NAME) {
+        InvalidationTracker.Observer(PlayList.TABLE_NAME, "playlist_tracks", PlayQueue.TABLE_NAME) {
         override fun onInvalidated(tables: Set<String>) {
           Timber.v("onInvalidated: $tables")
-          if (tables.contains(PlayList.TABLE_NAME)) {
+          if (tables.contains(PlayList.TABLE_NAME) || tables.contains("playlist_tracks")) {
             sendLocalBroadcast(
               Intent(MusicService.PLAYLIST_CHANGE)
                 .putExtra(EXTRA_PLAYLIST, PlayList.TABLE_NAME)
             )
-          } else if (tables.contains(PlayQueue.TABLE_NAME)) {
+          }
+          if (tables.contains(PlayQueue.TABLE_NAME)) {
             sendLocalBroadcast(
               Intent(MusicService.PLAYLIST_CHANGE)
                 .putExtra(EXTRA_PLAYLIST, PlayQueue.TABLE_NAME)

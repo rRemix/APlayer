@@ -134,11 +134,9 @@ fun HomeScreen() {
                   webDavVM.showAddWebDavDialog()
                 }
               )
-              if (smbVM.supportSmb) {
-                SmbDropDownMenu(smbVM) {
-                  showAddRemoteMenu = false
-                  smbVM.showAddSmbDialog()
-                }
+              SmbDropDownMenu {
+                showAddRemoteMenu = false
+                smbVM.showAddSmbDialog()
               }
             }
           }

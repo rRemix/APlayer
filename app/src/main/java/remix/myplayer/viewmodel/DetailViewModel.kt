@@ -43,9 +43,8 @@ class DetailViewModel @Inject constructor(
       // Keep the existing content while refreshing so returning from an album preserves scrolling.
       _state.value = _state.value.copy(loading = true, failed = false)
       try {
-        _state.value = withContext(Dispatchers.IO) {
-          val songs = songRepository.getSongsByModels(listOf(model))
-          detailState(model, songs)
+        songRepository.observeSongs(model).collect { songs ->
+          _state.value = withContext(Dispatchers.Default) { detailState(model, songs) }
         }
       } catch (e: CancellationException) {
         throw e
@@ -66,7 +65,7 @@ internal fun artistAlbums(songs: List<Song>): List<Album> {
   return ItemsSorter.sortedAlbums(albums, SortOrder.ALBUM_A_Z)
 }
 
-/** Called on IO: Song.duration may read file metadata when MediaStore has no duration. */
+/** Build UI values from an immutable song snapshot. */
 internal fun detailState(model: APlayerModel, songs: List<Song>) = DetailState(
   songs = songs,
   albums = if (model is Artist) artistAlbums(songs) else emptyList(),
@@ -77,5 +76,5 @@ internal fun detailState(model: APlayerModel, songs: List<Song>) = DetailState(
 
 /** Keep every song as a fallback, with an order independent of the song list's sort setting. */
 internal fun detailCoverSongs(songs: List<Song>): List<Song> = songs.sortedWith(
-  compareBy<Song> { it.albumId }.thenBy { it.id }.thenBy { it.data },
+  compareBy<Song> { it.albumId }.thenBy { it.getKey() }.thenBy { it.data },
 )

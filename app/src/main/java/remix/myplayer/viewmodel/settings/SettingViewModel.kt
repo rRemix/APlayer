@@ -1,5 +1,6 @@
 package remix.myplayer.viewmodel.settings
 
+import remix.myplayer.data.model.audio.SongIdentity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -19,7 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import remix.myplayer.R
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.misc.Library
@@ -32,8 +33,8 @@ import remix.myplayer.lyric.LyricManager
 import remix.myplayer.lyric.LyricManager.Companion.ACTION_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.CHANGE_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.EXTRA_LYRIC
-import remix.myplayer.repo.SongRepository
 import remix.myplayer.repo.usecase.DeleteSongUseCase
+import remix.myplayer.repo.SongMetadataRepository
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.DeleteSongState
 import remix.myplayer.ui.dialog.DialogState
@@ -52,7 +53,7 @@ import javax.inject.Inject
 class SettingViewModel @Inject constructor(
   private val savedStateHandle: SavedStateHandle,
   @param:ApplicationContext private val context: Context,
-  private val songRepo: SongRepository,
+  private val songMetadataRepository: SongMetadataRepository,
   val settingPrefs: SettingPrefs,
   val lyricPrefs: LyricPrefs,
   val themeController: ThemeController,
@@ -136,7 +137,8 @@ class SettingViewModel @Inject constructor(
       keepScreenOn = settingPrefs.keepScreenOn
     ),
     cover = CoverSettings(
-      loadEmbeddedCover = settingPrefs.loadEmbeddedCover,
+      loadLocalEmbeddedCover = settingPrefs.loadLocalEmbeddedCover,
+      loadRemoteEmbeddedCover = settingPrefs.loadRemoteEmbeddedCover,
       autoDownloadCover = settingPrefs.autoDownloadCover,
       downloadSource = settingPrefs.downloadSource,
       coverAnimationStyle = PlayingCoverAnimationStyle.fromPrefValue(settingPrefs.playingCoverAnimationStyle),
@@ -328,6 +330,7 @@ class SettingViewModel @Inject constructor(
   fun setSortOrder(category: SortCategory, order: String, playlistId: Long? = null): Boolean {
     if (category.saveOrder(order, settingPrefs, playlistId)) {
       if (category == SortCategory.PLAYLIST_DETAIL && playlistId != null) {
+        context.coverUriResolver().invalidate("playlist:$playlistId")
         return true
       }
       _settingsState.update {
@@ -396,9 +399,14 @@ class SettingViewModel @Inject constructor(
   }
 
   // -------- Cover 分组 ----------
-  fun setLoadEmbeddedCover(enabled: Boolean) {
-    settingPrefs.loadEmbeddedCover = enabled
-    _settingsState.update { it.copy(cover = it.cover.copy(loadEmbeddedCover = enabled)) }
+  fun setLoadLocalEmbeddedCover(enabled: Boolean) {
+    settingPrefs.loadLocalEmbeddedCover = enabled
+    _settingsState.update { it.copy(cover = it.cover.copy(loadLocalEmbeddedCover = enabled)) }
+  }
+
+  fun setLoadRemoteEmbeddedCover(enabled: Boolean) {
+    settingPrefs.loadRemoteEmbeddedCover = enabled
+    _settingsState.update { it.copy(cover = it.cover.copy(loadRemoteEmbeddedCover = enabled)) }
   }
 
   fun setAutoDownloadCover(mode: Int) {
@@ -474,7 +482,7 @@ class SettingViewModel @Inject constructor(
     MutableStateFlow(ImportPlayListState(DialogState(false), DialogState(false)))
   val addSongToPlayListState = _addSongToPlayListState.asStateFlow()
 
-  fun showAddSongToPlayListDialog(songIds: List<Long>, initialText: String = "") {
+  fun showAddSongToPlayListDialog(songIds: List<SongIdentity>, initialText: String = "") {
     _addSongToPlayListState.updateIf(
       condition = { !it.rootDialogState.isOpen },
       transform = {
@@ -546,6 +554,12 @@ class SettingViewModel @Inject constructor(
 
   private val _songDetailState = MutableStateFlow(SongDetailState(DialogState()))
   val songDetailState = _songDetailState.asStateFlow()
+
+  suspend fun cachedSongMetadata(song: Song): Song =
+    if (song.isRemote()) songMetadataRepository.withCachedMetadata(song.copy(size = 0L, dateModified = 0L))
+      .copy(size = song.size, dateModified = song.dateModified) else song
+
+  suspend fun loadSongMetadata(song: Song): Song = songMetadataRepository.refresh(song)
 
   fun showSongDetailDialog(song: Song) {
     _songDetailState.updateIf(

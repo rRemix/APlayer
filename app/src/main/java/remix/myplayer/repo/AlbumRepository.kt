@@ -1,77 +1,29 @@
 package remix.myplayer.repo
 
-import android.content.Context
-import android.provider.MediaStore.Audio
-import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import remix.myplayer.data.model.audio.Album
+import remix.myplayer.data.prefs.PrefKeys
 import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.data.prefs.observe
 import remix.myplayer.helper.ItemsSorter
-import remix.myplayer.util.PermissionUtil
-import timber.log.Timber
 import javax.inject.Inject
 
-interface AlbumRepository {
-  fun allAlbums(): List<Album>
-}
+interface AlbumRepository { fun observeAlbums(): Flow<List<Album>> }
 
 class AlbumRepoImpl @Inject constructor(
-  @param:ApplicationContext private val context: Context,
-  private val settingPrefs: SettingPrefs
-) : AlbumRepository, AbstractRepository(settingPrefs) {
-
-  override fun allAlbums(): List<Album> {
-    if (!PermissionUtil.hasNecessaryPermission()) {
-      return emptyList()
+  private val songs: SongRepository,
+  private val settings: SettingPrefs
+) : AlbumRepository {
+  override fun observeAlbums(): Flow<List<Album>> = songs.observeSongs().map { songs ->
+    songs.groupBy { it.albumId }.map { (id, tracks) ->
+      val song = tracks.first()
+      Album(id, song.album, song.artistId, song.artist, tracks.size)
     }
-    val albumMaps: MutableMap<Long, MutableList<Album>> = LinkedHashMap()
-    val albums: MutableList<Album> = ArrayList()
-    val sortOrder = settingPrefs.albumSortOrder
-    try {
-      context.contentResolver
-        .query(
-          Audio.Media.EXTERNAL_CONTENT_URI, arrayOf(
-            Audio.Media.ALBUM_ID,
-            Audio.Media.ALBUM,
-            Audio.Media.ARTIST_ID,
-            Audio.Media.ARTIST
-          ),
-          baseSelection,
-          baseSelectionArgs,
-          sortOrder
-        ).use { cursor ->
-          if (cursor != null) {
-            while (cursor.moveToNext()) {
-              try {
-                val albumId = cursor.getLong(0)
-                if (albumMaps[albumId] == null) {
-                  albumMaps[albumId] = ArrayList()
-                }
-                albumMaps[albumId]?.add(
-                  Album(
-                    albumId,
-                    cursor.getString(1),
-                    cursor.getLong(2),
-                    cursor.getString(3),
-                    0
-                  )
-                )
-              } catch (ignored: Exception) {
-              }
-            }
-            for ((_, value) in albumMaps) {
-              try {
-                val album = value[0]
-                album.count = value.size
-                albums.add(album)
-              } catch (e: Exception) {
-                Timber.v("addAlbum failed: $e")
-              }
-            }
-          }
-        }
-    } catch (e: Exception) {
-      Timber.v("getAllAlbum failed: $e")
-    }
-    return ItemsSorter.sortedAlbums(albums, sortOrder)
-  }
+  }.combine(settings.observe(PrefKeys.Setting.ALBUM_SORT_ORDER) { albumSortOrder }) { items, order ->
+    ItemsSorter.sortedAlbums(items, order)
+  }.flowOn(Dispatchers.Default)
 }

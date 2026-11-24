@@ -35,7 +35,7 @@ class EmbeddedProvider @Inject constructor(
 
     fun extractLyric(song: Song): String {
       checkWorkerThread()
-      if (song !is Song.Local) {
+      if (!song.isLocal()) {
         return ""
       }
 

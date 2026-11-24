@@ -7,12 +7,12 @@ import java.io.Serial
  * Created by Remix on 2017/10/22.
  */
 @Serializable
-data class Artist(val artistID: Long,
+data class Artist(val artistId: Long,
                   val artist: String,
-                  var count: Int) : APlayerModel {
+                  val count: Int) : APlayerModel {
 
   override fun getKey(): String {
-    return artistID.toString()
+    return artistId.toString()
   }
 
   companion object {

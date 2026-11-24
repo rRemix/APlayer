@@ -11,16 +11,16 @@ import java.io.Serial
  */
 
 @Serializable
-data class Album(val albumID: Long,
+data class Album(val albumId: Long,
                  val album: String,
-                 val artistID: Long,
+                 val artistId: Long,
                  val artist: String,
-                 var count: Int = 0) : APlayerModel {
+                 val count: Int = 0) : APlayerModel {
   val artUri: Uri
-    get() = ContentUris.withAppendedId("content://media/external/audio/albumart/".toUri(), albumID)
+    get() = ContentUris.withAppendedId("content://media/external/audio/albumart".toUri(), albumId)
 
   override fun getKey(): String {
-    return albumID.toString()
+    return albumId.toString()
   }
 
   companion object {

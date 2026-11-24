@@ -1,5 +1,6 @@
 package remix.myplayer.ui.dialog
 
+import remix.myplayer.data.model.audio.SongIdentity
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -15,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import remix.myplayer.R
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.ui.theme.LocalTheme
@@ -89,5 +90,5 @@ data class ImportPlayListState(
   val rootDialogState: DialogState,
   val inputDialogState: DialogState,
   val inputText: String = "",
-  val songIds: List<Long> = emptyList()
+  val songIds: List<SongIdentity> = emptyList()
 )

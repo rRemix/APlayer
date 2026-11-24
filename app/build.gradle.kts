@@ -180,7 +180,6 @@ android {
         includeInApk = false
     }
 
-    dynamicFeatures += setOf(":feature_smb")
 
     room {
         schemaDirectory("$projectDir/schemas")
@@ -265,8 +264,6 @@ dependencies {
 
     val googleImplementation by configurations
     googleImplementation(libs.billingclient)
-    googleImplementation(libs.play.feature.delivery)
-    googleImplementation(libs.play.feature.delivery.ktx)
 
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

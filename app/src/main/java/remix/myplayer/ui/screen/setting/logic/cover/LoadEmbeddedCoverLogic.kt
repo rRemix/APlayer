@@ -17,11 +17,20 @@ fun LoadEmbeddedCoverLogic() {
   val libraryVM = libraryViewModel
 
   SwitchPreference(
-    stringResource(R.string.load_embedded_cover),
-    stringResource(R.string.load_embedded_cover_tips),
-    settingState.cover.loadEmbeddedCover
+    stringResource(R.string.load_local_embedded_cover),
+    stringResource(R.string.load_local_embedded_cover_tips),
+    settingState.cover.loadLocalEmbeddedCover
   ) {
-    settingVM.setLoadEmbeddedCover(it)
+    settingVM.setLoadLocalEmbeddedCover(it)
+    libraryVM.refreshCovers()
+  }
+
+  SwitchPreference(
+    stringResource(R.string.load_remote_embedded_cover),
+    stringResource(R.string.load_remote_embedded_cover_tips),
+    settingState.cover.loadRemoteEmbeddedCover
+  ) {
+    settingVM.setLoadRemoteEmbeddedCover(it)
     libraryVM.refreshCovers()
   }
 }

@@ -2,7 +2,6 @@ package remix.myplayer.coil
 
 import android.content.Context
 import android.net.Uri
-import android.provider.MediaStore.Audio
 import androidx.core.net.toUri
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -15,12 +14,13 @@ import kotlinx.coroutines.flow.first
 import okio.ByteString.Companion.encodeUtf8
 import remix.myplayer.data.db.room.dao.PlayListDao
 import remix.myplayer.data.model.audio.APlayerModel
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.Album
 import remix.myplayer.data.model.audio.Artist
 import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.model.audio.SourceId
 import remix.myplayer.data.model.lastfm.Image
 import remix.myplayer.data.prefs.CoverPrefs
 import remix.myplayer.data.prefs.SettingPrefs
@@ -29,7 +29,10 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.DOWNLOAD_COVER_WIFI_ONLY
 import remix.myplayer.data.prefs.SettingPrefs.Companion.DOWNLOAD_LASTFM
 import remix.myplayer.lyric.provider.SearchScorer
 import remix.myplayer.repo.SongRepository
-import remix.myplayer.repo.usecase.FetchMetaDataUseCase
+import remix.myplayer.repo.SongQuery
+import remix.myplayer.repo.GenreRepository
+import remix.myplayer.repo.MusicSourceRepository
+import remix.myplayer.repo.SongMetadataRepository
 import remix.myplayer.request.netease.NetEaseClient
 import remix.myplayer.request.network.LastFMApi
 import remix.myplayer.util.SearchKeyUtil
@@ -50,8 +53,10 @@ class CoverUriResolver @Inject constructor(
   private val settingPrefs: SettingPrefs,
   private val coverPrefs: CoverPrefs,
   private val songRepo: SongRepository,
-  private val fetchMetaDataUseCase: FetchMetaDataUseCase,
-  private val playListDao: PlayListDao
+  private val songMetadataRepository: SongMetadataRepository,
+  private val musicSources: MusicSourceRepository,
+  private val playListDao: PlayListDao,
+  private val genres: GenreRepository
 ) {
 
   class CoverCandidate(val network: Boolean = false, private val load: suspend () -> Uri) {
@@ -80,12 +85,24 @@ class CoverUriResolver @Inject constructor(
       is Song -> songCacheKeyParts(model)
       is Album -> listOf(model.album, model.artist, model.count)
       is Artist -> listOf(model.artist, model.count)
-      is PlayList -> model.audioIds.toList()
+      is PlayList -> model.songIdentities.toList()
       is Genre -> listOf(model.genre, model.count)
       else -> error("Unsupported cover model")
     }
+    val embeddedCoverFlags = when (model) {
+      is Song -> listOf(shouldLoadEmbeddedCover(model))
+      is PlayList -> buildList {
+        if (model.songIdentities.any { it.sourceId == SourceId.MEDIASTORE }) {
+          add(settingPrefs.loadLocalEmbeddedCover)
+        }
+        if (model.songIdentities.any { it.sourceId.isRemote }) {
+          add(settingPrefs.loadRemoteEmbeddedCover)
+        }
+      }
+      else -> listOf(settingPrefs.loadLocalEmbeddedCover)
+    }
     // Auto-download permission is intentionally excluded so existing covers still work offline.
-    val sourceHash = hashKeyParts(keyParts + listOf(settingPrefs.loadEmbeddedCover, settingPrefs.downloadSource))
+    val sourceHash = hashKeyParts(keyParts + embeddedCoverFlags + settingPrefs.downloadSource)
     val key = cacheKey(model)
     val diskVersion = coverPrefs.diskRevision(key)
     val diskKey = "cover:${key.encodeUtf8().sha256().hex()}:$diskVersion:$sourceHash"
@@ -96,9 +113,9 @@ class CoverUriResolver @Inject constructor(
   }
 
   fun cacheKey(model: Any): String = when (model) {
-    is Song -> if (model.id > 0) "song:${model.id}" else "song-data:${model.data}"
-    is Album -> "album:${model.albumID}"
-    is Artist -> "artist:${model.artistID}"
+    is Song -> "song:${model.getKey()}"
+    is Album -> "album:${model.albumId}"
+    is Artist -> "artist:${model.artistId}"
     is PlayList -> "playlist:${model.id}"
     is Genre -> "genre:${model.id}"
     // Folder headers observe revisions, but load their individual song covers.
@@ -113,40 +130,41 @@ class CoverUriResolver @Inject constructor(
     if (model is Song) return CoverSources(diskKey, fetchCandidates(model))
 
     val songs = when (model) {
-      is Album -> songRepo.getSongs(Audio.Media.ALBUM_ID + "=?", arrayOf(model.albumID.toString()))
-      is Artist -> songRepo.getSongs(Audio.Media.ARTIST_ID + "=?", arrayOf(model.artistID.toString()))
+      is Album -> songRepo.getSongs(SongQuery(albumId = model.albumId))
+      is Artist -> songRepo.getSongs(SongQuery(artistId = model.artistId))
       is PlayList -> playListDao.observeById(model.id).first()?.let {
-        songRepo.getSongsByModels(listOf(it))
+        songRepo.getSongs(listOf(it.toModel()))
       }.orEmpty()
-      is Genre -> songRepo.getSongsByGenreId(model.id)
+      is Genre -> genres.getSongs(model.id)
       else -> error("Unsupported cover model")
     }.take(MAX_CANDIDATE_SONGS)
 
-    val candidates = when (model) {
-      is Album -> buildList {
-        if (loadEmbeddedCover()) {
-          for (song in songs) {
-            if (song.data.isNotEmpty()) add(CoverCandidate { embeddedUri(song.data) })
-          }
+    // Keep each song's embedded, MediaStore (local only), then online candidates together.
+    // A successful candidate stops resolution in CoverInterceptor before the next song.
+    val candidates = buildList {
+      for (song in songs) addAll(fetchCandidates(song))
+      when (model) {
+        is Album -> {
+          add(CoverCandidate { model.artUri })
+          add(CoverCandidate(network = true) { fetchNetwork(model) })
         }
-        add(CoverCandidate { model.artUri })
-        add(CoverCandidate(network = true) { fetchNetwork(model) })
+        is Artist -> add(CoverCandidate(network = true) { fetchNetwork(model) })
+        else -> Unit // Playlists and genres have no collection-level artwork source.
       }
-      is Artist -> buildList {
-        for (song in songs) addAll(localCandidates(song))
-        add(CoverCandidate(network = true) { fetchNetwork(model) })
-      }
-      else -> songs.flatMap(::fetchCandidates)
     }
 
     val songsHash = hashKeyParts(songs.flatMap(::songCacheKeyParts))
     return CoverSources("$diskKey:$songsHash", candidates)
   }
 
-  private fun songCacheKeyParts(song: Song): List<Any> = listOf(
-    song.id, song.data, song.albumId, song.title, song.album, song.artist,
-    song.dateModified, song.size
-  )
+  private fun songCacheKeyParts(song: Song): List<Any> = if (song.isRemote()) {
+    // The first embedded read publishes tags. Those tags must not change the artwork
+    // key and force an immediate second remote file open on the next list refresh.
+    listOf(song.songIdentity, song.data, song.dateModified, song.size)
+  } else {
+    listOf(song.songIdentity, song.data, song.albumId, song.title, song.album, song.artist,
+      song.dateModified, song.size)
+  }
 
   private fun hashKeyParts(parts: List<Any>): String = buildString {
     for (part in parts) {
@@ -155,15 +173,12 @@ class CoverUriResolver @Inject constructor(
     }
   }.encodeUtf8().sha256().hex()
 
-  private fun localCandidates(song: Song): List<CoverCandidate> {
-    if (!song.isLocal()) return emptyList()
-
-    return buildList {
-      if (loadEmbeddedCover() && song.data.isNotEmpty()) {
-        add(CoverCandidate { embeddedUri(song.data) })
-      }
-      add(CoverCandidate { song.artUri })
+  private fun localCandidates(song: Song): List<CoverCandidate> = buildList {
+    if (shouldLoadEmbeddedCover(song) && song.data.isNotEmpty()) {
+      add(CoverCandidate { embeddedUri(song) })
     }
+    // Album art provider only knows local MediaStore albums.
+    if (song.isLocal()) add(CoverCandidate { song.artUri })
   }
 
   private fun fetchCandidates(song: Song): List<CoverCandidate> =
@@ -173,8 +188,10 @@ class CoverUriResolver @Inject constructor(
     if (!canDownloadCover()) return Uri.EMPTY
 
     return try {
-      if (initialModel is Song.Remote) fetchMetaDataUseCase(initialModel)
-      val url = if (downloadFromLastFM()) fetchLastFM(initialModel) else fetchNetEase(initialModel)
+      val model = if (initialModel is Song && initialModel.isRemote()) {
+        songMetadataRepository.getOrFetch(initialModel)
+      } else initialModel
+      val url = if (downloadFromLastFM()) fetchLastFM(model) else fetchNetEase(model)
       url?.takeIf { it.isNotEmpty() }?.toUri() ?: Uri.EMPTY
     } catch (e: CancellationException) {
       throw e
@@ -232,7 +249,27 @@ class CoverUriResolver @Inject constructor(
   private fun embeddedUri(path: String): Uri =
     Uri.Builder().scheme(SCHEME_EMBEDDED).path(path).build()
 
-  private fun loadEmbeddedCover() = settingPrefs.loadEmbeddedCover
+  /**
+   * Remote artwork cannot be addressed by path alone: the resolved locator carries the
+   * credentials, so it travels with the request instead of being stored on [Song].
+   */
+  private suspend fun embeddedUri(song: Song): Uri {
+    if (song.isLocal()) return embeddedUri(song.data)
+    val source = musicSources.resolve(song)
+    return Uri.Builder()
+      .scheme(SCHEME_EMBEDDED)
+      .authority(AUTHORITY_REMOTE)
+      .appendQueryParameter(PARAM_LOCATOR, source.locator)
+      .appendQueryParameter(PARAM_AUTHORIZATION, source.headers[AUTHORIZATION].orEmpty())
+      .appendQueryParameter(PARAM_SOURCE_ID, song.sourceId.value)
+      .appendQueryParameter(PARAM_SOURCE_KEY, song.sourceKey)
+      .appendQueryParameter(PARAM_SIZE, song.size.toString())
+      .appendQueryParameter(PARAM_MODIFIED, song.dateModified.toString())
+      .build()
+  }
+
+  private fun shouldLoadEmbeddedCover(song: Song): Boolean =
+    if (song.isRemote()) settingPrefs.loadRemoteEmbeddedCover else settingPrefs.loadLocalEmbeddedCover
 
   private fun downloadFromLastFM() = settingPrefs.downloadSource == DOWNLOAD_LASTFM
 
@@ -259,6 +296,17 @@ class CoverUriResolver @Inject constructor(
     private const val MAX_CANDIDATE_SONGS = 5
 
     const val SCHEME_EMBEDDED = "embedded"
+
+    /** Query parameters carried by a remote [SCHEME_EMBEDDED] request. */
+    const val PARAM_LOCATOR = "locator"
+    const val PARAM_AUTHORIZATION = "authorization"
+    const val PARAM_SOURCE_ID = "sourceId"
+    const val PARAM_SOURCE_KEY = "sourceKey"
+    const val PARAM_SIZE = "size"
+    const val PARAM_MODIFIED = "modified"
+
+    private const val AUTHORITY_REMOTE = "remote"
+    private const val AUTHORIZATION = "Authorization"
   }
 }
 

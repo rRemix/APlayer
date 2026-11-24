@@ -27,13 +27,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.data.model.misc.Library
 import remix.myplayer.ui.theme.LocalTheme
-import remix.myplayer.viewmodel.LibraryViewModel
-import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.settings.SortCategory
 
 @Composable
-fun ScreenPopupButton(library: Library?, vm: LibraryViewModel = libraryViewModel) {
+fun ScreenPopupButton(library: Library?) {
   if (library == null) {
     return
   }
@@ -107,7 +105,6 @@ fun ScreenPopupButton(library: Library?, vm: LibraryViewModel = libraryViewModel
         }
       }
       expanded = false
-      vm.fetchMedia()
     }
 
     sortOrderItems.forEachIndexed { index, res ->

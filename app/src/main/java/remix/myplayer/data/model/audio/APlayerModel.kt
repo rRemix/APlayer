@@ -1,6 +1,6 @@
 package remix.myplayer.data.model.audio
 
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.util.Constants
 import java.io.Serializable
 

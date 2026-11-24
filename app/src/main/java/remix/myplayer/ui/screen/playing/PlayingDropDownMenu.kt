@@ -67,7 +67,7 @@ fun PlayingDropDownMenu(
   val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
 
   val menuItems = buildList {
-    add(R.string.song_edit)
+    if (song.isLocal()) add(R.string.song_edit)
     add(R.string.song_detail)
     // Only local songs with valid MediaStore ids can be linked to a library detail page.
     if (song.artistDetailRoute() != null) add(R.string.go_to_artist)
@@ -176,7 +176,7 @@ fun PlayingDropDownMenu(
             }
 
             R.string.add_to_playlist -> {
-              settingVM.showAddSongToPlayListDialog(listOf(song.id))
+              settingVM.showAddSongToPlayListDialog(listOf(song.songIdentity))
             }
 
             R.string.collect -> {
@@ -186,7 +186,7 @@ fun PlayingDropDownMenu(
               val favorite =
                 libraryVM.playLists.value.firstOrNull { it.isFavorite() } ?: return@DropdownMenuItem
 
-              libraryVM.addSongsToPlayList(listOf(song.id), favorite.name)
+              libraryVM.addSongsToPlayList(listOf(song.songIdentity), favorite.name)
             }
 
             R.string.sleep_timer -> {

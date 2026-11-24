@@ -178,7 +178,8 @@ class SettingPrefs @Inject constructor(
   )
   var keepScreenOn by PrefsDelegate(sp, PrefKeys.Setting.SCREEN_ALWAYS_ON, false)
 
-  var loadEmbeddedCover by PrefsDelegate(sp, PrefKeys.Setting.LOAD_EMBEDDED_COVER, false)
+  var loadLocalEmbeddedCover by PrefsDelegate(sp, PrefKeys.Setting.LOAD_LOCAL_EMBEDDED_COVER, false)
+  var loadRemoteEmbeddedCover by PrefsDelegate(sp, PrefKeys.Setting.LOAD_REMOTE_EMBEDDED_COVER, true)
   var autoDownloadCover by PrefsDelegate(
     sp,
     PrefKeys.Setting.AUTO_DOWNLOAD_ALBUM_COVER,
@@ -203,6 +204,7 @@ class SettingPrefs @Inject constructor(
   var checkMigration16600 by PrefsDelegate(sp, "check_migration_16600", false)
   var checkMigration20500 by PrefsDelegate(sp, "check_migration_20500", false)
   var checkMigration21100 by PrefsDelegate(sp, "check_migration_21100", false)
+  var checkMigration21400 by PrefsDelegate(sp, "check_migration_21400", false)
 
   companion object {
 
@@ -293,32 +295,18 @@ class SettingPrefs @Inject constructor(
   }
 }
 
-fun SettingPrefs.playlistSortOrderFlow(): Flow<String> {
-  return callbackFlow {
-    trySend(playlistSortOrder)
-    val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-      if (key == PrefKeys.Setting.PLAYLIST_SORT_ORDER) {
-        trySend(playlistSortOrder)
-      }
-    }
-    sp.registerOnSharedPreferenceChangeListener(listener)
-    awaitClose {
-      sp.unregisterOnSharedPreferenceChangeListener(listener)
-    }
-  }.distinctUntilChanged()
-}
+/** Observe only the settings that affect a derived library value. */
+fun <T> SettingPrefs.observe(vararg keys: String, read: SettingPrefs.() -> T): Flow<T> = callbackFlow {
+  val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+    if (key == null || keys.isEmpty() || key in keys) trySend(read())
+  }
+  sp.registerOnSharedPreferenceChangeListener(listener)
+  trySend(read())
+  awaitClose { sp.unregisterOnSharedPreferenceChangeListener(listener) }
+}.distinctUntilChanged()
 
-fun SettingPrefs.historySortOrderFlow(): Flow<String> {
-  return callbackFlow {
-    trySend(historySortOrder)
-    val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-      if (key == PrefKeys.Setting.HISTORY_SORT_ORDER) {
-        trySend(historySortOrder)
-      }
-    }
-    sp.registerOnSharedPreferenceChangeListener(listener)
-    awaitClose {
-      sp.unregisterOnSharedPreferenceChangeListener(listener)
-    }
-  }.distinctUntilChanged()
-}
+fun SettingPrefs.playlistSortOrderFlow(): Flow<String> =
+  observe(PrefKeys.Setting.PLAYLIST_SORT_ORDER) { playlistSortOrder }
+
+fun SettingPrefs.historySortOrderFlow(): Flow<String> =
+  observe(PrefKeys.Setting.HISTORY_SORT_ORDER) { historySortOrder }

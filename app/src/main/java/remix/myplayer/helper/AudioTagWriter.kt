@@ -140,11 +140,11 @@ object AudioTagWriter {
       .putExtra(
         BaseMusicActivity.EXTRA_NEW_SONG,
         request.song.copy(
-          title = request.fieldMap[AudioTagFile.TITLE],
-          album = request.fieldMap[AudioTagFile.ALBUM],
-          artist = request.fieldMap[AudioTagFile.ARTIST],
-          genre = request.fieldMap[AudioTagFile.GENRE],
-          year = request.fieldMap[AudioTagFile.DATE],
+          title = request.fieldMap[AudioTagFile.TITLE] ?: request.song.title,
+          album = request.fieldMap[AudioTagFile.ALBUM] ?: request.song.album,
+          artist = request.fieldMap[AudioTagFile.ARTIST] ?: request.song.artist,
+          genre = request.fieldMap[AudioTagFile.GENRE] ?: request.song.genre,
+          year = request.fieldMap[AudioTagFile.DATE] ?: request.song.year,
           track = request.fieldMap[AudioTagFile.TRACK_NUMBER]
         )
       )
@@ -158,7 +158,7 @@ object AudioTagWriter {
     if (directResult.isSuccess) {
       return
     }
-    if (!withFallback || !request.song.isLocal() || request.song.id <= 0) {
+    if (!withFallback || !request.song.isLocal() || (request.song.mediaStoreId ?: -1) <= 0) {
       throw directResult.exceptionOrNull()!!
     }
 

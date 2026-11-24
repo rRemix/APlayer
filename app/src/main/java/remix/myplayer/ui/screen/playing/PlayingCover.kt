@@ -100,7 +100,7 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
       PlayingCoverAnimationStyle.PAGE_TURN -> {
         horizontalFlip3DModifier(
           modifier = imageModifier,
-          isTargetContent = currentSong.id == song.id,
+          isTargetContent = currentSong.songIdentity == song.songIdentity,
           isPrevious = isPrevious,
           speed = coverAnimationSpeed
         )
@@ -109,7 +109,7 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
       PlayingCoverAnimationStyle.SLICE_STAGGER -> {
         sliceStaggerModifier(
           modifier = imageModifier,
-          isTargetContent = currentSong.id == song.id,
+          isTargetContent = currentSong.songIdentity == song.songIdentity,
           isPrevious = isPrevious,
           speed = coverAnimationSpeed
         )
@@ -124,7 +124,7 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
       modifier = contentModifier,
       onBitmap = { bitmap ->
         val playing = MusicStateSource.currentPlaybackUiState.song
-        if (currentSong.id == playing.id && currentSong.data == playing.data) {
+        if (currentSong.songIdentity == playing.songIdentity && currentSong.data == playing.data) {
           playbackVM.updateSwatch(bitmap)
         }
       }

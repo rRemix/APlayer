@@ -57,10 +57,10 @@ fun HistoryScreen() {
 
       LazyColumn(modifier = Modifier.weight(1f)) {
         itemsIndexed(items, key = { _, item ->
-          item.first.id
+          item.first.getKey()
         }) { pos, item ->
           val song = item.first
-          val isPlayingSong = playbackState.song.id == song.id
+          val isPlayingSong = playbackState.song.songIdentity == song.songIdentity
 
           ListSong(
             modifier = Modifier.height(64.dp),

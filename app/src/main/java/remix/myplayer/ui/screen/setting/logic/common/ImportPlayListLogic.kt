@@ -1,9 +1,11 @@
 package remix.myplayer.ui.screen.setting.logic.common
 
+import remix.myplayer.data.model.audio.SongIdentity
+import remix.myplayer.repo.SongQuery
+import remix.myplayer.repo.PathMatch
 import android.app.Activity
 import android.content.Intent
 import android.content.Intent.EXTRA_ALLOW_MULTIPLE
-import android.provider.MediaStore.Audio
 import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,7 +22,6 @@ import remix.myplayer.ui.screen.setting.NormalPreference
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStreamReader
 
 @Composable
@@ -44,23 +45,17 @@ fun ImportPlayListLogic() {
           } ?: return@launch
           stream.use { input ->
             BufferedReader(InputStreamReader(input)).use { reader ->
-              val audioIds = ArrayList<Long>()
-              reader.lineSequence().forEachIndexed { i, path ->
-                val entry = "#EXTINF:"
-                if (i != 0 && !path.startsWith(entry)) {
-                  val file = File(path)
-                  val song = if (file.exists() && file.isFile) {
-                    libraryVM.loadSong(Audio.Media.DATA + " = ?", arrayOf(path)).firstOrNull()
-                  } else {
-                    libraryVM.loadSong(
-                      Audio.Media.DATA + " like ?",
-                      arrayOf("%" + path.replace("\\", "/"))
-                    ).firstOrNull()
-                  } ?: return@forEachIndexed
-                  if (song.id > 0) {
-                    audioIds.add(song.id)
-                  }
-                }
+              val audioIds = ArrayList<SongIdentity>()
+              reader.lineSequence().forEach { line ->
+                val path = line.trim().replace('\\', '/')
+                if (path.isEmpty() || path.startsWith("#")) return@forEach
+                val query = SongQuery(path = path)
+                val exact = libraryVM.loadSongs(query)
+                val matches = if (exact.isNotEmpty()) exact else
+                  libraryVM.loadSongs(query.copy(pathMatch = PathMatch.SUFFIX))
+                // A basename can refer to several files; never silently import an arbitrary one.
+                val song = matches.singleOrNull() ?: return@forEach
+                if (song.valid()) audioIds.add(song.songIdentity)
               }
               if (audioIds.isNotEmpty()) {
                 settingVM.showAddSongToPlayListDialog(
