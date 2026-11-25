@@ -131,6 +131,21 @@ class SettingPrefs @Inject constructor(
   )
   var autoPlay by PrefsDelegate(sp, PrefKeys.Setting.AUTO_PLAY, NEVER)
   var crossFade by PrefsDelegate(sp, PrefKeys.Setting.CROSS_FADE, false)
+  var skipIntroOutroEnabled by PrefsDelegate(
+    sp,
+    PrefKeys.Setting.SKIP_INTRO_OUTRO_ENABLED,
+    false
+  )
+  var skipIntroSeconds by PrefsDelegate(
+    sp,
+    PrefKeys.Setting.SKIP_INTRO_SECONDS,
+    SKIP_INTRO_OUTRO_DEFAULT_SECONDS
+  )
+  var skipOutroSeconds by PrefsDelegate(
+    sp,
+    PrefKeys.Setting.SKIP_OUTRO_SECONDS,
+    SKIP_INTRO_OUTRO_DEFAULT_SECONDS
+  )
   var speed by PrefsDelegate(sp, PrefKeys.Setting.SPEED, "1.0")
   var replayGainEnabled by PrefsDelegate(sp, PrefKeys.Setting.REPLAY_GAIN_ENABLED, false)
   var replayGainMode by PrefsDelegate(sp, PrefKeys.Setting.REPLAY_GAIN_MODE, REPLAY_GAIN_MODE_TRACK)
@@ -282,6 +297,15 @@ class SettingPrefs @Inject constructor(
     const val UI_FONT_SCALE_MIN = 0.85f
     const val UI_FONT_SCALE_MAX = 1.5f
     const val UI_FONT_SCALE_STEP = 0.05f
+
+    // 自动跳过片头片尾
+    const val SKIP_INTRO_OUTRO_MIN_SECONDS = 0
+    const val SKIP_INTRO_OUTRO_MAX_SECONDS = 120
+    const val SKIP_INTRO_OUTRO_DEFAULT_SECONDS = 10
+
+    fun normalizeSkipIntroOutroSeconds(seconds: Int): Int {
+      return seconds.coerceIn(SKIP_INTRO_OUTRO_MIN_SECONDS, SKIP_INTRO_OUTRO_MAX_SECONDS)
+    }
 
     fun normalizeUiFontScale(scale: Float): Float {
       val snapped = (scale / UI_FONT_SCALE_STEP).roundToInt() * UI_FONT_SCALE_STEP

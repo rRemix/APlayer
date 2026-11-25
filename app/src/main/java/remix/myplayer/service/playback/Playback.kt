@@ -60,6 +60,12 @@ interface Playback {
   /** 跳至指定位置 */
   fun skipTo(index: Int)
 
+  /** 按当前重复模式和随机模式计算的下一个播放索引，没有下一项时返回 -1 */
+  val nextIndexRespectingMode: Int
+
+  /** 跳转到指定索引的默认起始位置 */
+  fun seekToIndex(index: Int)
+
   /** 获取当前播放列表 */
   fun getPlaylist(): List<Song>
 

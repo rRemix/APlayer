@@ -235,6 +235,17 @@ class MusicService : BaseService(),
     ScreenReceiver()
   }
   private var progressTickerJob: Job? = null
+
+  /**
+   * 自动跳过片尾的检测任务
+   */
+  private var skipIntroOutroJob: Job? = null
+
+  /**
+   * 当前歌曲是否已经执行过跳过片尾，避免重复触发
+   */
+  private var outroSkipped = false
+
   private var screenOn = true
     set(value) {
       if (field == value) {
@@ -399,6 +410,12 @@ class MusicService : BaseService(),
       PrefKeys.Setting.LIST_LOOP -> {
         playback.setMode(playModel, settingPrefs.listLoop)
         pushPlaybackUiState()
+      }
+      // 自动跳过片头片尾
+      PrefKeys.Setting.SKIP_INTRO_OUTRO_ENABLED,
+      PrefKeys.Setting.SKIP_INTRO_SECONDS,
+      PrefKeys.Setting.SKIP_OUTRO_SECONDS -> {
+        updateSkipIntroOutroTicker()
       }
     }
   }
@@ -588,6 +605,7 @@ class MusicService : BaseService(),
     stateSource.updatePlaybackUiState(isPlaying = isPlaying)
     pushProgressUiState()
     updateProgressTicker()
+    updateSkipIntroOutroTicker()
     if (isPlaying) {
       updatePlayHistory()
     }
@@ -603,6 +621,9 @@ class MusicService : BaseService(),
     EQHelper.updateAudioSession(this, playback.audioSessionId)
 
     pushPlaybackUiState()
+
+    // 自动跳过片头
+    skipIntroIfNeeded()
 
     if (firstPrepared) {
       firstPrepared = false
@@ -632,6 +653,14 @@ class MusicService : BaseService(),
     Timber.v("onItemTransition, playback.audioSessionId: ${playback.audioSessionId}")
     val song = mediaItem?.localConfiguration?.tag as? Song
     progressManager.saveSource(playback)
+
+    // 换歌后重置片尾标记，并在已准备完成时应用片头跳过
+    outroSkipped = false
+    if (playback.isPrepared) {
+      skipIntroIfNeeded()
+    }
+    updateSkipIntroOutroTicker()
+
     if (song != null && song.isRemote()) {
       launch {
         val updated = songMetadataRepository.refresh(song)
@@ -718,6 +747,8 @@ class MusicService : BaseService(),
 
     progressManager.saveSource(playback)
     progressManager.stop()
+    skipIntroOutroJob?.cancel()
+    skipIntroOutroJob = null
     playbackFavoriteState.cancelLookup()
     appWidgetUpdater.stop()
     cancel()
@@ -912,6 +943,88 @@ class MusicService : BaseService(),
     playback.skipToPrevious()
     progressManager.activateAndSave(playback)
     start(true)
+  }
+
+  /**
+   * 自动跳过片头：歌曲开始时如果进度早于片头时长，则跳转到片头结束处
+   */
+  private fun skipIntroIfNeeded() {
+    if (!::playback.isInitialized) return
+    if (!settingPrefs.skipIntroOutroEnabled) return
+
+    val introMs = settingPrefs.skipIntroSeconds * 1000L
+    if (introMs <= 0) return
+
+    val duration = playback.duration
+    if (duration > 0 && introMs >= duration) return
+
+    if (playback.position < introMs) {
+      Timber.v("skipIntro, seek to $introMs")
+      playback.seek(introMs)
+    }
+  }
+
+  /**
+   * 自动跳过片尾：到达片尾截止点时按当前播放模式切换或结束
+   */
+  private fun skipOutroIfNeeded() {
+    if (outroSkipped) return
+    if (!settingPrefs.skipIntroOutroEnabled) return
+
+    val outroMs = settingPrefs.skipOutroSeconds * 1000L
+    if (outroMs <= 0) return
+
+    val duration = playback.duration
+    if (duration <= 0) return
+
+    val threshold = duration - outroMs
+    // 片头与片尾时长超过歌曲总时长时不做片尾跳过，避免整首歌被跳过
+    if (threshold <= settingPrefs.skipIntroSeconds * 1000L) return
+    if (playback.position < threshold) return
+
+    outroSkipped = true
+    Timber.v("skipOutro, position: ${playback.position}, threshold: $threshold")
+
+    val currentIndex = playback.currentIndex
+    val nextIndex = playback.nextIndexRespectingMode
+    if (nextIndex == C.INDEX_UNSET) {
+      // 没有下一首，按正常播放结束处理
+      playback.seek(duration)
+      return
+    }
+
+    playback.seekToIndex(nextIndex)
+    if (nextIndex == currentIndex) {
+      // 单曲循环不会触发 onItemTransition，需要手动重新应用片头
+      outroSkipped = false
+      skipIntroIfNeeded()
+    }
+    progressManager.activateAndSave(playback)
+    start(true)
+  }
+
+  /**
+   * 播放中定时检测片尾截止点，不依赖屏幕是否点亮
+   */
+  private fun updateSkipIntroOutroTicker() {
+    if (!::playback.isInitialized) return
+
+    if (!playback.isPlaying || !settingPrefs.skipIntroOutroEnabled) {
+      skipIntroOutroJob?.cancel()
+      skipIntroOutroJob = null
+      return
+    }
+
+    if (skipIntroOutroJob?.isActive == true) return
+
+    skipIntroOutroJob = launch {
+      while (isActive) {
+        if (::playback.isInitialized && playback.isPlaying) {
+          skipOutroIfNeeded()
+        }
+        delay(SKIP_INTRO_OUTRO_CHECK_INTERVAL)
+      }
+    }
   }
 
   /**
@@ -1525,6 +1638,9 @@ class MusicService : BaseService(),
     const val EXTRA_POSITION = "position"
 
     private const val APLAYER_PACKAGE_NAME = "remix.myplayer"
+
+    // 片尾检测间隔
+    private const val SKIP_INTRO_OUTRO_CHECK_INTERVAL = 200L
 
     // 媒体数据库变化
     const val MEDIA_STORE_CHANGE = "$APLAYER_PACKAGE_NAME.media_store.change"

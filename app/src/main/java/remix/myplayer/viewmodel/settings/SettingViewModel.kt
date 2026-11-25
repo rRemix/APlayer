@@ -94,6 +94,9 @@ class SettingViewModel @Inject constructor(
       playAtBreakPoint = settingPrefs.playAtBreakPoint,
       sourceOpenAction = settingPrefs.sourceOpenAction,
       crossFade = settingPrefs.crossFade,
+      skipIntroOutroEnabled = settingPrefs.skipIntroOutroEnabled,
+      skipIntroSeconds = settingPrefs.skipIntroSeconds,
+      skipOutroSeconds = settingPrefs.skipOutroSeconds,
       autoPlay = settingPrefs.autoPlay,
       speed = settingPrefs.speed,
       listLoop = settingPrefs.listLoop,
@@ -253,6 +256,23 @@ class SettingViewModel @Inject constructor(
   fun setCrossFade(enabled: Boolean) {
     settingPrefs.crossFade = enabled
     _settingsState.update { it.copy(play = it.play.copy(crossFade = enabled)) }
+  }
+
+  fun setSkipIntroOutroEnabled(enabled: Boolean) {
+    settingPrefs.skipIntroOutroEnabled = enabled
+    _settingsState.update { it.copy(play = it.play.copy(skipIntroOutroEnabled = enabled)) }
+  }
+
+  fun setSkipIntroSeconds(seconds: Int) {
+    val normalized = SettingPrefs.normalizeSkipIntroOutroSeconds(seconds)
+    settingPrefs.skipIntroSeconds = normalized
+    _settingsState.update { it.copy(play = it.play.copy(skipIntroSeconds = normalized)) }
+  }
+
+  fun setSkipOutroSeconds(seconds: Int) {
+    val normalized = SettingPrefs.normalizeSkipIntroOutroSeconds(seconds)
+    settingPrefs.skipOutroSeconds = normalized
+    _settingsState.update { it.copy(play = it.play.copy(skipOutroSeconds = normalized)) }
   }
 
   fun setAutoPlay(mode: Int) {
