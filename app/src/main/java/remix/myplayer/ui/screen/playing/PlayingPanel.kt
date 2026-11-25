@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.view.WindowManager
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.keepScreenOn
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,21 +44,28 @@ import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 
 @Composable
-fun PlayingPanel(isVisible: Boolean) {
+fun PlayingPanel() {
   PlayingContainer {
     val context = LocalContext.current
     if (context.isPortraitOrientation()) {
-      Portrait(isVisible)
+      Portrait()
     } else {
-      Landscape(isVisible)
+      Landscape()
     }
   }
 }
 
 @Composable
-private fun Portrait(isVisible: Boolean) {
+private fun Portrait() {
+  val settingState by settingViewModel.settingsState.collectAsStateWithLifecycle()
+  val pagerState = rememberPagerState { 2 }
   Column(
-    modifier = Modifier,
+    // Both pager pages stay composed; only the selected lyrics page should keep the screen on.
+    modifier = if (settingState.playingScreen.keepScreenOn && pagerState.currentPage == 1) {
+      Modifier.keepScreenOn()
+    } else {
+      Modifier
+    },
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(30.dp)
   ) {
@@ -68,8 +74,6 @@ private fun Portrait(isVisible: Boolean) {
     val scope = rememberCoroutineScope()
 
     PlayingTopBar(playbackState.song, swatch)
-
-    val pagerState = rememberPagerState { 2 }
 
     HorizontalPager(
       pagerState,
@@ -111,8 +115,7 @@ private fun Portrait(isVisible: Boolean) {
 
     PlayingSeekbarWithText(swatch)
 
-    val playingScreenBottom =
-      settingViewModel.settingsState.collectAsStateWithLifecycle().value.playingScreen.bottom
+    val playingScreenBottom = settingState.playingScreen.bottom
     val showBottomBar = playingScreenBottom != SettingPrefs.BOTTOM_SHOW_NONE
     PlayingControl(Modifier.weight(if (showBottomBar) 1f else 2f), playbackState, swatch)
 
@@ -127,8 +130,6 @@ private fun Portrait(isVisible: Boolean) {
         swatch
       )
     }
-
-    KeepPlayingScreenOn(isVisible && pagerState.currentPage == 1)
 
     DisposableEffect(Unit) {
       val receiver = object : BroadcastReceiver() {
@@ -175,21 +176,27 @@ private fun PlayingIndicator(
 }
 
 @Composable
-private fun Landscape(isVisible: Boolean) {
+private fun Landscape() {
   val context = LocalContext.current
-  BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+  val keepScreenOn =
+    settingViewModel.settingsState.collectAsStateWithLifecycle().value.playingScreen.keepScreenOn
+  BoxWithConstraints(
+    modifier = Modifier
+      .fillMaxSize()
+      .then(if (keepScreenOn) Modifier.keepScreenOn() else Modifier)
+  ) {
     val isCompactLandscape = maxHeight < 420.dp || maxWidth > maxHeight * 2.2f
     val useExpandedControls = context.isTablet() || maxWidth >= 1200.dp
     if (isCompactLandscape) {
-      CompactLandscape(isVisible, useExpandedControls)
+      CompactLandscape(useExpandedControls)
     } else {
-      RegularLandscape(isVisible)
+      RegularLandscape()
     }
   }
 }
 
 @Composable
-private fun RegularLandscape(isVisible: Boolean) {
+private fun RegularLandscape() {
   Column(
     modifier = Modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -224,8 +231,6 @@ private fun RegularLandscape(isVisible: Boolean) {
       }
     }
 
-    KeepPlayingScreenOn(isVisible)
-
     PlayingSeekbarWithText(swatch)
 
     PlayingControl(Modifier.weight(1f), playbackState, swatch)
@@ -233,9 +238,7 @@ private fun RegularLandscape(isVisible: Boolean) {
 }
 
 @Composable
-private fun CompactLandscape(isVisible: Boolean, useExpandedControls: Boolean) {
-  KeepPlayingScreenOn(isVisible)
-
+private fun CompactLandscape(useExpandedControls: Boolean) {
   Row(
     modifier = Modifier
       .fillMaxSize()
@@ -293,21 +296,6 @@ private fun CompactLandscape(isVisible: Boolean, useExpandedControls: Boolean) {
       contentAlignment = Alignment.Center
     ) {
       PlayingLyric(playbackState.song)
-    }
-  }
-}
-
-@Composable
-private fun KeepPlayingScreenOn(shouldKeepScreenOn: Boolean) {
-  val keepScreenOn =
-    settingViewModel.settingsState.collectAsStateWithLifecycle().value.playingScreen.keepScreenOn
-  val window = LocalActivity.current?.window
-  DisposableEffect(shouldKeepScreenOn, keepScreenOn) {
-    if (shouldKeepScreenOn && keepScreenOn) {
-      window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-    }
-    onDispose {
-      window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
   }
 }

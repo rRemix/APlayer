@@ -169,11 +169,8 @@ class LyricSearcher @Inject constructor(
       require(song != Song.EMPTY_SONG)
       val rawKey = Json.encodeToString(
         listOf(
-          when (song) {
-            is Song.Local -> "local"
-            is Song.Remote -> "remote"
-          },
-          if (song is Song.Local) song.id.toString() else song.data,
+          if (song.isLocal()) "local" else "remote",
+          if (song.isLocal()) song.sourceKey else song.getKey(),
           song.title,
           song.artist,
           song.album

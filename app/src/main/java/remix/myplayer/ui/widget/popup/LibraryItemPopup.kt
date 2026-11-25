@@ -23,7 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Album
 import remix.myplayer.data.model.audio.Artist
@@ -100,13 +100,13 @@ fun LibraryItemDropdownMenu(
           onDismissRequest()
           scope.launch {
             val songs = withContext(Dispatchers.IO) {
-              libraryVM.loadSongsByModels(listOf(model))
+              libraryVM.loadSongs(listOf(model))
             }
 
 //            if (songs.isEmpty()) {
 //              return@launch
 //            }
-            val ids = songs.map { it.id }
+            val ids = songs.map { it.songIdentity }
             when (res) {
               // 播放
               R.string.play -> {

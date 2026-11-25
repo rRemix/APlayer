@@ -1,5 +1,7 @@
 package remix.myplayer.ui.screen
 
+import remix.myplayer.data.model.audio.SongIdentity
+import remix.myplayer.viewmodel.settingViewModel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -66,7 +68,7 @@ fun SongChooserScreen(id: Long, name: String, vm: LibraryViewModel = libraryView
   val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
 
   val selectedIds = remember {
-    mutableStateSetOf<Long>()
+    mutableStateSetOf<SongIdentity>()
   }
 
   val listState = rememberLazyListState()
@@ -77,7 +79,7 @@ fun SongChooserScreen(id: Long, name: String, vm: LibraryViewModel = libraryView
         modifier = Modifier
           .padding(end = 56.dp, bottom = 32.dp)
           .clickable {
-            val index = songs.indexOfFirst { it.id == playbackState.song.id }
+            val index = songs.indexOfFirst { it.songIdentity == playbackState.song.songIdentity }
             if (index != -1) {
               scope.launch {
                 listState.scrollToItem(index)
@@ -157,13 +159,13 @@ fun SongChooserScreen(id: Long, name: String, vm: LibraryViewModel = libraryView
       state = listState
     ) {
       itemsIndexed(songs, key = { _, song ->
-        song.id
+        song.songIdentity
       }) { pos, song ->
-        ListSong(song = song, checked = selectedIds.contains(song.id)) {
+        ListSong(song = song, checked = selectedIds.contains(song.songIdentity)) {
           if (it) {
-            selectedIds.add(song.id)
+            selectedIds.add(song.songIdentity)
           } else {
-            selectedIds.remove(song.id)
+            selectedIds.remove(song.songIdentity)
           }
         }
       }
@@ -189,7 +191,7 @@ private fun ListSong(song: Song, checked: Boolean, onCheckedChange: (Boolean) ->
     )
 
     Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
-      TextPrimary(song.showName)
+      TextPrimary(song.showName(settingViewModel.settingPrefs.showDisplayName))
       Spacer(Modifier.height(4.dp))
       TextSecondary(song.artist)
     }

@@ -10,8 +10,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.animateTo
-import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -58,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -72,9 +71,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import remix.myplayer.R
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Album
 import remix.myplayer.data.model.audio.Artist
@@ -90,9 +88,8 @@ import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.nav.DetailScreenRoute
-import remix.myplayer.ui.nav.ExtraHidePlayingScreenOnEntry
-import remix.myplayer.ui.nav.ExtraRestorePlayingScreen
 import remix.myplayer.ui.nav.LocalNavController
+import remix.myplayer.ui.nav.openPlayingScreen
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.theme.LocalTheme
@@ -104,12 +101,12 @@ import remix.myplayer.ui.widget.common.defaultAppBarActions
 import remix.myplayer.ui.widget.library.AlbumCoverCollage
 import remix.myplayer.ui.widget.library.CoverImage
 import remix.myplayer.ui.widget.library.list.ListSong
+import remix.myplayer.ui.widget.library.rememberAlbumCoverPainters
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.ext.verticalScrollbar
 import remix.myplayer.viewmodel.DetailState
 import remix.myplayer.viewmodel.DetailViewModel
 import remix.myplayer.viewmodel.MultiSelectState
-import remix.myplayer.viewmodel.PlayingScreenValue
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.playbackViewModel
@@ -130,6 +127,7 @@ fun DetailScreen(
     model
   }
   val detailState by vm.state.collectAsStateWithLifecycle()
+  val coverPainters = rememberAlbumCoverPainters(detailState.coverSongs, detailModel, DetailCoverSize)
   val mainVM = mainViewModel
   val selection by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
@@ -157,7 +155,6 @@ fun DetailScreen(
   }
   val albumRowState = rememberLazyListState()
   val entry = LocalLifecycleOwner.current as? NavBackStackEntry
-  val restorePlayingScreen = entry?.savedStateHandle?.get<Boolean>(ExtraRestorePlayingScreen) == true
   val settingState by settingViewModel.settingsState.collectAsStateWithLifecycle()
   val sourceOpenAction = settingState.play.sourceOpenAction
   val resumeDialog = rememberDialogState(false)
@@ -166,6 +163,9 @@ fun DetailScreen(
     if (!openFromLibrary || entry == null ||
       entry.savedStateHandle.get<Boolean>(SOURCE_OPEN_HANDLED) == true
     ) return@LaunchedEffect
+    // Merely previewing this destination must not start playback or open a dialog.
+    entry.lifecycle.currentStateFlow.first { it == Lifecycle.State.RESUMED }
+    if (nav.currentBackStackEntry != entry) return@LaunchedEffect
     entry.savedStateHandle[SOURCE_OPEN_HANDLED] = true
 
     when (sourceOpenAction) {
@@ -182,25 +182,10 @@ fun DetailScreen(
     }
   }
 
-  LaunchedEffect(entry) {
-    if (entry?.savedStateHandle?.get<Boolean>(ExtraHidePlayingScreenOnEntry) == true) {
-      entry.lifecycle.currentStateFlow.first { it == Lifecycle.State.RESUMED }
-      if (nav.currentBackStackEntry == entry) {
-        mainVM.playingScreenState.snapTo(PlayingScreenValue.Hidden)
-        entry.savedStateHandle[ExtraHidePlayingScreenOnEntry] = false
-      }
-    }
-  }
-
   fun exitDetail() {
-    scope.launch {
-      if (entry != null && (nav.currentBackStackEntry != entry ||
-          entry.lifecycle.currentState != Lifecycle.State.RESUMED)) return@launch
-      if (restorePlayingScreen) {
-        mainVM.playingScreenState.snapTo(PlayingScreenValue.Expanded)
-      }
-      nav.popBackStack()
-    }
+    if (entry != null && (nav.currentBackStackEntry != entry ||
+        entry.lifecycle.currentState != Lifecycle.State.RESUMED)) return
+    nav.popBackStack()
   }
 
   NormalDialog(
@@ -213,7 +198,6 @@ fun DetailScreen(
   )
 
   DetailRefreshEffect(detailModel, vm)
-  BackHandler(enabled = restorePlayingScreen && !selecting) { exitDetail() }
   BackHandler(selecting) { mainVM.closeMultiSelect() }
 
   fun playAll(shuffle: Boolean, index: Int = 0) {
@@ -273,6 +257,7 @@ fun DetailScreen(
           DetailHeader(
             detailModel,
             detailState,
+            coverPainters,
             modifier = Modifier.graphicsLayer {
               alpha = (1f - headerCollapse / 0.8f).coerceIn(0f, 1f)
             },
@@ -303,7 +288,7 @@ fun DetailScreen(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
               ) {
-                items(detailState.albums, key = { it.albumID }) { album ->
+                items(detailState.albums, key = { it.albumId }) { album ->
                   ArtistAlbumCard(
                     album, modifier = Modifier.width(144.dp), enabled = !selecting,
                     onClick = { nav.navigate(DetailScreenRoute(album = album)) },
@@ -329,10 +314,10 @@ fun DetailScreen(
         }
         itemsIndexed(
           detailState.songs,
-          key = { index, song -> "${index}_${song.id}" },
+          key = { index, song -> "${index}_${song.songIdentity}" },
           contentType = { _, _ -> "song" },
         ) { index, song ->
-          val playing = playbackState.song.id == song.id
+          val playing = playbackState.song.songIdentity == song.songIdentity
           ListSong(
             modifier = Modifier.heightIn(min = 64.dp),
             song = song,
@@ -347,7 +332,7 @@ fun DetailScreen(
               } else if (playbackState.isPlaying && playing &&
                 (detailModel.playbackSourceKey() == null || MusicServiceRemote.isPlayingFrom(detailModel))
               ) {
-                scope.launch { mainVM.playingScreenState.animateTo(PlayingScreenValue.Expanded) }
+                nav.openPlayingScreen()
               } else {
                 playAll(false, index)
               }
@@ -413,16 +398,20 @@ private fun DetailRefreshEffect(model: APlayerModel, vm: DetailViewModel) {
 }
 
 @Composable
-private fun DetailHeader(model: APlayerModel, state: DetailState, modifier: Modifier = Modifier) {
+private fun DetailHeader(
+  model: APlayerModel,
+  state: DetailState,
+  coverPainters: List<Painter>,
+  modifier: Modifier = Modifier
+) {
   val theme = LocalTheme.current
   BoxWithConstraints(modifier.padding(16.dp)) {
     val stacked = maxWidth < 300.dp || LocalDensity.current.fontScale > 1.3f
     val cover: @Composable () -> Unit = {
-      val coverModifier = Modifier.size(112.dp).clip(RoundedCornerShape(4.dp))
+      val coverModifier = Modifier.size(DetailCoverSize).clip(RoundedCornerShape(4.dp))
       AlbumCoverCollage(
-        songs = state.coverSongs,
+        covers = coverPainters,
         modifier = coverModifier,
-        model = model,
       )
     }
     val info: @Composable () -> Unit = {
@@ -569,3 +558,4 @@ private fun APlayerModel.detailTitle(): String = when (this) {
 }
 
 private const val SOURCE_OPEN_HANDLED = "source_open_handled"
+private val DetailCoverSize = 112.dp

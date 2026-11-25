@@ -17,16 +17,16 @@ class PlaybackFavoriteState @Inject constructor(
 
   fun refresh(scope: CoroutineScope, song: Song, stateSource: StateSource) {
     cancelLookup()
-    if (!song.isLocal() || !song.valid()) {
+    if (!song.valid()) {
       return
     }
 
-    val songId = song.id
+    val songId = song.songIdentity
     lookupJob = scope.launch {
       val favorite = withContext(Dispatchers.IO) {
         playListRepository.isFavorite(songId)
       }
-      if (stateSource.currentPlaybackUiState.song.id == songId) {
+      if (stateSource.currentPlaybackUiState.song.songIdentity == songId) {
         stateSource.updatePlaybackUiState(isFavorite = favorite)
       }
     }
@@ -34,15 +34,15 @@ class PlaybackFavoriteState @Inject constructor(
 
   suspend fun toggle(song: Song, stateSource: StateSource): Boolean {
     cancelLookup()
-    if (!song.isLocal() || !song.valid()) {
+    if (!song.valid()) {
       return false
     }
 
-    val songId = song.id
+    val songId = song.songIdentity
     val favorite = withContext(Dispatchers.IO) {
       playListRepository.toggleFavorite(songId)
     }
-    if (stateSource.currentPlaybackUiState.song.id != songId) {
+    if (stateSource.currentPlaybackUiState.song.songIdentity != songId) {
       return false
     }
     stateSource.updatePlaybackUiState(isFavorite = favorite)

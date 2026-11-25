@@ -1,28 +1,17 @@
 package remix.myplayer.data.db.room.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
-import androidx.room.PrimaryKey
+import remix.myplayer.data.model.audio.SongIdentity
+import remix.myplayer.data.model.audio.SourceId
 
-/**
- * Created by remix on 2019/1/12
- */
-@Entity(indices = [Index(value = ["audio_id"], unique = true)])
+@Entity(primaryKeys = ["source_id", "source_key"], indices = [Index(value = ["position"], unique = true)])
 data class PlayQueue(
-    val audio_id: Long,
-    val title: String,
-    val data: String
+  @ColumnInfo(name = "source_id") val sourceId: String,
+  @ColumnInfo(name = "source_key") val sourceKey: String,
+  val position: Int
 ) {
-  constructor(audio_id: Long): this(audio_id, "", "")
-
-  @PrimaryKey(autoGenerate = true)
-  var id: Int = 0
-
-  var account: String? = null
-  var pwd: String? = null
-
-
-  companion object {
-    const val TABLE_NAME = "PlayQueue"
-  }
+  fun identity() = SongIdentity(SourceId(sourceId), sourceKey)
+  companion object { const val TABLE_NAME = "PlayQueue" }
 }

@@ -32,7 +32,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
   }
 
   private fun updateWithBitmap(bitmap: Bitmap?, song: Song) {
-    if (song.id != playbackState.song.id) {
+    if (song.songIdentity != playbackState.song.songIdentity) {
       return
     }
     val playPauseIcon =

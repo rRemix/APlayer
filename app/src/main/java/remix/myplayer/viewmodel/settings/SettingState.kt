@@ -78,7 +78,8 @@ data class PlayingScreenSettings(
 
 @Stable
 data class CoverSettings(
-  val loadEmbeddedCover: Boolean,
+  val loadLocalEmbeddedCover: Boolean,
+  val loadRemoteEmbeddedCover: Boolean,
   val autoDownloadCover: Int,
   val downloadSource: Int,
   val coverAnimationStyle: PlayingCoverAnimationStyle,

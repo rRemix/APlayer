@@ -1,7 +1,6 @@
 package remix.myplayer.viewmodel
 
 import android.content.Context
-import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,9 +34,16 @@ class MainViewModel @Inject constructor(
   private val inAppUpdater: Lazy<InAppUpdater>
 ) : ViewModel() {
 
-  val playingScreenState = AnchoredDraggableState(
-    initialValue = PlayingScreenValue.Hidden
-  )
+  private val _openPlayingScreenRequests = MutableStateFlow(false)
+  val openPlayingScreenRequests = _openPlayingScreenRequests.asStateFlow()
+
+  fun requestPlayingScreen() {
+    _openPlayingScreenRequests.value = true
+  }
+
+  fun consumePlayingScreenRequest() {
+    _openPlayingScreenRequests.value = false
+  }
 
   private val _inAppUpdateState = MutableStateFlow(InAppUpdateState())
   val inAppUpdateState = _inAppUpdateState.asStateFlow()
@@ -124,14 +130,17 @@ class MainViewModel @Inject constructor(
   fun showMultiSelect(
     context: Context,
     where: MultiSelectState.Where,
-    initialSelect: APlayerModel
+    initialSelect: APlayerModel,
+    owner: String? = null
   ) {
     _multiSelectState.updateIf(
-      condition = { it.where != where && !it.isShowing() },
+      condition = { !it.isShowing() || (where == MultiSelectState.Where.Remote &&
+        it.where == where && it.owner != owner) },
       transform = {
         Util.vibrate(context, 50)
         it.copy(
           where = where,
+          owner = owner,
           selectedModels = listOf(initialSelect)
         )
       }
@@ -142,8 +151,15 @@ class MainViewModel @Inject constructor(
     _multiSelectState.update {
       it.copy(
         where = MultiSelectState.Where.None,
+        owner = null,
         selectedModels = emptyList()
       )
+    }
+  }
+
+  fun closeRemoteSelection(owner: String) {
+    _multiSelectState.update {
+      if (it.isShowInRemote(owner)) MultiSelectState() else it
     }
   }
 
@@ -176,6 +192,7 @@ class MainViewModel @Inject constructor(
 @Stable
 data class MultiSelectState(
   val where: Where = Where.None,
+  val owner: String? = null,
   val selectedModels: List<APlayerModel> = emptyList()
 ) {
 
@@ -190,6 +207,8 @@ data class MultiSelectState(
   fun isShowInLastAdded() = where == Where.LastAdded
 
   fun isShowInSearch() = where == Where.Search
+
+  fun isShowInRemote(owner: String) = where == Where.Remote && this.owner == owner
 
   fun selectedModels(target: Where): Set<String> {
     return if (target == where) {
@@ -209,7 +228,8 @@ data class MultiSelectState(
     Folder,
     Detail,
     LastAdded,
-    Search
+    Search,
+    Remote
   }
 }
 
@@ -218,5 +238,3 @@ data class InAppUpdateState(
   val dialogState: DialogState = DialogState(),
   val release: Release? = null
 )
-
-enum class PlayingScreenValue { Hidden, Expanded }

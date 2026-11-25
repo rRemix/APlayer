@@ -13,6 +13,7 @@ import remix.myplayer.coil.CoverFetcher
 import remix.myplayer.coil.CoverInterceptor
 import remix.myplayer.coil.CoverUriResolver
 import remix.myplayer.coil.EmbeddedFetcher
+import remix.myplayer.repo.SongMetadataRepository
 import remix.myplayer.helper.LanguageHelper.onConfigurationChanged
 import remix.myplayer.helper.LanguageHelper.saveSystemCurrentLanguage
 import remix.myplayer.helper.LanguageHelper.setApplicationLanguage
@@ -35,11 +36,14 @@ class App : Application(), SingletonImageLoader.Factory {
   @Inject
   lateinit var coverUriResolver: dagger.Lazy<CoverUriResolver>
 
+  @Inject
+  lateinit var songMetadataRepository: dagger.Lazy<SongMetadataRepository>
+
   override fun newImageLoader(context: Context): ImageLoader = ImageLoader.Builder(context)
     .components {
       add(CoverInterceptor(coverUriResolver.get()))
       add(CoverFetcher.Factory())
-      add(EmbeddedFetcher.Factory())
+      add(EmbeddedFetcher.Factory(songMetadataRepository.get()))
     }
     .build()
 

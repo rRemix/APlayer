@@ -1,5 +1,6 @@
 package remix.myplayer.service.playback
 
+import remix.myplayer.data.model.audio.SongIdentity
 import android.content.Context
 import android.os.Build
 import android.os.storage.StorageManager
@@ -14,9 +15,6 @@ import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.decoder.ffmpeg.FfmpegLibrary
-import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.DefaultRenderersFactory
@@ -31,6 +29,7 @@ import remix.myplayer.data.prefs.SettingPrefs.Companion.DECODER_MODE_FFMPEG
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
+import remix.myplayer.repo.MusicSourceRepository
 import remix.myplayer.service.AudioFocusManager
 import remix.myplayer.service.playback.Playback.PlayerCallback
 import remix.myplayer.service.playback.extractor.ApeExtractorsFactory
@@ -45,6 +44,7 @@ class ExoPlayback(
   private val decoderMode: Int,
   private val audioFocusManager: AudioFocusManager,
   private val replayGainController: ReplayGainController,
+  private val musicSources: MusicSourceRepository,
 ) : Playback {
 
   override var speed: Float
@@ -87,7 +87,6 @@ class ExoPlayback(
 
   private var callback: PlayerCallback? = null
 
-  private val localDataSourceFactory = DefaultDataSource.Factory(context)
   private val extractorsFactory = ApeExtractorsFactory()
   private val player: ExoPlayer = run {
     val rendererMode = resolveRendererMode(decoderMode)
@@ -159,33 +158,10 @@ class ExoPlayback(
 
   // 构建MediaSource
   private fun buildSource(song: Song): MediaSource {
-    val mediaItem =
-      MediaItem.Builder().setUri(song.contentUri).setMediaId(song.id.toString()).setTag(song)
-        .build()
-    return if (song is Song.Remote) {
-      if (song.contentUri.scheme == "smb") {
-        val smbFactory = SmbDataSourceFactory()
-        val cacheFactory = CacheDataSource.Factory()
-          .setCache(MediaCache.get(context))
-          .setUpstreamDataSourceFactory(smbFactory)
-          .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-        ProgressiveMediaSource.Factory(cacheFactory, extractorsFactory)
-          .createMediaSource(mediaItem)
-      } else {
-        val httpFactory = DefaultHttpDataSource.Factory()
-          .setDefaultRequestProperties(song.headers)
-        // 缓存
-        val cacheFactory = CacheDataSource.Factory()
-          .setCache(MediaCache.get(context))
-          .setUpstreamDataSourceFactory(httpFactory)
-          .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-        ProgressiveMediaSource.Factory(cacheFactory, extractorsFactory)
-          .createMediaSource(mediaItem)
-      }
-    } else {
-      ProgressiveMediaSource.Factory(localDataSourceFactory, extractorsFactory)
-        .createMediaSource(mediaItem)
-    }
+    val item = MediaItem.Builder().setUri(song.contentUri).setMediaId(song.getKey())
+      .setTag(song).build()
+    return ProgressiveMediaSource.Factory(SongDataSource.factory(context, song, musicSources), extractorsFactory)
+      .createMediaSource(item)
   }
 
   override fun setPlaylist(songs: List<Song>, index: Int, offset: Long) {
@@ -229,7 +205,7 @@ class ExoPlayback(
 
   override fun addToNextSong(nextSong: Song): Boolean {
     checkMainThread()
-    if (currentSong?.id == nextSong.id) {
+    if (currentSong?.songIdentity == nextSong.songIdentity) {
       return false
     }
 
@@ -238,7 +214,7 @@ class ExoPlayback(
       return true
     }
 
-    val existingIndex = findIndexOfSong(nextSong.id)
+    val existingIndex = findIndexOfSong(nextSong.songIdentity)
 
     // 无论什么模式，物理上都移动/插入到 currentIndex + 1
     val targetIndex =
@@ -265,13 +241,13 @@ class ExoPlayback(
     return true
   }
 
-  private fun findIndexOfSong(songId: Long): Int {
+  private fun findIndexOfSong(songId: SongIdentity): Int {
     val timeline = player.currentTimeline
     val window = Timeline.Window()
     for (i in 0 until timeline.windowCount) {
       timeline.getWindow(i, window)
       val song = window.mediaItem.localConfiguration?.tag as? Song
-      if (song?.id == songId) {
+      if (song?.songIdentity == songId) {
         return i
       }
     }
@@ -299,7 +275,7 @@ class ExoPlayback(
   override fun replaceSong(song: Song) {
     checkMainThread()
 
-    val index = findIndexOfSong(song.id)
+    val index = findIndexOfSong(song.songIdentity)
     if (index != C.INDEX_UNSET) {
       val mediaItem = player.getMediaItemAt(index)
 //      mediaItem.localConfiguration?.tag = song
@@ -506,7 +482,7 @@ private class ReplayGainRenderersFactory(
 }
 
 @OptIn(UnstableApi::class)
-private object MediaCache {
+internal object MediaCache {
 
   @Volatile
   private var cache: SimpleCache? = null

@@ -2,7 +2,8 @@ package remix.myplayer.data.db.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import remix.myplayer.data.model.audio.Song
+import androidx.room.ColumnInfo
+import remix.myplayer.data.model.audio.SongMetadata
 
 @Entity
 data class MetaDataCache(
@@ -17,26 +18,14 @@ data class MetaDataCache(
   val year: String,
   val genre: String,
   val track: String,
-  val updateTime: Long = System.currentTimeMillis()
+  val updateTime: Long = System.currentTimeMillis(),
+  @ColumnInfo(defaultValue = "''") val bitRate: String = "",
+  @ColumnInfo(defaultValue = "''") val sampleRate: String = "",
+  // Existing rows contain extracted tags; directory-only rows explicitly set false.
+  @ColumnInfo(defaultValue = "1") val tagsLoaded: Boolean = true
 ) {
 
-  fun toRemoteSong(account: String, pwd: String): Song.Remote {
-    return Song.Remote(
-      title = title,
-      album = album,
-      artist = artist,
-      duration = duration,
-      data = url,
-      size = fileSize,
-      year = year,
-      genre = genre,
-      track = track,
-      dateModified = lastModified,
-      account = account,
-      pwd = pwd
-    ).apply {
-      // 标记为已获取完成
-      metaFetchState.set(2)
-    }
-  }
+  fun metadata() = SongMetadata(
+    title, album, artist, duration, year, genre, track, bitRate, sampleRate
+  )
 }

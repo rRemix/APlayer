@@ -377,8 +377,10 @@
   <string name="list_loop_tip">播放到列表末尾后从第一首继续播放</string>
   <string name="will_stop_at_x">将在%d分钟后关闭</string>
   <string name="saveing">保存中</string>
-  <string name="load_embedded_cover">加载内嵌封面</string>
-  <string name="load_embedded_cover_tips">开启后将加载音频文件中的内嵌封面，可能会延长加载时间</string>
+  <string name="load_local_embedded_cover">本地歌曲加载内嵌封面</string>
+  <string name="load_local_embedded_cover_tips">开启后优先读取本地音频文件中的内嵌封面，可能会延长加载时间</string>
+  <string name="load_remote_embedded_cover">远程歌曲加载内嵌封面</string>
+  <string name="load_remote_embedded_cover_tips">开启后将从远程音频文件读取内嵌封面，首次加载可能较慢</string>
   <string name="error_setup_inapp_billing">初始化内购失败: %s</string>
   <string name="error_occur">发生错误: %s</string>
   <string name="thank_you">感谢您的支持!</string>
@@ -473,6 +475,7 @@
   <string name="zh_traditional">繁体中文</string>
   <string name="english">英文</string>
   <string name="japanese">日文</string>
+  <string name="polish">波兰语</string>
 
   <string name="bass_boost">低音增强</string>
   <string name="virtualizer">环绕声</string>
@@ -594,4 +597,11 @@
   <!-- Song menu -->
   <string name="go_to_artist">查看歌手</string>
   <string name="go_to_album">查看专辑</string>
+
+  <!-- Destructive remote file operations -->
+  <string name="remote_confirm_delete_title">从远程服务器删除？</string>
+  <string name="remote_confirm_delete_file">确定从远程服务器删除“%1$s”吗？此操作不可撤销。</string>
+  <string name="remote_confirm_delete_directory">确定删除目录“%1$s”吗？部分服务器还会删除目录内的所有内容，此操作不可撤销。</string>
+  <string name="remote_confirm_delete_multiple">确定从远程服务器删除选中的 %1$d 个文件吗？此操作不可撤销。</string>
+  <string name="remote_confirm_delete_with_directories">确定删除选中的 %1$d 个项目（包含 %2$d 个目录）吗？部分服务器还会删除目录内的所有内容，此操作不可撤销。</string>
 </resources>

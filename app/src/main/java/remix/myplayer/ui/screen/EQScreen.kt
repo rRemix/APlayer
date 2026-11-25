@@ -1,9 +1,7 @@
 package remix.myplayer.ui.screen
 
 import android.media.audiofx.AudioEffect
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +24,6 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,12 +34,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavBackStackEntry
-import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.service.MusicServiceRemote
-import remix.myplayer.ui.nav.ExtraRestorePlayingScreen
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
@@ -53,31 +47,13 @@ import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.common.defaultLineSliderProperties
 import remix.myplayer.util.ext.CenterInBox
 import remix.myplayer.util.ext.clickWithRipple
-import remix.myplayer.viewmodel.PlayingScreenValue
-import remix.myplayer.viewmodel.mainViewModel
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 @Composable
-fun EQScreen(backStackEntry: NavBackStackEntry) {
+fun EQScreen() {
   val context = LocalContext.current
   val nav = LocalNavController.current
-  val scope = rememberCoroutineScope()
-  val mainVM = mainViewModel
-
-  // 从播放页浮窗跳转过来时浮窗已被收起；退出时先恢复浮窗再 popBackStack，避免闪现主页面。
-  // sessionId/init 失败的早退分支不会走到这里，此时浮窗尚未收起，无需恢复。
-  fun exitEq() {
-    scope.launch {
-      if (backStackEntry.savedStateHandle.get<Boolean>(ExtraRestorePlayingScreen) == true) {
-        mainVM.playingScreenState.snapTo(PlayingScreenValue.Expanded)
-      }
-      nav.popBackStack()
-    }
-  }
-
-  BackHandler { exitEq() }
-
   val sessionId = MusicServiceRemote.getAudioSessionId()
   if (sessionId == AudioEffect.ERROR_BAD_VALUE || sessionId == null) {
     MessageNotifier.show(R.string.no_audio_ID)
@@ -120,7 +96,7 @@ fun EQScreen(backStackEntry: NavBackStackEntry) {
     topBar = {
       CommonAppBar(
         title = stringResource(R.string.eq),
-        onBack = { exitEq() },
+        onBack = { nav.popBackStack() },
         actions = emptyList()
       )
     },

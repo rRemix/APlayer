@@ -40,7 +40,7 @@ class ReplayGainController @Inject constructor(
    */
   fun applyFor(song: Song?) {
     val request = ++requestId
-    if (song !is Song.Local || !settingPrefs.replayGainEnabled) {
+    if (song == null || !song.isLocal() || !settingPrefs.replayGainEnabled) {
       processor.setGain(null)
       return
     }

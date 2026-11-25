@@ -9,11 +9,10 @@ import androidx.activity.result.IntentSenderRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.repo.AbstractRepository.Companion.makeInStrQuery
 import remix.myplayer.repo.PlayListRepository
 import remix.myplayer.repo.PlayQueueRepository
 import remix.myplayer.repo.SongRepository
@@ -28,7 +27,7 @@ import javax.inject.Singleton
 @Singleton
 class DeleteSongUseCase @Inject constructor(
   private val settingPrefs: SettingPrefs,
-  private val songRepo: SongRepository,
+  private val songRepository: SongRepository,
   private val playListRepo: PlayListRepository,
   private val playQueueRepo: PlayQueueRepository
 ) {
@@ -46,46 +45,19 @@ class DeleteSongUseCase @Inject constructor(
 
       settingPrefs.deleteSource = deleteSource
 
-      if (parent is PlayList) { // delete songs in playlist
-        val audioIds = models.map {
-          if (it is Song.Local) {
-            it.id
-          } else {
-            -1
-          }
-        }
-        parent.audioIds.removeAll(audioIds.toSet())
-
-        playListRepo.updatePlayList(parent)
-
-        if (!deleteSource) {
-          activity.contentResolver.notifyChange(Audio.Media.EXTERNAL_CONTENT_URI, null)
-          return@withContext
-        }
-      } else if (models.all { it is PlayList }) { // delete playlists
-        for (model in models) {
-          val playList = model as PlayList
-          if (playList.isFavorite()) {
-            MessageNotifier.show(R.string.mylove_cant_edit)
-            continue
-          }
-
-          playListRepo.deletePlayList(model.id)
-        }
-
-        if (!deleteSource) {
-          return@withContext
-        }
+      val songs = removePlaylistReferences(models, deleteSource, parent) {
+        MessageNotifier.show(R.string.mylove_cant_edit)
+      }
+      if (!deleteSource && (parent is PlayList || models.all { it is PlayList })) {
+        if (parent is PlayList) activity.contentResolver.notifyChange(Audio.Media.EXTERNAL_CONTENT_URI, null)
+        return@withContext
       }
 
-      val songs = withContext(Dispatchers.IO) {
-        songRepo.getSongsByModels(models)
-      }
-      val songIds = songs.map { it.id }
+      val songIds = songs.map { it.songIdentity }
 
       if (songs.isNotEmpty()) {
         val deleteId: MutableSet<String> = settingPrefs.deleteIds.toMutableSet().apply {
-          addAll(songIds.map { it.toString() })
+          addAll(songs.mapNotNull { it.mediaStoreId?.toString() })
         }
 
         // save to sp
@@ -95,11 +67,11 @@ class DeleteSongUseCase @Inject constructor(
         MusicServiceRemote.removeFromQueue(songIds)
 
         // remove from all playLists
-        playListRepo.removeAudioIdsFromAll(songIds)
+        playListRepo.removeSongsFromAll(songIds)
 
         // delete source if need
         if (deleteSource) {
-          deleteSource(activity, songs)
+          deleteSource(activity, songs.filter { it.isLocal() })
         }
       } else {
         MessageNotifier.show(R.string.delete_success)
@@ -109,7 +81,34 @@ class DeleteSongUseCase @Inject constructor(
       activity.contentResolver.notifyChange(Audio.Media.EXTERNAL_CONTENT_URI, null)
     }
 
+  /** Capture selected songs before removing the playlist rows and their cascaded tracks. */
+  internal suspend fun removePlaylistReferences(
+    models: List<APlayerModel>,
+    deleteSource: Boolean,
+    parent: APlayerModel?,
+    onFavoriteProtected: () -> Unit
+  ): List<Song> {
+    // A protected favorite must not leak into the subsequent source-file deletion either.
+    val targets = models.filterNot { it is PlayList && it.isFavorite() }
+    val songs = if (deleteSource || (parent !is PlayList && !models.all { it is PlayList })) {
+      withContext(Dispatchers.IO) { songRepository.getSongs(targets) }
+        .distinctBy { it.songIdentity }
+    } else {
+      emptyList()
+    }
+    if (parent is PlayList) {
+      val keys = models.filterIsInstance<Song>().mapTo(hashSetOf()) { it.songIdentity }
+      playListRepo.removeSongs(parent.id, keys)
+    } else if (models.all { it is PlayList }) {
+      models.filterIsInstance<PlayList>().forEach { playlist ->
+        if (playlist.isFavorite()) onFavoriteProtected() else playListRepo.deletePlayList(playlist.id)
+      }
+    }
+    return songs
+  }
+
   private suspend fun deleteSource(activity: BaseActivity, songs: List<Song>) = withContext(Dispatchers.IO){
+    if (songs.isEmpty()) return@withContext
     try {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         val uris = songs.map { it.contentUri }
@@ -119,10 +118,12 @@ class DeleteSongUseCase @Inject constructor(
       } else {
         // TODO 测试低版本
         try {
+          val ids = songs.mapNotNull { it.mediaStoreId }
+          if (ids.isEmpty()) return@withContext
           val count = activity.contentResolver.delete(
             Audio.Media.EXTERNAL_CONTENT_URI,
-            makeInStrQuery(songs.map { it.id }),
-            null
+            "${Audio.Media._ID} IN (${ids.joinToString { "?" }})",
+            ids.map { it.toString() }.toTypedArray()
           )
           Timber.v("remove from mediaStore: $count")
 

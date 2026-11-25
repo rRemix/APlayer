@@ -1,12 +1,15 @@
-//package remix.myplayer.bean.mp3
-//
-///**
-// * @ClassName
-// * @Description
-// * @Author Xiaoborui
-// * @Date 2016/10/13 11:22
-// */
-//data class PlayList(val id: Int = 0,
-//                    val name: String,
-//                    val count: Int,
-//                    val date: Int) : APlayerModel
+package remix.myplayer.data.model.audio
+
+import kotlinx.serialization.Serializable
+
+/** UI/domain value; persistence entities and mutable collections stay in the data layer. */
+@Serializable
+data class PlayList(
+  val id: Long,
+  val name: String,
+  val songIdentities: List<SongIdentity>,
+  val date: Long
+) : APlayerModel {
+  fun isFavorite(): Boolean = id == 1L
+  override fun getKey(): String = id.toString()
+}

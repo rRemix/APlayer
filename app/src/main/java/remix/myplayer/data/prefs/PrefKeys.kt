@@ -112,11 +112,11 @@ object PrefKeys {
 
     const val SOURCE_OPEN_ACTION = "source_open_action"
 
-    /** 是否加载内嵌封面 */
-    const val LOAD_EMBEDDED_COVER = "load_embedded_cover"
+    /** 是否加载本地歌曲内嵌封面，沿用旧键以保留已有设置 */
+    const val LOAD_LOCAL_EMBEDDED_COVER = "load_embedded_cover"
 
-    /** 迁移旧版“忽略媒体缓存”开关 */
-    const val IGNORE_MEDIA_STORE = "ignore_media_store"
+    /** 是否加载远程歌曲内嵌封面 */
+    const val LOAD_REMOTE_EMBEDDED_COVER = "load_remote_embedded_cover"
 
     /** 桌面部件样式 */
     const val APP_WIDGET_SKIN = "app_widget_transparent"

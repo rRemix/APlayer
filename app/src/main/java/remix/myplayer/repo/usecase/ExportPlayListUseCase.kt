@@ -6,7 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.repo.SongRepository
 import remix.myplayer.ui.nav.MessageNotifier
 import javax.inject.Inject
@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @Singleton
 class ExportPlayListUseCase @Inject constructor(
   @param:ApplicationContext private val context: Context,
-  private val songRepo: SongRepository
+  private val songRepository: SongRepository
 ) {
 
   suspend operator fun invoke(playList: PlayList?, uri: Uri) =
@@ -28,12 +28,12 @@ class ExportPlayListUseCase @Inject constructor(
       val entry = "#EXTINF:"
       val sep = ","
 
-      val songs = songRepo.getSongsByModels(listOf(playList))
+      val songs = songRepository.getSongs(listOf(playList))
       try {
         context.contentResolver.openOutputStream(uri)?.bufferedWriter().use { bw ->
           if (bw == null) throw IllegalStateException("openOutputStream failed")
           bw.write(header)
-          for (song in songs) {
+          for (song in songs.filter { it.isLocal() }) {
             bw.newLine()
             bw.write(entry + song.duration + sep + song.artist + " - " + song.title)
             bw.newLine()

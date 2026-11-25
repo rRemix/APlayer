@@ -6,12 +6,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.ui.screen.setting.SwitchPreference
-import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.settingViewModel
 
 @Composable
 fun ShowDisplayNameLogic() {
-  val libraryVM = libraryViewModel
   val settingVM = settingViewModel
   val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
 
@@ -21,6 +19,5 @@ fun ShowDisplayNameLogic() {
     settingState.common.showDisplayName
   ) {
     settingVM.setShowDisplayName(it)
-    libraryVM.fetchMedia()
   }
 }

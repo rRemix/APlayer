@@ -1,9 +1,12 @@
 package remix.myplayer.service
 
 import kotlinx.coroutines.flow.first
+import android.net.Uri
+import remix.myplayer.data.adapter.RemotePaths
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.repo.PlayQueueRepository
+import remix.myplayer.repo.SongQuery
 import remix.myplayer.repo.SongRepository
 import javax.inject.Inject
 
@@ -21,10 +24,10 @@ class PlayQueueStore @Inject constructor(
 
   suspend fun restore(): RestoredQueue {
     var queue = playQueueRepository.getAllSongs().first()
-    val hasSavedQueue = queue.isNotEmpty()
-    if (queue.isEmpty()) {
+    val hasSavedQueue = playQueueRepository.getIdentities().isNotEmpty()
+    if (queue.isEmpty() && !hasSavedQueue) {
       // 默认全部歌曲为播放列表
-      queue = songRepository.allSongs()
+      queue = songRepository.getSongs(SongQuery(sortOrder = settingPrefs.songSortOrder))
       save(queue)
     }
 
@@ -45,7 +48,13 @@ class PlayQueueStore @Inject constructor(
     // 查找上次退出时的歌曲是否还存在
     if (lastSong.isNotEmpty()) {
       for (i in queue.indices) {
-        if (lastSong == queue[i].id.toString() || lastSong == queue[i].data) {
+        val song = queue[i]
+        if (lastSong == song.getKey() || (song.isLocal() && lastSong == song.sourceKey) ||
+          (song.sourceId.value.startsWith("webdav:") &&
+            (RemotePaths.withoutCredentials(lastSong) == song.data || Uri.parse(song.data).let { uri ->
+              lastSong == "${uri.scheme}://${uri.authority}${uri.path}"
+            }))) {
+          settingPrefs.lastSong = song.getKey()
           pos = i
           break
         }

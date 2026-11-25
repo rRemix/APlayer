@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.helper.SortOrder
 import remix.myplayer.ui.nav.LocalNavController
@@ -68,14 +68,14 @@ fun CustomSortScreen(id: Long) {
           AppBarAction(R.drawable.ic_save_white_24dp, "CustomSortSave") {
             val playList = playList ?: return@AppBarAction
 
-            val newIds = songs.map { it.id }
-            if (newIds != playList.audioIds) {
+            val newIds = songs.map { it.songIdentity }
+            if (newIds != playList.songIdentities) {
               libraryVM.settingPrefs.setPlayListDetailSortOrder(
                 playList.id,
                 SortOrder.PLAYLIST_SONG_CUSTOM
               )
 
-              libraryVM.updatePlayList(playList.copy(audioIds = ArrayList(newIds)))
+              libraryVM.updateSongOrder(playList.id, newIds)
             }
 
             nav.popBackStack()
@@ -95,8 +95,8 @@ fun CustomSortScreen(id: Long) {
         .background(LocalTheme.current.libraryBackground),
       state = lazyListState
     ) {
-      itemsIndexed(songs, key = { _, song -> song.id }) { index, song ->
-        ReorderableItem(reorderableLazyListState, key = song.id) {
+      itemsIndexed(songs, key = { _, song -> song.songIdentity }) { index, song ->
+        ReorderableItem(reorderableLazyListState, key = song.songIdentity) {
           Row(
             modifier = Modifier
               .fillMaxWidth()
@@ -145,7 +145,7 @@ fun CustomSortScreen(id: Long) {
     playList = libraryVM.playLists.value.first { it.id == id }
 
     val result = withContext(Dispatchers.IO) {
-      libraryVM.loadSongsByModels(listOf(playList!!))
+      libraryVM.loadSongs(listOf(playList!!))
     }
     songs.clear()
     songs.addAll(result)

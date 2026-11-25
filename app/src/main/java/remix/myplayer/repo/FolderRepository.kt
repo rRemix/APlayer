@@ -1,50 +1,28 @@
 package remix.myplayer.repo
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import remix.myplayer.data.model.audio.Folder
-import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.prefs.PrefKeys
 import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.data.prefs.observe
 import remix.myplayer.helper.ItemsSorter
-import remix.myplayer.util.PermissionUtil
-import timber.log.Timber
-import java.util.Collections
 import javax.inject.Inject
 
-interface FolderRepository {
-  fun allFolders(): List<Folder>
-}
-
+interface FolderRepository { fun observeFolders(): Flow<List<Folder>> }
 
 class FolderRepoImpl @Inject constructor(
-  @param:ApplicationContext private val context: Context,
-  private val songRepo: SongRepository,
-  private val settingPrefs: SettingPrefs
-) : FolderRepository, AbstractRepository(settingPrefs) {
-
-  override fun allFolders(): List<Folder> {
-    if (!PermissionUtil.hasNecessaryPermission()) {
-      return Collections.emptyList()
+  private val songs: SongRepository,
+  private val settings: SettingPrefs
+) : FolderRepository {
+  override fun observeFolders(): Flow<List<Folder>> = songs.observeSongs().map { songs ->
+    songs.groupBy { it.data.substringBeforeLast('/', "") }.map { (id, tracks) ->
+      Folder(id.substringAfterLast('/'), tracks.size, id)
     }
-
-    val songs = songRepo.getSongs(null, null, settingPrefs.songSortOrder)
-    val folders: MutableList<Folder> = ArrayList()
-    val folderMap: MutableMap<String, MutableList<Song>> = LinkedHashMap()
-    try {
-      for (song in songs) {
-        val parentPath = song.data.substring(0, song.data.lastIndexOf("/"))
-        if (folderMap[parentPath] == null) {
-          folderMap[parentPath] = ArrayList()
-        }
-        folderMap[parentPath]?.add(song)
-      }
-
-      for ((path, songs) in folderMap) {
-        folders.add(Folder(path.substring(path.lastIndexOf("/") + 1), songs.size, path))
-      }
-    } catch (e: Exception) {
-      Timber.v(e)
-    }
-    return ItemsSorter.sortedFolders(folders, settingPrefs.folderSortOrder)
-  }
+  }.combine(settings.observe(PrefKeys.Setting.FOLDER_SORT_ORDER) { folderSortOrder }) { items, order ->
+    ItemsSorter.sortedFolders(items, order)
+  }.flowOn(Dispatchers.Default)
 }

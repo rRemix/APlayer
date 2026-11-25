@@ -10,54 +10,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import remix.myplayer.data.db.room.entity.Smb
-import remix.myplayer.data.model.audio.Song
-import remix.myplayer.data.model.smb.SmbClientDelegateProvider
-import remix.myplayer.data.model.smb.SmbFile
-import remix.myplayer.misc.manager.DynamicModuleManager
-import remix.myplayer.misc.manager.DynamicModuleStatus
+import remix.myplayer.data.remote.RemoteFileSystemFactory
 import remix.myplayer.repo.SmbRepository
-import remix.myplayer.repo.usecase.FetchMetaDataUseCase
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.runWithLoading
 import remix.myplayer.ui.nav.MessageNotifier
-import remix.myplayer.ui.state.DataUiState
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class SmbViewModel @Inject constructor(
   private val smbRepository: SmbRepository,
-  private val fetchMetaDataUseCase: FetchMetaDataUseCase,
-  private val delegateProvider: SmbClientDelegateProvider,
-  private val dynamicModuleManager: DynamicModuleManager
+  private val fileSystems: RemoteFileSystemFactory
 ) : ViewModel() {
-
-  val supportSmb get() = dynamicModuleManager.isModuleSupport("feature_smb")
-
-  val isSmbModuleInstalled get() = dynamicModuleManager.isModuleInstalled("feature_smb")
-
-  fun installSmbModule() = dynamicModuleManager.installModule("feature_smb")
-
-  private val _moduleInstallStatus = MutableStateFlow<DynamicModuleStatus?>(null)
-  val moduleInstallStatus = _moduleInstallStatus.asStateFlow()
-
-  fun startSmbModuleInstallation() {
-    viewModelScope.launch {
-      installSmbModule().collect {
-        _moduleInstallStatus.value = it
-      }
-    }
-  }
-
-  fun clearInstallStatus() {
-    _moduleInstallStatus.value = null
-  }
 
   private val _smbList = MutableStateFlow<List<Smb>>(emptyList())
   val smbList: StateFlow<List<Smb>> = _smbList.asStateFlow()
-
-  private val _smbResState = MutableStateFlow<DataUiState<List<SmbFile>>>(DataUiState.Loading())
-  val smbResState: StateFlow<DataUiState<List<SmbFile>>> = _smbResState.asStateFlow()
 
   init {
     viewModelScope.launch {
@@ -67,48 +35,13 @@ class SmbViewModel @Inject constructor(
     }
   }
 
-  fun loadSmbRes(smb: Smb, url: String) {
-    _smbResState.value = DataUiState.Loading()
-    viewModelScope.launch {
-      apiCall(smb, url)
-    }
-  }
-
-  private suspend fun apiCall(smb: Smb, url: String) {
-    val d = delegateProvider.getDelegate()
-    if (d == null) {
-      _smbResState.value = DataUiState.Error(Exception("SMB module not installed"))
-      return
-    }
-    try {
-      val files = d.listFiles(smb, url)
-      _smbResState.value = DataUiState.Success(files)
-    } catch (e: Exception) {
-      Timber.e(e)
-      _smbResState.value = DataUiState.Error(e)
-    }
-  }
-
   fun deleteSmb(smb: Smb) = viewModelScope.launch {
     smbRepository.delete(smb)
   }
 
-  fun updateLastUrl(smb: Smb, newUrl: String) = viewModelScope.launch {
-    if (smb.lastUrl == newUrl) {
-      return@launch
-    }
-    smb.lastUrl = newUrl
-    smbRepository.insertOrReplace(smb)
-  }
-
   fun insertOrReplaceSmb(smb: Smb) = viewModelScope.runWithLoading {
-    val d = delegateProvider.getDelegate()
-    if (d == null) {
-      MessageNotifier.show("SMB module not installed")
-      return@runWithLoading
-    }
     try {
-      d.checkConnection(smb)
+      fileSystems.create(smb).checkConnection()
       smbRepository.insertOrReplace(smb)
     } catch (e: Exception) {
       Timber.e(e)
@@ -161,7 +94,6 @@ class SmbViewModel @Inject constructor(
     _addSmbState.update { it.copy(showShareSelection = false) }
   }
 
-  suspend fun fetchMeta(song: Song.Remote) = fetchMetaDataUseCase(song)
 }
 
 @Stable

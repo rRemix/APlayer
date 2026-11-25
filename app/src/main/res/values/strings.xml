@@ -380,8 +380,10 @@
   <string name="list_loop_tip">Continue from the first song after the playlist reaches the end</string>
   <string name="will_stop_at_x">APlayer will be closed in %d minutes</string>
   <string name="saveing">Saving</string>
-  <string name="load_embedded_cover">Load embedded covers</string>
-  <string name="load_embedded_cover_tips">When enabled, APlayer will load embedded album covers from audio files, which may increase loading time</string>
+  <string name="load_local_embedded_cover">Load embedded covers for local songs</string>
+  <string name="load_local_embedded_cover_tips">Prefer embedded covers from local audio files over system album art. Loading may take longer</string>
+  <string name="load_remote_embedded_cover">Load embedded covers for remote songs</string>
+  <string name="load_remote_embedded_cover_tips">Read embedded covers from remote audio files. Initial loading may take longer</string>
   <string name="error_setup_inapp_billing">Problem setting up in-app billing: %s</string>
   <string name="error_occur">Error occurred: %s</string>
   <string name="thank_you">Thank you!</string>
@@ -476,6 +478,7 @@
   <string name="zh_traditional">Traditional Chinese</string>
   <string name="english">English</string>
   <string name="japanese">Japanese</string>
+  <string name="polish">Polish</string>
 
   <string name="bass_boost">Bass boost</string>
   <string name="virtualizer">Virtualizer</string>
@@ -612,4 +615,11 @@
   <!-- Song menu -->
   <string name="go_to_artist">Go to Artist</string>
   <string name="go_to_album">Go to Album</string>
+
+  <!-- Destructive remote file operations -->
+  <string name="remote_confirm_delete_title">Delete from remote server?</string>
+  <string name="remote_confirm_delete_file">Delete &quot;%1$s&quot; from the remote server? This cannot be undone.</string>
+  <string name="remote_confirm_delete_directory">Delete directory &quot;%1$s&quot;? Depending on the server, its contents may also be deleted. This cannot be undone.</string>
+  <string name="remote_confirm_delete_multiple">Delete %1$d selected files from the remote server? This cannot be undone.</string>
+  <string name="remote_confirm_delete_with_directories">Delete %1$d selected items, including %2$d directories? Some servers may also delete their contents. This cannot be undone.</string>
 </resources>

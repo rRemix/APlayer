@@ -16,20 +16,16 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.data.model.audio.Song
+import remix.myplayer.repo.SongQuery
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
@@ -54,9 +50,12 @@ fun LastAddedScreen() {
   val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val listState = rememberLazyListState()
-  val songs = remember {
-    mutableStateListOf<Song>()
+  val recentSongs = remember(libraryVM) {
+    libraryVM.observeSongs(SongQuery(
+      addedAfter = System.currentTimeMillis() - 7 * 24 * 3600 * 1000L
+    ))
   }
+  val songs by recentSongs.collectAsStateWithLifecycle(emptyList())
   val context = LocalContext.current
 
   val showMultiSelect = multiSelectState.isShowInLastAdded()
@@ -108,10 +107,10 @@ fun LastAddedScreen() {
 
       LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
         itemsIndexed(songs, key = { _, song ->
-          song.id
+          song.songIdentity
         }) { pos, song ->
           val selected = selectedIds.contains(song.getKey())
-          val isPlayingSong = playbackState.song.id == song.id
+          val isPlayingSong = playbackState.song.songIdentity == song.songIdentity
 
           ListSong(
             modifier = Modifier.height(64.dp),
@@ -143,11 +142,4 @@ fun LastAddedScreen() {
     }
   }
 
-  LaunchedEffect(Unit) {
-    val result = withContext(Dispatchers.IO) {
-      libraryVM.loadLastAddedSongs()
-    }
-    songs.clear()
-    songs.addAll(result)
-  }
 }

@@ -3,36 +3,19 @@ package remix.myplayer.service.playback
 import android.media.MediaDataSource
 import android.os.Build
 import androidx.annotation.RequiresApi
-import remix.myplayer.data.model.smb.SmbRandomAccessDelegate
-import timber.log.Timber
+import remix.myplayer.data.remote.RemoteFileReader
+import remix.myplayer.data.remote.smb.SmbFileSystem
 
 @RequiresApi(Build.VERSION_CODES.M)
 class SmbMediaDataSource(uriString: String) : MediaDataSource() {
+  private var reader: RemoteFileReader? = SmbFileSystem.fromUrl(uriString).let { (system, path) -> system.open(path) }
 
-  private var delegate: SmbRandomAccessDelegate? = null
+  override fun readAt(position: Long, buffer: ByteArray?, offset: Int, size: Int): Int =
+    if (buffer == null) -1 else checkNotNull(reader).readAt(position, buffer, offset, size)
 
-  init {
-    try {
-      val clazz = Class.forName("remix.myplayer.smb.SmbRandomAccessDelegateImpl")
-      delegate = clazz.getDeclaredConstructor().newInstance() as SmbRandomAccessDelegate
-      delegate?.open(uriString)
-    } catch (e: Exception) {
-      Timber.e(e, "Failed to initialize SmbMediaDataSource delegate")
-      delegate = null
-    }
-  }
-
-  override fun readAt(position: Long, buffer: ByteArray?, offset: Int, size: Int): Int {
-    if (buffer == null) return -1
-    return delegate?.readAt(position, buffer, offset, size) ?: -1
-  }
-
-  override fun getSize(): Long {
-    return delegate?.getSize() ?: -1
-  }
+  override fun getSize(): Long = reader?.size ?: -1L
 
   override fun close() {
-    delegate?.close()
-    delegate = null
+    try { reader?.close() } finally { reader = null }
   }
 }

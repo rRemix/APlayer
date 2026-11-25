@@ -4,6 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import remix.myplayer.data.adapter.AndroidSongMetadataReader
 import remix.myplayer.repo.AlbumRepoImpl
 import remix.myplayer.repo.AlbumRepository
 import remix.myplayer.repo.ArtistRepoImpl
@@ -20,14 +21,21 @@ import remix.myplayer.repo.PlayQueueRepoImpl
 import remix.myplayer.repo.PlayQueueRepository
 import remix.myplayer.repo.SmbRepoImpl
 import remix.myplayer.repo.SmbRepository
+import remix.myplayer.repo.SongMetadataReader
 import remix.myplayer.repo.SongRepoImpl
 import remix.myplayer.repo.SongRepository
+import remix.myplayer.repo.WebDavRepoImpl
 import remix.myplayer.repo.WebDavRepository
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
 abstract class RepositoryModule {
+  @Binds
+  abstract fun bindSongMetadataReader(
+    reader: AndroidSongMetadataReader
+  ): SongMetadataReader
+
   @Singleton
   @Binds
   abstract fun bindSongRepo(repo: SongRepoImpl): SongRepository
@@ -62,7 +70,7 @@ abstract class RepositoryModule {
 
   @Singleton
   @Binds
-  abstract fun bindWebDavRepo(repo: remix.myplayer.repo.WebDavRepoImpl): WebDavRepository
+  abstract fun bindWebDavRepo(repo: WebDavRepoImpl): WebDavRepository
 
   @Singleton
   @Binds

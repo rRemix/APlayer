@@ -73,7 +73,7 @@ fun ArtistScreen() {
           .verticalScrollbar(listState)
       ) {
         itemsIndexed(artists, key = { _, artist ->
-          artist.artistID
+          artist.artistId
         }) { _, artist ->
           ListItem(
             modifier = Modifier.height(64.dp),
@@ -105,7 +105,7 @@ fun ArtistScreen() {
         columns = GridCells.Fixed(spanCount()),
         content = {
           items(artists, key = {
-            it.artistID
+            it.artistId
           }) { artist ->
             GridItem(
               artist, text1 = artist.artist,

@@ -20,65 +20,66 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.model.audio.SongIdentity
 import remix.myplayer.ui.theme.LocalTheme
 
-/** Use the song list's cover source, keeping one successful song per album and up to four covers. */
+/** Keep this at screen scope so scrolling a lazy header away does not restart its cover requests. */
 @Composable
-fun AlbumCoverCollage(
+fun rememberAlbumCoverPainters(
   songs: List<Song>,
-  modifier: Modifier = Modifier,
   model: APlayerModel,
-) {
+  size: Dp,
+): List<Painter> {
+  val pixelSize = with(LocalDensity.current) { size.roundToPx().coerceAtLeast(1) }
   val coverRevision = rememberCoverRevision(model)
   val candidates = remember(songs) { songs.distinctBy { it.coverRequestKey } }
-  val results = remember(model, candidates, coverRevision) {
-    mutableStateMapOf<Pair<Long, String>, CoverResult>()
+  val results = remember(model, candidates, coverRevision, pixelSize) {
+    mutableStateMapOf<Pair<SongIdentity, String>, CoverResult>()
   }
-  val requests = candidates.asSequence()
-    .filter { results[it.coverRequestKey] != CoverResult.Failed }
-    // Filter failures before grouping, so another song in that album can supply its cover.
-    .distinctBy { it.albumId }
-    .take(4)
-    .toList()
+  val requests = selectCoverSongs(candidates) { results[it.coverRequestKey] == CoverResult.Failed }
+  requests.forEach { song ->
+    val requestKey = song.coverRequestKey
+    key(requestKey, coverRevision) {
+      val baseRequest = rememberCoverRequest(song)
+      val request = remember(baseRequest, pixelSize) {
+        // There is no image layout here to resolve size; avoid decoding full-size artwork.
+        baseRequest.newBuilder().size(pixelSize).build()
+      }
+      val painter = rememberAsyncImagePainter(request, contentScale = ContentScale.Crop)
+      val state by painter.state.collectAsState()
+      val result = when (val current = state) {
+        is AsyncImagePainter.State.Success -> CoverResult.Loaded(current.painter)
+        is AsyncImagePainter.State.Error -> CoverResult.Failed
+        else -> null
+      }
+      LaunchedEffect(result, results) {
+        if (result == null) {
+          results.remove(requestKey)
+        } else {
+          results[requestKey] = result
+        }
+      }
+    }
+  }
   // Keep one placeholder until the selection settles, rather than repeatedly reshaping the grid.
-  val covers = if (requests.all { results[it.coverRequestKey] is CoverResult.Loaded }) {
+  return if (requests.all { results[it.coverRequestKey] is CoverResult.Loaded }) {
     requests.map { (results.getValue(it.coverRequestKey) as CoverResult.Loaded).painter }
   } else {
     emptyList()
   }
+}
+
+@Composable
+fun AlbumCoverCollage(covers: List<Painter>, modifier: Modifier = Modifier) {
   Box(modifier.aspectRatio(1f).background(LocalTheme.current.mainBackground)) {
-    requests.forEach { song ->
-      val requestKey = song.coverRequestKey
-      key(requestKey, coverRevision) {
-        // Keep successful painters alive while drawing them in the collage below.
-        SubcomposeAsyncImage(
-          model = rememberCoverRequest(song),
-          contentDescription = null,
-          contentScale = ContentScale.Crop,
-          modifier = Modifier.matchParentSize()
-        ) {
-          val state by painter.state.collectAsState()
-          val result = when (val current = state) {
-            is AsyncImagePainter.State.Success -> CoverResult.Loaded(current.painter)
-            is AsyncImagePainter.State.Error -> CoverResult.Failed
-            else -> null
-          }
-          LaunchedEffect(result, results) {
-            if (result == null) {
-              results.remove(requestKey)
-            } else {
-              results[requestKey] = result
-            }
-          }
-        }
-      }
-    }
     when (covers.size) {
       0 -> Image(
         painter = painterResource(LocalTheme.current.albumPlaceHolder),
@@ -104,6 +105,15 @@ fun AlbumCoverCollage(
   }
 }
 
+internal fun selectCoverSongs(candidates: List<Song>, failed: (Song) -> Boolean): List<Song> =
+  candidates.asSequence()
+    // Filter failures before grouping, so another song in that album can supply its cover.
+    .filterNot(failed)
+    // Remote metadata has no MediaStore album ID; its default value cannot identify an album.
+    .distinctBy { if (it.isLocal() && it.albumId > 0) it.albumId else it.songIdentity }
+    .take(4)
+    .toList()
+
 @Composable
 private fun CoverColumn(covers: List<Painter>, modifier: Modifier) {
   Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -123,5 +133,5 @@ private sealed interface CoverResult {
   data object Failed : CoverResult
 }
 
-private val Song.coverRequestKey: Pair<Long, String>
-  get() = id to data
+private val Song.coverRequestKey: Pair<SongIdentity, String>
+  get() = songIdentity to data

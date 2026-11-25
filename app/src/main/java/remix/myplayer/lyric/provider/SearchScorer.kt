@@ -45,7 +45,7 @@ object SearchScorer {
     candidateDuration: Long? = null
   ): ScoreResult {
     // 时长匹配检查
-    if (targetSong is Song.Local) {
+    if (targetSong.isLocal()) {
       if (!checkDurationMatch(targetSong.duration, candidateDuration)) {
         return ScoreResult(score = 0f, durationMatch = false)
       }
@@ -88,7 +88,7 @@ object SearchScorer {
     keyword: String,
     keyKind: SearchKeyUtil.KeyKind
   ): ScoreResult {
-    if (targetSong is Song.Local) {
+    if (targetSong.isLocal()) {
       if (!checkDurationMatch(targetSong.duration, candidateDuration)) {
         return ScoreResult(score = 0f, durationMatch = false)
       }

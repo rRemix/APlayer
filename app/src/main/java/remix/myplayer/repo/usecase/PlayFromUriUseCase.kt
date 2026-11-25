@@ -9,7 +9,6 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
-import android.provider.MediaStore.Audio
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -18,6 +17,9 @@ import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.misc.MediaScanner
 import remix.myplayer.repo.SongRepository
+import remix.myplayer.repo.SongQuery
+import remix.myplayer.repo.MediaStoreLibrary
+import remix.myplayer.data.model.audio.SongIdentity
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.nav.MessageNotifier
@@ -29,12 +31,13 @@ import javax.inject.Singleton
 @Singleton
 class PlayFromUriUseCase @Inject constructor(
   @param:ApplicationContext private val context: Context,
-  private val songRepo: SongRepository
+  private val songRepo: SongRepository,
+  private val mediaStoreLibrary: MediaStoreLibrary
 ) {
 
   suspend operator fun invoke(uri: Uri) = withContext(Dispatchers.IO) {
     Timber.v("playFromUri, uri: $uri")
-    var songs: List<Song>? = null
+    var songs = emptyList<Song>()
     if (uri.scheme != null && uri.authority != null) {
       when (uri.scheme) {
         ContentResolver.SCHEME_CONTENT -> {
@@ -45,21 +48,26 @@ class PlayFromUriUseCase @Inject constructor(
             songId = uri.lastPathSegment
           }
 
-          songs = songId?.toLongOrNull()
-            ?.let { songRepo.song(it) }
-            ?.let { listOf(it) }
+          songId?.toLongOrNull()?.let { id ->
+            val keys = listOf(SongIdentity.local(id))
+            songs = songRepo.resolveSongs(keys)
+            if (songs.isEmpty()) {
+              mediaStoreLibrary.refresh()
+              songs = songRepo.resolveSongs(keys)
+            }
+          }
         }
 
         else -> {
           // 通过displayName查找
           val displayName = uri.lastPathSegment
           if (!displayName.isNullOrEmpty()) {
-            songs = songRepo.getSongs("${Audio.Media.DISPLAY_NAME} LIKE ?", arrayOf(displayName))
+            songs = songRepo.getSongs(SongQuery(displayName = displayName))
           }
         }
       }
     }
-    if (songs.isNullOrEmpty()) {
+    if (songs.isEmpty()) {
       var songFile: File? = null
       if (uri.authority != null && uri.authority == "com.android.externalstorage.documents") {
         val path = uri.path?.split(":".toRegex(), 2)?.get(1)
@@ -78,7 +86,7 @@ class PlayFromUriUseCase @Inject constructor(
       }
       if (songFile != null) {
         Timber.v("playFromUri, songFile: $songFile")
-        songs = songRepo.getSongs(Audio.Media.DATA + " = ?", arrayOf(songFile.absolutePath))
+        songs = songRepo.getSongs(SongQuery(path = songFile.absolutePath))
         if (songs.isEmpty()) {
           // 有可能是刚添加的歌曲，扫描一次再查询
           withTimeout(2_000) {
@@ -88,12 +96,13 @@ class PlayFromUriUseCase @Inject constructor(
             Timber.v("playFromUri scanUri: $it")
           }
 
-          songs = songRepo.getSongs(Audio.Media.DATA + " = ?", arrayOf(songFile.absolutePath))
+          mediaStoreLibrary.refresh()
+          songs = songRepo.getSongs(SongQuery(path = songFile.absolutePath))
         }
       }
     }
     Timber.v("playFromUri songs: $songs")
-    if (!songs.isNullOrEmpty()) {
+    if (songs.isNotEmpty()) {
       context.startService(
         Intent(context, MusicService::class.java).run {
           action = MusicService.ACTION_CMD

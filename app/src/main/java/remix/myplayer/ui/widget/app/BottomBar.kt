@@ -2,7 +2,6 @@ package remix.myplayer.ui.widget.app
 
 import android.content.Intent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -45,8 +42,8 @@ import remix.myplayer.ui.widget.library.CoverImage
 import remix.myplayer.util.Util
 import remix.myplayer.util.ext.clickableWithoutRipple
 import remix.myplayer.viewmodel.PlaybackViewModel
-import remix.myplayer.viewmodel.PlayingScreenValue
-import remix.myplayer.viewmodel.mainViewModel
+import remix.myplayer.ui.nav.LocalNavController
+import remix.myplayer.ui.nav.openPlayingScreen
 import remix.myplayer.viewmodel.playbackViewModel
 import kotlin.math.absoluteValue
 
@@ -54,8 +51,7 @@ private const val triggerThreshold = 10
 
 @Composable
 fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackViewModel) {
-  val mainVM = mainViewModel
-  val scope = rememberCoroutineScope()
+  val nav = LocalNavController.current
   val playbackState by vm.playbackUiState.collectAsStateWithLifecycle()
   val interactionSource = remember { MutableInteractionSource() }
 
@@ -72,9 +68,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
     Modifier
       // 点击跳转播放页
       .clickableWithoutRipple(interactionSource) {
-        scope.launch {
-          mainVM.playingScreenState.animateTo(PlayingScreenValue.Expanded)
-        }
+        nav.openPlayingScreen()
       }
       // 垂直滑动跳转播放页
       .pointerInput(Unit) {
@@ -83,9 +77,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
         ) { _, dragAmount ->
           if (dragAmount < -triggerThreshold && !hasTriggerAct) {
             hasTriggerAct = true
-            scope.launch {
-              mainVM.playingScreenState.animateTo(PlayingScreenValue.Expanded)
-            }
+            nav.openPlayingScreen()
           }
         }
       }

@@ -1,243 +1,127 @@
 package remix.myplayer.repo
 
-import android.content.Context
-import android.database.Cursor
-import android.os.Build
-import android.provider.MediaStore
-import android.provider.MediaStore.Audio
-import android.provider.MediaStore.Audio.Genres
-import dagger.hilt.android.qualifiers.ApplicationContext
-import remix.myplayer.data.db.room.dao.PlayListDao
-import remix.myplayer.data.db.room.entity.PlayList
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.withContext
+import remix.myplayer.data.adapter.RemotePaths
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Album
 import remix.myplayer.data.model.audio.Artist
 import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.data.model.audio.SongIdentity
+import remix.myplayer.data.model.audio.SourceId
+import remix.myplayer.data.prefs.PrefKeys
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.data.prefs.CoverPrefs
+import remix.myplayer.data.prefs.observe
 import remix.myplayer.helper.ItemsSorter
-import remix.myplayer.helper.SortOrder
-import remix.myplayer.util.ext.checkWorkerThread
-import timber.log.Timber
-import java.util.Calendar
-import java.util.Date
 import javax.inject.Inject
 
-
 interface SongRepository {
-
-  fun allSongs(): List<Song>
-
-  fun getSongs(
-    selection: String?,
-    selectionValues: Array<String?>?,
-    sortOrder: String? = null
-  ): List<Song>
-
-  fun song(id: Long): Song?
-
-  suspend fun getSongsByModels(models: List<APlayerModel>): List<Song>
-
-  fun getSongsByGenreId(genreId: Long, sortOrder: String? = null): List<Song>
-
-  fun getLastAddedSongs(): List<Song>
-
-  fun makeSongCursor(
-    selection: String?,
-    selectionValues: Array<String?>?,
-    sortOrder: String?
-  ): Cursor?
+  fun observeSongs(query: SongQuery = SongQuery()): Flow<List<Song>>
+  /** Observe the current item; playlists follow their saved row and subsequent edits. */
+  fun observeSongs(item: APlayerModel): Flow<List<Song>>
+  suspend fun getSongs(query: SongQuery = SongQuery()): List<Song>
+  /** Expand library items using the supplied playlist snapshot, including its saved track order. */
+  suspend fun getSongs(items: List<APlayerModel>): List<Song>
+  /** Resolve saved identities in the caller's order, retaining duplicate requests. No network I/O. */
+  suspend fun resolveSongs(identities: List<SongIdentity>): List<Song>
 }
 
 class SongRepoImpl @Inject constructor(
-  @param:ApplicationContext private val context: Context,
-  private val playListDao: PlayListDao,
-  private val settingPrefs: SettingPrefs,
-  private val coverPrefs: CoverPrefs
-) : SongRepository, AbstractRepository(settingPrefs) {
+  private val library: MediaStoreLibrary,
+  private val sources: MusicSourceRepository,
+  private val metadata: SongMetadataRepository,
+  private val playlists: PlayListRepository,
+  private val genres: GenreRepository,
+  private val settings: SettingPrefs
+) : SongRepository {
+  override fun observeSongs(query: SongQuery): Flow<List<Song>> = library.snapshots
+    .onStart { library.ensureLoaded() }
+    .map { query.applyTo(it.songs) }
+    .flowOn(Dispatchers.Default)
 
-  override fun allSongs(): List<Song> {
-    return getSongs(
-      null,
-      null,
-      settingPrefs.songSortOrder
-    )
-  }
-
-  override fun getSongs(
-    selection: String?, selectionValues: Array<String?>?,
-    sortOrder: String?
-  ): List<Song> {
-    checkWorkerThread()
-    val songs: MutableList<Song> = ArrayList()
-    try {
-      makeSongCursor(selection, selectionValues, sortOrder).use { cursor ->
-        if (cursor != null && cursor.count > 0) {
-          while (cursor.moveToNext()) {
-            songs.add(resolveSong(cursor))
-          }
-        }
+  override fun observeSongs(item: APlayerModel): Flow<List<Song>> {
+    val tracks = when (item) {
+      is Song -> flowOf(listOf(item))
+      is PlayList -> combine(playlists.observePlayList(item.id), observeSongs(), metadata.revision,
+        sources.observeSources()) { playlist, _, _, _ ->
+        if (playlist == null) emptyList() else resolveSongs(playlist.songIdentities)
       }
-    } catch (e: Exception) {
-      Timber.v(e)
+      is Genre -> genres.observeSongs(item.id)
+      else -> query(item)?.let(::observeSongs) ?: flowOf(emptyList())
     }
-    return ItemsSorter.sortedSongs(songs, sortOrder)
+    return tracks.combine(observeSortOrder(item)) { items, order ->
+      ItemsSorter.sortedSongs(items, order)
+    }.flowOn(Dispatchers.Default)
   }
 
-  override fun makeSongCursor(
-    selection: String?, selectionValues: Array<String?>?,
-    sortOrder: String?
-  ): Cursor? {
-    var selection = selection
-    var selectionValues = selectionValues
-    selection = if (selection != null && selection.trim { it <= ' ' } != "") {
-      "$selection AND ($baseSelection)"
-    } else {
-      baseSelection
-    }
-    if (selectionValues == null) {
-      selectionValues = arrayOfNulls(0)
-    }
-    val baseSelectionArgs = baseSelectionArgs
-    val newSelectionValues = arrayOfNulls<String>(selectionValues.size + baseSelectionArgs.size)
-    System.arraycopy(selectionValues, 0, newSelectionValues, 0, selectionValues.size)
-    if (newSelectionValues.size - selectionValues.size >= 0) {
-      System.arraycopy(
-        baseSelectionArgs, 0,
-        newSelectionValues, selectionValues.size,
-        newSelectionValues.size - selectionValues.size
-      )
-    }
+  override suspend fun getSongs(query: SongQuery): List<Song> = withContext(Dispatchers.Default) {
+    library.ensureLoaded()
+    query.applyTo(library.snapshots.value.songs)
+  }
 
-    val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-      Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-    } else {
-      Audio.Media.EXTERNAL_CONTENT_URI
-    }
-
-    return try {
-      context.contentResolver.query(
-        uri,
-        baseProjection, selection, newSelectionValues, sortOrder
-      )
-    } catch (e: SecurityException) {
-      null
+  override suspend fun getSongs(items: List<APlayerModel>): List<Song> = items.flatMap { item ->
+    when (item) {
+      is Song -> listOf(item)
+      is PlayList -> ItemsSorter.sortedSongs(resolveSongs(item.songIdentities), sortOrder(item))
+      is Genre -> genres.getSongs(item.id, sortOrder(item))
+      else -> query(item, sortOrder(item))?.let { getSongs(it) }.orEmpty()
     }
   }
 
-  override fun song(id: Long) =
-    getSongs(Audio.Media._ID + "=?", arrayOf(id.toString() + ""), null).firstOrNull()
-
-  override suspend fun getSongsByModels(models: List<APlayerModel>): List<Song> {
-    checkWorkerThread()
-    val result = arrayListOf<Song>()
-
-    models.forEach {
-      when (it) {
-        is Song -> {
-          result.add(it)
-        }
-
-        is Album -> {
-          result.addAll(
-            getSongs(
-              Audio.Media.ALBUM_ID + "=?",
-              arrayOf(it.albumID.toString()),
-              settingPrefs.albumDetailSortOrder
-            )
-          )
-        }
-
-        is Artist -> {
-          result.addAll(
-            getSongs(
-              Audio.Media.ARTIST_ID + "=?",
-              arrayOf(it.artistID.toString()),
-              settingPrefs.artistDetailSortOrder
-            )
-          )
-        }
-
-        is Genre -> {
-          result.addAll(getSongsByGenreId(it.id, settingPrefs.genreDetailSortOrder))
-        }
-
-        is Folder -> {
-          result.addAll(getSongs(null, null, settingPrefs.folderDetailSortOrder).filter { song ->
-            song.data.substringBeforeLast("/", missingDelimiterValue = "") == it.path
-          })
-        }
-
-        is PlayList -> {
-          val playListSortOrder = settingPrefs.getPlayListDetailSortOrder(it.id)
-          val customSort = playListSortOrder == SortOrder.PLAYLIST_SONG_CUSTOM
-          val ids = it.audioIds.toList()
-
-          val songs = getSongs(
-            makeInStrQuery(ids),
-            null,
-            if (customSort) null else playListSortOrder
-          )
-
-          val tempArray: Array<Song> = Array(ids.size) { Song.EMPTY_SONG }
-          songs.forEachIndexed { index, song ->
-            tempArray[if (customSort) ids.indexOf(song.id) else index] = song
-          }
-
-          // remove no longer exist
-          if (songs.size < ids.size) {
-            val deleteIds = ArrayList<Long>()
-            val existIds = songs.map { it.id }
-
-            for (audioId in ids) {
-              if (!existIds.contains(audioId)) {
-                deleteIds.add(audioId)
-              }
-            }
-
-            if (deleteIds.isNotEmpty()) {
-              it.audioIds.removeAll(deleteIds)
-              if (playListDao.update(it) > 0) coverPrefs.invalidate("playlist:${it.id}")
-            }
-          }
-
-          result.addAll(
-            tempArray
-              .filter { it.id != Song.EMPTY_SONG.id })
-        }
+  override suspend fun resolveSongs(identities: List<SongIdentity>): List<Song> = withContext(Dispatchers.IO) {
+    if (identities.isEmpty()) return@withContext emptyList()
+    val requested = identities.toSet()
+    if (requested.any { it.sourceId == SourceId.MEDIASTORE }) library.ensureLoaded()
+    val found = library.snapshots.value.songs.filter { it.songIdentity in requested }
+      .associateBy { it.songIdentity }.toMutableMap()
+    val remoteSongs = mutableListOf<Song>()
+    identities.filter { it.sourceId.isRemote }.distinct().groupBy { it.sourceId }.forEach { (id, keys) ->
+      val source = sources.get(id) ?: return@forEach
+      keys.forEach { key ->
+        val name = key.sourceKey.substringAfterLast('/')
+        remoteSongs += Song(id, key.sourceKey, RemotePaths.resolve(source.root, key.sourceKey), name,
+          title = name.substringBeforeLast('.', name))
       }
     }
-
-    return result
+    metadata.withCachedMetadata(remoteSongs).forEach { found[it.songIdentity] = it }
+    identities.mapNotNull(found::get)
   }
 
-  override fun getSongsByGenreId(genreId: Long, sortOrder: String?): List<Song> {
-    checkWorkerThread()
-    val songs = ArrayList<Song>()
-    context.contentResolver.query(
-      Genres.Members.getContentUri("external", genreId),
-      baseProjection,
-      null,
-      null,
-      sortOrder
-    )?.use { songCursor ->
-      while (songCursor.moveToNext()) {
-        songs.add(resolveSong(songCursor))
-      }
+  private fun observeSortOrder(item: APlayerModel): Flow<String?> {
+    val keys = when (item) {
+      is Album -> arrayOf(PrefKeys.Setting.CHILD_ALBUM_SONG_SORT_ORDER)
+      is Artist -> arrayOf(PrefKeys.Setting.CHILD_ARTIST_SONG_SORT_ORDER)
+      is Folder -> arrayOf(PrefKeys.Setting.CHILD_FOLDER_SONG_SORT_ORDER)
+      is Genre -> arrayOf(PrefKeys.Setting.CHILD_GENRE_SONG_SORT_ORDER)
+      is PlayList -> arrayOf(PrefKeys.Setting.CHILD_PLAYLIST_SONG_SORT_ORDER,
+        PrefKeys.Setting.CHILD_PLAYLIST_SONG_SORT_ORDER_PREFIX + item.id)
+      else -> return flowOf(null)
     }
-    return ItemsSorter.sortedSongs(songs, sortOrder)
+    return settings.observe(*keys) { sortOrder(item) }
   }
 
-  override fun getLastAddedSongs(): List<Song> {
-    checkWorkerThread()
-    val today = Calendar.getInstance()
-    today.time = Date()
-    return getSongs(
-      Audio.Media.DATE_ADDED + " >= ?",
-      arrayOf((today.timeInMillis / 1000 - 3600 * 24 * 7).toString()),
-      null
-    )
+  private fun sortOrder(item: APlayerModel): String? = when (item) {
+    is Album -> settings.albumDetailSortOrder
+    is Artist -> settings.artistDetailSortOrder
+    is Folder -> settings.folderDetailSortOrder
+    is Genre -> settings.genreDetailSortOrder
+    is PlayList -> settings.getPlayListDetailSortOrder(item.id)
+    else -> null
+  }
+
+  private fun query(item: APlayerModel, order: String? = null): SongQuery? = when (item) {
+    is Album -> SongQuery(albumId = item.albumId, sortOrder = order)
+    is Artist -> SongQuery(artistId = item.artistId, sortOrder = order)
+    is Folder -> SongQuery(folderPath = item.path, sortOrder = order)
+    else -> null
   }
 }

@@ -1,7 +1,7 @@
 package remix.myplayer.ui.nav
 
 import android.net.Uri
-import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -20,23 +20,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
-import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavDeepLink
 import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.toRoute
 import androidx.savedstate.SavedState
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
-import remix.myplayer.data.db.room.entity.PlayList
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.db.room.entity.Smb
 import remix.myplayer.data.db.room.entity.WebDav
 import remix.myplayer.data.model.audio.APlayerModel
@@ -45,7 +41,6 @@ import remix.myplayer.data.model.audio.Artist
 import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.ui.AppScaffold
 import remix.myplayer.ui.dialog.DialogContainer
 import remix.myplayer.ui.screen.AboutScreen
 import remix.myplayer.ui.screen.CustomSortScreen
@@ -59,13 +54,15 @@ import remix.myplayer.ui.screen.crop.CropScreen
 import remix.myplayer.ui.screen.detail.DetailScreen
 import remix.myplayer.ui.screen.history.HistoryScreen
 import remix.myplayer.ui.screen.home.HomeScreen
+import remix.myplayer.ui.screen.playing.PlayingPanel
 import remix.myplayer.ui.screen.setting.SettingDetailScreen
 import remix.myplayer.ui.screen.setting.SettingScreen
 import remix.myplayer.ui.screen.setting.ReplayGainSettingScreen
-import remix.myplayer.ui.screen.smb.SmbDetailScreen
-import remix.myplayer.ui.screen.webdav.WebDavDetailScreen
-import remix.myplayer.util.Constants
+import remix.myplayer.ui.screen.remote.RemoteDetailScreen
+import remix.myplayer.data.remote.RemoteBrowserSource
+import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.viewmodel.libraryViewModel
+import remix.myplayer.viewmodel.mainViewModel
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
@@ -86,11 +83,7 @@ const val RouteTagEditCrop = "tag_edit_crop"
 const val RouteEq = "eq"
 const val RouteSupport = "support"
 
-// 存在目标页 NavBackStackEntry.savedStateHandle 里的标志，
-// 标记该页是从播放页浮窗跳转过来的，退出时需要恢复浮窗
-const val ExtraRestorePlayingScreen = "restore_playing_screen"
-// Pending handoff to a detail page; consumed when that destination is ready.
-const val ExtraHidePlayingScreenOnEntry = "hide_playing_screen_on_entry"
+const val RoutePlaying = "playing"
 
 val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 
@@ -98,165 +91,155 @@ val playingScreenDeepLink = "aplayer://playingScreen".toUri()
 fun AppNav() {
   val snackBarHostState = remember { SnackbarHostState() }
   ProvideSnackBarHostState(snackBarHostState) {
-    Box(modifier = Modifier.fillMaxSize()) {
-      AppScaffold {
-        Box(modifier = Modifier.fillMaxSize()) {
-          DialogContainer()
+    Box(modifier = Modifier.fillMaxSize().background(LocalTheme.current.mainBackground)) {
+      DialogContainer()
 
-          NavHost(LocalNavController.current, startDestination = RouteHome) {
-            normalAnimatedScreen(
-              RouteHome,
-            ) {
-              HomeScreen()
-            }
+      PredictiveNavHost(
+        navController = LocalNavController.current,
+        startDestination = RouteHome,
+        backgroundColor = LocalTheme.current.mainBackground,
+      ) {
+        composable(
+          RouteHome,
+        ) {
+          HomeScreen()
+        }
 
-            normalAnimatedScreen(RouteSetting) {
-              SettingScreen()
-            }
+        composable(RoutePlaying) {
+          PlayingPanel()
+        }
 
-            normalAnimatedScreen(
-              "$RouteSettingDetail/{category}",
-              arguments = listOf(navArgument("category") { type = NavType.StringType })
-            ) {
-              val category = it.arguments?.getString("category") ?: return@normalAnimatedScreen
-              SettingDetailScreen(category)
-            }
+        composable(RouteSetting) {
+          SettingScreen()
+        }
 
-            normalAnimatedScreen(RouteReplayGain) {
-              ReplayGainSettingScreen()
-            }
+        composable(
+          "$RouteSettingDetail/{category}",
+          arguments = listOf(navArgument("category") { type = NavType.StringType })
+        ) {
+          val category = it.arguments?.getString("category") ?: return@composable
+          SettingDetailScreen(category)
+        }
 
-            normalAnimatedScreen(
-              "${RouteSongChoose}/{id}/{name}", arguments = listOf(navArgument("id") {
-                type = NavType.LongType
-              })
-            ) {
-              val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
-              val name = Uri.decode(it.arguments?.getString("name") ?: return@normalAnimatedScreen)
-              SongChooserScreen(id, name)
-            }
+        composable(RouteReplayGain) {
+          ReplayGainSettingScreen()
+        }
 
-            normalAnimatedScreen(RouteAbout) {
-              AboutScreen()
-            }
+        composable(
+          "${RouteSongChoose}/{id}/{name}", arguments = listOf(navArgument("id") {
+            type = NavType.LongType
+          })
+        ) {
+          val id = it.arguments?.getLong("id") ?: return@composable
+          val name = Uri.decode(it.arguments?.getString("name") ?: return@composable)
+          SongChooserScreen(id, name)
+        }
 
-            composable<DetailScreenRoute>(
-              typeMap = mapOf(
-                typeOf<Album?>() to ModelRouteType.album,
-                typeOf<Artist?>() to ModelRouteType.artist,
-                typeOf<Genre?>() to ModelRouteType.genre,
-                typeOf<PlayList?>() to ModelRouteType.playList,
-                typeOf<Folder?>() to ModelRouteType.folder,
-              ),
-              enterTransition = enterTransition(),
-              exitTransition = exitTransition(),
-              popEnterTransition = popEnterTransition(),
-              popExitTransition = popExitTransition(),
-            ) {
-              val route = it.toRoute<DetailScreenRoute>()
+        composable(RouteAbout) {
+          AboutScreen()
+        }
 
-              DetailScreen(route.findNotNull(), openFromLibrary = route.openFromLibrary)
-            }
+        composable<DetailScreenRoute>(
+          typeMap = mapOf(
+            typeOf<Album?>() to ModelRouteType.album,
+            typeOf<Artist?>() to ModelRouteType.artist,
+            typeOf<Genre?>() to ModelRouteType.genre,
+            typeOf<PlayList?>() to ModelRouteType.playList,
+            typeOf<Folder?>() to ModelRouteType.folder,
+          ),
+        ) {
+          val route = it.toRoute<DetailScreenRoute>()
 
-            normalAnimatedScreen("${RouteCustomSort}/{id}", arguments = listOf(navArgument("id") {
-              type = NavType.LongType
-            })) {
-              val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
-              CustomSortScreen(id)
-            }
+          DetailScreen(route.findNotNull(), openFromLibrary = route.openFromLibrary)
+        }
 
-            normalAnimatedScreen(RouteLastAdded) {
-              LastAddedScreen()
-            }
+        composable("${RouteCustomSort}/{id}", arguments = listOf(navArgument("id") {
+          type = NavType.LongType
+        })) {
+          val id = it.arguments?.getLong("id") ?: return@composable
+          CustomSortScreen(id)
+        }
 
-            normalAnimatedScreen(RouteHistory) {
-              HistoryScreen()
-            }
+        composable(RouteLastAdded) {
+          LastAddedScreen()
+        }
 
-            normalAnimatedScreen(RouteSearch) {
-              SearchScreen()
-            }
+        composable(RouteHistory) {
+          HistoryScreen()
+        }
 
-            normalAnimatedScreen(RouteTagEdit) {
-              TagEditScreen(it)
-            }
+        composable(RouteSearch) {
+          SearchScreen()
+        }
 
-            composable<WebDav>(
-              enterTransition = enterTransition(),
-              exitTransition = exitTransition(),
-              popEnterTransition = popEnterTransition(),
-              popExitTransition = popExitTransition(),
-            ) {
-              val webDav = it.toRoute<WebDav>()
-              WebDavDetailScreen(webDav)
-            }
+        composable(RouteTagEdit) {
+          TagEditScreen(it)
+        }
 
-            composable<Smb>(
-              enterTransition = enterTransition(),
-              exitTransition = exitTransition(),
-              popEnterTransition = popEnterTransition(),
-              popExitTransition = popExitTransition(),
-            ) {
-              val smb = it.toRoute<Smb>()
-              SmbDetailScreen(smb)
-            }
+        composable<WebDav> {
+          val webDav = it.toRoute<WebDav>()
+          RemoteDetailScreen(RemoteBrowserSource.WebDavSource(webDav))
+        }
 
-            normalAnimatedScreen(
-              "${RouteCustomCoverCrop}/{id}/{type}",
-              arguments = listOf(
-                navArgument("id") { type = NavType.LongType },
-                navArgument("type") { type = NavType.IntType })
-            ) {
-              val id = it.arguments?.getLong("id") ?: return@normalAnimatedScreen
-              val type = it.arguments?.getInt("type") ?: return@normalAnimatedScreen
-              val context = LocalContext.current
-              val nav = LocalNavController.current
-              val libraryVM = libraryViewModel
+        composable<Smb> {
+          val smb = it.toRoute<Smb>()
+          RemoteDetailScreen(RemoteBrowserSource.SmbSource(smb))
+        }
 
-              val destinationUri = remember(id, type) {
-                val cacheDir = File(context.cacheDir, "thumbnail")
-                if (!cacheDir.isDirectory && !cacheDir.mkdirs()) {
-                  Uri.EMPTY
-                } else {
-                  val file = File(cacheDir, "$type-${id}.jpg")
-                  Uri.fromFile(file)
-                }
-              }
+        composable(
+          "${RouteCustomCoverCrop}/{id}/{type}",
+          arguments = listOf(
+            navArgument("id") { type = NavType.LongType },
+            navArgument("type") { type = NavType.IntType })
+        ) {
+          val id = it.arguments?.getLong("id") ?: return@composable
+          val type = it.arguments?.getInt("type") ?: return@composable
+          val context = LocalContext.current
+          val nav = LocalNavController.current
+          val libraryVM = libraryViewModel
 
-              CropScreen(destinationUri = destinationUri, onCropSuccess = {
-                libraryVM.invalidateCover(type, id)
-                nav.popBackStack()
-              }, onCancel = {
-                nav.popBackStack()
-              })
-            }
-
-            composable(
-              "$RouteTagEditCrop/{uri}",
-              arguments = listOf(navArgument("uri") { type = NavType.StringType })
-            ) {
-              val uriString = it.arguments?.getString("uri") ?: return@composable
-              val destinationUri = Uri.decode(uriString).toUri()
-              val nav = LocalNavController.current
-
-              CropScreen(destinationUri = destinationUri, onCropSuccess = {
-                nav.previousBackStackEntry?.savedStateHandle?.set(
-                  "song_crop_result", System.currentTimeMillis()
-                )
-                nav.popBackStack()
-              }, onCancel = {
-                nav.popBackStack()
-              })
-            }
-
-            normalAnimatedScreen(RouteEq) {
-              EQScreen(it)
-            }
-
-            normalAnimatedScreen(RouteSupport) {
-              SupportScreen()
+          val destinationUri = remember(id, type) {
+            val cacheDir = File(context.cacheDir, "thumbnail")
+            if (!cacheDir.isDirectory && !cacheDir.mkdirs()) {
+              Uri.EMPTY
+            } else {
+              val file = File(cacheDir, "$type-${id}.jpg")
+              Uri.fromFile(file)
             }
           }
+
+          CropScreen(destinationUri = destinationUri, onCropSuccess = {
+            libraryVM.invalidateCover(type, id)
+            nav.popBackStack()
+          }, onCancel = {
+            nav.popBackStack()
+          })
+        }
+
+        composable(
+          "$RouteTagEditCrop/{uri}",
+          arguments = listOf(navArgument("uri") { type = NavType.StringType })
+        ) {
+          val uriString = it.arguments?.getString("uri") ?: return@composable
+          val destinationUri = Uri.decode(uriString).toUri()
+          val nav = LocalNavController.current
+
+          CropScreen(destinationUri = destinationUri, onCropSuccess = {
+            nav.previousBackStackEntry?.savedStateHandle?.set(
+              "song_crop_result", System.currentTimeMillis()
+            )
+            nav.popBackStack()
+          }, onCancel = {
+            nav.popBackStack()
+          })
+        }
+
+        composable(RouteEq) {
+          EQScreen()
+        }
+
+        composable(RouteSupport) {
+          SupportScreen()
         }
       }
 
@@ -274,25 +257,26 @@ fun AppNav() {
         snackBarHostState.showSnackbar(it)
       }
     }
-  }
-}
 
-private fun NavGraphBuilder.normalAnimatedScreen(
-  route: String,
-  arguments: List<NamedNavArgument> = emptyList(),
-  deepLinks: List<NavDeepLink> = emptyList(),
-  content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit
-) {
-  composable(
-    route = route,
-    arguments = arguments,
-    deepLinks = deepLinks,
-    enterTransition = enterTransition(),
-    exitTransition = exitTransition(),
-    popEnterTransition = popEnterTransition(),
-    popExitTransition = popExitTransition(),
-    content = content
-  )
+    val nav = LocalNavController.current
+    val mainVM = mainViewModel
+    LaunchedEffect(nav, mainVM) {
+      mainVM.openPlayingScreenRequests.collect { requested ->
+        if (requested) {
+          // The entry can change while a notification waits for a gesture/transition to finish.
+          while (true) {
+            val entry = nav.currentBackStackEntryFlow.first()
+            val state = entry.lifecycle.currentStateFlow.first {
+              it == Lifecycle.State.RESUMED || it == Lifecycle.State.DESTROYED
+            }
+            if (state == Lifecycle.State.RESUMED && nav.currentBackStackEntry == entry) break
+          }
+          nav.openPlayingScreen(animate = false)
+          mainVM.consumePlayingScreenRequest()
+        }
+      }
+    }
+  }
 }
 
 @Serializable
@@ -336,17 +320,36 @@ fun Song.albumDetailRoute(): DetailScreenRoute? =
 internal fun NavBackStackEntry.isSameDetail(route: DetailScreenRoute): Boolean {
   if (!destination.hasRoute<DetailScreenRoute>()) return false
   val current = toRoute<DetailScreenRoute>()
-  return (route.album != null && route.album.albumID == current.album?.albumID) ||
-    (route.artist != null && route.artist.artistID == current.artist?.artistID)
+  return (route.album != null && route.album.albumId == current.album?.albumId) ||
+    (route.artist != null && route.artist.artistId == current.artist?.artistId)
 }
 
-/** Open a detail page from a song list, without stacking the page we are already on. */
+/** Open a song's library detail, reusing the current page or the source directly under the player. */
 fun NavHostController.openSongLibraryDetail(route: DetailScreenRoute) {
   val current = currentBackStackEntry ?: return
   // Ignore taps while a previous navigation transition is still running.
   if (current.lifecycle.currentState != Lifecycle.State.RESUMED) return
   if (current.isSameDetail(route)) return
-  navigate(route)
+  if (current.destination.route == RoutePlaying && previousBackStackEntry?.isSameDetail(route) == true) {
+    popBackStack()
+  } else {
+    navigate(route)
+  }
+}
+
+/** Reuse the player already in this stack instead of stacking another player above its children. */
+fun NavHostController.openPlayingScreen(animate: Boolean = true) {
+  val current = currentBackStackEntry ?: return
+  if (current.lifecycle.currentState != Lifecycle.State.RESUMED) return
+  if (current.destination.route == RoutePlaying) return
+  if (runCatching { getBackStackEntry(RoutePlaying) }.isSuccess) {
+    popBackStack(RoutePlaying, inclusive = false)
+  } else {
+    navigate(RoutePlaying) { launchSingleTop = true }
+  }
+  if (!animate) {
+    currentBackStackEntry?.savedStateHandle?.set(SkipNextTransition, true)
+  }
 }
 
 private object ModelRouteType {

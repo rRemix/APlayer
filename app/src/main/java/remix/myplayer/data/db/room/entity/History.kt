@@ -1,16 +1,16 @@
 package remix.myplayer.data.db.room.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
+import remix.myplayer.data.model.audio.SongIdentity
+import remix.myplayer.data.model.audio.SourceId
 
-/**
- * Created by remix on 2019/1/12
- */
-@Entity
+@Entity(primaryKeys = ["source_id", "source_key"])
 data class History(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
-    val audio_id: Long,
-    val play_count: Int,
-    val last_play: Long
-)
+  @ColumnInfo(name = "source_id") val sourceId: String,
+  @ColumnInfo(name = "source_key") val sourceKey: String,
+  val play_count: Int,
+  val last_play: Long
+) {
+  fun identity() = SongIdentity(SourceId(sourceId), sourceKey)
+}

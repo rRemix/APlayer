@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Looper
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.thegrizzlylabs.sardineandroid.DavResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
@@ -15,7 +14,6 @@ import timber.log.Timber
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -149,17 +147,6 @@ private fun ZipOutputStream.createEmptyFolder(location: String) {
 
 fun getPendingIntentFlag() =
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
-
-
-private val musicExt = setOf("wav", "aif", "au", "mp3", "ram", "wma", "mmf", "amr", "aac", "flac")
-fun DavResource.isAudio(): Boolean {
-  if (isDirectory || path.isNullOrEmpty()) {
-    return false
-  }
-  val ext = path.substringAfterLast(".")
-  return musicExt.contains(ext.lowercase(Locale.getDefault())) &&
-      (contentType == "application/octet-stream" || contentType.startsWith("audio"))
-}
 
 
 fun Color.toHexString(withAlpha: Boolean = false): String {

@@ -1,7 +1,6 @@
 package remix.myplayer.ui.screen.playing
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +14,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,25 +29,21 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.palette.graphics.Palette
-import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.ui.nav.DetailScreenRoute
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.albumDetailRoute
 import remix.myplayer.ui.nav.artistDetailRoute
+import remix.myplayer.ui.nav.openSongLibraryDetail
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.popupButton
 import remix.myplayer.util.ext.clickWithRipple
-import remix.myplayer.viewmodel.PlayingScreenValue
-import remix.myplayer.viewmodel.mainViewModel
 
 @Composable
 @Stable
 internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
-  val mainVM = mainViewModel
   val nav = LocalNavController.current
-  val scope = rememberCoroutineScope()
   val theme = LocalTheme.current
   val titleColor = if (theme.isLight) Color(swatch.titleTextColor) else theme.textPrimary
   val bodyColor = if (theme.isLight) Color(swatch.bodyTextColor) else theme.textSecondary
@@ -62,9 +56,7 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
         .padding(8.dp)
         .size(40.dp)
         .clickWithRipple {
-          scope.launch {
-            mainVM.playingScreenState.animateTo(PlayingScreenValue.Hidden)
-          }
+          nav.popBackStack()
         }
     ) {
       Image(
@@ -91,9 +83,7 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
           } else {
             // An explicit empty style prevents Material's default link color and underline.
             withLink(LinkAnnotation.Clickable(tag, styles = TextLinkStyles()) {
-              scope.launch {
-                nav.openPlayingDetail(route, mainVM)
-              }
+              nav.openSongLibraryDetail(route)
             }) {
               append(label)
             }

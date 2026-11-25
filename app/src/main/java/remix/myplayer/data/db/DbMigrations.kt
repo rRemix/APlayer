@@ -9,6 +9,13 @@ import remix.myplayer.data.db.room.entity.WebDav
 
 internal object DbMigrations {
 
+  val migration8to9 = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+      // All existing rows contain extracted metadata, not just file attributes.
+      db.execSQL("ALTER TABLE MetaDataCache ADD COLUMN tagsLoaded INTEGER NOT NULL DEFAULT 1")
+    }
+  }
+
   val migration3to4 = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {
       db.execSQL("ALTER TABLE `PlayQueue` ADD COLUMN `title` TEXT NOT NULL DEFAULT ''")

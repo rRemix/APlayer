@@ -74,7 +74,7 @@ fun AlbumScreen() {
           .verticalScrollbar(listState)
       ) {
         itemsIndexed(albums, key = { _, album ->
-          album.albumID
+          album.albumId
         }) { _, album ->
           ListItem(
             modifier = Modifier.height(64.dp),
@@ -108,7 +108,7 @@ fun AlbumScreen() {
         columns = GridCells.Fixed(spanCount()),
         content = {
           items(albums, key = {
-            it.albumID
+            it.albumId
           }) { album ->
             GridItem(
               album, album.album, album.artist,

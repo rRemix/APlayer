@@ -1,5 +1,6 @@
 package remix.myplayer.ui.dialog
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +25,6 @@ import com.kyant.taglib.AudioProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import remix.myplayer.R
-import remix.myplayer.data.model.audio.Song
 import remix.myplayer.helper.AudioTagFile
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.Constants.MB
@@ -34,12 +34,14 @@ import java.io.File
 
 @Composable
 fun SongDetailDialog() {
-  val state by settingViewModel.songDetailState.collectAsStateWithLifecycle()
-  val song = state.song
+  val settingVM = settingViewModel
+  val state by settingVM.songDetailState.collectAsStateWithLifecycle()
+  var song by remember(state.song) { mutableStateOf(state.song) }
 
-  var audioProperties by remember(song) {
+  var audioProperties by remember(state.song) {
     mutableStateOf<AudioProperties?>(null)
   }
+  val displayPath = if (song.isRemote()) Uri.decode(song.data) else song.data
 
   NormalDialog(
     dialogState = state.dialogState,
@@ -52,8 +54,8 @@ fun SongDetailDialog() {
           .padding(top = 18.dp)
           .verticalScroll(rememberScrollState())
       ) {
-        DetailItem(R.string.song_path, song.data, true)
-        DetailItem(R.string.song_name, song.showName)
+        DetailItem(R.string.song_path, displayPath, true)
+        DetailItem(R.string.song_name, song.showName(settingViewModel.settingPrefs.showDisplayName))
         DetailItem(R.string.file_size, stringResource(R.string.cache_size, 1.0f * song.size / MB))
         DetailItem(
           R.string.format,
@@ -62,19 +64,22 @@ fun SongDetailDialog() {
         DetailItem(R.string.length, Util.getTime(song.duration))
         DetailItem(
           R.string.bitrate,
-          if (song.isLocal()) "${audioProperties?.bitrate ?: 0} kb/s" else if (song is Song.Remote) "${song.bitRate} kb/s" else ""
+          if (song.isLocal()) "${audioProperties?.bitrate ?: 0} kb/s" else if (song.isRemote()) "${song.bitRate} kb/s" else ""
         )
         DetailItem(
           R.string.sample_rate,
-          if (song.isLocal()) "${audioProperties?.sampleRate ?: 0} Hz" else if (song is Song.Remote) "${song.sampleRate} Hz" else ""
+          if (song.isLocal()) "${audioProperties?.sampleRate ?: 0} Hz" else if (song.isRemote()) "${song.sampleRate} Hz" else ""
         )
       }
     },
     positive = stringResource(R.string.close)
   )
 
-  LaunchedEffect(song) {
-    if (song.id > 0 && song.isLocal()) {
+  LaunchedEffect(state.dialogState.isOpen, state.song) {
+    if (!state.dialogState.isOpen || !state.song.valid()) return@LaunchedEffect
+    song = settingVM.cachedSongMetadata(state.song)
+    song = settingVM.loadSongMetadata(song)
+    if (song.isLocal()) {
       try {
         audioProperties = withContext(Dispatchers.IO) {
           AudioTagFile.readAudioProperties(File(song.data))
