@@ -307,7 +307,7 @@ private fun AboutItem(
 }
 
 private fun openUrl(context: Context, url: String) {
-  Util.startActivitySafely(context, Intent(Intent.ACTION_VIEW, url.toUri()))
+  Util.startActivitySafely(context, Intent.createChooser(Intent(Intent.ACTION_VIEW, url.toUri()), null))
 }
 
 private fun rateApp(context: Context) {

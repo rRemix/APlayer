@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +29,7 @@ import remix.myplayer.ui.widget.app.ProgressAware
 import remix.myplayer.ui.widget.common.LineSlider
 import remix.myplayer.ui.widget.common.defaultLineSliderProperties
 import remix.myplayer.util.Util
+import remix.myplayer.util.ext.clickableWithoutRipple
 import remix.myplayer.viewmodel.playbackViewModel
 import kotlin.math.roundToLong
 
@@ -35,17 +39,19 @@ internal fun PlayingSeekbarWithText(
 ) {
   val playbackVM = playbackViewModel
   val scope = rememberCoroutineScope()
+  // 右侧时间默认显示剩余时间，点击切换为总时长
+  var showRemaining by rememberSaveable { mutableStateOf(true) }
 
   ProgressAware { progress, duration ->
     val seekBarUiState by playbackVM.seekBarUiState.collectAsStateWithLifecycle()
 
     val time = remember(seekBarUiState, progress, duration) {
       if (duration <= 0) {
-        Time("00:00", "00:00")
+        Time("00:00", "00:00", "00:00")
       } else {
         val elapsed = seekBarUiState.uiProgress ?: progress
         val remaining = duration - elapsed
-        Time(Util.getTime(elapsed), Util.getTime(remaining))
+        Time(Util.getTime(elapsed), Util.getTime(remaining), Util.getTime(duration))
       }
     }
 
@@ -111,10 +117,14 @@ internal fun PlayingSeekbarWithText(
       )
 
       Text(
-        text = time.remaining,
+        text = if (showRemaining) time.remaining else time.total,
         style = tabularStyle,
         maxLines = 1,
-        color = textColor
+        color = textColor,
+        modifier = Modifier
+          .clickableWithoutRipple {
+            showRemaining = !showRemaining
+          }
       )
     }
   }
@@ -130,4 +140,4 @@ internal val playingTrackBackgroundColor: Color
     }.toColorInt()
   )
 
-private data class Time(val elapsed: String, val remaining: String)
+private data class Time(val elapsed: String, val remaining: String, val total: String)

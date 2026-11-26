@@ -71,15 +71,36 @@ object AudioTagWriter {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
       // Scoped storage: ask for write access to the specific file.
-      activity.pendingWriteRequest = request
-      activity.writeSongLauncher.launch(
-        IntentSenderRequest.Builder(
-          MediaStore.createWriteRequest(
-            activity.contentResolver,
-            listOf(song.contentUri)
-          ).intentSender
-        ).build()
-      )
+      // A Song restored from cache may carry a stale MediaStore id whose row is gone.
+      // createWriteRequest() would then throw IllegalArgumentException("Invalid Uri: ...")
+      // from MediaProvider and crash the app, so validate the Uri and guard the call.
+      val writeRequest = runCatching {
+        val uri = song.contentUri
+        val available = activity.contentResolver.query(
+          uri,
+          arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.IS_PENDING),
+          null, null, null
+        )?.use { cursor ->
+          if (!cursor.moveToFirst()) {
+            false
+          } else {
+            val pendingColumn = cursor.getColumnIndex(MediaStore.MediaColumns.IS_PENDING)
+            pendingColumn < 0 || cursor.getInt(pendingColumn) == 0
+          }
+        } == true
+        require(available) { "MediaStore entry no longer available: $uri" }
+        MediaStore.createWriteRequest(activity.contentResolver, listOf(uri))
+      }
+
+      writeRequest.onFailure { error ->
+        Timber.w(error, "Fail to create write request for ${song.contentUri}")
+        MessageNotifier.show(R.string.save_error_arg, error.toString())
+      }.onSuccess { pendingIntent ->
+        activity.pendingWriteRequest = request
+        activity.writeSongLauncher.launch(
+          IntentSenderRequest.Builder(pendingIntent.intentSender).build()
+        )
+      }
     } else {
       // Pre-R: try direct write and fall back to recoverable permission when needed.
       activity.lifecycleScope.launch {

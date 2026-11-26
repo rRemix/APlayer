@@ -265,6 +265,9 @@ object Util {
       context.startActivity(intent)
     } catch (e: ActivityNotFoundException) {
       MessageNotifier.show(R.string.activity_not_found_tip)
+    } catch (e: SecurityException) {
+      Timber.w(e, "startActivity denied by SecurityException")
+      MessageNotifier.show(R.string.activity_not_found_tip)
     }
   }
 
@@ -276,6 +279,9 @@ object Util {
     try {
       activity.startActivityForResult(intent, requestCode)
     } catch (e: ActivityNotFoundException) {
+      MessageNotifier.show(R.string.activity_not_found_tip)
+    } catch (e: SecurityException) {
+      Timber.w(e, "startActivityForResult denied by SecurityException")
       MessageNotifier.show(R.string.activity_not_found_tip)
     }
   }

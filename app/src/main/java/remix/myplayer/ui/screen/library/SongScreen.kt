@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
+import remix.myplayer.ui.nav.LocalNavController
+import remix.myplayer.ui.nav.openPlayingScreen
 import remix.myplayer.ui.widget.library.SongListHeader
 import remix.myplayer.ui.widget.library.list.ListSong
 import remix.myplayer.util.MusicUtil
@@ -37,6 +39,7 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
   val listState = rememberLazyListState()
   val songs by libraryVM.songs.collectAsStateWithLifecycle()
   val context = LocalContext.current
+  val nav = LocalNavController.current
   val popupEnabled = !multiSelectState.isShowInLibrary()
 
   LaunchedEffect(scrollToCurrentEvent) {
@@ -85,6 +88,11 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
 
             if (multiSelectState.where == MultiSelectState.Where.Song) {
               mainVM.updateMultiSelectModel(song)
+              return@ListSong
+            }
+
+            if (playbackState.isPlaying && isPlayingSong) {
+              nav.openPlayingScreen()
               return@ListSong
             }
 

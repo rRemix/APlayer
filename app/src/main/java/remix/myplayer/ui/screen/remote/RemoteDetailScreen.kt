@@ -61,6 +61,7 @@ import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.runWithLoading
 import remix.myplayer.ui.nav.LocalNavController
+import remix.myplayer.ui.nav.openPlayingScreen
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.state.DataUiState
 import remix.myplayer.ui.theme.LocalTheme
@@ -92,6 +93,7 @@ fun RemoteDetailScreen(
   val mainVM = mainViewModel
   val multiSelectState by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val playbackVM = playbackViewModel
+  val playbackState by playbackVM.playbackUiState.collectAsStateWithLifecycle()
   val settingVM = settingViewModel
   val libraryVM = libraryViewModel
   val scope = rememberCoroutineScope()
@@ -289,6 +291,12 @@ fun RemoteDetailScreen(
 
                 if (showMultiSelect) {
                   song?.let(mainVM::updateMultiSelectModel)
+                  return@RemoteDetailItem
+                }
+                if (song != null && playbackState.isPlaying &&
+                  playbackState.song.songIdentity == song.songIdentity
+                ) {
+                  nav.openPlayingScreen()
                   return@RemoteDetailItem
                 }
                 if (resource.isDirectory) {
