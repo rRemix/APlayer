@@ -225,7 +225,8 @@ internal fun LyricContainer(
 
   // 滚动到视图中心
   LaunchedEffect(highlightIndex, viewportHeightPx, lineBounds.getOrNull(highlightIndex)) {
-    if (lyrics.isEmpty() || viewportHeightPx == 0) return@LaunchedEffect
+    // 手动拖动和惯性滚动期间，布局变化不能触发自动定位。
+    if (dragging || lyrics.isEmpty() || viewportHeightPx == 0) return@LaunchedEffect
     val bound = lineBounds.getOrNull(highlightIndex) ?: return@LaunchedEffect
     val target = ((bound.top + bound.height / 2f) - viewportHeightPx / 2f).roundToInt()
     // 根据seekbar状态决定是否需要动画滚动

@@ -25,7 +25,8 @@ data class Song(
   val dateModified: Long = 0,
   val addedAt: Long = 0,
   val bitRate: String = "",
-  val sampleRate: String = ""
+  val sampleRate: String = "",
+  val albumArtist: String = ""
 ) : APlayerModel {
   val songIdentity: SongIdentity get() = SongIdentity(sourceId, sourceKey)
   val mediaStoreId: Long? get() = sourceKey.toLongOrNull().takeIf { isLocal() }

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.database.sqlite.SQLiteException
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio
@@ -116,7 +117,17 @@ class MediaStoreLibrary @Inject constructor(
         repeat(blacklist.size) { add("${Audio.Media.DATA} NOT LIKE ?") }
       }.joinToString(" AND ")
       val args = blacklist.map { "$it%" }.toTypedArray()
-      context.contentResolver.query(uri, projection, selection, args, null)?.use { cursor ->
+      val cursor = try {
+        context.contentResolver.query(uri, projection, selection, args, null)
+      } catch (error: RuntimeException) {
+        if (error !is IllegalArgumentException && error !is SQLiteException) throw error
+        // Some older providers do not expose this optional column. Keep the library readable.
+        Timber.w(error, "Retrying MediaStore scan without album artist")
+        context.contentResolver.query(
+          uri, projection.filterNot { it == COLUMN_ALBUM_ARTIST }.toTypedArray(), selection, args, null
+        )
+      }
+      cursor?.use { cursor ->
         buildList { while (cursor.moveToNext()) add(resolveSong(cursor)) }
       }
     } catch (error: CancellationException) {
@@ -143,7 +154,8 @@ class MediaStoreLibrary @Inject constructor(
         AudioColumns.ALBUM_ID,
         AudioColumns.ALBUM,
         AudioColumns.ARTIST_ID,
-        AudioColumns.ARTIST
+        AudioColumns.ARTIST,
+        COLUMN_ALBUM_ARTIST
       )
     )
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -174,6 +186,9 @@ class MediaStoreLibrary @Inject constructor(
         Util.TYPE_ARTIST
       ),
       artistId = cursor.getLong(cursor.getColumnIndex(AudioColumns.ARTIST_ID)),
+      albumArtist = cursor.getColumnIndex(COLUMN_ALBUM_ARTIST).let { index ->
+        if (index >= 0) cursor.getString(index).orEmpty() else ""
+      },
       duration = cursor.getLong(cursor.getColumnIndex(AudioColumns.DURATION)),
       data = cursor.getString(cursor.getColumnIndex(AudioColumns.DATA)),
       size = cursor.getLong(cursor.getColumnIndex(AudioColumns.SIZE)),
@@ -189,5 +204,10 @@ class MediaStoreLibrary @Inject constructor(
       dateModified = cursor.getLong(cursor.getColumnIndex(AudioColumns.DATE_MODIFIED)) * 1000L,
       addedAt = cursor.getLong(cursor.getColumnIndex(AudioColumns.DATE_ADDED)) * 1000L
     )
+  }
+
+  private companion object {
+    // The column is also exposed by many providers predating Android 11's public constant.
+    const val COLUMN_ALBUM_ARTIST = "album_artist"
   }
 }

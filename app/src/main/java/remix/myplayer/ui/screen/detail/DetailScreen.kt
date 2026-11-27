@@ -51,7 +51,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -72,12 +71,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import kotlinx.coroutines.flow.first
 import remix.myplayer.R
-import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Album
 import remix.myplayer.data.model.audio.Artist
 import remix.myplayer.data.model.audio.Folder
 import remix.myplayer.data.model.audio.Genre
+import remix.myplayer.data.model.audio.PlayList
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.data.prefs.playbackSourceKey
@@ -87,11 +86,11 @@ import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.activity.base.BaseMusicActivity
+import remix.myplayer.ui.dialog.NormalDialog
+import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.DetailScreenRoute
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.openPlayingScreen
-import remix.myplayer.ui.dialog.NormalDialog
-import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.highLightText
 import remix.myplayer.ui.widget.app.BottomBar
@@ -127,7 +126,11 @@ fun DetailScreen(
     model
   }
   val detailState by vm.state.collectAsStateWithLifecycle()
-  val coverPainters = rememberAlbumCoverPainters(detailState.coverSongs, detailModel, DetailCoverSize)
+  val coverPainters = if (detailModel is Album) {
+    emptyList()
+  } else {
+    rememberAlbumCoverPainters(detailState.coverSongs, detailModel, DetailCoverSize)
+  }
   val mainVM = mainViewModel
   val selection by mainVM.multiSelectState.collectAsStateWithLifecycle()
   val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
@@ -135,7 +138,6 @@ fun DetailScreen(
   val selectedIds = remember(selection) { selection.selectedModels(MultiSelectState.Where.Detail) }
   val nav = LocalNavController.current
   val context = LocalContext.current
-  val scope = rememberCoroutineScope()
   val listState = rememberLazyListState()
   val headerCollapse by remember(listState) {
     derivedStateOf {
@@ -409,16 +411,17 @@ private fun DetailHeader(
     val stacked = maxWidth < 300.dp || LocalDensity.current.fontScale > 1.3f
     val cover: @Composable () -> Unit = {
       val coverModifier = Modifier.size(DetailCoverSize).clip(RoundedCornerShape(4.dp))
-      AlbumCoverCollage(
-        covers = coverPainters,
-        modifier = coverModifier,
-      )
+      if (model is Album) {
+        CoverImage(model = model, circle = false, modifier = coverModifier)  // 专辑级请求
+      } else {
+        AlbumCoverCollage(covers = coverPainters, modifier = coverModifier)  // 原样
+      }
     }
     val info: @Composable () -> Unit = {
       Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(model.detailTitle(), style = MaterialTheme.typography.headlineSmall, color = theme.textPrimary)
-        if (model is Album) {
-          Text(model.artist, style = MaterialTheme.typography.bodyMedium, color = theme.textSecondary)
+        if (model is Album && state.albumArtistText.isNotEmpty()) {
+          Text(state.albumArtistText, style = MaterialTheme.typography.bodyMedium, color = theme.textSecondary)
         }
         if (state.loading && state.songs.isEmpty()) {
           Text(stringResource(R.string.loading), color = theme.textSecondary)

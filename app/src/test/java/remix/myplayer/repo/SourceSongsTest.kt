@@ -93,6 +93,26 @@ class SourceSongsTest {
   @After fun close() { db.close() }
 
   @Test
+  fun localSongsReadAlbumArtistFromMediaStoreOnOlderAndroidVersions() = runBlocking {
+    media.albumArtists = mapOf(1L to "群星")
+
+    val loaded = songs.getSongs().associateBy { it.mediaStoreId }
+
+    assertEquals("群星", loaded.getValue(1L).albumArtist)
+    assertEquals("", loaded.getValue(2L).albumArtist)
+  }
+
+  @Test
+  fun providersWithoutAlbumArtistStillLoadTheLibrary() = runBlocking {
+    media.supportsAlbumArtist = false
+
+    val loaded = songs.getSongs()
+
+    assertEquals(setOf(SongIdentity.local(1), SongIdentity.local(2)), loaded.map { it.songIdentity }.toSet())
+    assertTrue(loaded.all { it.albumArtist.isEmpty() })
+  }
+
+  @Test
   fun mixedPlaylistAndQueueRestoreInOrderAndRemoteFavoritesUseTheSameIdentity() = runBlocking {
     val favorite = lists.insertPlayList("Favorites")
     assertEquals(1L, favorite)
@@ -475,6 +495,8 @@ class SourceSongsTest {
     var returnNull = false
     var returnNullIds = false
     var paths = emptyMap<Long, String>()
+    var albumArtists = emptyMap<Long, String>()
+    var supportsAlbumArtist = true
     var genreMembers = listOf(1L, 2L, 999L)
     var calls = 0
     override fun onCreate() = true
@@ -489,6 +511,9 @@ class SourceSongsTest {
         }
       }
       val columns = requireNotNull(projection)
+      if (!supportsAlbumArtist && "album_artist" in columns) {
+        throw IllegalArgumentException("Invalid column album_artist")
+      }
       if (returnNullIds && columns.size == 1 && columns[0] == "_id") return null
       val minSize = Regex("""_size > (\d+)""").find(selection.orEmpty())?.groupValues?.get(1)?.toLong()
       val requested = if (selection?.contains("_id IN (") == true || selection?.contains("_id=?") == true)
@@ -500,6 +525,7 @@ class SourceSongsTest {
           "title_key" -> id.toString()
           "_data" -> paths[id] ?: "/music/song$id.flac"
           "album", "artist" -> "Album / Artist"
+          "album_artist" -> albumArtists[id].orEmpty()
           "duration" -> 1000L
           "date_modified", "date_added", "track" -> id
           "_size" -> 2_000_000L

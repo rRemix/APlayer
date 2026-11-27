@@ -24,6 +24,7 @@ data class DetailState(
   val songs: List<Song> = emptyList(),
   val albums: List<Album> = emptyList(),
   val coverSongs: List<Song> = emptyList(),
+  val albumArtistText: String = "",
   val duration: Long = 0,
   val loading: Boolean = true,
   val failed: Boolean = false,
@@ -70,9 +71,18 @@ internal fun detailState(model: APlayerModel, songs: List<Song>) = DetailState(
   songs = songs,
   albums = if (model is Artist) artistAlbums(songs) else emptyList(),
   coverSongs = detailCoverSongs(songs),
+  albumArtistText = if (model is Album) albumArtistText(songs) else "",
   duration = songs.sumOf { it.duration.coerceAtLeast(0L) },
   loading = false,
 )
+
+/** Album artists take priority; track artist credits stay intact, including collaborations. */
+internal fun albumArtistText(songs: List<Song>): String {
+  val albumArtists = songs.map { it.albumArtist.trim() }.filter { it.isNotEmpty() }
+  val artists = albumArtists.ifEmpty { songs.map { it.artist.trim() }.filter { it.isNotEmpty() } }
+  // A fixed order keeps the header unchanged when the song sort order changes.
+  return artists.distinct().sorted().joinToString(", ")
+}
 
 /** Keep every song as a fallback, with an order independent of the song list's sort setting. */
 internal fun detailCoverSongs(songs: List<Song>): List<Song> = songs.sortedWith(
